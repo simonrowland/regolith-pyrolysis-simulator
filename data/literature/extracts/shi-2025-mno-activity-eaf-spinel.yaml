@@ -1,0 +1,4892 @@
+schema_version: literature_extract.v1
+review_status: draft
+source_id: shi-2025-mno-activity-eaf-spinel
+source:
+  citation: Shi, C., Liu, Y., Urata, K., Yasui, S., Abe, T. & Kobayashi, Y. (2025). Thermodynamic Investigation of
+    MnAl2O4 Spinel Precipitation Behavior in Manganese-Containing Slag Systems. ISIJ International 65(13), 2269–2274.
+  doi: 10.2355/isijinternational.ISIJINT-2025-334
+  year: 2025
+extraction:
+  method: MinerU table drafts and born-digital pdftotext-layout transcription; full table cell values checked against
+    rendered PDF pages 2–6, with flagged columns and row/column assignments recorded in the cell audit.
+  date: '2026-11-03'
+  worker: w1103cw3-sh25
+  review_status: draft
+  note: Figure 2 values are not digitized. The prose maximum precipitation ratio is retained as a typed refusal because
+    no exact precipitation-ratio quantity token exists.
+fidelity_samples:
+- path: species.Al2O3.observations[shi2025_table3_row_1_al2o3_activity].values.points[0].value
+  value: '0.3691'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2271
+    table: '3'
+    row: '1'
+- path: species.O.observations[shi2025_table4_row_1_matrix_o].values.component_amount
+  value: '51.93'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 2272
+    table: '4'
+    row: '1'
+    column: O
+- path: species.MnO.observations[shi2025_table6_row_1_mno_activity].values.points[0].value
+  value: '0.04137'
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2274
+    table: '6'
+    row: '1'
+- path: species.Mn.observations[shi2025_table6_row_4_x_mn_measurement].values.component_amount
+  value: '0.0007829'
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2274
+    table: '6'
+    row: '4'
+    column: XMn
+experiments:
+- experiment_id: shi2025_slag_1
+  series: CaO–SiO2–MgO–FeO–MnO–Al2O3 slag; varying initial Al2O3 content
+  method: quench_equilibration
+  method_as_printed: Equilibrated with Ag–Mn alloy at 1673 K for 28 h in an iron crucible; water-quenched immediately.
+  sample: '1'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    row: '1'
+    section: 2.3. Experimental Procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.01325e-8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+    gas_mix_as_printed: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+- experiment_id: shi2025_slag_2
+  series: CaO–SiO2–MgO–FeO–MnO–Al2O3 slag; varying initial Al2O3 content
+  method: quench_equilibration
+  method_as_printed: Equilibrated with Ag–Mn alloy at 1673 K for 28 h in an iron crucible; water-quenched immediately.
+  sample: '2'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    row: '2'
+    section: 2.3. Experimental Procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.01325e-8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+    gas_mix_as_printed: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+- experiment_id: shi2025_slag_3
+  series: CaO–SiO2–MgO–FeO–MnO–Al2O3 slag; varying initial Al2O3 content
+  method: quench_equilibration
+  method_as_printed: Equilibrated with Ag–Mn alloy at 1673 K for 28 h in an iron crucible; water-quenched immediately.
+  sample: '3'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    row: '3'
+    section: 2.3. Experimental Procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.01325e-8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+    gas_mix_as_printed: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+- experiment_id: shi2025_slag_4
+  series: CaO–SiO2–MgO–FeO–MnO–Al2O3 slag; varying initial Al2O3 content
+  method: quench_equilibration
+  method_as_printed: Equilibrated with Ag–Mn alloy at 1673 K for 28 h in an iron crucible; water-quenched immediately.
+  sample: '4'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2270
+    row: '4'
+    section: 2.3. Experimental Procedure
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    oxygen_partial_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.01325e-8'
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        section: 2.3. Experimental Procedure
+        note: Printed oxygen partial pressure 10^-13 atm; converted to Pa.
+    gas_mix_as_printed: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+species:
+  MnO:
+    observations:
+    - observation_id: shi2025_table6_row_1_mno_activity
+      experiment: shi2025_slag_1
+      type: activity_coefficient
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '1'
+        column: aMnO
+        note: Table 6 MnO activity from chemical-equilibrium reduction.
+        table_row_number: 2
+        table_column_number: 4
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions: &id010
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: &id002
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id001
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id001
+      derived_from:
+      - shi2025_table6_row_1_x_mn_measurement
+      derivation:
+        relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13),
+          using the measured XMn and the Ag–Mn gamma relation in Eq. (14).
+        inputs:
+        - shi2025_table6_row_1_x_mn_measurement
+        equation_as_printed: aMnO = exp(-ΔG°(11)/(RT)) × γMn × XMn × pO2^(1/2); log γMn in Ag(l) = -2132/T + 1.088.
+        standard_state_as_printed: MnO(s) in reaction Mn(l) + 1/2 O2(g) = MnO(s), Eq. (11).
+      standard_state: pure solid MnO(s), as written in Eq. (11)
+      values:
+        quantity: activity
+        formula: MnO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method_as_printed: Chemical equilibrium with Ag–Mn alloy; XMn determined by ICP-OES; activity reduced by Eqs.
+          (13) and (14).
+        oxygen_partial_pressure:
+          value: 1e-13
+          units: atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed oxygen partial pressure 10^-13 atm.
+        points:
+        - sample: '1'
+          row_as_printed: '1'
+          species_as_printed: MnO
+          alumina_content_mol_percent: '13.64'
+          value_as_published: '0.04137'
+          value: '0.04137'
+          activity: '0.04137'
+          T_K: '1673'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag plus Ag–Mn alloy; both retrieved and water-quenched immediately
+    - observation_id: shi2025_table6_row_2_mno_activity
+      experiment: shi2025_slag_2
+      type: activity_coefficient
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '2'
+        column: aMnO
+        note: Table 6 MnO activity from chemical-equilibrium reduction.
+        table_row_number: 3
+        table_column_number: 4
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions: &id011
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id003
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id003
+      derived_from:
+      - shi2025_table6_row_2_x_mn_measurement
+      derivation:
+        relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13),
+          using the measured XMn and the Ag–Mn gamma relation in Eq. (14).
+        inputs:
+        - shi2025_table6_row_2_x_mn_measurement
+        equation_as_printed: aMnO = exp(-ΔG°(11)/(RT)) × γMn × XMn × pO2^(1/2); log γMn in Ag(l) = -2132/T + 1.088.
+        standard_state_as_printed: MnO(s) in reaction Mn(l) + 1/2 O2(g) = MnO(s), Eq. (11).
+      standard_state: pure solid MnO(s), as written in Eq. (11)
+      values:
+        quantity: activity
+        formula: MnO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method_as_printed: Chemical equilibrium with Ag–Mn alloy; XMn determined by ICP-OES; activity reduced by Eqs.
+          (13) and (14).
+        oxygen_partial_pressure:
+          value: 1e-13
+          units: atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed oxygen partial pressure 10^-13 atm.
+        points:
+        - sample: '2'
+          row_as_printed: '2'
+          species_as_printed: MnO
+          alumina_content_mol_percent: '23.64'
+          value_as_published: '0.03164'
+          value: '0.03164'
+          activity: '0.03164'
+          T_K: '1673'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag plus Ag–Mn alloy; both retrieved and water-quenched immediately
+    - observation_id: shi2025_table6_row_3_mno_activity
+      experiment: shi2025_slag_3
+      type: activity_coefficient
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '3'
+        column: aMnO
+        note: Table 6 MnO activity from chemical-equilibrium reduction.
+        table_row_number: 4
+        table_column_number: 4
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions: &id012
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id004
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id004
+      derived_from:
+      - shi2025_table6_row_3_x_mn_measurement
+      derivation:
+        relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13),
+          using the measured XMn and the Ag–Mn gamma relation in Eq. (14).
+        inputs:
+        - shi2025_table6_row_3_x_mn_measurement
+        equation_as_printed: aMnO = exp(-ΔG°(11)/(RT)) × γMn × XMn × pO2^(1/2); log γMn in Ag(l) = -2132/T + 1.088.
+        standard_state_as_printed: MnO(s) in reaction Mn(l) + 1/2 O2(g) = MnO(s), Eq. (11).
+      standard_state: pure solid MnO(s), as written in Eq. (11)
+      values:
+        quantity: activity
+        formula: MnO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method_as_printed: Chemical equilibrium with Ag–Mn alloy; XMn determined by ICP-OES; activity reduced by Eqs.
+          (13) and (14).
+        oxygen_partial_pressure:
+          value: 1e-13
+          units: atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed oxygen partial pressure 10^-13 atm.
+        points:
+        - sample: '3'
+          row_as_printed: '3'
+          species_as_printed: MnO
+          alumina_content_mol_percent: '28.64'
+          value_as_published: '0.02845'
+          value: '0.02845'
+          activity: '0.02845'
+          T_K: '1673'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag plus Ag–Mn alloy; both retrieved and water-quenched immediately
+    - observation_id: shi2025_table6_row_4_mno_activity
+      experiment: shi2025_slag_4
+      type: activity_coefficient
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '4'
+        column: aMnO
+        note: Table 6 MnO activity from chemical-equilibrium reduction.
+        table_row_number: 5
+        table_column_number: 4
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions: &id013
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id005
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id005
+      derived_from:
+      - shi2025_table6_row_4_x_mn_measurement
+      derivation:
+        relation: MnO activity calculated from the printed oxidation reaction and equilibrium relation, Eq. (13),
+          using the measured XMn and the Ag–Mn gamma relation in Eq. (14).
+        inputs:
+        - shi2025_table6_row_4_x_mn_measurement
+        equation_as_printed: aMnO = exp(-ΔG°(11)/(RT)) × γMn × XMn × pO2^(1/2); log γMn in Ag(l) = -2132/T + 1.088.
+        standard_state_as_printed: MnO(s) in reaction Mn(l) + 1/2 O2(g) = MnO(s), Eq. (11).
+      standard_state: pure solid MnO(s), as written in Eq. (11)
+      values:
+        quantity: activity
+        formula: MnO
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        admission_status: admitted
+        method_as_printed: Chemical equilibrium with Ag–Mn alloy; XMn determined by ICP-OES; activity reduced by Eqs.
+          (13) and (14).
+        oxygen_partial_pressure:
+          value: 1e-13
+          units: atm
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed oxygen partial pressure 10^-13 atm.
+        points:
+        - sample: '4'
+          row_as_printed: '4'
+          species_as_printed: MnO
+          alumina_content_mol_percent: '33.64'
+          value_as_published: '0.02117'
+          value: '0.02117'
+          activity: '0.02117'
+          T_K: '1673'
+          composition_role: initial_charge_only
+          sample_material_as_published: equilibrated slag plus Ag–Mn alloy; both retrieved and water-quenched immediately
+    context:
+    - observation_id: shi2025_table1_initial_slag_row_1_context
+      type: measured_table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        table: '1'
+        row: '1'
+      units: mol% as printed
+      values:
+        quantity: printed_initial_slag_composition
+        typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        - composition_series
+        schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation;
+          equilibrium_phase_composition would misstate the state. The values are retained as located initial-charge
+          conditions on the applicable rows.
+        row_as_printed: '1'
+        components_as_printed:
+          CaO: '18.97'
+          SiO2: '23.06'
+          Al2O3: '13.64'
+          MgO: '7.420'
+          FeO: '28.24'
+          MnO: '8.670'
+    - observation_id: shi2025_table1_initial_slag_row_2_context
+      type: measured_table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        table: '1'
+        row: '2'
+      units: mol% as printed
+      values:
+        quantity: printed_initial_slag_composition
+        typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        - composition_series
+        schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation;
+          equilibrium_phase_composition would misstate the state. The values are retained as located initial-charge
+          conditions on the applicable rows.
+        row_as_printed: '2'
+        components_as_printed:
+          CaO: '14.46'
+          SiO2: '17.58'
+          Al2O3: '23.64'
+          MgO: '7.420'
+          FeO: '28.24'
+          MnO: '8.670'
+    - observation_id: shi2025_table1_initial_slag_row_3_context
+      type: measured_table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        table: '1'
+        row: '3'
+      units: mol% as printed
+      values:
+        quantity: printed_initial_slag_composition
+        typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        - composition_series
+        schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation;
+          equilibrium_phase_composition would misstate the state. The values are retained as located initial-charge
+          conditions on the applicable rows.
+        row_as_printed: '3'
+        components_as_printed:
+          CaO: '12.21'
+          SiO2: '14.84'
+          Al2O3: '28.64'
+          MgO: '7.420'
+          FeO: '28.24'
+          MnO: '8.670'
+    - observation_id: shi2025_table1_initial_slag_row_4_context
+      type: measured_table_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 2270
+        table: '1'
+        row: '4'
+      units: mol% as printed
+      values:
+        quantity: printed_initial_slag_composition
+        typed_quantity_as_printed: initial slag recipe, not an equilibrium phase composition
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        - residue_component_composition
+        - composition_series
+        schema_gap_or_disposition: Table 1 is an initial charge recipe. The closed tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          and simulator/battery/migrate.py::QUANTITY_ALIASES have no exact initial-charge-composition observation;
+          equilibrium_phase_composition would misstate the state. The values are retained as located initial-charge
+          conditions on the applicable rows.
+        row_as_printed: '4'
+        components_as_printed:
+          CaO: '9.940'
+          SiO2: '12.09'
+          Al2O3: '33.64'
+          MgO: '7.420'
+          FeO: '28.24'
+          MnO: '8.670'
+    - observation_id: shi2025_table2_slow_cooling_gas_ratio_schedule_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '2'
+      units: PCO/PCO2 ratio as printed
+      values:
+        quantity: printed_gas_ratio_schedule
+        typed_quantity_as_printed: CO/CO2 partial-pressure-ratio schedule for oxygen-potential control
+        caption_as_printed: Partial pressure ratios of CO2 to CO required to maintain 10^-13 atm oxygen partial pressure
+        column_header_as_printed: PCO/PCO2
+        schema_gap_or_disposition: Retained as the printed gas-control schedule, not as an observation of a thermodynamic
+          output. The caption prose says CO2 to CO, while the printed column header and values state PCO/PCO2; both
+          are preserved without reversing the listed ratios.
+        oxygen_partial_pressure_as_printed: 10^-13 atm
+        temperature_interval_unit: K
+        rows_as_printed:
+        - - 1673–1633
+          - '121.0'
+        - - 1633–1593
+          - '77.74'
+        - - 1593–1553
+          - '49.51'
+        - - 1553–1513
+          - '31.34'
+        - - 1513–1473
+          - '19.62'
+        - - 1473–1433
+          - '11.90'
+        - - 1433–1393
+          - '6.940'
+        - - 1393–1353
+          - '3.863'
+        - - 1353–1313
+          - '2.062'
+        - - 1313–1273
+          - '0.4219'
+    - observation_id: shi2025_table3_fact_sage_model_inputs_context
+      type: measured_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        section: 3.1. Thermodynamic Equilibrium Calculation
+      units: mol% and dimensionless as printed
+      values:
+        quantity: printed_model_input_conditions
+        method_class: model_derived
+        software_as_printed: FactSage 8.3 (FToxid 8.3 and FactPS 8.3 databases)
+        temperature_K_as_printed: '1673'
+        oxygen_partial_pressure_as_printed: 10^-13 atm
+        fixed_components_mol_percent:
+          MgO: '7.420'
+          FeO: '28.24'
+          MnO: '8.670'
+        basicity_as_printed: 0.82 (CaO/SiO2 molar ratio)
+        alumina_content_rows_as_printed:
+        - - '1'
+          - '13.64'
+        - - '2'
+          - '23.64'
+        - - '3'
+          - '28.64'
+        - - '4'
+          - '33.64'
+        - - '5'
+          - '36.56'
+        activity_values_are_outputs_of: FactSage 8.3 calculation; Table 3, PDF page 3
+        note: For output rows 1–4, the corresponding full printed initial composition is also linked from Table 1.
+          For row 5, the source prints Al2O3 content, the fixed oxide fractions, and the CaO/SiO2 ratio, but not individual
+          CaO and SiO2 values; none are inferred.
+    - observation_id: shi2025_table4_row_1_spinel_schema_gap_context
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        note: Table 4 phase row printed as Spinel.
+      units: mol% as printed
+      phase_as_printed: Spinel
+      quench_statement:
+        text: The equilibrated samples were retrieved and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      values:
+        quantity: measured_solid_spinel_elemental_composition_as_printed
+        admission_status: typed_refusal
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+          has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map
+          the spinel to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid
+          phase role.
+        columns_as_printed:
+        - O
+        - Ca
+        - Si
+        - Al
+        - Mg
+        - Fe
+        - Mn
+        row_as_printed:
+        - '1'
+        - Spinel
+        - '49.25'
+        - '-'
+        - '-'
+        - '34.23'
+        - '10.28'
+        - '2.131'
+        - '4.110'
+    - observation_id: shi2025_table4_row_2_spinel_schema_gap_context
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        note: Table 4 phase row printed as Spinel.
+      units: mol% as printed
+      phase_as_printed: Spinel
+      quench_statement:
+        text: The equilibrated samples were retrieved and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      values:
+        quantity: measured_solid_spinel_elemental_composition_as_printed
+        admission_status: typed_refusal
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+          has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map
+          the spinel to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid
+          phase role.
+        columns_as_printed:
+        - O
+        - Ca
+        - Si
+        - Al
+        - Mg
+        - Fe
+        - Mn
+        row_as_printed:
+        - '2'
+        - Spinel
+        - '48.42'
+        - '-'
+        - '-'
+        - '34.30'
+        - '6.473'
+        - '5.420'
+        - '5.390'
+    - observation_id: shi2025_table4_row_3_spinel_schema_gap_context
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        note: Table 4 phase row printed as Spinel.
+      units: mol% as printed
+      phase_as_printed: Spinel
+      quench_statement:
+        text: The equilibrated samples were retrieved and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      values:
+        quantity: measured_solid_spinel_elemental_composition_as_printed
+        admission_status: typed_refusal
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+          has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map
+          the spinel to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid
+          phase role.
+        columns_as_printed:
+        - O
+        - Ca
+        - Si
+        - Al
+        - Mg
+        - Fe
+        - Mn
+        row_as_printed:
+        - '3'
+        - Spinel
+        - '50.55'
+        - '-'
+        - '-'
+        - '33.45'
+        - '5.360'
+        - '5.935'
+        - '4.700'
+    - observation_id: shi2025_table4_row_4_spinel_schema_gap_context
+      type: measured_table_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        note: Table 4 phase row printed as Spinel.
+      units: mol% as printed
+      phase_as_printed: Spinel
+      quench_statement:
+        text: The equilibrated samples were retrieved and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      values:
+        quantity: measured_solid_spinel_elemental_composition_as_printed
+        admission_status: typed_refusal
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 4 is measured solid spinel elemental EDS composition, but simulator/battery/enums.py::PhaseRole
+          has no solid role and simulator/battery/migrate.py::_phase_role_token rejects all other labels. Do not map
+          the spinel to glass or slag. PHASE_MAP and Phase.cr only identify a crystal phase, not the required solid
+          phase role.
+        columns_as_printed:
+        - O
+        - Ca
+        - Si
+        - Al
+        - Mg
+        - Fe
+        - Mn
+        row_as_printed:
+        - '4'
+        - Spinel
+        - '48.89'
+        - '-'
+        - '-'
+        - '34.60'
+        - '4.670'
+        - '6.410'
+        - '5.430'
+    - observation_id: shi2025_table5_spinel_cooling_comparison_schema_gap_context
+      type: measured_table_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 2273
+        table: '5'
+      units: mol% as printed
+      phase_as_printed: Spinel
+      quench_statement:
+        text: The paper states that spinel compositions from water-quenching and slow cooling were nearly identical.
+        preservation: asserted_preserved
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 2273
+          section: 3.3. Effect of Cooling Rate on MnAl2O4 Precipitation
+      values:
+        quantity: measured_solid_spinel_elemental_composition_as_printed
+        admission_status: typed_refusal
+        candidate_tokens_checked:
+        - equilibrium_phase_composition
+        schema_gap_or_disposition: Table 5 compares measured solid spinel compositions after quenching and slow cooling.
+          simulator/battery/enums.py::PhaseRole has no solid role and simulator/battery/migrate.py::_phase_role_token
+          has no exact solid/spinel role; values are retained verbatim, not treated as glass or liquid slag compositions.
+        columns_as_printed:
+        - Cooling method
+        - O
+        - Al
+        - Mg
+        - Fe
+        - Mn
+        rows_as_printed:
+        - - quenching
+          - '48.89'
+          - '34.60'
+          - '4.670'
+          - '6.410'
+          - '5.430'
+        - - slow cooling
+          - '48.24'
+          - '35.18'
+          - '4.506'
+          - '6.572'
+          - '5.502'
+  Mn:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_mn
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Mn
+        note: Table 4 row 1, Matrix, Mn elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 9
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id006
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id006
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '4.989'
+        component_amount_as_published: 4.989 mol%
+        component_as_published: Mn
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_mn
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Mn
+        note: Table 4 row 2, Matrix, Mn elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 9
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id007
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id007
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '3.996'
+        component_amount_as_published: 3.996 mol%
+        component_as_published: Mn
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_mn
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Mn
+        note: Table 4 row 3, Matrix, Mn elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 9
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id008
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id008
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '2.610'
+        component_amount_as_published: 2.610 mol%
+        component_as_published: Mn
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_mn
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Mn
+        note: Table 4 row 4, Matrix, Mn elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 9
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id009
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id009
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '1.970'
+        component_amount_as_published: 1.970 mol%
+        component_as_published: Mn
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table6_row_1_x_mn_measurement
+      experiment: shi2025_slag_1
+      type: equilibrium_phase_composition
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '1'
+        column: XMn
+        note: Table 6, XMn in the Ag–Mn alloy.
+        table_row_number: 2
+        table_column_number: 3
+        phase: liquid
+      phase: cr
+      units: mole_fraction
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
+          concentration in the Ag–Mn alloy was measured after nitric-acid dissolution.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: This is the ICP-OES measured Mn fraction in the quenched Ag–Mn alloy, reported as the equilibrium XMn
+        input for the 1673 K activity reduction.
+      point_conditions: *id010
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        basis: mole_fraction
+        component_amount: '0.001530'
+        component_amount_as_published: '0.001530'
+        phase_label: metal
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES after nitric-acid dissolution of the Ag–Mn alloy.
+        composition_role: initial_charge_only
+        T_K: '1673'
+    - observation_id: shi2025_table6_row_2_x_mn_measurement
+      experiment: shi2025_slag_2
+      type: equilibrium_phase_composition
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '2'
+        column: XMn
+        note: Table 6, XMn in the Ag–Mn alloy.
+        table_row_number: 3
+        table_column_number: 3
+        phase: liquid
+      phase: cr
+      units: mole_fraction
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
+          concentration in the Ag–Mn alloy was measured after nitric-acid dissolution.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: This is the ICP-OES measured Mn fraction in the quenched Ag–Mn alloy, reported as the equilibrium XMn
+        input for the 1673 K activity reduction.
+      point_conditions: *id011
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        basis: mole_fraction
+        component_amount: '0.001170'
+        component_amount_as_published: '0.001170'
+        phase_label: metal
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES after nitric-acid dissolution of the Ag–Mn alloy.
+        composition_role: initial_charge_only
+        T_K: '1673'
+    - observation_id: shi2025_table6_row_3_x_mn_measurement
+      experiment: shi2025_slag_3
+      type: equilibrium_phase_composition
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '3'
+        column: XMn
+        note: Table 6, XMn in the Ag–Mn alloy.
+        table_row_number: 4
+        table_column_number: 3
+        phase: liquid
+      phase: cr
+      units: mole_fraction
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
+          concentration in the Ag–Mn alloy was measured after nitric-acid dissolution.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: This is the ICP-OES measured Mn fraction in the quenched Ag–Mn alloy, reported as the equilibrium XMn
+        input for the 1673 K activity reduction.
+      point_conditions: *id012
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        basis: mole_fraction
+        component_amount: '0.001052'
+        component_amount_as_published: '0.001052'
+        phase_label: metal
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES after nitric-acid dissolution of the Ag–Mn alloy.
+        composition_role: initial_charge_only
+        T_K: '1673'
+    - observation_id: shi2025_table6_row_4_x_mn_measurement
+      experiment: shi2025_slag_4
+      type: equilibrium_phase_composition
+      regime: quench_equilibration
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2274
+        table: '6'
+        row: '4'
+        column: XMn
+        note: Table 6, XMn in the Ag–Mn alloy.
+        table_row_number: 5
+        table_column_number: 3
+        phase: liquid
+      phase: cr
+      units: mole_fraction
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
+          concentration in the Ag–Mn alloy was measured after nitric-acid dissolution.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: This is the ICP-OES measured Mn fraction in the quenched Ag–Mn alloy, reported as the equilibrium XMn
+        input for the 1673 K activity reduction.
+      point_conditions: *id013
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mn
+        basis: mole_fraction
+        component_amount: '0.0007829'
+        component_amount_as_published: '0.0007829'
+        phase_label: metal
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: ICP-OES after nitric-acid dissolution of the Ag–Mn alloy.
+        composition_role: initial_charge_only
+        T_K: '1673'
+    - observation_id: shi2025_prose_mn_spinel_precipitation_ratio_80_32
+      type: concentration_series
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        section: 3.3. Effect of Al2O3 Content on the Precipitation of Spinel
+        note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
+        equation: 7–9
+      phase: cr
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id002
+        composition:
+          state:
+            tag: unknown
+            reason: The reported composition is the initial charge; the post-equilibrium bulk composition is not printed.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Initial slag recipe in Table 1; only a starting-charge composition.
+      values:
+        quantity: manganese_spinel_precipitation_ratio_as_printed
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: typed_refusal
+        attribution: Authors' calculated MnAl2O4 precipitation ratio from EDS elemental balances, as printed in the
+          Results and Discussion.
+        schema_gap: The paper's precipitation ratio is the percentage of total bulk Mn incorporated into spinel, computed
+          from elemental balances in Eqs. (7)–(9). It is not an exact equilibrium phase composition or phase-to-phase
+          distribution ratio. simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO represents a concentration ratio
+          between phases, simulator/battery/enums.py::Quantity.YIELD_FRACTION is a yield, and tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          has no precipitation-ratio type. Keep this measured-reduced result typed-refused with a descriptive non-token
+          quantity.
+        schema_gap_symbols:
+        - simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO
+        - simulator/battery/enums.py::Quantity.YIELD_FRACTION
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        value_as_published: '80.32'
+        precipitation_ratio_as_printed: '80.32'
+        units_as_published: '%'
+        definition_as_printed: Fraction of Mn incorporated into the spinel phase relative to the total Mn content
+          in the bulk slag.
+        equations_as_printed: Eqs. (7)–(9), elemental balance calculation using EDS phase compositions and initial-charge
+          bulk Mn and Si.
+        points:
+        - sample: '4'
+          row_as_printed: prose maximum
+          alumina_content_as_printed: 33.64 mol%
+          value_as_published: '80.32'
+          value: '80.32'
+          T_K: '1673'
+  Al2O3:
+    observations:
+    - observation_id: shi2025_table3_row_1_al2o3_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '3'
+        row: '1'
+        note: Calculated Al2O3 activity, Table 3.
+        table_row_number: 2
+        table_column_number: 3
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: &id014
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      values:
+        quantity: activity
+        formula: Al2O3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
+        method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
+        activity_standard_state_as_printed: not stated
+        points:
+        - sample: '1'
+          row_as_printed: '1'
+          species_as_printed: Al2O3
+          alumina_content_mol_percent: '13.64'
+          value_as_published: '0.3691'
+          value: '0.3691'
+          activity: '0.3691'
+          T_K: '1673'
+    - observation_id: shi2025_table3_row_2_al2o3_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '3'
+        row: '2'
+        note: Calculated Al2O3 activity, Table 3.
+        table_row_number: 3
+        table_column_number: 3
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      values:
+        quantity: activity
+        formula: Al2O3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
+        method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
+        activity_standard_state_as_printed: not stated
+        points:
+        - sample: '2'
+          row_as_printed: '2'
+          species_as_printed: Al2O3
+          alumina_content_mol_percent: '23.64'
+          value_as_published: '0.7203'
+          value: '0.7203'
+          activity: '0.7203'
+          T_K: '1673'
+    - observation_id: shi2025_table3_row_3_al2o3_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '3'
+        row: '3'
+        note: Calculated Al2O3 activity, Table 3.
+        table_row_number: 4
+        table_column_number: 3
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      values:
+        quantity: activity
+        formula: Al2O3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
+        method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
+        activity_standard_state_as_printed: not stated
+        points:
+        - sample: '3'
+          row_as_printed: '3'
+          species_as_printed: Al2O3
+          alumina_content_mol_percent: '28.64'
+          value_as_published: '0.8020'
+          value: '0.8020'
+          activity: '0.8020'
+          T_K: '1673'
+    - observation_id: shi2025_table3_row_4_al2o3_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '3'
+        row: '4'
+        note: Calculated Al2O3 activity, Table 3.
+        table_row_number: 5
+        table_column_number: 3
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      values:
+        quantity: activity
+        formula: Al2O3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
+        method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
+        activity_standard_state_as_printed: not stated
+        points:
+        - sample: '4'
+          row_as_printed: '4'
+          species_as_printed: Al2O3
+          alumina_content_mol_percent: '33.64'
+          value_as_published: '0.9374'
+          value: '0.9374'
+          activity: '0.9374'
+          T_K: '1673'
+    - observation_id: shi2025_table3_row_5_al2o3_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2271
+        table: '3'
+        row: '5'
+        note: Calculated Al2O3 activity, Table 3.
+        table_row_number: 6
+        table_column_number: 3
+        phase: liquid
+      phase: l
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure; gas flow is not total pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: unknown
+            reason: For the 36.56 mol% Al2O3 calculation the paper states only the CaO/SiO2 ratio 0.82, not separate
+              CaO and SiO2 amounts.
+          locator: *id014
+      values:
+        quantity: activity
+        formula: Al2O3
+        method_class: quoted_attributed
+        evidence_class: quoted_attributed
+        admission_status: admitted
+        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
+        method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
+        activity_standard_state_as_printed: not stated
+        points:
+        - sample: '5'
+          row_as_printed: '5'
+          species_as_printed: Al2O3
+          alumina_content_mol_percent: '36.56'
+          value_as_published: '1.000'
+          value: '1.000'
+          activity: '1.000'
+          T_K: '1673'
+  O:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_o
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: O
+        note: Table 4 row 1, Matrix, O elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 3
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id015
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id015
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '51.93'
+        component_amount_as_published: 51.93 mol%
+        component_as_published: O
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_o
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: O
+        note: Table 4 row 2, Matrix, O elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 3
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id016
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id016
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '51.58'
+        component_amount_as_published: 51.58 mol%
+        component_as_published: O
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_o
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: O
+        note: Table 4 row 3, Matrix, O elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 3
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id017
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id017
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '53.66'
+        component_amount_as_published: 53.66 mol%
+        component_as_published: O
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_o
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: O
+        note: Table 4 row 4, Matrix, O elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 3
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id018
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id018
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: O
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '53.08'
+        component_amount_as_published: 53.08 mol%
+        component_as_published: O
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+  Ca:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_ca
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Ca
+        note: Table 4 row 1, Matrix, Ca elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 4
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id019
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id019
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '12.00'
+        component_amount_as_published: 12.00 mol%
+        component_as_published: Ca
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_ca
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Ca
+        note: Table 4 row 2, Matrix, Ca elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 4
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id020
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id020
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '12.06'
+        component_amount_as_published: 12.06 mol%
+        component_as_published: Ca
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_ca
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Ca
+        note: Table 4 row 3, Matrix, Ca elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 4
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id021
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id021
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '11.83'
+        component_amount_as_published: 11.83 mol%
+        component_as_published: Ca
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_ca
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Ca
+        note: Table 4 row 4, Matrix, Ca elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 4
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id022
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id022
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Ca
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '11.68'
+        component_amount_as_published: 11.68 mol%
+        component_as_published: Ca
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+  Si:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_si
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Si
+        note: Table 4 row 1, Matrix, Si elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 5
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id023
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id023
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Si
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '14.84'
+        component_amount_as_published: 14.84 mol%
+        component_as_published: Si
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_si
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Si
+        note: Table 4 row 2, Matrix, Si elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 5
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id024
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id024
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Si
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '14.44'
+        component_amount_as_published: 14.44 mol%
+        component_as_published: Si
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_si
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Si
+        note: Table 4 row 3, Matrix, Si elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 5
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id025
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id025
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Si
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '14.36'
+        component_amount_as_published: 14.36 mol%
+        component_as_published: Si
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_si
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Si
+        note: Table 4 row 4, Matrix, Si elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 5
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id026
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id026
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Si
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '13.96'
+        component_amount_as_published: 13.96 mol%
+        component_as_published: Si
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+  Al:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_al
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Al
+        note: Table 4 row 1, Matrix, Al elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 6
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id027
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id027
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '12.02'
+        component_amount_as_published: 12.02 mol%
+        component_as_published: Al
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_al
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Al
+        note: Table 4 row 2, Matrix, Al elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 6
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id028
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id028
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '14.29'
+        component_amount_as_published: 14.29 mol%
+        component_as_published: Al
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_al
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Al
+        note: Table 4 row 3, Matrix, Al elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 6
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id029
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id029
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '14.48'
+        component_amount_as_published: 14.48 mol%
+        component_as_published: Al
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_al
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Al
+        note: Table 4 row 4, Matrix, Al elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 6
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id030
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id030
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Al
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '18.06'
+        component_amount_as_published: 18.06 mol%
+        component_as_published: Al
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+  Mg:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_mg
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Mg
+        note: Table 4 row 1, Matrix, Mg elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 7
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id031
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id031
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mg
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '2.544'
+        component_amount_as_published: 2.544 mol%
+        component_as_published: Mg
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_mg
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Mg
+        note: Table 4 row 2, Matrix, Mg elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 7
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id032
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id032
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mg
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '0.8600'
+        component_amount_as_published: 0.8600 mol%
+        component_as_published: Mg
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_mg
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Mg
+        note: Table 4 row 3, Matrix, Mg elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 7
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id033
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id033
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mg
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '0.3770'
+        component_amount_as_published: 0.3770 mol%
+        component_as_published: Mg
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_mg
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Mg
+        note: Table 4 row 4, Matrix, Mg elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 7
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id034
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id034
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Mg
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '0.07800'
+        component_amount_as_published: 0.07800 mol%
+        component_as_published: Mg
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+  Fe:
+    observations:
+    - observation_id: shi2025_table4_row_1_matrix_fe
+      experiment: shi2025_slag_1
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_1
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '1'
+        column: Fe
+        note: Table 4 row 1, Matrix, Fe elemental mol% by SEM-EDS.
+        table_row_number: 3
+        table_column_number: 8
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id035
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '1'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '18.97'
+              - - SiO2
+                - '23.06'
+              - - Al2O3
+                - '13.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id035
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '1.686'
+        component_amount_as_published: 1.686 mol%
+        component_as_published: Fe
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_2_matrix_fe
+      experiment: shi2025_slag_2
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_2
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '2'
+        column: Fe
+        note: Table 4 row 2, Matrix, Fe elemental mol% by SEM-EDS.
+        table_row_number: 5
+        table_column_number: 8
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id036
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '2'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '14.46'
+              - - SiO2
+                - '17.58'
+              - - Al2O3
+                - '23.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id036
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '2.846'
+        component_amount_as_published: 2.846 mol%
+        component_as_published: Fe
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_3_matrix_fe
+      experiment: shi2025_slag_3
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_3
+      phase_assemblage_as_printed: Spinel + glassy matrix
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '3'
+        column: Fe
+        note: Table 4 row 3, Matrix, Fe elemental mol% by SEM-EDS.
+        table_row_number: 7
+        table_column_number: 8
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id037
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '3'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '12.21'
+              - - SiO2
+                - '14.84'
+              - - Al2O3
+                - '28.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id037
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '2.681'
+        component_amount_as_published: 2.681 mol%
+        component_as_published: Fe
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
+    - observation_id: shi2025_table4_row_4_matrix_fe
+      experiment: shi2025_slag_4
+      type: composition_series
+      regime: quench_equilibration
+      assemblage_id: shi2025_slag_4
+      phase_assemblage_as_printed: Spinel + glassy matrix + Al2O3 phase
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2272
+        table: '4'
+        row: '4'
+        column: Fe
+        note: Table 4 row 4, Matrix, Fe elemental mol% by SEM-EDS.
+        table_row_number: 9
+        table_column_number: 8
+      phase: glass
+      units: '%'
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1673'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: All chemical-equilibrium experiments were conducted at 1673 K.
+        fO2_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1.01325e-8'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: The paper prints oxygen partial pressure 10^-13 atm; converted to Pa for the fO2 identity axis.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The paper does not print a total pressure for the experiments; gas flow is not total pressure.
+          locator: *id002
+        gas_mix:
+          state:
+            tag: value
+            value: CO–CO2 reactive mixture; PCO/PCO2 approximately 151:1 at 1673 K; Ar carrier
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            section: 2.3. Experimental Procedure
+            note: Printed gas mixture and ratio for the 1673 K equilibrium experiments.
+        composition:
+          state:
+            tag: unknown
+            reason: The paper prints only the initial-charge composition, not the post-equilibrium slag composition.
+          locator: &id038
+            page: 2
+            pdf_page_index: 1
+            published_page: 2270
+            table: '1'
+            row: '4'
+            note: Table 1 composition is the initial charge only; the post-equilibrium bulk composition is not printed.
+        printed_composition:
+          state:
+            tag: value
+            value:
+              basis: published_initial_slag_mole_percent
+              amount_basis: mole_percent
+              components:
+              - - CaO
+                - '9.940'
+              - - SiO2
+                - '12.09'
+              - - Al2O3
+                - '33.64'
+              - - MgO
+                - '7.420'
+              - - FeO
+                - '28.24'
+              - - MnO
+                - '8.670'
+          locator: *id038
+      quench_statement:
+        text: After equilibration, samples were retrieved from the furnace and water-quenched immediately.
+        preservation: not_stated
+        locator:
+          page: 2
+          pdf_page_index: 1
+          published_page: 2270
+          section: 2.3. Experimental Procedure
+      note: Table 4 calls this phase Matrix; the discussion identifies it as the glassy matrix. The EDS values are
+        elemental mol%, measured after quenching. The source does not state that matrix composition was preserved
+        by quenching.
+      values:
+        quantity: equilibrium_phase_composition
+        formula: Fe
+        phase_label: glass
+        basis: mole_fraction
+        T_K: '1673'
+        component_amount: '1.170'
+        component_amount_as_published: 1.170 mol%
+        component_as_published: Fe
+        method_class: measured_direct
+        evidence_class: measured_direct
+        admission_status: admitted
+        method_as_printed: SEM-EDS analysis of individual phases after immediate water quenching.
+        composition_role: initial_charge_only
