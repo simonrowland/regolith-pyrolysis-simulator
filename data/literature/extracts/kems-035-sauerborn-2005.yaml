@@ -3672,13 +3672,31 @@ species:
       phase: JSC-1_model
       regime: model_calculation
       units: degC
+      derivation:
+        relation: >-
+          The paper labels the full-melt value at 1261 °C theoretical but does not locate its calculation method or raw inputs; no parent observation is named.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 107
+            pdf_page_index: 106
+            figure: '5.56'
+        method:
+          state:
+            tag: unknown
+            reason: method_unknown; calculation method not located by the source
+          locator:
+            page: 107
+            pdf_page_index: 106
+            figure: '5.56'
+        references: []
       values:
         quantity: MELTS_liquidus_model_output
-        evidence_class: model
+        evidence_class: model_derived
         method_class: model_derived
         semantics: bound_not_point_ordering
         liquidus_C: 1261
-        note: Printed theoretical full-melt value differs from the earlier MELTS sentence; no averaging or reconciliation.
+        note: Printed theoretical full-melt value differs from the earlier MELTS sentence; no averaging or reconciliation. Calculation method and inputs are not located; no parent is assigned.
       source_quotes:
       - locator:
           page: 107
