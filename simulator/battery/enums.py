@@ -199,6 +199,11 @@ class RefusalReason(StrEnum):
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
+    # Measured oxygen lies outside the Fe2+–Fe3+ oxide span. The observation
+    # stays stored; this is the engine-input refusal, not a clip.
+    OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE = (
+        "oxygen_excess_outside_oxide_component_space"
+    )
 
 
 class CellMaterial(StrEnum):
@@ -286,6 +291,11 @@ class NoticeKind(StrEnum):
     FIGURE_ONLY = "figure_only"
     APPROXIMATE_VALUE = "approximate_value"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
+    # Fe3+/sum Fe from measured oxygen, assigning every excess O atom to Fe.
+    # The reason lists any other redox-variable element that was printed.
+    REDOX_FROM_MEASURED_OXYGEN_FE_ONLY_ASSUMPTION = (
+        "redox_from_measured_oxygen_fe_only_assumption"
+    )
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
@@ -703,11 +713,15 @@ PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIE
 # with a free-text basis and are not in this set. ppm_mass is the printed
 # mass-ppm scale; it is not a weight percent and is not stored converted.
 # element_ppm_by_mass is the residue ppm subtype, a different quantity.
+# element_wt_percent stores printed elemental wt% with measured O. The
+# cation relabel (all Fe as FeO) is a separate step and does not rebuild O.
+ELEMENT_WT_PERCENT_BASIS = "element_wt_percent"
 PHASE_BASIS_TOKENS = frozenset({
     "wt_percent",
     "mole_fraction",
     "element_ppm_by_mass",
     "ppm_mass",
+    ELEMENT_WT_PERCENT_BASIS,
 })
 
 # Hero-chart funnel 1a. Exact printed subtypes from the funnelrule top

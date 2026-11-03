@@ -9,7 +9,12 @@ from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
+from simulator.battery.composition import (
+    excluded_component_notice_reason,
+    partition_engine_components,
+)
 from simulator.battery.migrate import (
+    _COMPOSITION_COMPONENTS,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
@@ -912,6 +917,44 @@ def normalized_composition(
                     # molar masses (0.094196 and 0.060084 kg/mol).
             elif raw.amount_basis in (AmountBasis.MOL_INVENTORY, AmountBasis.MOLE_FRACTION):
                 amounts = raw.as_map()
+                # A printed mole fraction (Mg2SiO4, SiO2) is already the
+                # charge. Only an oxide-wt derivation can now carry a formula
+                # the converter accepts and the oxide table does not list
+                # (H2O, Cl, Ag2O, I2O, Re). Those stay on the stored map and
+                # are named here when this MELTS-centric charge cannot use them.
+                relation = (
+                    located.inference.relation
+                    if located.inference is not None
+                    else ""
+                )
+                oxide_derived = (
+                    relation
+                    == "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction"
+                    or relation.endswith("wt_pct_to_mole_fraction")
+                )
+                if oxide_derived:
+                    _kept, _excluded = partition_engine_components(
+                        amounts,
+                        engine_components=tuple(
+                            name
+                            for name, spec in _COMPOSITION_COMPONENTS.items()
+                            if spec[2]
+                        ),
+                        retain_components=tuple(_COMPOSITION_COMPONENTS),
+                    )
+                    if _excluded:
+                        amounts = {name: amount for name, amount in _kept}
+                        _unit = (
+                            "mole_fraction"
+                            if raw.amount_basis is AmountBasis.MOLE_FRACTION
+                            else "mol"
+                        )
+                        _note = excluded_component_notice_reason(
+                            _excluded, unit=_unit
+                        )
+                        basis_notice = (
+                            f"{basis_notice}; {_note}" if basis_notice else _note
+                        )
             else:
                 raise ValueError("unsupported composition basis")
             if not amounts or any(not n.is_finite() or n < 0 for n in amounts.values()):
