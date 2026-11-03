@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import MethodToken, Quantity
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +39,14 @@ def _assert_every_table1a_cell(document):
     for row, expected in zip(rows, EXPECTED_TABLE1A):
         panel, printed_row, activity, sio2, al2o3, feo, cao, k2o, sm, marker = expected
         raw = row["values"]["oxide_wt_pct_as_printed"]
+        method_details = row["derivation"]["method_detail_as_printed"]
+        assert method_details == document["experiments"][0]["method_detail_as_printed"]
+        assert method_details["fO2_control"]["status"].startswith("controlled by the gas mixture")
+        assert "Fugacities of the gaseous species" in method_details["fO2_control"]["fugacity_calculation_as_printed"]
+        assert "99.94%" in method_details["metal_phase"]["phase_as_printed"]
+        assert "activity_as_printed" in method_details["metal_phase"]
+        assert "almost pure" in method_details["metal_phase"]["activity_as_printed"]
+        assert "Fe $_{0.947}$ O" in method_details["FeO_standard_state"]["standard_state_as_printed"]
         assert row["values"]["activity_as_printed"] == activity
         assert row["values"]["T_K"] == "1600"
         assert row["values"]["temperature_as_printed"] == "1600±2 K"
@@ -125,6 +133,13 @@ def test_doyle_1988_marker_pin_rejects_removed_spinel_asterisk():
         _assert_every_table1a_cell(mutated)
 
 
+def test_doyle_1988_method_detail_pin_rejects_deleted_metal_activity():
+    mutated = deepcopy(yaml.safe_load(EXTRACT.read_text(encoding="utf-8")))
+    del mutated["experiments"][0]["method_detail_as_printed"]["metal_phase"]["activity_as_printed"]
+    with pytest.raises(AssertionError):
+        _assert_every_table1a_cell(mutated)
+
+
 def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_every_table1a_cell(document)
@@ -143,6 +158,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
         row = migrated[raw["observation_id"]]
         assert row.value.point == Decimal(raw["values"]["activity"])
         if raw["observation_id"].startswith("doyle_1988_activity_p004"):
+            assert result.experiments[row.experiment_id].method.value is MethodToken.QUENCH_EQUILIBRATION
             assert row.uncertainty.kind.value == "printed"
             assert row.uncertainty.verbatim["value"] == SIGMA_BY_ACTIVITY[raw["values"]["activity"]]
             assert row.uncertainty.verbatim["verbatim"] == f"± {SIGMA_BY_ACTIVITY[raw['values']['activity']]}; confidence level not stated"
