@@ -61,6 +61,19 @@ def _assert_beerkens_render_pins(doc: dict) -> None:
     pb = rows["beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate"]
     assert pb["values"]["points"][0]["value"] == 3.0
     assert pb["values"]["points"][0]["T_K"] == 1000
+    pb_onset = rows["beerkens_1986_section4_5_6_pbo_measured_dew_point"]
+    assert pb_onset["values"]["points"][0]["T_K"] == 1090
+    assert pb_onset["values"]["points"][0]["locator"] == {
+        "page": 168,
+        "published_page": 159,
+        "section": "4.5.6",
+        "note": "experimental PbO deposition onset; render p168 confirms page 159",
+    }
+    k2so4 = rows["beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate"]
+    k2so4_point = k2so4["values"]["points"][0]
+    assert k2so4_point["T_K"] == 1100
+    assert k2so4_point["temperature_as_printed"] == "1100 K"
+    assert "approximate" not in k2so4_point
     nacl = rows["beerkens_1986_literature_jackson_duffin_34_nacl_dew_point"]
     assert nacl["values"]["points"][0]["locator"] == {
         "page": 70,
@@ -109,7 +122,7 @@ def test_beerkens_1986_render_pins_and_isolated_migration(tmp_path: Path) -> Non
         "beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment": 4,
         "beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl": 4,
         "beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate": 1,
-        "beerkens_1986_section4_5_5_na2so4_measured_comparator_rate": 1,
+        "beerkens_1986_section4_5_5_na2so4_model_comparator_rate": 1,
         "beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate": 1,
     }
     actual_unknown_prefix_counts: dict[str, int] = {}
@@ -127,6 +140,16 @@ def test_beerkens_1986_render_pins_and_isolated_migration(tmp_path: Path) -> Non
             actual_unknown_prefix_counts.get(base_id, 0) + 1
         )
     assert actual_unknown_prefix_counts == expected_unknown_prefix_counts
+
+    model_comparator = next(
+        row
+        for row in rows
+        if "beerkens_1986_section4_5_5_na2so4_model_comparator_rate"
+        in row.observation_id
+    )
+    from simulator.battery.enums import EvidenceClass
+
+    assert model_comparator.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
 
     for row in rows:
         assert row.identity.species is not None

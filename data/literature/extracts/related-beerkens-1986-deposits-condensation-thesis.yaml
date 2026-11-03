@@ -92,10 +92,10 @@ fidelity_samples:
 - path: species.PbO.observations[beerkens_1986_section4_5_6_pbo_measured_dew_point].values.points[0].T_K
   value: 1090
   locator:
-    page: 169
-    published_page: 160
+    page: 168
+    published_page: 159
     section: 4.5.6
-    note: render p169; MinerU and pdftotext agree
+    note: render p168; MinerU and pdftotext agree
 - path: species.PbO.observations[beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate].values.points[0].value
   value: 3.0
   locator:
@@ -2687,21 +2687,21 @@ species:
             tag: unknown
             reason: No experimental total pressure is printed.
           locator: *id045
-    - observation_id: beerkens_1986_section4_5_5_na2so4_measured_comparator_rate
+    - observation_id: beerkens_1986_section4_5_5_na2so4_model_comparator_rate
       type: rate_series
       locator: &id046
         page: 167
         published_page: 158
         section: 4.5.5
-        note: explicit sodium-sulphate comparison in the potassium-sulphate discussion
+        note: PDF p167 comparison; PDF p160 states "The theoretically calculated maximum deposition rate at 1200 K is 2.3 mg/m²·s, for the experimental case this value is approximately 20% lower."
       phase: cr
       units: mg/m2·s as printed
       values:
         quantity: surface_deposition_areal_mass_rate
         rail: wall_deposition
-        method_class: measured_direct
+        method_class: author_estimate
         schema_gap: No exact quantity token represents wall deposition mass per area per time. This row is the explicit
-          prose comparison; it is not Table 4.5's CFBL output. See simulator/battery/enums.py::Quantity and simulator/battery/migrate.py::QUANTITY_ALIASES.
+          prose comparison; PDF p160 identifies this as the author's theoretically calculated result. It is author_estimate because the calculation inputs are not stored and no derivation lineage can be claimed. The experimental value is not printed and is not inferred. It is not Table 4.5's CFBL output. See simulator/battery/enums.py::Quantity and simulator/battery/migrate.py::QUANTITY_ALIASES.
         points:
         - value: 2.3
           locator: *id046
@@ -2753,7 +2753,7 @@ species:
         page: 167
         published_page: 158
         section: 4.5.5
-        note: experimental maximum potassium-sulphate rate at approximately 1100 K
+        note: experimental maximum potassium-sulphate rate at 1100 K
       phase: cr
       units: mg/m2·s as printed
       values:
@@ -2765,8 +2765,7 @@ species:
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         points:
         - T_K: 1100
-          temperature_as_printed: approximately 1100 K
-          approximate: true
+          temperature_as_printed: 1100 K
           value: 2.9
           locator: *id047
           point_conditions:
@@ -2895,10 +2894,10 @@ species:
     - observation_id: beerkens_1986_section4_5_6_pbo_measured_dew_point
       type: transition_point
       locator: &id049
-        page: 169
-        published_page: 160
+        page: 168
+        published_page: 159
         section: 4.5.6
-        note: experimental PbO deposition onset
+        note: experimental PbO deposition onset; render p168 confirms page 159
       phase: gas
       units: K
       values:
