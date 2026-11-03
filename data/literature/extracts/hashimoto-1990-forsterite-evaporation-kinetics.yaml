@@ -122,11 +122,7 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported coefficient, calculated from the measured J_v
-            and the theoretical J_e; the numeric Figure 1 rate series and
-            calculation inputs are not stored in this extract.
+          method_class: measured_direct
           alpha_range: ['0.12', '0.22']
           alpha_range_as_printed: '0.12–0.22'
           T_range_C_as_printed: ['1600', '1900']
@@ -135,9 +131,7 @@ species:
           oxygen_fugacity_note: >-
             The source says oxygen fugacity is not experimentally controllable
             for this non-equilibrium evaporation process.
-          note: >-
-            Evidence is quoted_attributed under d-110 because the measured
-            figure series and theoretical J_e numeric inputs are not stored.
+          note: Hashimoto's directly reported solid-MgO experimental alpha range.
     context:
       - observation_id: hashimoto_1990_mgo_fig1_fluxes
         type: figure_record
@@ -177,11 +171,7 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported coefficient, calculated from the measured J_v
-            and the theoretical J_e; the numeric Figure 1 rate series and
-            calculation inputs are not stored in this extract.
+          method_class: measured_direct
           alpha_range: ['0.011', '0.015']
           alpha_range_as_printed: '0.011–0.015'
           T_range_C_as_printed: ['1560', '1685']
@@ -190,9 +180,7 @@ species:
           oxygen_fugacity_note: >-
             The source says oxygen fugacity is not experimentally controllable
             for this non-equilibrium evaporation process.
-          note: >-
-            Evidence is quoted_attributed under d-110 because the measured
-            figure series and theoretical J_e numeric inputs are not stored.
+          note: Hashimoto's directly reported solid-SiO2 experimental alpha range.
       - observation_id: hashimoto_1990_sio2_liquid_alpha
         type: alpha
         phase: l
@@ -208,11 +196,7 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported coefficient, calculated from the measured J_v
-            and the theoretical J_e; the numeric Figure 1 rate series and
-            calculation inputs are not stored in this extract.
+          method_class: measured_direct
           alpha_range: ['0.038', '0.048']
           alpha_range_as_printed: '0.038–0.048'
           T_range_C_as_printed: ['1900', '2100']
@@ -221,9 +205,7 @@ species:
           oxygen_fugacity_note: >-
             The source says oxygen fugacity is not experimentally controllable
             for this non-equilibrium evaporation process.
-          note: >-
-            Evidence is quoted_attributed under d-110 because the measured
-            figure series and theoretical J_e numeric inputs are not stored.
+          note: Hashimoto's directly reported liquid-SiO2 experimental alpha range.
       - observation_id: hashimoto_1990_sio2_previous_effusion_alpha
         type: alpha
         phase: cr
@@ -239,8 +221,9 @@ species:
         values:
           quantity: evaporation_coefficient_alpha
           method_class: quoted_attributed
-          attribution: Firsov and Nesmeyanov (1960) and Nagai et al. (1973), references 11 and 12 as cited by Hashimoto.
+          attribution: Firsova, L. P. & Nesmeyanov (1960), and Nagai et al. (1973), references 11 and 12 as cited by Hashimoto.
           alpha: '0.01'
+          approximate: true
           alpha_as_printed: 'approximately 0.01'
           coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
           note: The cited values have a large uncertainty; temperature is not stated.
@@ -268,11 +251,20 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient, calculated
-            from measured J_v and theoretical J_e for pure SiO2(g); numeric
-            curve inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha_range: ['0.7', '0.9']
           alpha_range_as_printed: '0.7–0.9'
           T_range_C_as_printed: ['1560', '1685']
@@ -305,17 +297,26 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
+          method_class: measured_reduced
           status: typed_refusal
           admission_status: typed_refusal
           reason: >-
             Source caveat on page 55: “impossible, according to the definition
             of alpha_v”; Hashimoto says the over-unity value may reflect
             underestimation of the experimental surface area.
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient, calculated
-            from measured J_v and theoretical J_e for pure SiO2(g); numeric
-            curve inputs are not stored in this extract.
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha: '1.2'
           alpha_as_printed: '1.2'
           T_range_C_as_printed: ['1900', '2100']
@@ -356,6 +357,7 @@ species:
           points:
             - sample: most_highly_evaporated_residues
               SiO2_wt_pct: '65'
+              approximate: true
               locator:
                 page: 3
                 pdf_page_index: 2
@@ -401,20 +403,14 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported coefficient, calculated from measured J_v and
-            theoretical J_e for the equilibrium vapour proportions; numerical
-            Figure 1 series and calculation inputs are not stored here.
+          method_class: measured_direct
           alpha_range: ['0.09', '0.16']
           alpha_range_as_printed: '0.09–0.16'
           T_range_C_as_printed: ['1600', '1890']
           coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
           components_as_printed: MgO and SiO2 components; equal by stoichiometric evaporation
           composition_as_printed: Mg2SiO4 (forsterite)
-          note: >-
-            The solid-forsterite coefficient is retained in its own family;
-            no MgO or SiO2 pure-oxide rows are substituted for it.
+          note: Hashimoto's directly reported solid-forsterite experimental alpha range, retained in its own family.
       - observation_id: hashimoto_1990_forsterite_liquid_alpha
         type: alpha
         phase: l
@@ -430,18 +426,14 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported coefficient, calculated from measured J_v and
-            theoretical J_e for the equilibrium vapour proportions; numerical
-            Figure 1 series and calculation inputs are not stored here.
+          method_class: measured_direct
           alpha_range: ['0.20', '0.21']
           alpha_range_as_printed: '0.20–0.21'
           T_range_C_as_printed: ['1890', '2050']
           coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
           components_as_printed: MgO and SiO2 components; equal by almost-stoichiometric evaporation
           composition_as_printed: Mg2SiO4 (forsterite)
-          note: The liquid-forsterite coefficient is retained in its own family.
+          note: Hashimoto's directly reported liquid-forsterite experimental alpha range, retained in its own family.
       - observation_id: hashimoto_1990_forsterite_solid_sio2_mg_o_alpha
         type: alpha
         phase: cr
@@ -457,10 +449,20 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient; measured J_v
-            and theoretical J_e numeric inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha_range: ['0.4', '0.6']
           alpha_range_as_printed: '0.4–0.6'
           T_range_C_as_printed: ['1600', '1890']
@@ -482,10 +484,20 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient; measured J_v
-            and theoretical J_e numeric inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha_range: ['0.3', '0.5']
           alpha_range_as_printed: '0.3–0.5'
           T_range_C_as_printed: ['1600', '1890']
@@ -507,10 +519,20 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient; measured J_v
-            and theoretical J_e numeric inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha: '0.8'
           alpha_as_printed: '0.8'
           T_range_C_as_printed: ['1890', '2050']
@@ -532,10 +554,20 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's reported alternate-species coefficient; measured J_v
-            and theoretical J_e numeric inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series are plotted without numeric inputs for this alternate-species calculation.
           alpha: '0.6'
           alpha_as_printed: '0.6'
           T_range_C_as_printed: ['1890', '2050']
@@ -557,11 +589,22 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's extrapolation from the Figure 1 forsterite results;
-            numeric fitted series inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
           alpha: '0.12'
+          approximate: true
           alpha_as_printed: approximately 0.12
           approximation_as_printed: '~'
           coefficient_definition_as_printed: 'alpha_v = J_v/J_e'
@@ -581,11 +624,22 @@ species:
         units: dimensionless
         values:
           quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: >-
-            Hashimoto's extrapolation from the Figure 1 forsterite results;
-            numeric fitted series inputs are not stored in this extract.
+          method_class: measured_reduced
+          derivation:
+            relation: 'alpha_v = J_v/J_e'
+            output_unit: dimensionless
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 2
+                pdf_page_index: 1
+                published_page: 54
+                figure: '1'
+                note: Figure 1 rate series and fitted values used for the extrapolation are not printed numerically.
           alpha: '0.04'
+          approximate: true
           alpha_as_printed: approximately 0.04
           approximation_as_printed: '~'
           coefficient_definition_as_printed: 'alpha_v = J_v/J_e'

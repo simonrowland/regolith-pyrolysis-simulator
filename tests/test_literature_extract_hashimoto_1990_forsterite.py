@@ -36,6 +36,29 @@ _ALPHA_PINS = {
     "hashimoto_1990_forsterite_alpha_1400c_extrapolated": ("alpha", "0.04", 3),
 }
 
+_METHOD_CLASS_PINS = {
+    "hashimoto_1990_mgo_solid_alpha": "measured_direct",
+    "hashimoto_1990_sio2_solid_alpha": "measured_direct",
+    "hashimoto_1990_sio2_liquid_alpha": "measured_direct",
+    "hashimoto_1990_sio2_previous_effusion_alpha": "quoted_attributed",
+    "hashimoto_1990_sio2_solid_alternate_gas_alpha": "measured_reduced",
+    "hashimoto_1990_sio2_liquid_alternate_gas_alpha": "measured_reduced",
+    "hashimoto_1990_forsterite_solid_alpha": "measured_direct",
+    "hashimoto_1990_forsterite_liquid_alpha": "measured_direct",
+    "hashimoto_1990_forsterite_solid_sio2_mg_o_alpha": "measured_reduced",
+    "hashimoto_1990_forsterite_solid_sio2_mg_o2_alpha": "measured_reduced",
+    "hashimoto_1990_forsterite_liquid_sio2_mg_o_alpha": "measured_reduced",
+    "hashimoto_1990_forsterite_liquid_sio2_mg_o2_alpha": "measured_reduced",
+    "hashimoto_1990_forsterite_alpha_1700c_extrapolated": "measured_reduced",
+    "hashimoto_1990_forsterite_alpha_1400c_extrapolated": "measured_reduced",
+}
+
+_APPROXIMATE_ALPHA_PINS = {
+    "hashimoto_1990_sio2_previous_effusion_alpha",
+    "hashimoto_1990_forsterite_alpha_1700c_extrapolated",
+    "hashimoto_1990_forsterite_alpha_1400c_extrapolated",
+}
+
 _FIGURE_SERIES = {
     "hashimoto_1990_mgo_fig1_fluxes": [
         "J_v,s: free evaporation rate from solid MgO",
@@ -84,6 +107,10 @@ def _assert_render_pins(document: dict) -> None:
         assert observation["locator"]["page"] == page, observation_id
         assert values["quantity"] == "evaporation_coefficient_alpha"
         assert values["coefficient_definition_as_printed"] == "alpha_v = J_v/J_e"
+        assert values["method_class"] == _METHOD_CLASS_PINS[observation_id]
+        assert (values.get("approximate") is True) == (
+            observation_id in _APPROXIMATE_ALPHA_PINS
+        )
 
     alpha_12 = observations[OUT_OF_DOMAIN_ID][1]
     assert alpha_12["values"]["status"] == "typed_refusal"
@@ -103,10 +130,16 @@ def _assert_render_pins(document: dict) -> None:
 
     residue = observations["hashimoto_1990_forsterite_residue_glass_sio2"][1]
     assert residue["values"]["points"][0]["SiO2_wt_pct"] == "65"
+    assert residue["values"]["points"][0]["approximate"] is True
     assert residue["units"] == "wt%"
     assert residue["locator"]["page"] == 3
     assert "Approximately 65 wt%" in residue["values"]["note"]
     assert residue["point_conditions"]["quench_state"]["state"]["value"] == "not_stated"
+
+    prior_effusion = observations["hashimoto_1990_sio2_previous_effusion_alpha"][1]
+    assert prior_effusion["values"]["attribution"].startswith(
+        "Firsova, L. P. & Nesmeyanov"
+    )
 
     volume_fraction = observations[SCHEMA_GAP_ID][1]
     assert volume_fraction["values"]["value_as_printed"] == "~5 vol%"
@@ -137,6 +170,20 @@ def test_render_checked_coefficients_residue_and_complete_row_count() -> None:
     _observations(mutated)["hashimoto_1990_forsterite_solid_alpha"][1]["values"]["alpha_range"][1] = "0.15"
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+    mutated_class = deepcopy(document)
+    _observations(mutated_class)["hashimoto_1990_mgo_solid_alpha"][1]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_class)
+
+    mutated_approximation = deepcopy(document)
+    _observations(mutated_approximation)["hashimoto_1990_forsterite_residue_glass_sio2"][1][
+        "values"
+    ]["points"][0]["approximate"] = False
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_approximation)
 
 
 def test_residue_glass_sio2_wt_percent_migrates_without_manual_division(tmp_path: Path) -> None:
@@ -181,6 +228,14 @@ def test_isolated_migration_keeps_printed_axes_and_ruled_quantity_refusals(
         SCHEMA_GAP_ID,
         OUT_OF_DOMAIN_ID,
     }
+    for observation_id, expected_class in _METHOD_CLASS_PINS.items():
+        evidence_class = rows[observation_id].evidence.class_
+        assert evidence_class.is_value
+        assert evidence_class.value.value == expected_class
+    for observation_id in _APPROXIMATE_ALPHA_PINS | {
+        "hashimoto_1990_forsterite_residue_glass_sio2"
+    }:
+        assert rows[observation_id].value.approximate
     assert all(row.identity.species.phase.is_value for row in rows.values())
 
     for observation_id, (_, observation) in _observations(document).items():
