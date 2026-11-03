@@ -19849,8 +19849,7 @@ class Migrator:
                 source_composition,
                 closure_context=composition_closure_context,
             )
-            if composition_axis_required
-            and isinstance(source_composition_state, Mapping)
+            if isinstance(source_composition_state, Mapping)
             and source_composition_state.get("tag") == StateTag.UNKNOWN.value
             else None
         )
