@@ -120,7 +120,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
-from engines.engine_commissioning import assess_engine_commissioning
+from engines.engine_commissioning import (
+    VAPOROCK_T_MAX_K,
+    VAPOROCK_T_MIN_K,
+    assess_engine_commissioning,
+    vaporock_temperature_in_domain,
+)
 from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
 from simulator.engine_pool import (
     EngineWorkerDied,
@@ -159,8 +164,6 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # by tests through a fake System. It is not recomputed against the
 # current installed engine. A finite provider return is therefore no
 # evidence of domain validity.
-VAPOROCK_T_MIN_K = 1350.0
-VAPOROCK_T_MAX_K = 1950.0
 _MELT_MODEL_ID = 'MELTS-v1.0'
 # In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
 # is a conservative sum-pressure sanity ceiling well below the 2026-07-31
@@ -367,17 +370,6 @@ _VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 def temperature_C_to_K(temperature_C: float) -> float:
     """Convert the adapter's Celsius melt temperature to Kelvin."""
     return float(temperature_C) + 273.15
-
-
-def vaporock_temperature_in_domain(temperature_K: float) -> bool:
-    """True iff *temperature_K* lies in the admitted VapoRock envelope."""
-    try:
-        t = float(temperature_K)
-    except (TypeError, ValueError):
-        return False
-    if not math.isfinite(t):
-        return False
-    return VAPOROCK_T_MIN_K <= t <= VAPOROCK_T_MAX_K
 
 
 def vaporock_liquid_fraction_admitted(
