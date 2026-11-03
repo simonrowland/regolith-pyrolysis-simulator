@@ -869,16 +869,36 @@ def test_vapor_engine_brackets_inside_vaporock_sum_pressure_domain() -> None:
     assert pressures["O2"] > 0.0
 
 
-def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
+def test_vapor_engine_reports_same_sign_residual_when_no_bracket_exists(
+    monkeypatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _OxygenBalanceRefusal,
         _solve_vapor_engine_cell_oxygen_balance,
     )
     from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
 
+    bracket_attempts: list[tuple[float, float]] = []
+    solve_cell_balance = battery._solve_cell_oxygen_balance
+
+    def record_bracket_attempt(*args, **kwargs):
+        bracket_attempts.append(kwargs["bracket"])
+        try:
+            return solve_cell_balance(*args, **kwargs)
+        except _OxygenBalanceRefusal as exc:
+            assert "oxygen-balance root is not bracketed" in str(exc)
+            raise
+
+    monkeypatch.setattr(
+        battery, "_solve_cell_oxygen_balance", record_bracket_attempt
+    )
+    trials: list[tuple[float, bool]] = []
+
     def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
         pressures_pa = {"K": 1e-6 * po2_bar**-0.25 * 1e5}
         admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
+        trials.append((round(math.log10(po2_bar)), admitted))
         return SimpleNamespace(
             status="ok" if admitted else "refusal",
             refusal_reason=None if admitted else "sum_pressure_sanity",
@@ -895,7 +915,10 @@ def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
         )
 
     detail = str(exc_info.value)
-    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert (
+        exc_info.value.reason_code
+        == "oxygen_balance_no_admitted_bracket:same_sign_residual"
+    )
     assert "no sign-changing bracket was found in the admitted pO2 window" in detail
     assert "reachable from the chosen start" in detail
     assert "start_pO2_bar=1e-06" in detail
@@ -905,6 +928,8 @@ def test_vapor_engine_reports_domain_when_no_admitted_bracket_exists() -> None:
     assert "upper_stop=" in detail and "upper_stop=None" not in detail
     assert "lower_stop=pO2=1e-29 bar; guard=sum_pressure_sanity" in detail
     assert "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar" in detail
+    assert (-6, True) in trials
+    assert bracket_attempts
 
 
 def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
@@ -1004,11 +1029,47 @@ def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> N
         )
 
     detail = str(exc_info.value)
-    assert exc_info.value.reason_code == "oxygen_balance_no_admitted_bracket"
+    assert (
+        exc_info.value.reason_code
+        == "oxygen_balance_no_admitted_bracket:engine_domain_crash"
+    )
     assert sorted(trials) == list(range(-30, 1))
     assert "engine_crash: subprocess_died: 15" in detail
     assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
     assert "out_of_basis: temperature_range: 6" in detail
+
+
+def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    trials: list[float] = []
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        trials.append(round(math.log10(po2_bar)))
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason="gate_refused_in_adapter",
+            engine_reason="silicate_window",
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert (
+        exc_info.value.reason_code
+        == "oxygen_balance_no_admitted_bracket:silicate_window_refusal"
+    )
+    assert sorted(trials) == list(range(-30, 1))
+    assert "gate_refused_in_adapter: silicate_window: 31" in str(exc_info.value)
 
 
 def test_feo_association_channel_uses_catalog_parent_for_oxygen_balance() -> None:
