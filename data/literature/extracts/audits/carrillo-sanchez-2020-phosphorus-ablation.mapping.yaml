@@ -1,0 +1,96 @@
+source_id: carrillo-sanchez-2020-phosphorus-ablation
+source:
+  citation: Carrillo-Sánchez et al. (2020), Injection of meteoric phosphorus into planetary atmospheres.
+  doi: 10.1016/j.pss.2020.104926
+  year: 2020
+extraction:
+  method: MinerU Table 3 draft plus pdftotext concordance; row and column assignment checked on the page 13 render. Parenthetical ablation percentages and the three ± uncertainties were hand-separated after render review because the table tool does not split them.
+  date: '2026-11-03'
+  worker: w1103cw3-cs20
+review_status: draft
+tables:
+- page: 13
+  table_index: 2
+  type: gas_speciation
+  quantity: planetary_phosphorus_mass_influx_rate
+  evidence_class: quoted_attributed
+  unit: t d-1
+  phase: gas
+  rows: all
+  value_pairs:
+  - species_column: 2
+    value_column: 3
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  - species_column: 2
+    value_column: 4
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  - species_column: 2
+    value_column: 5
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  - species_column: 2
+    value_column: 6
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  - species_column: 2
+    value_column: 7
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  - species_column: 2
+    value_column: 8
+    quantity: planetary_phosphorus_mass_influx_rate
+    evidence_class: quoted_attributed
+    unit: t d-1
+  render_verified:
+  - row: 2
+    column: 8
+    text: 28.0 ± 8.1
+  - row: 5
+    column: 6
+    text: 0.017 (41%)
+  - row: 6
+    column: 3
+    text: (25%)
+  - row: 6
+    column: 4
+    text: (57%)
+  - row: 6
+    column: 5
+    text: (96%)
+  - row: 7
+    column: 8
+    text: 2.1 ± 1.2
+  - row: 11
+    column: 3
+    text: (11%)
+  - row: 11
+    column: 4
+    text: (3%)
+  - row: 11
+    column: 5
+    text: (93%)
+  - row: 11
+    column: 6
+    text: (38%)
+  - row: 12
+    column: 8
+    text: 31.0 ± 17.7
+  - row: 15
+    column: 3
+    text: 0.011 (36%)
+  - row: 15
+    column: 5
+    text: 0.011 (98%)
+  - row: 15
+    column: 6
+    text: 0.024 (53%)
+  - row: 16
+    column: 4
+    text: (67%)
