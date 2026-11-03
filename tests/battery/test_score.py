@@ -13948,6 +13948,7 @@ def _quartz_silica_activity_observation():
 def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
     from copy import deepcopy
 
+    from simulator.battery.generators import janaf
     from simulator.reference_data import janaf_fusion
 
     original_loader = janaf_fusion.load_table_document
@@ -13960,8 +13961,8 @@ def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
         corrupted["extraction"]["source_sha256"] = "0" * 64
         return corrupted
 
-    monkeypatch.setattr(janaf, "load_table_document", corrupt_o037_hash)
-    janaf._fusion_table_points.cache_clear()
+    monkeypatch.setattr(janaf_fusion, "load_table_document", corrupt_o037_hash)
+    janaf_fusion._fusion_table_points.cache_clear()
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 
 
@@ -14898,9 +14899,9 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
 ) -> None:
     from copy import deepcopy
 
-    from simulator.battery.generators import janaf
+    from simulator.reference_data import janaf_fusion
 
-    original_loader = janaf.load_table_document
+    original_loader = janaf_fusion.load_table_document
 
     def missing_alumina_row(path):
         document = original_loader(path)
@@ -15295,7 +15296,12 @@ def test_internal_analytical_kume_row_uses_janaf_liquid_reference(
         ),
     )
     assert residual.numeric is not None
-    assert abs(residual.numeric.value - Decimal("1.281")) <= Decimal("0.001")
+    # At 1823 K the JANAF d-144 owner gives ΔG_fus(CaO) = 33.80370 kJ/mol.
+    # Its liquid-reference correction is ΔG/(R T ln 10) =
+    # 0.9685687321575947974588594828 dex; applying it to the former residual
+    # puts that value at 1.2808858678274053974588594828 dex, within the old
+    # 1.281 ± 0.001 pin. The corrected residual is pinned exactly below.
+    assert residual.numeric.value == Decimal("0.3123171356698106")
 
 
 def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:

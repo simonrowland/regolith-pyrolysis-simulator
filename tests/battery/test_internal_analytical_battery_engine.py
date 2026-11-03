@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    Fo2Mode,
     NoticeKind,
     Phase,
     Quantity,
@@ -263,12 +264,24 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
             Decimal("1473.15"),
             frozenset(
                 {
+                    # activity_request_for_engine defaults to SHARED_LADDER,
+                    # and fo2_tier_notice records that mode for borrowed fO2.
                     Notice(
                         kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
                         affected_quantities=(Quantity.ACTIVITY,),
                         reason="fo2_tier=4; route=intrinsic_melt_fO2; borrowed",
                         origin="fo2_ladder",
                         band="borrowed fO2: intrinsic_melt_fO2",
+                        authority=Authority.BRIDGE,
+                        fo2_mode=Fo2Mode.SHARED_LADDER,
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="melt_oxide_activity has no certified evidence tier",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
                         authority=Authority.BRIDGE,
                     ),
                     Notice(
@@ -311,6 +324,15 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
             Decimal("1473.15"),
             frozenset(
                 {
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="melt_oxide_activity has no certified evidence tier",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    ),
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
