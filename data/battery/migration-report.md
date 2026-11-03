@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 89339
-records out (observations): 179392
-works: 751
-experiments: 6867
-queue size: 120270
+rows in: 89572
+records out (observations): 179694
+works: 756
+experiments: 6879
+queue size: 120653
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 749
+index sources: 754
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,20 +197,20 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 748 (mismatch) |
-| doi_works | 56 | 405 (mismatch) |
-| no_doi_works | 91 | 346 (mismatch) |
-| admission_statuses | 374 | 30611 (mismatch) |
+| citations | 147 | 753 (mismatch) |
+| doi_works | 56 | 408 (mismatch) |
+| no_doi_works | 91 | 348 (mismatch) |
+| admission_statuses | 374 | 30757 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1369 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 21982 (mismatch) |
+| formulas | 1625 | 22022 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15602 (mismatch) |
+| absent_admissions | 3511 | 15689 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2841 (mismatch) |
+| range_only_T | 3125 | 2921 (mismatch) |
 | system_like_phases | 1065 | 3811 (mismatch) |
 | missing_phases | 237 | 1357 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -19192,6 +19192,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/hanson-jones-1998-am-cr-partitioning-olivine-liquid.yaml` | 98 | 400 | 18 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 30 |
 | `data/literature/extracts/haskin-1990-lunar-molten-regolith-electrolysis-nasa-report.yaml` | 38 | 38 | 38 |
+| `data/literature/extracts/hayashi-2025-ca-fe-silicate-redox-activities.yaml` | 65 | 65 | 28 |
 | `data/literature/extracts/he-2017-karrooite-ordering-heat-capacity.yaml` | 2 | 2 | 2 |
 | `data/literature/extracts/henao-2001-ni-cr-mn-co-cu-slag-distribution.yaml` | 431 | 431 | 0 |
 | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` | 8 | 8 | 36 |
@@ -19458,6 +19459,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ntrs-19650014783.yaml` | 8 | 52 | 27 |
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 66 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 36 |
+| `data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml` | 39 | 39 | 0 |
 | `data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml` | 18 | 18 | 49 |
 | `data/literature/extracts/ohta-1996-cao-mgo-al2o3-activities.yaml` | 140 | 140 | 17 |
 | `data/literature/extracts/ohta-suito-1995-mno-activity-slags.yaml` | 19 | 19 | 19 |
@@ -19515,6 +19517,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/rego-1985-na2o-sio2-transpiration.yaml` | 93 | 93 | 93 |
 | `data/literature/extracts/rego-1988-silicate-na2o-activities.yaml` | 85 | 85 | 0 |
 | `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 51 |
+| `data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml` | 17 | 66 | 75 |
 | `data/literature/extracts/renggli-2022-te-evaporation.yaml` | 1 | 36 | 1 |
 | `data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml` | 24 | 24 | 24 |
 | `data/literature/extracts/richter-2008-cai-like-liquids-lpsc-abstract.yaml` | 0 | 0 | 1 |
@@ -19676,6 +19679,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
+| `data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml` | 32 | 32 | 80 |
 | `data/literature/extracts/sugawara-2013-soda-lime-melt-na2o-activity.yaml` | 58 | 158 | 228 |
 | `data/literature/extracts/sugawara-2024-na-silicate-molybdate-miscibility.yaml` | 48 | 48 | 0 |
 | `data/literature/extracts/sugawara-akaogi-2003-ni-co-fusion.yaml` | 18 | 18 | 18 |
@@ -19737,6 +19741,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/volovetsky-2010-granitoid-iron-redox.yaml` | 22 | 22 | 0 |
 | `data/literature/extracts/wadhwa-2008-redox-small-bodies.yaml` | 1 | 2 | 4 |
 | `data/literature/extracts/wang-2001-solar-melt-evaporation-residues.yaml` | 38 | 538 | 0 |
+| `data/literature/extracts/wang-2009-cr-slag-kems-original.yaml` | 80 | 100 | 200 |
 | `data/literature/extracts/wang-2017-cao-sio2-vox-tables-s1-s32.yaml` | 516 | 516 | 516 |
 | `data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 5 |
@@ -19849,8 +19854,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 296841
+advisory issues: 297004
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 296841 |
+| `identity_incomplete` | 297004 |
