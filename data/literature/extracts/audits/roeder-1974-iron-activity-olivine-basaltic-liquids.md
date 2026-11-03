@@ -55,14 +55,12 @@ remain explicitly absent.
   supplied.
 - The exact standard-state sentence on PDF p. 9 (printed p. 405) is `The
   standard state for “FeO” is the liquid oxide in equilibrium with metallic
-  iron.` Each activity row now carries the existing Raoultian liquid
-  `Fe(1-x)O` reference state, with component basis `Fe(1-x)O`, and the printed
-  iron-equilibrium condition. The named Doyle extract in this checkout stores
-  its Fe0.947O standard as prose; this extract uses the repository's existing
-  structured `StandardState` payload. The source's footnote on PDF p. 2
-  (printed p. 398) says the iron/oxygen ratio is close to one but deviates
-  from one. It prints no numeric O/Fe or x value at saturation, so no
-  saturation composition is recorded or computed.
+  iron.` This wording remains prose in `standard_state`; it does not identify
+  a closed reference-state convention, so the migrated reference state remains
+  unknown. The source's footnote on PDF p. 2 (printed p. 398) says the
+  iron/oxygen ratio is close to one but deviates from one. It prints no numeric
+  O/Fe or x value at saturation, so no saturation composition is recorded or
+  computed.
 - Equation (1) on PDF p. 1 is `Fe + 1/2 O2 ⇌ FeO (dissolved in liquid)`.
   Equation (2) defines the activity and activity coefficient of a
   hypothetical ferrous species in liquid and the mole fraction of iron
@@ -106,33 +104,41 @@ its constants, and that run's printed conditions; each derivation locates the
 printed equation. Gamma rows derive from that run's activity observation via
 the printed `gamma = a/X` relation. No code or migrator changes were needed.
 
-The isolated real migration has 90 observations, 0 hard issues, 90 numeric
+Before and after the reference-state correction, the isolated real migration
+has 90 admitted observations, 0 refused, 0 pending, 0 hard issues, 90 numeric
 points, and 0 unavailable values. No migrated quantity or phase is unknown.
-All 90 temperatures, fO2 values, typed reference states, and iron-saturation
-conditions reach each observation. Total pressure is unknown for all
-observations because the experiment pressure is not printed. Composition is
-unknown for the 26 Table 1 rows with a blank MnO cell; Table 2 contains
-correlation coefficients, not alternate run compositions to join. The same
-26 run compositions remain unknown on both their activity and gamma rows.
+All 90 temperatures, fO2 values, unknown reference states, and
+iron-saturation conditions reach each observation. Total pressure is unknown
+for all observations because the experiment pressure is not printed.
+Composition is unknown for the 26 Table 1 rows with a blank MnO cell; Table 2
+contains correlation coefficients, not alternate run compositions to join.
+The same 26 run compositions remain unknown on both their activity and gamma
+rows.
 
 Identity axes after isolated migration:
 
 | Migrated observation | Composition (mole fraction) | Total pressure (Pa) | fO2 (Pa) | Temperature (K) | Reference state |
 | --- | --- | --- | --- | --- | --- |
-| Run 1 activity | unknown (MnO cell blank) | unknown | 3.355186088422354263011974178E-8 | 1579.15 | Fe(1-x)O(l), iron-saturated |
-| Run 23 activity | SiO2 0.4409393808421535756384873969; Al2O3 0.07658540930972451407797632525; FeO 0.2148773963931374284090054678; MgO 0.1187616688312790971630567709; CaO 0.1131610931577071212528078463; Na2O 0.009006655167539827897226302601; K2O 0.004291365910699174949932913055; TiO2 0.01912080072684749533319786024; MnO 0.003256229660911765278309117548 | unknown | 3.513311137210276836756623921E-8 | 1530.15 | Fe(1-x)O(l), iron-saturated |
-| Run 45 activity coefficient | SiO2 0.4260776928251815069283717692; Al2O3 0.07163868688048699330316767969; FeO 0.2426043852729424545605017238; MgO 0.08848185734986622236447848445; CaO 0.1293460902884312134414549193; Na2O 0.01469295199343954464321964951; K2O 0.003853528652495700983836950295; TiO2 0.02097073277180754048091865827; MnO 0.002334073965348823294050165649 | unknown | 2.487233808817857008300817804E-8 | 1486.15 | Fe(1-x)O(l), iron-saturated |
+| Run 1 activity | unknown (MnO cell blank) | unknown | 3.355186088422354263011974178E-8 | 1579.15 | unknown |
+| Run 23 activity | SiO2 0.4409393808421535756384873969; Al2O3 0.07658540930972451407797632525; FeO 0.2148773963931374284090054678; MgO 0.1187616688312790971630567709; CaO 0.1131610931577071212528078463; Na2O 0.009006655167539827897226302601; K2O 0.004291365910699174949932913055; TiO2 0.01912080072684749533319786024; MnO 0.003256229660911765278309117548 | unknown | 3.513311137210276836756623921E-8 | 1530.15 | unknown |
+| Run 45 activity coefficient | SiO2 0.4260776928251815069283717692; Al2O3 0.07163868688048699330316767969; FeO 0.2426043852729424545605017238; MgO 0.08848185734986622236447848445; CaO 0.1293460902884312134414549193; Na2O 0.01469295199343954464321964951; K2O 0.003853528652495700983836950295; TiO2 0.02097073277180754048091865827; MnO 0.002334073965348823294050165649 | unknown | 2.487233808817857008300817804E-8 | 1486.15 | unknown |
 
 The focused Roeder test pins every numeric value and condition to the render
-cell audit, checks the typed state and saturation condition on every
-observation, and verifies that mutations to the run 23 gamma or reference
-state fail.
-It passed (1 test). `tests/test_yaml_flow_scalar_commas.py` passed (17 tests).
+cell audit, checks the unknown reference state and saturation condition on
+every observation, and verifies that mutations to the run 23 gamma or printed
+standard state fail.
+The focused Roeder extract test passed locally (1 test); the extract validator
+passed with fidelity matching, and the isolated migration admitted 90 rows
+with 0 refused, 0 hard issues, 90 numeric points, and 0 unavailable values.
+`tests/test_yaml_flow_scalar_commas.py` passed locally (17 tests). The remote
+focused-test request was refused because the shared box policy differed, so
+the required local fallback was used.
 The full `tests/test_literature_extracts.py` module and its targeted
 `test_repo_extracts_validate_green` selection each exceeded the 300-second
 local cap; the focused Roeder test did validate and migrate this extract.
 The required j01 census selection also exceeded the 300-second local cap, so
 both broad checks remain UNVERIFIED-local.
 
-Expected generated store delta, without regeneration: 90 numeric observation
-rows; the generated store was not modified.
+Expected generated store delta, without regeneration: all 90 numeric points
+remain unchanged, while their reference states remain unknown and the
+90 schema-gap notes are present; the generated store was not modified.

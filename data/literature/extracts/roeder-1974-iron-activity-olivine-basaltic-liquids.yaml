@@ -37,25 +37,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 1, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: &roeder_iron_saturated_feo_standard_state
-        state:
-          tag: value
-          value:
-            convention: raoultian_pure_endmember
-            endmember:
-              formula: Fe(1-x)O
-              phase:
-                tag: value
-                value: l
-            component_basis: Fe(1-x)O
-        inferred: true
-        note: The source standard is the liquid oxide in equilibrium with metallic iron; typed as iron-saturated Fe(1-x)O(l) per the task ruling.
-        locator:
-          page: 9
-          published_page: 405
-          pdf_page_index: 8
-          section: Results and discussion
-          note: Printed standard-state sentence.
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -95,6 +77,7 @@ species:
               note: Table 1 row SY-MN 1, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.21'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -189,7 +172,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 1, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -229,6 +212,7 @@ species:
               note: Table 1 row SY-MN 1, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.21'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -310,7 +294,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 2, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -350,6 +334,7 @@ species:
               note: Table 1 row SY-MN 2, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.88'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -435,7 +420,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 2, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -475,6 +460,7 @@ species:
               note: Table 1 row SY-MN 2, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.88'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -556,7 +542,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 3, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -596,6 +582,7 @@ species:
               note: Table 1 row SY-MN 3, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.86'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -681,7 +668,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 3, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -721,6 +708,7 @@ species:
               note: Table 1 row SY-MN 3, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.86'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -802,7 +790,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 4, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -842,6 +830,7 @@ species:
               note: Table 1 row SY-MN 4, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '99.09'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -927,7 +916,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 4, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -967,6 +956,7 @@ species:
               note: Table 1 row SY-MN 4, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '99.09'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -1048,7 +1038,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 5, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -1088,6 +1078,7 @@ species:
               note: Table 1 row SY-MN 5, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.23'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -1173,7 +1164,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 5, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -1213,6 +1204,7 @@ species:
               note: Table 1 row SY-MN 5, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.23'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -1294,7 +1286,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 6, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -1334,6 +1326,7 @@ species:
               note: Table 1 row SY-MN 6, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.93'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -1419,7 +1412,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 6, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -1459,6 +1452,7 @@ species:
               note: Table 1 row SY-MN 6, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.93'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -1540,7 +1534,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 7, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -1580,6 +1574,7 @@ species:
               note: Table 1 row SY-MN 7, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.58'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -1665,7 +1660,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 7, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -1705,6 +1700,7 @@ species:
               note: Table 1 row SY-MN 7, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.58'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -1786,7 +1782,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 8, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -1817,6 +1813,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.41'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -1915,7 +1912,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 8, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -1946,6 +1943,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.41'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -2040,7 +2038,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 9, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -2080,6 +2078,7 @@ species:
               note: Table 1 row SY-MN 9, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.56'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -2165,7 +2164,7 @@ species:
         table: '1'
         note: Table 1 row SY-MN 9, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -2205,6 +2204,7 @@ species:
               note: Table 1 row SY-MN 9, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.56'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -2287,7 +2287,7 @@ species:
         note: Table 1 row CRB 4a 10, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -2328,6 +2328,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.61'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -2414,7 +2415,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 10, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -2455,6 +2456,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.61'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -2538,7 +2540,7 @@ species:
         note: Table 1 row CRB 4a 11, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -2579,6 +2581,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.07'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -2665,7 +2668,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 11, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -2706,6 +2709,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.07'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -2789,7 +2793,7 @@ species:
         note: Table 1 row CRB 4a 12, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -2830,6 +2834,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.21'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -2916,7 +2921,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 12, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -2957,6 +2962,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.21'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -3040,7 +3046,7 @@ species:
         note: Table 1 row CRB 4a 13, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -3081,6 +3087,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.77'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -3167,7 +3174,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 13, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -3208,6 +3215,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.77'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -3291,7 +3299,7 @@ species:
         note: Table 1 row CRB 4a 14, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -3332,6 +3340,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.18'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -3418,7 +3427,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 14, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -3459,6 +3468,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.18'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -3542,7 +3552,7 @@ species:
         note: Table 1 row CRB 4a 15, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -3573,6 +3583,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.77'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -3672,7 +3683,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 15, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -3703,6 +3714,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.77'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -3799,7 +3811,7 @@ species:
         note: Table 1 row CRB 4a 16, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -3840,6 +3852,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.49'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -3926,7 +3939,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 16, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -3967,6 +3980,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.49'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -4050,7 +4064,7 @@ species:
         note: Table 1 row CRB 4a 17, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -4081,6 +4095,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.15'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -4180,7 +4195,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 17, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -4211,6 +4226,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.15'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -4307,7 +4323,7 @@ species:
         note: Table 1 row CRB 4a 18, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -4338,6 +4354,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.18'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -4437,7 +4454,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 18, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -4468,6 +4485,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.18'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -4564,7 +4582,7 @@ species:
         note: Table 1 row CRB 4a 19, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -4605,6 +4623,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.56'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -4691,7 +4710,7 @@ species:
         table: '1'
         note: Table 1 row CRB 4a 19, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -4732,6 +4751,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.56'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -4814,7 +4834,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 20, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -4845,6 +4865,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.10'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -4944,7 +4965,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 20, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -4975,6 +4996,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.10'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -5070,7 +5092,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 21, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -5101,6 +5123,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.15'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -5200,7 +5223,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 21, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -5231,6 +5254,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.15'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -5326,7 +5350,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 22, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -5357,6 +5381,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.83'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -5456,7 +5481,7 @@ species:
         table: '1'
         note: Table 1 row K14 G 22, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -5487,6 +5512,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.83'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -5582,7 +5608,7 @@ species:
         table: '1'
         note: Table 1 row 4135 23, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -5613,6 +5639,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.11'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -5711,7 +5738,7 @@ species:
         table: '1'
         note: Table 1 row 4135 23, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -5742,6 +5769,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.11'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -5836,7 +5864,7 @@ species:
         table: '1'
         note: Table 1 row 4135 24, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -5876,6 +5904,7 @@ species:
               note: Table 1 row 4135 24, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.82'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -5961,7 +5990,7 @@ species:
         table: '1'
         note: Table 1 row 4135 24, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -6001,6 +6030,7 @@ species:
               note: Table 1 row 4135 24, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.82'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -6082,7 +6112,7 @@ species:
         table: '1'
         note: Table 1 row 4135 25, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -6113,6 +6143,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '97.68'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -6211,7 +6242,7 @@ species:
         table: '1'
         note: Table 1 row 4135 25, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -6242,6 +6273,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '97.68'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -6337,7 +6369,7 @@ species:
         note: Table 1 row GL-654 26, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -6378,6 +6410,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.71'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -6464,7 +6497,7 @@ species:
         table: '1'
         note: Table 1 row GL-654 26, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -6505,6 +6538,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.71'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -6588,7 +6622,7 @@ species:
         note: Table 1 row GL-654 27, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -6629,6 +6663,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '97.41'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -6715,7 +6750,7 @@ species:
         table: '1'
         note: Table 1 row GL-654 27, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -6756,6 +6791,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '97.41'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -6839,7 +6875,7 @@ species:
         note: Table 1 row GL-654 28, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -6870,6 +6906,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.43'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -6969,7 +7006,7 @@ species:
         table: '1'
         note: Table 1 row GL-654 28, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -7000,6 +7037,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.43'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -7095,7 +7133,7 @@ species:
         table: '1'
         note: Table 1 row HAW 29, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -7135,6 +7173,7 @@ species:
               note: Table 1 row HAW 29, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.79'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -7219,7 +7258,7 @@ species:
         table: '1'
         note: Table 1 row HAW 29, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -7259,6 +7298,7 @@ species:
               note: Table 1 row HAW 29, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '97.79'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -7339,7 +7379,7 @@ species:
         table: '1'
         note: Table 1 row HAW 30, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -7370,6 +7410,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.28'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -7467,7 +7508,7 @@ species:
         table: '1'
         note: Table 1 row HAW 30, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -7498,6 +7539,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.28'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -7592,7 +7634,7 @@ species:
         note: Table 1 row GL-1050 31, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -7623,6 +7665,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.58'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -7722,7 +7765,7 @@ species:
         table: '1'
         note: Table 1 row GL-1050 31, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -7753,6 +7796,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.58'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -7849,7 +7893,7 @@ species:
         note: Table 1 row GL-1050 32, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -7890,6 +7934,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.40'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -7977,7 +8022,7 @@ species:
         table: '1'
         note: Table 1 row GL-1050 32, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -8018,6 +8063,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '99.40'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -8102,7 +8148,7 @@ species:
         note: Table 1 row GL-1050 33, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -8143,6 +8189,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.00'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -8230,7 +8277,7 @@ species:
         table: '1'
         note: Table 1 row GL-1050 33, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -8271,6 +8318,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.00'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -8354,7 +8402,7 @@ species:
         table: '1'
         note: Table 1 row 4136 34, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -8394,6 +8442,7 @@ species:
               note: Table 1 row 4136 34, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.37'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -8479,7 +8528,7 @@ species:
         table: '1'
         note: Table 1 row 4136 34, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -8519,6 +8568,7 @@ species:
               note: Table 1 row 4136 34, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.37'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -8601,7 +8651,7 @@ species:
         note: Table 1 row GL-1868 35, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -8632,6 +8682,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '97.98'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -8731,7 +8782,7 @@ species:
         table: '1'
         note: Table 1 row GL-1868 35, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -8762,6 +8813,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '97.98'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -8857,7 +8909,7 @@ species:
         table: '1'
         note: Table 1 row K30J 36, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -8888,6 +8940,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.87'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -8986,7 +9039,7 @@ species:
         table: '1'
         note: Table 1 row K30J 36, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -9017,6 +9070,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.87'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -9111,7 +9165,7 @@ species:
         table: '1'
         note: Table 1 row CA 4 37, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -9142,6 +9196,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.45'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -9240,7 +9295,7 @@ species:
         table: '1'
         note: Table 1 row CA 4 37, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -9271,6 +9326,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.45'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -9365,7 +9421,7 @@ species:
         table: '1'
         note: Table 1 row WRAB 38, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -9396,6 +9452,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.12'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -9494,7 +9551,7 @@ species:
         table: '1'
         note: Table 1 row WRAB 38, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -9525,6 +9582,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.12'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -9619,7 +9677,7 @@ species:
         table: '1'
         note: Table 1 row WRAB 39, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -9659,6 +9717,7 @@ species:
               note: Table 1 row WRAB 39, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.75'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -9744,7 +9803,7 @@ species:
         table: '1'
         note: Table 1 row WRAB 39, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -9784,6 +9843,7 @@ species:
               note: Table 1 row WRAB 39, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '98.75'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -9865,7 +9925,7 @@ species:
         table: '1'
         note: Table 1 row Z 519 40, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -9906,6 +9966,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '100.46'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -9992,7 +10053,7 @@ species:
         table: '1'
         note: Table 1 row Z 519 40, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -10033,6 +10094,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '100.46'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -10115,7 +10177,7 @@ species:
         table: '1'
         note: Table 1 row Z 571 41, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -10156,6 +10218,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.98'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -10242,7 +10305,7 @@ species:
         table: '1'
         note: Table 1 row Z 571 41, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -10283,6 +10346,7 @@ species:
                 reads.
         Total_wt_pct_as_printed: '98.98'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -10365,7 +10429,7 @@ species:
         table: '1'
         note: Table 1 row 653 42, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -10405,6 +10469,7 @@ species:
               note: Table 1 row 653 42, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '99.11'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -10489,7 +10554,7 @@ species:
         table: '1'
         note: Table 1 row 653 42, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -10529,6 +10594,7 @@ species:
               note: Table 1 row 653 42, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
         Total_wt_pct_as_printed: '99.11'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -10610,7 +10676,7 @@ species:
         note: Table 1 row P 340409 43, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -10641,6 +10707,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.61'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -10740,7 +10807,7 @@ species:
         table: '1'
         note: Table 1 row P 340409 43, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -10771,6 +10838,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '98.61'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -10867,7 +10935,7 @@ species:
         note: Table 1 row GL-C71 44, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -10898,6 +10966,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.57'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -10997,7 +11066,7 @@ species:
         table: '1'
         note: Table 1 row GL-C71 44, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -11028,6 +11097,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '99.57'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -11124,7 +11194,7 @@ species:
         note: Table 1 row GL-C71 45, column Act. FeO; 600 dpi page render; see the cell audit for the independent machine
           reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity
@@ -11155,6 +11225,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '100.92'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: Act. FeO
         printed_marker_suffix: none
@@ -11254,7 +11325,7 @@ species:
         table: '1'
         note: Table 1 row GL-C71 45, column γ FeO; 600 dpi page render; see the cell audit for the independent machine reads.
       phase: l
-      standard_state: *roeder_iron_saturated_feo_standard_state
+      standard_state: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
       units: dimensionless
       values:
         quantity: activity_coefficient
@@ -11285,6 +11356,7 @@ species:
         oxide_absences_as_printed: {}
         Total_wt_pct_as_printed: '100.92'
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+        reference_state_schema_gap: The printed wording is preserved verbatim; no exact convention token is stated. See simulator/battery/enums.py::ReferenceStateConvention.
         composition_units_as_printed: wt%
         printed_column_header: γ FeO
         printed_marker_suffix: none
@@ -11402,7 +11474,18 @@ species:
           oxide
         metal_activity_as_printed: All the experiments in the present study were conducted in equilibrium with metallic iron
           and assuming the iron to be pure the activity can be set equal to one.
-        reference_state_mapping: *roeder_iron_saturated_feo_standard_state
+        reference_state_mapping:
+          state:
+            tag: unknown
+            reason: The exact source wording is retained, but it does not explicitly identify a closed reference-state convention;
+              no convention is inferred.
+          inferred: false
+          note: The source says “the liquid oxide in equilibrium with metallic iron” and calls the dissolved ferrous species
+            hypothetical.
+        reference_state_locator:
+          page: 9
+          published_page: 405
+          pdf_page_index: 8
         standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
         thermodynamic_data_attribution_as_printed: Schuhmann and Ensio [2] and Coughlin [9]
     - observation_id: roeder_1974_feo_quotation_mark_footnote
