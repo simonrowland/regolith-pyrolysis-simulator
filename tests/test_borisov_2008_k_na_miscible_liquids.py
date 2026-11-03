@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.migrate import _log_fO2_to_pa
+from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -323,7 +323,27 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
             else:
                 assert observation.point_conditions["total_pressure_Pa"].state.is_unknown
         if "composition" in conditions:
-            assert observation.point_conditions["composition"].state.is_unknown
+            source_state = conditions["composition"]["state"]
+            if source_state["tag"] == "unknown":
+                sample_id = values.get("sample_id")
+                sample_maps = [
+                    row["values"]["composition_wt_pct"]
+                    for _other_id, (_other_container, row) in raw.items()
+                    if row["values"].get("sample_id") == sample_id
+                    and "composition_wt_pct" in row["values"]
+                ]
+                if sample_maps:
+                    assert all(item == sample_maps[0] for item in sample_maps)
+                    expected = wt_pct_to_mole_fraction(
+                        {
+                            oxide: Decimal(str(amount))
+                            for oxide, amount in sample_maps[0].items()
+                        }
+                    )
+                    assert observation.point_conditions["composition"].state.is_value
+                    assert observation.point_conditions["composition"].state.value == expected
+                else:
+                    assert observation.point_conditions["composition"].state.is_unknown
         if source_row.get("phase") == "l":
             assert observation.identity.species.phase.value == "l"
             assert source_row["quench_statement"]["preservation"] == "asserted_preserved"
@@ -353,3 +373,74 @@ def test_wt_percent_row_copies_printed_fo2_and_total_pressure_onto_identity(tmp_
     assert observation.identity.total_pressure_Pa is not None
     assert observation.identity.total_pressure_Pa.is_value
     assert observation.identity.total_pressure_Pa.value == printed_pa
+
+
+def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
+    document = _document()
+    result = _migrate_real_extract(
+        tmp_path / "candidate", EXTRACT_NAME, extract_doc=document
+    )
+    source_rows = _observations(document)
+    migrated = {
+        observation.observation_id.split("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+
+    composition_rows = {
+        observation_id: row
+        for observation_id, (_container, row) in source_rows.items()
+        if "composition_wt_pct" in row["values"]
+    }
+    assert len(composition_rows) == 259
+    for observation_id, row in composition_rows.items():
+        printed_wt = {
+            oxide: Decimal(str(amount))
+            for oxide, amount in row["values"]["composition_wt_pct"].items()
+        }
+        expected = wt_pct_to_mole_fraction(printed_wt)
+        observation = migrated[observation_id]
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_value
+        assert observation.identity.composition.value == expected
+        condition = observation.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.state.value == expected
+        assert condition.locator is not None
+        expected_table = "3" if observation_id.startswith("borisov2008_t3_") else "2"
+        assert condition.locator.table == expected_table
+
+    temperature_rows = {
+        observation_id: row
+        for observation_id, (_container, row) in source_rows.items()
+        if observation_id.startswith("borisov2008_t2_")
+        and "_initial_" in observation_id
+        and "T_C_as_published" in row["values"]
+    }
+    assert len(temperature_rows) == 22
+    for observation_id, row in temperature_rows.items():
+        celsius = Decimal(str(row["values"]["T_C"]))
+        expected = celsius + Decimal("273.15")
+        observation = migrated[observation_id]
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.is_value
+        assert observation.identity.temperature_K.value == expected
+        condition = observation.point_conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == expected
+        assert condition.locator is not None
+        assert condition.locator.table == "2"
+
+    mutated = copy.deepcopy(document)
+    for _container, row in _observations(mutated).values():
+        if row["values"].get("sample_id") == "CSA6Na-3":
+            row["values"].pop("composition_wt_pct", None)
+    mutated_result = _migrate_real_extract(
+        tmp_path / "mutated", EXTRACT_NAME, extract_doc=mutated
+    )
+    changed = next(
+        observation
+        for observation in mutated_result.observations.values()
+        if observation.observation_id.endswith("borisov2008_t3_csa6na_3_sio2")
+    )
+    assert changed.identity.composition is not None
+    assert changed.identity.composition.is_unknown
