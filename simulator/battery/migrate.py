@@ -1700,7 +1700,9 @@ def _composition_located_from_plain(
             inference=source.inference,
         )
     wt = _mass_percent_components(body)
-    if wt is not None:
+    if wt is not None and any(
+        _kume_formula_unit_oxide(name) is not None for name in wt
+    ):
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
         else:
