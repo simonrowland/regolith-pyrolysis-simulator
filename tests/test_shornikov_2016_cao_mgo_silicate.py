@@ -121,8 +121,29 @@ def _assert_rendered_cells(document) -> None:
         assert row["locator"]["page"] == 2
 
 
+def _assert_sc456_model_classes(document) -> None:
+    rows = _observations(document)
+    model_rows = [
+        row
+        for _formula, row in rows
+        if row["type"] == "gibbs_table"
+        or row["observation_id"]
+        in {
+            "shornikov_2016_fig1a_CaO_activity",
+            "shornikov_2016_fig1a_MgO_activity",
+            "shornikov_2016_fig1a_SiO2_activity",
+            "shornikov_2016_fig1b_CaO_activity",
+            "shornikov_2016_fig1b_MgO_activity",
+            "shornikov_2016_fig1b_SiO2_activity",
+        }
+    ]
+    assert len(model_rows) == 44
+    assert all(row["values"]["method_class"] == "model_derived" for row in model_rows)
+
+
 def test_table_and_figure_reads_are_pinned():
     document = _load()
+    _assert_sc456_model_classes(document)
     gibbs = [
         row
         for _formula, row in _observations(document)
@@ -296,8 +317,6 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         if row.source_id == document["source_id"]
     ]
     assert len(migrated) == 85
-    assert not result.registry_issues
-    assert not result.validation.hard_issues
 
     gibbs = [row for row in migrated if row.identity.quantity.value.value == "delta_fG"]
     activities = [
@@ -351,3 +370,17 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     ]
     assert len(contexts) == 9
     assert not any(row.identity.quantity.value.value == "delta_fG" and "fig2" in row.observation_id for row in migrated)
+    assert not result.registry_issues
+    assert not result.validation.hard_issues
+
+
+def test_sc456_model_class_pin_rejects_quote_reversion():
+    document = _load()
+    target = next(
+        row
+        for _formula, row in _observations(document)
+        if row["type"] == "gibbs_table"
+    )
+    target["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_classes(document)
