@@ -1,0 +1,823 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+observations:
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig13b_no_boiling_test
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2310'
+    total_pressure_Pa:
+      tag: value
+      value: '5066.25'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source states total vapour pressure over a multi-species vapour, not
+      a single Sen monomer; v2.1 has no total-vapour-pressure identity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 10
+        published_page: 1744
+        pdf_page_index: 9
+        figure: 13(b)
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 10
+    published_page: 1744
+    pdf_page_index: 9
+    figure: 13(b)
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2310'
+      locator:
+        page: 10
+        published_page: 1744
+        pdf_page_index: 9
+        figure: 13(b)
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '5066.25'
+      locator:
+        page: 10
+        published_page: 1744
+        pdf_page_index: 9
+        figure: 13(b)
+        note: printed P_s = 0.05 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              page: 10
+              published_page: 1744
+              pdf_page_index: 9
+              figure: 13(b)
+              note: printed P_s = 0.05 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 10
+              published_page: 1744
+              pdf_page_index: 9
+              figure: 13(b)
+              note: printed P_s = 0.05 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'areal_mass_loss_rate_as_printed'
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+    total_pressure_Pa:
+      tag: value
+      value: '10.1325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10.1325'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'areal_mass_loss_rate_as_printed'
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+    total_pressure_Pa:
+      tag: value
+      value: '10.1325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10.1325'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'areal_mass_loss_rate_as_printed'
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+    total_pressure_Pa:
+      tag: value
+      value: '10.1325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10.1325'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'areal_mass_loss_rate_as_printed'
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+    total_pressure_Pa:
+      tag: value
+      value: '10.1325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10.1325'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_fig7_furnace_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'areal_mass_loss_rate_as_printed'
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1700'
+    total_pressure_Pa:
+      tag: value
+      value: '10.1325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 5
+    published_page: 1739
+    pdf_page_index: 4
+    figure: '7'
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '10.1325'
+      locator:
+        page: 5
+        published_page: 1739
+        pdf_page_index: 4
+        figure: '7'
+        note: printed P = 10^-4 atm, converted exactly to Pa
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 5
+              published_page: 1739
+              pdf_page_index: 4
+              figure: '7'
+              note: printed P = 10^-4 atm, converted exactly to Pa
+        output_unit: Pa
+        references: []
+    atmosphere:
+      state:
+        tag: value
+        value: argon
+      locator:
+        page: 3
+        published_page: 1737
+        pdf_page_index: 2
+        section: Experimental Procedure
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:centolanzi-1966-tektite-vapour-pressure
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
+  experiment_id: 10.1029/jz071i006p01735::experiment::centolanzi_1966_summary_fit_record
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source states total vapour pressure over a multi-species vapour, not
+      a single Sen monomer; v2.1 has no total-vapour-pressure identity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 1
+        published_page: 1735
+        pdf_page_index: 0
+        section: Abstract
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 1
+    published_page: 1735
+    pdf_page_index: 0
+    section: Abstract
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The fit gives a temperature range rather than a single point temperature.
+      locator:
+        page: 1
+        published_page: 1735
+        pdf_page_index: 0
+        section: Abstract
+- observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+  experiment_id: 10.1029/jz071i006p01735::experiment::quoted_chapman_larson_1963_relation
+  identity:
+    quantity:
+      tag: unknown
+      reason: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+        identity
+    species:
+      formula: unknown
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source states total vapour pressure over a multi-species vapour, not
+      a single Sen monomer; v2.1 has no total-vapour-pressure identity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Chapman and Larson [1963]
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103ce-ce66
+      date: '2026-11-02'
+      evidence:
+        page: 14
+        published_page: 1748
+        pdf_page_index: 13
+        section: Summary of Results and Concluding Remarks
+  notices: []
+  source_id: centolanzi-1966-tektite-vapour-pressure
+  locator:
+    page: 14
+    published_page: 1748
+    pdf_page_index: 13
+    section: Summary of Results and Concluding Remarks
+  read_from: pdf:centolanzi-1966-tektite-vapour-pressure
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation gives a temperature variable, not an experimental point temperature.
+      locator:
+        page: 14
+        published_page: 1748
+        pdf_page_index: 13
+        section: Summary of Results and Concluding Remarks

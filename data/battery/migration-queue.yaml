@@ -156125,6 +156125,236 @@ entries:
       figure: '9'
       note: row=ZE; column=C from CO2 (µg/g)
       source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: conditional method_class author_derived lacks measured lineage
+  axes:
+  - evidence.class
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+    locator:
+      page: 10
+      published_page: 1744
+      pdf_page_index: 9
+      figure: 13(b)
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
+    locator:
+      page: 1
+      published_page: 1735
+      pdf_page_index: 0
+      section: Abstract
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: declared quantity is unknown; source states total vapour pressure over a multi-species vapour, not a single Sen monomer;
+    v2.1 has no total-vapour-pressure identity; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+    locator:
+      page: 10
+      published_page: 1744
+      pdf_page_index: 9
+      figure: 13(b)
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
+    locator:
+      page: 1
+      published_page: 1735
+      pdf_page_index: 0
+      section: Abstract
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+    locator:
+      page: 14
+      published_page: 1748
+      pdf_page_index: 13
+      section: Summary of Results and Concluding Remarks
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: declared quantity is unknown; unsupported quantity 'areal_mass_loss_rate_as_printed'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: regime 'furnace_vaporization_in_argon' is not a closed method token (kems_effusion alone is insufficient)
+  axes:
+  - method
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+    locator:
+      page: 10
+      published_page: 1744
+      pdf_page_index: 9
+      figure: 13(b)
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
+    locator:
+      page: 1
+      published_page: 1735
+      pdf_page_index: 0
+      section: Abstract
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+    locator:
+      page: 14
+      published_page: 1748
+      pdf_page_index: 13
+      section: Summary of Results and Concluding Remarks
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: source states total vapour pressure over a multi-species vapour, not a single Sen monomer; v2.1 has no total-vapour-pressure
+    identity
+  axes:
+  - quantity
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+    locator:
+      page: 10
+      published_page: 1744
+      pdf_page_index: 9
+      figure: 13(b)
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit
+    locator:
+      page: 1
+      published_page: 1735
+      pdf_page_index: 0
+      section: Abstract
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+    locator:
+      page: 14
+      published_page: 1748
+      pdf_page_index: 13
+      section: Summary of Results and Concluding Remarks
+- work_id: 10.1029/jz071i006p01735
+  source: data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+  why: unsupported quantity 'areal_mass_loss_rate_as_printed'
+  axes:
+  - quantity
+  observations:
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_gold_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silica_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_silver_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
+  - observation_id: centolanzi-1966-tektite-vapour-pressure::centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+    locator:
+      page: 5
+      published_page: 1739
+      pdf_page_index: 4
+      figure: '7'
 - work_id: 10.1029/rg024i001p00001
   source: data/literature/extracts/richet-bottinga-1986-silicate-thermochemistry.yaml
   why: source does not state method
@@ -430911,6 +431141,383 @@ entries:
       pdf_page_index: 6
       table: '3'
       note: row=BG-49; column=MnO
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: conditional method_class author_derived lacks measured lineage
+  axes:
+  - evidence.class
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 10, column 4; PDF page 2 render checked.; row=binary parameter K2; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 11, column 4; PDF page 2 render checked.; row=binary parameter K4; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 3, column 4; PDF page 2 render checked.; row=ternary parameter K2; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 4, column 4; PDF page 2 render checked.; row=ternary parameter K4; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: declared quantity is unknown; unsupported quantity 'correlation_coefficient'; refusing to pick a number
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_r
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 15, column 4; PDF page 2 render checked.; row=binary parameter r; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_r
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 8, column 4; PDF page 2 render checked.; row=ternary parameter r; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: declared quantity is unknown; unsupported quantity 'least_squares_slope_of_rho_t_vs_sqrt_P_H2O'; refusing to pick a
+    number
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_m
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 13, column 4; PDF page 2 render checked.; row=binary parameter m; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_m
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 6, column 4; PDF page 2 render checked.; row=ternary parameter m; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: declared quantity is unknown; unsupported quantity 'linear_equilibrium_constant_k2_as_published'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 10, column 4; PDF page 2 render checked.; row=binary parameter K2; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 3, column 4; PDF page 2 render checked.; row=ternary parameter K2; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: declared quantity is unknown; unsupported quantity 'linear_equilibrium_constant_k4_as_published'; refusing to pick
+    a number
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 11, column 4; PDF page 2 render checked.; row=binary parameter K4; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 4, column 4; PDF page 2 render checked.; row=ternary parameter K4; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: declared quantity is unknown; unsupported quantity 'total_pressure_of_Na_bearing_vapor_species'; refusing to pick a
+    number
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_01_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 1 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_02_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 2 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_03_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 3 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_04_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 4 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_05_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 5 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_06_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 6 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_01_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 1 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_02_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 2 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_03_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 3 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_04_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 4 density.
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: 'no mapped p_partial field selected; source fields: quantity, method_class, evidence_class, admission_status, value_as_printed,
+    quoted_pressure_as_published, reason_not_typed, attribution, T_K, composition_as_published'
+  axes:
+  - value
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '17'
+      note: Footnote below Eq. (17), PDF page 3 render.
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: source does not state method
+  axes:
+  - method
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_quoted_naoh_pressure_1e5_atm
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '17'
+      note: Footnote below Eq. (17), PDF page 3 render.
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: unsupported quantity 'correlation_coefficient'
+  axes:
+  - quantity
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_r
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 15, column 4; PDF page 2 render checked.; row=binary parameter r; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_r
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 8, column 4; PDF page 2 render checked.; row=ternary parameter r; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: unsupported quantity 'least_squares_slope_of_rho_t_vs_sqrt_P_H2O'
+  axes:
+  - quantity
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_m
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 13, column 4; PDF page 2 render checked.; row=binary parameter m; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_m
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 6, column 4; PDF page 2 render checked.; row=ternary parameter m; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: unsupported quantity 'linear_equilibrium_constant_k2_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 10, column 4; PDF page 2 render checked.; row=binary parameter K2; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k2
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 3, column 4; PDF page 2 render checked.; row=ternary parameter K2; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: unsupported quantity 'linear_equilibrium_constant_k4_as_published'
+  axes:
+  - quantity
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_binary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 11, column 4; PDF page 2 render checked.; row=binary parameter K4; column=Parameters*
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_table1_ternary_k4
+    locator:
+      page: 2
+      published_page: 139
+      pdf_page_index: 1
+      table: I
+      note: MinerU grid row 4, column 4; PDF page 2 render checked.; row=ternary parameter K4; column=Parameters*
+- work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source: data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+  why: unsupported quantity 'total_pressure_of_Na_bearing_vapor_species'
+  axes:
+  - quantity
+  observations:
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_01_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 1 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_02_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 2 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_03_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 3 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_04_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 4 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_05_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 5 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_binary_row_06_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 6 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_01_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 1 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_02_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 2 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_03_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 3 density.
+  - observation_id: sanders-1977-water-vapour-na-vaporization::sanders_1977_eq13_ternary_row_04_p_t
+    locator:
+      page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '13'
+      note: Eq. (13) reduced from Table I row 4 density.
 - work_id: 810e5b37ab0da50e4dcc764ba86954f54fb2e947f04b1ab08e32e92fa00c2d0c
   source: data/literature/extracts/lpsc-2014-2057.yaml
   why: declared quantity is unknown; unsupported quantity 'Ca_perchlorate_decomposition_peak_temperature_shift'; refusing

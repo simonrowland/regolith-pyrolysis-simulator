@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 88487
-records out (observations): 178331
-works: 736
-experiments: 6835
-queue size: 118571
+rows in: 88526
+records out (observations): 178370
+works: 738
+experiments: 6842
+queue size: 118644
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 734
+index sources: 736
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 733 (mismatch) |
-| doi_works | 56 | 394 (mismatch) |
-| no_doi_works | 91 | 342 (mismatch) |
-| admission_statuses | 374 | 30110 (mismatch) |
+| citations | 147 | 735 (mismatch) |
+| doi_works | 56 | 395 (mismatch) |
+| no_doi_works | 91 | 343 (mismatch) |
+| admission_statuses | 374 | 30149 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1358 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -19104,6 +19104,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer-supplement.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` | 682 | 682 | 682 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
+| `data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml` | 8 | 8 | 31 |
 | `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` | 120 | 120 | 150 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 |
@@ -19522,6 +19523,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/saito-2021-fexo-cao-silica-activity.yaml` | 84 | 84 | 84 |
 | `data/literature/extracts/saito-2025-transition-metal-oxide-criteria.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sakao-sano-1962-oxygen-ni-cr-co-cr.yaml` | 0 | 0 | 1 |
+| `data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml` | 31 | 31 | 42 |
 | `data/literature/extracts/saridikmen-2009-phosphide-sulphide.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sato-1976-lunar-fo2-apollo-17.yaml` | 21 | 115 | 39 |
 | `data/literature/extracts/sato-hickling-mclane-1973-lunar-fo2.yaml` | 15 | 75 | 15 |
@@ -19834,8 +19836,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 295506
+advisory issues: 295510
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 295506 |
+| `identity_incomplete` | 295510 |
