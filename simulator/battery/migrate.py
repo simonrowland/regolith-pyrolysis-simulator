@@ -4110,6 +4110,21 @@ def _is_engine_oxide_component(name: str) -> bool:
     return component is not None and component[2]
 
 
+def is_engine_map_oxide_key(name: str) -> bool:
+    """True when ``name`` is itself an engine-map oxide key.
+
+    ``_is_engine_oxide_component`` is true for CrO1.5, which is stored
+    under the Cr2O3 key. A phase-map lookup uses the printed key, so an
+    alias is not a key: component exists, the engine-input flag is set,
+    and the canonical key equals ``name``. FeOT, FeO1.5, NaO0.5, elements,
+    CaF2 and SnO2 are not keys. V2O5 is a key here even though it is
+    absent from ``state.OXIDE_SPECIES``.
+    """
+
+    component = _COMPOSITION_COMPONENTS.get(name)
+    return component is not None and component[2] and component[1] == name
+
+
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
