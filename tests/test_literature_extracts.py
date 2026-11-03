@@ -2874,10 +2874,10 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
         "kems-053-stolyarova-1991.yaml",
         "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
     )
-    assert atomic_source["values"]["method_class"] == "quoted_attributed"
-    assert atomic_source["values"]["evidence_class"] == "quoted_attributed"
+    assert atomic_source["values"]["method_class"] == "measured_reduced"
+    assert atomic_source["values"]["evidence_class"] == "measured_reduced"
     assert atomic_source["values"]["attribution"] == (
-        "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
     )
     assert atomic_source["reaction_as_printed"] == "(WO3)(g) = (WO2)(g) + (O)(g)"
     assert "reservoir" not in atomic_source
