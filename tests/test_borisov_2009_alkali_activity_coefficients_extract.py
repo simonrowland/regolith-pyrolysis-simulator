@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import AmountBasis, Phase, PhaseRole, Quantity
 from simulator.battery.migrate import Migrator
 
 
@@ -80,6 +80,22 @@ SERIES = {
     "39": ("1400", "9.63", "16.0"),
 }
 KELVIN = {"1300": Decimal("1573.15"), "1400": Decimal("1673.15"), "1470": Decimal("1743.15")}
+SOURCE_STARTING_WT = {
+    "SiO2": "75.9",
+    "Na2O": "5.4",
+    "K2O": "6.9",
+    "Rb2O": "11.0",
+}
+STARTING_GLASS_WT = {
+    "CSA6": {"SiO2": "57.9", "Al2O3": "6.7", "CaO": "35.4"},
+    "CSA12": {"SiO2": "53.8", "Al2O3": "13.4", "CaO": "32.9"},
+    "CSA18": {"SiO2": "49.8", "Al2O3": "20.0", "CaO": "30.2"},
+    "CSA25": {"SiO2": "45.7", "Al2O3": "26.6", "CaO": "27.7"},
+    "DA": {"SiO2": "50.2", "Al2O3": "15.7", "MgO": "10.4", "CaO": "23.7"},
+    "DAS50": {"SiO2": "66.7", "Al2O3": "10.6", "MgO": "7.0", "CaO": "15.7"},
+    "DAS200": {"SiO2": "83.0", "Al2O3": "5.5", "MgO": "3.6", "CaO": "7.9"},
+    "DAS400": {"SiO2": "90.2", "Al2O3": "3.1", "MgO": "2.0", "CaO": "4.7"},
+}
 
 
 def document() -> dict:
@@ -156,11 +172,21 @@ def assert_table3_matches(extract: dict, rendered: str) -> None:
         assert actual_full_composition["SiO2"] == sio2
         assert actual_full_composition["Al2O3"] == al2o3
         assert actual_full_composition["CaO"] == cao
+        run_composition = actual[(sample, "SiO2")]["point_conditions"]["composition"]
+        assert run_composition["state"]["tag"] == "value"
+        if sample.startswith("CSA"):
+            base = sample.split("RNK-", 1)[0]
+        elif sample.startswith("DAS"):
+            base = sample.split("RNK-", 1)[0]
+        else:
+            base = "DA"
+        assert run_composition["state"]["value"]["components"] == STARTING_GLASS_WT[base]
+        assert run_composition["state"]["value"]["amount_basis"] == "mass_percent"
+        assert run_composition["locator"]["table"] == "1"
+        assert run_composition["locator"]["row"] == base
         if mgo == "—":
             assert actual_full_composition["MgO"] == "— (not reported)"
-            condition = actual[(sample, "SiO2")]["point_conditions"]["composition"]["state"]
-            assert condition["tag"] == "unknown"
-            assert "MgO" in condition["reason"]
+            assert "MgO" not in run_composition["state"]["value"]["components"]
         else:
             assert actual_full_composition["MgO"] == mgo
     assert expected_count == 108
@@ -204,6 +230,67 @@ def assert_table5_matches(extract: dict, rendered: str) -> None:
             assert values["component_mole_fraction_as_printed"] == x_component
             assert values["Al_over_alkalis_as_printed"] == al_alk
             assert values["ASI_as_printed"] == asi
+
+
+def assert_run_phase_bindings(extract: dict) -> None:
+    target = [
+        row
+        for container in extract["species"].values()
+        for row in container.get("observations", [])
+        if row["type"] == "equilibrium_phase_composition"
+        and str(row["locator"].get("table")) in {"2", "3"}
+    ]
+    assert len(target) == 124
+    for row in target:
+        table = str(row["locator"]["table"])
+        sample = row["values"]["sample_as_printed"]
+        series_no = sample.rsplit("RNK-", 1)[-1]
+        temperature_c, minus_log_f_o2, _duration = SERIES[series_no]
+        assert row["phase"] == "l"
+        assert row["values"]["phase_label"] == "glass"
+        assert row["values"]["basis"] == "wt_percent"
+        condition = row["point_conditions"]["composition"]
+        assert condition["state"]["tag"] == "value"
+        assert condition["state"]["value"]["basis"] == "printed oxide mass percent"
+        assert condition["state"]["value"]["amount_basis"] == "mass_percent"
+        assert condition["units"] == "wt% as printed"
+        assert condition["locator"] is not None
+        if table == "2":
+            expected = SOURCE_STARTING_WT
+            assert condition["locator"]["table"] == "2"
+            assert condition["locator"]["note"] == "The starting composition of the sources"
+        else:
+            if sample.startswith("CSA"):
+                base = sample.split("RNK-", 1)[0]
+            elif sample.startswith("DAS"):
+                base = sample.split("RNK-", 1)[0]
+            else:
+                base = "DA"
+            expected = STARTING_GLASS_WT[base]
+            assert condition["locator"]["table"] == "1"
+            assert condition["locator"]["row"] == base
+        assert condition["state"]["value"]["components"] == expected
+
+        temperature = row["point_conditions"]["temperature_K"]
+        assert "fO2_log" in row["point_conditions"]
+        oxygen = row["point_conditions"]["fO2_log"]
+        minus_log = row["point_conditions"]["minus_log_fO2_as_printed"]
+        assert temperature["state"]["tag"] == "value"
+        assert temperature["locator"] is not None
+        assert temperature["state"]["value"] == str(KELVIN[temperature_c])
+        assert row["T_C"] == temperature_c
+        assert oxygen["state"]["tag"] == "value"
+        assert oxygen["locator"] is not None
+        assert oxygen["state"]["value"] == str(-Decimal(minus_log_f_o2))
+        assert oxygen["locator"]["table"] == "2"
+        assert oxygen["locator"]["row"] == f"Series {series_no}"
+        assert oxygen["locator"]["column"] == "− log fO2"
+        assert minus_log["state"]["value"] == minus_log_f_o2
+        assert row["T_C"] == row["values"]["T_C"]
+
+    csa6 = next(row for row in target if row["values"]["sample_as_printed"] == "CSA6RNK-38")
+    assert csa6["values"]["sample_composition_as_published"]["MgO"] == "— (not reported)"
+    assert "MgO" not in csa6["point_conditions"]["composition"]["state"]["value"]["components"]
 
 
 def test_table2_source_glass_cells_and_run_binding_mutations() -> None:
@@ -284,6 +371,26 @@ def test_table5_activity_grid_and_reference_definition_mutations() -> None:
         assert_table5_matches(changed_extract, TABLE5_RENDER)
 
 
+def test_run_phase_composition_fo2_bindings_and_unknown_dash_mutations() -> None:
+    extract = document()
+    assert_run_phase_bindings(extract)
+
+    changed_phase = deepcopy(extract)
+    changed_phase["species"]["SiO2"]["observations"][0]["values"]["phase_label"] = "melt"
+    with pytest.raises(AssertionError):
+        assert_run_phase_bindings(changed_phase)
+
+    changed_run_composition = deepcopy(extract)
+    changed_run_composition["species"]["SiO2"]["observations"][0]["point_conditions"]["composition"]["state"]["value"]["components"]["SiO2"] = "1"
+    with pytest.raises(AssertionError):
+        assert_run_phase_bindings(changed_run_composition)
+
+    changed_fo2 = deepcopy(extract)
+    changed_fo2["species"]["SiO2"]["observations"][0]["point_conditions"].pop("fO2_log")
+    with pytest.raises(AssertionError):
+        assert_run_phase_bindings(changed_fo2)
+
+
 def test_isolated_migration_species_temperature_conditions_and_reference_state() -> None:
     extract = document()
     source_rows = [
@@ -312,7 +419,13 @@ def test_isolated_migration_species_temperature_conditions_and_reference_state()
         formula = row.identity.species.formula
         formula_counts[(quantity, formula)] += 1
         assert row.locator.page == row.locator.pdf_page_index + 1
-        assert row.identity.species.phase.value.value == "l"
+        if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            assert row.identity.species.phase.value is Phase.L
+            assert row.identity.phase_role is not None
+            assert row.identity.phase_role.is_value
+            assert row.identity.phase_role.value is PhaseRole.GLASS
+        else:
+            assert row.identity.species.phase.value is Phase.L
         assert row.identity.temperature_K is not None and row.identity.temperature_K.is_value
 
         conditions = row.point_conditions or {}
@@ -324,6 +437,11 @@ def test_isolated_migration_species_temperature_conditions_and_reference_state()
         assert conditions["minus_log_fO2_as_printed"].state.is_value
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
         assert conditions["composition"].state.is_value or conditions["composition"].state.is_unknown
+        if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            assert conditions["composition"].state.is_value
+            assert conditions["composition"].state.value.amount_basis is AmountBasis.MOLE_FRACTION
+            assert conditions["fO2_log"].state.is_value
+            assert conditions["fO2_log"].locator is not None
 
         if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             assert row.identity.species.formula in OXIDES
