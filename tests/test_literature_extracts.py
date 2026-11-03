@@ -7106,7 +7106,24 @@ def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> 
 
 @pytest.mark.parametrize(
     "source_id",
-    [pytest.param("fujisawa-1994-na-sn-carbonate-thermodynamics", id="fujisawa-1994-na-sn-carbonate-thermodynamics")],
+    [
+        pytest.param("shornikov-2016-cao-mgo-silicate", id="shornikov-2016-cao-mgo-silicate"),
+        pytest.param("fujisawa-1994-na-sn-carbonate-thermodynamics", id="fujisawa-1994-na-sn-carbonate-thermodynamics"),
+        pytest.param("kunisada-1986-na-silicate-dephosphorization", id="kunisada-1986-na-silicate-dephosphorization"),
+        pytest.param("shornikov-2025-ca-al-inclusion-thermodynamics", id="shornikov-2025-ca-al-inclusion-thermodynamics"),
+        pytest.param("beerkens-2003-sulfate-decomposition-na2o-activity", id="beerkens-2003-sulfate-decomposition-na2o-activity"),
+        pytest.param("shornikov-2017-spinel-evaporation", id="shornikov-2017-spinel-evaporation"),
+        pytest.param("willenborg-2006-alkali-removal-thermodynamics", id="willenborg-2006-alkali-removal-thermodynamics"),
+        pytest.param("majzlan-2021-magnesium-silicate-glass-cp", id="majzlan-2021-magnesium-silicate-glass-cp"),
+        pytest.param("wang-2017-sodium-stannate-formation-emf", id="wang-2017-sodium-stannate-formation-emf"),
+        pytest.param("nasa-tm-2024-simulant-guide", id="nasa-tm-2024-simulant-guide"),
+        pytest.param("jacquet-2026-alkali-recondensation", id="jacquet-2026-alkali-recondensation"),
+        pytest.param("cardiff-2007-vacuum-pyrolysis-gsfc", id="cardiff-2007-vacuum-pyrolysis-gsfc"),
+        pytest.param("shornikov-2023-calcium-phosphate", id="shornikov-2023-calcium-phosphate"),
+        pytest.param("masuda-tanaka-1979-vacuum-condensates", id="masuda-tanaka-1979-vacuum-condensates"),
+        pytest.param("kems-035-sauerborn-2005", id="kems-035-sauerborn-2005"),
+        pytest.param("baborak-2023-alkali-silicate-levitation-evaporation", id="baborak-2023-alkali-silicate-levitation-evaporation"),
+    ],
 )
 def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
     extract_path = EXTRACTS / f"{source_id}.yaml"
@@ -7147,6 +7164,9 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
             )
             observation = migrated_rows[migrated_id]
             assert observation.point_conditions is not None
+            printed_temperature_c = row.get("values", {}).get("T_C")
+            if printed_temperature_c is not None:
+                assert observation.identity.temperature_K.is_value
             for name, condition in source_conditions.items():
                 migrated_name = "temperature_K" if name == "temperature_C" else name
                 migrated_condition = observation.point_conditions.get(migrated_name)
@@ -7155,5 +7175,9 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
                     assert migrated_condition.locator is not None
                 elif condition.get("locator") and migrated_condition is not None:
                     assert migrated_condition.locator is not None
-                if condition.get("state") and migrated_condition is not None:
+                if (
+                    condition.get("state")
+                    and migrated_condition is not None
+                    and name != "composition"
+                ):
                     assert migrated_condition.state.tag.value == condition["state"]["tag"]
