@@ -19,6 +19,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    Polymorph,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -249,19 +250,56 @@ def test_d144_converts_kume_cao_and_mgo_and_refuses_the_other_solids(
     assert "periclase" in mgo_notice.band
     assert f"T={mgo_temperature}" in mgo_notice.band
 
-    # MAGEMin's native basis is solid periclase, not the liquid endmember.
-    # d-144 still uses the liquid shift, including for CaO which has no
-    # native MAGEMin activity.
-    magemin = fusion_comparison_reference(cao, engine=Engine.MAGEMIN)
-    assert magemin.identity.reference_state.value.endmember.phase.value is Phase.L
-    assert magemin.value.point == hand
+    # MAGEMin stays on its native crystal. CaO has no native activity, so
+    # the printed solid is unchanged and the refusal stays
+    # typed-refusal:magemin_no_native_activity:CaO. MgO periclase is that
+    # basis: phase crystal, polymorph periclase, point the printed activity.
+    from simulator.battery.generators.bench import (
+        _ENGINE_REPORTED_ACTIVITY,
+        _engine_reports_formula,
+        _reference_matches,
+    )
+
+    magemin_cao = fusion_comparison_reference(cao, engine=Engine.MAGEMIN)
+    assert (
+        magemin_cao.identity.reference_state.value.endmember.phase.value is Phase.CR
+    )
+    assert magemin_cao.value.point == cao.value.point
     assert any(
-        notice.reason == "single_polymorph_identity_d144" for notice in magemin.notices
+        notice.reason == "single_polymorph_identity_d144"
+        for notice in magemin_cao.notices
     )
     assert not any(
         notice.reason.startswith("MAGEMin native solid-reference conversion;")
-        for notice in magemin.notices
+        for notice in magemin_cao.notices
     )
+    assert _engine_reports_formula("magemin", "CaO") == (
+        False,
+        "typed-refusal:magemin_no_native_activity:CaO",
+    )
+
+    magemin_mgo = fusion_comparison_reference(mgo, engine=Engine.MAGEMIN)
+    magemin_standard = magemin_mgo.identity.reference_state.value
+    assert magemin_standard.endmember.phase.value is Phase.CR
+    assert magemin_standard.endmember.polymorph.value is Polymorph.PERICLASE
+    assert magemin_mgo.value.point == mgo.value.point
+    assert mgo.value.point == Decimal("0.103")
+    magemin_mgo_notice = next(
+        notice
+        for notice in magemin_mgo.notices
+        if notice.reason == "single_polymorph_identity_d144"
+    )
+    assert magemin_mgo_notice.authority is Authority.CERTIFIED
+    assert "Mg-008" in magemin_mgo_notice.band
+    assert "periclase" in magemin_mgo_notice.band
+    assert f"T={mgo_temperature}" in magemin_mgo_notice.band
+    assert _reference_matches(
+        magemin_standard, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
+    ) == (True, "raoultian_native_crystal_activity")
+
+    benchmark = fusion_comparison_reference(cao, engine=None)
+    assert benchmark.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert benchmark.value.point == hand
 
     for refused in (silica, alumina_half):
         comparison = fusion_comparison_reference(refused, engine=Engine.OPENIMCC)
