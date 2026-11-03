@@ -141,7 +141,7 @@ def mass_weighted_mixture_wt_pct(
 
 
 # Printed slag oxide wt% + printed alloy elements + the mass of each phase.
-# One mol inventory. See reports/t1625-design.md.
+# One mol inventory.
 SLAG_METAL_CHARGE_BASIS = "slag_metal_charge"
 SLAG_METAL_CHARGE_FIELDS = (
     "slag_oxide_wt_pct",

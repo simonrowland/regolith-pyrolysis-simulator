@@ -5942,6 +5942,7 @@ def _apply_equilibrium_starting_bulk(
     *,
     origin: str,
     only_basis: str | None = None,
+    quantity: Quantity = Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
 ) -> tuple[Mapping[str, Located[Any]] | None, list[Notice]]:
     """Hand the printed starting bulk to an equilibrium phase row.
 
@@ -5949,7 +5950,8 @@ def _apply_equilibrium_starting_bulk(
     observation's component amount is the analysed phase and is not read
     here. An open system (printed volatile loss, an open crucible,
     evaporation, or a flux) still carries that bulk, with a typed notice:
-    predict and flag, never a silent use and never a refusal. A printed
+    predict and flag, never a silent use and never a refusal. The notices
+    name ``quantity``, the row that carries the bulk. A printed
     anhydrous normalization still carries the oxide bulk and says that
     identity.composition omits H2O. A missing or
     unusable start, including a dash or blank the loader did not accept as
@@ -6006,7 +6008,7 @@ def _apply_equilibrium_starting_bulk(
         notices.append(
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                affected_quantities=(quantity,),
                 reason=(
                     "open_system_starting_bulk: " + "; ".join(causes)
                 ),
@@ -6019,7 +6021,7 @@ def _apply_equilibrium_starting_bulk(
         notices.append(
             Notice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(Quantity.EQUILIBRIUM_PHASE_COMPOSITION,),
+                affected_quantities=(quantity,),
                 reason=(
                     "anhydrous_starting_bulk_omits_h2o: "
                     "identity.composition omits H2O; the printed starting "
@@ -6044,7 +6046,7 @@ def _apply_equilibrium_starting_bulk(
         }
         iron = _total_iron_reported_as_feo_notice(
             weights,
-            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            quantity,
             origin,
         )
         if iron is not None:
@@ -22017,6 +22019,7 @@ class Migrator:
                     point_conditions,
                     origin=obs_id,
                     only_basis=SLAG_METAL_CHARGE_BASIS,
+                    quantity=q_token,
                 )
             )
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
