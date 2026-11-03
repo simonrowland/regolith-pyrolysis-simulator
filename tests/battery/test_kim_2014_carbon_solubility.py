@@ -8,12 +8,18 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    AmountBasis,
+    Authority,
+    Engine,
     EvidenceClass,
+    ExecutionState,
     Phase,
     PhaseRole,
     Quantity,
+    RefusalReason,
     ValueKind,
 )
+from simulator.battery.score import predict_with_engine
 from tests.battery.test_migrate import _migrate_real_extract
 from tests.battery.test_phase_composition_rows import _condition_amount
 from tests.helpers.corpus_paths import regolith_corpus_root
@@ -65,7 +71,16 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
         assert len({item["experiment"] for item in actual_rows}) == 1
         sample = experiments[sample_id]["sample"]
         assert sample["component_values_as_printed"] == expected_values
-        assert sample["component_basis"] == "element_wt_percent"
+        assert sample["component_basis"] == "mass percent"
+        printed_composition = sample["printed_composition"]
+        assert printed_composition["state"]["tag"] == "value"
+        assert printed_composition["state"]["value"] == expected_values
+        assert printed_composition["locator"]["page"] == 3
+        assert printed_composition["locator"]["table"] == row["table"]
+        assert (
+            printed_composition["locator"]["record"]
+            == actual_rows[0]["locator"]["row_label"]
+        )
         assert sample["system_as_printed"] == row["system"]
         assert sample["sample_id_note"].startswith("Local table-row key")
         assert sample["unreported_component"] == "Fe balance is not reported and was not calculated."
@@ -76,15 +91,8 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert item["values"]["phase_label"] == "metal"
             assert item["values"]["component_amount_as_published"] == item["values"]["component_amount"]
             point_conditions = item["values"]["point_conditions"]
-            printed_composition = point_conditions["printed_composition"]
-            assert printed_composition["state"]["tag"] == "value"
-            assert printed_composition["state"]["value"] == {
-                "basis": "element_wt_percent",
-                "values": expected_values,
-            }
-            assert printed_composition["locator"]["page"] == 3
-            assert printed_composition["locator"]["table"] == row["table"]
-            assert printed_composition["locator"]["record"] == item["locator"]["row_label"]
+            assert "composition" not in point_conditions
+            assert "printed_composition" not in point_conditions
             expected_ids.add(item["observation_id"])
 
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
@@ -119,21 +127,24 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
             assert migrated.identity.temperature_K.value == Decimal(row["T_K"])
             assert _condition_amount(migrated, "temperature_K") == Decimal(row["T_K"])
             assert _condition_amount(migrated, "gas_mix") == "Ar"
-            printed_composition = migrated.point_conditions["printed_composition"]
-            assert printed_composition.state.is_value
-            assert printed_composition.state.value == {
-                "basis": "element_wt_percent",
-                "values": expected_values,
+            assert migrated.identity.composition is not None
+            assert migrated.identity.composition.is_value
+            composition = migrated.identity.composition.value
+            assert composition.basis == "printed_phase_composition"
+            assert composition.amount_basis is AmountBasis.MASS_PERCENT
+            assert dict(composition.components) == {
+                component: Decimal(value) for component, value in expected_values.items()
             }
-            assert printed_composition.locator.page == 3
-            assert printed_composition.locator.table == row["table"]
-            assert printed_composition.locator.record == item["locator"]["row_label"]
-            unavailable_composition = migrated.point_conditions["composition"]
-            assert unavailable_composition.state.is_unknown
-            assert "Fe balance is unreported" in unavailable_composition.state.reason
-            assert migrated.identity.composition is None or migrated.identity.composition.is_unknown
+            assert "Fe" not in dict(composition.components)
             assert migrated.identity.fO2_Pa.is_unknown
             assert migrated.notices == ()
+
+    phase_row = migrated_by_id[source_rows["t1-r02"][0]["observation_id"]]
+    prediction = predict_with_engine(Engine.MAGEMIN, phase_row)
+    assert prediction.execution.state is ExecutionState.UNSUPPORTED
+    assert prediction.authority is Authority.REFUSED
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["identity_amount_basis"] == "mass_percent"
 
     expected_parameters = {
         "kim2014_table3_epsilon_C^V": (Decimal("-1.94"), "0.018"),
@@ -146,6 +157,7 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
         assert migrated.value.point == expected
         assert migrated.identity.species.formula == "C"
         assert migrated.identity.quantity.value is Quantity.INTERACTION_PARAMETER
+        assert migrated.identity.composition is None or migrated.identity.composition.is_unknown
         assert migrated.identity.temperature_K.value == Decimal("1873")
         assert migrated.evidence.class_.value is EvidenceClass.MODEL_DERIVED
         assert migrated.uncertainty.verbatim["sigma"] == sigma
