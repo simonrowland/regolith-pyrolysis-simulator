@@ -529,13 +529,16 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Re-pinned after b-1119's CaO/MgO liquid-reference conversion. The numeric
-    # payload remains bit-identical; the decoded metadata changes are the
-    # CaO/MgO internal seam values plus the reference-state notices and model
-    # limitation text.
+    # Re-decoded against R3 (443ec6ed6): the numeric payload is bit-identical.
+    # The metadata delta is the R4 split of oxide reference-state reasons from
+    # melt_oxide_activity_warning into the structured
+    # melt_oxide_activity_reference_state_notice field (Al2O3, K2O, SiO2 and
+    # TiO2 species records here); K2O's domain warning loses only its appended
+    # reference-state reason. The projected warnings lose those same notice
+    # reasons.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "2cd9e6fb2b7b7e0a2e8ac9a07c63e1d7e2557236b286f6480405a3ac7c37ca96"
+    ).hexdigest() == "007bdfa6c2468442e4a65ca3216c9008b36498b56e44ebca2312d1da7d33ec2a"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -547,18 +550,20 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Re-pinned after decoding the b-1119 CaO/MgO liquid-reference conversion:
-    # Ca/Mg activities and their monoxide vapour pressures carry one fusion
-    # factor; Ca2/Mg2 vapours carry its square. Other oxide numeric fields are
-    # bit-identical to green.
+    # Re-decoded against R3 (443ec6ed6): the numeric payload is bit-identical.
+    # The metadata delta is the R4 split of oxide reference-state reasons from
+    # melt_oxide_activity_warning into the structured
+    # melt_oxide_activity_reference_state_notice field (Al2O3, K2O, SiO2 and
+    # TiO2 species records here); K2O's domain warning loses only its appended
+    # reference-state reason. The projected warnings lose those same notice
+    # reasons.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "81eff0369d7c3cfed06705c05b9d6dd697cde2869bcc1f647263320c8971d69a"
-    # The same decoded oxide notices and model limitation text also change the
-    # projected metadata digest.
+    # The decoded notice/provenance-only delta changes the projected digest.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "d304d6523b7e36de44a23199b5b814e537031e1b53ed2ffa5cee9aa77130d782"
+    ).hexdigest() == "a2192b577479a10ba45237a2212c3b05e897dcef6d3f23f9f6670b72a8a787c6"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
