@@ -844,6 +844,9 @@ species:
           interval_as_printed_summary: "0.1 to 0.02"
           studied_evaporation_range_as_printed: "2073–1153 K"
           hydrogen_pressure_as_printed: wide ranges of hydrogen pressure
+          orientation_dependence_as_printed: >-
+            depending on temperature, hydrogen gas pressure, and
+            crystallographic orientations
         point_conditions:
           temperature_K:
             state:
@@ -867,46 +870,6 @@ species:
               published_page: 5
               pdf_page_index: 4
               section: "3"
-      - observation_id: tt2014_fo_alpha_e_0p03_1275
-        type: alpha
-        experiment: tt2014_forsterite_evaporation_review
-        locator:
-          published_page: 9
-          pdf_page_index: 8
-          figure: "10"
-        T_K: 1275
-        phase: cr
-        units: dimensionless
-        values:
-          quantity: evaporation_coefficient_alpha
-          method_class: quoted_attributed
-          attribution: "Figure 10 caption cites reference [8]; section 4.4 cites reference [10] for the same dashed line"
-          alpha: "0.03"
-          alpha_as_printed: "0.03"
-          temperature_pairing_as_printed: >-
-            Figure 10 caption pairs alpha_e of 0.03 with the evaporation flux
-            at 1275 K. Section 4.4 pairs the same 0.03 with the substrate
-            temperature of that paragraph and cites reference 10.
-          citation_figure_10_as_printed: "[8]"
-          citation_section_4_4_as_printed: "[10]"
-        point_conditions:
-          temperature_K:
-            state: {tag: value, value: "1275"}
-            locator:
-              published_page: 9
-              pdf_page_index: 8
-              figure: "10"
-          pH2_Pa:
-            state:
-              tag: unknown
-              reason: >-
-                Figure 10 prints pH2 of 5.6 Pa for the condensation runs. It
-                does not print a hydrogen pressure for the 0.03 coefficient
-                itself.
-            locator:
-              published_page: 9
-              pdf_page_index: 8
-              figure: "10"
       - observation_id: tt2014_fo_alpha_e_0p03_1426
         type: alpha
         experiment: tt2014_forsterite_evaporation_review
@@ -926,9 +889,9 @@ species:
           temperature_K_as_printed: "1426"
           pH2_Pa_as_printed: "2"
           kept_separate_from_as_printed: >-
-            Figure 10 and section 4.4 also print 0.03, paired there with
-            1275 K and with citations 8 and 10. Those pairings are a separate
-            row. They were not averaged with 1426 K.
+            Figure 10 and section 4.4 print an evaporation flux drawn with
+            alpha_e of 0.03. Those sentences do not state the coefficient at
+            1426 K. They are not this row.
         point_conditions:
           temperature_K:
             state: {tag: value, value: "1426"}
@@ -1039,6 +1002,50 @@ species:
           atmosphere_as_printed: vacuum and low-pressure hydrogen gas
           congruent_as_printed: Forsterite evaporates congruently
           references_as_printed: "[8, 10, 11]"
+      - observation_id: tt2014_fo_fig10_evaporation_flux
+        type: review_statement
+        locator:
+          published_page: 9
+          pdf_page_index: 8
+          figure: "10"
+        units: as printed
+        values:
+          quantity_as_printed: evaporation flux drawn with alpha_e of 0.03
+          statement_as_printed: >-
+            The expected evaporation flux of forsterite at 1275 K (dashed
+            line) with alpha_e of 0.03.
+          flux_temperature_K_as_printed: "1275"
+          alpha_e_as_printed: "0.03"
+          coefficient_temperature_as_printed: >-
+            Not printed. This caption states the flux at 1275 K. It does not
+            state alpha_e at 1275 K.
+          citation_as_printed: "[8]"
+          method_class: quoted_attributed
+          attribution: "Takigawa et al. 2009 [8]"
+      - observation_id: tt2014_fo_s44_flux_compared_in_fig11
+        type: review_statement
+        locator:
+          published_page: 8
+          pdf_page_index: 7
+          section: "4.4"
+        units: as printed
+        values:
+          quantity_as_printed: evaporation flux compared in Figure 11
+          statement_as_printed: >-
+            An evaporation flux of forsterite at the substrate temperature
+            with alpha_e of 0.03 (dashed line) is compared in Figure 11.
+          flux_temperature_K_as_printed: "1275"
+          flux_temperature_role_as_printed: >-
+            1275 K is the substrate temperature of the flux in this paragraph.
+            It is not a printed temperature of alpha_e.
+          alpha_e_as_printed: "0.03"
+          coefficient_temperature_as_printed: >-
+            Not printed. Section 4.4 uses alpha_e of 0.03 to draw the flux.
+            It does not state alpha_e at 1275 K.
+          compared_in_as_printed: "Fig. 11"
+          citation_as_printed: "[10]"
+          method_class: quoted_attributed
+          attribution: "Yamada et al. 2006 [10]"
       - observation_id: tt2014_fo_disk_fraction
         type: review_statement
         locator:
@@ -1268,11 +1275,7 @@ species:
             lines) and the expected evaporation flux of forsterite at 1275 K
             (dashed line) with alpha_e of 0.03 [8] are also plotted. The
             ranges of S are also shown.
-          body_cross_reference_as_printed: >-
-            Section 4.4 says the incoming-flux lines and the alpha_e = 0.03
-            dashed line are compared in Figure 11, and it cites reference 10
-            for that 0.03. The Figure 10 caption places those lines on Figure
-            10 and cites reference 8. Both statements are kept.
+          citation_as_printed: "[8]"
           temperature_K_as_printed: "1275"
           pH2_Pa_as_printed: "5.6"
           axes_as_printed:

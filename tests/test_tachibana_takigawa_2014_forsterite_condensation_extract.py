@@ -37,7 +37,6 @@ THIS_WORK_POINT_TEMPERATURES = {
     "tt2014_fo_grain_size_1160": Decimal("1160"),
     "tt2014_fo_grain_size_1275_over_40h": Decimal("1275"),
     "tt2014_fo_grain_size_1275_ten_um": Decimal("1275"),
-    "tt2014_fo_alpha_e_0p03_1275": Decimal("1275"),
     "tt2014_fo_alpha_e_0p03_1426": Decimal("1426"),
     "tt2014_fe_alpha_c_1235": Decimal("1235"),
     "tt2014_fe_alpha_c_1340": Decimal("1340"),
@@ -64,7 +63,6 @@ REFUSED_QUANTITIES = {
 
 EVAPORATION_ALPHA_IDS = {
     "tt2014_fo_alpha_e_range",
-    "tt2014_fo_alpha_e_0p03_1275",
     "tt2014_fo_alpha_e_0p03_1426",
     "tt2014_fe_alpha_e_vacuum",
 }
@@ -149,7 +147,23 @@ def test_printed_coefficients_supersaturations_and_run_labels() -> None:
     assert rows["tt2014_fo_alpha_e_0p03_1426"][1]["values"]["alpha"] == "0.03"
     assert rows["tt2014_fo_alpha_e_0p03_1426"][1]["T_K"] == 1426
     assert rows["tt2014_fo_alpha_e_0p03_1426"][1]["values"]["pH2_Pa_as_printed"] == "2"
-    assert rows["tt2014_fo_alpha_e_0p03_1275"][1]["T_K"] == 1275
+    assert "tt2014_fo_alpha_e_0p03_1275" not in rows
+    assert "crystallographic orientations" in rows["tt2014_fo_alpha_e_range"][1]["values"][
+        "orientation_dependence_as_printed"
+    ]
+    context = {
+        row["observation_id"]: row
+        for body in _document()["species"].values()
+        for row in body["context"]
+    }
+    figure_10_flux = context["tt2014_fo_fig10_evaporation_flux"]["values"]
+    assert figure_10_flux["flux_temperature_K_as_printed"] == "1275"
+    assert figure_10_flux["citation_as_printed"] == "[8]"
+    assert "[10]" not in figure_10_flux["citation_as_printed"]
+    section_44 = context["tt2014_fo_s44_flux_compared_in_fig11"]["values"]
+    assert section_44["citation_as_printed"] == "[10]"
+    assert "[8]" not in section_44["citation_as_printed"]
+    assert section_44["compared_in_as_printed"] == "Fig. 11"
     assert "alpha" not in rows["tt2014_fe_alpha_e_vacuum"][1]["values"]
     assert rows["tt2014_fe_alpha_e_vacuum"][1]["values"]["alpha_as_printed"] == "close to unity"
     assert rows["tt2014_fe_alpha_c_1340"][1]["T_K"] == 1340
@@ -262,7 +276,21 @@ def test_isolated_migration_keeps_temperature_and_refuses_untyped_quantities() -
     assert alpha_1426.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
     assert alpha_1426.value.kind is ValueKind.POINT
     assert alpha_1426.value.point == Decimal("0.03")
+    assert alpha_1426.identity.temperature_K.value == Decimal("1426")
     assert alpha_1426.point_conditions["pH2_Pa"].state.value == Decimal("2")
+    assert alpha_1426.admission.status is AdmissionStatus.ADMITTED
+    assert "tt2014_fo_alpha_e_0p03_1275" not in stored
+    alpha_points_at_1275 = [
+        observation_id
+        for observation_id, observation in stored.items()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        and observation.value.kind is ValueKind.POINT
+        and observation.identity.temperature_K is not None
+        and observation.identity.temperature_K.is_value
+        and observation.identity.temperature_K.value == Decimal("1275")
+    ]
+    assert alpha_points_at_1275 == []
 
     iron_evaporation = stored["tt2014_fe_alpha_e_vacuum"]
     assert iron_evaporation.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA

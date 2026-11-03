@@ -14,7 +14,7 @@ and forsterite αc=0.09–0.006.
 
 ## What was recorded
 
-Twenty observations and seventeen context rows.
+Nineteen observations and nineteen context rows.
 
 This paper's forsterite condensation campaign (sections 4.1–4.4 and the
 summary):
@@ -49,13 +49,17 @@ Quoted evaporation coefficients that the schema can type:
   0.1 to 0.02 (summary). Stored as `evaporation_coefficient_alpha` with
   `alpha_range` low then high, 0.02 then 0.1. Temperature and hydrogen
   pressure on this row are unknown. The studied range 2073–1153 K is a
-  separate sentence and is not the bounds of this coefficient.
-- αe of 0.03 paired by the Figure 10 caption and section 4.4 with 1275 K.
-  Figure 10 cites [8]; section 4.4 cites [10] and says the dashed line is
-  compared in Figure 11. Both citations are kept. pH2 is unknown on this
-  coefficient: 5.6 Pa is the condensation-run pressure.
-- αe of 0.03 at 1426 K and pH2 of 2 Pa from the Figure 11 caption. A separate
-  row. It was not averaged with the 1275 K pairing.
+  separate sentence and is not the bounds of this coefficient. The summary
+  clause "depending on temperature, hydrogen gas pressure, and
+  crystallographic orientations" is stored on this row as printed text.
+- Figure 10's dashed line is an evaporation flux at 1275 K drawn with αe of
+  0.03, citation [8]. Section 4.4 says that flux, at the substrate
+  temperature, is compared in Figure 11, citation [10]. Those are two
+  context rows. 1275 K is the flux temperature. Neither sentence states αe
+  at 1275 K, so that coefficient is not an observation and is not admitted
+  at identity temperature 1275 K.
+- αe of 0.03 at 1426 K and pH2 of 2 Pa from the Figure 11 caption. This is
+  the admitted point. It does not carry citation [8] or [10].
 - Metallic iron αe in vacuum (pFe=0) "close to unity". No numeric 1 was
   invented. Value unavailable, quantity `evaporation_coefficient_alpha`.
 
@@ -116,36 +120,42 @@ string. The migrator therefore stores quantity unknown with reason
 
 - work `10.22323/1.207.0046`
 - 3 experiments
-- 20 observations
-- 17 context rows on that work (not scored)
+- 19 observations
+- 19 context rows on that work (not scored)
 - 0 hard issues
 - 0 registry issues
-- 34 `identity_incomplete` advisories (missing charge, pressure, exposure,
-  and, on the two rows with no single printed temperature, temperature_K)
-- 53 queue entries: unsupported quantity, unknown method token, or no mapped
+- 26 `identity_incomplete` advisories
+- 52 queue entries: unsupported quantity, unknown method token, or no mapped
   value. These are the typed refusals and the review furnaces. No geometry
   was invented to clear them.
 
-Admission of the 20 observations: 16 rejected, 3 admitted, 1 pending.
+Admission of the 19 observations: 16 rejected, 2 admitted, 1 pending.
 Admitted: the forsterite αe interval 0.02–0.1 (temperature unknown) and the
-two αe=0.03 points (1275 K; 1426 K with pH2 2 Pa). Pending: metallic-iron
-αe "close to unity", value unavailable. Every observation has a
-`point_conditions.temperature_K` with a locator. Where the YAML prints
-`T_K`, the identity temperature equals that kelvin value.
+Figure 11 point αe=0.03 at 1426 K and pH2 2 Pa. No
+`evaporation_coefficient_alpha` point has identity temperature 1275 K.
+Pending: metallic-iron αe "close to unity", value unavailable. Every
+observation has a `point_conditions.temperature_K` with a locator. Where the
+YAML prints `T_K`, the identity temperature equals that kelvin value.
 
 The derived battery store was not regenerated.
 
 ## Tests
 
-Local, `.venv` python, `PYTHONPATH` this seat, `-n 0`, no remote runner:
+`validate_all` on this extract, with fidelity matching, returned 0 errors.
+
+Local fallback after the remote runner refused (`shared box policy differs`
+on request `56aca213c9574f48ab8202841ea60ad4`; it did not name a Studio and
+did not run the tests). `.venv` python, `PYTHONPATH` this seat, `-n 0`:
 
 - `tests/test_tachibana_takigawa_2014_forsterite_condensation_extract.py`:
-  5 passed in 4.75 s. The validator accepts the extract and the fidelity
+  5 passed in 5.37 s. The validator accepts the extract and the fidelity
   pins match. Mutating `alpha_low_as_printed` from 0.006 to 0.007 makes
   `check_fidelity_sample_matches` fail. Mutating `T_K` 1275 to 1276 on
   `tt2014_fo_alpha_c_1275` changes the migrated identity temperature from
-  1275 to 1276. The isolated migration has 0 hard issues, and temperature
-  and the printed conditions reach every observation.
-- `tests/test_yaml_flow_scalar_commas.py`: 17 passed in 66.77 s.
+  1275 to 1276. The isolated migration has 0 hard issues. No stored
+  evaporation-coefficient point has identity temperature 1275 K. The
+  Figure 11 point stays admitted at 1426 K and pH2 2 Pa. Citations [8] and
+  [10] are on separate context rows.
+- `tests/test_yaml_flow_scalar_commas.py`: 17 passed in 83.97 s.
 
-Whole-store scoring was not run. Remote CI was not used.
+Whole-store scoring was not run.
