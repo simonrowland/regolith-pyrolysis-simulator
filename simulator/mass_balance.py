@@ -159,10 +159,10 @@ class MassBalance:
             products[species] = products.get(species, 0.0) + kg
         return products
 
-    def stage_purity(self, train: CondensationTrain) -> Dict[int, Dict[str, float]]:
+    def stage_purity(self, train: CondensationTrain) -> Dict[str, Dict[str, float]]:
         """
         Calculate purity of each condensation stage's product.
 
-        Returns dict of stage_number → {species: purity_pct}.
+        Returns dict of stage_key → {species: purity_pct}.
         """
         return query_stage_purity(train)

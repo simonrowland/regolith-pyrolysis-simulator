@@ -2531,30 +2531,26 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. A standard-reaction row uses its pure-component sidecar when
-    the segment projection gate accepts it, or when the block is partial or
-    malformed with A present so the wall consumer can type the refusal. Other
-    unusable projections fail closed with an empty block. Non-standard rows
-    use the runtime selector unchanged.
+    pressures. Wall saturation uses the independent pure-component sidecar
+    even when the melt-source interval requires activities. Its finite Antoine
+    flank is predicted outside the fit band and the wall consumer flags that
+    extrapolation. Non-standard rows use the runtime selector unchanged.
     """
 
     if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
         return vapor_pressure_antoine_coefficients(row, temperature_K)
-    if not bool((row or {}).get("interval_required")):
-        pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
-        if _is_mapping(pure):
-            selected = _selected_temperature_segment(pure, temperature_K)
-            # Same guard as the runtime selector: do not replace the
-            # selector's phase-boundary result with an empty block or
-            # the other phase. An extension already carries its flank.
-            if selected.get("selection_refusal"):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
-            if _pure_segment_usable(selected, temperature_K):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
-            # A grounded pure-species wall answer exists but not at this
-            # temperature: fail closed so the caller types a refusal rather
-            # than extrapolate through a pole or substitute the melt term.
-            return {}, COEFF_BLOCK_PURE_COMPONENT
+    pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+    if _is_mapping(pure):
+        selected = _selected_temperature_segment(pure, temperature_K)
+        # Same guard as the runtime selector: do not replace the
+        # selector's phase-boundary result with an empty block or
+        # the other phase. An extension already carries its flank.
+        if selected.get("selection_refusal"):
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        if _pure_segment_usable(selected, temperature_K):
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        # A pole or non-finite pressure still has no physical prediction.
+        return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 

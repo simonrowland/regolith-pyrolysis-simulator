@@ -23,12 +23,13 @@ The Oxygen Shuttle extracts metals + O₂ from regolith in six campaigns:
 
 Two condensation trains branch from the crucible:
     Volatiles train (C0/C0b) — sealed by gate valve after devolatilisation
-    Metals train (C2A onward) — linear 8-stage default from
+    Metals train (C2A onward) — public stages 0-7 from
         CondensationTrain.create_default(), used by this module's
         PyrolysisSimulator.__init__ and load_batch:
         0 Hot Duct (IR) → 1 Fe Condenser → 2 Cr Oxide Harvester →
-        3 SiO Zone → 4 Alkali/Mg Cyclone → 5 Vortex Dust Filter →
+        3 SiO Zone → 4 Na collector → 4b K cold trap → 5 Vortex Dust Filter →
         6 Turbine-Compressor → 7 Turbine Outlet Monitor.
+        4b is appended on the stage list; route() visits it between 4 and 5.
         Stage 7 of that default train has no target species. The O₂
         accumulator in the units list is OverheadGas.O2_stored_kg, not
         a condensation stage of that default train.
@@ -761,6 +762,7 @@ def _canonicalize_condenser_geometry_stage_keys(
     for stage_map_key in (
         'stage_area_ratios',
         'stage_area_ratio_sources',
+        'stage_hydraulic_diameter_m',
     ):
         raw_stage_map = resolved.get(stage_map_key)
         if not isinstance(raw_stage_map, Mapping):
@@ -3883,6 +3885,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # segment temperatures are liner-wall states, not gas states.
             gas_temperature_C=transport['conductance_temperature_C'],
             stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+            stage_hydraulic_diameter_m_by_stage=transport[
+                'stage_hydraulic_diameter_m_by_stage'
+            ],
             stage_area_geometry_provenance_notice=transport.get(
                 'stage_area_geometry_provenance_notice', {}),
             pipe_segment_temperatures_C=(

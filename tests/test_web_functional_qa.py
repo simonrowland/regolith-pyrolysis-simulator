@@ -1,12 +1,14 @@
 import json
 import math
 import subprocess
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 import app as app_module
+import simulator.three_product_report as three_product_report
 import web.events as web_events
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -29,6 +31,7 @@ from simulator.accounting.queries import (
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
+from tests._cpu_budget import DEFAULT_CPU_BUDGET_SECONDS
 from web.events import _clear_simulation_state, _simulations
 from web.run_store import RunArtifactStore
 
@@ -52,8 +55,7 @@ _START = {
 }
 
 
-@pytest.fixture(autouse=True)
-def _deterministic_web_run(monkeypatch):
+def _patch_deterministic_web_run(monkeypatch):
     curve = {
         "source": "test_web_functional_qa",
         "solidus_T_C": 1000.0,
@@ -88,8 +90,12 @@ def _deterministic_web_run(monkeypatch):
     monkeypatch.setattr(web_events, "_safe_log", lambda _message: None)
 
 
-@pytest.fixture
-def web_driver(monkeypatch, tmp_path):
+@pytest.fixture(autouse=True)
+def _deterministic_web_run(monkeypatch):
+    _patch_deterministic_web_run(monkeypatch)
+
+
+def _create_web_driver(monkeypatch, tmp_path):
     tasks = []
 
     def backend(_name):
@@ -112,21 +118,135 @@ def web_driver(monkeypatch, tmp_path):
     client = app_module.socketio.test_client(app, flask_test_client=http)
     assert client.is_connected()
     client.get_received()
-    before = set(_simulations)
+    return {
+        "app": app,
+        "client": client,
+        "tasks": tasks,
+        "before": set(_simulations),
+        "run_dir": run_dir,
+        "html": html_response.get_data(as_text=True),
+    }
+
+
+def _close_web_driver(driver):
+    client = driver["client"]
+    if client.is_connected():
+        client.disconnect()
+    for sid in set(_simulations) - driver["before"]:
+        _clear_simulation_state(sid)
+
+
+@pytest.fixture
+def web_driver(monkeypatch, tmp_path):
+    driver = _create_web_driver(monkeypatch, tmp_path)
     try:
-        yield {
-            "app": app,
-            "client": client,
-            "tasks": tasks,
-            "before": before,
-            "run_dir": run_dir,
-            "html": html_response.get_data(as_text=True),
-        }
+        yield driver
     finally:
-        if client.is_connected():
-            client.disconnect()
-        for sid in set(_simulations) - before:
-            _clear_simulation_state(sid)
+        _close_web_driver(driver)
+
+
+def displayed_species_kg(species_kg):
+    return {
+        species: round(float(mass), 2)
+        for species, mass in species_kg.items()
+        if round(float(mass), 2) > 0.0
+    }
+
+
+@pytest.fixture(scope="module")
+def headless_full_run_product_story(tmp_path_factory):
+    monkeypatch = pytest.MonkeyPatch()
+    driver = None
+    try:
+        started_cpu = time.process_time()
+        started_wall = time.monotonic()
+        _patch_deterministic_web_run(monkeypatch)
+        driver = _create_web_driver(
+            monkeypatch,
+            tmp_path_factory.mktemp("headless-full-run"),
+        )
+        sid, state, events, decisions, completion = _drive(
+            driver,
+            perturb_every_gate=True,
+            reject_first=True,
+        )
+        return_values = {
+            "driver": driver,
+            "sid": sid,
+            "state": state,
+            "events": events,
+            "decisions": decisions,
+            "completion": completion,
+            "web_phase_cpu_seconds": time.process_time() - started_cpu,
+            "web_phase_wall_seconds": time.monotonic() - started_wall,
+        }
+        yield return_values
+    finally:
+        if driver is not None:
+            _close_web_driver(driver)
+        monkeypatch.undo()
+
+
+@pytest.mark.parametrize(
+    (
+        "feedstock", "hours", "additives_kg", "web_ingots",
+        "web_unclassified", "oxygen_kg", "rump_kg",
+    ),
+    [
+        (
+            "lunar_mare_low_ti", 24, {},
+            {}, {"Cl": 0.02, "Co": 0.04, "Ni": 0.21, "S": 0.72},
+            0.0, 363.32,
+        ),
+        (
+            "mars_basalt", 12, {"C": 30.0},
+            {}, {"CaCO3": 0.01, "Cl": 8.36},
+            3.0629468311083095, 266.49,
+        ),
+    ],
+)
+def test_current_web_and_runner_product_story_pins_shipped_scenarios(
+    feedstock, hours, additives_kg, web_ingots, web_unclassified,
+    oxygen_kg, rump_kg,
+):
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import PyrolysisRun
+    from simulator.three_product_report import classify_products
+
+    execution = RunExecutor().execute(
+        PyrolysisRun(
+            feedstock_id=feedstock,
+            campaign="C2A",
+            hours=hours,
+            additives_kg=additives_kg,
+        )._session_config()
+    )
+    assert execution.status == "ok"
+    sim = execution.simulator
+    assert sim.melt.hour == hours
+
+    runner = classify_products(sim)
+    web_story = web_events._product_story_payload(
+        sim, terminal_rump_by_species=sim._terminal_rump_by_species(),
+        classification=runner,
+    )
+    assert web_story["metal_ingots"]["species_kg"] == web_ingots
+    assert web_story["unclassified"]["species_kg"] == web_unclassified
+    assert runner["ingots_metals"]["species_kg"] == {}
+    assert web_story["glass"]["species_kg"] == {}
+    assert runner["glass"]["species_kg"] == {}
+    assert web_story["captured_volatiles"]["species_kg"] == {}
+    assert runner["captured_volatiles"]["kg_by_species"] == {}
+    assert web_story["oxygen"]["class_total_kg"] == pytest.approx(
+        oxygen_kg, abs=0.01
+    )
+    assert runner["oxygen"]["O2_kg"] == pytest.approx(oxygen_kg)
+    assert web_story["refractory_ceramic"]["class_total_kg"] == pytest.approx(
+        rump_kg, abs=0.01
+    )
+    assert runner["refractory_ceramic_rump"]["class_total_kg"] == pytest.approx(
+        rump_kg, abs=0.01
+    )
 
 
 def _drive(
@@ -318,12 +438,19 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Report: docs-private/research/2026-07-19-webqa/report.md
 # Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
 @pytest.mark.nightly
-def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
-    sid, state, events, decisions, completion = _drive(
-        web_driver,
-        perturb_every_gate=True,
-        reject_first=True,
-    )
+def test_headless_full_run_ledgers_and_product_story_web(
+    headless_full_run_product_story,
+):
+    test_started_cpu = time.process_time()
+    test_started_wall = time.monotonic()
+    web_driver = headless_full_run_product_story["driver"]
+    sid = headless_full_run_product_story["sid"]
+    state = headless_full_run_product_story["state"]
+    events = headless_full_run_product_story["events"]
+    decisions = headless_full_run_product_story["decisions"]
+    completion = headless_full_run_product_story["completion"]
+    sim = state["session"].simulator
+    story = completion["product_story"]
     assert [kind for kind, _choice in decisions] == [
         "PATH_AB",
         "BRANCH_ONE_TWO",
@@ -355,7 +482,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         status="ok",
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
-    sim = state["session"].simulator
     assert (
         sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
         is False
@@ -374,7 +500,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     )
     assert completion["mass_balance_error_breached"] is False
 
-    story = completion["product_story"]
     assert story["input"] == {
         "feedstock": "lunar_mare_low_ti",
         "feedstock_label": sim.record.feedstock_label,
@@ -424,33 +549,63 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     # metal-equivalent Cr in terminal offgas. The product story displays the
     # same inventory by species, rounded to two decimal places.
     rump = completion["terminal_rump_by_species"]
-    _CR_MASS_FRACTION_IN_CR2O3 = 2 * 51.9961 / 151.9904  # 2 Cr per Cr2O3
-    _CR_MW = 51.9961
-    _CRO_MW = 51.9961 + 15.9994  # CrO
+    from simulator.accounting.formulas import resolve_species_formula
+
+    cr_formula = resolve_species_formula("Cr", sim.species_formula_registry)
+
+    def _cr_mass_fraction(species):
+        formula = resolve_species_formula(species, sim.species_formula_registry)
+        # Premise: one formula unit contains formula.atom_moles(1)['Cr'] Cr atoms;
+        # multiplying by Cr kg/mol and dividing by species kg/mol gives a
+        # dimensionless mass fraction. A pure Cr formula is the limiting case 1.
+        return (
+            formula.atom_moles(1.0).get("Cr", 0.0)
+            * cr_formula.molar_mass_kg_per_mol()
+            / formula.molar_mass_kg_per_mol()
+        )
+
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
     _PINNED_CRO_OFFGAS_KG = 0.0
-    # t-1457 d-252 C0 contract: the full-run trajectory shifts the terminal Cr-bearing offgas;
-    # the move enters at 375537bff with the residual Cr2O3 re-pin below (CrO offgas stays 0).
-    _PINNED_CR_OFFGAS_EQ_KG = 9.216286830238766e-06
-    cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _CR_MASS_FRACTION_IN_CR2O3
+    # c679673f5 integrates Stage 2 capture over its temperature band (33 equal
+    # center samples). This captures Cr-bearing vapour the midpoint calculation
+    # sent to terminal.offgas: Cr-equivalent offgas falls from 0.182436796288
+    # to 0.180051898903 kg, while accepted Stage 2 Cr rises from 0.000066897364
+    # to 0.002451792057 kg. The remaining 2.69e-9 kg Cr moves into the rump:
+    # 3.932472e-9 kg extra Cr2O3 times its formula-derived Cr mass fraction.
+    # Thus 2.384897384 g lost from offgas = 2.384894693 g gained in Stage 2
+    # plus 0.000002691 g gained in the rump; the full ledger still totals
+    # 2.459768802 kg Cr against the 2.46 kg feed. CrO offgas remains 0.
+    # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
+    # into Stage 2 capture; the later segment-update refactor leaves the pin
+    # unchanged.
+    _PINNED_CR_OFFGAS_EQ_KG = 0.18005189890349527
+    cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
     cro_offgas_kg = float(offgas_kg.get("CrO", 0.0) or 0.0)
-    # Offgas Cr metal-equivalent (kg Cr) across Cr-bearing offgas species.
-    _CRO2_MW = _CR_MW + 2.0 * 15.9994
-    _CRO3_MW = _CR_MW + 3.0 * 15.9994
-    cr_offgas_eq_kg = (
-        float(offgas_kg.get("Cr", 0.0) or 0.0)
-        + cro_offgas_kg * (_CR_MW / _CRO_MW)
-        + float(offgas_kg.get("CrO2", 0.0) or 0.0) * (_CR_MW / _CRO2_MW)
-        + float(offgas_kg.get("CrO3", 0.0) or 0.0) * (_CR_MW / _CRO3_MW)
+    # Convert only the Cr-bearing terminal streams to Cr-equivalent kg; formula
+    # resolution supplies the atom count and molar mass used by accounting.
+    cr_offgas_eq_kg = sum(
+        float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
+        for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # Cr conserved; the residual moved via run trajectory/end hour (257 -> 188 h across the t-470..d-019 refusal window), not Cr accounting.
-    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
-    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.3280300206015765, rel=1e-9)
-    assert cr_ingot_kg == pytest.approx(0.18, abs=0.005)
+    # Stage 4 now captures Na/Mg at 250 C and K at 40 C. That changes per-hour
+    # alkali capture and the later pressure-limited reduction trajectory: the
+    # independent runner and web paths both move Cr2O3 from 3.3280300206015765
+    # to 3.3283236817361845 kg, while Cr-equivalent terminal offgas moves from
+    # 9.216286830238766e-06 to 0.1824367962875407 kg and extracted Cr falls
+    # from 0.18 to 0 kg. The Cr2O3 delta is 0.000293661134608 kg; dividing by
+    # the old residual gives 8.8239e-5 (dimensionless); kg cancel in that
+    # ratio. In the limiting case of
+    # unchanged alkali capture, the late reduction trajectory and delta return
+    # to the old value. The sum still closes the 2.46 kg feed Cr inventory.
+    # d-137 rounds 5-7 (per-strip piecewise capture solution) move this by
+    # 3.93e-9 kg (1.18e-9 relative): float-level, measured on studio-3 at
+    # 340d3c9c5 with the nightly tier; the band-integration bisect bounds the
+    # solver's per-call differences at <=1.1e-7 kg.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
+    assert cr_ingot_kg == 0.0
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
@@ -478,36 +633,6 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "E=(R1/M1)/(R0/M0); X=1-M1/M0; retention=R1/R0"
     )
 
-    stage_collection = sim._stage_collection_kg_by_source
-    # _product_story_bucket omits positive species that display as 0.00 kg.
-    def _displayed_species_kg(species_kg):
-        displayed_species_kg = {}
-        for species, mass in species_kg.items():
-            if float(mass) <= 0.0:
-                continue
-            displayed_mass = round(mass, 2)
-            if displayed_mass != 0.0:
-                displayed_species_kg[species] = displayed_mass
-        return displayed_species_kg
-
-    def _stage_story_species_kg(stage_number, allowed_species):
-        species_kg = {}
-        for (account, stage, species), mass in stage_collection.items():
-            if (
-                account == CONDENSATION_TRAIN_ACCOUNT
-                and stage == stage_number
-                and species in allowed_species
-                and float(mass) > 0.0
-            ):
-                species_kg[species] = species_kg.get(species, 0.0) + mass
-        return _displayed_species_kg(species_kg)
-
-    assert story["glass"]["species_kg"] == _stage_story_species_kg(
-        3, {"SiO", "SiO2"}
-    )
-    assert story["captured_volatiles"]["species_kg"] == (
-        _stage_story_species_kg(4, {"Na", "K", "Mg"})
-    )
     escape_species_kg = {}
     escape_accounts = (
         TERMINAL_ESCAPE_ACCOUNT,
@@ -526,13 +651,13 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
                     escape_species_kg.get(species, 0.0) + mass
                 )
     assert story["escaped_to_vacuum"]["species_kg"] == (
-        _displayed_species_kg(escape_species_kg)
+            displayed_species_kg(escape_species_kg)
     )
     assert story["escaped_to_vacuum"]["class_total_kg"] == round(
         sum(escape_species_kg.values()), 2
     )
     rump = sim._terminal_rump_by_species()
-    assert story["refractory_ceramic"]["species_kg"] == _displayed_species_kg(
+    assert story["refractory_ceramic"]["species_kg"] == displayed_species_kg(
         {
             species: mass
             for species, mass in rump.items()
@@ -545,7 +670,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         if species not in TERMINAL_RUMP_REFRACTORY_OXIDES
     }
     assert set(story["terminal_residue"]["species_kg"]) == set(
-        _displayed_species_kg(terminal_residue_species_kg)
+        displayed_species_kg(terminal_residue_species_kg)
     )
 
     product_class_species = [
@@ -565,7 +690,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
 
     source_total = sum(
         sum(sim.atom_ledger.project_account_kg(account).values())
-        for account in PRODUCT_LEDGER_ACCOUNTS
+        for account in (*PRODUCT_LEDGER_ACCOUNTS, TERMINAL_ESCAPE_ACCOUNT)
         if account != C7_AL_CREDIT_ACCOUNT
     )
     source_total += sum(
@@ -589,6 +714,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     story_total = _story_total(
         story,
         "metal_ingots",
+        "unrecovered_metal_phase",
         "glass",
         "oxygen",
         "captured_volatiles",
@@ -611,6 +737,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
+        "unrecovered_metal_phase",
         "unrecovered_process_inventory",
         "wall_deposits",
         "process_residue",
@@ -640,6 +767,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "Refractory ceramic out",
         "Terminal residue — incompletely extracted",
         "Escaped to vacuum",
+        "Unrecovered metal phase (in-process inventory)",
         "Unrecovered process inventory",
         "Furnace wall deposits",
         "Process residue",
@@ -654,6 +782,7 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
         "refractory_ceramic",
         "terminal_residue",
         "escaped_to_vacuum",
+        "unrecovered_metal_phase",
         "unrecovered_process_inventory",
         "wall_deposits",
         "process_residue",
@@ -681,6 +810,113 @@ def test_headless_full_run_ledgers_and_product_story_match_runner(web_driver):
     assert "class total kg: 0 kg" in empty_text
 
     assert sid in _simulations
+    web_cpu = headless_full_run_product_story["web_phase_cpu_seconds"]
+    web_wall = headless_full_run_product_story["web_phase_wall_seconds"]
+    test_cpu = time.process_time() - test_started_cpu
+    test_wall = time.monotonic() - test_started_wall
+    assert web_cpu + test_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    print(
+        "HEADLESS_WEB_PHASE "
+        f"cpu={web_cpu:.3f}s wall={web_wall:.3f}s "
+        f"test_cpu={web_cpu + test_cpu:.3f}s "
+        f"test_wall={web_wall + test_wall:.3f}s "
+        f"wall_cpu={((web_wall + test_wall) / (web_cpu + test_cpu)):.3f}"
+    )
+
+
+@pytest.mark.nightly
+def test_headless_full_run_ledgers_and_product_story_match_runner(
+    headless_full_run_product_story,
+):
+    from dataclasses import replace
+
+    from simulator.accounting.queries import TERMINAL_RUMP_ACCOUNTS
+    from simulator.run_executor import RunExecutor
+    from simulator.runner import _product_classification_report
+
+    test_started_cpu = time.process_time()
+    test_started_wall = time.monotonic()
+    state = headless_full_run_product_story["state"]
+    decisions = headless_full_run_product_story["decisions"]
+    completion = headless_full_run_product_story["completion"]
+    sim = state["session"].simulator
+    story = completion["product_story"]
+
+    # Replay the same inputs through a fresh AUTO_APPLY runner session. The
+    # web envelope above is built from its live session, so it cannot by itself
+    # establish web-versus-runner parity.
+    runner_started_cpu = time.process_time()
+    runner_started_wall = time.monotonic()
+    runner_execution = RunExecutor().execute(
+        replace(
+            state["session"]._config,
+            hours=int(sim.melt.hour),
+            result_document_factory=None,
+        )
+    )
+    runner_cpu = time.process_time() - runner_started_cpu
+    runner_wall = time.monotonic() - runner_started_wall
+    assert runner_execution.status == "ok"
+    assert [
+        (row["decision_type"], row["choice"])
+        for row in runner_execution.operator_decisions
+    ] == decisions
+    runner_sim = runner_execution.simulator
+    for account in TERMINAL_RUMP_ACCOUNTS:
+        assert dict(runner_sim.atom_ledger.project_account_mol(account)) == dict(
+            sim.atom_ledger.project_account_mol(account)
+        )
+
+    runner_classification = _product_classification_report(
+        runner_sim,
+        feedstock_id=runner_sim.record.feedstock_key,
+        campaign=runner_sim.melt.campaign.name,
+    )["classification"]
+    assert story["metal_ingots"]["species_kg"] == displayed_species_kg(
+        runner_classification["ingots_metals"]["species_kg"]
+    )
+    assert story["metal_ingots"]["source_accounts_by_species"] == (
+        runner_classification["ingots_metals"]["source_accounts_by_species"]
+    )
+    assert story["unrecovered_metal_phase"]["species_kg"] == (
+        displayed_species_kg(
+            runner_classification["unrecovered_metal_phase"]["species_kg"]
+        )
+    )
+    assert story["unrecovered_metal_phase"]["source_accounts_by_species"] == (
+        runner_classification["unrecovered_metal_phase"][
+            "source_accounts_by_species"
+        ]
+    )
+    assert story["glass"]["species_kg"] == displayed_species_kg(
+        runner_classification["glass"]["species_kg"]
+    )
+    assert story["captured_volatiles"]["species_kg"] == displayed_species_kg(
+        runner_classification["captured_volatiles"]["kg_by_species"]
+    )
+    oxygen_partition = runner_classification["oxygen"]["partition_kg"]
+    assert story["oxygen"]["class_total_kg"] == round(
+        oxygen_partition["stored"] + oxygen_partition["captured"], 2
+    )
+    rump_by_species = runner_classification["refractory_ceramic_rump"][
+        "rump_kg_by_species"
+    ]
+    story_rump_by_species = {
+        **story["refractory_ceramic"]["species_kg"],
+        **story["terminal_residue"]["species_kg"],
+    }
+    assert story_rump_by_species == displayed_species_kg(rump_by_species)
+
+    test_cpu = time.process_time() - test_started_cpu
+    test_wall = time.monotonic() - test_started_wall
+    assert test_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    assert runner_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    print(
+        "HEADLESS_RUNNER_PARITY_PHASE "
+        f"cpu={runner_cpu:.3f}s wall={runner_wall:.3f}s "
+        f"test_cpu={test_cpu:.3f}s test_wall={test_wall:.3f}s "
+        f"wall_cpu={(test_wall / test_cpu):.3f}"
+    )
 
 
 # Nightly (2026-08-02 CI tiering): serial web full path (~327 s junit).
@@ -725,10 +961,14 @@ def test_completion_payload_degrades_when_product_classifier_raises(monkeypatch)
         {"metals": {}, "oxide_vapors": {}},
     )
     sim.load_batch("s_type")
+    def fail_product_classification(_sim):
+        raise ValueError("rump mismatch")
+
     monkeypatch.setattr(
-        web_events,
-        "classify_products",
-        lambda _sim: (_ for _ in ()).throw(ValueError("rump mismatch")),
+        web_events, "classify_products", fail_product_classification
+    )
+    monkeypatch.setattr(
+        three_product_report, "classify_products", fail_product_classification
     )
     monkeypatch.setattr(
         sim,
@@ -870,15 +1110,24 @@ def test_product_badge_counts_terminal_metal_tap_not_diagnostic_float_layer(
     assert payload["product_story"]["metal_ingots"]["class_total_kg"] == pytest.approx(
         drain_tap_kg
     )
-    assert payload["product_story"]["unrecovered_process_inventory"][
+    assert payload["product_story"]["unrecovered_metal_phase"][
         "class_total_kg"
     ] == pytest.approx(float_layer_kg)
     if float_layer_kg:
+        assert payload["product_story"]["unrecovered_metal_phase"][
+            "source_accounts_by_species"
+        ]["Al"] == [
+            {
+                "account": METAL_FLOAT_LAYER_ACCOUNT,
+                "kg": pytest.approx(float_layer_kg),
+            }
+        ]
         assert sim.atom_ledger.project_account_kg(METAL_FLOAT_LAYER_ACCOUNT) == {
             "Al": pytest.approx(float_layer_kg)
         }
-        assert "Unrecovered process inventory" in text
+        assert "Unrecovered metal phase (in-process inventory)" in text
         assert f"Al {_display_mass(float_layer_kg)} kg" in text
+        assert METAL_FLOAT_LAYER_ACCOUNT in text
 
 
 def test_empty_product_classes_render_from_completion_projection(web_driver):
@@ -947,6 +1196,7 @@ def test_product_badge_uses_extracted_classes_not_residue(
                 "process_residue",
                 "off_spec_condensate",
                 "unclassified",
+                "unrecovered_metal_phase",
             )
         }
         for key, value in story_product.items():
@@ -1020,6 +1270,11 @@ def test_product_badge_does_not_count_unrecovered_flat_inventory_as_extraction(
             "species_kg": {"SiO": 50.0},
             "class_total_kg": 50.0,
         },
+        "unrecovered_metal_phase": {
+            "species_kg": {},
+            "source_accounts_by_species": {},
+            "class_total_kg": 0.0,
+        },
     }
     payload = {
         "mass_in_kg": 1000.0,
@@ -1076,7 +1331,9 @@ def test_completion_payload_marks_story_incomplete_without_builder_exception(
     assert payload["product_story_status"] == "incomplete"
 
 
-def test_product_story_requires_designated_stage_provenance(monkeypatch):
+def test_product_story_uses_runner_classification_and_keeps_off_spec_capture(
+    monkeypatch,
+):
     balances = {
         "process.condensation_train": {
             "SiO": 1.0,
@@ -1109,7 +1366,25 @@ def test_product_story_requires_designated_stage_provenance(monkeypatch):
             ("process.condensation_train", 4, "Ca"): 6.0,
         },
     )
-    monkeypatch.setattr(web_events, "classify_products", lambda _sim: {})
+    monkeypatch.setattr(
+        web_events,
+        "classify_products",
+        lambda _sim: {
+            "ingots_metals": {
+                "species_kg": {"Ca": 6.0, "Fe": 3.0},
+                "source_accounts_by_species": {
+                    "Ca": [{"account": CONDENSATION_TRAIN_ACCOUNT, "kg": 6.0}],
+                    "Fe": [{"account": CONDENSATION_TRAIN_ACCOUNT, "kg": 3.0}],
+                },
+            },
+            "glass": {"species_kg": {}},
+            "captured_volatiles": {"kg_by_species": {}},
+            "unrecovered_metal_phase": {
+                "species_kg": {}, "source_accounts_by_species": {}
+            },
+            "oxygen": {"O2_kg": 0.0, "partition_kg": {}},
+        },
+    )
 
     story = web_events._product_story_payload(
         sim,

@@ -379,7 +379,10 @@ def test_collector_band_defaults_are_yaml_owned_and_detached():
     ('condensation_train', 'metals_train'),
     *(
         ('condensation_train', 'metals_train', key)
-        for key in config_module.COLLECTOR_STAGE_KEY_BY_NUMBER.values()
+        for key in (
+            *config_module.COLLECTOR_STAGE_KEY_BY_NUMBER.values(),
+            *config_module.SUBSTAGE_COLLECTOR_KEYS,
+        )
     ),
     ('condensation_train', 'metals_train', 'stage_4_alkali_mg_cyclone', 'temp_range_C'),
 ])

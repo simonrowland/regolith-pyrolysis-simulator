@@ -79,6 +79,12 @@ def test_step2_migration_proof_on_base(scenario):
 def test_runner_section_layout_matches_pinned_expectations(generated_runner_sections):
     expected = json.loads(LAYOUT.read_text(encoding="utf-8"))
     assert set(expected) == set(generated_runner_sections)
+    # The split adds one stage_4b_k_trap inventory section. The regenerated
+    # lunar run also omits three final-state account sections and seven hourly
+    # Fe stratification records: the t-1579 hot face raises Stage-1 train Fe
+    # from 0.3653496257 to 3.5411372009 kg while bottom-pool Fe goes from
+    # 0.6609858418 kg to absent, so those late Fe-pool records no longer emit.
+    # Thus 532 - 10 + 1 = 523 sections. Mars and CI each add the trap section.
     for scenario, (_, directory) in generated_runner_sections.items():
         files = read_sections(directory)
         # Content pins certify the historical migration, not future golden values.

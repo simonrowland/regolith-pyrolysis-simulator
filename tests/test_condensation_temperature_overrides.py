@@ -41,6 +41,14 @@ from simulator.condensation import (
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
+def _constant_deposition_flux(*args, diagnostic_out=None, **kwargs):
+    """Keep the mocked saturation diagnostic paired with the mocked flux."""
+    if diagnostic_out is not None:
+        diagnostic_out["wall_saturation_pressure_pa"] = 1.0
+        diagnostic_out["wall_saturation_pressure_refused"] = False
+    return 2.0
+
+
 @pytest.fixture(autouse=True)
 def _restore_condensation_temps():
     """Snapshot the module-level dict before each test and restore
@@ -598,7 +606,7 @@ def test_new_simulator_uses_reloaded_materials_without_module_reload(tmp_path):
 
 @pytest.mark.parametrize(
     "subpath",
-    ["cold_spot_diagnostic", "pressure_isolated_capture_budget"],
+    ["cold_spot_diagnostic", "stage_efficiency"],
 )
 def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     CONDENSATION_TEMPS_C['SiO'] = 1300.0
@@ -608,6 +616,8 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         wall_temperature_C=1000.0,
     )
     _configure_knudsen_policy(default_model)
+    if subpath == "stage_efficiency":
+        default_model.pipe_segments = []
     default_result = default_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -619,6 +629,8 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
     )
     overridden_model.condensation_temperatures_C['SiO'] = 900.0
     _configure_knudsen_policy(overridden_model)
+    if subpath == "stage_efficiency":
+        overridden_model.pipe_segments = []
     overridden_result = overridden_model.route(
         EvaporationFlux(species_kg_hr={'SiO': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1500.0),
@@ -628,17 +640,22 @@ def test_instance_temperature_override_reaches_all_route_subpaths(subpath):
         assert default_model.last_cold_spot_diagnostic["has_cold_spot"]
         assert not overridden_model.last_cold_spot_diagnostic["has_cold_spot"]
     else:
-        # T-dependent alpha_s(T) narrows the cold-stage contrast versus the old
-        # fixed 0.04 pin, but the instance override still reaches the budget path.
-        assert overridden_result.remaining_by_species["SiO"] > (
-            default_result.remaining_by_species["SiO"] + 0.03
-        )
+        assert default_result.condensed_by_stage_species[
+            "stage_1_fe_condenser"]["SiO"] > 0.0
+        assert "SiO" not in overridden_result.condensed_by_stage_species.get(
+            "stage_1_fe_condenser", {})
 
 
 def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback():
     def route_calcium(vapor_pressure_data=None):
+        train = CondensationTrain.create_default()
+        # The shipped 250 C Na wall selects a Ca coefficient segment other
+        # than pure_component_antoine, so both curves saturate and the route
+        # masses match. This wiring check keeps the wall where that A is
+        # the curve route() evaluates.
+        train.stages[4].temp_range_C = (350.0, 700.0)
         model = CondensationModel(
-            CondensationTrain.create_default(),
+            train,
             vapor_pressure_data=vapor_pressure_data,
             wall_temperature_C=900.0,
         )
@@ -666,18 +683,17 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         },
         "oxide_vapors": {},
     }
-    custom_vapor_pressures["metals"]["Ca"]["antoine"]["A"] += 8.0
+    custom_vapor_pressures["metals"]["Ca"]["pure_component_antoine"]["A"] += 8.0
 
     default_route = route_calcium()
     custom_route = route_calcium(custom_vapor_pressures)
 
-    default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
-    default_stage5 = default_route.condensed_by_stage_species[5]["Ca"]
-    custom_stage4 = custom_route.condensed_by_stage_species[4]["Ca"]
-    custom_stage5 = custom_route.condensed_by_stage_species[5]["Ca"]
-
-    assert custom_stage4 > default_stage4
-    assert custom_stage5 < default_stage5 * 0.8
+    default_stage4 = default_route.condensed_by_stage_species[
+        "stage_4_alkali_mg_cyclone"]["Ca"]
+    custom_stage4 = custom_route.condensed_by_stage_species.get(
+        "stage_4_alkali_mg_cyclone", {}).get("Ca", 0.0)
+    # Raising the owning wall saturation curve reduces supersaturation.
+    assert custom_stage4 < default_stage4
 
     with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
         condensation_module._antoine_psat_pa("SiO", 1700.0)
@@ -738,12 +754,12 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        _constant_deposition_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0 * 3600.0
     )
 
     def efficiency(area_m2: float) -> float:
@@ -755,10 +771,16 @@ def test_configured_stage_area_scales_baffle_capture(monkeypatch):
             residence_s=1.0,
             available_kg=available_kg,
             alpha_s_value=1.0,
+            inlet_partial_pressure_pa=100.0,
         )
 
-    assert efficiency(0.25) == pytest.approx(0.05)
-    assert efficiency(1.0) == pytest.approx(0.2)
+    # P_sat/p_in = 1 Pa/100 Pa = 0.01, so the dimensionless equilibrium
+    # excess is 1 - 0.01 = 0.99. The 900-1200 C band has 33 centers; the
+    # inclusive 1050 C cutoff makes 17/33 strips eligible. These area-response
+    # pins are from that integrated path with the fixed test flux; eta tends
+    # to zero as configured area tends to zero.
+    assert efficiency(0.25) == pytest.approx(0.025425385812662002)
+    assert efficiency(1.0) == pytest.approx(0.09785031217279809)
 
 
 def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
@@ -777,7 +799,7 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        _constant_deposition_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
@@ -785,14 +807,11 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
         * 10.0
     )
 
-    missing_area_efficiency = model._condensation_efficiency(
-        stage=stage,
-        species="SiO",
-        T_cond_C=1050.0,
-        residence_s=10.0,
-        available_kg=available_kg,
-        alpha_s_value=1.0,
-    )
+    with pytest.raises(condensation_module.DepositionInputRefusal, match="stage_area_m2"):
+        model._condensation_efficiency(
+            stage=stage, species="SiO", T_cond_C=1050.0, residence_s=10.0,
+            available_kg=available_kg, alpha_s_value=1.0, inlet_partial_pressure_pa=100.0,
+        )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     configured_area_efficiency = model._condensation_efficiency(
         stage=stage,
@@ -801,10 +820,10 @@ def test_missing_stage_area_cannot_make_flux_ratio_a_rate_constant(monkeypatch):
         residence_s=1.0,
         available_kg=available_kg,
         alpha_s_value=1.0,
+        inlet_partial_pressure_pa=100.0,
     )
 
-    assert missing_area_efficiency == pytest.approx(0.0)
-    assert configured_area_efficiency == pytest.approx(0.2)
+    assert configured_area_efficiency == pytest.approx(0.99)
 
 
 # ---------------------------------------------------------------------------
@@ -920,8 +939,9 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
 
     setpoints = load_config_bundle().setpoints
     expected = (
-        (1400, 1600), (1100, 1400), (1100, 1300), (900, 1200),
-        (350, 700), (200, 350), (50, 200), (20, 50),
+        (1400, 1600), (1150, 1150), (1100, 1300), (900, 1200),
+        (250, 250), (200, 350), (50, 200), (20, 50),
+        (40, 40),
     )
     sim = _collector_sim(setpoints)
     for reset in (False, True, True):
@@ -936,7 +956,9 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
         'stage_0_hot_duct', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
         'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone', 'stage_5_vortex_dust_filter',
     )) == expected[:6]
-    assert condensation_stage_windows_K(setpoints)['K'] == (623.15, 973.15)
+    assert condensation_stage_windows_K(setpoints)['Na'] == (523.15, 523.15)
+    assert condensation_stage_windows_K(setpoints)['Mg'] == (523.15, 523.15)
+    assert condensation_stage_windows_K(setpoints)['K'] == (313.15, 313.15)
     schema = RecipeSchema(setpoints=setpoints)
     assert tuple(
         (schema.spec_for(tuple(
@@ -947,7 +969,7 @@ def test_default_collector_band_contract_at_startup_reset_and_lazy_init():
             .split('.')
         )).high)
         for name in ('stage_4_to_stage_5', 'stage_5_to_stage_6', 'stage_6_to_stage_7')
-    ) == ((200.0, 700.0), (50.0, 350.0), (20.0, 200.0))
+    ) == ((200.0, 250.0), (50.0, 350.0), (20.0, 200.0))
 
 
 @pytest.mark.parametrize('initialize_before_reset', [False, True])
@@ -960,7 +982,7 @@ def test_yaml_only_collector_band_reaches_all_consumers(
 
     source = Path(__file__).resolve().parents[1] / 'data' / 'setpoints.yaml'
     changed = source.read_text().replace(
-        'temp_range_C: [350, 700]', 'temp_range_C: [150, 250]', 1,
+        'temp_range_C: [250, 250]', 'temp_range_C: [150, 250]', 1,
     )
     assert changed != source.read_text()
     path = tmp_path / 'setpoints.yaml'
@@ -972,24 +994,31 @@ def test_yaml_only_collector_band_reaches_all_consumers(
     sim = _collector_sim(setpoints)
     assert sim.train.stages[4].temp_range_C == band
 
-    seen = {'hkl_band': [], 'capture_budget': []}
+    seen = {'hkl_band': [], 'capture': []}
     original_band = condensation_module._stage_temp_band_C
-    original_budget = condensation_module._pressure_isolated_stage_efficiency
+    original_capture = condensation_module.CondensationModel._condensation_efficiency
 
     def observed_band(stage):
         result = original_band(stage)
-        if stage.stage_number == 4:
+        if stage.stage_number == 4 and int(getattr(stage, 'sub_order', 0) or 0) == 0:
             seen['hkl_band'].append(result)
         return result
 
-    def observed_budget(stage, *args, **kwargs):
-        if stage.stage_number == 4:
-            seen['capture_budget'].append(stage.temp_range_C)
-        return original_budget(stage, *args, **kwargs)
+    def observed_capture(self, *args, **kwargs):
+        stage = kwargs.get('stage')
+        if (
+            stage is not None
+            and stage.stage_number == 4
+            and int(getattr(stage, 'sub_order', 0) or 0) == 0
+        ):
+            seen['capture'].append(stage.temp_range_C)
+        return original_capture(self, *args, **kwargs)
 
     monkeypatch.setattr(condensation_module, '_stage_temp_band_C', observed_band)
     monkeypatch.setattr(
-        condensation_module, '_pressure_isolated_stage_efficiency', observed_budget,
+        condensation_module.CondensationModel,
+        '_condensation_efficiency',
+        observed_capture,
     )
     if initialize_before_reset:
         assert sim.condensation_model.train is sim.train
@@ -1007,27 +1036,32 @@ def test_yaml_only_collector_band_reaches_all_consumers(
         assert model.train.stages[4].temp_range_C == band
         for calls in seen.values():
             calls.clear()
+        # K is isolated off the Na collector, and the band spy only records
+        # sub_order 0. Na is what still walks stage 4's capture law.
         model.configure_operating_conditions(
-            overhead_pressure_mbar=1.0,
-            species_partial_pressures_mbar={'K': 1.0},
+            overhead_pressure_mbar=2.0,
+            species_partial_pressures_mbar={'K': 1.0, 'Na': 1.0},
             stage_area_m2_by_stage={str(s.stage_number): 1.0 for s in model.train.stages},
         )
         route = model.route(
-            EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
+            EvaporationFlux(species_kg_hr={'K': 1.0, 'Na': 1.0}, total_kg_hr=2.0),
             MeltState(temperature_C=1650.0),
         )
         for consumer, calls in seen.items():
             assert calls and set(calls) == {band}, consumer
         allocations.append(route.condensed_by_stage_species)
         # The YAML experiment must affect capture, beyond reporting the band.
-        assert route.condensed_by_stage_species[4]['K'] != 0.069231258147549
-        assert independent.train.stages[4].temp_range_C == (350, 700)
+        assert route.condensed_by_stage_species[
+            "stage_4b_k_trap"]['K'] != 0.069231258147549
+        assert independent.train.stages[4].temp_range_C == (250, 250)
         assert independent.condensation_model.train is independent.train
     assert allocations[0] == allocations[1]
 
     windows = condensation_stage_windows_K(setpoints)
-    for species in ('Na', 'K', 'Mg'):
+    for species in ('Na', 'Mg'):
         assert windows[species] == tuple(value + 273.15 for value in band)
+    # K follows the K-trap band, which this experiment does not edit.
+    assert windows['K'] == (313.15, 313.15)
     schema = RecipeSchema(setpoints=setpoints)
     spec = schema.spec_for(tuple(
         'overhead_headspace.pipe_segment_temperatures_C.segments.stage_4_to_stage_5.default_C'

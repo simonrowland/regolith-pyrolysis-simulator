@@ -7,6 +7,11 @@ import pytest
 import yaml
 
 from simulator.backends import BackendSelectionPolicy
+from simulator.condensation import (
+    _required_record_alpha_s,
+    _series_resistance_deposition_flux_mol_m2_s,
+    _wall_alpha_record,
+)
 from simulator.session import SimSession, SimSessionConfig
 from simulator.state import (
     EvaporationFlux,

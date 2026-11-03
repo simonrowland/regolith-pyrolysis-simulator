@@ -116,18 +116,21 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # b-1043: the resolved-setpoints leaf chemistry_kernel.liquid_fraction_provider
     # is now "magemin". Removing only that leaf recovers 911f820f...;
     # EvalSpec's matching gate-input leaf is pinned separately below.
+    # Recomputed 2026-10-31 for the d-137 Stage-4 split. The split makes the
+    # stage_4_to_stage_5 interface terminate at the 250 C Na/Mg collector
+    # before the 40 C K trap; the resolved default moves from 350 C to 250 C.
     # Recomputed 2026-10-30 for d-310 (b-784 C2A product labels): the
     # campaigns.C2A_continuous.products entries Fe, SiO2_glass and O2 each gain
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "887faabbe81fa1006d7950fb78c45c8d428f775ddbc297a695d8addaf7987df4"
+        "8bc00e196df6dc085f3833b82404824067138e07011e9d304fde64f20691817a"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
+        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -136,7 +139,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
+        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -149,7 +152,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
+        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -1728,6 +1731,9 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
 
     assert first.recipe_id() == second.recipe_id()
     # Recomputed after the catalog-grounded C2A full-yield envelope expansion.
+    # 2026-10-31 d-137: the split Stage 4 changes the stage_4_to_stage_5
+    # wall bound to 250 C, which changes RecipeSchema.bounds_digest and the
+    # versioned recipe identity.
     # 2026-07-21 B1: recomputed again after the hot-wall offset window
     # re-derivation (OVERHEAD_HEADSPACE_OFFSET_MIN_K -200 -> -443 for the
     # 1843 C melt ceiling) moved the schema bounds digest.
@@ -1740,7 +1746,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # 2026-09-29 for C2 loader-scalar pressure coupling.
     assert (
         first.recipe_id()
-                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
+                == "a22450a415301779be6d918590944b3e5c7050b72970a03602d457d9b9e6f4bc"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

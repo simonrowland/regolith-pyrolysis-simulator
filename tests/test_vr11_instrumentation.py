@@ -276,7 +276,10 @@ def test_finite_live_pressure_map_refuses_nonfinite_silent_drop() -> None:
 
 
 def _efficiency_model() -> CondensationModel:
-    return CondensationModel(CondensationTrain.create_default())
+    model = CondensationModel(CondensationTrain.create_default())
+    model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
+    model.wall_species_partial_pressures_pa = {"SiO": 100.0, "Na": 100.0}
+    return model
 
 
 def _b127_uncovered_na_vapor_data() -> tuple[dict[str, Any], float]:
@@ -314,13 +317,7 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
-    # Force a non-refused but nonpositive pressure so the nonpositive branch
-    # (not antoine_psat_unavailable_at_T) is the one that mints.
-    monkeypatch.setattr(
-        condensation_module,
-        "_try_antoine_psat_pa",
-        lambda *args, **kwargs: (0.0, False),
-    )
+    model.wall_species_partial_pressures_pa["SiO"] = 0.0
     outcomes: list[dict[str, Any]] = []
     eta = model._condensation_efficiency(
         stage=stage,
@@ -335,8 +332,8 @@ def test_b112_nonpositive_local_pressure_mints_typed_outcome(monkeypatch) -> Non
     assert outcomes[0]["reason"] == "nonpositive_local_pressure"
 
 
-def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
-    """An uncovered Na segment uses measured flow and records extrapolation authority."""
+def test_b127_uncovered_antoine_segment_predicts_and_flags_not_100_pa() -> None:
+    """A finite pure-Na flank predicts outside its fit band with flagged authority."""
     import simulator.condensation as condensation_module
 
     vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
@@ -359,21 +356,26 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     assert condensation_module._species_has_antoine_data(
         "Na", vapor_pressure_data=vapor_data
     )
-    with pytest.raises(condensation_module.WallSaturationPressureRefusal):
-        condensation_module._antoine_psat_pa(
-            "Na", test_temperature_K, vapor_pressure_data=vapor_data
-        )
+    custom_extrapolations: dict[str, dict[str, Any]] = {}
+    custom_pressure = condensation_module._antoine_psat_pa(
+        "Na",
+        test_temperature_K,
+        vapor_pressure_data=vapor_data,
+        antoine_extrapolations=custom_extrapolations,
+    )
+    assert math.isfinite(custom_pressure) and custom_pressure > 0.0
+    assert custom_extrapolations
     pressure_pa, refused = condensation_module._try_antoine_psat_pa(
         "Na", test_temperature_K, vapor_pressure_data=vapor_data
     )
-    assert pressure_pa is None
-    assert refused is True
+    assert pressure_pa is not None and math.isfinite(pressure_pa) and pressure_pa > 0.0
+    assert refused is False
     local = condensation_module._local_species_pressure_pa(
         "Na",
         test_temperature_K - condensation_module.CELSIUS_TO_KELVIN_OFFSET,
         vapor_pressure_data=vapor_data,
     )
-    assert local == 0.0
+    assert local > 0.0
     assert local != 100.0
 
     from simulator.overhead import OverheadGasModel
@@ -389,7 +391,7 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     )
     # Use the production geometry defaults. The model itself has no
     # default Na flowing partial pressure; this is the explicit measured
-    # flow input whose preservation the refusal outcome records.
+    # flow input used for the out-of-band wall prediction below.
     model.configure_operating_conditions(
         stage_area_m2_by_stage=OverheadGasModel().stage_area_m2_by_stage(),
     )
@@ -411,6 +413,7 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
     routing_temperature_C = model.condensation_temperatures_C["Na"]
     residence_s = model.residence_time_s[stage_number]
     outcomes: list[dict[str, Any]] = []
+    route_extrapolations: dict[str, dict[str, Any]] = {}
     eta = model._condensation_efficiency(
         stage=stage,
         species="Na",
@@ -418,21 +421,20 @@ def test_b127_uncovered_antoine_segment_is_typed_refusal_not_100_pa() -> None:
         residence_s=residence_s,
         available_kg=1.0,
         alpha_s_value=alpha_s_value,
+        antoine_extrapolations=route_extrapolations,
         efficiency_outcomes=outcomes,
     )
-    assert len(outcomes) == 1
-    outcome = outcomes[0]
-    assert outcome["status"] == "extrapolated"
-    assert outcome["authority_level"] == "extrapolated"
-    assert outcome["output_status"] == "status_bearing"
-    assert outcome["reason"] == "antoine_psat_unavailable_at_T"
-    assert outcome["refusal_type"] == "WallSaturationPressureRefusal"
-    assert tuple(outcome["valid_range_K"]) == valid_range
-    assert outcome["stage_number"] == stage_number
-    assert outcome["routing_reference_temperature_C"] == routing_temperature_C
-    assert outcome["flowing_pressure_pa"] == measured_flowing_pressure_pa
-    assert outcome["flowing_pressure_pa"] != 100.0
-    assert outcome["eta"] == eta
+    assert 0.0 < eta <= 1.0
+    assert outcomes == []
+    assert any(
+        record.get("status") == "extrapolated"
+        and tuple(record.get("valid_range_K", ())) == valid_range
+        for record in route_extrapolations.values()
+    )
+    assert all(
+        record.get("status") != "refused"
+        for record in route_extrapolations.values()
+    )
 
 
 def test_b127_uncovered_antoine_missing_flow_is_a_typed_input_refusal() -> None:
@@ -441,6 +443,7 @@ def test_b127_uncovered_antoine_missing_flow_is_a_typed_input_refusal() -> None:
     vapor_data, test_temperature_K = _b127_uncovered_na_vapor_data()
     model = _efficiency_model()
     model.vapor_pressure_data = vapor_data
+    model.wall_species_partial_pressures_pa.pop("Na", None)
     stage = next(s for s in model.train.stages if s.stage_number == 3)
     outcomes: list[dict[str, Any]] = []
 
@@ -491,6 +494,9 @@ def test_b112_nonpositive_reference_flux_mints_typed_outcome(monkeypatch) -> Non
 
 def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
     import simulator.condensation as condensation_module
+    from tests.chemistry.test_equilibrium_capped_capture import (
+        _integrated_pressure_driven_capture,
+    )
 
     model = _efficiency_model()
     stage = next(s for s in model.train.stages if s.stage_number == 3)
@@ -504,15 +510,22 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         "_hkl_impingement_flux_mol_m2_s",
         lambda *args, **kwargs: 1.0,
     )
+    def positive_flux(*args, **kwargs):
+        kwargs["diagnostic_out"].update(
+            wall_saturation_pressure_pa=1.0,
+            wall_saturation_pressure_refused=False,
+        )
+        return 2.0
+
     monkeypatch.setattr(
         condensation_module,
         "_series_resistance_deposition_flux_mol_m2_s",
-        lambda *args, **kwargs: 2.0,
+        positive_flux,
     )
     available_kg = (
         condensation_module._molecular_mass_kg_per_molecule("SiO")
         * condensation_module.AVOGADRO_MOL
-        * 10.0
+        * 10.0 * 3600.0
     )
     model.stage_area_m2_by_stage = {"sio_stage3": 1.0}
     outcomes: list[dict[str, Any]] = []
@@ -525,7 +538,28 @@ def test_b112_positive_efficiency_does_not_mint_outcome(monkeypatch) -> None:
         alpha_s_value=1.0,
         efficiency_outcomes=outcomes,
     )
-    assert eta == pytest.approx(0.2)
+    # Independent ODE: 17 of the 33 band samples use the inclusive reactive
+    # backstop, with the stub flux supplying the same pressure coefficient in
+    # each active strip. The equilibrium headroom stays 99 Pa at 100 Pa inlet.
+    active_fraction = 17 / condensation_module.HKL_BAND_SAMPLES
+    inventory_mol = (
+        available_kg
+        / (
+            condensation_module._molecular_mass_kg_per_molecule("SiO")
+            * condensation_module.AVOGADRO_MOL
+        )
+        / 3600.0
+    )
+    expected = _integrated_pressure_driven_capture(
+        pressure=100.0,
+        psat=1.0,
+        temperature=model.gas_temperature_C + 273.15,
+        coefficient=active_fraction * (2.0 / 99.0),
+        area=1.0,
+        inventory=inventory_mol,
+        residence=1.0,
+    )
+    assert eta == pytest.approx(expected, rel=1e-8)
     assert outcomes == []
 
 

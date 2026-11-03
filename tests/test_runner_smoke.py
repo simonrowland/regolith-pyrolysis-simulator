@@ -44,6 +44,8 @@ from simulator.accounting.run_artifact import build_run_artifact
 from simulator.chemistry.kernel import ChemistryIntent, ProviderUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.core import PoisonedHourError
+from simulator.condensation import CondensationModel
+from simulator.core import CondensationTrain, EvaporationFlux, MeltState
 from simulator.diagnostics import _plain_value
 from simulator.optimize.recipe import (
     C3_ALKALI_DOSING_K_KG_PATH,
@@ -103,8 +105,14 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
         # studio-2 and studio-3 (gate config).
-        "flux_maps_sha256": "b3e8f5d65e0868bb09f59134fef15e923c654145512225862d615fef2fcb457a",
-        "ledger_sha256": "f50e2c2aaf8cef9711951d08c5df8213a7dbd0f1af467b385502eeec6aa69324",
+        # d-137 condenser (t-1217 law, Stage-1 plate, Stage-4 Na / 4b K split) +
+        # t-1579 hot-face schedule: regenerated on studio-3, two passes identical.
+        # d-137 fix rounds (single product-accounting owner, band-integrated
+        # Stage-3 capture, typed saturation refusal): flux unchanged; the
+        # ledger digest moves with the additive unrecovered_metal_phase /
+        # source-account fields. Regenerated on studio-3 at b0b70903d.
+        "flux_maps_sha256": "15c212d781da125be67e7f8e265450bcbfe4c11d8f8bfb8afc4a93f079d9bdf3",
+        "ledger_sha256": "958be30db7c2b1677301036473e8025d49cdd89480283bbd6bbf68071349978f",
     },
     "mars_basalt_C2A_12h": {
         "flux_maps_sha256": "ee736357bbbb900b35fdf3839f2b31042a6c10de7d382a7132f9eb92b763f2a7",
@@ -796,9 +804,15 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         return sum(float(values.get(species, 0.0)) for species in ("Na", "K"))
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
-    assert alkali_total(rows[8], "product_ledger_kg_at_hour") < alkali_total(
-        rows[7], "product_ledger_kg_at_hour"
+    # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
+    # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
+    # this production row total; the next row transfers it to reagent, so live
+    # product returns to zero while cumulative condensate and recycled mass
+    # retain the capture.
+    assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
+        0.0004975311735864234, rel=1e-12, abs=1e-15
     )
+    assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
         "condensation_train_kg_cumulative",
         "recycled_to_reagent_kg_cumulative",
@@ -813,9 +827,10 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
                 == pytest.approx(
                     row["product_ledger_kg_at_hour"].get(species, 0.0)
                     + row["recycled_to_reagent_kg_cumulative"].get(species, 0.0)
-                    - offgas[species]
                 )
             )
+            assert offgas[species] >= 0.0
+    assert sum(terminal_offgas[-1].values()) > 0.0
 
 
 @pytest.mark.parametrize(
@@ -2004,10 +2019,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     )
     assert _flux_ledger_pins(capture) == SCENARIO_FLUX_LEDGER_PINS[scenario["name"]]
     if scenario["name"] == "mars_basalt_C2A_12h":
-        # Pre-t-423 default-N2 hourly envelope. This uses the existing runner
-        # scenario/generator path and excludes run metadata; the rows contain
-        # no run IDs or timestamps. Keep this byte pin separate from fixture
-        # semantics so a default-path drift cannot be accepted by reblessing.
+        # Pin the merged d-137 envelope while keeping t-423's default carrier
+        # covered. d-137 adds wall-deposit authority metadata to each row.
         canonical_hours = json.dumps(
             actual["per_hour_summary"],
             sort_keys=True,
@@ -2022,7 +2035,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         ).encode("utf-8")
         assert canonical_hours == expected_hours
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "744fee078070a611770a4e86d34c47235d11006b0e8fe072cf759eb827bf9ebd"
+            "e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386"
         )
 
 
@@ -3365,6 +3378,72 @@ def test_per_hour_summary_includes_pressure_and_mass_balance():
         assert entry["O2_metric_label"] == (
             "source-side O2 potential (emitted; not recovered)"
         )
+
+
+def test_hourly_metadata_keeps_alpha_only_fe_extrapolation() -> None:
+    train = CondensationTrain.create_default()
+    model = CondensationModel(train, wall_temperature_C=1426.85)
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Fe": 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in train.stages
+        },
+        campaign_name="C0",
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1700.0),
+    )
+    assert route.wall_deposit_by_species["Fe"] > 0.0
+    assert not any(
+        model.last_sticking_alpha_provenance_notice.get(key)
+        for key in (
+            "wall_saturation_pressure_extrapolations_by_species",
+            "wall_saturation_pressure_refusals_by_species",
+            "evaporation_transport_notices_by_species",
+        )
+    )
+
+    snapshot = HourSnapshot(hour=1, campaign=CampaignPhase.C0)
+    snapshot.temperature_C = 1700.0
+    snapshot.overhead.pressure_mbar = 10.0
+    snapshot.wall_deposit_by_segment_species_delta = {
+        (segment, species): kg
+        for segment, by_species in route.wall_deposit_by_segment_species.items()
+        for species, kg in by_species.items()
+    }
+    sim = SimpleNamespace(
+        product_ledger=lambda: {},
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+        record=SimpleNamespace(snapshots=(snapshot,)),
+        condensation_model=model,
+        _last_vapour_batch_report={
+            "n_requested": 1,
+            "n_flux_active": 1,
+            "n_refused": 0,
+            "solve_bundle_ids": [],
+            "channels_by_species": {},
+            "metadata": {},
+        },
+    )
+    summary = build_per_hour_summary(
+        sim,
+        snapshot,
+        include_fe_redox_split=False,
+    )
+
+    authority = summary["vapour_batch_summary"]["metadata"][
+        "wall_deposit_sticking_authority"
+    ]
+    alpha = authority["alpha_s_provenance_by_species"]["Fe"][
+        "stage_0_to_stage_1"
+    ]
+    assert alpha["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert alpha["alpha_s_temperature_above_valid_range"] is True
+    assert alpha["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert alpha["output_status"] == "status_bearing"
+    assert authority["authoritative_for_deposit_mass"] is False
 
 
 def test_session_per_hour_summary_event_uses_runner_builder():

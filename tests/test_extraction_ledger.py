@@ -24,6 +24,10 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.config import load_config_bundle
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    stage_list_index_for_destination,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import (
     DECOMP_VOLTAGES,
@@ -969,9 +973,12 @@ def test_stage_projection_combines_condensation_and_metal_phase_sources():
     sim._record_stage_collection_source(
         "process.condensation_train", 2, "K", 2.0
     )
+    # MRE K is the appended trap, not the Na collector at list index 4.
+    trap_idx = stage_list_index_for_destination(sim.train, K_TRAP_STAGE_KEY)
+    assert trap_idx == 8
 
     sim._project_condensed_species(
-        4, "K", source_account=METAL_PHASE_ACCOUNT
+        trap_idx, "K", source_account=METAL_PHASE_ACCOUNT
     )
 
     assert sim.train.total_by_species()["K"] == pytest.approx(3.0)
@@ -980,7 +987,8 @@ def test_stage_projection_combines_condensation_and_metal_phase_sources():
     assert sim._transfer_condensed_species("K") == pytest.approx(2.0)
     assert sim.train.total_by_species()["K"] == pytest.approx(1.0)
     assert sim.train.stages[2].collected_kg.get("K", 0.0) == pytest.approx(0.0)
-    assert sim.train.stages[4].collected_kg["K"] == pytest.approx(1.0)
+    assert sim.train.stages[trap_idx].collected_kg["K"] == pytest.approx(1.0)
+    assert sim.train.stages[4].collected_kg.get("K", 0.0) == pytest.approx(0.0)
     assert sim._audit_metal_projection_drift() == {}
 
 
