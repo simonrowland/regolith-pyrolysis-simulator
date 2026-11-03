@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    Quantity,
     RefusalReason,
     ValueKind,
 )
@@ -1849,6 +1850,29 @@ def test_nonclosing_mole_percent_composition_is_flagged() -> None:
     assert composition.state.reason == (
         "mole-percent composition does not close to 100 (sum=90)"
     )
+
+
+def test_existing_percent_fraction_conversion_outputs_are_pinned() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "basis": "printed_mole_percent",
+            "amount_basis": "mole_percent",
+            "components": [["SiO2", "51.93"], ["MgO", "48.07"]],
+        }
+    )
+    selection = migrate_module.select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "wt%",
+        {"mass_loss_wt_pct": "51.93"},
+    )
+
+    assert composition.state.is_value
+    assert composition.state.value.as_map() == {
+        "SiO2": Decimal("0.5193"),
+        "MgO": Decimal("0.4807"),
+    }
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "percent_to_fraction"
 
 
 @pytest.mark.parametrize("wrapped", [False, True])
