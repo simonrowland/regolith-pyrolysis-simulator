@@ -52,7 +52,7 @@ def test_every_printed_point_has_located_conditions_and_no_assumed_pressure() ->
 def test_printed_measurements_and_table5_1_rows_match_rendered_source() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     observations = _source_observations(document)
-    assert len(observations) == 8
+    assert len(observations) == 9
     assert document["fidelity_samples"] == [
         {
             "path": "species.Na.observations[allendorf_2005_table5_1_extractive_total_sodium].values.series[3].value",
@@ -84,6 +84,14 @@ def test_printed_measurements_and_table5_1_rows_match_rendered_source() -> None:
     ]
     assert observations["allendorf_2005_table5_1_extractive_total_sodium"][1]["locator"]["page"] == 99
     assert observations["allendorf_2005_table5_1_elif_naoh"][1]["locator"]["page"] == 99
+    assert (
+        observations["allendorf_2005_table5_1_extractive_total_sodium"][1]["values"]["method_class"]
+        == "measured_direct"
+    )
+    assert (
+        observations["allendorf_2005_table5_1_elif_naoh"][1]["values"]["method_class"]
+        == "measured_direct"
+    )
     extractive_values = observations[
         "allendorf_2005_table5_1_extractive_total_sodium"
     ][1]["values"]["series"]
@@ -137,10 +145,23 @@ def test_printed_measurements_and_table5_1_rows_match_rendered_source() -> None:
         "kind": "interval", "interval_low": "5", "interval_high": "10"
     }
     assert faber_verheijen["values"]["series"][1]["T_range_C"] == ["1530", "1580"]
-    buckley = observations["allendorf_2005_buckley_later_naoh_concentration"][1]
-    assert buckley["values"]["value"] == "125"
-    assert buckley["values"]["approximate"] is True
-    assert buckley["locator"]["page"] == 82
+    later_walsh = observations["allendorf_2005_walsh_later_naoh_concentration"][1]
+    assert later_walsh["values"]["value"] == "125"
+    assert later_walsh["values"]["approximate"] is True
+    assert later_walsh["locator"]["page"] == 82
+    assert (
+        "Walsh, Moore, Neufeld, Lemings, Brown, and Wu (2001)"
+        in later_walsh["values"]["attribution"]
+    )
+    van_limpt = observations["allendorf_2005_van_limpt_unfavourable_burner_naoh_concentration"][1]
+    assert van_limpt["locator"]["page"] == 61
+    assert van_limpt["values"]["method_class"] == "quoted_attributed"
+    assert van_limpt["values"]["value"] == {
+        "kind": "interval", "interval_low": "350", "interval_high": "400"
+    }
+    assert van_limpt["values"]["value_as_published"] == "as high as 350–400 ppm"
+    assert "unfavourable burner orientation" in van_limpt["values"]["qualifier"]
+    assert "van Limpt" in van_limpt["values"]["attribution"]
 
 
 def test_isolated_migration_keeps_all_points_typed_refused_with_known_phases() -> None:
@@ -151,10 +172,10 @@ def test_isolated_migration_keeps_all_points_typed_refused_with_known_phases() -
 
     result = migrator.result
     records = list(result.observations.values())
-    assert len(records) == 20
+    assert len(records) == 21
     assert not result.validation.hard_issues
     assert not result.registry_issues
-    assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 20
+    assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 21
     assert all(record.identity.quantity.is_unknown for record in records)
     assert all(not record.identity.species.phase.is_unknown for record in records)
     for record in records:

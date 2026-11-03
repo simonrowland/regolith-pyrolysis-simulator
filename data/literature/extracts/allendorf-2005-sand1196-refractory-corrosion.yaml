@@ -17,10 +17,11 @@ extraction:
   date: '2026-11-02'
   worker: w1103cw1-al05
   note: >-
-    This extract contains 20 printed measured points: ten available numerical cells in the six-row
+    This extract contains 21 printed measured points: ten available numerical cells in the six-row
     Table 5-1, three Faber and Beerkens NaOH concentration ranges, the Walsh-reported NaOH value,
     one Monofrax test concentration, two reported refractory recession distances, two reported
-    recession rates, and a later Buckley-reported NaOH concentration. Table 5-1's two n.a. cells
+    recession rates, a later Walsh-reported NaOH concentration, and the van Limpt-attributed
+    350–400 ppm NaOH range. Table 5-1's two n.a. cells
     are retained in printed_table_rows below, never as zero. No condition is supplied unless printed
     for that observation. Measured activity curves and figure-only corrosion series are listed in
     the companion audit and are not digitized.
@@ -72,16 +73,14 @@ species:
         units: ppm
         values:
           quantity: total_sodium_vapour_concentration_ppm
-          method_class: quoted_attributed
+          method_class: measured_direct
           admission_status: typed_refusal
           status: typed_refusal
           reason: >-
             No closed quantity token represents total gas-phase sodium concentration independent
             of speciation; the total sodium sample amounts and withdrawn gas volumes are not
             tabulated as lineage inputs.
-          attribution: >-
-            Allendorf et al., Table 5-1. The report says concentration was determined from withdrawn
-            gas volume and collected sodium amount; those per-sample inputs are not tabulated.
+          attribution: Allendorf et al., authors' own Table 5-1 extractive measurements.
           species_as_printed: total sodium, independent of speciation
           series:
             - value: '185'
@@ -146,13 +145,13 @@ species:
         units: ppm
         values:
           quantity: naoh_vapour_concentration_ppm
-          method_class: quoted_attributed
+          method_class: measured_direct
           admission_status: typed_refusal
           status: typed_refusal
           reason: >-
             No closed quantity token represents gas concentration in ppm; the underlying ELIF
             signals and the Figure 5-3 calibration values are not tabulated as lineage inputs.
-          attribution: Allendorf et al., Table 5-1; values use the Figure 5-3 ELIF calibration.
+          attribution: Allendorf et al., authors' own Table 5-1 ELIF measurements using Figure 5-3 calibration.
           series:
             - value: '125'
               port_as_printed: Right side midtank port
@@ -324,7 +323,7 @@ species:
                         - [MgO, '4.21']
                   locator: {page: 67}
                 duration_h: {state: {tag: value, value: '75'}, locator: {page: 68}}
-      - observation_id: allendorf_2005_buckley_later_naoh_concentration
+      - observation_id: allendorf_2005_walsh_later_naoh_concentration
         type: concentration_series
         locator: {page: 82, section: Computational Fluid Dynamic Modeling of Corrosion}
         phase: g
@@ -335,7 +334,7 @@ species:
           admission_status: typed_refusal
           status: typed_refusal
           reason: No closed quantity token represents gas concentration in ppm.
-          attribution: Later measurements reported from the same furnace, cited as reference 64.
+          attribution: Later measurements reported from the same furnace, attributed to Walsh, Moore, Neufeld, Lemings, Brown, and Wu (2001), reference 64.
           approximate: true
           value: '125'
           value_as_published: approximately 125 ppm at 1.0 m
@@ -350,6 +349,31 @@ species:
                 atmosphere: {state: {tag: unknown, reason: gas_composition_at_measurement_not_reported}, locator: {page: 82}}
                 composition: {state: {tag: unknown, reason: melt_composition_at_measurement_not_reported}, locator: {page: 82}}
                 axial_position_m: {state: {tag: value, value: '1.0'}, locator: {page: 82}}
+      - observation_id: allendorf_2005_van_limpt_unfavourable_burner_naoh_concentration
+        type: concentration_series
+        locator: {page: 61, section: Comparison of measured and predicted corrosion-product composition}
+        phase: g
+        units: ppm
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents gas concentration in ppm.
+          attribution: van Limpt, reference 24, as cited by Allendorf et al. (2000).
+          qualifier: Reported as high as 350–400 ppm from unfavourable burner orientation in an oxy-fuel furnace.
+          value: {kind: interval, interval_low: '350', interval_high: '400'}
+          value_as_published: as high as 350–400 ppm
+          note: Unfavourable burner orientation in an oxy-fuel furnace.
+          series:
+            - value: {kind: interval, interval_low: '350', interval_high: '400'}
+              as_published: as high as 350–400 ppm
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_reported}, locator: {page: 61}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_or_gas_ratio_reported}, locator: {page: 61}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 61}}
+                atmosphere: {state: {tag: value, value: oxy-fuel furnace}, locator: {page: 61}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_reported}, locator: {page: 61}}
   SiO2:
     observations:
       - observation_id: allendorf_2005_werezczak_recession_distances
