@@ -173,6 +173,12 @@ def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
     assert table3_na4feo3.identity.temperature_K.value == Decimal("904")
     assert table3_na4feo3.point_conditions["temperature_K"].locator.page == 5
     assert table3_na4feo3.point_conditions["temperature_K"].locator.equation == "33"
+    assert table3_na4feo3.identity.composition.is_unknown
+    assert "basis and denominator are not printed" in table3_na4feo3.identity.composition.reason
+    composition_condition = table3_na4feo3.point_conditions["composition"]
+    assert composition_condition.state.is_unknown
+    assert composition_condition.locator.page == 5
+    assert composition_condition.locator.equation == "33"
 
     # Independent render pins: the raw printed cells and their page/table locators.
     rendered_cells = (
@@ -230,6 +236,9 @@ def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
     oxide_formation = _raw_row(
         extract, "Na4FeO3", "dai_1984_table3_na4feo3_gibbs_from_oxides"
     )
+    assert oxide_formation["values"]["melt_Na_fraction_as_printed"] == "0.85"
+    assert oxide_formation["values"]["melt_composition_as_printed"] == "0.85 Na-fraction"
+    assert oxide_formation["values"]["melt_composition_locator"]["equation"] == "33"
     assert oxide_formation["values"]["table_cell_as_printed"] == "-147988 + 164.80T"
     assert oxide_formation["values"]["equation_34_as_printed"] == "-147998 + 164.8T"
     equation_34_sample = next(

@@ -2848,6 +2848,12 @@ species:
             published_page: 36
             section: Discussion
             equation: '33'
+        composition:
+          state:
+            tag: unknown
+            reason: The source prints 0.85 Na-fraction, but its composition basis
+              and denominator are not printed.
+          locator: *id052
       values:
         quantity: gibbs_formation_from_component_oxides_as_printed
         method_class: model_derived
@@ -2866,6 +2872,13 @@ species:
           -147988; both render-verified forms are retained. The text also pairs 0.85
           Na-fraction with aNa2O=0.74 under Eq. (23); both are preserved without recalculation.
         melt_Na_fraction_as_printed: '0.85'
+        melt_composition_as_printed: 0.85 Na-fraction
+        melt_composition_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 36
+          section: Discussion
+          equation: '33'
         activity_Na2O_as_printed: '0.74'
         calibration_locator:
           page: 5

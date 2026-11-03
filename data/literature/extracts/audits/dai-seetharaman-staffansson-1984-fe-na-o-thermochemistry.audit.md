@@ -49,19 +49,19 @@ Migrated identity axes (`composition`, `total_pressure_Pa`, `fO2_Pa`, `temperatu
 | Observation | Migrated axes |
 | --- | --- |
 | Table II FeO heat evolution | composition not mapped; total pressure not mapped; fO₂ not mapped; 313.15 K |
-| Table III Na₂FeO₂ formation from oxides | composition not mapped; total pressure not mapped; fO₂ not mapped; 1075 K |
+| Table III Na₄FeO₃ formation from oxides | composition unknown: basis and denominator are not printed; total pressure not mapped; fO₂ not mapped; 904 K |
 | Table VII O₂ log pressure, phase row 1 | composition not mapped; total pressure not mapped; fO₂ not mapped; 873 K |
 
-For those rows, the source does not print a sample mixture composition, numeric oxygen pressure, or experimental total pressure. The Table III Na₄FeO₃ calculation is an exception: page 5 prints “0.85 Na-fraction” for the melt at 904 K. The value and equation locator are preserved in the row, but it does not yet reach `Identity.composition`; a schema/science ruling is needed before choosing a component or denominator. The existing composition parser accepts `AmountBasis` values and component maps (`simulator/battery/enums.py::AmountBasis`, `simulator/battery/migrate.py::_composition_from_plain`).
+For those rows, the source does not print a sample mixture composition, numeric oxygen pressure, or experimental total pressure. The Table III Na₄FeO₃ calculation is an exception: page 5 prints “0.85 Na-fraction” for the melt at 904 K. The verbatim value, label, and Eq. (33) locator are retained as a method input; the migrated identity composition and `point_conditions.composition` remain unknown because the source does not state the basis or denominator. This is an open source-interpretation question for a later reader, not a schema gap. The existing composition parser accepts `AmountBasis` values and component maps (`simulator/battery/enums.py::AmountBasis`, `simulator/battery/migrate.py::_composition_from_plain`).
 
 ## Verification status
 
 - Focused extract test: passed; pins five render values/locators, row counts, the exact quantity-unknown set, condition mapping, phase mapping, and unprinted pressure/fO₂ absence.
 - Mutation check: changing the pinned Table II `345600` cell to `345601` made the focused test fail at the independent render pin; the source value was restored and the test passed again.
 - `tests/test_yaml_flow_scalar_commas.py`: 17 passed.
-- `tests/test_literature_extracts.py`: **UNVERIFIED-local**. The full local run was stopped at 290 seconds under the 300-second per-call cap after 893 tests were collected; bounded `-k` batches remain to be run.
+- `tests/test_literature_extracts.py`: bounded local `-k` batches passed for all 637 fidelity samples and the other collected cases, except `test_repo_extracts_validate_green` and `test_pilot_extract_count_exact_and_merge_smoke`. Each of those repository-wide checks was run alone and stopped at 290 seconds under the 300-second per-call cap; both remain **UNVERIFIED-local**. The full invocation collected 893 tests before it was stopped at the same cap.
 - Expected store delta is 67 unavailable observations. No generated battery store is included.
 
-## Open composition binding
+## Open composition interpretation
 
-Do not commit a guessed composition identity for “0.85 Na-fraction.” The paper does not state whether this is a mole fraction, an oxide fraction, or a fraction on another denominator. Resume after the controller resolves whether to encode a partial Na component with a specific existing amount basis or leave the identity axis unknown while retaining the located printed method input.
+The paper does not state whether “0.85 Na-fraction” is a cation fraction, an atom fraction, or a mole fraction of an oxide component. The identity remains explicitly unknown with the page 5 Eq. (33) locator, while the printed value and label remain on the row as a method input. A later reader may resolve the basis from the cited phase-diagram source [7].
