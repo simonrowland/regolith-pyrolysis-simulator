@@ -65,7 +65,17 @@ from simulator.battery.polymorph_dictionary import (
     polymorph_matches_formula,
     resolve_formula_polymorph,
 )
-from simulator.battery.composition import parse_species_formula
+from simulator.battery.composition import (
+    ELEMENT_WT_PERCENT_FEO_T_BASIS,
+    ElementMassFractionRedox,
+    canonical_element_symbol,
+    element_mass_fraction_redox,
+    element_wt_percent_map_from_row,
+    parse_species_formula,
+    printed_component_identified,
+    printed_oxygen_sigma_from_row,
+    unidentified_component_refusal,
+)
 from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
@@ -79,6 +89,7 @@ from simulator.battery.enums import (
     Authority,
     BoundDirection,
     BoundInclusivity,
+    ELEMENT_WT_PERCENT_BASIS,
     EvidenceClass,
     ExperimentKind,
     FUSION_QUANTITIES,
@@ -3934,21 +3945,23 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
         raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
 
-    unsupported = []
+    # A formula the parser can read (H2O, Cl, Ag2O, I2O, Re) stays in the
+    # stored map. A token it cannot read (Na2O_plus_K2O) is still a refusal.
+    # Engine support is a later split: this conversion does not drop a
+    # component the parser identified.
+    unidentified = []
     for oxide, weight in wt.items():
         name = str(oxide).strip()
-        if (
-            name in _COMPOSITION_COMPONENTS
-            or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+        if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
+        if printed_component_identified(
+            name, known_components=tuple(_COMPOSITION_COMPONENTS)
         ):
             continue
         if _as_dec_or_none(weight) is not None:
-            unsupported.append(name)
-    if unsupported:
-        raise ValueError(
-            "printed oxide wt% map has unsupported numeric component(s): "
-            + ", ".join(sorted(unsupported))
-        )
+            unidentified.append(name)
+    if unidentified:
+        raise ValueError(unidentified_component_refusal(unidentified))
 
     moles: dict[str, Decimal] = {}
     total = Decimal("0")
@@ -3958,12 +3971,19 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
             continue
         component = _COMPOSITION_COMPONENTS.get(name)
         if component is None:
-            continue
+            if not printed_component_identified(name):
+                continue
+            canonical_name = name
+        else:
+            canonical_name = component[1]
         amount = as_decimal(weight)
         if amount < 0:
             raise ValueError(f"oxide {name!r} wt% is negative")
-        n = amount / oxide_molar_mass(name)
-        canonical_name = component[1]
+        try:
+            mass = oxide_molar_mass(name)
+        except (KeyError, ValueError, ArithmeticError):
+            raise ValueError(unidentified_component_refusal([name]))
+        n = amount / mass
         moles[canonical_name] = moles.get(canonical_name, Decimal("0")) + n
         total += n
     if total <= 0:
@@ -5934,6 +5954,167 @@ def _phase_row_rejection(
         if not equation:
             return "printed capacity requires defining_equation"
     return None
+
+
+def _element_wt_notices(
+    decision: ElementMassFractionRedox,
+    *,
+    quantity: Quantity,
+    origin: str,
+) -> list[Notice]:
+    notices: list[Notice] = []
+    for item in decision.notices:
+        notices.append(
+            Notice(
+                kind=item.kind,
+                affected_quantities=(quantity,),
+                reason=item.reason,
+                origin=origin,
+                dropped=item.dropped or None,
+            )
+        )
+    return notices
+
+
+def _apply_element_mass_fraction_basis(
+    *,
+    values: Mapping[str, Any],
+    ident_kwargs: dict[str, Any],
+    point_conditions: dict[str, Located[Any]] | None,
+    locator: Locator | None,
+    origin: str,
+    quantity: Quantity,
+    species_formula: str,
+    read_from: str,
+) -> tuple[dict[str, Any], dict[str, Located[Any]] | None, list[Notice]]:
+    """Store printed element wt% and the FeO_T relabel. O is not rebuilt.
+
+    The oxide mole fractions are what an engine consumes. The oxygen excess
+    is a derived point, marked with inference so a ferric reader does not
+    treat it as a printed Fe3+ measurement.
+    """
+
+    notices: list[Notice] = []
+    element_map = element_wt_percent_map_from_row(values)
+    if element_map is None:
+        ident_kwargs["composition"] = State.unknown(
+            "element_wt_percent map is not printed"
+        )
+        notices.append(
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason="element_wt_percent_not_printed",
+                origin=origin,
+            )
+        )
+        return ident_kwargs, point_conditions, notices
+
+    sigma, sigma_clash = printed_oxygen_sigma_from_row(values)
+    if sigma_clash is not None:
+        notices.append(
+            Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(quantity,),
+                reason=sigma_clash,
+                origin=origin,
+            )
+        )
+    decision = element_mass_fraction_redox(
+        element_map,
+        oxygen_wt_percent_sigma=sigma,
+        chloride_components=(),
+    )
+    notices.extend(
+        _element_wt_notices(decision, quantity=quantity, origin=origin)
+    )
+    conditions = dict(point_conditions or {})
+    if decision.printed_wt_percent:
+        try:
+            verbatim = Composition(
+                basis=ELEMENT_WT_PERCENT_BASIS,
+                components=decision.printed_wt_percent,
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        except ValueError as exc:
+            ident_kwargs["composition"] = State.unknown(str(exc))
+            return ident_kwargs, conditions or None, notices
+        conditions[ELEMENT_WT_PERCENT_BASIS] = Located(
+            State.of(verbatim), locator=locator
+        )
+    if decision.oxide_mole_fractions:
+        oxide = Composition(
+            basis=ELEMENT_WT_PERCENT_FEO_T_BASIS,
+            components=decision.oxide_mole_fractions,
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        ident_kwargs["composition"] = State.of(oxide)
+        conditions["composition"] = Located(
+            State.of(oxide),
+            locator=locator,
+            inference=Derivation(
+                relation="element_wt_percent_feo_t",
+                inputs=(read_from,),
+                parameters=(),
+                output_unit="mole_fraction",
+            ),
+        )
+    else:
+        ident_kwargs["composition"] = State.unknown(
+            decision.refusal or "element_wt_percent relabel refused"
+        )
+    if decision.oxygen_excess_mol_per_100g is not None:
+        parameters: list[tuple[str, Located[Any]]] = []
+        if decision.oxygen_excess_sigma_mol_per_100g is not None and sigma is not None:
+            parameters.append(
+                (
+                    "oxygen_wt_percent_sigma",
+                    Located(State.of(sigma), locator=locator),
+                )
+            )
+        if decision.fe3_over_sum_fe is not None:
+            parameters.append(
+                (
+                    "derived_fe3_over_sum_fe",
+                    Located(State.of(decision.fe3_over_sum_fe), locator=locator),
+                )
+            )
+        conditions["oxygen_excess_mol_per_100g"] = Located(
+            State.of(decision.oxygen_excess_mol_per_100g),
+            locator=locator,
+            inference=Derivation(
+                relation="measured_oxygen_excess",
+                inputs=(read_from,),
+                parameters=tuple(parameters),
+                output_unit="mol/100g",
+            ),
+        )
+    printed_amount = _as_dec_or_none(values.get("component_amount"))
+    symbol = canonical_element_symbol(species_formula)
+    vector_amount = None
+    for key, amount in decision.printed_wt_percent:
+        if canonical_element_symbol(key) == symbol:
+            vector_amount = amount
+            break
+    if (
+        printed_amount is not None
+        and vector_amount is not None
+        and printed_amount != vector_amount
+        and decision.refusal != "duplicate_total_iron"
+    ):
+        notices.append(
+            Notice(
+                kind=NoticeKind.SOURCE_DISAGREEMENT,
+                affected_quantities=(quantity,),
+                reason=(
+                    "component_amount_disagrees_with_element_wt_percent: "
+                    f"{species_formula} component_amount={printed_amount} "
+                    f"element_wt_percent={vector_amount}"
+                ),
+                origin=origin,
+            )
+        )
+    return ident_kwargs, conditions or None, notices
 
 
 def _point_condition_decimal(node: object) -> Decimal | None:
@@ -19461,6 +19642,23 @@ class Migrator:
                 ident_kwargs["fO2_Pa"] = State.of(
                     _log_fO2_to_pa(fO2_condition.state.value, fO2_reference_pa)
                 )
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and str(values.get("basis") or "").strip() == ELEMENT_WT_PERCENT_BASIS
+        ):
+            ident_kwargs, point_conditions, element_notices = (
+                _apply_element_mass_fraction_basis(
+                    values=values,
+                    ident_kwargs=ident_kwargs,
+                    point_conditions=point_conditions,
+                    locator=locator,
+                    origin=obs_id,
+                    quantity=q_token,
+                    species_formula=species.formula,
+                    read_from=choose_read_from(work, locator),
+                )
+            )
+            starting_bulk_notices.extend(element_notices)
         identity = fill_identity(
             quantity,
             None if q_token is Quantity.LOG10_K_REACTION else species,

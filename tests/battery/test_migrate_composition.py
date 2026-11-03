@@ -389,9 +389,24 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         values=observation["values"],
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
+    printed_cl = Decimal(str(observation["values"]["composition_wt_pct"]["Cl"]))
+    assert printed_cl == Decimal("0.81")
     expected = selected.initial_composition
-    assert expected is not None and not expected.state.is_value
-    assert "unsupported numeric component(s): Cl" in expected.state.reason
+    assert expected is not None and expected.state.is_value
+    assert isinstance(expected.state.value, Composition)
+    assert "Cl" in dict(expected.state.value.components)
+    printed = selected.printed_composition
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value["Cl"] == str(printed_cl)
+    from simulator.battery.composition import partition_engine_components
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+    _kept, excluded = partition_engine_components(
+        {name: Decimal(str(amount)) for name, amount in printed.state.value.items()},
+        engine_components=MELTS_OXIDE_BASIS,
+        retain_components=(),
+    )
+    assert ("Cl", printed_cl) in excluded
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -2595,7 +2610,11 @@ def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     )
 
 
-def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+def test_mass_percent_initial_keeps_the_printed_map_and_stores_chlorine() -> None:
+    """Cl is a real formula. The printed map stays verbatim and the mole
+    fraction stores Cl. MELTS does not list Cl, so the engine split names it.
+    """
+
     raw = {
         "initial_composition": {
             "locator": {"table": "2", "page": 14},
@@ -2614,8 +2633,20 @@ def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical(
 
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
-    assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_unknown
+    initial = sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert isinstance(initial.state.value, Composition)
+    assert set(dict(initial.state.value.components)) == {"SiO2", "Cl"}
+    from simulator.battery.composition import partition_engine_components
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+    kept, excluded = partition_engine_components(
+        {"SiO2": Decimal("60"), "Cl": Decimal("40")},
+        engine_components=MELTS_OXIDE_BASIS,
+        retain_components=(),
+    )
+    assert dict(kept) == {"SiO2": Decimal("60")}
+    assert ("Cl", Decimal("40")) in excluded
 
 
 def _iter_store_observations() -> list[dict]:
