@@ -17898,6 +17898,28 @@ def test_residue_identity_uses_only_printed_fo2_from_row_or_experiment(
     assert "fO2_Pa" in outcome.fields
 
 
+def test_bare_log_convention_pins_existing_iw_window() -> None:
+    from simulator.battery.migrate import _bare_log_convention
+
+    accepted, notice = _bare_log_convention(Decimal("-12"), Decimal("1600"))
+    assert accepted.is_value
+    # 10^-12 bar × 100000 Pa/bar, pinned before the admission rule changes.
+    assert accepted.value == Decimal("1e-7")
+    assert notice == (
+        "fO2 reference state not printed; 1 bar convention assumed "
+        "(1 atm alternative: +0.0057 dex)"
+    )
+
+    rejected, rejection_notice = _bare_log_convention(
+        Decimal("-0.68"), Decimal("1600")
+    )
+    assert rejected.is_unknown
+    assert rejected.reason == (
+        "fO2 reference scale not printed (absolute vs buffer-relative)"
+    )
+    assert rejection_notice is None
+
+
 def test_residue_series_resolves_printed_oxygen_once_at_final_identity(
     tmp_path: Path,
 ) -> None:
