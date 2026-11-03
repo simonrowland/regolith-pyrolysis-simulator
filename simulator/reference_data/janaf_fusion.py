@@ -236,13 +236,21 @@ def _fusion_gibbs_difference_from_points(
     ) - _interpolate_formation_gibbs(solid_points, temperature_K)
 
 
+def d144_fusion_table_pair(oxide: str) -> tuple[str, str] | None:
+    """Return an oxide's d-144 solid/liquid pair, if its solid is identified."""
+    pair = _FUSION_TABLES.get(str(oxide))
+    if pair is None or pair[0] not in _D144_SINGLE_POLYMORPH_TABLES:
+        return None
+    return pair
+
+
 def d144_fusion_delta_g_kJ_per_mol(
     oxide: str, temperature_K: Decimal
 ) -> Decimal:
     """Return the JANAF liquid-minus-solid Gibbs chord for the d-144 pair."""
 
-    pair = _FUSION_TABLES.get(str(oxide))
-    if pair is None or pair[0] not in _D144_SINGLE_POLYMORPH_TABLES:
+    pair = d144_fusion_table_pair(oxide)
+    if pair is None:
         raise ValueError(f"no d-144 JANAF fusion pair for {oxide}")
     temperature = Decimal(str(temperature_K))
     solid_points, _solid_digest = _fusion_table_points(pair[0])

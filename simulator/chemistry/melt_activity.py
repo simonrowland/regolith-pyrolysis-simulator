@@ -11,8 +11,14 @@ import math
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from decimal import Decimal
 from functools import lru_cache
 from typing import Any
+
+from simulator.reference_data.janaf_fusion import (
+    d144_fusion_delta_g_kJ_per_mol,
+    d144_fusion_table_pair,
+)
 
 
 ALPHAMELTS_CROSS_CHECK_STATUS = "inconclusive_no_activities"
@@ -28,12 +34,15 @@ MELT_OXIDE_IDEAL_ASSERTION_TIER = "ASSUMED_IDEAL_SOLUTION"
 MELT_OXIDE_TABLE_GAMMA_MODEL = "constant_gamma_table_with_endmember_continuity"
 MELT_OXIDE_IDEAL_SOLUTION_MODEL = "declared_ideal_solution"
 MELT_OXIDE_ACTIVITY_LIMITATION = (
-    "constant_gamma_table_value with endmember continuity shell starting at "
-    "asserted X=0.99; gamma is a shipped mid-range constant (CaO/Al2O3/SiO2/"
+    "constant source-table gamma with endmember continuity shell starting at "
+    "asserted X=0.99; source gamma is a shipped mid-range constant "
+    "(CaO/Al2O3/SiO2/"
     "TiO2/Cr2O3/MgO/MnO: rounded geometric midpoint of the Sossi & Fegley 2018 "
     "Table 2 printed envelope, not a cited point coefficient; Na2O/K2O: cited "
-    "point anchors); no one-parameter pseudo-binary mid-range regular solution "
-    "and no A*T*/T temperature scaling of gamma (held for multi-component G^E / "
+    "point anchors); verified solid-referenced CaO and MgO source gammas are "
+    "converted to the declared liquid basis with the JANAF d-144 fusion chord; "
+    "no one-parameter pseudo-binary mid-range regular solution and no A*T*/T "
+    "temperature scaling of the source gamma (held for multi-component G^E / "
     "MC-5); as X approaches 1 the shell enforces Raoultian a->1 continuously so "
     "the former gamma*X to a=1 step (31.1x for Cr) is absent; when "
     "valid_range_K is set, a temperature outside that interval remains "
@@ -78,6 +87,46 @@ class MeltOxideActivityCoefficient:
     citation: str
     valid_range_K: tuple[float, float] | None = None
     anchor_T_K: float | None = None
+
+
+@dataclass(frozen=True)
+class _VerifiedGammaReferenceState:
+    quote_locator: str
+    phase: str
+    missing_fusion_chord_reason: str | None = None
+
+
+# Each value records what the cited primary says about the standard state.
+# The MnO source is verified as solid-referenced, but this checkout's JANAF
+# manifest has no MnO(cr)/MnO(l) pair with which to convert it.
+reference_state_provenance: dict[
+    str, _VerifiedGammaReferenceState | str
+] = {
+    "Na2O": _VerifiedGammaReferenceState(
+        "Sossi et al. 2019 manuscript line 219; pure liquid oxide", "liquid"
+    ),
+    "K2O": "unprinted",
+    "CaO": _VerifiedGammaReferenceState(
+        "Beckett 2002 p. 94 §2.1 after Eq. (2); lime", "solid"
+    ),
+    "Al2O3": "unverified",
+    "SiO2": "unverified",
+    "TiO2": "unverified",
+    "Cr2O3": _VerifiedGammaReferenceState(
+        "Pretorius & Muan 1992 p. 1368 §IV; CrO1.5 pure liquid", "liquid"
+    ),
+    "MgO": _VerifiedGammaReferenceState(
+        "Beckett 2002 p. 94 §2.1 after Eq. (2); periclase", "solid"
+    ),
+    "MnO": _VerifiedGammaReferenceState(
+        "Ohta & Suito 1995 p. 296 §III.C; solid standard state",
+        "solid",
+        "JANAF manifest lists only elemental Mn-001 through Mn-006; no "
+        "MnO(cr)/MnO(l) fusion chord (data/literature/compilations/janaf/"
+        "manifest.yaml:28177-28444)",
+    ),
+    "P2O5": "unverified",
+}
 
 
 # provenance: gamma_alkali_melt_activity
@@ -551,6 +600,69 @@ def table_gamma_effective(
     return effective_gamma
 
 
+def _gamma_reference_state_notice(parent_oxide: str) -> str | None:
+    provenance = reference_state_provenance.get(parent_oxide)
+    if provenance == "unverified":
+        return "gamma_reference_state_unverified"
+    if provenance == "unprinted":
+        return "gamma_reference_state_unprinted"
+    if (
+        isinstance(provenance, _VerifiedGammaReferenceState)
+        and provenance.phase == "solid"
+        and d144_fusion_table_pair(parent_oxide) is None
+    ):
+        reason = provenance.missing_fusion_chord_reason
+        if reason is None:
+            raise ValueError(
+                f"{parent_oxide}: verified solid gamma lacks its JANAF fusion chord"
+            )
+        return f"gamma_reference_state_solid_unconverted (reason: {reason})"
+    return None
+
+
+def _melt_oxide_gamma_for_activity(
+    parent_oxide: str,
+    gamma_s: float,
+    temperature_K: float | None,
+) -> tuple[float, str | None]:
+    """Return the activity gamma on the declared liquid basis and its notice."""
+
+    provenance = reference_state_provenance.get(parent_oxide)
+    gamma = float(gamma_s)
+    if (
+        isinstance(provenance, _VerifiedGammaReferenceState)
+        and provenance.phase == "solid"
+    ):
+        if d144_fusion_table_pair(parent_oxide) is not None:
+            if temperature_K is None:
+                raise ValueError(
+                    f"temperature_K required for solid-referenced {parent_oxide} gamma"
+                )
+            temperature = float(temperature_K)
+            delta_g_fus = float(
+                d144_fusion_delta_g_kJ_per_mol(
+                    parent_oxide, Decimal(str(temperature))
+                )
+            )
+            # mu = mu_s° + RT ln(a_s) = mu_l° + RT ln(a_l), so
+            # a_l = a_s exp(-(mu_l° - mu_s°)/RT). At the same X,
+            # gamma_l = gamma_s exp(-dG_fus/RT). JANAF supplies dG in
+            # kJ/mol; R is kJ/(mol K) and T is K, making the exponent
+            # dimensionless. Below T_fus, dG_fus > 0 and gamma_l < gamma_s.
+            # Sanity: at 1873 K, MgO's rough fusion-enthalpy estimate
+            # (dH_fus ~77 kJ/mol, T_m ~3098 K) gives dG ~30.4 kJ/mol
+            # and a factor ~0.14; the JANAF chord gives the Kume row
+            # a_l/a_s factor ~0.16.
+            gamma *= math.exp(-delta_g_fus / (R_KJ_PER_MOL_K * temperature))
+        return gamma, _gamma_reference_state_notice(parent_oxide)
+    return gamma, _gamma_reference_state_notice(parent_oxide)
+
+
+def _combine_activity_warnings(*warnings: str | None) -> str | None:
+    combined = "; ".join(warning for warning in warnings if warning)
+    return combined or None
+
+
 def melt_oxide_activity(
     parent_oxide: str,
     account_mol: Mapping[str, float],
@@ -612,6 +724,9 @@ def melt_oxide_activity(
                 "melt_oxide_activity unity-gamma fallback: P2O5 literature "
                 "gamma requires temperature_K; result is non-authoritative"
             )
+            warning = _combine_activity_warnings(
+                warning, _gamma_reference_state_notice(parent)
+            )
             citation = (
                 "ASSUMED unity fallback; temperature_K required for the "
                 "Turkdogan/Sossi-Fegley P2O5 gamma envelope"
@@ -661,7 +776,10 @@ def melt_oxide_activity(
         )
 
     activity_authority_status = "temperature_not_supplied"
-    activity_warning = None
+    gamma, reference_state_warning = _melt_oxide_gamma_for_activity(
+        parent, coeff.gamma, resolved_temperature_K
+    )
+    activity_warning = reference_state_warning
     if resolved_temperature_K is not None and coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
         if low <= resolved_temperature_K <= high:
@@ -670,33 +788,36 @@ def melt_oxide_activity(
             activity_authority_status = (
                 "out_of_gamma_domain_status_bearing_non_authoritative"
             )
-            activity_warning = (
+            domain_warning = (
                 "constant_gamma_extrapolated_out_of_domain: "
                 f"parent_oxide={parent} temperature_K={resolved_temperature_K:.3f} "
                 f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
+            )
+            activity_warning = _combine_activity_warnings(
+                domain_warning, reference_state_warning
             )
 
     if x_single_cation <= 0.0:
         return MeltOxideActivity(
             parent,
             coeff.single_cation_component,
-            coeff.gamma,
+            gamma,
             0.0,
             0.0,
             coeff.citation,
             activity_warning,
-            effective_gamma=table_gamma_effective(coeff.gamma, 0.0),
+            effective_gamma=table_gamma_effective(gamma, 0.0),
             temperature_K=resolved_temperature_K,
             valid_range_K=coeff.valid_range_K,
             authority_status=activity_authority_status,
         )
 
-    effective_gamma = table_gamma_effective(coeff.gamma, x_single_cation)
+    effective_gamma = table_gamma_effective(gamma, x_single_cation)
     activity = effective_gamma * x_single_cation
     return MeltOxideActivity(
         parent,
         coeff.single_cation_component,
-        coeff.gamma,
+        gamma,
         x_single_cation,
         activity,
         coeff.citation,
