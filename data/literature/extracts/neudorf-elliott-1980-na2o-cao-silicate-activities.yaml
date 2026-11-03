@@ -144,10 +144,26 @@ species:
         published_page: 608
         section: Thermodynamic Considerations
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+      derivation:
+        relation: "Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 25 w/o melt; fit inputs derive from measured cell potentials."
+        method:
+          state:
+            tag: value
+            value: "Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 25 w/o melt; fit inputs derive from measured cell potentials."
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            section: "Table I"
+            equation: "4–6"
+        inputs:
+        - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
       values:
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         activity: '-10.2'
         printed_form: log10
@@ -171,7 +187,6 @@ species:
             published_page: 607
             section: Thermodynamic Considerations
             note: The cell diagram prints O2(g, 0.21 atm) on both sides.
-        attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
       point_conditions:
         temperature_C:
           state:
@@ -209,7 +224,6 @@ species:
             references: []
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
     - observation_id: neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -239,10 +253,26 @@ species:
             value: 0
       standard_state_locator: *id004
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+      derivation:
+        relation: "Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 40 w/o melt; fit inputs derive from measured cell potentials."
+        method:
+          state:
+            tag: value
+            value: "Abstract activity evaluated from the authors' fitted log aNa2O = A/T + B relation for the 40 w/o melt; fit inputs derive from measured cell potentials."
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            section: "Table I"
+            equation: "4–6"
+        inputs:
+        - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
       values:
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         activity: '-8.3'
         printed_form: log10
@@ -255,7 +285,6 @@ species:
         composition_discrepancy_note: ''
         method_as_printed: Activities of Na2O were calculated from the reversible emf of the cell.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
       point_conditions:
         temperature_C:
           state:
@@ -293,7 +322,6 @@ species:
             references: []
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 1, Abstract or Results and Discussion.
     - observation_id: neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -306,6 +334,28 @@ species:
         note: 'row 1: 25 w/o Na2O'
       phase: l
       units: dimensionless
+      derivation:
+        relation: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+        method:
+          state:
+            tag: value
+            value: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 609
+            section: Na2O-SiO2 System
+            equation: "4–6"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            figure: '3'
+            note: Raw cell-potential values used for the fit are not tabulated.
       values:
         fit_equation_as_printed: log aNa2O = A / T + B
         A_as_printed: -7,650
@@ -323,8 +373,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -334,7 +384,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
       point_conditions:
         temperature_C: &id007
           state:
@@ -364,7 +413,6 @@ species:
             note: Table I row 1 prints 34.4 m/o Na2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
     - observation_id: neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -377,6 +425,28 @@ species:
         note: 'row 2: 30 w/o Na2O'
       phase: l
       units: dimensionless
+      derivation:
+        relation: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+        method:
+          state:
+            tag: value
+            value: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 609
+            section: Na2O-SiO2 System
+            equation: "4–6"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            figure: '3'
+            note: Raw cell-potential values used for the fit are not tabulated.
       values:
         fit_equation_as_printed: log aNa2O = A / T + B
         A_as_printed: -8,390
@@ -394,8 +464,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -405,7 +475,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
       point_conditions:
         temperature_C: *id007
         composition:
@@ -425,7 +494,6 @@ species:
             note: Table I row 2 prints 29.4 m/o Na2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
     - observation_id: neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -438,6 +506,28 @@ species:
         note: 'row 3: 35 w/o Na2O'
       phase: l
       units: dimensionless
+      derivation:
+        relation: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+        method:
+          state:
+            tag: value
+            value: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 609
+            section: Na2O-SiO2 System
+            equation: "4–6"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            figure: '3'
+            note: Raw cell-potential values used for the fit are not tabulated.
       values:
         fit_equation_as_printed: log aNa2O = A / T + B
         A_as_printed: -6,830
@@ -455,8 +545,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -466,7 +556,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
       point_conditions:
         temperature_C: *id007
         composition:
@@ -486,7 +575,6 @@ species:
             note: Table I row 3 prints 34.3 m/o Na2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
     - observation_id: neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -499,6 +587,28 @@ species:
         note: 'row 4: 40 w/o Na2O'
       phase: l
       units: dimensionless
+      derivation:
+        relation: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+        method:
+          state:
+            tag: value
+            value: "Measured cell potentials and temperatures were converted to log aNa2O using Eqs. [4]–[6]; straight lines were fitted to Fig. 3 data and coefficients printed in Table I."
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 609
+            section: Na2O-SiO2 System
+            equation: "4–6"
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            figure: '3'
+            note: Raw cell-potential values used for the fit are not tabulated.
       values:
         fit_equation_as_printed: log aNa2O = A / T + B
         A_as_printed: -6,140
@@ -516,8 +626,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -527,7 +637,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
       point_conditions:
         temperature_C: *id007
         composition:
@@ -547,7 +656,6 @@ species:
             note: Table I row 4 prints 39.3 m/o Na2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table I.
     - observation_id: neudorf_elliott_1980_table2_na2o_fit_row1
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -560,6 +668,28 @@ species:
         note: left-hand equation row 1; T = 1273 K
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+      derivation:
+        relation: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            section: "Table II"
+            equation: "log aNa2O = C × R* + D"
+        inputs:
+        - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
       values:
         fit_equation_as_printed: log aNa2O = C × R* + D
         R_definition_as_printed: R = NNa2O / NSiO2
@@ -568,8 +698,8 @@ species:
         C_as_printed: '5.923'
         D_as_printed: '-12.31'
         quantity: log_activity_composition_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -579,7 +709,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K:
           state:
@@ -603,7 +732,6 @@ species:
             note: The left-hand Table II equation is a relation over R = NNa2O/NSiO2.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table2_na2o_fit_row2
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -616,6 +744,28 @@ species:
         note: left-hand equation row 2; T = 1323 K
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+      derivation:
+        relation: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            section: "Table II"
+            equation: "log aNa2O = C × R* + D"
+        inputs:
+        - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
       values:
         fit_equation_as_printed: log aNa2O = C × R* + D
         R_definition_as_printed: R = NNa2O / NSiO2
@@ -624,8 +774,8 @@ species:
         C_as_printed: '5.748'
         D_as_printed: '-12.01'
         quantity: log_activity_composition_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -635,7 +785,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K:
           state:
@@ -650,7 +799,6 @@ species:
         composition: *id008
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table2_na2o_fit_row3
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -663,6 +811,28 @@ species:
         note: left-hand equation row 3; T = 1373 K
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+      - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
+      derivation:
+        relation: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors fitted log aNa2O = C × R* + D to activity data derived from their measured-cell results; the relation and coefficients are printed in Table II."
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 611
+            section: "Table II"
+            equation: "log aNa2O = C × R* + D"
+        inputs:
+        - neudorf_elliott_1980_table1_row1_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row2_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row3_log_activity_temperature_fit
+        - neudorf_elliott_1980_table1_row4_log_activity_temperature_fit
       values:
         fit_equation_as_printed: log aNa2O = C × R* + D
         R_definition_as_printed: R = NNa2O / NSiO2
@@ -671,8 +841,8 @@ species:
         C_as_printed: '5.592'
         D_as_printed: '-11.74'
         quantity: log_activity_composition_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm
           pressure.
@@ -682,7 +852,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K:
           state:
@@ -697,7 +866,6 @@ species:
         composition: *id008
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table4_row1_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1485,6 +1653,28 @@ species:
         note: right-hand equation row 1; NNa2O = 0.244
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table2_na2o_fit_row1
+      - neudorf_elliott_1980_table2_na2o_fit_row2
+      - neudorf_elliott_1980_table2_na2o_fit_row3
+      derivation:
+        relation: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            section: Na2O-SiO2 System
+            equation: "8"
+        references:
+        - "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        inputs:
+        - neudorf_elliott_1980_table2_na2o_fit_row1
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_na2o_fit_row3
       values:
         fit_equation_as_printed: log aSiO2 = A / T + B
         NNa2O_as_printed: '0.244'
@@ -1496,8 +1686,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: Tridymite is the Standard State.
         schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
@@ -1506,7 +1696,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K: &id020
           state:
@@ -1535,7 +1724,6 @@ species:
             note: Table II right row 1 prints NNa2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table2_sio2_fit_row2
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1548,6 +1736,28 @@ species:
         note: right-hand equation row 2; NNa2O = 0.294
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table2_na2o_fit_row1
+      - neudorf_elliott_1980_table2_na2o_fit_row2
+      - neudorf_elliott_1980_table2_na2o_fit_row3
+      derivation:
+        relation: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            section: Na2O-SiO2 System
+            equation: "8"
+        references:
+        - "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        inputs:
+        - neudorf_elliott_1980_table2_na2o_fit_row1
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_na2o_fit_row3
       values:
         fit_equation_as_printed: log aSiO2 = A / T + B
         NNa2O_as_printed: '0.294'
@@ -1559,8 +1769,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: Tridymite is the Standard State.
         schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
@@ -1569,7 +1779,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K: *id020
         composition:
@@ -1589,7 +1798,6 @@ species:
             note: Table II right row 2 prints NNa2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table2_sio2_fit_row3
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1602,6 +1810,28 @@ species:
         note: right-hand equation row 3; NNa2O = 0.343
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table2_na2o_fit_row1
+      - neudorf_elliott_1980_table2_na2o_fit_row2
+      - neudorf_elliott_1980_table2_na2o_fit_row3
+      derivation:
+        relation: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            section: Na2O-SiO2 System
+            equation: "8"
+        references:
+        - "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        inputs:
+        - neudorf_elliott_1980_table2_na2o_fit_row1
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_na2o_fit_row3
       values:
         fit_equation_as_printed: log aSiO2 = A / T + B
         NNa2O_as_printed: '0.343'
@@ -1613,8 +1843,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: Tridymite is the Standard State.
         schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
@@ -1623,7 +1853,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K: *id020
         composition:
@@ -1643,7 +1872,6 @@ species:
             note: Table II right row 3 prints NNa2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_table2_sio2_fit_row4
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1656,6 +1884,28 @@ species:
         note: right-hand equation row 4; NNa2O = 0.393
       phase: l
       units: dimensionless
+      derived_from:
+      - neudorf_elliott_1980_table2_na2o_fit_row1
+      - neudorf_elliott_1980_table2_na2o_fit_row2
+      - neudorf_elliott_1980_table2_na2o_fit_row3
+      derivation:
+        relation: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+        method:
+          state:
+            tag: value
+            value: "Authors integrated the Gibbs–Duhem equation [8] using the Na2O activity relations and the silica-saturation temperature and composition from Kracek [26] to derive log aSiO2 = A/T + B; coefficients are printed in Table II."
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 610
+            section: Na2O-SiO2 System
+            equation: "8"
+        references:
+        - "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        inputs:
+        - neudorf_elliott_1980_table2_na2o_fit_row1
+        - neudorf_elliott_1980_table2_na2o_fit_row2
+        - neudorf_elliott_1980_table2_na2o_fit_row3
       values:
         fit_equation_as_printed: log aSiO2 = A / T + B
         NNa2O_as_printed: '0.393'
@@ -1667,8 +1917,8 @@ species:
         - '1000'
         - '1100'
         quantity: log_activity_temperature_fit_as_published
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         standard_state_as_printed: Tridymite is the Standard State.
         schema_gap: No exact quantity token represents a fitted log activity function. simulator/battery/enums.py::Quantity.ACTIVITY
@@ -1677,7 +1927,6 @@ species:
           + D. This row stays quantity-unknown; see simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
           and simulator/battery/migrate.py::QUANTITY_ALIASES.
         oxygen_partial_pressure: *id005
-        attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
       point_conditions:
         temperature_K: *id020
         composition:
@@ -1697,7 +1946,6 @@ species:
             note: Table II right row 4 prints NNa2O.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      attribution: Neudorf and Elliott (1980), PDF page 5, Table II.
     - observation_id: neudorf_elliott_1980_sio2_activity_na_binary_at_1070c
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient

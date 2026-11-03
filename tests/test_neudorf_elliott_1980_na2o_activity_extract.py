@@ -258,6 +258,57 @@ def _assert_extracted_table_cells(document: dict) -> None:
             observations[f"{base}_interpolated_log_a_star_na2o"]["method_class"]
             == "author_derived"
         )
+
+
+def _assert_sc456_relabels(document: dict) -> None:
+    observations = _observations(document)
+    changed_ids = {
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c",
+        "neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c",
+        *(f"neudorf_elliott_1980_table1_row{i}_log_activity_temperature_fit" for i in range(1, 5)),
+        *(f"neudorf_elliott_1980_table2_na2o_fit_row{i}" for i in range(1, 4)),
+        *(f"neudorf_elliott_1980_table2_sio2_fit_row{i}" for i in range(1, 5)),
+    }
+    for observation_id in changed_ids:
+        values = observations[observation_id]["values"]
+        assert values["method_class"] == "measured_reduced"
+        assert values["evidence_class"] == "measured_reduced"
+
+    assert observations[
+        "neudorf_elliott_1980_abstract_log_a_na2o_25wt_1050c"
+    ]["derived_from"] == ["neudorf_elliott_1980_table1_row1_log_activity_temperature_fit"]
+    assert observations[
+        "neudorf_elliott_1980_abstract_log_a_na2o_40wt_1050c"
+    ]["derived_from"] == ["neudorf_elliott_1980_table1_row4_log_activity_temperature_fit"]
+    for index in range(1, 5):
+        row = observations[f"neudorf_elliott_1980_table1_row{index}_log_activity_temperature_fit"]
+        raw_inputs = row["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]["figure"] == "3"
+    table1_ids = [
+        f"neudorf_elliott_1980_table1_row{index}_log_activity_temperature_fit"
+        for index in range(1, 5)
+    ]
+    for index in range(1, 4):
+        row = observations[f"neudorf_elliott_1980_table2_na2o_fit_row{index}"]
+        assert row["derivation"]["inputs"] == table1_ids
+    for index in range(1, 5):
+        row = observations[f"neudorf_elliott_1980_table2_sio2_fit_row{index}"]
+        assert row["derivation"]["references"] == [
+            "Kracek [26]: J. Phys. Chem., 1930, vol. 34, p. 1583."
+        ]
+
+
+def test_sc456_evidence_class_and_lineage_are_pinned() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_sc456_relabels(document)
+
+    reverted = copy.deepcopy(document)
+    _observations(reverted)[
+        "neudorf_elliott_1980_table1_row1_log_activity_temperature_fit"
+    ]["values"]["evidence_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_relabels(reverted)
         assert "evidence_class" not in interpolated
         assert interpolated["column_as_printed"] == "Interpolated (†) as printed in the Table IV footnote"
         assert "activity" not in interpolated
