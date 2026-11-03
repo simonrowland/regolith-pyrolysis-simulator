@@ -7077,6 +7077,7 @@ _SC456_SOURCE_IDS = (
     "banya-hino-takezoe-1985-na-fe-silicate-redox",
     "gca-366-210-berry-2024",
     "yakovlev-2024-cai-vaporization",
+    "yamaguchi-1984-na2o-activity-sodium-beta-alumina",
 )
 
 
