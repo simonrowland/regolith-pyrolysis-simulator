@@ -1,3 +1,11 @@
+## Fix round (2026-11-02)
+
+The review findings are resolved in the current extract. Table 1/2 per-gfw fusion enthalpies (9.3, 14.5, 26.6, 7.79, 12.7, 23.8) and liquid heat capacities (86.29, 87.78, 90.99) retain their printed values and `formula_basis_as_printed`, but use descriptive non-token quantities with `admission_status: typed_refusal`; no rescaled twins are stored. Full-formula 53.2 and 29.0 and the SiO2/Na2O endmember values remain quantitative rows. The five present-study DSC rows are `measured_tabulated`, have `regime: dta_dsc`, and migrate to DTA_DSC; cited comparison rows remain `quoted_attributed`. Every printed enthalpy uncertainty is copied to the observation-level `uncertainty` block with `kind: printed`, while the printed value and wording remain in `values`.
+
+The three model-derived Table 2 fusion rows retain 7.79, 12.7, and 23.8 as printed; their lineage now points to the Table 3 coefficient context, the matching mixture solid enthalpy, and the SiO2/Na2O endmember solid enthalpies. The three footnote-d solid enthalpies and the weighted mean are `author_derived` typed refusals. Footnote d's [47] standard-state and [40] heat-capacity inputs are named in the derivation relation; stored endmember [47] solid-enthalpy rows are the resolvable `derived_from` pointers. The weighted mean points to the stored present-study/Table 2 rows, and its relation names the cited comparison data. Migration has 32 observations, 0 hard issues, 22 unavailable values, and 18 quantity-unknown observations (the prior nine plus the nine per-gfw cells). The focused test and extract validator pin the refusal, uncertainty, class, method, and lineage behavior. The per-gfw schema note is grounded in `simulator/battery/migrate.py::QUANTITY_ALIASES`, `simulator/battery/records.py::Identity`, and the corresponding full-formula `Quantity` token; no identity field encodes a gram-formula multiplier.
+
+`INDEX.yaml` and `INDEX.md` are intentionally unchanged; the controller adds their rows when restacking this extract onto the landing chain. No battery-store regeneration is committed.
+
 # Sugawara et al. (2011): transcription and migration audit
 
 ## Scope and source reading

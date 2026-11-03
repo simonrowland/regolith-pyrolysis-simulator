@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Phase, ValueKind
+from simulator.battery.enums import MethodToken, Phase, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -138,13 +138,10 @@ def test_printed_rows_and_render_pins():
     assert model["locator"]["table"] == "3"
 
     model_fit_parents = [
-        "sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing",
-        "sugawara_2011_t1_na2si2o5_enthalpy_of_mixing",
-        "sugawara_2011_t1_na2sio3_enthalpy_of_mixing",
-        "sugawara_2011_t2_sio2_fusion_enthalpy",
-        "sugawara_2011_t2_na2o_fusion_enthalpy",
-        "sugawara_2011_t2_sio2_liquid_heat_capacity",
-        "sugawara_2011_t2_na2o_liquid_heat_capacity",
+        "sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients",
+        "sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm",
+        "sugawara_2011_t2_sio2_solid_enthalpy_at_tm",
+        "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
     ]
     model_hsolid_parents = {
         "sugawara_2011_t2_na6si8o19_fusion_enthalpy": "sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm",
@@ -154,7 +151,8 @@ def test_printed_rows_and_render_pins():
     for observation_id, mixture_solid_enthalpy in model_hsolid_parents.items():
         row = rows[observation_id]
         assert row["values"]["method_class"] == "model_derived"
-        expected_parents = model_fit_parents + [
+        expected_parents = [
+            model_fit_parents[0],
             mixture_solid_enthalpy,
             "sugawara_2011_t2_sio2_solid_enthalpy_at_tm",
             "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
@@ -202,8 +200,26 @@ def test_printed_rows_and_render_pins():
     for observation_id, expected in solid_enthalpy_values.items():
         row = rows[observation_id]
         assert row["values"]["quantity"] == "solid_enthalpy_at_Tm_as_printed"
-        assert row["values"]["method_class"] == "quoted_attributed"
+        expected_class = "author_derived" if observation_id in {
+            "sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm",
+        } else "quoted_attributed"
+        assert row["values"]["method_class"] == expected_class
         assert row["values"]["solid_enthalpy_at_Tm_kJ_mol_as_published"] == expected
+    for observation_id in (
+        "sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm",
+        "sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm",
+        "sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm",
+    ):
+        row = rows[observation_id]
+        assert row["values"]["derived_from"] == [
+            "sugawara_2011_t2_sio2_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
+        ]
+        assert "[47] standard state value" in row["values"]["derivation"]["relation"]
+        assert "[40] heat capacity" in row["values"]["derivation"]["relation"]
+    assert rows["sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing"]["values"]["method_class"] == "author_derived"
 
 
 def test_compositions_keep_printed_basis_and_migration_conditions():
@@ -235,14 +251,43 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
     assert len(migrated) == 32
     assert len(result.validation.hard_issues) == 0
     assert result.registry_issues == []
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 13
-    migrated_value_pins = {
-        "sugawara_2011_t1_na2sio3_heat_of_fusion": Decimal("26.6"),
-        "sugawara_2011_t2_sio2_liquid_heat_capacity": Decimal("81.37"),
-        "sugawara_2011_t2_na6si8o19_fusion_enthalpy": Decimal("7.79"),
-    }
-    for observation_id, expected in migrated_value_pins.items():
-        assert migrated[observation_id].value.point == expected
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated.values()) == 22
+    per_gfw = (
+        "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+        "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+        "sugawara_2011_t1_na2sio3_heat_of_fusion",
+        "sugawara_2011_t2_na6si8o19_fusion_enthalpy",
+        "sugawara_2011_t2_na2si2o5_fusion_enthalpy",
+        "sugawara_2011_t2_na2sio3_fusion_enthalpy",
+        "sugawara_2011_t2_na6si8o19_liquid_heat_capacity",
+        "sugawara_2011_t2_na2si2o5_liquid_heat_capacity",
+        "sugawara_2011_t2_na2sio3_liquid_heat_capacity",
+    )
+    for observation_id in per_gfw:
+        assert migrated[observation_id].value.kind is ValueKind.UNAVAILABLE
+        assert not migrated[observation_id].identity.quantity.is_value
+    assert source_rows["sugawara_2011_t1_na2sio3_heat_of_fusion"]["values"]["value"] == "26.6"
+    assert source_rows["sugawara_2011_t2_na6si8o19_fusion_enthalpy"]["values"]["value"] == "7.79"
+    assert source_rows["sugawara_2011_t1_na2sio3_heat_of_fusion"]["values"]["formula_basis_as_printed"].startswith("1/2 Na2SiO3")
+    assert source_rows["sugawara_2011_t2_na6si8o19_fusion_enthalpy"]["values"]["formula_basis_as_printed"].startswith("Na6Si8O19–SiO2")
+    assert migrated["sugawara_2011_t2_sio2_liquid_heat_capacity"].value.point == Decimal("81.37")
+    for observation_id, expected in (
+        ("sugawara_2011_t1_na2si2o5_heat_of_fusion", Decimal("0.7")),
+        ("sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy", Decimal("2.0")),
+    ):
+        assert migrated[observation_id].uncertainty.kind is UncertaintyKind.PRINTED
+        assert migrated[observation_id].uncertainty.verbatim["value"] == str(expected)
+    for observation_id in (
+        "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+        "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+        "sugawara_2011_t1_na2sio3_heat_of_fusion",
+        "sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy",
+        "sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy",
+    ):
+        observation = migrated[observation_id]
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.value is MethodToken.DTA_DSC
+        assert observation.evidence.class_.value.value == "measured_tabulated"
     for observation_id, page, table in (
         ("sugawara_2011_t1_na2sio3_heat_of_fusion", 2, "1"),
         ("sugawara_2011_t2_sio2_liquid_heat_capacity", 3, "2"),
@@ -265,6 +310,15 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
         "sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm",
         "sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm",
         "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
+        "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+        "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+        "sugawara_2011_t1_na2sio3_heat_of_fusion",
+        "sugawara_2011_t2_na6si8o19_fusion_enthalpy",
+        "sugawara_2011_t2_na2si2o5_fusion_enthalpy",
+        "sugawara_2011_t2_na2sio3_fusion_enthalpy",
+        "sugawara_2011_t2_na6si8o19_liquid_heat_capacity",
+        "sugawara_2011_t2_na2si2o5_liquid_heat_capacity",
+        "sugawara_2011_t2_na2sio3_liquid_heat_capacity",
     }
     assert all(row.identity.species.phase.is_value for row in migrated.values())
 

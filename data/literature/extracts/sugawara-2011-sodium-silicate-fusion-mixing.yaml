@@ -59,16 +59,23 @@ species:
           row: Na6Si8O19–SiO2 eutectic composition
           column: ΔH_Tm^L
         phase: cr
+        regime: dta_dsc
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
-          quantity: heat_of_fusion
-          method_class: quoted_attributed
-          attribution: Authors' corrected DSC result; raw apparent exotherm and numeric premelting correction are not tabulated.
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '9.3'
           uncertainty_kJ_mol-1: '0.9'
           uncertainty_as_printed: ± 0.9
           uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
           composition_as_printed:
             SiO2_mol_percent: '74.4'
@@ -80,6 +87,12 @@ species:
           method_as_printed: Differential scanning calorimetry (DSC-320), platinum cell, 2 K/min; premelting correction applied.
           calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
           premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
+        uncertainty:
+          kind: printed
+          value: '0.9'
+          verbatim: ± 0.9
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_na6_conditions_fusion
           temperature_K:
             state:
@@ -221,34 +234,29 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
         values:
-          quantity: heat_of_fusion
           method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           derived_from:
-            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-            - sugawara_2011_t2_sio2_fusion_enthalpy
-            - sugawara_2011_t2_na2o_fusion_enthalpy
-            - sugawara_2011_t2_sio2_liquid_heat_capacity
-            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
             - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           derivation:
             relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
             inputs:
-              - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-              - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-              - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-              - sugawara_2011_t2_sio2_fusion_enthalpy
-              - sugawara_2011_t2_na2o_fusion_enthalpy
-              - sugawara_2011_t2_sio2_liquid_heat_capacity
-              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
               - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
               - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
               - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           value: '7.79'
           value_as_printed: 7.79^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
           composition_as_printed:
             SiO2_mol_percent: '74.4'
@@ -304,8 +312,9 @@ species:
         units: J/mol K
         standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
         values:
-          quantity: cp
           method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '86.29'
           value_as_printed: 86.29 [38]
           attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
@@ -406,8 +415,13 @@ species:
         standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
         values:
           quantity: solid_enthalpy_at_Tm_as_printed
-          method_class: quoted_attributed
+          method_class: author_derived
           admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
           schema_gap: &solid_enthalpy_schema_gap >-
             The exact printed quantity is H^S_Tm, the solid enthalpy at melting temperature. OBSERVATION_TYPES admits
             heat_capacity_and_heat_content_series and PHASE_MAP maps cr, but the closed Quantity set has no exact token
@@ -432,7 +446,6 @@ species:
             Na2O_mol_percent: '25.6'
           T_K: '1164'
           method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
-          attribution: Author calculation from [47] and [40]; those source inputs are not stored here.
         point_conditions: &t2_na6_hsolid_conditions
           temperature_K:
             state:
@@ -472,16 +485,23 @@ species:
           row: 1/3 Na2Si2O5 (N2S)
           column: ΔH_Tm^L
         phase: cr
+        regime: dta_dsc
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
-          quantity: heat_of_fusion
-          method_class: quoted_attributed
-          attribution: Authors' corrected DSC result; raw apparent exotherm and numeric premelting correction are not tabulated.
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '14.5'
           uncertainty_kJ_mol-1: '0.7'
           uncertainty_as_printed: ± 0.7
           uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
           composition_as_printed:
             SiO2_mol_percent: '66.4'
@@ -492,6 +512,12 @@ species:
           calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
           premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
           number_of_experiments: '9'
+        uncertainty:
+          kind: printed
+          value: '0.7'
+          verbatim: ± 0.7
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_n2s_fusion_conditions
           temperature_K:
             state:
@@ -532,18 +558,24 @@ species:
           published_page: 1391
           paragraph: Results of DSC measurements
         phase: cr
+        regime: dta_dsc
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion from crystalline Na2Si2O5 to liquid.
         values:
           quantity: heat_of_fusion
-          method_class: quoted_attributed
+          method_class: measured_tabulated
           value: '29.0'
           uncertainty_kJ_mol-1: '1.4'
           uncertainty_as_printed: ± 1.4
           uncertainty_confidence_level: not stated
-          attribution: Authors' DSC value stated in the results prose; the reported value is not the Table 1 one-third-formula entry.
           formula_basis_as_printed: Na2Si2O5 full formula.
           method_as_printed: The results paragraph says these values are from the DSC measurements listed in Table 1.
+        uncertainty:
+          kind: printed
+          value: '1.4'
+          verbatim: ± 1.4
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -587,6 +619,12 @@ species:
           attribution: P. Boivin, J.C. Berthelay, Y. Blanc, A. Coulet, and R. Castanet [43].
           formula_basis_as_printed: Na2Si2O5 full formula.
           method_as_printed: The results prose identifies the cited result as a previous DSC measurement.
+        uncertainty:
+          kind: printed
+          value: '4.0'
+          verbatim: ± 4.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -630,6 +668,12 @@ species:
           attribution: P. Richet and Y. Bottinga [44].
           formula_basis_as_printed: Na2Si2O5 full formula.
           method_as_printed: The results prose says [44] calculated this value using calorimetric heat capacities, glass transition temperature, and enthalpies of vitrification reported in prior studies.
+        uncertainty:
+          kind: printed
+          value: '4.4'
+          verbatim: ± 4.4
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -761,34 +805,29 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
         values:
-          quantity: heat_of_fusion
           method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           derived_from:
-            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-            - sugawara_2011_t2_sio2_fusion_enthalpy
-            - sugawara_2011_t2_na2o_fusion_enthalpy
-            - sugawara_2011_t2_sio2_liquid_heat_capacity
-            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
             - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           derivation:
             relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
             inputs:
-              - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-              - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-              - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-              - sugawara_2011_t2_sio2_fusion_enthalpy
-              - sugawara_2011_t2_na2o_fusion_enthalpy
-              - sugawara_2011_t2_sio2_liquid_heat_capacity
-              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
               - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
               - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
               - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           value: '12.7'
           value_as_printed: 12.7^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
           composition_as_printed:
             SiO2_mol_percent: '66.6'
@@ -844,8 +883,9 @@ species:
         units: J/mol K
         standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
         values:
-          quantity: cp
           method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '87.78'
           value_as_printed: 87.78 [38]
           attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
@@ -946,8 +986,13 @@ species:
         standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
         values:
           quantity: solid_enthalpy_at_Tm_as_printed
-          method_class: quoted_attributed
+          method_class: author_derived
           admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
           schema_gap: *solid_enthalpy_schema_gap
           schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
           solid_enthalpy_at_Tm_kJ_mol_as_published: '-761.609^d'
@@ -958,7 +1003,6 @@ species:
             Na2O_mol_percent: '33.3'
           T_K: '1142'
           method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
-          attribution: Author calculation from [47] and [40]; those source inputs are not stored here.
         point_conditions: &t2_n2s_hsolid_conditions
           temperature_K:
             state:
@@ -998,16 +1042,23 @@ species:
           row: 1/2 Na2SiO3 (NS)
           column: ΔH_Tm^L
         phase: cr
+        regime: dta_dsc
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
-          quantity: heat_of_fusion
-          method_class: quoted_attributed
-          attribution: Authors' corrected DSC result; raw apparent exotherm and numeric premelting correction are not tabulated.
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '26.6'
           uncertainty_kJ_mol-1: '1.0'
           uncertainty_as_printed: ± 1.0
           uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
           composition_as_printed:
             SiO2_mol_percent: '50.0'
@@ -1018,6 +1069,12 @@ species:
           method_as_printed: Differential scanning calorimetry (DSC-320), platinum cell, 2 K/min; premelting correction applied.
           calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
           premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
+        uncertainty:
+          kind: printed
+          value: '1.0'
+          verbatim: ± 1.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_ns_fusion_conditions
           temperature_K:
             state:
@@ -1058,18 +1115,24 @@ species:
           published_page: 1391
           paragraph: Results of DSC measurements
         phase: cr
+        regime: dta_dsc
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion from crystalline Na2SiO3 to liquid.
         values:
           quantity: heat_of_fusion
-          method_class: quoted_attributed
+          method_class: measured_tabulated
           value: '53.2'
           uncertainty_kJ_mol-1: '2.0'
           uncertainty_as_printed: ± 2.0
           uncertainty_confidence_level: not stated
-          attribution: Authors' DSC value stated in the results prose; the reported value is not the Table 1 one-half-formula entry.
           formula_basis_as_printed: Na2SiO3 full formula.
           method_as_printed: The results paragraph says these values are from the DSC measurements listed in Table 1.
+        uncertainty:
+          kind: printed
+          value: '2.0'
+          verbatim: ± 2.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -1113,6 +1176,12 @@ species:
           attribution: B.F. Naylor [37].
           formula_basis_as_printed: Na2SiO3 full formula.
           method_as_printed: Drop calorimetry [37].
+        uncertainty:
+          kind: printed
+          value: '0.6'
+          verbatim: ± 0.6
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -1156,6 +1225,12 @@ species:
           attribution: P. Richet, Y. Bottinga, and C. Tequi [38].
           formula_basis_as_printed: Na2SiO3 full formula.
           method_as_printed: Drop calorimetry [38].
+        uncertainty:
+          kind: printed
+          value: '1.0'
+          verbatim: ± 1.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -1288,8 +1363,17 @@ species:
           H^L_Mix,T,alpha = H^L_T,alpha − (X^L_Na2O H^L_T,Na2O + X^L_SiO2 H^L_T,SiO2).
         values:
           quantity: integral_enthalpy_of_mixing_as_printed
-          method_class: quoted_attributed
+          method_class: author_derived
           admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
+            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
+            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+            - sugawara_2011_t2_na6si8o19_fusion_enthalpy
+            - sugawara_2011_t2_na2si2o5_fusion_enthalpy
+            - sugawara_2011_t2_na2sio3_fusion_enthalpy
+          derivation:
+            relation: Authors report the weighted average from the present-study and Table 2 rows plus comparison data from Fan [10], Naylor [37], and Richet et al. [38].
           schema_gap: >-
             The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
             heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
@@ -1311,12 +1395,17 @@ species:
           uncertainty_kJ_mol-1: '0.3'
           uncertainty_as_printed: ± 0.3
           uncertainty_confidence_level: not stated
-          attribution: Authors' weighted average from this study, Fan [10], Naylor [37], Richet et al. [38], and Table 2.
           composition_as_printed:
             SiO2_mol_percent: '50'
           composition_context_as_printed: NS composition at 50 mol% SiO2 in the Na2O-SiO2 binary system.
           temperature_dependence_as_printed: H_Mix^L is independent of temperature under the stated no-heat-capacity-of-mixing assumption.
           method_as_printed: Weighted average of enthalpy data from the present study, Fan [10], Naylor [37], Richet et al. [38], and Table 2.
+        uncertainty:
+          kind: printed
+          value: '0.3'
+          verbatim: ± 0.3
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions:
           temperature_K:
             state:
@@ -1360,34 +1449,29 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
         values:
-          quantity: heat_of_fusion
           method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
           derived_from:
-            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-            - sugawara_2011_t2_sio2_fusion_enthalpy
-            - sugawara_2011_t2_na2o_fusion_enthalpy
-            - sugawara_2011_t2_sio2_liquid_heat_capacity
-            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
             - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           derivation:
             relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
             inputs:
-              - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-              - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
-              - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-              - sugawara_2011_t2_sio2_fusion_enthalpy
-              - sugawara_2011_t2_na2o_fusion_enthalpy
-              - sugawara_2011_t2_sio2_liquid_heat_capacity
-              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
               - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
               - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
               - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
           value: '23.8'
           value_as_printed: 23.8^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
           formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
           composition_as_printed:
             SiO2_mol_percent: '50'
@@ -1443,8 +1527,9 @@ species:
         units: J/mol K
         standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
         values:
-          quantity: cp
           method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
           value: '90.99'
           value_as_printed: 90.99 [38]
           attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
@@ -1545,8 +1630,13 @@ species:
         standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
         values:
           quantity: solid_enthalpy_at_Tm_as_printed
-          method_class: quoted_attributed
+          method_class: author_derived
           admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
           schema_gap: *solid_enthalpy_schema_gap
           schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
           solid_enthalpy_at_Tm_kJ_mol_as_published: '-697.782^d'
@@ -1557,7 +1647,6 @@ species:
             Na2O_mol_percent: '50'
           T_K: '1360'
           method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
-          attribution: Author calculation from [47] and [40]; those source inputs are not stored here.
         point_conditions: &t2_ns_hsolid_conditions
           temperature_K:
             state:
