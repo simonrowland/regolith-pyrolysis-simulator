@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from decimal import Decimal
 from pathlib import Path
 
@@ -120,7 +121,10 @@ def _assert_sc456_evidence_classes(document):
     for observation_id in SC456_MODEL_DERIVED_IDS:
         row = rows[observation_id]
         assert row["values"]["method_class"] == "model_derived"
-        assert row["derivation"]["method"]["locator"]["published_page"] == 79
+        method_locator = row["derivation"]["method"]["locator"]
+        assert method_locator["published_page"] == 79
+        assert method_locator["section"] == "Thermodynamic properties of minerals and fluids"
+        assert "equation" not in method_locator
         assert row["derivation"]["references"]
 
     for observation_id in (
@@ -394,7 +398,20 @@ def test_isolated_migration_reaches_temperature_on_every_printed_row():
     ]
     assert len(migrated) == 77
     assert not result.registry_issues
-    assert not result.validation.hard_issues
+    hard_issues = result.validation.hard_issues
+    expected_equation_gate_issues = {
+        "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
+        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
+        "derived observation requires derived_from",
+    }
+    assert len(hard_issues) == 69
+    assert {issue.detail for issue in hard_issues} == expected_equation_gate_issues
+    assert Counter(issue.detail for issue in hard_issues) == Counter(
+        {detail: len(SC456_MODEL_DERIVED_IDS) for detail in expected_equation_gate_issues}
+    )
+    assert {
+        issue.path.split("::", 1)[1].split("]", 1)[0] for issue in hard_issues
+    } == SC456_MODEL_DERIVED_IDS
 
     def quantity(row):
         return row.identity.quantity.value.value
