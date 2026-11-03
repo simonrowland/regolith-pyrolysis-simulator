@@ -20657,7 +20657,13 @@ class Migrator:
                 else (quantity if isinstance(quantity, Quantity) else None)
             )
             sample = raw_item.get("sample") or raw_item.get("id")
-            sample_label = sample.strip() if isinstance(sample, str) else None
+            # Florin's Cu12.1-style sample IDs are labels, not formulas.
+            sample_label = (
+                sample.strip()
+                if isinstance(sample, str)
+                and source_id != "florin-2025-cu-silicate-evaporation"
+                else None
+            )
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
             )
@@ -20739,7 +20745,10 @@ class Migrator:
                     polymorph=species.polymorph,
                     charge=species.charge,
                 )
-            elif sample_label and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            elif (
+                sample_label
+                and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            ):
                 from simulator.accounting.formulas import parse_formula
 
                 try:
