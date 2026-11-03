@@ -202,6 +202,8 @@ species:
             - Cr+
             - TiO+
             - TiO2+
+            - CaWO3+
+            - CaWO4+
           detected_tungsten_oxide_ions_as_printed:
             - WO2+
             - WO3+
@@ -214,8 +216,8 @@ species:
                 pdf_page_index: 2
                 section: Experimental
                 note: >-
-                  The text's less-than 10^-4 atm statement is an upper limit on
-                  total vapor pressure over the melt, not the chamber pressure.
+                  The printed upper limit on vapor pressure over the melt is
+                  not the chamber pressure.
             fO2:
               state: {tag: unknown, reason: not_printed_as_an_experiment_condition}
               locator:
@@ -241,14 +243,16 @@ species:
                 section: Experimental
                 note: No sweep gas is stated for the Knudsen effusion experiment.
           output_bound_not_a_condition:
-            total_vapor_pressure_over_melt_atm: '<10^-4'
+            printed_statement: >-
+              did not allow the total vapor pressure over the melts to increase
+              above 10^-4 atm
             locator:
               page: 3
               published_page: 553
               pdf_page_index: 2
               section: Experimental
               note: The authors use this calculated output bound to justify an ideal-gas approximation.
-      - observation_id: shornikov_2025_residue_and_pressure_prose_summary
+      - observation_id: shornikov_2025_residue_prose_model_summary
         type: text_stated_result_context
         locator:
           page: 5
@@ -257,12 +261,12 @@ species:
           section: Results
         units: as printed per fact
         values:
-          quantity: author_result_summary
-          method_class: quoted_attributed
+          quantity: residue_component_composition
+          method_class: model_derived
           attribution: >-
-            Shornikov and Yakovlev's prose summary of their Figure 5 calculations
-            and Figure 8 O2/O trend; the underlying figure coordinates and
-            calculation inputs are not stored as numeric rows in this extract.
+            Shornikov and Yakovlev's prose summary of their Figure 5 calculations;
+            the underlying figure coordinates and calculation inputs are not
+            stored as numeric rows in this extract.
           facts:
             - fact: Residual-melt MgO content decreases to zero at 2000°C.
               value_as_printed: zero
@@ -298,6 +302,21 @@ species:
                 published_page: 556
                 pdf_page_index: 5
                 section: Results
+      - observation_id: shornikov_2025_oxygen_ratio_prose_measurement_summary
+        type: text_stated_result_context
+        locator:
+          page: 9
+          published_page: 559
+          pdf_page_index: 8
+          section: Oxygen at CAI evaporation
+        units: as printed per fact
+        values:
+          quantity: oxygen_ratio
+          method_class: measured_reduced
+          attribution: >-
+            Shornikov and Yakovlev's prose summary of their KEMS-derived Figure 8
+            O2/O trend.
+          facts:
             - fact: At 1800–2000°C, the vapor O2/O ratio decreases by one order of magnitude.
               value_as_printed: one order of magnitude
               temperature_range_C_as_printed: '1800–2000'
@@ -306,6 +325,31 @@ species:
                 published_page: 559
                 pdf_page_index: 8
                 section: Oxygen at CAI evaporation
+      - observation_id: shornikov_2025_fig1_knudsen_effusion_apparatus_schematic
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          figure: '1'
+        units: schematic; no numeric data extracted
+        values:
+          quantity: apparatus_schematic
+          caption_as_printed: Schematic representation of the experimental setup.
+          digitisation: not_applicable; schematic only.
+      - observation_id: shornikov_2025_fig2_temperature_time_schedule
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          figure: '2'
+        units: T, °C and time as printed
+        values:
+          quantity: temperature_time_schedule
+          samples_as_printed: test compositions; includes Murchison comparison
+          caption_as_printed: Temperature regime for heating the Knudsen effusion cell.
+          digitisation: deferred; no figure coordinates are stored.
       - observation_id: shornikov_2025_fig3_murchison_comparison
         type: figure_record
         locator:
@@ -385,7 +429,7 @@ species:
           published_page: 557
           pdf_page_index: 6
           figure: '6'
-        units: activity, dimensionless
+        units: log a_i
         values:
           quantity: activity
           method_class: model_derived
@@ -394,7 +438,7 @@ species:
           phase_as_printed: residual melt
           axes_as_printed:
             x: T, °C
-            y: activity
+            y: log a_i
           caption_as_printed: Temperature dependences of gehlenite and anorthite end-member activities in the type-A residual melt.
           attribution: This work; activities are calculated from experimental data and cited thermodynamic data.
           digitisation: deferred; no figure coordinates are stored.
@@ -442,4 +486,8 @@ species:
           attribution: >-
             Type-A and type-B measurements are this work. Murchison comparison
             data are attributed in the text to Yakovlev et al. (1987).
+          series_attribution:
+            '1': {sample: CAI type A, method_class: measured_reduced}
+            '2': {sample: CAI type B, method_class: measured_reduced}
+            '3': {sample: Murchison, method_class: quoted_attributed, attribution: Yakovlev et al. (1987)}
           digitisation: deferred; no figure coordinates are stored.

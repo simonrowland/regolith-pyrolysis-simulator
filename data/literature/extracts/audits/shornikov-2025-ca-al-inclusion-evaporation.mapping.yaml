@@ -52,6 +52,26 @@ table_mapping:
     experimental_charge_composition: not_assigned_from_table_1
   cell_audit: shornikov-2025-ca-al-inclusion-evaporation.cell-audit.csv
 figure_mappings:
+  - figure: '1'
+    pdf_page: 3
+    published_page: 553
+    quantity: apparatus_schematic
+    evidence_class: not_applicable
+    species: not_applicable
+    phase: apparatus_diagram
+    unit: schematic; no numeric data extracted
+    conditions: Knudsen effusion apparatus schematic
+    numeric_rows: 0
+  - figure: '2'
+    pdf_page: 3
+    published_page: 553
+    quantity: temperature_time_schedule
+    evidence_class: not_digitised
+    species: experimental samples; Murchison comparison
+    phase: not_applicable
+    unit: T, °C and time as printed
+    conditions: heating schedule for the Knudsen effusion cell
+    numeric_rows: 0
   - figure: '3'
     pdf_page: 4
     published_page: 554
@@ -89,7 +109,7 @@ figure_mappings:
     evidence_class: model_derived
     species: gehlenite and anorthite end members
     phase: type A residual melt
-    unit: dimensionless activity
+    unit: log a_i
     conditions: T axis in °C
     numeric_rows: 0
   - figure: '7'
@@ -111,6 +131,10 @@ figure_mappings:
     phase: gas
     unit: oxygen pressure in atm and O2/O ratio
     conditions: type A and B CAIs; T axis in °C; Murchison series attributed to Yakovlev et al. (1987)
+    series_attribution:
+      '1': CAI type A; measured_reduced
+      '2': CAI type B; measured_reduced
+      '3': Murchison; quoted_attributed to Yakovlev et al. (1987)
     numeric_rows: 0
 unplotted_species:
   - species: Na
