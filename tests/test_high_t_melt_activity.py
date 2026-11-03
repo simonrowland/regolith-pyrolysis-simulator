@@ -529,10 +529,13 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # Re-pinned after b-1119's CaO/MgO liquid-reference conversion. The numeric
+    # payload remains bit-identical; the decoded metadata changes are the
+    # CaO/MgO internal seam values plus the reference-state notices and model
+    # limitation text.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "2cd9e6fb2b7b7e0a2e8ac9a07c63e1d7e2557236b286f6480405a3ac7c37ca96"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -544,14 +547,18 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # Re-pinned after decoding the b-1119 CaO/MgO liquid-reference conversion:
+    # Ca/Mg activities and their monoxide vapour pressures carry one fusion
+    # factor; Ca2/Mg2 vapours carry its square. Other oxide numeric fields are
+    # bit-identical to green.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "81eff0369d7c3cfed06705c05b9d6dd697cde2869bcc1f647263320c8971d69a"
+    # The same decoded oxide notices and model limitation text also change the
+    # projected metadata digest.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
+    ).hexdigest() == "d304d6523b7e36de44a23199b5b814e537031e1b53ed2ffa5cee9aa77130d782"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
