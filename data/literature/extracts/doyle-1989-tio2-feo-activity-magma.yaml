@@ -12,6 +12,21 @@ extraction:
   worker: codex
   provenance_path: text/doyle-1989-tio2-feo-activity-magma/pdftotext-layout.txt
 review_status: draft
+experiments:
+- experiment_id: doyle_1989_feo_activity_measurement
+  method: quench_equilibration
+  method_detail_as_printed: &doyle_1989_method_detail_as_printed >-
+    The melts are “equilibrated with reagent-grade metallic iron under controlled oxygen fugacity at 1600 K” and each
+    sample is suspended on a reagent-grade Fe-wire loop and equilibrated with a “CO2-H2-N2 gas” in the hot zone of the
+    Deltech MoSi2 vertical quench furnace. Table 1B reports the input-gas flow rates. Hot-zone gas fugacities are
+    calculated by Brinkley’s method using the Van Zeggeren and Storey algorithm, assuming ideal gases. The metallic
+    iron is “almost pure (a_Fe=1)”; the printed FeO standard state is molten Fe0.947O.
+  locator: &doyle_1989_method_locator
+    page: 3
+    pdf_page_index: 2
+    published_page: 2633
+    section: Experimental and Analytical Methods
+    note: Control of the activity of FeO; Furnace arrangement
 fidelity_samples:
 - path: species.FeO.observations[doyle_1989_table1a_fig4a_r01].values.activity
   value: '0.20'
@@ -55,6 +70,7 @@ species:
   FeO:
     observations:
     - observation_id: doyle_1989_table1a_fig4a_r01
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -182,6 +198,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -204,6 +225,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r02
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -331,6 +353,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -353,6 +380,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r03
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -480,6 +508,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -502,6 +535,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r04
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -629,6 +663,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -651,6 +690,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r05
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -778,6 +818,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -800,6 +845,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r06
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -927,6 +973,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -949,6 +1000,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r07
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1076,6 +1128,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -1098,6 +1155,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r08
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1225,6 +1283,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -1247,6 +1310,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r09
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1374,6 +1438,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -1396,6 +1465,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4a_r10
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1523,6 +1593,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -1545,6 +1620,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r11
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1672,6 +1748,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -1694,6 +1775,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r12
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1821,6 +1903,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -1843,6 +1930,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r13
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -1970,6 +2058,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -1992,6 +2085,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r14
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2119,6 +2213,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2141,6 +2240,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r15
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2268,6 +2368,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2290,6 +2395,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r16
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2417,6 +2523,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2439,6 +2550,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r17
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2566,6 +2678,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2588,6 +2705,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r18
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2715,6 +2833,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2737,6 +2860,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r19
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -2864,6 +2988,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -2886,6 +3015,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r20
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3013,6 +3143,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -3035,6 +3170,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r21
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3162,6 +3298,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -3184,6 +3325,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4a_r22
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3311,6 +3453,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -3333,6 +3480,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r23
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3460,6 +3608,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -3482,6 +3635,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r24
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3609,6 +3763,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -3631,6 +3790,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r25
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3758,6 +3918,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -3780,6 +3945,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r26
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -3907,6 +4073,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -3929,6 +4100,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r27
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4056,6 +4228,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4078,6 +4255,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r28
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4205,6 +4383,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4227,6 +4410,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r29
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4354,6 +4538,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4376,6 +4565,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r30
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4503,6 +4693,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4525,6 +4720,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r31
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4652,6 +4848,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4674,6 +4875,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r32
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4801,6 +5003,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4823,6 +5030,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r33
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -4950,6 +5158,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -4972,6 +5185,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r34
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5099,6 +5313,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -5121,6 +5340,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r35
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5248,6 +5468,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -5270,6 +5495,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r36
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5397,6 +5623,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -5419,6 +5650,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r37
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5546,6 +5778,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -5568,6 +5805,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4a_r38
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5695,6 +5933,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -5717,6 +5960,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r39
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5844,6 +6088,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -5866,6 +6115,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r40
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -5993,6 +6243,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6015,6 +6270,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r41
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6142,6 +6398,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6164,6 +6425,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r42
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6291,6 +6553,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6313,6 +6580,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r43
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6440,6 +6708,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6462,6 +6735,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r44
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6589,6 +6863,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6611,6 +6890,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r45
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6738,6 +7018,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6760,6 +7045,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r46
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -6887,6 +7173,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -6909,6 +7200,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r47
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7036,6 +7328,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -7058,6 +7355,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r48
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7185,6 +7483,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -7207,6 +7510,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r49
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7334,6 +7638,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -7356,6 +7665,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r50
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7483,6 +7793,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -7505,6 +7820,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4a_r51
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7632,6 +7948,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -7654,6 +7975,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r52
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7781,6 +8103,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -7803,6 +8130,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r53
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -7930,6 +8258,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -7952,6 +8285,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r54
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8079,6 +8413,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -8101,6 +8440,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r55
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8228,6 +8568,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -8250,6 +8595,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r56
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8377,6 +8723,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -8399,6 +8750,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r57
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8526,6 +8878,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -8548,6 +8905,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4a_r58
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8675,6 +9033,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
         locator:
@@ -8697,6 +9060,7 @@ species:
           row: '5'
           note: uncertainty paired with a_FeO 0.60
     - observation_id: doyle_1989_table1a_fig4b_r01
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8824,6 +9188,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -8846,6 +9215,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r02
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -8973,6 +9343,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -8995,6 +9370,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r03
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9122,6 +9498,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9144,6 +9525,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r04
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9271,6 +9653,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9293,6 +9680,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r05
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9420,6 +9808,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9442,6 +9835,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r06
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9569,6 +9963,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9591,6 +9990,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r07
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9718,6 +10118,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9740,6 +10145,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r08
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -9867,6 +10273,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -9889,6 +10300,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r09
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10016,6 +10428,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -10038,6 +10455,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r10
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10165,6 +10583,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -10187,6 +10610,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r11
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10314,6 +10738,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -10336,6 +10765,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r12
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10463,6 +10893,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -10485,6 +10920,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4b_r13
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10612,6 +11048,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -10634,6 +11075,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r14
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10761,6 +11203,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -10783,6 +11230,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r15
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -10910,6 +11358,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -10932,6 +11385,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r16
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11059,6 +11513,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11081,6 +11540,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r17
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11208,6 +11668,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11230,6 +11695,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r18
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11357,6 +11823,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11379,6 +11850,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r19
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11506,6 +11978,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11528,6 +12005,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r20
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11655,6 +12133,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11677,6 +12160,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r21
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11804,6 +12288,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11826,6 +12315,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r22
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -11953,6 +12443,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -11975,6 +12470,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4b_r23
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12102,6 +12598,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12124,6 +12625,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r24
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12251,6 +12753,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12273,6 +12780,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r25
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12400,6 +12908,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12422,6 +12935,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r26
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12549,6 +13063,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12571,6 +13090,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r27
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12698,6 +13218,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12720,6 +13245,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r28
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12847,6 +13373,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -12869,6 +13400,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r29
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -12996,6 +13528,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13018,6 +13555,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r30
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13145,6 +13683,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13167,6 +13710,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r31
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13294,6 +13838,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13316,6 +13865,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r32
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13443,6 +13993,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13465,6 +14020,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r33
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13592,6 +14148,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13614,6 +14175,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r34
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13741,6 +14303,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13763,6 +14330,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r35
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -13890,6 +14458,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -13912,6 +14485,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r36
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14039,6 +14613,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -14061,6 +14640,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4b_r37
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14188,6 +14768,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14210,6 +14795,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r38
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14337,6 +14923,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14359,6 +14950,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r39
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14486,6 +15078,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14508,6 +15105,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r40
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14635,6 +15233,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14657,6 +15260,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r41
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14784,6 +15388,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14806,6 +15415,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r42
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -14933,6 +15543,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -14955,6 +15570,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r43
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15082,6 +15698,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15104,6 +15725,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r44
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15231,6 +15853,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15253,6 +15880,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r45
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15380,6 +16008,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15402,6 +16035,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r46
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15529,6 +16163,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15551,6 +16190,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r47
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15678,6 +16318,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15700,6 +16345,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r48
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15827,6 +16473,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15849,6 +16500,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r49
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -15976,6 +16628,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -15998,6 +16655,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4b_r50
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16125,6 +16783,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -16147,6 +16810,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r01
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16274,6 +16938,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -16296,6 +16965,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r02
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16423,6 +17093,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -16445,6 +17120,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r03
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16572,6 +17248,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -16594,6 +17275,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r04
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16721,6 +17403,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -16743,6 +17430,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r05
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -16870,6 +17558,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -16892,6 +17585,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r06
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17019,6 +17713,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17041,6 +17740,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r07
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17168,6 +17868,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17190,6 +17895,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r08
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17317,6 +18023,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17339,6 +18050,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r09
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17466,6 +18178,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17488,6 +18205,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r10
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17615,6 +18333,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17637,6 +18360,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r11
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17764,6 +18488,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17786,6 +18515,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r12
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -17913,6 +18643,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -17935,6 +18670,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r13
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18062,6 +18798,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -18084,6 +18825,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r14
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18211,6 +18953,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
         locator:
@@ -18233,6 +18980,7 @@ species:
           row: '1'
           note: uncertainty paired with a_FeO 0.20
     - observation_id: doyle_1989_table1a_fig4c_r15
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18360,6 +19108,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -18382,6 +19135,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r16
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18509,6 +19263,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -18531,6 +19290,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r17
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18658,6 +19418,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -18680,6 +19445,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r18
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18807,6 +19573,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -18829,6 +19600,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r19
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -18956,6 +19728,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -18978,6 +19755,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r20
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19105,6 +19883,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19127,6 +19910,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r21
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19254,6 +20038,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19276,6 +20065,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r22
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19403,6 +20193,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19425,6 +20220,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r23
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19552,6 +20348,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19574,6 +20375,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r24
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19701,6 +20503,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19723,6 +20530,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r25
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19850,6 +20658,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -19872,6 +20685,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r26
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -19999,6 +20813,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -20021,6 +20840,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r27
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20148,6 +20968,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
         locator:
@@ -20170,6 +20995,7 @@ species:
           row: '2'
           note: uncertainty paired with a_FeO 0.30
     - observation_id: doyle_1989_table1a_fig4c_r28
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20297,6 +21123,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -20319,6 +21150,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r29
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20446,6 +21278,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -20468,6 +21305,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r30
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20595,6 +21433,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -20617,6 +21460,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r31
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20744,6 +21588,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -20766,6 +21615,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r32
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -20893,6 +21743,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -20915,6 +21770,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r33
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21042,6 +21898,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21064,6 +21925,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r34
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21191,6 +22053,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21213,6 +22080,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r35
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21340,6 +22208,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21362,6 +22235,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r36
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21489,6 +22363,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21511,6 +22390,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r37
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21638,6 +22518,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21660,6 +22545,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r38
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21787,6 +22673,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21809,6 +22700,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r39
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -21936,6 +22828,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -21958,6 +22855,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r40
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22085,6 +22983,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -22107,6 +23010,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r41
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22234,6 +23138,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -22256,6 +23165,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r42
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22383,6 +23293,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -22405,6 +23320,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r43
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22532,6 +23448,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
         locator:
@@ -22554,6 +23475,7 @@ species:
           row: '3'
           note: uncertainty paired with a_FeO 0.40
     - observation_id: doyle_1989_table1a_fig4c_r44
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22681,6 +23603,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -22703,6 +23630,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r45
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22830,6 +23758,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -22852,6 +23785,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r46
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -22979,6 +23913,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23001,6 +23940,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r47
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23128,6 +24068,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23150,6 +24095,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r48
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23277,6 +24223,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23299,6 +24250,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r49
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23426,6 +24378,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23448,6 +24405,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r50
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23575,6 +24533,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23597,6 +24560,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r51
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23724,6 +24688,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23746,6 +24715,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r52
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -23873,6 +24843,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -23895,6 +24870,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r53
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24022,6 +24998,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24044,6 +25025,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r54
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24171,6 +25153,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24193,6 +25180,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r55
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24320,6 +25308,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24342,6 +25335,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r56
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24469,6 +25463,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24491,6 +25490,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r57
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24618,6 +25618,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24640,6 +25645,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r58
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24767,6 +25773,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
@@ -24789,6 +25800,7 @@ species:
           row: '4'
           note: uncertainty paired with a_FeO 0.50
     - observation_id: doyle_1989_table1a_fig4c_r59
+      experiment: doyle_1989_feo_activity_measurement
       type: activity_coefficient
       locator:
         page: 4
@@ -24916,6 +25928,11 @@ species:
       - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
       derivation:
         relation: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), Eq. (8); Table 1A rows use the matching printed Table 1B setpoint.
+        method:
+          state:
+            tag: value
+            value: *doyle_1989_method_detail_as_printed
+          locator: *doyle_1989_method_locator
         inputs:
         - doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
         locator:
