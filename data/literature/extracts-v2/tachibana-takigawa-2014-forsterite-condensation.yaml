@@ -1,0 +1,1698 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml
+observations:
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fe_alpha_c_1235
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1235'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tachibana et al. 2011 [7]
+  admission:
+    status: rejected
+    reason: No condensation_coefficient quantity exists. The printed term is alpha_c of unity for metallic iron at this substrate
+      temperature.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 4
+    pdf_page_index: 3
+    section: '2'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1235'
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+    supersaturation_ratio:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '10'
+          approximate: false
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fe_alpha_c_1340
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1340'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tachibana et al. 2011 [7]
+  admission:
+    status: rejected
+    reason: No condensation_coefficient quantity exists. The printed term is alpha_c of unity for metallic iron at the substrate
+      temperature printed in the text.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 4
+    pdf_page_index: 3
+    section: '2'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1340'
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+    figure_4_caption_temperature_K:
+      state:
+        tag: value
+        value: '1337'
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        figure: '4'
+    supersaturation_ratio:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '10'
+          approximate: false
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        section: '2'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fe_alpha_c_vacuum_summary
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+    attribution: Tachibana et al. 2011 [7], as summarised here
+  admission:
+    status: rejected
+    reason: No condensation_coefficient quantity exists. The summary says the condensation coefficient of metallic iron in
+      vacuum is close to unity. That phrase was not stored as evaporation_coefficient_alpha and was not converted to the number
+      1.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        section: '5'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    section: '5'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The summary does not print one temperature for the vacuum condensation coefficient.
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        section: '5'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fe_alpha_e_vacuum
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_iron_condensation_review
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped evaporation_coefficient_alpha field selected; source fields: quantity, method_class, attribution,
+      alpha_as_printed, page_4_as_printed, summary_as_printed, abstract_phrase_as_printed, pFe_as_printed, vacuum_as_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Tachibana et al. 2011 [7]
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 4
+    pdf_page_index: 3
+    equation: '2.1'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The vacuum evaporation-coefficient sentence does not print one temperature.
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        equation: '2.1'
+    pFe_Pa:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        equation: '2.1'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_S_1160
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1160'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Section 4.1 prints a substrate-temperature fluctuation of plus or minus 5-10 K.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. The printed term is the supersaturation ratio S.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: '4.3'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1160'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '800'
+          interval_high: '8000'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supercooling_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '160'
+          interval_high: '230'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5.5'
+          approximate: true
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+    H2O_over_H2:
+      state:
+        tag: value
+        value: '0.015'
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_S_1275
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Section 4.1 prints a substrate-temperature fluctuation of plus or minus 5-10 K.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. The printed term is the supersaturation ratio S.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: '4.3'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '7'
+          interval_high: '190'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supercooling_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '40'
+          interval_high: '150'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5.5'
+          approximate: true
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+    H2O_over_H2:
+      state:
+        tag: value
+        value: '0.015'
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_S_1320
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1320'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Section 4.1 prints a substrate-temperature fluctuation of plus or minus 5-10 K. The supersaturation estimate includes
+        the unprinted amount of gas condensed on the silica wall.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. The printed term is the supersaturation ratio S. wall_deposit_mass is not
+      used because no deposited mass in kg is printed.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: '4.3'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1320'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1'
+          interval_high: '5'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supercooling_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0'
+          interval_high: '50'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5.5'
+          approximate: true
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+    H2O_over_H2:
+      state:
+        tag: value
+        value: '0.015'
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_alpha_c_1275
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Section 4.1 prints a substrate-temperature fluctuation of plus or minus 5-10 K. Section 4.4 says the coefficient
+        estimate has a large uncertainty because S is uncertain.
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: rejected
+    reason: No condensation_coefficient quantity exists. The printed term is the condensation coefficient alpha_c. evaporation_coefficient_alpha
+      is a different coefficient and is not used for this row. wall_deposit_mass is not used because the paper prints no deposited
+      mass in kg.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.4'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: '4.4'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.4'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.4'
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '5.5'
+          approximate: true
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+    H2O_over_H2:
+      state:
+        tag: value
+        value: '0.015'
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_alpha_e_0p03_1426
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_evaporation_review
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1426'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.03'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Figure 11 caption, comparison line
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_alpha_e_0p03_1426
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '11'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1426'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '11'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '2'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '11'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_alpha_e_range
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_evaporation_review
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.02'
+    interval_high: '0.1'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+    attribution: Takigawa et al. 2009 [8]; Yamada et al. 2006 [10]; Ozawa et al. 2012 [11]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_alpha_e_range
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 5
+    pdf_page_index: 4
+    section: '3'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Page 5 says the coefficient ranges from 0.1-0.02 in wide ranges of temperature and hydrogen pressure. It does
+          not print one temperature. The 2073-1153 K sentence is the studied evaporation range, not the bounds of this coefficient.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: '3'
+    hydrogen_pressure_Pa:
+      state:
+        tag: unknown
+        reason: Page 5 says wide ranges of hydrogen pressure and does not print one pressure for this coefficient.
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        section: '3'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_fig10_run12_S
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. This row is the S label printed on Figure 10 for run 12. The flux-symbol coordinates
+      were not read.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '10'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '13'
+          interval_high: '62'
+          approximate: false
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    run_number:
+      state:
+        tag: value
+        value: '12'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_fig10_run13_S
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. This row is the S label printed on Figure 10 for run 13. The flux-symbol coordinates
+      were not read.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '10'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '12'
+          interval_high: '56'
+          approximate: false
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    run_number:
+      state:
+        tag: value
+        value: '13'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_fig10_run14_S
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. This row is the S label printed on Figure 10 for run 14. The flux-symbol coordinates
+      were not read.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '10'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '14'
+          interval_high: '66'
+          approximate: false
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    run_number:
+      state:
+        tag: value
+        value: '14'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_fig10_run15_S
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. This row is the S label printed on Figure 10 for run 15. The flux-symbol coordinates
+      were not read.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '10'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '18'
+          interval_high: '89'
+          approximate: false
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    run_number:
+      state:
+        tag: value
+        value: '15'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_fig10_run16_S
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'supersaturation'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'supersaturation'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: No supersaturation quantity exists. This row is the S label printed on Figure 10 for run 16. The flux-symbol coordinates
+      were not read.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 9
+    pdf_page_index: 8
+    figure: '10'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    pH2_Pa:
+      state:
+        tag: value
+        value: '5.6'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '39'
+          interval_high: '188'
+          approximate: false
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+    run_number:
+      state:
+        tag: value
+        value: '16'
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        figure: '10'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_grain_size_1160
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensate_grain_size'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1160'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensate_grain_size'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No grain-size quantity exists. The printed term is condensate size. wall_deposit_mass is not used because no mass
+      is printed.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 7
+    pdf_page_index: 6
+    section: '4.2'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1160'
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+    duration_h:
+      state:
+        tag: unknown
+        reason: The size sentence says the size was irrespective of experimental duration. It does not print one duration.
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+    grain_size:
+      state:
+        tag: value
+        value: sub-micron to 1 µm
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_grain_size_1275_over_40h
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensate_grain_size'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensate_grain_size'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No grain-size quantity exists. The printed term is several micron-sized flat regions. No single micrometre number
+      is printed in this sentence.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 7
+    pdf_page_index: 6
+    section: '4.2'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+    duration_h:
+      state:
+        tag: value
+        value:
+          kind: bound
+          bound_operator: '>'
+          bound_value: '40'
+          approximate: false
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+    micrograph_duration_h:
+      state:
+        tag: value
+        value: '115'
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        figure: '8'
+    grain_size:
+      state:
+        tag: value
+        value: several micron-sized flat regions
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_grain_size_1275_ten_um
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensate_grain_size'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1275'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensate_grain_size'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No grain-size quantity exists. The printed term is several to ten µm. The word several is not a number, so no
+      interval was invented.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 8
+    pdf_page_index: 7
+    section: '4.3'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1275'
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    supersaturation:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '7'
+          interval_high: '190'
+          approximate: false
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+    grain_size:
+      state:
+        tag: value
+        value: several to ten µm
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        section: '4.3'
+- observation_id: tachibana-takigawa-2014-forsterite-condensation::tt2014_fo_thickness_1160
+  experiment_id: 10.22323/1.207.0046::experiment::tt2014_forsterite_condensation
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensate_film_thickness'
+    species:
+      formula: Mg2SiO4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1160'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensate_film_thickness'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No thickness quantity exists. The printed term is condensate thickness in nm. wall_deposit_mass is kilograms and
+      is not used because no deposited mass is printed.
+    decided_by:
+      worker: w1103ta-tt14
+      date: '2026-11-02'
+      evidence:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+  notices: []
+  source_id: tachibana-takigawa-2014-forsterite-condensation
+  locator:
+    published_page: 7
+    pdf_page_index: 6
+    section: '4.2'
+  read_from: pdf:tachibana-takigawa-2014-forsterite-condensation
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1160'
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'
+    duration_h:
+      state:
+        tag: value
+        value: '93'
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        section: '4.1'
+    thickness_nm:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '30'
+          interval_high: '150'
+          approximate: true
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        section: '4.2'

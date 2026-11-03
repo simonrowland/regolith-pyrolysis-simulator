@@ -1,0 +1,1884 @@
+schema_version: literature_extract.v1
+source_id: delgado-2015-mg-thermite-regolith
+source:
+  citation: Delgado, A., Cordova, S. & Shafirovich, E. (2015), "Thermite Reactions in the Mixtures of Magnesium with Lunar and Martian Regolith Simulants", AIAA SciTech Forum, 8th Symposium on Space Resource Utilization, AIAA 2015-1179.
+  doi: 10.2514/6.2015-1179
+  url: https://doi.org/10.2514/6.2015-1179
+  year: 2015
+extraction:
+  method: Machine-text transcription from MinerU and pdftotext; Table 1 row and column placement checked against the rendered PDF page 3. Prose conditions and qualitative XRD identifications checked against rendered pages 2-5. Table 1 values are quoted from references [9] and [10], not replaced with other simulant analyses. Figures 1-7 remain undigitised except printed text results and the Figure 4 phase labels.
+  date: '2026-11-02'
+  worker: w1103dg-dg15
+  provenance_path: raw/delgado-2015-mg-thermite-regolith/delgado-2015-mg-thermite-regolith.pdf
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: SiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_sio2_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '45.7'
+    table_row_number: 3
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+- species: SiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_sio2_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '43.48'
+    table_row_number: 3
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+- species: SiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_sio2_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '49.4'
+    table_row_number: 3
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+- species: Al2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_al2o3_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '16.2'
+    table_row_number: 4
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+- species: Al2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_al2o3_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '22.09'
+    table_row_number: 4
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+- species: Al2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_al2o3_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '17.10'
+    table_row_number: 4
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+- species: Fe2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_fe2o3_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '12.4'
+    table_row_number: 5
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+- species: Fe2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_fe2o3_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '16.08'
+    table_row_number: 5
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+- species: Fe2O3
+  observable: composition_series
+  observation_id: delgado_2015_table1_fe2o3_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '10.87'
+    table_row_number: 5
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+- species: CaO
+  observable: composition_series
+  observation_id: delgado_2015_table1_cao_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '10.0'
+    table_row_number: 6
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+- species: CaO
+  observable: composition_series
+  observation_id: delgado_2015_table1_cao_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '6.05'
+    table_row_number: 6
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+- species: CaO
+  observable: composition_series
+  observation_id: delgado_2015_table1_cao_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '10.45'
+    table_row_number: 6
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+- species: MgO
+  observable: composition_series
+  observation_id: delgado_2015_table1_mgo_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '8.7'
+    table_row_number: 7
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+- species: MgO
+  observable: composition_series
+  observation_id: delgado_2015_table1_mgo_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '4.22'
+    table_row_number: 7
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+- species: MgO
+  observable: composition_series
+  observation_id: delgado_2015_table1_mgo_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '6.08'
+    table_row_number: 7
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+- species: Na2O
+  observable: composition_series
+  observation_id: delgado_2015_table1_na2o_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '3.2'
+    table_row_number: 8
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+- species: Na2O
+  observable: composition_series
+  observation_id: delgado_2015_table1_na2o_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '2.34'
+    table_row_number: 8
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+- species: Na2O
+  observable: composition_series
+  observation_id: delgado_2015_table1_na2o_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '3.28'
+    table_row_number: 8
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+- species: TiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_tio2_jsc_1a
+  field: points
+  value:
+  - sample: JSC-1A [9]
+    value: '1.9'
+    table_row_number: 9
+    table_column_number: 2
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+- species: TiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_tio2_jsc_mars_1a
+  field: points
+  value:
+  - sample: JSC-Mars-1A [10]
+    value: '3.62'
+    table_row_number: 9
+    table_column_number: 3
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+- species: TiO2
+  observable: composition_series
+  observation_id: delgado_2015_table1_tio2_mojave_mars
+  field: points
+  value:
+  - sample: Mojave Mars [10]
+    value: '1.09'
+    table_row_number: 9
+    table_column_number: 4
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+- species: Mg
+  observable: phase_transition
+  observation_id: delgado_2015_jsc1a_cdta_reaction_peak
+  field: reaction_peak_temperature_C_as_published
+  value: about 560
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    figure: '3'
+    note: The text calls the c-DTA exothermic peak about 560°C.
+- species: Mg
+  observable: characterization
+  observation_id: delgado_2015_xrd_phase_identification_jsc1a_mg
+  field: phase_labels_as_printed
+  value:
+  - Mg
+  - MgO
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    figure: '4'
+    note: Figure 4 labels the XRD peaks Mg and MgO.
+species:
+  SiO2:
+    observations:
+    - observation_id: delgado_2015_table1_sio2_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        row: SiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: &id001
+          state:
+            tag: unknown
+            reason: Table 1 does not state a temperature for these quoted material compositions.
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+        total_pressure_Pa: &id002
+          state:
+            tag: unknown
+            reason: Table 1 does not state a pressure for these quoted material compositions.
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+        fO2_Pa: &id003
+          state:
+            tag: unknown
+            reason: Table 1 does not state an oxygen fugacity or gas condition for these
+              quoted material compositions.
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '45.7'
+          table_row_number: 3
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_sio2_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        row: SiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '43.48'
+          table_row_number: 3
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_sio2_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        row: SiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '49.4'
+          table_row_number: 3
+          table_column_number: 4
+  Al2O3:
+    observations:
+    - observation_id: delgado_2015_table1_al2o3_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        row: Al2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '16.2'
+          table_row_number: 4
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_al2o3_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        row: Al2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '22.09'
+          table_row_number: 4
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_al2o3_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        row: Al2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '17.10'
+          table_row_number: 4
+          table_column_number: 4
+  Fe2O3:
+    observations:
+    - observation_id: delgado_2015_table1_fe2o3_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        row: Fe2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '12.4'
+          table_row_number: 5
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_fe2o3_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        row: Fe2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '16.08'
+          table_row_number: 5
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_fe2o3_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        row: Fe2O3
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '10.87'
+          table_row_number: 5
+          table_column_number: 4
+  CaO:
+    observations:
+    - observation_id: delgado_2015_table1_cao_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        row: CaO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '10.0'
+          table_row_number: 6
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_cao_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        row: CaO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '6.05'
+          table_row_number: 6
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_cao_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        row: CaO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '10.45'
+          table_row_number: 6
+          table_column_number: 4
+  MgO:
+    observations:
+    - observation_id: delgado_2015_table1_mgo_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        row: MgO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '8.7'
+          table_row_number: 7
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_mgo_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        row: MgO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '4.22'
+          table_row_number: 7
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_mgo_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        row: MgO
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '6.08'
+          table_row_number: 7
+          table_column_number: 4
+  Na2O:
+    observations:
+    - observation_id: delgado_2015_table1_na2o_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        row: Na2O
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '3.2'
+          table_row_number: 8
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_na2o_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        row: Na2O
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '2.34'
+          table_row_number: 8
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_na2o_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        row: Na2O
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '3.28'
+          table_row_number: 8
+          table_column_number: 4
+  TiO2:
+    observations:
+    - observation_id: delgado_2015_table1_tio2_jsc_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        row: TiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - Al2O3
+                - '16.2'
+              - - Fe2O3
+                - '12.4'
+              - - CaO
+                - '10.0'
+              - - MgO
+                - '8.7'
+              - - Na2O
+                - '3.2'
+              - - TiO2
+                - '1.9'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-1A [9]
+          value: '1.9'
+          table_row_number: 9
+          table_column_number: 2
+    - observation_id: delgado_2015_table1_tio2_jsc_mars_1a
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        row: TiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '43.48'
+              - - Al2O3
+                - '22.09'
+              - - Fe2O3
+                - '16.08'
+              - - CaO
+                - '6.05'
+              - - MgO
+                - '4.22'
+              - - Na2O
+                - '2.34'
+              - - TiO2
+                - '3.62'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: JSC-Mars-1A [10]
+          value: '3.62'
+          table_row_number: 9
+          table_column_number: 3
+    - observation_id: delgado_2015_table1_tio2_mojave_mars
+      type: composition_series
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        row: TiO2
+      phase: condensed_solid
+      units: wt%
+      standard_state: Table 1 feedstock oxide concentration as printed, with cited source
+        markers retained.
+      point_conditions:
+        temperature_K: *id001
+        total_pressure_Pa: *id002
+        fO2_Pa: *id003
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '49.4'
+              - - Al2O3
+                - '17.10'
+              - - Fe2O3
+                - '10.87'
+              - - CaO
+                - '10.45'
+              - - MgO
+                - '6.08'
+              - - Na2O
+                - '3.28'
+              - - TiO2
+                - '1.09'
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 2
+            table: '1'
+            note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+      values:
+        quantity: regolith_simulant_feedstock_oxide_mass_percent
+        method_class: quoted_attributed
+        attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+        admission_status: typed_refusal
+        reason: No quantity token exactly represents a quoted component wt% in an initial
+          regolith simulant.
+        schema_gap: composition_series is allowed by tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          but no quantity in simulator/battery/migrate.py::QUANTITY_ALIASES or simulator/battery/migrate.py::TYPE_QUANTITY
+          represents a non-equilibrium feedstock component wt%. equilibrium_phase_composition
+          would claim an equilibrium phase, while simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION
+          is for residue output. The seven reported oxide amounts are retained verbatim
+          without closing the composition to 100 wt%.
+        candidate_quantity_as_printed: simple-oxide wt% in regolith simulant feedstock
+        points:
+        - sample: Mojave Mars [10]
+          value: '1.09'
+          table_row_number: 9
+          table_column_number: 4
+  Mg:
+    observations:
+    - observation_id: delgado_2015_jsc1a_cdta_reaction_peak
+      type: phase_transition
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: '3'
+        note: Text describes the c-DTA exothermic peak for 26 wt% Mg and 74 wt% JSC-1A as about 560°C.
+      phase: condensed_solid
+      units: °C
+      regime: dta_dsc
+      point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_reactant_mass_percent
+              amount_basis: mass_percent
+              components:
+              - [Mg, '26']
+              - [JSC-1A, '74']
+          locator: {page: 4, published_page: 4, pdf_page_index: 3, figure: '3', note: 'Figure 3 caption: 74 wt% JSC-1A and 26 wt% Mg.'}
+        temperature_K:
+          state: {tag: unknown, reason: The peak temperature is the measured reaction result; no fixed experimental temperature is stated.}
+          locator: {page: 4, published_page: 4, pdf_page_index: 3, figure: '3'}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: The thermal analysis pressure is not stated; the printed argon flow is not a pressure.}
+          locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        fO2_Pa:
+          state: {tag: unknown, reason: The source states argon flow but no oxygen fugacity or gas ratio.}
+          locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        atmosphere:
+          state: {tag: value, value: Argon flow}
+          locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        heating_rate_C_min:
+          state: {tag: value, value: '10'}
+          locator: {page: 4, published_page: 4, pdf_page_index: 3, figure: '3'}
+        argon_flow_mL_min:
+          state: {tag: value, value: '20'}
+          locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+      values:
+        quantity: thermite_exothermic_reaction_peak_temperature
+        method_class: measured_direct
+        admission_status: typed_refusal
+        reason: The source's reaction peak is a DSC/DTA event temperature, not a thermodynamic transition temperature.
+        schema_gap: phase_transition is an allowed observation type, but no quantity token exactly represents an exothermic thermite reaction peak; do not relabel it as a phase-transition temperature.
+        reaction_peak_temperature_C_as_published: about 560
+        unit_as_published: °C
+        experimental_method_as_published: c-DTA curve obtained in the thermogravimetric analyzer.
+        initial_endothermic_peak_as_published: associated with water vaporization
+        curve_digitization_status: undigitised; only the prose-reported approximate peak is retained.
+    context:
+      - observation_id: delgado_2015_reagent_and_pellet_preparation
+        type: method
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        units: as printed
+        values:
+          quantity: regolith_simulant_and_magnesium_preparation
+          method_class: method_only
+          simulants_as_printed: 'JSC-Mars-1A and JSC-1A obtained from ORBITEC; Mojave Mars provided by NASA.'
+          milling: 'Planetary ball mill at 1100 rpm; four cycles, each 10 min milling followed by a 60 min cooling pause. Zirconia grinding balls, 1.5 mm diameter; balls-mixture ratio: 4:1.'
+          magnesium_powder: −325 mesh (<44 µm), 99.8% pure, Sigma-Aldrich.
+          mixing: 1 h in a three-dimensional inversion kinematics tumbler mixer.
+          pellet_dimensions_as_printed: 13 mm diameter, 21–24 mm height.
+      - observation_id: delgado_2015_combustion_apparatus_conditions
+        type: laboratory_conditions
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        units: as printed
+        values:
+          quantity: combustion_experiment_conditions
+          method_class: method_only
+          chamber_as_printed: 'Windowed steel chamber, 30 cm diameter and 40 cm height, connected to a compressed argon cylinder and a vacuum pump.'
+          atmosphere: Argon environment at 1 atm for all combustion experiments.
+          ignition: 'Pellet ignited at the top by a tungsten wire heated with a DC power supply; ignition temperature and electrical input are not printed.'
+          temperature_measurement: Middle of pellet measured by a K-type thermocouple with 254 µm diameter wire.
+          combustion_temperature_results: 'Maximum temperatures are experimental values plotted only in Figure 2; no point values are transcribed.'
+          figure_only: true
+          digitization_status: undigitised
+      - observation_id: delgado_2015_thermal_analysis_conditions
+        type: laboratory_conditions
+        locator: {page: 2, published_page: 2, pdf_page_index: 1, section: Experimental}
+        units: as printed
+        values:
+          quantity: thermal_analysis_conditions
+          method_class: method_only
+          instruments: 'Netzsch TGA 209 F1 Iris thermogravimetric analyzer and Netzsch DSC 404 F1 Pegasus differential scanning calorimeter.'
+          crucibles: Alumina.
+          sweep_gas: Argon flow, 20 mL/min.
+          heating_rates_C_min: ['5', '10']
+          heating_rate_scope: 'Rate depended on the test. Table/prose and figure captions are retained as the locator for the rate of each named test.'
+          total_pressure: 'Not stated for the thermal-analysis tests; argon flow is not a pressure.'
+          xrd_sample_handling: 'For some tests, heating was stopped at different temperatures and condensed products were cooled in argon before XRD analysis.'
+      - observation_id: delgado_2015_thermo_calculation_conditions
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 3, pdf_page_index: 2, figure: '1', section: Results and Discussion}
+        units: as printed
+        values:
+          quantity: thermodynamic_calculation_inputs_and_plot_scope
+          method_class: method_only
+          software: THERMO [8]
+          calculations: 'Adiabatic flame temperatures and combustion products for JSC-Mars-1A and Mojave Mars with Mg; comparison calculations also used Al.'
+          magnesium_concentration_range_wt_percent: ['0', '100']
+          total_pressure_atm: '1'
+          composition_model: 'Mars simulants represented by simple oxides because quantitative mineral compositions were unknown; calculations used the Table 1 oxide values.'
+          result_status: Model output is plotted in Figure 1 and is not digitised here.
+          figure_only: true
+          digitization_status: undigitised
+      - observation_id: delgado_2015_xrd_phase_identification_jsc1a_mg
+        type: characterization
+        locator: {page: 4, published_page: 4, pdf_page_index: 3, figure: '4', note: Figure 4 labels XRD peaks Mg and MgO; prose states conversion observations.}
+        units: qualitative phase identification; °C as printed for the heating stop
+        values:
+          quantity: xrd_phase_identification_and_conversion
+          method_class: measured_direct
+          sample_as_printed: 74 wt% JSC-1A and 26 wt% Mg.
+          heating_rate_C_min: '5'
+          heating_stop_temperatures_C: ['500', '550', '590']
+          atmosphere_during_cooling: Argon.
+          phase_labels_as_printed: [Mg, MgO]
+          at_500_C: No MgO.
+          at_550_C: Partial conversion of Mg to MgO.
+          at_590_C: All Mg converted to MgO.
+          phase_state_note: The source says the reaction occurs while Mg is still solid.
+          other_identified_product_phases: None named in the XRD prose or Figure 4 labels.
+          uncertainty: No uncertainty is printed for these phase identifications.
+      - observation_id: delgado_2015_thermal_runs_with_26_wt_percent_mg
+        type: experiment_series
+        locator: {page: 4, published_page: 4, pdf_page_index: 3, figure: '5', section: Results and Discussion}
+        units: wt%; °C; °C/min
+        values:
+          quantity: 26_wt_percent_mg_simulant_dsc_series
+          method_class: method_only
+          mixtures:
+            - {simulant_as_printed: JSC-Mars-1A, Mg_wt_percent: '26'}
+            - {simulant_as_printed: Mojave Mars, Mg_wt_percent: '26'}
+            - {simulant_as_printed: JSC-1A, Mg_wt_percent: '26', simulant_wt_percent: '74', role: Figure 5 comparison and Figure 3/4 reference sample}
+          maximum_temperature_C: '650'
+          heating_rate_C_min: '10'
+          atmosphere: Argon flow from the thermal-analysis method; total pressure is not stated.
+          exothermic_peak_results: 'JSC-Mars-1A peak is at a significantly higher temperature than JSC-1A and Mojave Mars; Mojave Mars is lowest. Numerical peak temperatures are figure-only and undigitised.'
+          figure_only_peak_values: true
+          digitization_status: undigitised
+      - observation_id: delgado_2015_binary_oxide_dsc
+        type: experiment_series
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, figure: '6', section: Results and Discussion}
+        units: as printed
+        values:
+          quantity: binary_fe2o3_mg_and_sio2_mg_dsc_series
+          method_class: method_only
+          reactant_pairs_as_printed: [Fe2O3/Mg, SiO2/Mg]
+          fe2o3_size_and_purity: '>2 µm, 99%, Sigma-Aldrich'
+          sio2_size_and_purity: '−400 mesh (<37 µm), 99.5%, Alpha Aesar'
+          conditions_cross_reference: 'Same DSC conditions as the immediately preceding JSC-Mars-1A/Mojave Mars sentence on page 4: heated to 650°C at 10°C/min.'
+          mg_to_oxide_ratio: Not printed.
+          results: 'Fe2O3/Mg peak is at about the same temperature as JSC-Mars-1A/Mg; SiO2/Mg peak is lower than the peaks for the other two simulants. Figure 6 values are undigitised.'
+          figure_only_peak_values: true
+          digitization_status: undigitised
+          total_pressure: Not stated; argon flow does not establish a pressure.
+      - observation_id: delgado_2015_ternary_thermite_component_mass_ratios
+        type: experiment_series
+        locator: {page: 5, published_page: 5, pdf_page_index: 4, figure: '7', section: Results and Discussion}
+        units: wt%
+        values:
+          quantity: printed_ternary_stoichiometric_thermite_component_split
+          method_class: method_only
+          mixture_1: {Mg_SiO2_thermite_wt_percent: '71', Mg_Fe2O3_thermite_wt_percent: '29'}
+          mixture_2: {Mg_SiO2_thermite_wt_percent: '55', Mg_Fe2O3_thermite_wt_percent: '45'}
+          mixture_3: {Mg_SiO2_thermite_wt_percent: '38', Mg_Fe2O3_thermite_wt_percent: '62'}
+          note: 'These are printed percentages of the two thermite components. They are not Mg:regolith ratios; the text says Mg was chosen to make both reactions stoichiometric but gives no combined Mg wt% or Mg:regolith ratio.'
+          total_pressure: Not stated.
+          thermal_schedule: 'Not printed for Figure 7; no temperature or heating rate is inferred from Figures 5-6.'
+          results: Figure 7 peak-temperature order is described qualitatively only; curve values are undigitised.
+          figure_only_peak_values: true
+          digitization_status: undigitised
+      - observation_id: delgado_2015_reaction_equations_and_enthalpies
+        type: thermodynamic_example
+        locator: {page: 1, published_page: 1, pdf_page_index: 0, equation: '1–2', section: Introduction}
+        units: kJ per mol Mg
+        values:
+          quantity: printed_thermite_reaction_equations
+          method_class: method_only
+          silica_reaction_as_printed: SiO2 + 2 Mg → Si + 2 MgO
+          silica_reaction_enthalpy_kJ_per_mol_Mg: '−146'
+          iron_oxide_reaction_as_printed: Fe2O3 + 3 Mg → 2 Fe + 3 MgO
+          iron_oxide_reaction_enthalpy_kJ_per_mol_Mg: '−328'
+          note: Printed ΔH°rxn values are retained as reaction context; no reduction is made.
