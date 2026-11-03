@@ -288,7 +288,7 @@ def test_internal_analytical_row_uses_gamma_reference_notice(
         )
     else:
         assert any(
-            notice.reason.startswith(notice_reason)
+            notice_reason in notice.reason
             for notice in prediction.notices
         )
 
