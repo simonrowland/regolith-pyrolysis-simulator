@@ -23,7 +23,6 @@ OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
     }
 )
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
-_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 OxygenBalanceBracketBoundary = Literal["lower", "upper"]
 _OXYGEN_GAS_ALPHA = 1.0
 _OXYGEN_GAS_ALPHA_SOURCE = (

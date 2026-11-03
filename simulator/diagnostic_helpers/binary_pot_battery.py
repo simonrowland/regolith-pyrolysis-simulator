@@ -50,9 +50,6 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
-from simulator.battery.oxygen_balance import (
-    _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON,
-)
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
@@ -131,6 +128,7 @@ REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
+_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
 _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
 
@@ -2124,6 +2122,14 @@ def _solve_vapor_engine_cell_oxygen_balance(
         last_admitted_po2_bar = pO2_bar
         return cells_by_po2[pO2_bar]
 
+    def _is_silicate_window_trial_refusal(
+        refusal: _OxygenBalanceEngineTrialRefusal,
+    ) -> bool:
+        return (
+            refusal.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
+            and "silicate_window" in refusal.backend_status_reason
+        )
+
     start_logp = -6.0
     start_cell = None
     starting_refusal_counts: dict[str, int] = {}
@@ -2144,10 +2150,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
         except _OxygenBalanceEngineTrialRefusal as exc:
             if exc.reason_code == REFUSAL_ENGINE_CRASH:
                 starting_grid_had_engine_crash = True
-            if not (
-                exc.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
-                and "silicate_window" in exc.backend_status_reason
-            ):
+            if not _is_silicate_window_trial_refusal(exc):
                 starting_grid_all_silicate_window_refusals = False
             guard_reason = exc.reason_code
             engine_reason = getattr(exc.cell, "engine_reason", None)
@@ -2325,10 +2328,7 @@ def _solve_vapor_engine_cell_oxygen_balance(
                         if last_refused_trial is None
                         else f"{last_refused_trial[0]:g}"
                     )
-                    if (
-                        exc.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
-                        and "silicate_window" in exc.backend_status_reason
-                    ):
+                    if _is_silicate_window_trial_refusal(exc):
                         refusal_reason = (
                             f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
                             "silicate_window_refusal"
