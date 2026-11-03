@@ -6,7 +6,7 @@ from decimal import Decimal
 import pytest
 import yaml
 
-from simulator.battery.enums import PhaseRole, Quantity, ValueKind
+from simulator.battery.enums import MethodToken, PhaseRole, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 
@@ -196,6 +196,78 @@ def test_table1_grid_rejects_expected_and_extract_cell_mutations() -> None:
     sample101_cao["values"]["component_amount"] = "33.3"
     with pytest.raises(AssertionError):
         _assert_rendered_table1_grid(mutated)
+
+
+def _assert_scoring_gap_bindings(document: dict[str, object]) -> None:
+    species = document["species"]
+    assert isinstance(species, dict)
+    observations = {
+        row["observation_id"]: row
+        for body in species.values()
+        if isinstance(body, dict)
+        for row in body.get("observations", [])
+    }
+    for observation_id in (
+        "yan_2020_table_1_sample_101_measured_liquid_cao",
+        "yan_2020_table_1_sample_102_measured_liquid_sio2",
+        "yan_2020_table_1_sample_129_normalized_liquid_v2o3",
+    ):
+        pressure = observations[observation_id]["values"].get("total_pressure_Pa")
+        assert isinstance(pressure, dict)
+        assert pressure["tag"] == "unknown"
+        assert "does not report the total gas pressure" in pressure["reason"]
+        assert pressure["locator"]["pdf_page_index"] == 4
+        assert pressure["locator"]["section"].startswith("2.1 ")
+
+    experiments = {row["experiment_id"]: row for row in document["experiments"]}
+    calcium = experiments["yan_2020_yan_2020_gamma_ca_calculated"]
+    assert calcium.get("method") == "quench_equilibration"
+    assert calcium["locator"]["pdf_page_index"] == 4
+    assert calcium["locator"]["section"].startswith("2.2 ")
+    assert "chemical equilibrium method" in calcium["locator"]["note"]
+
+
+def test_scoring_gap_bindings_are_located_and_migrate() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_scoring_gap_bindings(document)
+
+    missing_pressure = deepcopy(document)
+    sample_101_cao = next(
+        row
+        for body in missing_pressure["species"].values()
+        for row in body.get("observations", [])
+        if row["observation_id"] == "yan_2020_table_1_sample_101_measured_liquid_cao"
+    )
+    del sample_101_cao["values"]["total_pressure_Pa"]
+    with pytest.raises(AssertionError):
+        _assert_scoring_gap_bindings(missing_pressure)
+
+    missing_method = deepcopy(document)
+    calcium = next(
+        row
+        for row in missing_method["experiments"]
+        if row["experiment_id"] == "yan_2020_yan_2020_gamma_ca_calculated"
+    )
+    del calcium["method"]
+    with pytest.raises(AssertionError):
+        _assert_scoring_gap_bindings(missing_method)
+
+    migrator = migrate_one_extract(REPO_ROOT, EXTRACT, index=None, aliases={})
+    migrator.finalize()
+    migrated = migrator.result.observations
+    pressure_row = migrated[
+        f"{SOURCE_ID}::yan_2020_table_1_sample_101_measured_liquid_cao"
+    ]
+    assert pressure_row.identity.total_pressure_Pa is not None
+    assert pressure_row.identity.total_pressure_Pa.is_unknown
+
+    calcium_row = migrated[f"{SOURCE_ID}::yan_2020_gamma_ca_calculated"]
+    calcium_experiment = migrator.result.experiments[calcium_row.experiment_id]
+    assert calcium_experiment.method.is_value
+    assert calcium_experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    assert not migrator.result.registry_issues
 
 
 def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
