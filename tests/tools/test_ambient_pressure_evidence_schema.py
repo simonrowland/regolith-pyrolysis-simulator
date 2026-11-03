@@ -40,7 +40,7 @@ def _document(evidence_class: str) -> dict:
 def test_open_furnace_evidence_classes_validate(evidence_class: str) -> None:
     errors = validate_extract_document(_document(evidence_class))
 
-    assert not any("ambient_pressure_evidence" in error for error in errors)
+    assert errors == []
 
 
 @pytest.mark.parametrize("evidence_class", ["sealed", "vacuum", "knudsen"])

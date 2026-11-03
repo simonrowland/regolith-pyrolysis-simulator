@@ -32,7 +32,9 @@ The token's evidence class is filled only when the record has none; an
 existing class is kept. Explicit rejection tokens stay rejected. Parked,
 preserved_unscored, and the Cardiff/Matchett and Markova holds stay
 pending. Missing class/pressure/phase/method
-remain unknown, never certified / 101325 Pa / liquid / knudsen_effusion.
+remain unknown, never certified / liquid / knudsen_effusion. An explicit
+experiment-level ``ambient_pressure_evidence`` may supply 101325 Pa only for
+an otherwise missing total pressure on an open/flowing-gas furnace.
 Unknown rail spellings raise. Unmapped phase strings are ``State.unknown``
 on ``Species.phase`` and queued; they are never stored as gas.
 """
@@ -11118,8 +11120,13 @@ def _partial_pressure_identity_fields(
 
 
 def _partial_pressure_point_condition(
-    identity_fields: Mapping[str, Any], locator: Locator
+    identity_fields: Mapping[str, Any],
+    locator: Locator,
+    *,
+    ambient_pressure_filled: bool = False,
 ) -> Located[Any] | None:
+    if ambient_pressure_filled:
+        return None
     total = identity_fields.get("total_pressure_Pa")
     if not isinstance(total, State) or not total.is_value or total.value is None:
         return None
@@ -18387,14 +18394,21 @@ _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES = (
         {
             Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
             Quantity.CONDENSATE_COMPOSITION,
+            Quantity.DENSITY,
+            Quantity.ELECTRICAL_CONDUCTIVITY,
+            Quantity.FE3_FE2_RATIO,
             Quantity.LIQUIDUS_COMPOSITION,
+            Quantity.PARTIAL_MOLAR_ENTHALPY,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Quantity.TRANSITION_TEMPERATURE,
+            Quantity.VALENCE_RATIO,
+            Quantity.VISCOSITY,
         }
     )
 )
 _ABSOLUTE_PRESSURE_QUANTITIES = (
     KINETIC_YIELD_QUANTITIES
-    - {Quantity.EVAPORATION_COEFFICIENT_ALPHA, Quantity.CONDENSATE_COMPOSITION}
+    - {Quantity.CONDENSATE_COMPOSITION}
     | {
         Quantity.FUGACITY,
         Quantity.MASS_LOSS_AREAL_DENSITY,
@@ -18409,7 +18423,13 @@ def _ambient_pressure_band_for(
     *,
     species_formula: str,
     experiment: Experiment,
-) -> tuple[str | None, str]:
+) -> tuple[str | None, str] | None:
+    if quantity not in (
+        _ABSOLUTE_PRESSURE_QUANTITIES
+        | _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES
+    ):
+        return None
+
     ratio_pair: frozenset[str] = frozenset()
     control = experiment.fO2_control
     if control is not None and control.gas_ratio is not None:
@@ -18446,9 +18466,7 @@ def _ambient_pressure_band_for(
             "H2/CO2 gas speciation is weakly pressure-dependent through H2O/CO; "
             "flagged without a band",
         )
-    if co2_co_ratio and (
-        quantity not in _ABSOLUTE_PRESSURE_QUANTITIES or oxygen_partial_pressure
-    ):
+    if co2_co_ratio and oxygen_partial_pressure:
         return (
             None,
             "pO2 set by the CO2/CO ratio carries no total-pressure dependence",
@@ -18466,7 +18484,7 @@ def _ambient_pressure_band_for(
         # For condensed phases, V ΔP ≈ 0.2 J/mol versus RT ≈ 1.4×10⁴ J/mol,
         # so Δln(a) ≈ 1×10⁻⁵; this is too small to justify a band.
         return None, "condensed-phase VdP/RT is about 1e-5; no band assigned"
-    return None, "d-327 assigns no pressure band to this quantity category"
+    return None
 
 
 class Migrator:
@@ -22273,32 +22291,44 @@ class Migrator:
                 ambient_pressure_evidence = (
                     ambient_experiment.ambient_pressure_evidence
                 )
-                ident_kwargs["total_pressure_Pa"] = State.of(
-                    _AMBIENT_PRESSURE_TOTAL_PA
-                )
-                band, category_reason = _ambient_pressure_band_for(
+                pressure_category = _ambient_pressure_band_for(
                     q_token,
                     species_formula=species.formula,
                     experiment=ambient_experiment,
                 )
-                ambient_pressure_notice = Notice(
-                    kind=NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
-                    affected_quantities=(q_token,),
-                    reason=(
-                        f"total_pressure_Pa=101325 Pa derived from explicit "
-                        "ambient_pressure_evidence "
-                        f"class={ambient_pressure_evidence.evidence_class.value}; "
-                        f"{category_reason}"
-                    ),
-                    origin=obs_id,
-                    band=band,
-                    authority=Authority.DERIVED_FROM_APPARATUS,
-                )
-                identity_provenance += (
-                    "identity.total_pressure_Pa=derived from explicit "
-                    "ambient_pressure_evidence "
-                    f"class={ambient_pressure_evidence.evidence_class.value}",
-                )
+                if pressure_category is not None:
+                    band, category_reason = pressure_category
+                    ident_kwargs["total_pressure_Pa"] = State.of(
+                        _AMBIENT_PRESSURE_TOTAL_PA
+                    )
+                    ambient_pressure_notice = Notice(
+                        kind=NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
+                        affected_quantities=(q_token,),
+                        reason=(
+                            f"total_pressure_Pa=101325 Pa derived from explicit "
+                            "ambient_pressure_evidence "
+                            f"class={ambient_pressure_evidence.evidence_class.value}; "
+                            f"{category_reason}"
+                        ),
+                        origin=obs_id,
+                        band=band,
+                        authority=Authority.DERIVED_FROM_APPARATUS,
+                    )
+                    self.result.queue[:] = [
+                        entry
+                        for entry in self.result.queue
+                        if not (
+                            entry.work_id == work.work_id
+                            and entry.source == source_key
+                            and entry.observation_id == obs_id
+                            and entry.axes == ["total_pressure_Pa"]
+                            and entry.why
+                            == "source does not state a numeric total_pressure_Pa"
+                        )
+                    ]
+        ambient_pressure_notices = (
+            () if ambient_pressure_notice is None else (ambient_pressure_notice,)
+        )
         refreshed_oxygen = _refresh_buffer_decision(
             oxygen_decision,
             _positive_pressure_pa(ident_kwargs.get("total_pressure_Pa")),
@@ -22405,7 +22435,9 @@ class Migrator:
             **ident_kwargs,
         )
         partial_total_condition = _partial_pressure_point_condition(
-            ident_kwargs, locator
+            ident_kwargs,
+            locator,
+            ambient_pressure_filled=ambient_pressure_notice is not None,
         )
         if q_token is Quantity.P_PARTIAL and partial_total_condition is not None:
             # P_PARTIAL identity pressure is the in-cell vapour total. Keep it
@@ -22571,7 +22603,7 @@ class Migrator:
                     source_derivation=source_derivation,
                     phase_provenance=phase_provenance,
                     identity_provenance=identity_provenance,
-                    notices=point_notices,
+                    notices=(*point_notices, *ambient_pressure_notices),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
                     parent_values=values,
@@ -22691,7 +22723,12 @@ class Migrator:
                         phase_provenance=phase_provenance,
                         identity_provenance=identity_provenance,
                         notices=(
-                            () if total_iron_notice is None else (total_iron_notice,)
+                            *(
+                                ()
+                                if total_iron_notice is None
+                                else (total_iron_notice,)
+                            ),
+                            *ambient_pressure_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -22820,6 +22857,7 @@ class Migrator:
                             else (total_iron_notice,)
                         ),
                         *validity_notices,
+                        *ambient_pressure_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -23003,6 +23041,7 @@ class Migrator:
                                 else (total_iron_notice,)
                             ),
                             *validity_notices,
+                            *ambient_pressure_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -24602,7 +24641,12 @@ class Migrator:
                         ),
                     }
         partial_total_condition = _partial_pressure_point_condition(
-            ident_kwargs, point_locator
+            ident_kwargs,
+            point_locator,
+            ambient_pressure_filled=any(
+                notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+                for notice in notices
+            ),
         )
         if q_token_point is Quantity.P_PARTIAL and partial_total_condition is not None:
             # Keep series points on the same in-cell total-pressure identity as
