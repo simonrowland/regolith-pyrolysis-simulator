@@ -516,13 +516,10 @@ def _accounting_composition(formula: str) -> tuple[tuple[str, float], ...] | Non
 
 def _term_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
     # Dotted hydrates/mixtures (CuSO4.5H2O, 3Al2O3.2SiO2) and bracket
-    # groups are not JANAF tokens. parse_formula is the generator's parser;
-    # do not let a successful but wrong JANAF decimal-oxygen parse win.
-    # Decimal subscripts (NaO0.5, Fe0.947O) fail parse_formula and must
-    # still use the JANAF tokenizer.
+    # groups are not JANAF tokens. The molar-mass owner tries
+    # parse_formula first, so a hydrate is not read as decimal oxygen
+    # and a decimal subscript (NaO0.5, Fe0.947O, FeO1.5) still resolves.
     if "." in formula or "[" in formula:
-        # Same owner as oxide_molar_mass_g_mol. parse_formula wins;
-        # AccountingError falls back to JANAF atoms.
         return atoms_parse_formula_else_janaf(formula)
     parsed = formula_composition(formula)
     if parsed is None:

@@ -258,11 +258,12 @@ def atoms_parse_formula_else_janaf(
 ) -> tuple[tuple[str, float], ...] | None:
     """Atom counts for one component name.
 
-    A successful ``parse_formula`` wins, so ``CuSO4.5H2O`` stays five
-    waters. ``AccountingError`` (a segment with no body, or a multiplier
-    that is not positive) falls back to JANAF ``formula_composition``,
-    which keeps decimal subscripts such as ``FeO1.5`` and ``KO0.5``.
-    None means both failed. Other exceptions propagate.
+    A successful ``parse_formula`` wins. A hydrate stays waters
+    (``CuSO4.5H2O`` and ``CuSO4·5H2O`` are five waters, not decimal
+    oxygen). A printed decimal subscript stays one species and is not
+    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). ``AccountingError``
+    falls back to JANAF ``formula_composition``. None means both failed.
+    Other exceptions propagate.
     """
 
     try:
@@ -590,9 +591,106 @@ def _clean_formula_text(formula: str) -> str:
     return text
 
 
+def _flanked_digit_dot(text: str) -> bool:
+    for index, char in enumerate(text):
+        if char != "." or index == 0 or index + 1 == len(text):
+            continue
+        if text[index - 1].isdigit() and text[index + 1].isdigit():
+            return True
+    return False
+
+
+def _segment_parses(text: str) -> bool:
+    """True when one dot-free segment is an integer-stoichiometry formula."""
+
+    if not text or "." in text or "·" in text:
+        return False
+    try:
+        multiplier, body = _leading_multiplier(text)
+        if multiplier <= 0.0:
+            return False
+        elements = _FormulaParser(body).parse()
+    except AccountingError:
+        return False
+    return bool(elements)
+
+
+def _is_integer_adduct(text: str) -> bool:
+    """True when every dot in text separates closed integer formulas.
+
+    A decimal subscript (a dot with a digit on both sides) is not an
+    adduct. Empty pieces from a leading, trailing, or doubled dot are
+    not an adduct either.
+    """
+
+    if not text or _flanked_digit_dot(text):
+        return False
+    pieces = text.split(".")
+    if not pieces or any(piece == "" for piece in pieces):
+        return False
+    return all(_segment_parses(piece) for piece in pieces)
+
+
+def _dot_is_decimal_subscript(text: str, index: int) -> bool:
+    """True when the ASCII dot at index is a coefficient, not an adduct.
+
+    ``FeO1.5``, ``FeO1.33``, and ``NaO0.5`` end in the fractional digits,
+    so the dot is a subscript. ``Fe0.947O`` and ``SiO1.5C0.5`` stay one
+    species because the left side or the right side is not a closed
+    integer formula. ``CuSO4.5H2O`` and ``3Al2O3.2SiO2`` are adducts:
+    both sides parse with integer stoichiometry, so the dot separates.
+    """
+
+    if index <= 0 or index + 1 >= len(text) or text[index] != ".":
+        return False
+    if not text[index - 1].isdigit() or not text[index + 1].isdigit():
+        return False
+    cursor = index + 1
+    while cursor < len(text) and text[cursor].isdigit():
+        cursor += 1
+    if cursor == len(text):
+        return True
+    nxt = text[cursor]
+    if not (nxt.isupper() or nxt in _OPEN_TO_CLOSE):
+        return True
+    left = text[:index]
+    right = text[index + 1 :]
+    return not (_is_integer_adduct(left) and _is_integer_adduct(right))
+
+
+def _split_ascii_adducts(text: str) -> list[str]:
+    if not text:
+        return []
+    if "." not in text:
+        return [text]
+    segments: list[str] = []
+    start = 0
+    for index, char in enumerate(text):
+        if char == "." and not _dot_is_decimal_subscript(text, index):
+            segments.append(text[start:index])
+            start = index + 1
+    segments.append(text[start:])
+    return segments
+
+
 def _split_formula_segments(formula: str) -> list[str]:
-    normalized = formula.replace("·", ".")
-    segments = [segment for segment in normalized.split(".") if segment]
+    """Split hydrate and adduct boundaries. Keep a decimal subscript intact.
+
+    A middle dot (U+00B7) always separates segments: ``CuSO4·5H2O`` is
+    five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII ``.``
+    is a decimal subscript of one species when a digit flanks it and the
+    two sides are not both closed integer formulas: ``FeO1.5``,
+    ``Fe0.947O``, ``KO0.5``, and ``SiO1.5C0.5`` stay one species.
+    ``CuSO4.5H2O`` and ``3Al2O3.2SiO2`` still split, because each side
+    is an integer formula and the dot is the adduct multiplier. A dot
+    that is not flanked by digits is always a separator (``Na2O.SiO2``,
+    ``K2O.2SiO2``), including the leading-dot spelling ``Fe.947O``.
+    """
+
+    pieces: list[str] = []
+    for part in formula.split("·"):
+        pieces.extend(_split_ascii_adducts(part))
+    segments = [segment for segment in pieces if segment]
     if not segments:
         raise UnknownSpeciesError("formula is required")
     return segments
