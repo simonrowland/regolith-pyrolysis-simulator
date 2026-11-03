@@ -131,6 +131,44 @@ def test_inoue_suito_phase_compositions_migrate_with_sample_identity_and_tempera
     assert result.validation is not None
     assert result.validation.ok, result.validation.hard_issues
     assert result.validation.hard_issues == (), result.validation.hard_issues
+    source_doc = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    assert len(source_doc["experiments"]) == 122
+    assert all(
+        experiment["method"] == "quench_equilibration"
+        for experiment in source_doc["experiments"]
+    )
+    for experiment in source_doc["experiments"]:
+        detail = experiment["method_detail_as_printed"]
+        assert detail["temperature"]["state"]["value"] == (
+            "temperature range from 1 550 °C to 1 650 °C"
+        )
+        assert detail["crucible"]["state"]["value"] == "magnesia crucible"
+        assert detail["equilibration_time"]["state"]["value"] == (
+            "the holding time at the experimental equilibrium temperatures was "
+            "3 to 5 hr depending on the slag compositions and temperatures"
+        )
+        assert detail["quench"]["state"]["tag"] == "unknown"
+        assert set(detail) == {
+            "temperature",
+            "atmosphere",
+            "gas_mixture",
+            "fO2_control",
+            "crucible",
+            "equilibration_time",
+            "quench",
+            "analysis_method",
+        }
+        for key, entry in detail.items():
+            if key == "analysis_method":
+                assert all(
+                    item["state"]["tag"] == "value" and item.get("locator")
+                    for item in entry.values()
+                )
+            else:
+                assert entry.get("locator")
+                assert entry["state"]["tag"] in {"value", "unknown"}
+                if entry["state"]["tag"] == "unknown":
+                    assert entry["state"].get("reason")
     rows = {
         row.observation_id.split("::", 1)[-1]: row
         for row in result.observations.values()
@@ -152,7 +190,7 @@ def test_inoue_suito_phase_compositions_migrate_with_sample_identity_and_tempera
             assert row.identity.species.formula == formula
             assert row.identity.phase_role.value.value == role
             assert row.identity.temperature_K.value == temperature
-            assert experiment.method.value.value == "static_equilibrium"
+            assert experiment.method.value.value == "quench_equilibration"
             condition = row.point_conditions["temperature_K"]
             assert condition.state.value == temperature
             assert condition.locator is not None
@@ -171,7 +209,7 @@ def test_inoue_suito_phase_compositions_migrate_with_sample_identity_and_tempera
         assert reference.identity.species.formula == "Fe2O3"
         assert reference.identity.phase_role.value.value == "slag"
         assert reference.identity.temperature_K.value == temperature
-        assert reference_experiment.method.value.value == "static_equilibrium"
+        assert reference_experiment.method.value.value == "quench_equilibration"
         assert reference.point_conditions["temperature_K"].locator.page == page
 
 
