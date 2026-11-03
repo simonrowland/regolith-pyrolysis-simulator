@@ -232,9 +232,11 @@ def _member(buffer: str, calibration_id: str, temperature: Decimal) -> Decimal:
 
 
 def _pair(central: Decimal, route: Decimal, edge_central: Decimal, edge_route: Decimal) -> Decimal:
-    """The ruling's band: both logs rounded to the survey's 0.0001 first."""
+    """Pair width: round to survey precision, then count the edge once."""
 
-    return abs(_q4(central) - _q4(route)) + abs(_q4(edge_central) - _q4(edge_route))
+    at_temperature = _q4(central) - _q4(route)
+    at_edge = _q4(edge_central) - _q4(edge_route)
+    return abs(at_temperature - at_edge) + abs(at_edge)
 
 
 def test_iw_qfm_nno_stay_off_the_extended_region_path() -> None:
@@ -293,6 +295,19 @@ def test_extended_curves_match_the_survey_table() -> None:
                 buffer, Decimal(temperature), calibration_id=calibration_id
             )
             assert _q4(evaluation.log10_fO2_bar) == Decimal(printed)
+
+
+def test_mo_region2_endpoints_count_each_edge_offset_once() -> None:
+    # At T = edge, d(T) = d(edge), so |d(T) - d(edge)| + |d(edge)|
+    # reduces to the edge offset itself. These values are the hand-rounded
+    # survey offsets at the open O'Neill endpoints.
+    for temperature, expected_band in (
+        (Decimal(1000), Decimal("0.1739")),
+        (Decimal(1450), Decimal("0.1150")),
+    ):
+        evaluation = evaluate_buffer("Mo-MoO2", temperature)
+        assert evaluation.region == 2
+        assert evaluation.band_dex == expected_band
 
 
 def test_mo_regions_authority_and_edge_offsets() -> None:
@@ -456,6 +471,28 @@ def test_extended_buffers_record_pressure_and_do_not_move_the_log() -> None:
         assert pressed.pressure_bar == Decimal(2000)
         assert not pressed.pressure_coefficient_spread
         assert base.pressure_bar is None
+
+
+def test_explicit_janaf_authority_uses_its_table_window() -> None:
+    janaf_inside = evaluate_buffer(
+        "Mo-MoO2", Decimal(1673), calibration_id="janaf_mo_moo2"
+    )
+    assert janaf_inside.authority == "tabulated_thermochemistry"
+    janaf_outside = evaluate_buffer(
+        "Mo-MoO2", Decimal(2900), calibration_id="janaf_mo_moo2"
+    )
+    assert janaf_outside.authority == "extrapolated"
+
+
+def test_explicit_haas_authority_uses_its_table_window() -> None:
+    haas_inside = evaluate_buffer(
+        "MH", Decimal(1473), calibration_id="haas1992_table_10_9"
+    )
+    assert haas_inside.authority == "tabulated_thermochemistry"
+    haas_outside = evaluate_buffer(
+        "MH", Decimal(1873), calibration_id="haas1992_table_10_9"
+    )
+    assert haas_outside.authority == "extrapolated"
 
 
 def test_janaf_moo2_route_matches_the_printed_log_kf_column() -> None:
