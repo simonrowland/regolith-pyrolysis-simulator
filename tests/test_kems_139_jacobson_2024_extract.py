@@ -7,7 +7,6 @@ import pytest
 import yaml
 
 from tests.battery.factories import migrate_one_extract
-from tests.battery.sc456 import assert_only_pending_equation_issues
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,9 +71,5 @@ def test_sc456_classes_and_lineage_are_pinned_with_isolated_migration() -> None:
     migrator.finalize()
     result = migrator.result
     assert not result.registry_issues
-    # t-1610 will make the prose method sufficient; until then this is the
-    # only permitted issue for the author-generated FactSage result.
-    assert_only_pending_equation_issues(
-        result.validation,
-        observation_id_fragment="jacobson_2024_t1_factsage_2500k_predicted_psat",
-    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues

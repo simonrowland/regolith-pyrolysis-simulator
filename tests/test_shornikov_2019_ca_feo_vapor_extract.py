@@ -178,22 +178,8 @@ def test_table_and_figure_rows_are_render_pinned_and_migrate_with_conditions():
         for row in migrated
     ) == 20
     assert not result.registry_issues
-    expected_legacy_model_method_issues = {
-        "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
-        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-        "derived observation requires derived_from",
-    }
-    model_table_ids = {
-        row["observation_id"]
-        for block in document["species"].values()
-        for row in block.get("observations", [])
-        if row["locator"].get("table") == "1"
-    }
-    assert all(
-        issue.detail in expected_legacy_model_method_issues
-        and any(observation_id in issue.path for observation_id in model_table_ids)
-        for issue in result.validation.hard_issues
-    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues
 
     all_points = [point for series in figure_series for point in series["values"]["points"]]
     assert len({point["read_2"]["crop_id"] for point in all_points}) == 36

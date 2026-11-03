@@ -16,10 +16,12 @@ IDS = (
     "stolyarova_2013_fig5_gibbs_gltas_contours_model",
     "stolyarova_2013_fig6_gibbs_gltas_model_figure_only",
 )
-TRANSIENT_EQUATION_GATE = {
-    "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
-    "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-    "derived observation requires derived_from",
+PHYSICAL_PAGES = {
+    IDS[0]: (6, 5),
+    IDS[1]: (7, 6),
+    IDS[2]: (7, 6),
+    IDS[3]: (8, 7),
+    IDS[4]: (9, 8),
 }
 
 
@@ -41,6 +43,14 @@ def _assert_model_evidence(document: dict) -> None:
         assert row["derivation"]["references"] == [
             "GLTAS [50], as cited in the figure caption."
         ]
+        page, pdf_page_index = PHYSICAL_PAGES[observation_id]
+        for locator in (
+            row["derivation"]["method"]["locator"],
+            row["derivation"]["raw_inputs"]["locator"],
+        ):
+            assert locator["page"] == page
+            assert locator["pdf_page_index"] == pdf_page_index
+            assert locator["published_page"] == row["locator"]["published_page"]
 
 
 def test_gltas_figure_outputs_are_model_derived() -> None:
@@ -51,11 +61,7 @@ def test_gltas_figure_outputs_are_model_derived() -> None:
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     assert migrator.result.validation is not None
-    assert all(
-        issue.detail in TRANSIENT_EQUATION_GATE
-        and any(observation_id in issue.path for observation_id in IDS)
-        for issue in migrator.result.validation.hard_issues
-    )
+    assert not migrator.result.validation.hard_issues
 
 
 def test_gltas_class_pin_rejects_quoted_reversion() -> None:

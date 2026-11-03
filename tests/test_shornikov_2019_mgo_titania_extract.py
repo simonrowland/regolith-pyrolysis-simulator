@@ -11,7 +11,6 @@ import yaml
 
 from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
-from tests.battery.sc456 import assert_only_pending_equation_issues
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -169,10 +168,8 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 22
     assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 41
     assert not result.registry_issues
-    assert_only_pending_equation_issues(
-        result.validation,
-        observation_id_fragment="_p003_t02_",
-    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues
 
     for row in migrated:
         temperature = row.point_conditions["temperature_K"]
