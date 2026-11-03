@@ -1079,28 +1079,57 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # d-252's C0 setup and d-237 phosphorus retention yield the 35-transition
-    # roster measured by the studio-2 probe.
-    assert len(sim.atom_ledger.transitions) == 35
+    # No-backpressure commit on this code is 35 transitions. The same-hour
+    # solve puts four carriers on the 1e-12 kg ledger floor, so these eight
+    # transitions are not committed: evaporate_AlO, condense_AlO,
+    # evaporate_CaO_gas, condense_CaO_gas, evaporate_K2, evaporate_K2O_gas,
+    # evaporate_TiO, condense_TiO. Committed inlet and stoich legs, kg on
+    # the one-hour tick (kg/hr * kg/kg):
+    #   AlO 2.940412990755e-13 * 1.18611911993611 = 3.487680068843e-13 oxide,
+    #       below the floor, so the caller returns before dispatch and the
+    #       condense route never starts.
+    #   CaO_gas 1.569083220166e-13 oxide and no O2 leg.
+    #   K2O_gas 6.756098791708e-14 oxide and no O2 leg.
+    #   K2 2.033929340480e-12 * 1.2045996884775 = 2.450070649927e-12 oxide
+    #       (clears) and * 0.204599688477504 = 4.161413094475e-13 O2 (does
+    #       not). The provider omits the whole transition.
+    #   TiO 1.808429245219e-12 * 1.25050887796324 = 2.261456826315e-12 oxide
+    #       and * 0.250508877963236 = 4.530275810957e-13 O2. Same omission,
+    #       so condense_TiO is not created.
+    # Limiting case: a zero O2 coefficient leaves only the parent-oxide test.
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
+    assert len(sim.atom_ledger.transitions) == 27
+    assert {
+        "evaporate_AlO",
+        "condense_AlO",
+        "evaporate_CaO_gas",
+        "condense_CaO_gas",
+        "evaporate_K2",
+        "evaporate_K2O_gas",
+        "evaporate_TiO",
+        "condense_TiO",
+    }.isdisjoint(ca_ti_reasons)
     # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
     assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
         ca_ti_reasons
     )
     assert "Ti" not in snapshot.evap_flux.species_kg_hr
-    assert "Ti" not in snapshot.evap_flux.alpha_authority_status_by_species
+    assert (
+        snapshot.evap_flux.alpha_authority_status_by_species["Ti"]
+        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+    )
     assert "evaporate_Ti" not in ca_ti_reasons
     assert {
-        "condense_SiO", "condense_AlO", "condense_CaO_gas",
-        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
+        "condense_SiO",
+        "condense_CrO",
+        "condense_MgO_gas",
+        "condense_SiO2_gas",
         "condense_TiO2_gas",
     } <= ca_ti_reasons
     for required in (
         "evaporate_Ca",
-        "evaporate_CaO_gas",
-        "evaporate_TiO",
         "evaporate_TiO2_gas",
         "condense_Ca",
     ):
@@ -1108,7 +1137,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "condense_TiO",
+        "condense_SiO2_gas",
         "evaporate_TiO2_gas",
         "condense_TiO2_gas",
         "fe_redox_respeciation",
@@ -1375,9 +1404,16 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         required_transitions.append("evaporate_Ti")
     for required in required_transitions:
         assert required in reason_set, required
+    # Al2O's committed inlet is 1.145858619760e-12 kg/hr. Parent oxide
+    # 1.145858619760e-12 * 1.45736206487981 = 1.669930884154e-12 kg clears
+    # the floor; the O2 leg * 0.457362064879806 = 5.240722643938e-13 kg does
+    # not, so the provider omits evaporate_Al2O and condense_Al2O together.
+    # Unit: kg/hr * kg/kg = kg on the one-hour tick. Limiting case: an O2
+    # coefficient of zero would leave the parent-oxide test alone.
+    assert "evaporate_Al2O" not in reason_set
+    assert "condense_Al2O" not in reason_set
     assert {
         "condense_SiO",
-        "condense_Al2O",
         "condense_AlO",
         "condense_CaO_gas",
         "condense_CrO",
