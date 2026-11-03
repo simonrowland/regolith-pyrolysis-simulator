@@ -236,11 +236,38 @@ def _freeze_gate_curve_with_outcome(
         record_gate_curve_provider_outcome,
     )
 
+    curve = _freeze_gate_curve_fixture(sim, curve)
     record_gate_curve_provider_outcome(
         sim,
         outcome,
     )
     return dict(curve)
+
+
+def _freeze_gate_curve_fixture(sim, curve):
+    """Give valid fixture bounds the production builder's endpoint path."""
+    curve = dict(curve)
+    if 'path' in curve:
+        return curve
+    solidus_T_C = sim._optional_float(curve.get('solidus_T_C'))
+    liquidus_T_C = sim._optional_float(curve.get('liquidus_T_C'))
+    if solidus_T_C is None or liquidus_T_C is None:
+        return curve
+    if not (
+        math.isfinite(solidus_T_C)
+        and math.isfinite(liquidus_T_C)
+        and solidus_T_C < liquidus_T_C
+    ):
+        return curve
+    built = sim._freeze_gate_curve_from_bounds(
+        solidus_T_C=solidus_T_C,
+        liquidus_T_C=liquidus_T_C,
+        source=str(curve.get('source') or 'test'),
+        reasons=[],
+    )
+    if built is not None:
+        curve['path'] = built['path']
+    return curve
 
 
 def _configure_kernel_liquidus_authority(sim, monkeypatch):
@@ -982,6 +1009,7 @@ def _install_freeze_gate_curve(
     }
     if path is not None:
         curve['path'] = path
+    curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(
         sim,
         curve,
@@ -2519,18 +2547,100 @@ def test_projected_notice_survives_shared_cache_reuse_in_run_metadata(
     )
 
 
-def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+@pytest.mark.parametrize(
+    'curve, malformed_fields',
+    [
+        (
+            {
+                'source': 'test',
+                'liquidus_T_C': 1300.0,
+                'path': ((1000.0, 0.0), (1300.0, 1.0)),
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': 'not-a-temperature',
+                'liquidus_T_C': 1300.0,
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': math.inf,
+                'liquidus_T_C': 1300.0,
+            },
+            ['solidus_T_C'],
+        ),
+        (
+            {
+                'source': 'test',
+                'solidus_T_C': 1800.0,
+                'liquidus_T_C': 1700.0,
+            },
+            ['solidus_T_C', 'liquidus_T_C'],
+        ),
+    ],
+    ids=(
+        'missing-solidus',
+        'nonnumeric-solidus',
+        'nonfinite-solidus',
+        'inverted-bounds',
+    ),
+)
+def test_malformed_provider_liquidus_curve_refuses_for_current_hour(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
+    curve,
+    malformed_fields,
 ):
-    """Interpolation KeyError/TypeError/ValueError must not assert solid.
+    """Invalid provider bounds are refused instead of inventing liquid."""
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    record = gate_curve_memo_record(
+        curve,
+        None,
+        (),
+        'live',
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        lambda **_kwargs: record,
+    )
 
-    FALSIFIABILITY: restore `return 0.0` on the mapping-curve exception
-    path in `_melt_redox_liquid_fraction_factor` and this goes red —
-    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
-    """
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert error.value.reason == 'liquid_fraction_provider_invalid_curve'
+    diagnostic = error.value.diagnostic
+    assert diagnostic['provider'] == sim._liquid_fraction_provider
+    assert diagnostic['malformed_fields'] == malformed_fields
+    assert diagnostic['hour'] == sim.melt.hour
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+@pytest.mark.parametrize(
+    'error',
+    [KeyError('path'), ValueError('invalid path value')],
+    ids=('missing-path-field', 'nonnumeric-path-value'),
+)
+def test_unreadable_mapping_curve_refuses_without_granting_floor(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    error,
+):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -2543,7 +2653,7 @@ def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     )
 
     def unreadable_curve(*_args, **_kwargs):
-        raise KeyError('freeze-gate path')
+        raise error
 
     monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', unreadable_curve)
     monkeypatch.setattr(
@@ -2551,41 +2661,59 @@ def test_unreadable_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
     )
 
     T_K = 1500.0 + 273.15
-    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
-    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
-    assert diagnostic['status'] == 'invalid'
-    assert diagnostic['source'] == 'none:invalid_liquid_fraction_curve'
-    assert 'freeze-gate path' in diagnostic['reason']
-    assert 'liquidus_status' not in diagnostic
-    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
-        fO2_log=-9.0,
-        T_K=T_K,
-    ) == 12.0
-    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
-    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
-    assert fallback['liquidus_status'] == 'invalid'
-    assert fallback['source'] == 'none:invalid_liquid_fraction_curve'
-    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
-        'invalid'
+    with pytest.raises(EvaporationFluxRefusal) as error_info:
+        sim._melt_redox_liquid_fraction_factor(T_K)
+
+    assert error_info.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert error_info.value.diagnostic['provider'] == (
+        sim._liquid_fraction_provider
     )
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
-        'none:invalid_liquid_fraction_curve'
-    )
+    assert error_info.value.diagnostic['malformed_fields'] == ['path']
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+    with pytest.raises(EvaporationFluxRefusal):
+        sim._melt_redox_source_capacity_mol_per_ln_fO2(
+            fO2_log=-9.0,
+            T_K=T_K,
+        )
 
 
-def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
+def test_nonfinite_interpolated_liquid_fraction_refuses_without_floor_grant(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
 ):
-    """A NaN/Inf interpolated fraction is unusable data, not a solidus.
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    _install_freeze_gate_curve(
+        sim,
+        path=((1000.0, 0.0), (1300.0, 1.0)),
+    )
+    monkeypatch.setattr(
+        sim,
+        '_interpolate_freeze_gate_curve',
+        lambda *_args, **_kwargs: float('nan'),
+    )
 
-    FALSIFIABILITY: restore `return 0.0` on the mapping-curve non-finite
-    path in `_melt_redox_liquid_fraction_factor` and this goes red —
-    capacity at 1500 °C collapses to 0 instead of the Kress91 floor.
-    """
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+    assert error.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert error.value.diagnostic['provider'] == sim._liquid_fraction_provider
+    assert error.value.diagnostic['malformed_fields'] == ['liquid_fraction']
+    assert sim._melt_redox_liquidus_gate_fallback_summary() == {}
+
+
+def test_typeerror_from_liquid_fraction_interpolation_propagates(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
         feedstocks_data,
@@ -2597,44 +2725,53 @@ def test_nonfinite_mapping_curve_floor_falls_back_instead_of_zeroing_capacity(
         path=((1000.0, 0.0), (1300.0, 1.0)),
     )
 
-    monkeypatch.setattr(
-        sim,
-        '_interpolate_freeze_gate_curve',
-        lambda *_args, **_kwargs: float('nan'),
-    )
-    monkeypatch.setattr(
-        sim, '_melt_redox_capacity_mol_per_ln_fO2', lambda **_kwargs: 12.0
-    )
+    def programming_error(*_args, **_kwargs):
+        raise TypeError('interpolation programming error')
 
-    T_K = 1500.0 + 273.15
-    assert sim._melt_redox_liquid_fraction_factor(T_K) == 1.0
-    diagnostic = sim._last_melt_redox_liquid_fraction_diagnostic
-    assert diagnostic['status'] == 'invalid'
-    assert diagnostic['source'] == 'none:nonfinite_liquid_fraction'
-    assert math.isnan(diagnostic['liquid_fraction'])
-    assert 'liquidus_status' not in diagnostic
-    assert sim._melt_redox_source_capacity_mol_per_ln_fO2(
-        fO2_log=-9.0,
-        T_K=T_K,
-    ) == 12.0
-    fallback = sim._melt_redox_liquidus_gate_fallback_diagnostics[-1]
-    assert fallback['status'] == 'liquidus_unavailable_floor_fallback'
-    assert fallback['liquidus_status'] == 'invalid'
-    assert fallback['source'] == 'none:nonfinite_liquid_fraction'
-    assert fallback['repair_notice'] == {
-        'kind': 'kress_liquidus_floor_repair',
-        'repaired': 'unusable liquidus bounds or interpolation',
-        'reason': 'non-finite liquid_fraction=nan',
-        'replacement': 'deterministic Kress91 liquidus floor',
-        'floor_T_C': 1200.0,
+    monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', programming_error)
+
+    with pytest.raises(TypeError, match='interpolation programming error'):
+        sim._melt_redox_liquid_fraction_factor(1500.0 + 273.15)
+
+
+@pytest.mark.parametrize(
+    'error, expected_type',
+    [
+        (ValueError('invalid path value'), EvaporationFluxRefusal),
+        (TypeError('interpolation programming error'), TypeError),
+    ],
+    ids=('typed-refusal-is-visible', 'programming-error-propagates'),
+)
+def test_phase_context_diagnostic_does_not_swallow_liquid_fraction_failures(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    error,
+    expected_type,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((1000.0, 0.0), (1300.0, 1.0)),
     }
-    assert sim._melt_redox_liquid_fraction_factor(1200.0 + 273.15) == 0.0
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['status'] == (
-        'invalid'
-    )
-    assert sim._last_melt_redox_liquid_fraction_diagnostic['source'] == (
-        'none:nonfinite_liquid_fraction'
-    )
+    sim._melt_redox_gate_authority_tick_hour = sim.melt.hour
+    sim._melt_redox_gate_authority_this_tick = curve
+
+    def fail_interpolation(*_args, **_kwargs):
+        raise error
+
+    monkeypatch.setattr(sim, '_interpolate_freeze_gate_curve', fail_interpolation)
+
+    with pytest.raises(expected_type):
+        sim._record_phase_context_diagnostic('test')
 
 
 def test_typed_thermoengine_out_of_domain_is_not_labelled_unavailable(
@@ -2871,6 +3008,47 @@ def test_redox_reference_seed_builds_liquidus_curve_before_first_seed(
     assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1450.0 + 273.15)
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-9.0)
     assert sim._last_melt_redox_liquidus_gate_diagnostic['status'] == 'ok'
+
+
+def test_valid_redox_liquidus_curve_diagnostic_keeps_validated_bounds(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    curve = {
+        'source': 'test:valid-redox-bounds',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+        'path': ((1000.0, 0.0), (1300.0, 1.0)),
+    }
+    record = gate_curve_memo_record(
+        curve,
+        None,
+        (),
+        'live',
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_record',
+        lambda **_kwargs: record,
+    )
+
+    resolved_curve = sim._melt_redox_liquidus_gate_curve()
+
+    assert resolved_curve['solidus_T_C'] == pytest.approx(1000.0)
+    assert resolved_curve['liquidus_T_C'] == pytest.approx(1300.0)
+    diagnostic = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert diagnostic['status'] == 'ok'
+    assert diagnostic['solidus_T_C'] == pytest.approx(1000.0)
+    assert diagnostic['liquidus_T_C'] == pytest.approx(1300.0)
 
 
 def test_freeze_gate_pre_curve_window_builds_curve_on_first_staged_tick(
@@ -3428,6 +3606,7 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
         'solidus_T_C': 900.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sims[0], curve)
     analytical_backend = sims[0].backend
     for index, sim in enumerate(sims):
         sim.backend = analytical_backend
@@ -3443,7 +3622,7 @@ def test_shared_freeze_gate_curve_cache_reuses_same_analytical_producer(
     second = sims[1]._freeze_gate_curve()
 
     assert calls == [0]
-    assert second == first == curve
+    assert second == first == expected_curve
     assert len(shared_cache) == 1
 
 
@@ -3963,6 +4142,7 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
             'solidus_T_C': 1000.0,
             'liquidus_T_C': 1700.0,
         }
+        curve = _freeze_gate_curve_fixture(sim, curve)
         return gate_curve_memo_record(curve, None, (), 'live')
 
     monkeypatch.setattr(
@@ -4529,11 +4709,11 @@ def test_aborted_respeciation_preserves_fo2_reference_state(
         sim,
         '_freeze_gate_curve_record',
         lambda: gate_curve_memo_record(
-            {
+            _freeze_gate_curve_fixture(sim, {
                 'source': 'test_real_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1300.0,
-            },
+            }),
             None,
             (),
             'live',
@@ -4667,17 +4847,17 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
         nonlocal curve_calls
         curve_calls += 1
         if curve_calls == 1:
-            curve = {
+            curve = _freeze_gate_curve_fixture(sim, {
                 'source': 'test_invalid_curve',
                 'solidus_T_C': 1800.0,
                 'liquidus_T_C': 1700.0,
-            }
+            })
         else:
-            curve = {
+            curve = _freeze_gate_curve_fixture(sim, {
                 'source': 'test_recovered_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
-            }
+            })
         return gate_curve_memo_record(
             curve,
             None,
@@ -4699,19 +4879,27 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
 
     assert sim._freeze_gate_liquid_fraction_curve_memo == {}
 
-    invalid = sim._melt_redox_liquidus_gate_curve()
+    with pytest.raises(EvaporationFluxRefusal) as refusal:
+        sim._melt_redox_liquidus_gate_curve()
 
-    assert invalid.liquidus_status == 'invalid'
+    assert refusal.value.reason == 'liquid_fraction_provider_invalid_curve'
+    assert refusal.value.diagnostic['provider'] == (
+        sim._liquid_fraction_provider
+    )
+    assert refusal.value.diagnostic['malformed_fields'] == [
+        'solidus_T_C',
+        'liquidus_T_C',
+    ]
     assert sim._freeze_gate_liquid_fraction_cache is None
 
     valid = sim._melt_redox_liquidus_gate_curve()
 
     assert curve_calls == 2
-    assert valid == {
+    assert valid == _freeze_gate_curve_fixture(sim, {
         'source': 'test_recovered_curve',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1700.0,
-    }
+    })
     assert sim._freeze_gate_liquid_fraction_cache['key'] == key
     assert sim._freeze_gate_liquid_fraction_cache['curve'] == valid
 
@@ -5292,12 +5480,12 @@ def test_core_gate_curve_memo_does_not_keep_r15_vetoed_live_curve(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'unavailable' if veto == 'uncacheable-status' else 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     sticky_reason = (
         'test sticky disposition'
         if veto == 'sticky-disposition'
@@ -5598,12 +5786,12 @@ def test_core_gate_curve_local_slot_reads_match_green_provenance_count(
         _binary_path=binary,
         get_engine_version=lambda: 'fixture-runtime',
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:authoritative:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     original_install_provenance = admission_module.install_provenance
     provenance_calls = []
 
@@ -5818,6 +6006,7 @@ def test_gate_memo_origin_missing_is_a_miss(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['origin'] = None
     sim._freeze_gate_liquid_fraction_cache = {
@@ -5834,7 +6023,7 @@ def test_gate_memo_origin_missing_is_a_miss(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert result['disposition'] == 'live'
     assert len(producer_calls) == 1
 
@@ -5869,6 +6058,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     sim._freeze_gate_liquid_fraction_cache = {
@@ -5891,7 +6081,7 @@ def test_gate_memo_origin_rejects_install_fingerprint_change(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert result['origin']['producer_evidence'] == (
         admission_module.admission_fingerprint(identity, provenance[0])
     )
@@ -5964,6 +6154,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     assert record['origin']['producer_evidence'] == 'unproven'
     sim._freeze_gate_liquid_fraction_cache = {
@@ -5979,7 +6170,7 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
     result = sim._freeze_gate_curve_record()
     notice = admission_module.binding_admission_run_notice(sim)
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert notice is not None
     reason = (
         'unproven gate producer; register its adapter; in-process reuse '
@@ -6077,6 +6268,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
     }
+    expected_curve = _freeze_gate_curve_fixture(sim, curve)
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     assert record['origin']['producer_evidence'] == 'evidence-unavailable'
     assert len(provenance_calls) == 1
@@ -6101,7 +6293,7 @@ def test_gate_memo_evidence_unavailable_is_a_miss(
 
     result = sim._freeze_gate_curve_record()
 
-    assert result['curve'] == curve
+    assert result['curve'] == expected_curve
     assert len(producer_calls) == 1
     assert len(provenance_calls) == 2
     notice = admission_module.binding_admission_run_notice(sim)
@@ -6440,12 +6632,12 @@ def test_gate_memo_replay_return_is_not_written_to_core_memo(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -6486,11 +6678,11 @@ def test_core_gate_curve_memo_rejects_foreign_pid_or_configuration(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'unit-test',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     if foreign_member == 'pid':
@@ -6532,11 +6724,11 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'unit-test',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     record = engine_binding_admission.write_gate_curve_memo_record(sim, curve)
     record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
     if foreign_member == 'pid':
@@ -6785,12 +6977,12 @@ def test_replay_gate_curve_is_not_written_to_core_memo(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -6820,12 +7012,12 @@ def test_replay_gate_curve_is_not_pinned_as_tick_authority(
         setpoints_data,
         enabled=True,
     )
-    curve = {
+    curve = _freeze_gate_curve_fixture(sim, {
         'source': 'gate_liquid_fraction:replay:test',
         'status': 'ok',
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1300.0,
-    }
+    })
     replay_calls = []
     store = PT0DeterminismStore('replay')
 
@@ -7221,11 +7413,11 @@ def test_fallback_diagnostic_log_survives_recovered_last_value(
         if curve_calls == 1:
             raise ProviderUnavailableError('durable diagnostic test failure')
         return gate_curve_memo_record(
-            {
+            _freeze_gate_curve_fixture(sim, {
                 'source': 'test_recovered_curve',
                 'solidus_T_C': 1000.0,
                 'liquidus_T_C': 1700.0,
-            },
+            }),
             None,
             (),
             'live',

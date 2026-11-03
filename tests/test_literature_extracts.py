@@ -6670,3 +6670,417 @@ def test_celsius_point_conditions_reach_every_migrated_series_point(
             assert condition.state.value == temperature.value
             assert condition.locator is not None
             assert row.evidence.class_.value is battery_migrate.EvidenceClass.FIGURE_ONLY
+
+
+def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
+    tmp_path: Path,
+) -> None:
+    """Pin every migrated number and its source conditions in Sanders Table I."""
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    name = "sanders-1977-water-vapour-na-vaporization.yaml"
+    doc = yaml.safe_load((EXTRACTS / name).read_text(encoding="utf-8"))
+    assert doc["source_id"] == "sanders-1977-water-vapour-na-vaporization"
+    assert vle.validate_extract_document(
+        doc, expected_source_id=doc["source_id"]
+    ) == []
+
+    table = {
+        "sanders_1977_table1_ternary_density_01": (
+            "3.5e-4", "4.90e-9", "1570", {"SiO2": "74", "Na2O": "16", "CaO": "10"}, False
+        ),
+        "sanders_1977_table1_ternary_density_02": (
+            "2.35e-2", "1.37e-8", "1570", {"SiO2": "74", "Na2O": "16", "CaO": "10"}, False
+        ),
+        "sanders_1977_table1_ternary_density_03": (
+            "7.32e-2", "2.14e-8", "1570", {"SiO2": "74", "Na2O": "16", "CaO": "10"}, True
+        ),
+        "sanders_1977_table1_ternary_density_04": (
+            "2.94e-1", "3.67e-8", "1570", {"SiO2": "74", "Na2O": "16", "CaO": "10"}, True
+        ),
+        "sanders_1977_table1_binary_density_01": (
+            "3.5e-4", "2.18e-9", "1332", {"SiO2": "75", "Na2O": "25"}, False
+        ),
+        "sanders_1977_table1_binary_density_02": (
+            "4.28e-4", "2.47e-9", "1332", {"SiO2": "75", "Na2O": "25"}, False
+        ),
+        "sanders_1977_table1_binary_density_03": (
+            "7.59e-3", "4.29e-9", "1332", {"SiO2": "75", "Na2O": "25"}, False
+        ),
+        "sanders_1977_table1_binary_density_04": (
+            "1.18e-2", "5.27e-9", "1332", {"SiO2": "75", "Na2O": "25"}, True
+        ),
+        "sanders_1977_table1_binary_density_05": (
+            "2.07e-2", "6.35e-9", "1332", {"SiO2": "75", "Na2O": "25"}, True
+        ),
+        "sanders_1977_table1_binary_density_06": (
+            "8.33e-2", "1.16e-8", "1332", {"SiO2": "75", "Na2O": "25"}, True
+        ),
+    }
+    eq13_atm = {
+        "sanders_1977_eq13_ternary_row_01_p_t": "0.000004777380430622009569377990430622009569377990430622",
+        "sanders_1977_eq13_ternary_row_02_p_t": "0.00001335716569377990430622009569377990430622009569378",
+        "sanders_1977_eq13_ternary_row_03_p_t": "0.000020864477799043062200956937799043062200956937799043",
+        "sanders_1977_eq13_ternary_row_04_p_t": "0.000035781604449760765550239234449760765550239234449761",
+        "sanders_1977_eq13_binary_row_01_p_t": "0.0000021254468038277511961722488038277511961722488038277",
+        "sanders_1977_eq13_binary_row_02_p_t": "0.0000024081897272727272727272727272727272727272727272727",
+        "sanders_1977_eq13_binary_row_03_p_t": "0.0000041826453157894736842105263157894736842105263157895",
+        "sanders_1977_eq13_binary_row_04_p_t": "0.0000051381214019138755980861244019138755980861244019139",
+        "sanders_1977_eq13_binary_row_05_p_t": "0.0000061910950478468899521531100478468899521531100478469",
+        "sanders_1977_eq13_binary_row_06_p_t": "0.000011309716937799043062200956937799043062200956937799",
+    }
+    unavailable_ids = {
+        "sanders_1977_table1_ternary_k2",
+        "sanders_1977_table1_ternary_k4",
+        "sanders_1977_table1_ternary_m",
+        "sanders_1977_table1_ternary_r",
+        "sanders_1977_table1_binary_k2",
+        "sanders_1977_table1_binary_k4",
+        "sanders_1977_table1_binary_m",
+        "sanders_1977_table1_binary_r",
+        "sanders_1977_quoted_naoh_pressure_1e5_atm",
+    }
+    printed_parameters = {
+        "sanders_1977_table1_ternary_k2": (
+            "K2_as_published", "8.8 × 10^-6", "K2 = 8.8 × 10^-6"
+        ),
+        "sanders_1977_table1_ternary_k4": (
+            "K4_as_published", "1.9", "K4 = 1.9"
+        ),
+        "sanders_1977_table1_ternary_b": (
+            "parameter_as_published", "b = 4.28 × 10^-9", "b = 4.28 × 10^-9"
+        ),
+        "sanders_1977_table1_ternary_m": (
+            "slope_as_published", "6.06 × 10^-8", "m = 6.06 × 10^-8"
+        ),
+        "sanders_1977_table1_ternary_r": (
+            "correlation_coefficient_as_published", "0.999", "r = 0.999"
+        ),
+        "sanders_1977_table1_binary_k2": (
+            "K2_as_published", "5 × 10^-9", "K2 = 5 × 10^-9"
+        ),
+        "sanders_1977_table1_binary_k4": (
+            "K4_as_published", "0.14", "K4 = 0.14"
+        ),
+        "sanders_1977_table1_binary_b": (
+            "parameter_as_published", "b = 1.51 × 10^-9", "b = 1.51 × 10^-9"
+        ),
+        "sanders_1977_table1_binary_m": (
+            "slope_as_published", "3.47 × 10^-8", "m = 3.47 × 10^-8"
+        ),
+        "sanders_1977_table1_binary_r": (
+            "correlation_coefficient_as_published", "0.999", "r = 0.999"
+        ),
+    }
+    raw_observations = {
+        observation["observation_id"]: observation
+        for block in doc["species"].values()
+        for observation in block.get("observations", [])
+    }
+    assert sum(
+        observation["observation_id"].startswith("sanders_1977_table1_")
+        and "_density_" in observation["observation_id"]
+        for block in doc["species"].values()
+        for observation in block.get("observations", [])
+    ) == 10
+    for observation_id, (field, value, printed_cell) in printed_parameters.items():
+        observation = raw_observations[observation_id]
+        assert observation["values"][field] == value
+        cell_value = observation["values"].get(
+            "parameter_as_published",
+            observation["values"].get("constant_as_printed"),
+        )
+        assert cell_value == printed_cell
+        assert observation["values"]["printed_marker_suffix"] == "*"
+        assert observation["locator"]["page"] == 2
+        assert observation["locator"]["table"] == "I"
+        assert observation["locator"]["column"] == "Parameters*"
+    for sample in doc["fidelity_samples"]:
+        assert vle.check_fidelity_sample_matches(doc, sample) == []
+        assert sample["locator"]["page"] in {2, 3}
+        if sample["observation_id"] in table:
+            assert raw_observations[sample["observation_id"]]["locator"]["table"] == "I"
+
+    def migrated_rows_for(result):
+        return {
+            observation_id.rsplit("::", 1)[-1]: battery_migrate.to_plain(observation)
+            for observation_id, observation in result.observations.items()
+        }
+
+    def assert_migration(result):
+        assert result.validation is not None
+        assert not result.validation.hard_issues
+        rows = migrated_rows_for(result)
+        assert len(rows) == 31
+        numeric_ids = {
+            observation_id
+            for observation_id, observation in rows.items()
+            if observation["value"]["kind"] == "point"
+        }
+        unavailable = {
+            observation_id
+            for observation_id, observation in rows.items()
+            if observation["value"]["kind"] == "unavailable"
+        }
+        expected_numeric = set(table) | {
+            "sanders_1977_table1_ternary_b",
+            "sanders_1977_table1_binary_b",
+        }
+        expected_unavailable = unavailable_ids | set(eq13_atm)
+        assert numeric_ids == expected_numeric
+        assert unavailable == expected_unavailable
+        assert len(numeric_ids) == 12
+        assert len(unavailable) == 19
+
+        migrated_observations = {
+            observation_id.rsplit("::", 1)[-1]: observation
+            for observation_id, observation in result.observations.items()
+        }
+        for observation_id in rows:
+            if observation_id == "sanders_1977_quoted_naoh_pressure_1e5_atm":
+                continue
+            source = raw_observations[observation_id]
+            source_values = source["values"]
+            source_conditions = source["point_conditions"]
+            migrated = migrated_observations[observation_id]
+            conditions = migrated.point_conditions
+            assert conditions is not None
+            for condition_name, source_condition in source_conditions.items():
+                source_locator = source_condition.get("locator")
+                assert source_locator is not None
+                migrated_locator = conditions[condition_name].locator
+                assert migrated_locator is not None
+                for locator_field in (
+                    "page",
+                    "published_page",
+                    "pdf_page_index",
+                    "table",
+                    "section",
+                    "equation",
+                ):
+                    if locator_field in source_locator:
+                        assert getattr(migrated_locator, locator_field) == source_locator[
+                            locator_field
+                        ]
+                source_state = source_condition["state"]
+                migrated_state = conditions[condition_name].state
+                if source_state["tag"] == "unknown":
+                    assert migrated_state.is_unknown
+                elif condition_name == "composition":
+                    printed_composition = {
+                        oxide: Decimal(amount)
+                        for oxide, amount in source_values[
+                            "composition_wt_pct"
+                        ].items()
+                    }
+                    expected_point_composition = battery_migrate.wt_pct_to_mole_fraction(
+                        printed_composition
+                    )
+                    assert dict(migrated_state.value.components) == dict(
+                        expected_point_composition.components
+                    )
+                elif condition_name == "oxygen_partial_pressure_ppm_as_published":
+                    assert migrated_state.value == "200 ± 50 ppm O2"
+                else:
+                    assert migrated_state.value == Decimal(source_state["value"])
+
+            if observation_id in numeric_ids:
+                temperature = Decimal(
+                    source_conditions["temperature_K"]["state"]["value"]
+                )
+                assert migrated.identity.temperature_K.value == temperature
+                assert migrated.identity.total_pressure_Pa.value == Decimal("101325")
+                printed_composition = {
+                    oxide: Decimal(amount)
+                    for oxide, amount in source_values["composition_wt_pct"].items()
+                }
+                expected_composition = battery_migrate.wt_pct_to_mole_fraction(
+                    printed_composition
+                )
+                identity_composition = dict(
+                    migrated.identity.composition.value.components
+                )
+                assert identity_composition == dict(expected_composition.components)
+                assert not migrated.identity.fO2_Pa.is_value
+
+        for observation_id, (water_atm, rho, temperature, comp, has_table_po2) in table.items():
+            source = raw_observations[observation_id]
+            migrated = rows[observation_id]
+            assert source["locator"]["page"] == 2
+            assert source["locator"]["table"] == "I"
+            assert migrated_observations[observation_id].locator.page == 2
+            assert migrated_observations[observation_id].locator.table == "I"
+            assert migrated["identity"]["quantity"]["value"] == "density"
+            assert migrated["identity"]["species"]["phase"]["value"] == "g"
+            expected_density, trail = battery_migrate.convert_density_to_kg_per_m3(
+                Decimal(rho), "g/cm3"
+            )
+            assert trail == "g_per_cm3_to_kg_per_m3"
+            assert Decimal(migrated["value"]["point"]) == expected_density
+            assert migrated["identity"]["temperature_K"]["value"] == temperature
+            assert Decimal(migrated["identity"]["total_pressure_Pa"]["value"]) == Decimal("101325")
+            assert migrated["identity"]["fO2_Pa"]["tag"] != "value"
+
+            composition_weight = {
+                oxide: Decimal(amount) for oxide, amount in comp.items()
+            }
+            expected_composition = battery_migrate.wt_pct_to_mole_fraction(
+                composition_weight
+            )
+            migrated_composition = dict(
+                migrated["identity"]["composition"]["value"]["components"]
+            )
+            assert {
+                oxide: Decimal(amount)
+                for oxide, amount in migrated_composition.items()
+            } == dict(expected_composition.components)
+
+            conditions = source["point_conditions"]
+            assert conditions["temperature_K"]["locator"]["page"] == 2
+            assert conditions["composition"]["locator"]["page"] == 2
+            assert conditions["total_pressure_Pa"]["locator"]["page"] == 1
+            assert conditions["fO2_log"]["state"]["tag"] == "unknown"
+            assert conditions["carrier_gas"]["state"]["tag"] == "unknown"
+            assert Decimal(
+                conditions["water_partial_pressure_atm_as_published"]["state"]["value"]
+            ) == Decimal(water_atm)
+            assert conditions["oxygen_partial_pressure_ppm_as_published"]["state"]["value"] == "200 ± 50 ppm O2"
+            migrated_conditions = migrated_observations[observation_id].point_conditions
+            assert migrated_conditions is not None
+            assert migrated_conditions[
+                "water_partial_pressure_atm_as_published"
+            ].state.value == Decimal(water_atm)
+            assert migrated_conditions[
+                "oxygen_partial_pressure_ppm_as_published"
+            ].state.value == "200 ± 50 ppm O2"
+            if has_table_po2:
+                p_o2 = conditions["P_O2_atm_as_published"]
+                assert Decimal(p_o2["state"]["value"]) == Decimal("2e-4")
+                assert p_o2["locator"]["page"] == 2
+                assert p_o2["locator"]["table"] == "I"
+                assert migrated_conditions[
+                    "P_O2_atm_as_published"
+                ].state.value == Decimal("2e-4")
+            else:
+                assert "P_O2_atm_as_published" not in conditions
+                assert "P_O2_atm_as_published" not in migrated_conditions
+
+        for observation_id, pressure_atm in eq13_atm.items():
+            migrated = rows[observation_id]
+            assert migrated_observations[observation_id].locator.page == 3
+            assert migrated_observations[observation_id].locator.equation == "13"
+            assert migrated["value"]["kind"] == "unavailable"
+            assert migrated["identity"]["quantity"]["tag"] == "unknown"
+            assert migrated["identity"]["total_pressure_Pa"]["value"] == "101325"
+            assert migrated["identity"].get("fO2_Pa", {}).get("tag") in {
+                None,
+                "unknown",
+            }
+            source_row = raw_observations[observation_id]
+            assert source_row["values"]["quantity"] == (
+                "total_pressure_of_Na_bearing_vapor_species"
+            )
+            assert source_row["units"] == "atm"
+            assert source_row["values"]["method_class"] == "measured_reduced"
+            assert source_row["values"]["evidence_class"] == "measured_reduced"
+            assert source_row["values"]["gas_species_as_published"] == (
+                "total pressure of species containing Na (P_t)"
+            )
+            assert Decimal(
+                source_row["values"]["pressure_atm"]
+            ) == Decimal(pressure_atm)
+            assert source_row["values"]["admission_status"] == "typed_refusal"
+            series_and_row = observation_id.removeprefix(
+                "sanders_1977_eq13_"
+            )
+            series, row_number = series_and_row.removesuffix("_p_t").split("_row_")
+            assert source_row["derived_from"] == [
+                f"sanders_1977_table1_{series}_density_{row_number}"
+            ]
+            assert source_row["derivation"]["relation"].startswith(
+                "P_t = 82.06 × 273.15 × rho_t / 22.99 atm"
+            )
+
+        for suffix, rho in (("ternary", "4.28e-9"), ("binary", "1.51e-9")):
+            observation_id = f"sanders_1977_table1_{suffix}_b"
+            expected_density, _trail = battery_migrate.convert_density_to_kg_per_m3(
+                Decimal(rho), "g/cm3"
+            )
+            assert Decimal(rows[observation_id]["value"]["point"]) == expected_density
+            migrated_parents = [
+                parent.rsplit("::", 1)[-1]
+                for parent in rows[observation_id]["derivation"]["inputs"]
+            ]
+            expected_parents = [
+                observation["observation_id"]
+                for observation in doc["species"]["Na"]["observations"]
+                if observation["observation_id"].startswith(
+                    f"sanders_1977_table1_{suffix}_density_"
+                )
+            ]
+            assert len(migrated_parents) == len(expected_parents)
+            assert set(migrated_parents) == set(expected_parents)
+
+        quoted = rows["sanders_1977_quoted_naoh_pressure_1e5_atm"]
+        assert quoted["value"]["kind"] == "unavailable"
+        assert quoted["identity"]["quantity"]["value"] == "p_partial"
+        assert quoted["identity"]["temperature_K"]["tag"] == "unknown"
+        assert quoted["identity"]["composition"]["tag"] == "unknown"
+        assert quoted["identity"]["total_pressure_Pa"]["tag"] == "unknown"
+        assert quoted["identity"]["fO2_Pa"]["tag"] == "unknown"
+        quoted_source = raw_observations[
+            "sanders_1977_quoted_naoh_pressure_1e5_atm"
+        ]
+        quoted_conditions = quoted_source["point_conditions"]
+        migrated_quoted = migrated_observations[
+            "sanders_1977_quoted_naoh_pressure_1e5_atm"
+        ]
+        assert migrated_quoted.locator.page == 3
+        assert migrated_quoted.locator.equation == "17"
+        for condition_name in (
+            "temperature_K",
+            "total_pressure_Pa",
+            "composition",
+            "fO2_log",
+            "water_partial_pressure_atm_as_published",
+        ):
+            assert quoted_conditions[condition_name]["state"]["tag"] == "unknown"
+            try:
+                migrated_condition = migrated_quoted.point_conditions[condition_name]
+            except KeyError:
+                migrated_condition = None
+            if migrated_condition is not None:
+                assert migrated_condition.state.is_unknown
+
+        unknown_quantity_ids = {
+            observation_id.rsplit("::", 1)[-1]
+            for observation_id, observation in result.observations.items()
+            if not observation.identity.quantity.is_value
+        }
+        expected_unknown_quantity_ids = (
+            unavailable_ids
+            - {"sanders_1977_quoted_naoh_pressure_1e5_atm"}
+        ) | set(eq13_atm)
+        assert unknown_quantity_ids == expected_unknown_quantity_ids
+        assert not any(
+            observation.identity.species.phase.is_unknown
+            for observation in result.observations.values()
+        )
+        return rows
+
+    original = _migrate_real_extract(tmp_path / "original", name, extract_doc=doc)
+    assert_migration(original)
+
+    mutated_doc = copy.deepcopy(doc)
+    mutated_row = next(
+        observation
+        for observation in mutated_doc["species"]["Na"]["observations"]
+        if observation["observation_id"]
+        == "sanders_1977_table1_ternary_density_02"
+    )
+    mutated_row["values"]["value"] = "1.38e-8"
+    mutated = _migrate_real_extract(
+        tmp_path / "mutated", name, extract_doc=mutated_doc
+    )
+    with pytest.raises(AssertionError):
+        assert_migration(mutated)
