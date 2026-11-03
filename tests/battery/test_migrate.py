@@ -19442,7 +19442,7 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
-def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
+def test_stolyarova_1991_atomic_oxygen_is_measured_reduced_with_author_relation(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -19493,11 +19493,19 @@ def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
     )
     for obs in rows:
         assert obs.derivation is not None
-        assert obs.derivation.relation == "atm_to_Pa"
-        assert "WO3" not in obs.derivation.relation
+        assert obs.derivation.relation == (
+            "Atomic oxygen pressure calculated from measured WO2 and WO3 partial pressures using gas reaction (1)."
+        )
+        assert obs.derivation.output_unit == "Pa"
+        original = dict(obs.derivation.parameters)["original"]
+        assert original.inference is not None
+        assert original.inference.relation == "atm_to_Pa"
+        assert original.inference.output_unit == "Pa"
         assert obs.derived_from is None
-        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert obs.evidence.attribution == (
+            "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
+        )
 
 
 def test_stolyarova_1991_composition_map_mutation_removes_identity(

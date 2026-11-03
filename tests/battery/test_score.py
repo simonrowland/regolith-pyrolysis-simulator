@@ -16600,11 +16600,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert all(
         observation.admission.status is AdmissionStatus.ADMITTED
         and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
-    # The parents are not printed, so the rows are not model_derived.
+    # 4e0819f6d and 3de591b81 type the calculated oxygen columns MEASURED_REDUCED.
+    # These are the authors' reductions of their own KEMS measurements; the WO2
+    # and WO3 input pressures are not printed.
     # b162's 1995 model_derived count of 26 describes the pre-car extract,
     # which this car retyped. The 1996 count of 55 is the quoted population.
     assert len(stolyarova_1995_derived_pressures) == 0
@@ -16728,8 +16729,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         )
         for residual in model_derived_residuals
     )
+    # The nine authors' own atomic-oxygen reductions count as measured evidence;
+    # the remaining diagnostic references are excluded from the measured tier.
     assert all(
-        "reference_measured_evidence" in residual.exclusions
+        ("reference_measured_evidence" in residual.exclusions)
+        == (residual.reference not in stolyarova_atomic_oxygen_pressures)
         for residual in headline_diagnostic_residuals
     )
     diagnostic_context = replace(
