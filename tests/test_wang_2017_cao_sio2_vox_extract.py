@@ -77,7 +77,10 @@ def test_wang_s1_s32_rows_migrate_with_component_and_conditions() -> None:
         assert observation.point_conditions["pO2_Pa"].locator.section == "Article title"
         composition_condition = observation.point_conditions["composition"]
         assert composition_condition.locator.table == raw["locator"]["table"]
-        assert composition_condition.state == observation.identity.composition
+        # t-1617 / SC-458: both retain the printed composition, while the
+        # identity copy carries the echo-guard provenance marker.
+        assert composition_condition.state.value.components == observation.identity.composition.value.components
+        assert observation.identity.composition.value.input_provenance == "scored_phase_analysis"
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
         composition = dict(observation.identity.composition.value.as_map())
