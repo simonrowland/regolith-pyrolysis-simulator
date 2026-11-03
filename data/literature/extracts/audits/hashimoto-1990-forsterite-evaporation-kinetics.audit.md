@@ -22,21 +22,29 @@ requested scope.
 The authors define the free evaporation coefficient as `alpha_v = J_v/J_e`.
 The 14 reported alpha statements are stored under the matching MgO, SiO2, and
 Mg2SiO4 species. Solid forsterite coefficients remain their own family. The
-two coefficients quoted from earlier SiO2 effusion work retain the printed
-attribution and its missing temperature. Figure-only rates remain un-digitized.
+previous-effusion coefficient quoted from Firsova and Nesmeyanov and Nagai
+retains its printed attribution and its missing temperature. Figure-only rates
+remain un-digitized.
 
-The alpha values are reported by Hashimoto from measured free-evaporation rates
-and theoretical maximum rates, but the numeric curve inputs are not stored.
-They are therefore `quoted_attributed` under d-110. The 5 vol% glass amount and
-approximately 65 wt% SiO2 residue-glass composition are the authors' measured
-residue results and are `measured_direct`. The source's solid-stoichiometric
-and molten-almost-stoichiometric statements remain qualitative context because
+The five primary experimental ranges are Hashimoto's own reported results and
+are `measured_direct`. The eight alternate-gas recalculations and temperature
+extrapolations are `measured_reduced` under the printed relation
+`alpha_v = J_v/J_e`. Their numeric Figure 1 inputs are not printed, so each
+reduced row locates `raw_inputs: not_printed` to Figure 1 on page 2. The earlier
+SiO2 effusion coefficient remains `quoted_attributed` because Hashimoto
+attributes it to other authors. The 5 vol% glass amount and approximately 65
+wt% SiO2 residue-glass composition are the authors' measured residue results
+and are `measured_direct`; the latter retains its printed approximation in the
+migrated value. The source's solid-stoichiometric and
+molten-almost-stoichiometric statements remain qualitative context because
 they contain no numeric composition to store.
 
 The source prints the liquid-SiO2 alternate-species alpha as 1.2 while explicitly
 stating that alpha above one is impossible by its definition and may result from
 underestimating experimental surface area. The row remains an observation with
-the printed value `1.2`, its temperature range, and typed-refusal status. Its
+the printed value `1.2`, its temperature range, typed-refusal status, and
+`measured_reduced` evidence class. Its derivation records the printed ratio and
+located unprinted Figure 1 inputs. Its
 reason includes the source's caveat: “impossible, according to the definition
 of alpha_v”; Hashimoto says the value may reflect underestimation of the
 experimental surface area. The existing migrator alpha-domain guard
@@ -119,17 +127,21 @@ do not add observation rows.
 - Isolated migration: 16 observations, 0 hard issues, 2 unavailable values,
   2 quantity-unknown rows, and 0 phase-unknown rows. The quantity-unknown IDs
   are the volume-fraction schema gap and the author-flagged alpha 1.2 refusal.
-- Focused extraction test: 3 passed. It pins the rendered coefficients and
-  residue composition, verifies a deliberate coefficient mutation fails, and
-  pins the migrated 65 wt% value as 65 without manual division.
-- `tests/test_yaml_flow_scalar_commas.py`: 17 passed.
-- `test_repo_extracts_validate_green`: 1 passed after correcting the residue
-  composition fidelity path. The focused Hashimoto fidelity matcher selected
-  4 cases and passed all 4.
+- Focused extraction test: 3 passed in 2.55 seconds. It pins the rendered coefficients,
+  evidence classes, approximation flags, and residue composition; deliberate
+  coefficient, evidence-class, and approximation mutations fail. It pins the
+  migrated 65 wt% value as 65 without manual division and with
+  `Value.approximate` true.
+- `tests/test_yaml_flow_scalar_commas.py`: 17 passed in 59.68 seconds.
+- `test_repo_extracts_validate_green`: 1 passed in 250.09 seconds after
+  correcting the residue composition fidelity path.
+- The focused Hashimoto fidelity matcher selected 4 cases and passed all 4 in
+  35.29 seconds.
 - The complete `tests/test_literature_extracts.py` file remains
-  `UNVERIFIED-local`: two full-file attempts exceeded the 300-second cap and
-  were interrupted (128 passed at 329.50 seconds; 158 passed, one excluded, at
-  328.78 seconds). The extract-tree validator and Hashimoto fidelity cases were
+  `UNVERIFIED-local`: two earlier full-file attempts exceeded the 300-second
+  cap (128 passed at 329.50 seconds; 158 passed, one excluded, at 328.78
+  seconds); a post-fix attempt also reached its 300-second cap without
+  completing. The extract-tree validator and Hashimoto fidelity cases were
   then run separately and passed.
 
 ## Figure-read candidate
