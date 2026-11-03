@@ -150,22 +150,63 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
     result = migrator.result
     observations = [row for row in result.observations.values() if row.source_id == EXTRACT.stem]
     assert len(observations) == 189
-    combined_bulk_reason = (
-        "Complete combined initial bulk is not reported: Table 2 omits Fe and gives "
-        "no Fe-balance statement. Table 3 contains the slag charge only; Table 4 "
-        "contains the measured equilibrated output and cannot serve as its own input."
-    )
+    combined_bulk_reason = "mixed metal + oxide charge not representable in the engine input schema (t-1625)"
     migrated_by_id = {
         row.observation_id.split("::", 1)[1]: row for row in observations
     }
     source_by_id = {row["observation_id"]: row for row in _observations(document)}
+    first_id = "van_ende_2008_1-1_slag_SiO2"
+    last_id = "van_ende_2008_6-2_metal_Mn"
+    first_source = source_by_id[first_id]
+    first_values = first_source["values"]
+    slag_start = first_values["starting_slag_composition"]
+    assert slag_start["state"]["value"]["basis"] == "wt_percent"
+    assert slag_start["state"]["value"]["components"] == {
+        "MgO": "10",
+        "MnO": "10",
+        "CrO1.5": "10",
+        "CaO": "42.0",
+        "SiO2": "28.0",
+    }
+    assert slag_start["locator"]["table"] == "3"
+    assert slag_start["locator"]["row"] == "1-1"
+    steel_start = first_values["starting_steel_composition"]
+    assert steel_start["state"]["value"]["components"] == {
+        "Mn": "11.8",
+        "Cr": "17.5",
+        "C": "0.15",
+        "Ni": "0.5",
+        "Si": "0.3",
+        "N": "0.26",
+        "Al": "0.008",
+        "Fe": "69.482",
+    }
+    assert steel_start["derivation"]["notice"] == "fe_balance_from_printed_steel_identity"
+    assert steel_start["derivation"]["listed_sum_wt_percent"] == "30.518"
+    assert steel_start["derivation"]["derived_fe_wt_percent"] == "69.482"
+    assert "unlisted elements (p, s, cu, mo, ...) are assumed absent" in steel_start["derivation"]["assumption"].lower()
+    charge_masses = first_values["starting_charge_masses"]
+    assert charge_masses["state"]["value"] == {"slag_g": "15", "steel_g": "25"}
+    assert "15 g of slag" in charge_masses["quote"]
+    assert "25 g of the high Mn stainless steel" in charge_masses["quote"]
+    assert charge_masses["locator"]["section"] == "2.3 Experimental Procedure"
+    last_slag = source_by_id[last_id]["values"]["starting_slag_composition"]
+    assert last_slag["locator"]["row"] == "6-2"
+    assert last_slag["state"]["value"]["components"] == {
+        "MgO": "10",
+        "MnO": "10",
+        "CrO1.5": "5",
+        "CaO": "45.0",
+        "SiO2": "30.0",
+    }
     for observation_id in (
-        "van_ende_2008_1-1_slag_SiO2",
-        "van_ende_2008_6-2_metal_Mn",
+        first_id,
+        last_id,
     ):
         row = migrated_by_id[observation_id]
         source_composition = source_by_id[observation_id]["values"]["composition"]
         assert source_composition["state"]["tag"] == "unknown"
+        assert source_composition["state"]["reason"] == combined_bulk_reason
         assert source_composition["locator"]["table"] == "2"
         assert row.identity.composition is not None
         assert row.identity.composition.is_unknown
