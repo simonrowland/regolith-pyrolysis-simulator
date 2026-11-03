@@ -164,7 +164,7 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
 
     sulfide = run_phase_evidence["sulfide_phase"]
     assert sulfide["as_printed"] == (
-        "Values for the Ni-bearing glasses were meaningless, because the loss of the "
+        "and those for the Ni-bearing glasses were meaningless, because the loss of the "
         "immiscible sulphide phase led to a drop in S content to below the CMAS value."
     )
     assert sulfide["locator"] == {
@@ -202,10 +202,69 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
         and item["locator"]["row"] == item["run_as_printed"]
         for item in sulfide["applies_to_runs"]
     )
+
+    run_results = run_phase_evidence["sulfide_phase_run_results"]
+    assert run_results["as_printed"] == (
+        "B010806 samples contained black specks inferred to be exsolved NiS "
+        "while B140906 did not."
+    )
+    assert run_results["locator"] == {
+        "page": 9,
+        "published_page": 6855,
+        "pdf_page_index": 8,
+        "section": "3.2.2. Synthetic silicate glasses",
+    }
+    assert run_results["results_by_run"] == [
+        {
+            "run_as_printed": "B010806",
+            "result_as_printed": "samples contained black specks inferred to be exsolved NiS",
+        },
+        {"run_as_printed": "B140906", "result_as_printed": "did not"},
+    ]
+
+    series_observations = run_phase_evidence["series_phase_observations"]
+    assert [item["as_printed"] for item in series_observations] == [
+        "Most of the samples formed translucent clear or yellow-coloured glass beads "
+        "up to 5 mm in diameter and 0.05–0.15 g in weight.",
+        "A number of samples contained bubbles and/or black specks. In most cases the "
+        "black specks occurred on the margins of the sample, or showed dendritic form "
+        "in fractures but appeared to be a surface feature, probably produced on quench, "
+        "and of insufficient size for analysis. However, in some Ni-bearing samples "
+        "specks were distributed through the glass and appeared to define flow patterns; "
+        "probe analysis (Evans et al., 2008a, not shown here) revealed that this apparently "
+        "exsolved material contained Ni and S with minor Fe.",
+        "This is consistent with equilibration of the melt with a Ni sulphide phase, "
+        "which was observed to have exsolved from the melt in many of the samples "
+        "(Evans et al., 2008a).",
+    ]
+    assert all(
+        item["locator"] == {
+            "page": 6,
+            "published_page": 6852,
+            "pdf_page_index": 5,
+            "section": "3.1. Characteristics of synthetic silicate glasses",
+        }
+        for item in series_observations
+    )
+
     rows_by_run = {
         run: sum(point["run_as_printed"] == run for point in all_source_points)
         for run in run_fO2
     }
+    ni_runs = [fields[0] for fields in run_table_rows if fields[1] == "Ni"]
+    assert len(ni_runs) == 8
+    assert rows_by_run["B010806"] == 30
+    assert rows_by_run["B140906"] == 15
+    ni_runs_without_sample_specific_speck_result = [
+        run for run in ni_runs if run not in {"B010806", "B140906"}
+    ]
+    assert len(ni_runs_without_sample_specific_speck_result) == 6
+    assert sum(
+        rows_by_run[run] for run in ni_runs_without_sample_specific_speck_result
+    ) == 62
+    non_ni_runs = [fields[0] for fields in run_table_rows if fields[1] != "Ni"]
+    assert len(non_ni_runs) == 12
+    assert sum(rows_by_run[run] for run in non_ni_runs) == 274
     assert sum(rows_by_run.values()) == 381
     assert sum(rows_by_run[run] for run in sulfide_runs) == 76
     assert len(run_fO2) - len(sulfide_runs) == 15
