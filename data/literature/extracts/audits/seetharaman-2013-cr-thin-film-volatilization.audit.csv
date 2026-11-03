@@ -47,18 +47,18 @@ RING_WALL_VOLUME,4,Results,alumina ring wall,volume,15.7 mm3,15.7 mm3,15.7 mm3,p
 RING_SLAG_VOLUME,4,Results,slag sample,volume,12.5 mm3,12.5 mm3,12.5 mm3,pdftotext exact; 600 dpi prose render check,stored mass-balance context
 T4_TREATMENT_T,5,Table IV,caption,sample temperature,1873 K,1873 K,1873 K,both reads agree; 600 dpi table/caption check,stored table context
 T4_TREATMENT_TIME,5,Table IV,caption,sample duration,24 h,24 h,24 h,both reads agree; 600 dpi table/caption check,stored table context
-T4_SPINEL_O,5,Table IV,Spinel,O,61.82,61.82,61.82,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_SPINEL_MG,5,Table IV,Spinel,Mg,8.36,8.36,8.36,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_SPINEL_AL,5,Table IV,Spinel,Al,29.65,29.65,29.65,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_SPINEL_SI,5,Table IV,Spinel,Si,0.10,0.10,0.10,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_SPINEL_CA,5,Table IV,Spinel,Ca,0.04,0.04,0.04,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_SPINEL_CR,5,Table IV,Spinel,Cr,0.03,0.03,0.03,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_O,5,Table IV,Matrix,O,66.59,66.59,66.59,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_MG,5,Table IV,Matrix,Mg,3.07,3.07,3.07,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_AL,5,Table IV,Matrix,Al,17.84,17.84,17.84,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_SI,5,Table IV,Matrix,Si,8.03,8.03,8.03,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_CA,5,Table IV,Matrix,Ca,4.47,4.47,4.47,both reads agree; 600 dpi layout check,stored typed-refused context
-T4_MATRIX_CR,5,Table IV,Matrix,Cr,0.00,0.00,0.00,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_O,5,Table IV,Spinel,O,61.82,61.82,61.82,both reads agree; 600 dpi layout check,stored table context
+T4_SPINEL_MG,5,Table IV,Spinel,Mg,8.36,8.36,8.36,both reads agree; 600 dpi layout check,stored table context
+T4_SPINEL_AL,5,Table IV,Spinel,Al,29.65,29.65,29.65,both reads agree; 600 dpi layout check,stored table context
+T4_SPINEL_SI,5,Table IV,Spinel,Si,0.10,0.10,0.10,both reads agree; 600 dpi layout check,stored table context
+T4_SPINEL_CA,5,Table IV,Spinel,Ca,0.04,0.04,0.04,both reads agree; 600 dpi layout check,stored table context
+T4_SPINEL_CR,5,Table IV,Spinel,Cr,0.03,0.03,0.03,both reads agree; 600 dpi layout check,stored table context plus structured typed refusal
+T4_MATRIX_O,5,Table IV,Matrix,O,66.59,66.59,66.59,both reads agree; 600 dpi layout check,stored table context
+T4_MATRIX_MG,5,Table IV,Matrix,Mg,3.07,3.07,3.07,both reads agree; 600 dpi layout check,stored table context
+T4_MATRIX_AL,5,Table IV,Matrix,Al,17.84,17.84,17.84,both reads agree; 600 dpi layout check,stored table context
+T4_MATRIX_SI,5,Table IV,Matrix,Si,8.03,8.03,8.03,both reads agree; 600 dpi layout check,stored table context
+T4_MATRIX_CA,5,Table IV,Matrix,Ca,4.47,4.47,4.47,both reads agree; 600 dpi layout check,stored table context
+T4_MATRIX_CR,5,Table IV,Matrix,Cr,0.00,0.00,0.00,both reads agree; 600 dpi layout check,stored table context plus structured typed refusal
 F2_T,4,Figure 2,caption,TGA,1873 K,1873 K,1873 K,pdftotext and 600 dpi page render agree,stored figure metadata
 F2_TIME,4,Figure 2,body text,soak duration,2 hours,2 hours,2 hours,pdftotext and 600 dpi page render agree,stored figure metadata
 F2_THICKNESS_1,4,Figure 2,legend,series 0.5mm O2,0.5 mm,0.5mm,0.5mm,600 dpi legend confirms thickness and gas; MinerU not run on page,stored figure metadata
@@ -82,8 +82,14 @@ F8_T,5,Figure 8,caption,sample temperature,1673 K,1673 K,1673 K,pdftotext and re
 F8_TIME,5,Figure 8,caption,sample duration,2 h,2 h,2 h,pdftotext and render agree,stored figure metadata
 F9_T,6,Figure 9,caption,soak temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored figure metadata
 F9_INITIAL_CR,6,Figure 9,caption,initial Cr content,2.0 atomic percent,2.0 atomic percent,2.0 atomic percent,pdftotext and render agree,stored figure metadata
+F9_BAR_CR_ORIGINAL,6,Figure 9,bar Cr original,Cr average,"2,00",not applicable,"2,00",pdftotext text and 600 dpi render agree on printed bar label,caption baseline retained without duplicate observation
+F9_BAR_CR_2H_AR,6,Figure 9,bar 2h Ar,Cr average,"1,62",not applicable,"1,62",pdftotext text and 600 dpi render agree on printed bar label,stored typed-refused observation
+F9_BAR_CR_4H_AIR,6,Figure 9,bar 4h Air,Cr average,"1,25",not applicable,"1,25",pdftotext text and 600 dpi render agree on printed bar label,stored typed-refused observation
+F9_BAR_CR_2H_O2,6,Figure 9,bar 2h O2,Cr average,0.27,not applicable,0.27,pdftotext text and 600 dpi render agree on printed bar label; same value as prose corroboration,existing typed-refused observation points to this bar
+F9_BAR_CR_6H_O2,6,Figure 9,bar 6h O2,Cr average,0.04,not applicable,0.04,pdftotext text and 600 dpi render agree on printed bar label,stored typed-refused observation
+F9_BAR_CR_24H_O2,6,Figure 9,bar 24h O2,Cr average,"0,02",not applicable,"0,02",pdftotext text and 600 dpi render agree on printed bar label,stored typed-refused observation
 TEXT_CR_2H_INITIAL,6,Discussion,prose,initial Cr content,2 at. pct,2 at. pct,2 at. pct,pdftotext and 600 dpi render agree,stored textual WDS result context
-TEXT_CR_2H_REMAINING,6,Discussion,prose,Cr content after 2 h O2,0.27 at. pct,0.27 at. pct,0.27 at. pct,pdftotext and 600 dpi render agree,stored textual WDS result context
+TEXT_CR_2H_REMAINING,6,Discussion,prose,Cr content after 2 h O2,0.27 at. pct,0.27 at. pct,0.27 at. pct,pdftotext and 600 dpi render agree,prose corroboration for the Figure 9 typed-refused observation; not a second row
 TEXT_CR_2H_T,6,Discussion,prose,treatment temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored textual WDS result context
 TEXT_CR_2H_TIME,6,Discussion,prose,treatment duration,2 hours,2 hours,2 hours,pdftotext and 600 dpi render agree,stored textual WDS result context
 TEXT_CR_SUMMARY_TIME,5,Effect of Temperature,prose,treatment duration,6 hours,6 hours,6 hours,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
