@@ -17274,8 +17274,20 @@ def _walk_printed_oxygen(
                 # Printed units choose the atm or bar frame. An explicit
                 # non-printed convention block wins when it parses, and a
                 # block that does not parse is a refusal rather than a guess.
-                # A unitless log is the 1 bar entry in the frame table.
+                # A missing unit stays the 1 bar frame-table entry. An explicit
+                # empty unit is a printed bare log: `_bare_log_convention`
+                # owns it, the same rule as a unitless log_fO2 key.
                 units_reference_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
+                explicit_empty_unit = False
+                if isinstance(condition, Mapping):
+                    for unit_key in ("units", "unit"):
+                        if unit_key not in condition:
+                            continue
+                        raw_unit = condition.get(unit_key)
+                        explicit_empty_unit = (
+                            raw_unit is not None and str(raw_unit).strip() == ""
+                        )
+                        break
                 conventional_reference_pa = _fO2_conventional_reference_pressure_pa(
                     condition
                 )
@@ -17321,7 +17333,7 @@ def _walk_printed_oxygen(
                             inference=located_condition.inference,
                         ),
                         reference_pressure_pa,
-                        False,
+                        explicit_empty_unit,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             node = value if isinstance(value, Mapping) else {}

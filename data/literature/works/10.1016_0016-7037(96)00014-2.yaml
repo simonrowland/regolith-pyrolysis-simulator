@@ -1,0 +1,521 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/0016-7037(96)00014-2
+  citation: Nagahara, H. and Ozawa, K. (1996), ‘Evaporation of forsterite in H2 gas’, Geochimica et Cosmochimica Acta 60,
+    1445–1458.
+  source_ids:
+  - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: a6871422ff04f6033afef12c4593f2df76704e17
+    files:
+    - asset_id: pdf:nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      role: pdf
+      path: raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.pdf
+      sha256:
+        tag: value
+        value: 20e076cded33e4b4beede5019e4d3780ed14a0363a01a5b6991f1347ef80b709
+    - asset_id: pdftotext:nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      role: pdftotext
+      path: text/nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/0016-7037(96)00014-2
+experiments:
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em05
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 765, draft body row 20; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 765, draft body row 20; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 765, draft body row 20; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em06
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.2'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 771, draft body row 9; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 771, draft body row 9; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 771, draft body row 9; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_2p00Em07
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.02'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 769, draft body row 5; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 769, draft body row 5; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 769, draft body row 5; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_3p95Em06
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.395'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 806, draft body row 12; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 806, draft body row 12; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 806, draft body row 12; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_4p00Em05
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 805, draft body row 28; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 805, draft body row 28; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 805, draft body row 28; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_7p89Em06
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.789'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 787, draft body row 18; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 787, draft body row 18; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 787, draft body row 18; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_8p60Em05
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '8.6'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 777, draft body row 32; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: H2
+          flow_sccm:
+            tag: unknown
+            reason: No numeric H2 flow rate is reported for each run.
+          partial_pressure_Pa:
+            tag: unknown
+            reason: No numerical H2 partial pressure is reported.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 777, draft body row 32; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 777, draft body row 32; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::experiment::optimized_fit_vacuum
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The fit combines four vacuum runs with distinct residual pressures.
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 754, draft body row 1; cell Optimized J.
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 754, draft body row 1; cell Optimized J.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 754, draft body row 1; cell Optimized J.
+- experiment_id: 10.1016/0016-7037(96)00014-2::nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.00001801'
+          approximate: false
+      locator:
+        page: 4
+        published_page: 1448
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 printed run 798, draft body row 45; cell w1 (g) and w2 (g).
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.01801 g
+        - printed=initial_mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.01801'
+            locator:
+              page: 4
+              published_page: 1448
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 printed run 798, draft body row 45; cell w1 (g) and w2 (g).
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 4
+              published_page: 1448
+              pdf_page_index: 3
+              table: '1'
+              note: Table 1 printed run 798, draft body row 45; cell w1 (g) and w2 (g).
+        output_unit: kg
+        references: []
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: conflicting printed pressures; not collapsed into one number
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/0016-7037(96)00014-2
+  locator:
+    page: 4
+    published_page: 1448
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 printed run 754, draft body row 1; cell w1 (g) and w2 (g).

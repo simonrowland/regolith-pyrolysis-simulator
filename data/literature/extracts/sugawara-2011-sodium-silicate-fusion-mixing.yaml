@@ -1,0 +1,2216 @@
+schema_version: literature_extract.v1
+source_id: sugawara-2011-sodium-silicate-fusion-mixing
+source:
+  citation: >-
+    Sugawara, T.; Shinoya, K.; Yoshida, S.; Matsuoka, J. (2011). Thermodynamic mixing properties of liquids in the
+    system Na2O-SiO2. Journal of Non-Crystalline Solids 357, 1390–1398.
+  doi: 10.1016/j.jnoncrysol.2010.09.064
+  year: 2011
+  url: https://doi.org/10.1016/j.jnoncrysol.2010.09.064
+extraction:
+  method: >-
+    Transcribed from the MinerU table blocks and born-digital pdftotext layout. Table 1, Table 2 and Table 3 row/column
+    assignments and every stored numeric cell were checked against renders of PDF pages 2, 3 and 5. Figure-only values
+    were not digitized.
+  date: '2026-11-02'
+  worker: w1103su11-su11
+  note: >-
+    Table 1 reports three corrected DSC fusion results and three liquid mixing enthalpies calculated from those results
+    and Table 2 data. The results prose adds two full-formula DSC fusion values, four attributed comparison values, and
+    a weighted mean at NS composition. Table 2 supplies five liquid heat-capacity values, four solid heat-capacity
+    equations, five fusion enthalpies (three calculated from the fitted model), and five solid enthalpies at Tm stored
+    as typed-refused input observations. Table 3 reports the ten fitted h_i and s_i coefficients. Integral liquid enthalpy of mixing has no
+    exact quantity token and the three Table 1 values plus the weighted mean are retained as typed-refused data. Table 1 and Table 2 disagree in the N2S silica composition (66.4 vs 66.6 mol%); both are
+    preserved as printed. Table 1 prints 26.6 for 1/2 Na2SiO3 and the prose prints 53.2 for Na2SiO3 on its full formula
+    basis; both are retained as printed. Table 1 and its prose report different Na2Si2O5 fusion enthalpies (14.5 for
+    1/3 Na2Si2O5 vs 29.0 for Na2Si2O5); neither is converted or reconciled. Table 1 gives the eutectic melting
+    temperature as 1064 K, while Table 2 gives 1164 K at the same printed composition; both table values are preserved.
+review_status: draft
+fidelity_samples:
+  - path: species.Na2SiO3.observations[sugawara_2011_t1_na2sio3_heat_of_fusion].values.value
+    value: '26.6'
+    locator:
+      page: 2
+      table: '1'
+  - path: species.Na6Si8O19.observations[sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing].values.enthalpy_of_mixing_kJ_mol-1_as_published
+    value: '-56.9'
+    locator:
+      page: 2
+      table: '1'
+  - path: species.SiO2.observations[sugawara_2011_t2_sio2_liquid_heat_capacity].values.value
+    value: '81.37'
+    locator:
+      page: 3
+      table: '2'
+  - path: species.Na2O.context[sugawara_2011_t3_gibbs_mixing_coefficients].values.parameters[0].value_as_published
+    value: '−271.2'
+    locator:
+      page: 5
+      table: '3'
+species:
+  Na6Si8O19:
+    observations:
+      - observation_id: sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: ΔH_Tm^L
+        phase: cr
+        regime: dta_dsc
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
+        values:
+          composition_id: sugawara_2011_present_study_dsc
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '9.3'
+          uncertainty_kJ_mol-1: '0.9'
+          uncertainty_as_printed: ± 0.9
+          uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '74.4'
+            Na2O_mol_percent: '25.6'
+          composition_reference_as_printed: '[41]'
+          T_K: '1064'
+          temperature_uncertainty_K_as_printed: '1'
+          number_of_experiments: '7'
+          method_as_printed: Differential scanning calorimetry (DSC-320), platinum cell, 2 K/min; premelting correction applied.
+          calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
+          premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
+        uncertainty:
+          kind: printed
+          value: '0.9'
+          verbatim: ± 0.9
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_na6_conditions_fusion
+          temperature_K:
+            state:
+              tag: value
+              value: '1064'
+            locator: &t1_na6_locator
+              page: 2
+              published_page: 1391
+              table: '1'
+              row: Na6Si8O19–SiO2 eutectic composition
+              column: Present study melting temperature
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t1_na6_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report the total pressure for the DSC fusion measurement.
+            locator: *t1_na6_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+            locator: *t1_na6_locator
+      - observation_id: sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: H_Mix^L
+        phase: l
+        units: kJ/mol
+        standard_state_as_printed: >-
+          Equation (2) defines H_Mix^L relative to the pure liquid Na2O and SiO2 endmembers:
+          H^L_Mix,T,alpha = H^L_T,alpha − (X^L_Na2O H^L_T,Na2O + X^L_SiO2 H^L_T,SiO2).
+        values:
+          quantity: integral_enthalpy_of_mixing_as_printed
+          method_class: measured_reduced
+          admission_status: typed_refusal
+          schema_gap: >-
+            The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
+            heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
+            exists: Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar, and Quantity.INTERACTION_PARAMETER is a model
+            parameter, not integral enthalpy. QUANTITY_ALIASES has no exact alias and TYPE_QUANTITY cannot infer this
+            value from the generic series type. PHASE_BASIS_TOKENS applies to phase-composition rows, not this liquid
+            thermodynamic datum. Keep the printed number typed-refused instead of binding a near-miss quantity.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - simulator/battery/migrate.py::PHASE_MAP
+          enthalpy_of_mixing_kJ_mol-1_as_published: '-56.9'
+          uncertainty_as_printed: ± 1.3
+          uncertainty_kJ_mol-1: '1.3'
+          uncertainty_confidence_level: not stated
+          value_as_published: −56.9 ± 1.3 kJ/mol
+          composition_as_printed:
+            SiO2_mol_percent: '74.4'
+            Na2O_mol_percent: '25.6'
+          composition_reference_as_printed: '[41]'
+          formula_basis_as_printed: Na2O–SiO2 liquid mixture at the Na6Si8O19–SiO2 eutectic composition
+          temperature_dependence_as_printed: >-
+            The authors state that H_Mix^L and S_Mix^L are independent of temperature when there is no heat capacity
+            of mixing (PDF page 2, equations 4–7).
+          method_as_printed: Calculated from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).
+          derivation:
+            relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+            inputs:
+              - sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+              - sugawara_2011_t2_sio2_fusion_enthalpy
+              - sugawara_2011_t2_na2o_fusion_enthalpy
+              - sugawara_2011_t2_sio2_liquid_heat_capacity
+              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derived_from:
+            - sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+            - sugawara_2011_t2_sio2_fusion_enthalpy
+            - sugawara_2011_t2_na2o_fusion_enthalpy
+            - sugawara_2011_t2_sio2_liquid_heat_capacity
+            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.3'
+          verbatim: ± 1.3
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_na6_conditions_mixing
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent under its no-heat-capacity-of-mixing assumption.
+            locator: *t1_na6_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t1_na6_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report a total pressure for the mixing enthalpy.
+            locator: *t1_na6_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+            locator: *t1_na6_locator
+      - observation_id: sugawara_2011_t2_na6si8o19_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: ΔH_Tm^L
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
+        values:
+          method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+            - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
+            inputs:
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+              - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          value: '7.79'
+          value_as_printed: 7.79^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '74.4'
+            Na2O_mol_percent: '25.6'
+          melting_temperature_as_printed: '1164'
+          T_K: '1164'
+          method_as_printed: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.
+          derivation_context_id: sugawara_2011_t3_gibbs_mixing_coefficients
+          uncertainty:
+            reported_status: not_reported
+        point_conditions: &t2_na6_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1164'
+            locator: &t2_na6_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: Na6Si8O19–SiO2 eutectic composition
+              column: Tm
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t2_na6_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this thermodynamic datum.
+            locator: *t2_na6_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+            locator: *t2_na6_locator
+      - observation_id: sugawara_2011_t2_na6si8o19_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: Cp^L
+        phase: l
+        units: J/mol K
+        standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
+        values:
+          method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '86.29'
+          value_as_printed: 86.29 [38]
+          attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+          composition_as_printed:
+            SiO2_mol_percent: '74.4'
+            Na2O_mol_percent: '25.6'
+          temperature_as_printed: no single T stated for this Cp value
+        point_conditions: &t2_na6_cp_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values are independent of temperature.
+            locator: &t2_na6_cp_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: Na6Si8O19–SiO2 eutectic composition
+              column: Cp^L
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t2_na6_cp_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this heat-capacity datum.
+            locator: *t2_na6_cp_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+            locator: *t2_na6_cp_locator
+      - observation_id: sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_na6_cpg_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: Cp^G
+        phase: cr
+        units: J/mol K
+        standard_state_as_printed: Solid heat capacity function at the printed eutectic composition.
+        values:
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
+          method_class: quoted_attributed
+          equation_as_printed: Cp = 112.78 − 1.3334 × 10⁻³ T + 2.2919 × 10⁵ T⁻² − 1089.1 T⁻⁰·⁵
+          formula_variable_as_printed: T in K
+          attribution: '[49]'
+          method_as_printed: Table 2 attributes the Cp^G equation to [49] but does not state the measurement method.
+          temperature_as_printed: Equation variable T; no validity interval is reported.
+        point_conditions: &t2_na6_cpg_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+            locator: *t2_na6_cpg_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t2_na6_cpg_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid heat capacity equation.
+            locator: *t2_na6_cpg_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+            locator: *t2_na6_cpg_locator
+      - observation_id: sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_na6_hsolid_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na6Si8O19–SiO2 eutectic composition
+          column: H^S_Tm
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
+        values:
+          quantity: solid_enthalpy_at_Tm_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
+          schema_gap: &solid_enthalpy_schema_gap >-
+            The exact printed quantity is H^S_Tm, the solid enthalpy at melting temperature. OBSERVATION_TYPES admits
+            heat_capacity_and_heat_content_series and PHASE_MAP maps cr, but the closed Quantity set has no exact token
+            for solid enthalpy at Tm. Quantity.DELTA_FH is formation enthalpy and the source does not state a formation
+            reference; Quantity.ENTHALPY_OF_FUSION is a phase-change difference, and Quantity.PARTIAL_MOLAR_ENTHALPY
+            is partial-molar. QUANTITY_ALIASES has no exact alias and TYPE_QUANTITY cannot infer an exact token from the
+            generic series type. Preserve the printed value as a typed refusal rather than binding a near-miss.
+          schema_gap_symbols: &solid_enthalpy_schema_gap_symbols
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity
+            - simulator/battery/enums.py::Quantity.DELTA_FH
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - simulator/battery/migrate.py::PHASE_MAP
+          solid_enthalpy_at_Tm_kJ_mol_as_published: '-786.070^d'
+          value_as_printed: '-786.070^d'
+          formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition
+          composition_as_printed:
+            SiO2_mol_percent: '74.4'
+            Na2O_mol_percent: '25.6'
+          T_K: '1164'
+          method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
+        point_conditions: &t2_na6_hsolid_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1164'
+            locator: *t2_na6_hsolid_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.744'
+                  - - Na2O
+                    - '0.256'
+            locator: *t2_na6_hsolid_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid enthalpy.
+            locator: *t2_na6_hsolid_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+            locator: *t2_na6_hsolid_locator
+  Na2Si2O5:
+    observations:
+      - observation_id: sugawara_2011_t1_na2si2o5_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: 1/3 Na2Si2O5 (N2S)
+          column: ΔH_Tm^L
+        phase: cr
+        regime: dta_dsc
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
+        values:
+          composition_id: sugawara_2011_present_study_dsc
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '14.5'
+          uncertainty_kJ_mol-1: '0.7'
+          uncertainty_as_printed: ± 0.7
+          uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '66.4'
+            Na2O_mol_percent: '33.3'
+          T_K: '1142'
+          temperature_uncertainty_K_as_printed: '1'
+          method_as_printed: Differential scanning calorimetry (DSC-320), platinum cell, 2 K/min; premelting correction applied.
+          calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
+          premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
+          number_of_experiments: '9'
+        uncertainty:
+          kind: printed
+          value: '0.7'
+          verbatim: ± 0.7
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_n2s_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1142'
+            locator: &t1_n2s_locator
+              page: 2
+              published_page: 1391
+              table: '1'
+              row: 1/3 Na2Si2O5 (N2S)
+              column: Present study melting temperature
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.664'
+                  - - Na2O
+                    - '0.333'
+            locator: *t1_n2s_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report the total pressure for the DSC fusion measurement.
+            locator: *t1_n2s_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+            locator: *t1_n2s_locator
+      - observation_id: sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        regime: dta_dsc
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2Si2O5 to liquid.
+        values:
+          quantity: heat_of_fusion
+          composition_id: sugawara_2011_present_study_dsc
+          method_class: measured_tabulated
+          value: '29.0'
+          uncertainty_kJ_mol-1: '1.4'
+          uncertainty_as_printed: ± 1.4
+          uncertainty_confidence_level: not stated
+          formula_basis_as_printed: Na2Si2O5 full formula.
+          method_as_printed: The results paragraph says these values are from the DSC measurements listed in Table 1.
+        uncertainty:
+          kind: printed
+          value: '1.4'
+          verbatim: ± 1.4
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for this full-formula fusion enthalpy.
+            locator: &p2_na2si2o5_prose_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+            locator: *p2_na2si2o5_prose_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this prose fusion value.
+            locator: *p2_na2si2o5_prose_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this prose fusion value.
+            locator: *p2_na2si2o5_prose_locator
+      - observation_id: sugawara_2011_p2_na2si2o5_prior_dsc_fusion_enthalpy_43
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2Si2O5 to liquid.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '34.0'
+          uncertainty_kJ_mol-1: '4.0'
+          uncertainty_as_printed: ± 4.0
+          uncertainty_confidence_level: not stated
+          attribution: P. Boivin, J.C. Berthelay, Y. Blanc, A. Coulet, and R. Castanet [43].
+          formula_basis_as_printed: Na2Si2O5 full formula.
+          method_as_printed: The results prose identifies the cited result as a previous DSC measurement.
+        uncertainty:
+          kind: printed
+          value: '4.0'
+          verbatim: ± 4.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for the cited fusion enthalpy.
+            locator: &p2_na2si2o5_43_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+            locator: *p2_na2si2o5_43_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this cited fusion value.
+            locator: *p2_na2si2o5_43_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+            locator: *p2_na2si2o5_43_locator
+      - observation_id: sugawara_2011_p2_na2si2o5_prior_calculated_fusion_enthalpy_44
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2Si2O5 to liquid.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '37.8'
+          uncertainty_kJ_mol-1: '4.4'
+          uncertainty_as_printed: ± 4.4
+          uncertainty_confidence_level: not stated
+          attribution: P. Richet and Y. Bottinga [44].
+          formula_basis_as_printed: Na2Si2O5 full formula.
+          method_as_printed: The results prose says [44] calculated this value using calorimetric heat capacities, glass transition temperature, and enthalpies of vitrification reported in prior studies.
+        uncertainty:
+          kind: printed
+          value: '4.4'
+          verbatim: ± 4.4
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for the cited calculated fusion enthalpy.
+            locator: &p2_na2si2o5_44_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+            locator: *p2_na2si2o5_44_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this cited fusion value.
+            locator: *p2_na2si2o5_44_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+            locator: *p2_na2si2o5_44_locator
+      - observation_id: sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: 1/3 Na2Si2O5 (N2S)
+          column: H_Mix^L
+        phase: l
+        units: kJ/mol
+        standard_state_as_printed: >-
+          Equation (2) defines H_Mix^L relative to the pure liquid Na2O and SiO2 endmembers:
+          H^L_Mix,T,alpha = H^L_T,alpha − (X^L_Na2O H^L_T,Na2O + X^L_SiO2 H^L_T,SiO2).
+        values:
+          quantity: integral_enthalpy_of_mixing_as_printed
+          method_class: measured_reduced
+          admission_status: typed_refusal
+          schema_gap: >-
+            The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
+            heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
+            exists: Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar, and Quantity.INTERACTION_PARAMETER is a model
+            parameter, not integral enthalpy. QUANTITY_ALIASES has no exact alias and TYPE_QUANTITY cannot infer this
+            value from the generic series type. PHASE_BASIS_TOKENS applies to phase-composition rows, not this liquid
+            thermodynamic datum. Keep the printed number typed-refused instead of binding a near-miss quantity.
+          schema_gap_symbols:
+            - simulator/battery/enums.py::Quantity
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+            - simulator/battery/migrate.py::PHASE_MAP
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          enthalpy_of_mixing_kJ_mol-1_as_published: '-75.8'
+          uncertainty_as_printed: ± 1.2
+          uncertainty_kJ_mol-1: '1.2'
+          uncertainty_confidence_level: not stated
+          value_as_published: −75.8 ± 1.2 kJ/mol
+          composition_as_printed:
+            SiO2_mol_percent: '66.4'
+            Na2O_mol_percent: '33.3'
+          formula_basis_as_printed: Na2O–SiO2 liquid mixture at the Table 1 N2S nominal composition
+          temperature_dependence_as_printed: >-
+            The authors state that H_Mix^L and S_Mix^L are independent of temperature when there is no heat capacity
+            of mixing (PDF page 2, equations 4–7).
+          method_as_printed: Calculated from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).
+          derivation:
+            relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+            inputs:
+              - sugawara_2011_t1_na2si2o5_heat_of_fusion
+              - sugawara_2011_t2_sio2_fusion_enthalpy
+              - sugawara_2011_t2_na2o_fusion_enthalpy
+              - sugawara_2011_t2_sio2_liquid_heat_capacity
+              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derived_from:
+            - sugawara_2011_t1_na2si2o5_heat_of_fusion
+            - sugawara_2011_t2_sio2_fusion_enthalpy
+            - sugawara_2011_t2_na2o_fusion_enthalpy
+            - sugawara_2011_t2_sio2_liquid_heat_capacity
+            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.2'
+          verbatim: ± 1.2
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_n2s_mixing_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent under its no-heat-capacity-of-mixing assumption.
+            locator: *t1_n2s_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.664'
+                  - - Na2O
+                    - '0.333'
+            locator: *t1_n2s_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report a total pressure for the mixing enthalpy.
+            locator: *t1_n2s_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+            locator: *t1_n2s_locator
+      - observation_id: sugawara_2011_t2_na2si2o5_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/3 Na2Si2O5
+          column: ΔH_Tm^L
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
+        values:
+          method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+            - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
+            inputs:
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+              - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          value: '12.7'
+          value_as_printed: 12.7^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '66.6'
+            Na2O_mol_percent: '33.3'
+          melting_temperature_as_printed: '1142'
+          T_K: '1142'
+          method_as_printed: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.
+          derivation_context_id: sugawara_2011_t3_gibbs_mixing_coefficients
+          uncertainty:
+            reported_status: not_reported
+        point_conditions: &t2_n2s_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1142'
+            locator: &t2_n2s_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: 1/3 Na2Si2O5
+              column: Tm
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.666'
+                  - - Na2O
+                    - '0.333'
+            locator: *t2_n2s_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this thermodynamic datum.
+            locator: *t2_n2s_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+            locator: *t2_n2s_locator
+      - observation_id: sugawara_2011_t2_na2si2o5_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/3 Na2Si2O5
+          column: Cp^L
+        phase: l
+        units: J/mol K
+        standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
+        values:
+          method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '87.78'
+          value_as_printed: 87.78 [38]
+          attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+          composition_as_printed:
+            SiO2_mol_percent: '66.6'
+            Na2O_mol_percent: '33.3'
+          temperature_as_printed: no single T stated for this Cp value
+        point_conditions: &t2_n2s_cp_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values are independent of temperature.
+            locator: &t2_n2s_cp_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: 1/3 Na2Si2O5
+              column: Cp^L
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.666'
+                  - - Na2O
+                    - '0.333'
+            locator: *t2_n2s_cp_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this heat-capacity datum.
+            locator: *t2_n2s_cp_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+            locator: *t2_n2s_cp_locator
+      - observation_id: sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_n2s_cpg_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/3 Na2Si2O5
+          column: Cp^G
+        phase: cr
+        units: J/mol K
+        standard_state_as_printed: Solid heat capacity function at the printed one-third formula composition.
+        values:
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
+          method_class: quoted_attributed
+          equation_as_printed: Cp = 108.43 + 1.5187 × 10⁻³ T + 1.6813 × 10⁵ T⁻² − 975.92 T⁻⁰·⁵
+          formula_variable_as_printed: T in K
+          attribution: '[49]'
+          method_as_printed: Table 2 attributes the Cp^G equation to [49] but does not state the measurement method.
+          temperature_as_printed: Equation variable T; no validity interval is reported.
+        point_conditions: &t2_n2s_cpg_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+            locator: *t2_n2s_cpg_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.666'
+                  - - Na2O
+                    - '0.333'
+            locator: *t2_n2s_cpg_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid heat capacity equation.
+            locator: *t2_n2s_cpg_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+            locator: *t2_n2s_cpg_locator
+      - observation_id: sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_n2s_hsolid_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/3 Na2Si2O5
+          column: H^S_Tm
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
+        values:
+          quantity: solid_enthalpy_at_Tm_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
+          schema_gap: *solid_enthalpy_schema_gap
+          schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
+          solid_enthalpy_at_Tm_kJ_mol_as_published: '-761.609^d'
+          value_as_printed: '-761.609^d'
+          formula_basis_as_printed: 1/3 Na2Si2O5
+          composition_as_printed:
+            SiO2_mol_percent: '66.6'
+            Na2O_mol_percent: '33.3'
+          T_K: '1142'
+          method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
+        point_conditions: &t2_n2s_hsolid_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1142'
+            locator: *t2_n2s_hsolid_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.666'
+                  - - Na2O
+                    - '0.333'
+            locator: *t2_n2s_hsolid_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid enthalpy.
+            locator: *t2_n2s_hsolid_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+            locator: *t2_n2s_hsolid_locator
+  Na2SiO3:
+    observations:
+      - observation_id: sugawara_2011_t1_na2sio3_heat_of_fusion
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: 1/2 Na2SiO3 (NS)
+          column: ΔH_Tm^L
+        phase: cr
+        regime: dta_dsc
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
+        values:
+          composition_id: sugawara_2011_present_study_dsc
+          method_class: measured_tabulated
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '26.6'
+          uncertainty_kJ_mol-1: '1.0'
+          uncertainty_as_printed: ± 1.0
+          uncertainty_confidence_level: not stated
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '50.0'
+            Na2O_mol_percent: '50.0'
+          T_K: '1360'
+          temperature_uncertainty_K_as_printed: '1'
+          number_of_experiments: '10'
+          method_as_printed: Differential scanning calorimetry (DSC-320), platinum cell, 2 K/min; premelting correction applied.
+          calibration_as_printed: DSC detector calibrated using fusion enthalpies of Al, Ag, and Au.
+          premelting_correction_as_printed: Premelting correction determined using the heat-capacity equation of Berman and Brown [40] and drop-calorimetry enthalpies [37,38].
+        uncertainty:
+          kind: printed
+          value: '1.0'
+          verbatim: ± 1.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_ns_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1360'
+            locator: &t1_ns_locator
+              page: 2
+              published_page: 1391
+              table: '1'
+              row: 1/2 Na2SiO3 (NS)
+              column: Present study melting temperature
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t1_ns_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report the total pressure for the DSC fusion measurement.
+            locator: *t1_ns_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+            locator: *t1_ns_locator
+      - observation_id: sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        regime: dta_dsc
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2SiO3 to liquid.
+        values:
+          quantity: heat_of_fusion
+          composition_id: sugawara_2011_present_study_dsc
+          method_class: measured_tabulated
+          value: '53.2'
+          uncertainty_kJ_mol-1: '2.0'
+          uncertainty_as_printed: ± 2.0
+          uncertainty_confidence_level: not stated
+          formula_basis_as_printed: Na2SiO3 full formula.
+          method_as_printed: The results paragraph says these values are from the DSC measurements listed in Table 1.
+        uncertainty:
+          kind: printed
+          value: '2.0'
+          verbatim: ± 2.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for this full-formula fusion enthalpy.
+            locator: &p2_na2sio3_prose_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2SiO3 but gives no molar composition for this value.
+            locator: *p2_na2sio3_prose_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this prose fusion value.
+            locator: *p2_na2sio3_prose_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this prose fusion value.
+            locator: *p2_na2sio3_prose_locator
+      - observation_id: sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2SiO3 to liquid.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '52.2'
+          uncertainty_kJ_mol-1: '0.6'
+          uncertainty_as_printed: ± 0.6
+          uncertainty_confidence_level: not stated
+          attribution: B.F. Naylor [37].
+          formula_basis_as_printed: Na2SiO3 full formula.
+          method_as_printed: Drop calorimetry [37].
+        uncertainty:
+          kind: printed
+          value: '0.6'
+          verbatim: ± 0.6
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for the cited fusion enthalpy.
+            locator: &p2_na2sio3_37_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2SiO3 but gives no molar composition for this value.
+            locator: *p2_na2sio3_37_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this cited fusion value.
+            locator: *p2_na2sio3_37_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+            locator: *p2_na2sio3_37_locator
+      - observation_id: sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_38
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          paragraph: Results of DSC measurements
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion from crystalline Na2SiO3 to liquid.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '52.0'
+          uncertainty_kJ_mol-1: '1.0'
+          uncertainty_as_printed: ± 1.0
+          uncertainty_confidence_level: not stated
+          attribution: P. Richet, Y. Bottinga, and C. Tequi [38].
+          formula_basis_as_printed: Na2SiO3 full formula.
+          method_as_printed: Drop calorimetry [38].
+        uncertainty:
+          kind: printed
+          value: '1.0'
+          verbatim: ± 1.0
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The results prose gives no temperature for the cited fusion enthalpy.
+            locator: &p2_na2sio3_38_locator
+              page: 2
+              published_page: 1391
+              paragraph: Results of DSC measurements
+          composition:
+            state:
+              tag: unknown
+              reason: The prose names Na2SiO3 but gives no molar composition for this value.
+            locator: *p2_na2sio3_38_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this cited fusion value.
+            locator: *p2_na2sio3_38_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+            locator: *p2_na2sio3_38_locator
+      - observation_id: sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 2
+          published_page: 1391
+          table: '1'
+          row: 1/2 Na2SiO3 (NS)
+          column: H_Mix^L
+        phase: l
+        units: kJ/mol
+        standard_state_as_printed: >-
+          Equation (2) defines H_Mix^L relative to the pure liquid Na2O and SiO2 endmembers:
+          H^L_Mix,T,alpha = H^L_T,alpha − (X^L_Na2O H^L_T,Na2O + X^L_SiO2 H^L_T,SiO2).
+        values:
+          quantity: integral_enthalpy_of_mixing_as_printed
+          method_class: measured_reduced
+          admission_status: typed_refusal
+          schema_gap: >-
+            The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
+            heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
+            exists: Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar, and Quantity.INTERACTION_PARAMETER is a model
+            parameter, not integral enthalpy. QUANTITY_ALIASES has no exact alias and TYPE_QUANTITY cannot infer this
+            value from the generic series type. PHASE_BASIS_TOKENS applies to phase-composition rows, not this liquid
+            thermodynamic datum. Keep the printed number typed-refused instead of binding a near-miss quantity.
+          schema_gap_symbols:
+            - simulator/battery/enums.py::Quantity
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+            - simulator/battery/migrate.py::PHASE_MAP
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          enthalpy_of_mixing_kJ_mol-1_as_published: '-109.6'
+          uncertainty_as_printed: ± 1.5
+          uncertainty_kJ_mol-1: '1.5'
+          uncertainty_confidence_level: not stated
+          value_as_published: −109.6 ± 1.5 kJ/mol
+          composition_as_printed:
+            SiO2_mol_percent: '50.0'
+            Na2O_mol_percent: '50.0'
+          formula_basis_as_printed: Na2O–SiO2 liquid mixture at the Table 1 NS nominal composition
+          temperature_dependence_as_printed: >-
+            The authors state that H_Mix^L and S_Mix^L are independent of temperature when there is no heat capacity
+            of mixing (PDF page 2, equations 4–7).
+          method_as_printed: Calculated from the DSC fusion enthalpy and the thermodynamic data in Table 2, using equations (2) and (16).
+          derivation:
+            relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+            inputs:
+              - sugawara_2011_t1_na2sio3_heat_of_fusion
+              - sugawara_2011_t2_sio2_fusion_enthalpy
+              - sugawara_2011_t2_na2o_fusion_enthalpy
+              - sugawara_2011_t2_sio2_liquid_heat_capacity
+              - sugawara_2011_t2_na2o_liquid_heat_capacity
+              - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derived_from:
+            - sugawara_2011_t1_na2sio3_heat_of_fusion
+            - sugawara_2011_t2_sio2_fusion_enthalpy
+            - sugawara_2011_t2_na2o_fusion_enthalpy
+            - sugawara_2011_t2_sio2_liquid_heat_capacity
+            - sugawara_2011_t2_na2o_liquid_heat_capacity
+            - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.5'
+          verbatim: ± 1.5
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions: &t1_ns_mixing_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent under its no-heat-capacity-of-mixing assumption.
+            locator: *t1_ns_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t1_ns_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report a total pressure for the mixing enthalpy.
+            locator: *t1_ns_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+            locator: *t1_ns_locator
+      - observation_id: sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        phase: l
+        units: kJ/mol
+        standard_state_as_printed: >-
+          Equation (2) defines H_Mix^L relative to the pure liquid Na2O and SiO2 endmembers:
+          H^L_Mix,T,alpha = H^L_T,alpha − (X^L_Na2O H^L_T,Na2O + X^L_SiO2 H^L_T,SiO2).
+        values:
+          quantity: integral_enthalpy_of_mixing_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+          derivation:
+            relation: Authors report the weighted average from the present-study NS row and the Fan [10], Naylor [37], and Richet et al. [38] references; Table 2 data are also cited in the text.
+            inputs:
+              - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+
+          schema_gap: >-
+            The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
+            heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
+            exists: Quantity.PARTIAL_MOLAR_ENTHALPY is partial-molar, and Quantity.INTERACTION_PARAMETER is a model
+            parameter, not integral enthalpy. QUANTITY_ALIASES has no exact alias and TYPE_QUANTITY cannot infer this
+            value from the generic series type. PHASE_BASIS_TOKENS applies to phase-composition rows, not this liquid
+            thermodynamic datum. Keep the printed number typed-refused instead of binding a near-miss quantity.
+          schema_gap_symbols:
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+            - simulator/battery/enums.py::Quantity
+            - simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+            - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+            - simulator/battery/enums.py::PhaseRole.MELT
+            - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - simulator/battery/migrate.py::PHASE_MAP
+          enthalpy_of_mixing_kJ_mol-1_as_published: '-110.2'
+          uncertainty_kJ_mol-1: '0.3'
+          uncertainty_as_printed: ± 0.3
+          uncertainty_confidence_level: not stated
+          composition_as_printed:
+            SiO2_mol_percent: '50'
+          composition_context_as_printed: NS composition at 50 mol% SiO2 in the Na2O-SiO2 binary system.
+          temperature_dependence_as_printed: H_Mix^L is independent of temperature under the stated no-heat-capacity-of-mixing assumption.
+          method_as_printed: Weighted average of enthalpy data from the present study, Fan [10], Naylor [37], Richet et al. [38], and Table 2.
+        uncertainty:
+          kind: printed
+          value: '0.3'
+          verbatim: ± 0.3
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: No single temperature is assigned; the paper states that H_Mix^L is temperature-independent under its no-heat-capacity-of-mixing assumption.
+            locator: &p4_ns_weighted_mean_locator
+              page: 4
+              published_page: 1393
+              paragraph: Weighted average of liquid mixing enthalpy at NS composition
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *p4_ns_weighted_mean_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report total pressure for this weighted mean.
+            locator: *p4_ns_weighted_mean_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not report oxygen fugacity or oxygen partial pressure for this weighted mean.
+            locator: *p4_ns_weighted_mean_locator
+      - observation_id: sugawara_2011_t2_na2sio3_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/2 Na2SiO3
+          column: ΔH_Tm^L
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
+        values:
+          method_class: model_derived
+          quantity: heat_of_fusion_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+            - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy and endmember data.
+            inputs:
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+              - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+              - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+              - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          value: '23.8'
+          value_as_printed: 23.8^f
+          schema_gap: >-
+            Per gram-formula weight is not the full-formula heat_of_fusion or cp token; retain the printed basis without rescaling.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/records.py::Identity
+            - simulator/battery/enums.py::Quantity.ENTHALPY_OF_FUSION
+          formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
+          composition_as_printed:
+            SiO2_mol_percent: '50'
+            Na2O_mol_percent: '50'
+          melting_temperature_as_printed: '1360'
+          T_K: '1360'
+          method_as_printed: Calculated from solid enthalpy at Tm, Na2O and SiO2 endmember enthalpies, and optimized H_Mix^L from equation (8), per Table 2 footnote f.
+          derivation_context_id: sugawara_2011_t3_gibbs_mixing_coefficients
+          uncertainty:
+            reported_status: not_reported
+        point_conditions: &t2_ns_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1360'
+            locator: &t2_ns_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: 1/2 Na2SiO3
+              column: Tm
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t2_ns_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this thermodynamic datum.
+            locator: *t2_ns_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+            locator: *t2_ns_locator
+      - observation_id: sugawara_2011_t2_na2sio3_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/2 Na2SiO3
+          column: Cp^L
+        phase: l
+        units: J/mol K
+        standard_state_as_printed: Molar heat capacity of the liquid at the printed composition.
+        values:
+          method_class: quoted_attributed
+          quantity: heat_capacity_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          value: '90.99'
+          value_as_printed: 90.99 [38]
+          attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+          composition_as_printed:
+            SiO2_mol_percent: '50'
+            Na2O_mol_percent: '50'
+          temperature_as_printed: no single T stated for this Cp value
+        point_conditions: &t2_ns_cp_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values are independent of temperature.
+            locator: &t2_ns_cp_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: 1/2 Na2SiO3
+              column: Cp^L
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t2_ns_cp_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this heat-capacity datum.
+            locator: *t2_ns_cp_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+            locator: *t2_ns_cp_locator
+      - observation_id: sugawara_2011_t2_na2sio3_solid_heat_capacity_equation
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_ns_cpg_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/2 Na2SiO3
+          column: Cp^G
+        phase: cr
+        units: J/mol K
+        standard_state_as_printed: Solid heat capacity function at the printed one-half formula composition.
+        values:
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
+          method_class: quoted_attributed
+          equation_as_printed: Cp = 99.042 + 7.6665 × 10⁻³ T + 0.3655 × 10⁵ T⁻² − 731.95 T⁻⁰·⁵
+          formula_variable_as_printed: T in K
+          attribution: '[49]'
+          method_as_printed: Table 2 attributes the Cp^G equation to [49] but does not state the measurement method.
+          temperature_as_printed: Equation variable T; no validity interval is reported.
+        point_conditions: &t2_ns_cpg_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+            locator: *t2_ns_cpg_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t2_ns_cpg_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid heat capacity equation.
+            locator: *t2_ns_cpg_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+            locator: *t2_ns_cpg_locator
+      - observation_id: sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_ns_hsolid_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: 1/2 Na2SiO3
+          column: H^S_Tm
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
+        values:
+          quantity: solid_enthalpy_at_Tm_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          derived_from:
+            - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+            - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+          derivation:
+            relation: Footnote d calculates this solid enthalpy using the [47] standard state value and [40] heat capacity; the stored [47] endmember solid enthalpies are the available standard-state inputs.
+          schema_gap: *solid_enthalpy_schema_gap
+          schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
+          solid_enthalpy_at_Tm_kJ_mol_as_published: '-697.782^d'
+          value_as_printed: '-697.782^d'
+          formula_basis_as_printed: 1/2 Na2SiO3
+          composition_as_printed:
+            SiO2_mol_percent: '50'
+            Na2O_mol_percent: '50'
+          T_K: '1360'
+          method_as_printed: Calculated using the standard state value of [47] and heat capacity of [40], per Table 2 footnote d.
+        point_conditions: &t2_ns_hsolid_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1360'
+            locator: *t2_ns_hsolid_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0.5'
+                  - - Na2O
+                    - '0.5'
+            locator: *t2_ns_hsolid_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid enthalpy.
+            locator: *t2_ns_hsolid_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+            locator: *t2_ns_hsolid_locator
+  SiO2:
+    observations:
+      - observation_id: sugawara_2011_t2_sio2_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: SiO2
+          column: ΔH_Tm^L
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm; polymorph is not specified in this table row.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '8.92'
+          value_as_printed: 8.92 [50]
+          attribution: '[50]'
+          method_as_printed: This article attributes the fusion enthalpy to [50] but does not state that source's method.
+          formula_basis_as_printed: SiO2 endmember
+          composition_as_printed:
+            SiO2_mol_percent: '100'
+            Na2O_mol_percent: '0'
+          melting_temperature_as_printed: '1996 [47]'
+          T_K: '1996'
+        point_conditions: &t2_sio2_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1996'
+            locator: &t2_sio2_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: SiO2
+              column: Tm
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '1'
+                  - - Na2O
+                    - '0'
+            locator: *t2_sio2_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this thermodynamic datum.
+            locator: *t2_sio2_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+            locator: *t2_sio2_locator
+      - observation_id: sugawara_2011_t2_sio2_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: SiO2
+          column: Cp^L
+        phase: l
+        units: J/mol K
+        standard_state_as_printed: Molar heat capacity of liquid SiO2.
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          value: '81.37'
+          value_as_printed: 81.37 [38]
+          attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+          composition_as_printed:
+            SiO2_mol_percent: '100'
+            Na2O_mol_percent: '0'
+          temperature_as_printed: no single T stated for this Cp value
+        point_conditions: &t2_sio2_cp_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values are independent of temperature.
+            locator: &t2_sio2_cp_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: SiO2
+              column: Cp^L
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '1'
+                  - - Na2O
+                    - '0'
+            locator: *t2_sio2_cp_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this heat-capacity datum.
+            locator: *t2_sio2_cp_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+            locator: *t2_sio2_cp_locator
+      - observation_id: sugawara_2011_t2_sio2_solid_heat_capacity_equation
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_sio2_cpg_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: SiO2
+          column: Cp^G
+        phase: cr
+        units: J/mol K
+        standard_state_as_printed: Solid heat capacity function for the SiO2 endmember.
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          equation_as_printed: Cp = 127.20 − 10.777 × 10⁻³ T + 4.3130 × 10⁵ T⁻² − 1463.9 T⁻⁰·⁵
+          formula_variable_as_printed: T in K
+          attribution: '[49]'
+          method_as_printed: Table 2 attributes the Cp^G equation to [49] but does not state the measurement method.
+          temperature_as_printed: Equation variable T; no validity interval is reported.
+        point_conditions: &t2_sio2_cpg_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+            locator: *t2_sio2_cpg_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '1'
+                  - - Na2O
+                    - '0'
+            locator: *t2_sio2_cpg_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid heat capacity equation.
+            locator: *t2_sio2_cpg_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+            locator: *t2_sio2_cpg_locator
+      - observation_id: sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_sio2_hsolid_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: SiO2
+          column: H^S_Tm
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
+        values:
+          quantity: solid_enthalpy_at_Tm_as_printed
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          schema_gap: *solid_enthalpy_schema_gap
+          schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
+          solid_enthalpy_at_Tm_kJ_mol_as_published: '-790.589 [47]'
+          value_as_printed: '-790.589 [47]'
+          formula_basis_as_printed: SiO2 endmember
+          composition_as_printed:
+            SiO2_mol_percent: '100'
+            Na2O_mol_percent: '0'
+          T_K: '1996'
+          method_as_printed: This article attributes the value to [47] but does not state that source's method.
+          attribution: '[47]'
+        point_conditions: &t2_sio2_hsolid_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1996'
+            locator: *t2_sio2_hsolid_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '1'
+                  - - Na2O
+                    - '0'
+            locator: *t2_sio2_hsolid_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid enthalpy.
+            locator: *t2_sio2_hsolid_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+            locator: *t2_sio2_hsolid_locator
+  Na2O:
+    observations:
+      - observation_id: sugawara_2011_t2_na2o_fusion_enthalpy
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na2O
+          column: ΔH_Tm^L
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Enthalpy of fusion at the Table 2 melting temperature Tm.
+        values:
+          quantity: heat_of_fusion
+          method_class: quoted_attributed
+          value: '47.7'
+          value_as_printed: 47.7 [47]
+          attribution: '[47]'
+          method_as_printed: This article attributes the fusion enthalpy to [47] but does not state that source's method.
+          formula_basis_as_printed: Na2O endmember
+          composition_as_printed:
+            SiO2_mol_percent: '0'
+            Na2O_mol_percent: '100'
+          melting_temperature_as_printed: '1678 [47]'
+          T_K: '1678'
+        point_conditions: &t2_na2o_fusion_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1678'
+            locator: &t2_na2o_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: Na2O
+              column: Tm
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0'
+                  - - Na2O
+                    - '1'
+            locator: *t2_na2o_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this thermodynamic datum.
+            locator: *t2_na2o_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+            locator: *t2_na2o_locator
+      - observation_id: sugawara_2011_t2_na2o_liquid_heat_capacity
+        type: heat_capacity_and_heat_content_series
+        locator:
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na2O
+          column: Cp^L
+        phase: l
+        units: J/mol K
+        standard_state_as_printed: Molar heat capacity of liquid Na2O.
+        values:
+          quantity: cp
+          method_class: quoted_attributed
+          value: '104.6'
+          value_as_printed: 104.6 [47]
+          attribution: '[47]'
+          method_as_printed: This article attributes the heat capacity to [47] but does not state that source's method.
+          composition_as_printed:
+            SiO2_mol_percent: '0'
+            Na2O_mol_percent: '100'
+          temperature_as_printed: no single T stated for this Cp value
+        point_conditions: &t2_na2o_cp_conditions
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 2 gives no single temperature for Cp^L.
+            locator: &t2_na2o_cp_locator
+              page: 3
+              published_page: 1392
+              table: '2'
+              row: Na2O
+              column: Cp^L
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0'
+                  - - Na2O
+                    - '1'
+            locator: *t2_na2o_cp_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report a total pressure for this heat-capacity datum.
+            locator: *t2_na2o_cp_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+            locator: *t2_na2o_cp_locator
+      - observation_id: sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        type: heat_capacity_and_heat_content_series
+        locator: &t2_na2o_hsolid_locator
+          page: 3
+          published_page: 1392
+          table: '2'
+          row: Na2O
+          column: H^S_Tm
+        phase: cr
+        units: kJ/mol
+        standard_state_as_printed: Solid enthalpy at the printed Tm; Table 2 does not state a reference basis for H^S_Tm.
+        values:
+          quantity: solid_enthalpy_at_Tm_as_printed
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          schema_gap: *solid_enthalpy_schema_gap
+          schema_gap_symbols: *solid_enthalpy_schema_gap_symbols
+          solid_enthalpy_at_Tm_kJ_mol_as_published: '-304.711 [47]'
+          value_as_printed: '-304.711 [47]'
+          formula_basis_as_printed: Na2O endmember
+          composition_as_printed:
+            SiO2_mol_percent: '0'
+            Na2O_mol_percent: '100'
+          T_K: '1678'
+          method_as_printed: This article attributes the value to [47] but does not state that source's method.
+          attribution: '[47]'
+        point_conditions: &t2_na2o_hsolid_conditions
+          temperature_K:
+            state:
+              tag: value
+              value: '1678'
+            locator: *t2_na2o_hsolid_locator
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_percent_as_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - SiO2
+                    - '0'
+                  - - Na2O
+                    - '1'
+            locator: *t2_na2o_hsolid_locator
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report total pressure for this solid enthalpy.
+            locator: *t2_na2o_hsolid_locator
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+            locator: *t2_na2o_hsolid_locator
+    context:
+      - observation_id: sugawara_2011_p4_weighted_mean_fan_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Fan [10]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+      - observation_id: sugawara_2011_p4_weighted_mean_naylor_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Naylor [37]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+      - observation_id: sugawara_2011_p4_weighted_mean_richet_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Richet et al. [38]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+      - observation_id: sugawara_2011_t3_gibbs_mixing_coefficients
+        type: thermodynamic_model_parameters
+        locator:
+          page: 5
+          published_page: 1394
+          table: '3'
+          row: h2–h6 and s2–s6
+        phase: l
+        units: h_i in kJ/mol; s_i in J/K mol
+        values:
+          evidence_class: thermodynamic_model_parameter
+          method_class: model_derived
+          measurement_status: fitted_parameters_not_measured_values
+          model: Fifth-order polynomial model of Na2O–SiO2 liquid enthalpy and entropy of mixing, equations (8) and (9); partial molar Gibbs energy and activity are calculated by equation (14).
+          system: Na2O-SiO2 liquid
+          fit_method_as_printed: Least-squares minimization of a weighted sum of squares for measured enthalpy, Na2O activity, liquidus and immiscibility data.
+          fit_inputs_stored_as_observations:
+            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
+            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
+            - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+          fit_inputs_not_digitized: Figure-only data in Figs. 2–6 are excluded by the figure-read rule.
+          confidence_level: not stated
+          parenthetical_error_as_printed: Number in parentheses is the probability error.
+          parameters:
+            - name: h2
+              value_as_published: '−271.2'
+              probability_error_as_published: '117.2'
+              full_value_as_published: '−271.2 (117.2)'
+              unit: kJ/mol
+              footnote_mark: b
+            - name: s2
+              value_as_published: '−1947.0'
+              probability_error_as_published: '161.6'
+              full_value_as_published: '−1947.0 (161.6)'
+              unit: J/K mol
+            - name: h3
+              value_as_published: '3991.5'
+              probability_error_as_published: '367.2'
+              full_value_as_published: '3991.5 (367.2)'
+              unit: kJ/mol
+            - name: s3
+              value_as_published: '5972.7'
+              probability_error_as_published: '485.4'
+              full_value_as_published: '5972.7 (485.4)'
+              unit: J/K mol
+            - name: h4
+              value_as_published: '−6177.3'
+              probability_error_as_published: '550.9'
+              full_value_as_published: '−6177.3 (550.9)'
+              unit: kJ/mol
+            - name: s4
+              value_as_published: '−8320.5'
+              probability_error_as_published: '707.1'
+              full_value_as_published: '−8320.5 (707.1)'
+              unit: J/K mol
+            - name: h5
+              value_as_published: '3920.7'
+              probability_error_as_published: '398.7'
+              full_value_as_published: '3920.7 (398.7)'
+              unit: kJ/mol
+            - name: s5
+              value_as_published: '5468.3'
+              probability_error_as_published: '500.4'
+              full_value_as_published: '5468.3 (500.4)'
+              unit: J/K mol
+            - name: h6
+              value_as_published: '−932.8'
+              probability_error_as_published: '112.0'
+              full_value_as_published: '−932.8 (112.0)'
+              unit: kJ/mol
+            - name: s6
+              value_as_published: '−1392.9'
+              probability_error_as_published: '138.1'
+              full_value_as_published: '−1392.9 (138.1)'
+              unit: J/K mol

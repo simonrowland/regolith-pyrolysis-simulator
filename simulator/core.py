@@ -54,7 +54,7 @@ import logging
 import math
 from pathlib import Path
 from types import MappingProxyType
-from typing import Any, Dict, Literal, Mapping, Optional, Tuple
+from typing import Any, Dict, Literal, Mapping, Optional, Sequence, Tuple
 
 from engines.antoine import (
     _AntoineCoefficientRefusal,
@@ -2805,7 +2805,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'campaign_hour': int(self.melt.campaign_hour),
                 'per_species': per_species,
             }
-        except Exception as exc:  # noqa: BLE001 - diagnostics cannot gate chemistry
+        except (EvaporationFluxRefusal, TypeError):
+            raise
+        except Exception as exc:  # noqa: BLE001
+            # Ordinary diagnostic errors are non-gating.
             record = {
                 'schema': 'phase_context_diagnostic_v1',
                 'diagnostic_only': True,
@@ -4733,6 +4736,119 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         return fO2_log
 
+    def _refuse_malformed_melt_redox_liquidus_curve(
+        self,
+        *,
+        source: str,
+        detail: str,
+        malformed_fields: Sequence[str],
+    ) -> None:
+        reason = 'liquid_fraction_provider_invalid_curve'
+        diagnostic = {
+            'status': 'invalid',
+            'reason': reason,
+            'provider': self._liquid_fraction_provider,
+            'malformed_fields': list(malformed_fields),
+            'detail': detail,
+            'source': source,
+            'hour': int(self.melt.hour),
+            'campaign_hour': int(self.melt.campaign_hour),
+            'campaign': self.melt.campaign.name,
+        }
+        self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
+        self._last_melt_redox_liquid_fraction_diagnostic = dict(diagnostic)
+        raise EvaporationFluxRefusal(reason, diagnostic)
+
+    def _validated_melt_redox_liquidus_curve(
+        self,
+        curve: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        field = 'solidus_T_C'
+        try:
+            solidus_T_C = float(curve[field])
+            field = 'liquidus_T_C'
+            liquidus_T_C = float(curve[field])
+        except (KeyError, ValueError) as exc:
+            self._refuse_malformed_melt_redox_liquidus_curve(
+                source='none:invalid_liquidus_curve',
+                detail=str(exc),
+                malformed_fields=(field,),
+            )
+
+        malformed_bounds = []
+        if not math.isfinite(solidus_T_C):
+            malformed_bounds.append('solidus_T_C')
+        if not math.isfinite(liquidus_T_C):
+            malformed_bounds.append('liquidus_T_C')
+        if not malformed_bounds and not solidus_T_C < liquidus_T_C:
+            malformed_bounds.extend(('solidus_T_C', 'liquidus_T_C'))
+        if malformed_bounds:
+            self._refuse_malformed_melt_redox_liquidus_curve(
+                source='none:invalid_liquidus_bounds',
+                detail=(
+                    'invalid liquidus bounds: '
+                    f'solidus_T_C={solidus_T_C!r}, '
+                    f'liquidus_T_C={liquidus_T_C!r}'
+                ),
+                malformed_fields=malformed_bounds,
+            )
+
+        try:
+            path = tuple(curve.get('path') or ())
+            normalized_path = []
+            for point in path:
+                temperature_C, liquid_fraction = point
+                temperature_C = float(temperature_C)
+                liquid_fraction = float(liquid_fraction)
+                if not (
+                    math.isfinite(temperature_C)
+                    and math.isfinite(liquid_fraction)
+                ):
+                    raise ValueError('non-finite liquidus path knot')
+                normalized_path.append((temperature_C, liquid_fraction))
+            if not normalized_path:
+                raise IndexError('empty liquidus path')
+        except (IndexError, KeyError, ValueError) as exc:
+            self._refuse_malformed_melt_redox_liquidus_curve(
+                source='none:invalid_liquid_fraction_curve',
+                detail=str(exc),
+                malformed_fields=('path',),
+            )
+
+        normalized_curve = dict(curve)
+        normalized_curve['solidus_T_C'] = solidus_T_C
+        normalized_curve['liquidus_T_C'] = liquidus_T_C
+        normalized_curve['path'] = tuple(normalized_path)
+        return normalized_curve
+
+    def _melt_redox_liquid_fraction_at_temperature(
+        self,
+        curve: Mapping[str, Any],
+        temperature_C: float,
+    ) -> float:
+        try:
+            liquid_fraction = float(
+                self._interpolate_freeze_gate_curve(curve, temperature_C)
+            )
+        except (IndexError, KeyError, ValueError) as exc:
+            field = (
+                str(exc.args[0])
+                if isinstance(exc, KeyError) and exc.args
+                else 'path'
+            )
+            self._refuse_malformed_melt_redox_liquidus_curve(
+                source='none:invalid_liquid_fraction_curve',
+                detail=str(exc),
+                malformed_fields=(field,),
+            )
+        if not math.isfinite(liquid_fraction):
+            self._refuse_malformed_melt_redox_liquidus_curve(
+                source='none:nonfinite_liquid_fraction',
+                detail=f'non-finite liquid_fraction={liquid_fraction!r}',
+                malformed_fields=('liquid_fraction',),
+            )
+        return max(0.0, min(1.0, liquid_fraction))
+
     def _melt_redox_liquidus_floor_fallback(
         self,
         *,
@@ -4755,18 +4871,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'campaign_hour': int(self.melt.campaign_hour),
             'campaign': self.melt.campaign.name,
         }
-        if source in (
-            'none:invalid_liquidus_curve',
-            'none:invalid_liquidus_bounds',
-            'none:nonfinite_liquid_fraction',
-        ):
-            diagnostic['repair_notice'] = {
-                'kind': 'kress_liquidus_floor_repair',
-                'repaired': 'unusable liquidus bounds or interpolation',
-                'reason': reason,
-                'replacement': 'deterministic Kress91 liquidus floor',
-                'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
-            }
         self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
         fallback_diagnostics = getattr(
             self,
@@ -5277,9 +5381,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
 
         try:
-            solidus_T_C = float(curve['solidus_T_C'])
-            liquidus_T_C = float(curve['liquidus_T_C'])
-        except (KeyError, TypeError, ValueError) as exc:
+            normalized_curve = (
+                self._validated_melt_redox_liquidus_curve(curve)
+            )
+        except EvaporationFluxRefusal:
             if (
                 isinstance(self._freeze_gate_liquid_fraction_cache, dict)
                 and self._freeze_gate_liquid_fraction_cache.get('key') == key
@@ -5287,36 +5392,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._freeze_gate_liquid_fraction_cache = None
             if isinstance(memo, dict):
                 memo.pop(key, None)
-            return self._melt_redox_liquidus_floor_fallback(
-                source='none:invalid_liquidus_curve',
-                reason=str(exc),
-                liquidus_status='invalid',
-            )
-        if (
-            not math.isfinite(solidus_T_C)
-            or not math.isfinite(liquidus_T_C)
-            or not solidus_T_C < liquidus_T_C
-        ):
-            if (
-                isinstance(self._freeze_gate_liquid_fraction_cache, dict)
-                and self._freeze_gate_liquid_fraction_cache.get('key') == key
-            ):
-                self._freeze_gate_liquid_fraction_cache = None
-            if isinstance(memo, dict):
-                memo.pop(key, None)
-            return self._melt_redox_liquidus_floor_fallback(
-                source='none:invalid_liquidus_bounds',
-                reason=(
-                    'invalid liquidus bounds: '
-                    f'solidus_T_C={solidus_T_C!r}, '
-                    f'liquidus_T_C={liquidus_T_C!r}'
-                ),
-                liquidus_status='invalid',
-            )
-
-        normalized_curve = dict(curve)
-        normalized_curve['solidus_T_C'] = solidus_T_C
-        normalized_curve['liquidus_T_C'] = liquidus_T_C
+            raise
+        solidus_T_C = normalized_curve['solidus_T_C']
+        liquidus_T_C = normalized_curve['liquidus_T_C']
         normalized_record = gate_curve_memo_record(
             normalized_curve,
             record.get('origin'),
@@ -5436,51 +5514,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
             }
             return liquid_fraction
-        try:
-            liquid_fraction = float(
-                self._interpolate_freeze_gate_curve(
-                    curve,
-                    float(T_K) - 273.15,
-                )
+        temperature_C = float(T_K) - 273.15
+        liquid_fraction = (
+            self._melt_redox_liquid_fraction_at_temperature(
+                curve,
+                temperature_C,
             )
-        except (KeyError, TypeError, ValueError) as exc:
-            self._last_melt_redox_liquid_fraction_diagnostic = {
-                'status': 'invalid',
-                'source': 'none:invalid_liquid_fraction_curve',
-                'reason': str(exc),
-            }
-            # Unreadable curve is a measurement failure, not evidence of
-            # solidification. Same policy as the fallback branch above.
-            self._melt_redox_liquidus_floor_fallback(
-                source='none:invalid_liquid_fraction_curve',
-                reason=str(exc),
-                liquidus_status='invalid',
-            )
-            temperature_C = float(T_K) - 273.15
-            return (
-                1.0
-                if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
-                else 0.0
-            )
-        if not math.isfinite(liquid_fraction):
-            self._last_melt_redox_liquid_fraction_diagnostic = {
-                'status': 'invalid',
-                'source': 'none:nonfinite_liquid_fraction',
-                'liquid_fraction': liquid_fraction,
-            }
-            # Non-finite interpolation is unusable data, not a solidus.
-            self._melt_redox_liquidus_floor_fallback(
-                source='none:nonfinite_liquid_fraction',
-                reason=f'non-finite liquid_fraction={liquid_fraction!r}',
-                liquidus_status='invalid',
-            )
-            temperature_C = float(T_K) - 273.15
-            return (
-                1.0
-                if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
-                else 0.0
-            )
-        liquid_fraction = max(0.0, min(1.0, liquid_fraction))
+        )
         fraction_diagnostic = {
             'status': 'ok',
             'source': curve.get('source', 'liquidus_solidus'),

@@ -1,0 +1,310 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/tatsumi-2004-iron-condensation.yaml
+observations:
+- observation_id: tatsumi-2004-iron-condensation::tatsumi_2004_fe_condensation_coefficient_1020c
+  experiment_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::experiment::tatsumi-2004-fe-mo-1020c
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1293.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tatsumi-2004-iron-condensation
+  locator:
+    page: 2
+    published_page: 2013
+    pdf_page_index: 1
+    section: Discussion
+  read_from: pdf:tatsumi-2004-iron-condensation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '1020'
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+    substrate_distance_mm:
+      state:
+        tag: value
+        value: '54'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    chamber_pressure_as_printed:
+      state:
+        tag: value
+        value: 10^-5~10^-4 Pa
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    duration_as_printed:
+      state:
+        tag: value
+        value: 1 to 48 hours
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    substrate:
+      state:
+        tag: value
+        value: molybdenum
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    source_temperature_C:
+      state:
+        tag: value
+        value: '1170'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    condensation_area_mm2:
+      state:
+        tag: value
+        value: '178'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    source_size_as_printed:
+      state:
+        tag: value
+        value: 12x12mm
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    temperature_K:
+      state:
+        tag: value
+        value: '1293.15'
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1020'
+            locator:
+              page: 2
+              published_page: 2013
+              pdf_page_index: 1
+              section: Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 2013
+              pdf_page_index: 1
+              section: Discussion
+        output_unit: K
+        references: []
+- observation_id: tatsumi-2004-iron-condensation::tatsumi_2004_fe_condensation_coefficient_415c
+  experiment_id: 7b4ab140fedc8a71057ac025318e343ac90e589e512a91fc9c1f80c1b25912d2::experiment::tatsumi-2004-fe-mo-415c
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'condensation_coefficient'
+    species:
+      formula: Fe
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '688.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'condensation_coefficient'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: tatsumi-2004-iron-condensation
+  locator:
+    page: 2
+    published_page: 2013
+    pdf_page_index: 1
+    section: Discussion
+  read_from: pdf:tatsumi-2004-iron-condensation
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value: '415'
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+    substrate_distance_mm:
+      state:
+        tag: value
+        value: '88'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    chamber_pressure_as_printed:
+      state:
+        tag: value
+        value: 10^-5~10^-4 Pa
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    duration_as_printed:
+      state:
+        tag: value
+        value: 6 to 144 hours
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    substrate:
+      state:
+        tag: value
+        value: molybdenum
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    source_temperature_C:
+      state:
+        tag: value
+        value: '1170'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    condensation_area_mm2:
+      state:
+        tag: value
+        value: '178'
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    source_size_as_printed:
+      state:
+        tag: value
+        value: 12x12mm
+      locator:
+        page: 1
+        published_page: 2013
+        pdf_page_index: 0
+        section: Method
+    temperature_K:
+      state:
+        tag: value
+        value: '688.15'
+      locator:
+        page: 2
+        published_page: 2013
+        pdf_page_index: 1
+        section: Discussion
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '415'
+            locator:
+              page: 2
+              published_page: 2013
+              pdf_page_index: 1
+              section: Discussion
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 2
+              published_page: 2013
+              pdf_page_index: 1
+              section: Discussion
+        output_unit: K
+        references: []
