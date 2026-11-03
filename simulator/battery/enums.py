@@ -191,6 +191,24 @@ class RefusalReason(StrEnum):
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
+    # SC-458. The engine bulk was built from the phase analysis this row
+    # scores. Not a basis mismatch and not an incomplete identity.
+    # same_run_initial_analysed_melt uses this reason with detail
+    # input_is_same_run_analysed_melt.
+    INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS = (
+        "input_composition_is_scored_phase_analysis"
+    )
+    # d-323. A non-input melt observable whose run text does not say the
+    # charge was a single melt. Crystal-bearing runs use the crystalline token.
+    INPUT_PHASE_ASSEMBLAGE_UNSTATED = "input_phase_assemblage_unstated"
+    INPUT_PHASE_ASSEMBLAGE_CRYSTALLINE = "input_phase_assemblage_crystalline"
+    # d-325. Printed bulk scored on a phase composition when the engine
+    # result is a single liquid. 100% liquid is the engine liquid mass
+    # fraction, not a phase name.
+    SINGLE_PHASE_BULK_IDENTITY = "single_phase_bulk_identity"
+    SINGLE_PHASE_BULK_IDENTITY_ASSEMBLAGE_UNSTATED = (
+        "single_phase_bulk_identity_assemblage_unstated"
+    )
     ENGINE_DOES_NOT_REPORT_FE_REDOX = "engine_does_not_report_fe_redox"
     ENGINE_DOES_NOT_REPORT_FUSION = "engine_does_not_report_fusion"
     ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
