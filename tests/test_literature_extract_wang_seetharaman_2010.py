@@ -23,6 +23,22 @@ RENDER_PINS = {
     "wang2010_table4_sample_1_cro_partial_pressure": "3.1e-2",
     "wang2010_table4_sample_1_cro2_partial_pressure": "6.4e-3",
 }
+EQ7_RATIO_PINS = {
+    "wang2010_table4_sample_1_xcro_over_xcro15_eq7": "1.42",
+    "wang2010_table4_sample_2_xcro_over_xcro15_eq7": "3.75",
+    "wang2010_table4_sample_3_xcro_over_xcro15_eq7": "3.64",
+    "wang2010_table4_sample_4_xcro_over_xcro15_eq7": "1.64",
+    "wang2010_table4_sample_5_xcro_over_xcro15_eq7": "4.71",
+    "wang2010_table4_sample_6_xcro_over_xcro15_eq7": "1.02",
+    "wang2010_table4_sample_7_xcro_over_xcro15_eq7": "0.882",
+    "wang2010_table4_sample_8_xcro_over_xcro15_eq7": "1.85",
+    "wang2010_table4_sample_9_xcro_over_xcro15_eq7": "2.14",
+    "wang2010_table4_sample_10_xcro_over_xcro15_eq7": "2.56",
+}
+TABLE_IV_FO2_NOTE = (
+    "Table IV oxygen pressure calculated using Eq. (10) and accounting for "
+    "tungsten-crucible interactions; not a separately imposed or measured fO2."
+)
 
 
 def _document() -> dict:
@@ -56,6 +72,11 @@ def test_printed_row_counts_and_render_pins_are_independent() -> None:
     assert len(rows) == 39
 
     _assert_render_pins(document)
+    for observation_id, expected in EQ7_RATIO_PINS.items():
+        assert _source_rows(document)[observation_id]["values"]["value"] == expected
+    assert _source_rows(document)[
+        "wang2010_table4_sample_1_xcro_over_xcro15_eq7"
+    ]["point_conditions"]["fO2_Pa"]["locator"]["note"] == TABLE_IV_FO2_NOTE
     assert document["fidelity_samples"][0]["locator"]["page"] == 5
     assert document["fidelity_samples"][0]["locator"]["table"] == "III"
     assert document["fidelity_samples"][0]["locator"]["table_row_number"] == 3
@@ -123,6 +144,7 @@ def test_isolated_migration_binds_redox_axes_and_exact_parents(tmp_path: Path) -
     assert (table4_ratio.locator.page, table4_ratio.locator.equation) == (5, "7")
     assert table4_ratio.point_conditions["temperature_K"].locator.page == 5
     assert table4_ratio.point_conditions["temperature_K"].state.value == Decimal("2000")
+    assert table4_ratio.point_conditions["fO2_Pa"].locator.note == TABLE_IV_FO2_NOTE
 
     for observation_id in (
         "wang2010_table3_08d_xcro_over_xcro15_xanes",
@@ -159,7 +181,8 @@ def test_isolated_migration_binds_redox_axes_and_exact_parents(tmp_path: Path) -
 
     kems_ratio = migrated["wang2010_table4_sample_1_xcro_over_xcro15_eq7"]
     assert kems_ratio.identity.species.phase.value == "l"
-    assert kems_ratio.value.point == Decimal("1.42")
+    for observation_id, expected in EQ7_RATIO_PINS.items():
+        assert migrated[observation_id].value.point == Decimal(expected)
     assert set(kems_ratio.derived_from) == {
         f"{SID}::wang2010_table4_sample_1_cro_partial_pressure",
         f"{SID}::wang2010_table4_sample_1_cro2_partial_pressure",
