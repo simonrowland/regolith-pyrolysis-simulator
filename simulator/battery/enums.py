@@ -285,6 +285,7 @@ class NoticeKind(StrEnum):
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
+    TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.
@@ -538,6 +539,13 @@ class ExperimentKind(StrEnum):
     SYNTHETIC = "synthetic"
 
 
+class AmbientPressureEvidenceClass(StrEnum):
+    GAS_FLOW = "gas_flow"
+    GAS_MIXING = "gas_mixing"
+    VENTED = "vented"
+    ATMOSPHERIC_PRESSURE_STATEMENT = "atmospheric_pressure_statement"
+
+
 class FO2Channel(StrEnum):
     COMMANDED = "commanded"
     INTRINSIC = "intrinsic"
@@ -564,6 +572,7 @@ class Authority(StrEnum):
     EXTRAPOLATED = "extrapolated"
     CONVENTION = "convention"
     REFUSED = "refused"
+    DERIVED_FROM_APPARATUS = "derived_from_apparatus"
 
 
 class ResidualStatus(StrEnum):
