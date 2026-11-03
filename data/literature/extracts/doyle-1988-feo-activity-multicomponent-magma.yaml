@@ -30,29 +30,42 @@ experiments:
   method_as_printed: each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace.
   method_detail_as_printed: &doyle_1988_method_detail
     fO2_control:
-      control_as_printed: "aluminosilicate liquids are equilibrated with reagent-grade (99.94%) metallic iron-wire under controlled oxygen fugacity at 1600 K."
-      gas_mixing_as_printed: "each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace."
-      fugacity_calculation_as_printed: "Fugacities of the gaseous species in the hot zone are calculated by BRINKLEY's (1946) method using the algorithm of VAN ZEGGEREN and STOREY (1970)."
-      status: "controlled by the gas mixture; fugacities are calculated from the gaseous species, not reported as directly measured."
-      locators:
-      - page: 2
-        published_page: 1828
-        pdf_page_index: 1
-        section: Control of the Activity of FeO
-      - page: 3
-        published_page: 1829
-        pdf_page_index: 2
-        section: Experimental and Analytical Methods
+      control:
+        as_printed: "aluminosilicate liquids are equilibrated with reagent-grade (99.94%) metallic iron-wire under controlled oxygen fugacity at 1600 K."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Control of the Activity of FeO
+      gas_mixing:
+        as_printed: "each sample is suspended on a 99.94% Fe-wire loop and is equilibrated with a COHN gas at 1600 K in the hot zone of the Deltech MoSi₂ vertical quench furnace."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Experimental and Analytical Methods
+      fugacity_calculation:
+        as_printed: "Fugacities of the gaseous species in the hot zone are calculated by BRINKLEY's (1946) method using the algorithm of VAN ZEGGEREN and STOREY (1970)."
+        locator:
+          page: 2
+          published_page: 1828
+          pdf_page_index: 1
+          section: Experimental and Analytical Methods
       gas_flow_locator:
         page: 5
         published_page: 1831
         pdf_page_index: 4
         table: 1B
-        note: The table prints the gas input flow rates for the corresponding fO2 setpoints; each observation links its own setpoint through derived_from.
+        note: 'Table 1B. Compositions of input gases (c.c./min) used in the experiments to determine aFeO at 1600±2K in [SiO₂-KAlO₂-CaAl₂Si₂O₈]-FeO liquids.'
     metal_phase:
       phase_as_printed: "reagent-grade (99.94%) metallic iron-wire"
+      phase_locator:
+        page: 2
+        published_page: 1828
+        pdf_page_index: 1
+        section: Control of the Activity of FeO
       activity_as_printed: 'Because the metallic iron is almost pure ( $a_{\mathrm{Fe}}^{\mathrm{metal}} = 1$ )'
-      locator:
+      activity_locator:
         page: 2
         published_page: 1828
         pdf_page_index: 1
@@ -65,9 +78,9 @@ experiments:
         pdf_page_index: 1
         section: Control of the Activity of FeO
   locator:
-    page: 3
-    published_page: 1829
-    pdf_page_index: 2
+    page: 2
+    published_page: 1828
+    pdf_page_index: 1
     section: Experimental and Analytical Methods
 species:
   FeO:
