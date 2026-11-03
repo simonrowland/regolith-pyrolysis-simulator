@@ -22,9 +22,132 @@ ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml"
 SOURCE_ID = "oeltjen-1999-coal-slag-thermochemistry"
 
+_EXPECTED_FIGURE_CONTEXT_IDS = {
+    "oeltjen_1999_figure_6_1",
+    "oeltjen_1999_figure_6_2",
+    "oeltjen_1999_figure_6_3",
+    "oeltjen_1999_figure_6_4",
+    "oeltjen_1999_figure_6_6",
+    "oeltjen_1999_figure_6_7",
+    "oeltjen_1999_figure_6_8",
+    "oeltjen_1999_figure_6_18",
+    "oeltjen_1999_figure_6_19",
+    "oeltjen_1999_figure_6_20",
+    "oeltjen_1999_figure_6_21",
+    "oeltjen_1999_figure_6_22",
+    "oeltjen_1999_figure_6_23",
+    "oeltjen_1999_figure_6_24",
+    "oeltjen_1999_figure_6_25",
+    "oeltjen_1999_figure_6_26",
+    "oeltjen_1999_figure_6_27",
+    "oeltjen_1999_figure_6_28",
+    "oeltjen_1999_figure_6_29",
+    "oeltjen_1999_figure_6_30",
+    "oeltjen_1999_figure_6_31",
+    "oeltjen_1999_figure_6_32",
+    "oeltjen_1999_figure_6_33",
+    "oeltjen_1999_figure_6_34",
+    "oeltjen_1999_figure_6_35",
+    "oeltjen_1999_figure_6_36",
+    "oeltjen_1999_figure_6_37",
+    "oeltjen_1999_figure_6_38",
+    "oeltjen_1999_figure_6_39",
+    "oeltjen_1999_figure_6_40",
+}
+_EXPECTED_MODEL_CONTEXT_IDS = {
+    "oeltjen_1999_table4_1_sk1",
+    "oeltjen_1999_table4_1_sk2",
+    "oeltjen_1999_table4_1_sk3",
+    "oeltjen_1999_table4_1_bk1",
+    "oeltjen_1999_table4_1_bk2",
+    "oeltjen_1999_table4_1_bk3",
+}
+_EXPECTED_CONTEXT_IDS = (
+    _EXPECTED_FIGURE_CONTEXT_IDS
+    | _EXPECTED_MODEL_CONTEXT_IDS
+    | {
+        "oeltjen_1999_figure_6_21_marker_legend",
+        "oeltjen_1999_figure_6_22_marker_legend",
+    }
+)
+_TABLE_4_1_MODEL_VALUES = {
+    "SK1": {
+        "SiO2": "75.2", "Al2O3": "22.6", "CaO": "-",
+        "FeO": "-", "Na2O": "-", "K2O": "2.2",
+    },
+    "SK2": {
+        "SiO2": "69.6", "Al2O3": "21.0", "CaO": "7.3",
+        "FeO": "-", "Na2O": "-", "K2O": "2.1",
+    },
+    "SK3": {
+        "SiO2": "64.8", "Al2O3": "19.5", "CaO": "-",
+        "FeO": "13.7", "Na2O": "-", "K2O": "1.9",
+    },
+    "BK1": {
+        "SiO2": "85.4", "Al2O3": "12.5", "CaO": "-",
+        "FeO": "-", "Na2O": "2.1", "K2O": "-",
+    },
+    "BK2": {
+        "SiO2": "61.3", "Al2O3": "9.0", "CaO": "28.2",
+        "FeO": "-", "Na2O": "1.5", "K2O": "-",
+    },
+    "BK3": {
+        "SiO2": "74.9", "Al2O3": "10.9", "CaO": "-",
+        "FeO": "12.4", "Na2O": "1.8", "K2O": "-",
+    },
+}
+_DIGITIZED_POINT_LABELS = {
+    "oeltjen_1999_fig621_s1": (
+        "p01", "p02", "p03", "p04", "p05", "p06", "p07"
+    ),
+    "oeltjen_1999_fig621_s2": ("p01", "p02", "p03", "p04", "p05", "p06"),
+    "oeltjen_1999_fig621_s3": (
+        "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"
+    ),
+    "oeltjen_1999_fig622_s4": ("p01", "p02", "p03", "p04", "p05"),
+    "oeltjen_1999_fig622_s5": ("p01", "p02", "p03", "p04", "p05"),
+    "oeltjen_1999_fig622_s6": (
+        "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08"
+    ),
+}
+_EXPECTED_DIGITIZED_POINT_IDS = {
+    f"{series}_{point}"
+    for series, point_labels in _DIGITIZED_POINT_LABELS.items()
+    for point in point_labels
+}
+
 
 def _load_extract() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def _assert_expected_context_ids(contexts: list) -> None:
+    assert tuple(sorted(row["observation_id"] for row in contexts)) == tuple(
+        sorted(_EXPECTED_CONTEXT_IDS)
+    )
+
+
+def _assert_expected_figure_ids(figure_rows: list) -> None:
+    assert tuple(sorted(row["observation_id"] for row in figure_rows)) == tuple(
+        sorted(_EXPECTED_FIGURE_CONTEXT_IDS)
+    )
+
+
+def _assert_expected_digitized_point_ids(source_rows: list) -> None:
+    assert tuple(sorted(row["observation_id"] for row in source_rows)) == tuple(
+        sorted(_EXPECTED_DIGITIZED_POINT_IDS)
+    )
+
+
+def _assert_model_system_printed_values(model_rows: list) -> None:
+    assert {
+        row["values"]["model_system"]: row["values"]["printed_values"]
+        for row in model_rows
+    } == _TABLE_4_1_MODEL_VALUES
+    assert all(
+        (row["locator"]["page"], row["locator"]["table"]) == (29, "4.1")
+        for row in model_rows
+    )
 
 
 def test_oeltjen_tables_and_kems_registry_migrate_with_render_pins() -> None:
@@ -83,23 +206,17 @@ def test_oeltjen_tables_and_kems_registry_migrate_with_render_pins() -> None:
     assert sample6.state.value["Al2O3"] == "12.7"
 
     contexts = [row for rows in result.context_by_work.values() for row in rows]
+    _assert_expected_context_ids(contexts)
+    assert tuple(
+        sorted(source_id for work in result.works.values() for source_id in work.source_ids)
+    ) == (SOURCE_ID,)
+    assert tuple(
+        sorted(bench.id.rsplit("::bench::", 1)[-1] for bench in result.benches.values())
+    ) == ("oeltjen_1999_kems_bench",)
     model_rows = [
         row for row in contexts if row.get("observation_id", "").startswith("oeltjen_1999_table4_1_")
     ]
-    assert {row["values"]["model_system"] for row in model_rows} == {
-        "SK1", "SK2", "SK3", "BK1", "BK2", "BK3"
-    }
-    assert all((row["locator"]["page"], row["locator"]["table"]) == (29, "4.1") for row in model_rows)
-    assert all(
-        set(row["values"]["printed_values"])
-        == {"SiO2", "Al2O3", "CaO", "FeO", "Na2O", "K2O"}
-        for row in model_rows
-    )
-    assert next(
-        row["values"]["printed_values"]["SiO2"]
-        for row in model_rows
-        if row["values"]["model_system"] == "SK1"
-    ) == "75.2"
+    _assert_model_system_printed_values(model_rows)
 
     # The cell and condition locator pairs are checked after isolated migration.
     bench = next(iter(result.benches.values()))
@@ -107,7 +224,7 @@ def test_oeltjen_tables_and_kems_registry_migrate_with_render_pins() -> None:
     assert bench.geometry.orifice_diameter_m.locator.page == 42
     assert bench.geometry.cell_internal_dimensions["height_m"].locator.page == 42
     figure_rows = [row for row in contexts if row.get("type") == "figure_record"]
-    assert figure_rows
+    _assert_expected_figure_ids(figure_rows)
     digitized_figures = {
         row["locator"].get("figure")
         for row in figure_rows
@@ -201,6 +318,7 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         for formula in ("K2O", "Na2O")
         for row in document["species"][formula]["observations"]
     ]
+    _assert_expected_digitized_point_ids(source_rows)
     figures = {
         row["locator"]["figure"]: row
         for row in contexts
@@ -244,7 +362,7 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         observation.observation_id.rsplit("::", 1)[-1]: observation
         for observation in result.observations.values()
     }
-    assert set(migrated) == {row["observation_id"] for row in source_rows}
+    assert set(migrated) == _EXPECTED_DIGITIZED_POINT_IDS
     for row in source_rows:
         numeral = row["values"]["printed_series_numeral"]
         figure = _FIGURE_FOR_SAMPLE[numeral]

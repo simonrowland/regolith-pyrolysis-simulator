@@ -102,6 +102,19 @@ def test_hayashi_isolated_migration_binds_conditions_and_only_declared_schema_ga
         for row in observations
         if row.value.kind.value == "unavailable"
     } == expected_unknown_quantity_ids
+    unavailable_reasons = {
+        row.observation_id.split("::", 1)[1]: row.value.unavailable_reason
+        for row in observations
+        if row.value.kind.value == "unavailable"
+    }
+    assert unavailable_reasons == {
+        observation_id: (
+            "declared quantity is unknown; unsupported quantity 'Fe3plus_oct_over_total_Fe'; refusing to pick a number"
+            if observation_id.endswith("_c04")
+            else "declared quantity is unknown; unsupported quantity 'Fe3plus_tetr_over_total_Fe'; refusing to pick a number"
+        )
+        for observation_id in expected_unknown_quantity_ids
+    }
     assert all(row.identity.species is not None for row in observations)
     assert all(not row.identity.species.phase.is_unknown for row in observations)
 

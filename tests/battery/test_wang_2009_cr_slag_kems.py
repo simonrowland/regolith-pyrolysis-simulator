@@ -31,6 +31,110 @@ CORPUS = regolith_corpus_root()
 SOURCE = CORPUS / "raw" / SID / f"{SID}.pdf"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SID}.yaml"
 
+_EXPECTED_TABLE5_ACTIVITIES = {
+    "wang_2009_table5_cr2o3_sample_01_activities_at_1950_2035_k": (
+        ("1950", "0.010"), ("2035", "0.005")
+    ),
+    "wang_2009_table5_cr2o3_sample_02_activities_at_1950_2035_k": (
+        ("1950", "0.120"), ("2035", "0.910")
+    ),
+    "wang_2009_table5_cr2o3_sample_03_activities_at_1950_2035_k": (
+        ("1950", "0.006"), ("2035", "0.082")
+    ),
+    "wang_2009_table5_cr2o3_sample_04_activities_at_1950_2035_k": (
+        ("1950", "0.043"), ("2035", "0.500")
+    ),
+    "wang_2009_table5_cr2o3_sample_05_activities_at_1950_2035_k": (
+        ("1950", "0.037"), ("2035", "0.380")
+    ),
+    "wang_2009_table5_cr2o3_sample_06_activities_at_1950_2035_k": (
+        ("1950", "0.008"), ("2035", "0.073")
+    ),
+    "wang_2009_table5_cr2o3_sample_07_activities_at_1950_2035_k": (
+        ("1950", "0.006"), ("2035", "0.071")
+    ),
+    "wang_2009_table5_cr2o3_sample_08_activities_at_1950_2035_k": (
+        ("1950", "0.005"), ("2035", "0.032")
+    ),
+    "wang_2009_table5_cr2o3_sample_09_activities_at_1950_2035_k": (
+        ("1950", "0.032"), ("2035", "0.190")
+    ),
+    "wang_2009_table5_cr2o3_sample_10_activities_at_1950_2035_k": (
+        ("1950", "0.032"), ("2035", "0.260")
+    ),
+    "wang_2009_table5_cr2o3_sample_11_activities_at_1950_2035_k": (
+        ("1950", "0.056"), ("2035", "0.780")
+    ),
+    "wang_2009_table5_cr2o3_sample_12_activities_at_1950_2035_k": (
+        ("1950", "0.007"), ("2035", "0.070")
+    ),
+    "wang_2009_table5_cr2o3_sample_13_activities_at_1950_2035_k": (
+        ("1950", "0.057"), ("2035", "0.710")
+    ),
+    "wang_2009_table5_cr2o3_sample_14_activities_at_1950_2035_k": (
+        ("1950", "0.026"), ("2035", "0.290")
+    ),
+    "wang_2009_table5_cr2o3_sample_15_activities_at_1950_2035_k": (
+        ("1950", "0.009"), ("2035", "0.100")
+    ),
+    "wang_2009_table5_cr2o3_sample_16_activities_at_1950_2035_k": (
+        ("1950", "0.004"), ("2035", "0.036")
+    ),
+    "wang_2009_table5_cr2o3_sample_17_activities_at_1950_2035_k": (
+        ("1950", "0.003"), ("2035", "0.022")
+    ),
+    "wang_2009_table5_cr2o3_sample_18_activities_at_1950_2035_k": (
+        ("1950", "0.0005"), ("2035", "0.008")
+    ),
+    "wang_2009_table5_cr2o3_sample_19_activities_at_1950_2035_k": (
+        ("1950", "0.0016"), ("2035", "0.012")
+    ),
+    "wang_2009_table5_cr2o3_sample_20_activities_at_1950_2035_k": (
+        ("1950", "0.002"), ("2035", "0.018")
+    ),
+}
+
+
+def _assert_table5_activity_cells(extract: dict) -> None:
+    activity_rows = {
+        row["observation_id"]: row
+        for row in extract["species"]["Cr2O3"]["observations"]
+        if row["observation_id"].endswith("_activities_at_1950_2035_k")
+    }
+    assert set(activity_rows) == set(_EXPECTED_TABLE5_ACTIVITIES)
+    for observation_id, expected_points in _EXPECTED_TABLE5_ACTIVITIES.items():
+        row = activity_rows[observation_id]
+        sample = int(observation_id.split("_sample_")[1][:2])
+        assert row["units"] == "dimensionless activity as printed"
+        assert (
+            row["locator"]["page"],
+            row["locator"]["published_page"],
+            row["locator"]["table"],
+            row["locator"]["table_row_number"],
+            row["locator"]["table_column_number"],
+        ) == (5, 2237, "5", sample + 1, 5)
+        assert tuple(
+            (
+                str(point["T_K"]),
+                point["activity"],
+                (
+                    point["locator"]["page"],
+                    point["locator"]["published_page"],
+                    point["locator"]["table"],
+                    point["locator"]["table_row_number"],
+                    point["locator"]["table_column_number"],
+                ),
+            )
+            for point in row["values"]["points"]
+        ) == tuple(
+            (
+                temperature,
+                activity,
+                (5, 2237, "5", sample + 1, 5 if temperature == "1950" else 6),
+            )
+            for temperature, activity in expected_points
+        )
+
 
 def _page_text(page_number: int) -> str:
     return subprocess.run(
@@ -124,6 +228,7 @@ def _assert_render_pins(extract: dict, page2: str, page4: str, page5: str) -> No
         for row in rows
     }
     assert source_ids == table4_ids | table5_ids
+    _assert_table5_activity_cells(extract)
 
     assert "Table 1." in page2
     assert re.search(r"\b1\s+0\.062\b", page2)
@@ -239,29 +344,43 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
         for observation in rows
         if observation.value.kind is ValueKind.UNAVAILABLE
     }
-    expected_point_keys = {
-        (row["observation_id"], str(point["T_K"]))
-        for species in extract["species"].values()
-        for row in species["observations"]
-        for point in row.get("values", {}).get("points", [])
-        if isinstance(point.get("activity"), str)
+    expected_activity_points = {
+        (observation_id, temperature, activity)
+        for observation_id, points in _EXPECTED_TABLE5_ACTIVITIES.items()
+        for temperature, activity in points
     }
-    actual_point_keys = {
+    actual_activity_points = {
         (
             observation.observation_id.split("::", 1)[1].split("::T=", 1)[0],
             str(observation.identity.temperature_K.value),
+            str(observation.value.point),
         )
         for observation in rows
         if observation.value.kind is ValueKind.POINT
     }
     assert unavailable_ids == fit_ids
-    assert actual_point_keys == expected_point_keys
+    assert actual_activity_points == expected_activity_points
     unknown_quantity_ids = {
         observation.observation_id.split("::", 1)[1]
         for observation in rows
         if not observation.identity.quantity.is_value
     }
     assert unknown_quantity_ids == fit_ids
+    unavailable_reasons = {
+        observation.observation_id.split("::", 1)[1]: observation.value.unavailable_reason
+        for observation in rows
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    }
+    assert unavailable_reasons == {
+        observation_id: (
+            "declared quantity is unknown; unsupported quantity "
+            "'log_partial_pressure_temperature_fit_coefficients'; refusing to pick a number"
+            if observation_id.startswith("wang_2009_table4_")
+            else "declared quantity is unknown; unsupported quantity "
+            "'log_activity_temperature_fit_coefficients'; refusing to pick a number"
+        )
+        for observation_id in fit_ids
+    }
     assert all(observation.identity.species.phase.is_value for observation in rows)
 
     for observation in rows:

@@ -13,6 +13,86 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "sugawara-2011-sodium-silicate-fusion-mixing"
 EXTRACT = ROOT / f"data/literature/extracts/{SOURCE_ID}.yaml"
 
+_EXPECTED_GIBBS_PARAMETERS = (
+    ("h2", "−271.2 (117.2)", "kJ/mol"),
+    ("s2", "−1947.0 (161.6)", "J/K mol"),
+    ("h3", "3991.5 (367.2)", "kJ/mol"),
+    ("s3", "5972.7 (485.4)", "J/K mol"),
+    ("h4", "−6177.3 (550.9)", "kJ/mol"),
+    ("s4", "−8320.5 (707.1)", "J/K mol"),
+    ("h5", "3920.7 (398.7)", "kJ/mol"),
+    ("s5", "5468.3 (500.4)", "J/K mol"),
+    ("h6", "−932.8 (112.0)", "kJ/mol"),
+    ("s6", "−1392.9 (138.1)", "J/K mol"),
+)
+
+def _unsupported_quantity_refusal(quantity: str) -> str:
+    return f"declared quantity is unknown; unsupported quantity '{quantity}'; refusing to pick a number"
+
+
+_EXPECTED_UNAVAILABLE_REASONS = {
+    **{
+        observation_id: _unsupported_quantity_refusal(
+            "heat_of_fusion_per_gram_formula_as_printed"
+        )
+        for observation_id in (
+            "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+            "sugawara_2011_t2_na6si8o19_fusion_enthalpy",
+            "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+            "sugawara_2011_t2_na2si2o5_fusion_enthalpy",
+            "sugawara_2011_t1_na2sio3_heat_of_fusion",
+            "sugawara_2011_t2_na2sio3_fusion_enthalpy",
+        )
+    },
+    **{
+        observation_id: _unsupported_quantity_refusal(
+            "integral_enthalpy_of_mixing_as_printed"
+        )
+        for observation_id in (
+            "sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing",
+            "sugawara_2011_t1_na2si2o5_enthalpy_of_mixing",
+            "sugawara_2011_t1_na2sio3_enthalpy_of_mixing",
+            "sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing",
+        )
+    },
+    **{
+        observation_id: _unsupported_quantity_refusal(
+            "heat_capacity_per_gram_formula_as_printed"
+        )
+        for observation_id in (
+            "sugawara_2011_t2_na6si8o19_liquid_heat_capacity",
+            "sugawara_2011_t2_na2si2o5_liquid_heat_capacity",
+            "sugawara_2011_t2_na2sio3_liquid_heat_capacity",
+        )
+    },
+    **{
+        observation_id: _unsupported_quantity_refusal(
+            "heat_capacity_equation_per_gram_formula_as_printed"
+        )
+        for observation_id in (
+            "sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation",
+            "sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation",
+            "sugawara_2011_t2_na2sio3_solid_heat_capacity_equation",
+        )
+    },
+    **{
+        observation_id: _unsupported_quantity_refusal(
+            "solid_enthalpy_at_Tm_as_printed"
+        )
+        for observation_id in (
+            "sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_sio2_solid_enthalpy_at_tm",
+            "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
+        )
+    },
+    "sugawara_2011_t2_sio2_solid_heat_capacity_equation": (
+        "no mapped cp field selected; source fields: quantity, method_class, equation_as_printed, "
+        "formula_variable_as_printed, attribution, method_as_printed, temperature_as_printed"
+    ),
+}
+
 
 def _document():
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -24,6 +104,13 @@ def _source_rows(document):
         for species in document["species"].values()
         for row in species.get("observations", [])
     }
+
+
+def _assert_gibbs_parameter_pins(model: dict) -> None:
+    assert tuple(
+        (parameter["name"], parameter["full_value_as_published"], parameter["unit"])
+        for parameter in model["values"]["parameters"]
+    ) == _EXPECTED_GIBBS_PARAMETERS
 
 
 def _migrated_rows():
@@ -131,8 +218,7 @@ def test_printed_rows_and_render_pins():
         for row in document["species"]["Na2O"]["context"]
         if row["observation_id"] == "sugawara_2011_t3_gibbs_mixing_coefficients"
     )
-    h2 = model["values"]["parameters"][0]
-    assert h2["full_value_as_published"] == "−271.2 (117.2)"
+    _assert_gibbs_parameter_pins(model)
     assert model["locator"]["page"] == 5
     assert model["locator"]["table"] == "3"
 
@@ -295,11 +381,17 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
     for observation_id in per_gfw_cpg:
         assert migrated[observation_id].value.kind is ValueKind.UNAVAILABLE
         assert not migrated[observation_id].identity.quantity.is_value
-    assert all(
-        row.value.unavailable_reason
-        for row in migrated.values()
+    assert {
+        observation_id: row.value.unavailable_reason
+        for observation_id, row in migrated.items()
         if row.value.kind is ValueKind.UNAVAILABLE
-    )
+    } == _EXPECTED_UNAVAILABLE_REASONS
+    sio2_solid_cp = migrated["sugawara_2011_t2_sio2_solid_heat_capacity_equation"]
+    assert sio2_solid_cp.value.kind is ValueKind.UNAVAILABLE
+    assert sio2_solid_cp.identity.quantity.is_value
+    assert sio2_solid_cp.value.unavailable_reason == _EXPECTED_UNAVAILABLE_REASONS[
+        "sugawara_2011_t2_sio2_solid_heat_capacity_equation"
+    ]
     assert migrated["sugawara_2011_t2_sio2_liquid_heat_capacity"].value.point == Decimal("81.37")
     for observation_id, expected in (
         ("sugawara_2011_t1_na2si2o5_heat_of_fusion", Decimal("0.7")),
