@@ -444,11 +444,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 5.1 ± 0.3 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -498,11 +518,21 @@ species:
             section: Results
             row: Na at 1200° K
             note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+        method:
+          state:
+            tag: value
+            value: "Partial pressures of the observed species were estimated following the procedure described in reference [6]."
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+        references:
+          - "G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6]."
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
-          but the intermediate current and calibration inputs are not printed.
+        method_class: measured_reduced
+        attribution: "Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate KEMS ion-current and calibration inputs are not printed."
         gas_species: Na(g)
         formula: Na
         points:
@@ -2873,11 +2903,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as ~ 40 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -2924,11 +2974,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 21 ± 1 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -2975,11 +3045,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 15.0 ± 0.8 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3026,11 +3116,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 18.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3077,11 +3187,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 15.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3128,11 +3258,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 15.5 ± 1.0 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3179,11 +3329,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as ~ 15 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3242,11 +3412,19 @@ species:
             pdf_page_index: 12
             section: Results
             note: The individual I+80/I+78 ratios are not printed; only their average is reported.
+        method:
+          state:
+            tag: value
+            value: "The I+80/I+78 ion-intensity ratio measured at three temperatures; the reported value is their average."
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
       values:
         quantity: ion_intensity_ratio
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; this is the reported average of three ratios, while the
-          individual ratios are not printed.
+        method_class: measured_reduced
+        attribution: "Authors' reported average of the measured I+80/I+78 ion-intensity ratios at three temperatures; the individual ratios are not printed."
         ion_pair: I+80/I+78
         ion_intensity_ratio: '10.2'
         ion_intensity_ratio_as_printed: '10.2'
@@ -3700,11 +3878,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 6.0 ± 0.3 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -3754,11 +3952,21 @@ species:
             section: Results
             row: K at 1200° K
             note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+        method:
+          state:
+            tag: value
+            value: "Partial pressures of the observed species were estimated following the procedure described in reference [6]."
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+        references:
+          - "G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6]."
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
-          but the intermediate current and calibration inputs are not printed.
+        method_class: measured_reduced
+        attribution: "Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate KEMS ion-current and calibration inputs are not printed."
         gas_species: K(g)
         formula: K
         points:
@@ -4424,11 +4632,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 12.5 ± 0.3 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -4473,11 +4701,31 @@ species:
             note: The prose appearance-potential statement gives no experiment temperature.
       uncertainty:
         note: Printed as 12.0 ± 0.8 eV; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; the prose reports the SiO appearance potential determined
-          from the ionization-efficiency curve by linear extrapolation; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -4663,11 +4911,31 @@ species:
             note: Table II gives no temperature for the appearance-potential measurement.
       uncertainty:
         note: Printed as 8.0 ± 0.3 eV where a width is shown; confidence level not stated.
+      derivation:
+        relation: "Appearance potential reduced by linear extrapolation of the ionization-efficiency curve on the Hg+-calibrated energy scale."
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
+            note: "The ionization-efficiency curve points in Figures 2–4 are not tabulated; the appearance potential is determined by linear extrapolation."
+        method:
+          state:
+            tag: value
+            value: "Ionization potentials were determined by linear extrapolation, using Hg+ as a standard to calibrate the energy scale."
+          locator:
+            page: 12
+            published_page: 534
+            pdf_page_index: 11
+            section: Results
       values:
         quantity: appearance_potential_as_published
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; Table II appearance potentials are determined by linear
-          extrapolation from Figures 2–4 on the Hg+ standard energy scale; curve points are not tabulated.
+        method_class: measured_reduced
+        attribution: "Authors' appearance potential determined from the ionization-efficiency curve by linear extrapolation, using Hg+ to calibrate the energy scale; curve points are not tabulated."
         admission_status: typed_refusal
         status: typed_refusal
         refusal_reason: No exact appearance-potential quantity token exists; this row is preserved without binding a near-miss
@@ -4717,11 +4985,21 @@ species:
             section: Results
             row: Fe at 2000° K
             note: The intermediate ion-current and calibration inputs used for this estimate are not printed in this paper.
+        method:
+          state:
+            tag: value
+            value: "Partial pressures of the observed species were estimated following the procedure described in reference [6]."
+          locator:
+            page: 13
+            published_page: 535
+            pdf_page_index: 12
+            section: Results
+        references:
+          - "G. De Maria, M. Guido, L. Malaspina and B. Pesce (1965), J. Chem. Phys. 43, 4449 [6]."
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
-        attribution: De Maria and Piacente (1969), present study; partial pressures are estimated following reference [6],
-          but the intermediate current and calibration inputs are not printed.
+        method_class: measured_reduced
+        attribution: "Authors' own partial-pressure estimates, made using the procedure described in reference [6]; the intermediate KEMS ion-current and calibration inputs are not printed."
         gas_species: Fe(g)
         formula: Fe
         points:
