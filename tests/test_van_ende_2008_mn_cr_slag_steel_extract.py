@@ -150,6 +150,26 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
     result = migrator.result
     observations = [row for row in result.observations.values() if row.source_id == EXTRACT.stem]
     assert len(observations) == 189
+    combined_bulk_reason = (
+        "Complete combined initial bulk is not reported: Table 2 omits Fe and gives "
+        "no Fe-balance statement. Table 3 contains the slag charge only; Table 4 "
+        "contains the measured equilibrated output and cannot serve as its own input."
+    )
+    migrated_by_id = {
+        row.observation_id.split("::", 1)[1]: row for row in observations
+    }
+    source_by_id = {row["observation_id"]: row for row in _observations(document)}
+    for observation_id in (
+        "van_ende_2008_1-1_slag_SiO2",
+        "van_ende_2008_6-2_metal_Mn",
+    ):
+        row = migrated_by_id[observation_id]
+        source_composition = source_by_id[observation_id]["values"]["composition"]
+        assert source_composition["state"]["tag"] == "unknown"
+        assert source_composition["locator"]["table"] == "2"
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_unknown
+        assert row.identity.composition.reason == combined_bulk_reason
     assert sum(row.identity.quantity.value.value == "equilibrium_phase_composition" for row in observations) == 151
     assert sum(row.identity.quantity.value.value == "distribution_ratio" for row in observations) == 38
     assert sum(

@@ -171,6 +171,19 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: &van_ende_2008_unreported_combined_bulk
+            state:
+              tag: unknown
+              reason: >-
+                Complete combined initial bulk is not reported: Table 2 omits Fe and gives
+                no Fe-balance statement. Table 3 contains the slag charge only; Table 4
+                contains the measured equilibrated output and cannot serve as its own input.
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: '1333'
+              table: '2'
+              note: "Table 2 prints Mn, Cr, C, Ni, Si, N, and Al; it gives no Fe value or balance entry."
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -241,6 +254,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -311,6 +325,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -381,6 +396,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -451,6 +467,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -521,6 +538,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -591,6 +609,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -661,6 +680,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -731,6 +751,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -801,6 +822,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -871,6 +893,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -941,6 +964,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1011,6 +1035,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1081,6 +1106,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1151,6 +1177,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1221,6 +1248,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1291,6 +1319,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1361,6 +1390,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1431,6 +1461,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: SiO2
           phase_label: slag
@@ -1844,6 +1875,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -1937,6 +1969,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2030,6 +2063,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2123,6 +2157,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2216,6 +2251,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2309,6 +2345,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2402,6 +2439,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2495,6 +2533,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2588,6 +2627,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2681,6 +2721,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2774,6 +2815,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2867,6 +2909,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -2960,6 +3003,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3053,6 +3097,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3146,6 +3191,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3239,6 +3285,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3332,6 +3379,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3425,6 +3473,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3518,6 +3567,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Mn
           phase_label: metal
@@ -3613,6 +3663,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -3706,6 +3757,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -3799,6 +3851,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -3892,6 +3945,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -3985,6 +4039,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4078,6 +4133,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4171,6 +4227,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4264,6 +4321,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4357,6 +4415,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4450,6 +4509,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4543,6 +4603,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4636,6 +4697,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4729,6 +4791,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4822,6 +4885,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -4915,6 +4979,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -5008,6 +5073,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -5101,6 +5167,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -5194,6 +5261,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -5287,6 +5355,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: Cr
           phase_label: metal
@@ -5382,6 +5451,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5452,6 +5522,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5522,6 +5593,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5592,6 +5664,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5662,6 +5735,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5732,6 +5806,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5802,6 +5877,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5872,6 +5948,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -5942,6 +6019,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6012,6 +6090,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6082,6 +6161,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6152,6 +6232,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6222,6 +6303,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6292,6 +6374,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6362,6 +6445,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6432,6 +6516,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6502,6 +6587,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6572,6 +6658,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6642,6 +6729,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MgO
           phase_label: slag
@@ -6714,6 +6802,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -6784,6 +6873,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -6854,6 +6944,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -6924,6 +7015,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -6994,6 +7086,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7064,6 +7157,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7134,6 +7228,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7204,6 +7299,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7274,6 +7370,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7344,6 +7441,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7414,6 +7512,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7484,6 +7583,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7554,6 +7654,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7624,6 +7725,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7694,6 +7796,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7764,6 +7867,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7834,6 +7938,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7904,6 +8009,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -7974,6 +8080,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: MnO
           phase_label: slag
@@ -8046,6 +8153,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8116,6 +8224,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8186,6 +8295,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8256,6 +8366,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8326,6 +8437,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8396,6 +8508,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8466,6 +8579,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8536,6 +8650,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8606,6 +8721,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8676,6 +8792,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8746,6 +8863,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8816,6 +8934,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8886,6 +9005,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -8956,6 +9076,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9026,6 +9147,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9096,6 +9218,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9166,6 +9289,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9236,6 +9360,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9306,6 +9431,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CrO1.5
           phase_label: slag
@@ -9378,6 +9504,7 @@ species:
           row: 1-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9448,6 +9575,7 @@ species:
           row: 1-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9518,6 +9646,7 @@ species:
           row: 1-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9588,6 +9717,7 @@ species:
           row: 1-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9658,6 +9788,7 @@ species:
           row: 2-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9728,6 +9859,7 @@ species:
           row: 2-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9798,6 +9930,7 @@ species:
           row: 2-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9868,6 +10001,7 @@ species:
           row: 3-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -9938,6 +10072,7 @@ species:
           row: 3-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10008,6 +10143,7 @@ species:
           row: 3-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10078,6 +10214,7 @@ species:
           row: 3-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10148,6 +10285,7 @@ species:
           row: 4-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10218,6 +10356,7 @@ species:
           row: 4-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10288,6 +10427,7 @@ species:
           row: 4-3
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10358,6 +10498,7 @@ species:
           row: 4-4
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10428,6 +10569,7 @@ species:
           row: 5-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10498,6 +10640,7 @@ species:
           row: 5-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10568,6 +10711,7 @@ species:
           row: 6-1
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10638,6 +10782,7 @@ species:
           row: 6-2
         units: mass_percent
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: CaO
           phase_label: slag
@@ -10710,6 +10855,7 @@ species:
           row: 1-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -10780,6 +10926,7 @@ species:
           row: 1-3
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -10850,6 +10997,7 @@ species:
           row: 1-4
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -10920,6 +11068,7 @@ species:
           row: 2-1
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -10990,6 +11139,7 @@ species:
           row: 2-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11060,6 +11210,7 @@ species:
           row: 2-3
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11130,6 +11281,7 @@ species:
           row: 3-1
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11200,6 +11352,7 @@ species:
           row: 3-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11270,6 +11423,7 @@ species:
           row: 3-3
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11340,6 +11494,7 @@ species:
           row: 3-4
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11410,6 +11565,7 @@ species:
           row: 4-1
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11480,6 +11636,7 @@ species:
           row: 4-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11550,6 +11707,7 @@ species:
           row: 4-3
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11620,6 +11778,7 @@ species:
           row: 4-4
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11690,6 +11849,7 @@ species:
           row: 5-1
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11760,6 +11920,7 @@ species:
           row: 5-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11830,6 +11991,7 @@ species:
           row: 6-1
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
@@ -11900,6 +12062,7 @@ species:
           row: 6-2
         units: ppm
         values:
+          composition: *van_ende_2008_unreported_combined_bulk
           quantity: equilibrium_phase_composition
           formula: O
           phase_label: metal
