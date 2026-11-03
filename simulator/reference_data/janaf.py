@@ -134,6 +134,8 @@ PAGE_READ_SIGN_MAGNITUDE_MISMATCH_KIND = "page_read_sign_magnitude_mismatch"
 PAGE_READ_SIGN_MAGNITUDE_MISMATCH_REASON = (
     "page-read sign magnitude does not match the text-layer magnitude"
 )
+# Chase 1998, NIST-JANAF 4th ed., Monograph 9, p. 10 §3.4; retain the
+# printed source-era gas constant used to reproduce JANAF identities.
 JANAF_R_J_MOL_K = Decimal("8.31441")
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")

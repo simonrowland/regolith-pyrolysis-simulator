@@ -9,14 +9,16 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from simulator.reference_data.janaf import SIDECAR_PATH, TABLES_DIR, load_table_document
+from simulator.reference_data.janaf import (
+    JANAF_R_J_MOL_K as JANAF_R_J_PER_MOL_K,
+    SIDECAR_PATH,
+    TABLES_DIR,
+    load_table_document,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
-# Chase 1998, NIST-JANAF 4th ed., Monograph 9, p. 10 §3.4: R in the
-# printed JANAF identities is 8.31441 J/(mol K). Keep that source value for
-# fusion and reference-state conversions; do not substitute a newer constant.
-JANAF_R_J_PER_MOL_K = Decimal("8.31441")
+# Preserve the fusion module's existing name while sharing janaf.py's value.
 
 _FUSION_TABLES = {
     "CaO": ("Ca-027", "Ca-028"),
