@@ -51,10 +51,8 @@ def test_survey_antoine_sample_is_pinned_as_float_hex():
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_hex"),
     (
-        ("Na", 1000.0, "0x1.160a226c438ffp+14"),
         ("K", 900.0, "0x1.777ea4a15c5ebp+14"),
         ("Mg", 1200.0, "0x1.585d52b026f95p+14"),
-        ("Na", 1200.0, "0x1.ca9a35618cac1p+16"),
     ),
 )
 def test_normalized_runtime_callers_keep_bit_identical_antoine_pins(
@@ -170,7 +168,6 @@ def test_alphamelts_activity_diagnostic_antoine_reference_pins(
 
 def test_species_rail_antoine_evaluator_pins_real_rows(vapor_pressure_data):
     rows = (
-        ("Na", 1000.0, "0x1.160a226c438ffp+14"),
         ("K", 900.0, "0x1.777ea4a15c5ebp+14"),
         ("Mg", 1200.0, "0x1.585d52b026f95p+14"),
     )
@@ -332,7 +329,6 @@ def test_melt_effect_antoine_forms_keep_stull_pressure_pins():
 
 def test_vapour_catalog_antoine_log_and_boundary_pins(vapor_pressure_data):
     rows = (
-        ("Na", 1000.0, "0x1.1004b22108244p+2"),
         ("K", 900.0, "0x1.185ec2f3c3cafp+2"),
         ("Mg", 1200.0, "0x1.15f6f66eb80bbp+2"),
     )
@@ -346,22 +342,25 @@ def test_vapour_catalog_antoine_log_and_boundary_pins(vapor_pressure_data):
         assert reference.log10_pressure(temperature_K).hex() == expected_hex
 
     evaluator = CompiledPressureEvaluator(
-        species_id="Na",
+        species_id="K",
         evaluator_family="antoine",
         pressure_observable=PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE,
         species_basis="pure_component",
-        valid_temperature_K=(924.0, 1118.0),
+        valid_temperature_K=(679.4, 1033.0),
         validation_status=ValidationStatus.VALIDATED,
-        reference_model=references["Na"],
+        reference_model=references["K"],
         extrapolation_policy=DEFAULT_EXTRAPOLATION_POLICY,
         out_of_range_status="extrapolated",
         acquisition_flag="",
     )
+    # Outside K's certified window the catalog still continues on the
+    # reciprocal-temperature tangent of the unchanged potassium sidecar.
+    assert evaluator.evaluate(1200.0).status == "extrapolated"
     assert evaluator._reciprocal_T_tangent_log10(1200.0).hex() == (
-        "0x1.452f3dc163188p+2"
+        "0x1.67dd2379bb9e0p+2"
     )
     assert evaluator.evaluate(1200.0).pressure_pa.hex() == (
-        "0x1.d6b9eb0b55a4cp+16"
+        "0x1.99cce064d4aa2p+18"
     )
     pressure_rows = (
         ("K", 900.0, (679.4, 1033.0), "0x1.777ea4a15c5ebp+14"),

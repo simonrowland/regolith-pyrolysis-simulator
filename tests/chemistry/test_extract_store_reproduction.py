@@ -1711,11 +1711,11 @@ def test_normal_boiling_point_inverts_antoine_in_kelvin(
     assert record.units == "K"
     assert residual_dex(record) is None
     assert residual_K(record) is not None
-    # Sanity: Na NIST 1156 K vs sidecar inversion ~1179.58 K (short
-    # extrapolation past the 924–1118 K certified window).
+    # Browning-Potter root at 101325 Pa is 1154.691 K (Fink recommends
+    # 1154.7 ± 1.3 K). The observation anchor stays the 1156 K boiling point.
     assert record.expected_value == pytest.approx(1156.0)
-    assert record.actual_value == pytest.approx(1179.584731, abs=1e-4)
-    assert record.residual == pytest.approx(23.584731, abs=1e-4)
+    assert record.actual_value == pytest.approx(1154.691147, abs=1e-3)
+    assert record.residual == pytest.approx(1154.691147 - 1156.0, abs=1e-3)
 
 
 def test_silicate_melt_class_does_not_pin_a_pure_component_nbp(

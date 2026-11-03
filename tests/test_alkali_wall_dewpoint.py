@@ -12,30 +12,27 @@ invariant 7 — not on the simulator's own output:
   (Clausius-Clapeyron, dH_vap > 0), so any wall above the normal boiling
   point has P_sat > 1 atm >= p_i for ANY admissible p_i <= P_total. This
   argument alone settles the sign; the Antoine sidecar only has to be sane.
-- The Antoine coefficients themselves come from the literature sidecar
-  data/vapor_pressures.yaml::pure_component_antoine (NIST SRD 69 fits),
-  evaluated here by hand, independent of the simulator's code path.
+- Potassium's Antoine coefficients come from the literature sidecar
+  data/vapor_pressures.yaml::pure_component_antoine (NIST SRD 69),
+  evaluated here by hand. Sodium's pure saturation is the Browning-Potter
+  equation written below, also evaluated by hand, independent of the
+  simulator's code path.
 
-Dew-point derivation (premise -> Antoine inversion -> units -> sanity):
+Dew-point derivation (premise -> published curve -> units -> sanity):
 
   Premise:   ideal-gas mixture at P_total = 10 mbar = 1000 Pa, so by Dalton
              p_i <= P_total = 1000 Pa for every species i. The dew point at
              the MAX admissible p_i = 1000 Pa is the highest possible dew
              point; if that is below the wall band, every admissible mixture
              is undersaturated on those walls.
-  Relation:  the sidecar Antoine form is log10(P_sat / Pa) = A - B/(T_K + C)
-             (simulator/condensation.py::_antoine_psat_pa returns
-             10.0 ** (A - B / (T_K + C)), P in Pa, T in K).
-  Inversion: T_dew_K(p) = B / (A - log10(p / Pa)) - C.
-  Units:     A, B, C as tabulated are already in the Pa/K convention of the
-             sidecar (the NIST bar fits were converted by A += 5, per the
-             sidecar source strings), so p enters in Pa and T_dew comes out
-             in K; C carries the Kelvin offset of the shifted Antoine form.
-  Sanity:    inverting at p = 101325 Pa must reproduce the external normal
-             boiling points (Na 883 C, K 759 C) — checked below. At
-             p = 1000 Pa the inversion gives Na 836.4 K = 563.3 C and
-             K 702.4 K = 429.2 C, both far below the 1500-1650 C wall band
-             (and consistent with the commit's "~651 C / ~429 C" wording).
+  Potassium: log10(P_sat / Pa) = A - B/(T_K + C), inverted as
+             T_dew_K(p) = B / (A - log10(p / Pa)) - C.
+  Sodium:    ln(P/MPa) = 11.9463 - 12633.73/T - 0.4672 ln T, inverted by
+             bisection of that published equation.
+  Sanity:    at 101325 Pa the curves land on the external normal boiling
+             points (Na 883 C, K 759 C). At 1000 Pa, potassium inverts to
+             702.4 K and sodium's published root is about 803 K. Both sit
+             far below the 1500-1650 C wall band.
 
 Mirrored pattern: tests/test_coating_rate.py:364-370 asserts mol_s == 0.0
 AND p_i <= P_total AND supersaturated is False — a mechanism assertion, not
@@ -107,23 +104,62 @@ def _antoine_dew_point_K(coeff: dict, pressure_pa: float) -> float:
     ) - float(coeff.get("C", 0.0))
 
 
+# Fink & Leibowitz ANL/RE-95/2 §1.2 Eq. (1), written here, not imported.
+_NA_A = 11.9463
+_NA_B = 12633.73
+_NA_C = 0.4672
+
+
+def _browning_potter_psat_pa(temperature_K: float) -> float:
+    ln_p_mpa = _NA_A - _NA_B / temperature_K - _NA_C * math.log(temperature_K)
+    return 1.0e6 * math.exp(ln_p_mpa)
+
+
+def _browning_potter_dew_point_K(pressure_pa: float) -> float:
+    low = 400.0
+    high = 2000.0
+    for _step in range(80):
+        mid = 0.5 * (low + high)
+        if _browning_potter_psat_pa(mid) < pressure_pa:
+            low = mid
+        else:
+            high = mid
+    return 0.5 * (low + high)
+
+
+def _hand_psat_pa(species: str, temperature_K: float) -> float:
+    if species == "Na":
+        return _browning_potter_psat_pa(temperature_K)
+    return _antoine_psat_pa(_antoine_coefficients(species), temperature_K)
+
+
+def _hand_dew_point_K(species: str, pressure_pa: float) -> float:
+    if species == "Na":
+        return _browning_potter_dew_point_K(pressure_pa)
+    return _antoine_dew_point_K(_antoine_coefficients(species), pressure_pa)
+
+
 @pytest.mark.parametrize("species", ["Na", "K"])
 def test_antoine_sidecar_recovers_external_normal_boiling_point(
     species: str,
 ) -> None:
-    # Grounding for everything else in this file: the sidecar coefficients,
+    # Grounding for everything else in this file: the published curve,
     # inverted at 1 atm, must land on the externally known normal boiling
-    # point (Na 883 C, K 759 C). 5% in K covers the short extrapolation of
-    # the Na NIST fit (certified 924-1118 K; its boiling point is 1156 K)
-    # and the in-range K fit (certified 679.4-1033 K; boiling 1032 K).
-    coeff = _antoine_coefficients(species)
+    # point (Na 883 C, K 759 C). 5% in K covers potassium's in-range fit
+    # and the sodium equation's 1154.7 K root against the 1156 K anchor.
     external_boiling_K = (
         ALKALI_EXTERNAL_ANCHORS[species]["normal_boiling_point_C"]
         + CELSIUS_TO_KELVIN
     )
+    if species == "Na":
+        block = _vapor_pressure_data()["metals"]["Na"]["pure_component_saturation"]
+        assert block["ln_p_mpa"]["a"] == _NA_A
+        assert block["ln_p_mpa"]["b"] == _NA_B
+        assert block["ln_p_mpa"]["c"] == _NA_C
+    else:
+        assert _antoine_coefficients(species)["source"]
 
-    assert coeff["source"]
-    assert _antoine_dew_point_K(coeff, PA_PER_ATM) == pytest.approx(
+    assert _hand_dew_point_K(species, PA_PER_ATM) == pytest.approx(
         external_boiling_K,
         rel=0.05,
     )
@@ -133,13 +169,10 @@ def test_antoine_sidecar_recovers_external_normal_boiling_point(
 def test_dew_point_at_max_admissible_partial_pressure_is_below_wall_band(
     species: str,
 ) -> None:
-    coeff = _antoine_coefficients(species)
-
     # Highest admissible dew point: p_i = P_total = 10 mbar = 1000 Pa.
-    # Inversion: T_dew = B/(A - log10(1000 Pa)) - C  (Pa in, K out).
-    #   Na: 1873.728/(7.460770 - 3) + 416.372 = 836.4 K = 563.3 C
+    #   Na: root of the Browning-Potter equation, about 803 K.
     #   K:  4691.58/(9.457180 - 3) - 24.195   = 702.4 K = 429.2 C
-    t_dew_K = _antoine_dew_point_K(coeff, TOTAL_PRESSURE_PA)
+    t_dew_K = _hand_dew_point_K(species, TOTAL_PRESSURE_PA)
 
     # Mechanism, not the number: the dew point sits hundreds of K below the
     # coolest wall in the band (actual margins: Na 937 K, K 1071 K).
@@ -161,7 +194,6 @@ def test_wall_driving_force_is_zero_via_dewpoint_relation(
     wall_temperature_C: float,
 ) -> None:
     vapor_data = _vapor_pressure_data()
-    coeff = vapor_data["metals"][species]["pure_component_antoine"]
     wall_temperature_K = wall_temperature_C + CELSIUS_TO_KELVIN
     # Worst case over all admissible mixtures: the driving force
     # max(0, p_i - P_sat) is monotonically nondecreasing in p_i, so proving
@@ -201,9 +233,9 @@ def test_wall_driving_force_is_zero_via_dewpoint_relation(
     #     undersaturation is verified against the hand-evaluated sidecar fit,
     #     and the simulator's P_sat is that same published fit, not a
     #     substitute surface.
-    assert _antoine_psat_pa(coeff, wall_temperature_K) > p_i_pa
+    assert _hand_psat_pa(species, wall_temperature_K) > p_i_pa
     assert p_sat_pa == pytest.approx(
-        _antoine_psat_pa(coeff, wall_temperature_K),
+        _hand_psat_pa(species, wall_temperature_K),
         rel=1e-9,
     )
     assert p_sat_pa > p_i_pa
@@ -219,9 +251,8 @@ def test_wall_driving_force_turns_positive_below_the_dew_point(
     # return the full undersaturation gap p_i - P_sat(T) > 0 — proving the
     # in-band zero is the dew-point relation evaluating live for Na/K.
     vapor_data = _vapor_pressure_data()
-    coeff = vapor_data["metals"][species]["pure_component_antoine"]
     p_i_pa = TOTAL_PRESSURE_PA
-    below_dew_K = _antoine_dew_point_K(coeff, p_i_pa) - 20.0
+    below_dew_K = _hand_dew_point_K(species, p_i_pa) - 20.0
 
     driving_pa = _wall_deposition_driving_pressure_pa(
         species,
@@ -230,7 +261,7 @@ def test_wall_driving_force_turns_positive_below_the_dew_point(
         vapor_pressure_data=vapor_data,
     )
 
-    expected_pa = p_i_pa - _antoine_psat_pa(coeff, below_dew_K)
+    expected_pa = p_i_pa - _hand_psat_pa(species, below_dew_K)
     assert expected_pa > 0.0
     assert driving_pa == pytest.approx(expected_pa, rel=1e-9)
 
@@ -307,6 +338,6 @@ def test_shadow_records_show_zero_alkali_wall_flux_via_dewpoint(
             assert record["wall_saturation_pressure_refused"] is False
             assert p_sat_pa > p_i_pa
             assert p_sat_pa == pytest.approx(
-                _antoine_psat_pa(_antoine_coefficients(species), wall_K),
+                _hand_psat_pa(species, wall_K),
                 rel=1e-9,
             )

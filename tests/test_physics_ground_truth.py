@@ -408,8 +408,6 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_pa", "rel_tol"),
     [
-        # NIST Chemistry WebBook SRD 69, sodium Antoine row, Rodebush and Walters 1930.
-        ("Na", 1118.0, 61_691.685390, 1e-6),
         # NIST Chemistry WebBook SRD 69, potassium Antoine row, Fiock and Rodebush 1926.
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
@@ -789,9 +787,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
             assert "pure_component_first_principles" not in label
             assert "extrapolated_beyond_source" in label
 
-    # t-383: Na joins K on standard_reaction_term for the runtime selector.
-    # NIST Rodebush pure-component sidecar stays wall-only (wall_condensation
-    # / pure_component_antoine point tests); runtime coefficient block is antoine.
+    # t-383: Na joins K on standard_reaction_term for the melt selector.
+    # Pure-Na saturation is the Browning-Potter owner, not that reaction term.
     na_metal = data["metals"]["Na"]
     _, na_block = vapor_pressure_antoine_coefficients(na_metal, 1429.0)
     assert na_block == "antoine"
@@ -804,18 +801,14 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         )
         == "builtin_fallback:standard_reaction_term"
     )
-    # Pure-component provenance tier still honest when the sidecar is selected.
-    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+    from engines.builtin.sodium_saturation import sodium_saturation_pressure
 
-    _, na_pure_block = wall_condensation_antoine_coefficients(na_metal, 1118.0)
-    assert na_pure_block == "pure_component_antoine"
-    na_pure_label = vapor_pressure_source_label(
-        "builtin_fallback",
-        na_metal,
-        coefficient_block=na_pure_block,
-        temperature_K=1118.0,
+    na_saturation = sodium_saturation_pressure(
+        na_metal["pure_component_saturation"], 1118.0
     )
-    assert "pure_component_source_equation_fit" in na_pure_label
+    assert na_saturation.authority == "certified"
+    assert na_saturation.phase == "liquid"
+    assert "pure_component_antoine" not in na_metal
 
     k_metal = data["metals"]["K"]
     _, k_block = vapor_pressure_antoine_coefficients(k_metal, 1429.0)
@@ -847,9 +840,11 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         assert "pure_component_unspecified" not in label
         assert "pure_component_first_principles" not in label
 
-    # t-383: runtime selector returns standard_reaction antoine for Na; force the
-    # pure-component sidecar block to exercise the unspecified-tier path.
-    unannotated = copy.deepcopy(data["metals"]["Na"])
+    # The unspecified tier is the label function when a grounded pure-component
+    # sidecar has no provenance class. Sodium's sidecar is retired, so this
+    # uses potassium's NIST row and strips its tier annotation. 900 K is inside
+    # that row's 679.4-1033 K band.
+    unannotated = copy.deepcopy(data["metals"]["K"])
     unannotated["pure_component_antoine"].pop("provenance_class", None)
     unannotated["pure_component_antoine"].pop("source_certification", None)
     unannotated_block = "pure_component_antoine"
@@ -857,7 +852,7 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
         "builtin_fallback",
         unannotated,
         coefficient_block=unannotated_block,
-        temperature_K=1118.0,
+        temperature_K=900.0,
     )
     assert unannotated_label == "builtin_fallback:pure_component_unspecified"
     assert "pure_component_first_principles" not in unannotated_label

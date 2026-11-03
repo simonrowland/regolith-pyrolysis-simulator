@@ -32,15 +32,15 @@ UNCALIBRATED_MARGIN_ERROR_INFLATION = 2.0
 # boundary buffer until t-126 provides registry-backed surfaces.
 LIQUID_FRACTION_BOUNDARY_BUFFER = 0.02
 
-# data/vapor_pressures.yaml records Na boiling_point_C=883 from the
-# NIST Chemistry WebBook SRD 69 Rodebush and Walters 1930 sodium row (C7440235).
-# data/vapor_pressures.yaml records K boiling_point_C=759 from the
-# NIST Chemistry WebBook SRD 69 Fiock and Rodebush 1926 potassium row (C7440097).
+# Diagnostic boiling thresholds, not saturation-pressure calculators.
+# Na 883 C is the normal boiling point (1156 K). Fink's Browning-Potter
+# equation recovers about 1154.7 K at 1 atm. K 759 C remains the NIST
+# Fiock and Rodebush potassium row.
 ALKALI_BOILING_THRESHOLDS_K = MappingProxyType(
     {
         "Na": {
             "threshold_K": 883.0 + 273.15,
-            "source": "data/vapor_pressures.yaml NIST WebBook SRD 69 sodium row",
+            "source": "data/vapor_pressures.yaml boiling_point_C 883",
         },
         "K": {
             "threshold_K": 759.0 + 273.15,

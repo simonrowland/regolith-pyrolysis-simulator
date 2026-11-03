@@ -229,16 +229,19 @@ def test_predict_flag_wall_values_keep_source_fit_and_authority(temperature, pre
     assert diagnostic["wall_saturation_pressure_refused"] is False
 
 
-def test_predict_flag_cold_na_pole_is_unavailable_with_band():
+def test_predict_flag_cold_na_is_a_flagged_number():
     diagnostic = {}
     condensation._wall_deposition_driving_pressure_pa(
         "Na", 100.0, 298.15, diagnostic_out=diagnostic,
     )
-    assert diagnostic["wall_saturation_pressure_pa"] is None
+    pressure = diagnostic["wall_saturation_pressure_pa"]
+    assert pressure is not None and math.isfinite(pressure) and pressure > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
     notice = diagnostic["wall_saturation_pressure_notice"]
-    assert notice["authority_level"] == "unavailable"
-    assert notice["valid_range_K"] == [924.0, 1118.0]
-    assert "no extrapolation available" in notice["reason"]
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["valid_range_K"]) == (864.0, 2499.0)
+    assert "24%" in notice["notice"]
+    assert "fusion" in notice["notice"]
 
 
 @pytest.mark.parametrize("invalid_value", [None, float("nan")], ids=["missing_B", "nan_B"])
@@ -336,11 +339,16 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert wall["authoritative_for_coating"] is False
         assert wall["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
         refused = wall["wall_saturation_pressure_refusals_by_species"]
-        assert {"Na", "Al2"} <= refused.keys()
-        assert any(
-            "no extrapolation available" in record["reason"]
-            for record in refused["Na"].values()
-        )
+        # Sodium's cold wall is the Browning-Potter saturation, flagged outside
+        # 864-2499 K. It is no longer the retired Antoine pole refusal.
+        assert "Na" not in refused
+        na_wall = wall["wall_saturation_pressure_extrapolations_by_species"].get("Na", {})
+        assert na_wall
+        for record in na_wall.values():
+            assert record["authority_level"] == "extrapolated"
+            assert tuple(record["valid_range_K"]) == (864.0, 2499.0)
+            assert "24%" in str(record.get("notice") or "")
+        assert "Al2" in refused
         # Al2 has no reactive-product backstop, so reactivity metadata is not
         # applicable.  Its real reversible wall route instead refuses because
         # the available reaction-term source is not a wall saturation curve.
@@ -364,7 +372,14 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         assert transport["Si"]["evaporation"]["authority_level"] == "extrapolated"
     pareto = document["run_metadata"]["pressure_coating_pareto_diagnostic"]["by_species"]
     assert pareto["Mg"]["authority_level"] == "extrapolated"
-    assert pareto["Na"]["status"] == "unavailable"
+    # The cold wall flags Na. The coating pareto does not promote an
+    # unavailable flux (Na is absent from that series) into a status of
+    # extrapolated; the extrapolation record and its authority still travel.
+    na_pareto = pareto["Na"]
+    assert na_pareto["status"] == "unavailable", na_pareto
+    assert na_pareto["authority_level"] == "extrapolated", na_pareto
+    assert "wall_saturation_pressure_refusals" not in na_pareto
+    assert na_pareto["wall_saturation_pressure_extrapolations"]
     assert pareto["Al2"]["status"] == "unavailable"
     assert pareto["SiO"]["vapour_pressure_extrapolation_notice"]["authority_level"] == "extrapolated"
     if hours == 24:
@@ -522,10 +537,29 @@ def test_sio_wall_temperature_diagnostic_keeps_missing_value_unavailable(monkeyp
     assert diagnostics["wall_deposit_liner_temperature_C"] is None
 
 
-@pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])
-def test_predict_flag_underflow_is_unavailable(species, temperature):
+def test_predict_flag_sodium_just_above_the_retired_pole_is_a_flagged_number():
+    # 417 K is 0.6 K above the retired Rodebush pole (T+C = 0 at 416.372 K).
+    # That Antoine underflow is gone. Browning-Potter at 417 K is below its
+    # certified band and above the melting point, so the liquid equation is
+    # evaluated and flagged.
     diagnostic = {}
-    condensation._wall_deposition_driving_pressure_pa(species, 100.0, temperature, diagnostic_out=diagnostic)
+    condensation._wall_deposition_driving_pressure_pa(
+        "Na", 100.0, 417.0, diagnostic_out=diagnostic
+    )
+    pressure = diagnostic["wall_saturation_pressure_pa"]
+    assert pressure is not None and pressure > 0.0
+    assert diagnostic["wall_saturation_pressure_refused"] is False
+    notice = diagnostic["wall_saturation_pressure_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert tuple(notice["valid_range_K"]) == (864.0, 2499.0)
+    assert "24%" in notice["notice"]
+
+
+def test_predict_flag_underflow_is_unavailable():
+    diagnostic = {}
+    condensation._wall_deposition_driving_pressure_pa(
+        "Mg", 100.0, 115.0, diagnostic_out=diagnostic
+    )
     assert diagnostic["wall_saturation_pressure_pa"] is None
     assert "no extrapolation available" in diagnostic["wall_saturation_pressure_refusal_reason"]
 

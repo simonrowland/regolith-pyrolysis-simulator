@@ -6177,6 +6177,89 @@ def _record_antoine_extrapolation(
             antoine_extrapolation_warnings.append(warning)
 
 
+def _store_saturation_extrapolation(
+    species: str,
+    record: Mapping[str, Any],
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+    warning: str,
+) -> None:
+    if antoine_extrapolations is not None:
+        existing_records = [
+            existing
+            for key, existing in antoine_extrapolations.items()
+            if str(key).split("#", 1)[0] == species
+        ]
+        if not any(dict(existing) == dict(record) for existing in existing_records):
+            key = species
+            if key in antoine_extrapolations:
+                suffix = 2
+                while f"{species}#{suffix}" in antoine_extrapolations:
+                    suffix += 1
+                key = f"{species}#{suffix}"
+            antoine_extrapolations[key] = dict(record)
+    if antoine_extrapolation_warnings is not None and warning not in antoine_extrapolation_warnings:
+        antoine_extrapolation_warnings.append(warning)
+
+
+def _pure_sodium_saturation_pa(
+    species: str,
+    T_K: float,
+    data: Mapping[str, Any],
+    *,
+    antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+    antoine_extrapolation_warnings: list[str] | None,
+) -> float | None:
+    """Wall P_sat from the one pure-Na owner, or None when the row has none."""
+
+    from engines.builtin.sodium_saturation import (
+        SodiumSaturationError,
+        sodium_saturation_block,
+        sodium_saturation_pressure,
+    )
+
+    block = sodium_saturation_block(data)
+    if block is None:
+        return None
+    try:
+        saturation = sodium_saturation_pressure(block, T_K)
+    except SodiumSaturationError as exc:
+        raise DepositionInputRefusal(
+            "pure_component_saturation",
+            species,
+            str(exc),
+        ) from exc
+    if saturation.authority == "extrapolated":
+        low, high = saturation.certified_range_K
+        try:
+            temperature = float(T_K)
+        except (TypeError, ValueError):
+            temperature = T_K
+        temperature_text = f"{temperature:.3f}".rstrip("0").rstrip(".")
+        warning = (
+            f"{species} metal saturation fit extrapolated beyond "
+            f"valid_range_K [{low:g}, {high:g}] at {temperature_text} K"
+        )
+        if saturation.notice:
+            warning = f"{warning}. {saturation.notice}"
+        _store_saturation_extrapolation(
+            species,
+            {
+                "temperature_K": temperature,
+                "valid_range_K": saturation.certified_range_K,
+                "authority_level": "extrapolated",
+                "reason": "wall_saturation_pressure_out_of_validated_range",
+                "status": "extrapolated",
+                "notice": saturation.notice,
+            },
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            warning=warning,
+        )
+    return saturation.pressure_pa
+
+
 def _antoine_psat_pa(
     species: str,
     T_K: float,
@@ -6195,6 +6278,15 @@ def _antoine_psat_pa(
         species,
         vapor_pressure_data=vapor_pressure_data,
     )
+    sodium_pressure = _pure_sodium_saturation_pa(
+        species,
+        T_K,
+        data,
+        antoine_extrapolations=antoine_extrapolations,
+        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+    )
+    if sodium_pressure is not None:
+        return sodium_pressure
     has_legacy_antoine = any(
         isinstance(block, Mapping)
         for block_name in _ANTOINE_COEFFICIENT_BLOCKS
