@@ -207,6 +207,16 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
     )
     assert rys_experiment.method.is_value
     assert rys_experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    activity_rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activity_rows) == 380
+    assert all(
+        row.experiment_id == rys_experiment.experiment_id for row in activity_rows
+    )
     assert rys_experiment.bench_id is not None
     rys_bench = result.benches[rys_experiment.bench_id]
     assert rys_bench.cell_materials is not None
