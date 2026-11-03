@@ -27,6 +27,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_TIER,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+    _melt_oxide_gamma_for_activity,
     melt_oxide_activity_coefficient,
 )
 from simulator.physical_constants import GAS_CONSTANT
@@ -903,7 +904,32 @@ def henrian_unknown_gamma_upper_bound(
             evidence_tier=MELT_OXIDE_IDEAL_ASSERTION_TIER,
         )
 
-    gamma_is_at_most_unity = float(coeff.gamma) <= 1.0
+    try:
+        gamma_anchor, reference_warning = _melt_oxide_gamma_for_activity(
+            coeff.parent_oxide, coeff.gamma, None
+        )
+    except ValueError as exc:
+        if "temperature_K required" not in str(exc):
+            raise
+        return SourceReactionActivity(
+            component_id=component_id,
+            value=None,
+            verdict=ActivityVerdictKind.REFUSAL,
+            bound_direction=None,
+            reason=REASON_HENRIAN_GAMMA_UNMEASURED,
+            standard_state=standard_state,
+            phase_assemblage_ref=None,
+            chemical_potential_ref=None,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            provider="henrian_bound_policy",
+            authority=False,
+            report_label=BOUND_NOT_POINT,
+            refusal_code=ActivityRefusalCode.MONOTONICITY_UNPROVED,
+            detail=str(exc),
+        )
+
+    gamma_is_at_most_unity = gamma_anchor <= 1.0
     pressure_increases_with_activity = exponent >= 0.0
     is_upper = gamma_is_at_most_unity == pressure_increases_with_activity
     direction = BoundDirection.UPPER if is_upper else BoundDirection.LOWER
@@ -912,6 +938,25 @@ def henrian_unknown_gamma_upper_bound(
         if is_upper
         else ActivityVerdictKind.LOWER_BOUND
     )
+    derivation = {
+        "premise": (
+            "at fixed X, the coefficient table determines whether "
+            "a=gamma*X lies above or below the unity-gamma value X"
+        ),
+        "algebra": (
+            "gamma<=1 ⇒ a<=X; gamma>1 ⇒ a>=X; the sign of the "
+            "pressure activity exponent preserves or reverses that bound"
+        ),
+        "units": "a dimensionless; n dimensionless activity exponent",
+        "limiting_case": "gamma=1 makes the bound exact at a=X",
+        "activity_exponent": exponent,
+        "mole_fraction": x_value,
+        "gamma_anchor": gamma_anchor,
+        "gamma_property": "gamma<=1" if gamma_is_at_most_unity else "gamma>1",
+        "coefficient_domain_K": coeff.valid_range_K,
+    }
+    if reference_warning:
+        derivation["melt_oxide_activity_warning"] = reference_warning
     return SourceReactionActivity(
         component_id=component_id,
         value=x_value,
@@ -926,23 +971,7 @@ def henrian_unknown_gamma_upper_bound(
         provider="henrian_bound_policy",
         authority=False,
         report_label=BOUND_NOT_POINT if is_upper else LOWER_BOUND_NOT_POINT,
-        derivation={
-            "premise": (
-                "at fixed X, the coefficient table determines whether "
-                "a=gamma*X lies above or below the unity-gamma value X"
-            ),
-            "algebra": (
-                "gamma<=1 ⇒ a<=X; gamma>1 ⇒ a>=X; the sign of the "
-                "pressure activity exponent preserves or reverses that bound"
-            ),
-            "units": "a dimensionless; n dimensionless activity exponent",
-            "limiting_case": "gamma=1 makes the bound exact at a=X",
-            "activity_exponent": exponent,
-            "mole_fraction": x_value,
-            "gamma_anchor": float(coeff.gamma),
-            "gamma_property": "gamma<=1" if gamma_is_at_most_unity else "gamma>1",
-            "coefficient_domain_K": coeff.valid_range_K,
-        },
+        derivation=derivation,
         evidence_ref=coeff.citation,
         evidence_tier=MELT_OXIDE_ACTIVITY_TIER,
     )

@@ -54,6 +54,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_CATIONS_PER_FORMULA,
     P2O5_ACTIVITY_COEFFICIENT,
+    _melt_oxide_gamma_for_activity,
     melt_oxide_activity,
     melt_oxide_activity_coefficient,
 )
@@ -4661,9 +4662,33 @@ def _evaluate_activity(
                 expected=expected,
                 observable=observable_kind,
             )
-        actual = float(coefficient.gamma)
+        T_mid_for_activity = (
+            0.5 * (float(obs.T_range_K[0]) + float(obs.T_range_K[1]))
+            if obs.T_range_K is not None
+            else None
+        )
+        try:
+            actual, reference_warning = _melt_oxide_gamma_for_activity(
+                parent_oxide,
+                coefficient.gamma,
+                T_mid_for_activity,
+            )
+        except ValueError as exc:
+            if "temperature_K required" not in str(exc):
+                raise
+            return _activity_skip(
+                obs,
+                evaluation,
+                "missing_condition:temperature_K_for_solid_reference_gamma",
+                expected=expected,
+                observable=observable_kind,
+            )
+        if reference_warning:
+            runtime["melt_oxide_activity_warning"] = reference_warning
+            assumption_gaps.append(reference_warning)
         runtime["citation"] = coefficient.citation
         runtime["engine_gamma"] = actual
+        runtime["condition_gaps"] = list(dict.fromkeys(assumption_gaps))
     else:
         recipe, recipe_source, recipe_error = _melt_recipe_mol(obs)
         runtime["recipe_source"] = recipe_source
@@ -4680,11 +4705,22 @@ def _evaluate_activity(
             if obs.T_range_K is not None
             else None
         )
-        result = melt_oxide_activity(
-            parent_oxide,
-            recipe,
-            temperature_K=T_mid_for_activity,
-        )
+        try:
+            result = melt_oxide_activity(
+                parent_oxide,
+                recipe,
+                temperature_K=T_mid_for_activity,
+            )
+        except ValueError as exc:
+            if "temperature_K required" not in str(exc):
+                raise
+            return _activity_skip(
+                obs,
+                evaluation,
+                "missing_condition:temperature_K_for_solid_reference_gamma",
+                expected=expected,
+                observable=observable_kind,
+            )
         if result is None:
             return _activity_skip(
                 obs,

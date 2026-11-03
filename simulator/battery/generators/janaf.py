@@ -88,6 +88,7 @@ from simulator.reference_data.janaf_fusion import (
     _interpolate_table_points,
     _missing_node_for_interpolation,
     _sidecar_hashes,
+    d144_fusion_table_pair,
 )
 from tools.harvest_janaf_compilation import parse_table
 
@@ -2617,7 +2618,7 @@ def _d144_single_polymorph(oxide: str) -> tuple[str, Polymorph] | None:
     `_D144_SINGLE_POLYMORPH_TABLES`. Both dicts are read at call time.
     """
 
-    pair = _FUSION_TABLES.get(oxide)
+    pair = d144_fusion_table_pair(oxide)
     if pair is None:
         return None
     solid_table = pair[0]
