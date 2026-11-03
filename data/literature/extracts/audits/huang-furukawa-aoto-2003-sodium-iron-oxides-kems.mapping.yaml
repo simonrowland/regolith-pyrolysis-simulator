@@ -1,0 +1,36 @@
+source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+source:
+  citation: Huang, Furukawa and Aoto (2003), Thermochimica Acta 405, 61–66.
+  doi: 10.1016/S0040-6031(03)00136-9
+extraction:
+  machine_inputs:
+    - MinerU Table 1 HTML and markdown
+    - pdftotext-layout Table 1
+  render_check: >-
+    Table 1 row and column layout was checked against the PDF render on absolute
+    page 5 (printed page 65). The table is born digital; all 125 numeric cells
+    agree between MinerU and pdftotext, and no cell-specific render trap was
+    flagged. The companion cell-audit CSV records the two-read evidence per cell.
+  printed_row_count: 25
+  mineru_numeric_agreement: '1.000'
+tables:
+  - page: 5
+    table_index: 1
+    published_page: 65
+    type: partial_pressure
+    quantity: partial_pressure
+    phase: gas
+    unit: Pa
+    evidence_class: author_derived
+    rows: all
+    temperature: {as_printed: T/K, unit: K}
+    values:
+      - {column: 3, species: Na, phase: g, unit: Pa, quantity: partial_pressure, evidence_class: author_derived}
+      - {column: 4, species: Na3FeO3, phase: cr, unit: J/mol, quantity: reaction_gibbs_energy_as_printed, evidence_class: author_derived}
+      - {column: 5, species: Na3FeO3, phase: cr, unit: not_printed, quantity: raw_reaction_equilibrium_constant_Kp_as_printed, evidence_class: author_derived}
+    conditions:
+      temperature: each row's printed T/K
+      composition: Na4FeO3(s) prepared from Na2O(s):FeO(s) in a 2:1 molar ratio, section 2.2, page 3
+      total_pressure: unknown; 10^-6 Pa describes the vacuum-system operating level
+      fO2: unknown; the measurement atmosphere is not stated
+    regime: knudsen_effusion

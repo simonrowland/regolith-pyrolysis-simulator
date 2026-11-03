@@ -1,0 +1,256 @@
+source_id: kress-carmichael-1989-lime-iron-silicate-redox
+source:
+  citation: >-
+    Kress, V.C. and Carmichael, I.S.E. (1989). The lime-iron-silicate melt
+    system: Redox and volume systematics. Geochimica et Cosmochimica Acta
+    53(11), 2883-2892.
+  doi: 10.1016/0016-7037(89)90165-8
+  year: 1989
+extraction:
+  method: >-
+    Table 1 was read from the controller's 300 and 400 dpi Tesseract OCR redo
+    (PSM 6); both reads were reconciled against the 600 dpi render for every
+    cell. Tables 2-5 were transcribed from the seat's MinerU cell drafts and
+    pdftotext layout, with every numeric cell checked against the page render.
+    The consolidated cell audit records both machine reads, the selected read,
+    and the render confirmation per numeric cell.
+  row_count_note: >-
+    Table 1 prints 52 experimental rows; Table 2 prints 5 fit coefficients;
+    Table 3 prints 51 sample rows plus E.S.D.; Table 4 prints 6 parameters;
+    Table 5 prints 16 comparator rows plus Mean and E.S.D.
+  cell_audit: kress-carmichael-1989-lime-iron-silicate-redox.cells.csv
+  compare_output: kress-carmichael-1989-lime-iron-silicate-redox.compare.csv
+  numeric_cell_count: 731
+  mineru_qa: >-
+    The Table 1 page is absent from the supplied MinerU chunk and pdftotext
+    table cells. The QA prescreen found the printed Table 2 block at PDF page 5
+    with full digit agreement; the Table 3, Table 4, and Table 5 blocks had low
+    numeric agreement and were checked cell-by-cell against their renders. The
+    two later blocks are the volume-only Tables 6 and 7 and are outside this
+    redox-rail extract.
+  compare_summary:
+    matched: 0
+    no_match: 52
+    mismatch: 0
+    unverifiable: 1093
+    total: 1145
+    interpretation: >-
+      Table 1 is absent from the MinerU draft index, so Table 1 observation
+      fields cannot match draft cells. The 52 no-match entries are script-
+      reduced Fe3+/Fe2+ values, which are not printed cells. No MinerU numeric
+      mismatch was reported; every Table 1 value and all selected Table 2-5
+      cells were independently checked against page renders and are listed in
+      the consolidated cell audit.
+tables:
+  - page: 3
+    table: '1'
+    published_page: 2885
+    printed_rows: 52
+    role: experimental liquid compositions and conditions
+    columns:
+      - sample identifier
+      - T (°C)
+      - log(fO2)
+      - SiO2 (wt%)
+      - Fe2O3 (wt%)
+      - FeO (wt%)
+      - CaO (wt%)
+    machine_reads:
+      - Tesseract OCR redo, 300 dpi, PSM 6
+      - Tesseract OCR redo, 400 dpi, PSM 6
+      - pdftotext page cut and MinerU: table cells absent
+    render_check: >-
+      Every Table 1 numeric cell was reconciled against the 600 dpi page render;
+      both OCR reads are retained in the consolidated cell audit. Printed run
+      identifiers and the 205AF3 suffix were checked against the render. No
+      uncertainty column is printed. The column header is a bare log(fO2); the
+      paper does not print a pressure reference. No total pressure or per-run
+      gas-mixture assignment is printed.
+    cell_counts:
+      numeric: 312
+      row_identifiers: 52
+  - page: 5
+    table: '2'
+    published_page: 2887
+    printed_rows: 5
+    role: empirical Fe2O3/FeO fit coefficients for Equation 3
+    machine_reads:
+      - MinerU cell draft
+      - pdftotext layout
+    render_check: >-
+      All coefficient cells and variable labels were checked against the 600
+      dpi page render. The equation is printed on PDF page 4, published page
+      2886, and stored with that locator in the fit context record.
+    cell_counts:
+      numeric: 5
+  - page: 5
+    table: '3'
+    published_page: 2887
+    printed_rows: 51
+    summary_rows:
+      - E.S.D.
+    role: measured and predicted Fe2O3 and FeO values with residuals
+    machine_reads:
+      - MinerU cell draft
+      - pdftotext table cells absent
+    render_check: >-
+      The header, row assignments, and all 308 numeric cells were checked
+      against the 600 dpi page render. Table 3 omits 245B and has no row-level
+      conditions; values remain a context comparison and are not scored.
+    cell_counts:
+      numeric: 308
+      sample_rows: 51
+  - page: 6
+    table: '4'
+    published_page: 2888
+    printed_rows: 6
+    role: asymmetric regular-solution redox fit parameters
+    machine_reads:
+      - MinerU cell draft
+      - pdftotext layout
+    render_check: >-
+      All six parameter cells and row labels were checked against the 600 dpi
+      page render. Equations 9 and 10 are stored with this context record.
+    cell_counts:
+      numeric: 6
+  - page: 7
+    table: '5'
+    published_page: 2889
+    printed_rows: 16
+    summary_rows:
+      - Mean
+      - E.S.D.
+    role: comparison with Dingwell and Brearley (1988)
+    machine_reads:
+      - MinerU cell draft
+      - pdftotext layout
+    render_check: >-
+      The header, comparator row assignments, and all 100 numeric cells were
+      checked against the 600 dpi page render. Conditions and complete
+      compositions are not printed per comparator row; values remain context.
+    cell_counts:
+      numeric: 100
+out_of_scope_tables:
+  - page: 8
+    table: '6'
+    published_page: 2890
+    role: partial molar volume and temperature-derivative fit for the linear
+      volume model
+    reason: >-
+      The values parameterize volume predictions and do not report iron redox,
+      fO2, temperature, or composition observations for the redox rail.
+  - page: 9
+    table: '7'
+    published_page: 2891
+    role: partial molar volume and silica-lime excess-volume model parameters
+    reason: >-
+      The values parameterize a volume model and do not report iron redox, fO2,
+      temperature, or composition observations for the redox rail.
+method_and_condition_decisions:
+  experiment_regime:
+    token: quench_equilibration
+    locator:
+      page: 2
+      published_page: 2884
+      section: Experimental procedure
+    reason: >-
+      The authors state that the run durations exceeded the time required for
+      equilibration, then describe the mercury and chilled-water quench methods.
+      Per-run quench medium is not assigned.
+  melt_phase: >-
+    The measured material is completely glass-quenched. The authors state that
+    water-quenched glass does not significantly re-equilibrate and that only
+    samples quenched completely to glass are considered; rows use phase glass
+    and quench_state asserted_preserved, located on PDF page 4.
+  oxygen_reference: >-
+    Table 1 gives log(fO2) values with at most two decimal places and does not
+    print a pressure reference. The printed logarithm is stored with an empty
+    unit so the migrator bare-log convention owns the frame. This is separate
+    from total experimental pressure, which remains unknown.
+  total_pressure: >-
+    The paper prints no total experimental pressure for Table 1. No pressure is
+    inferred from the air or CO-CO2 atmosphere, and no 1 bar total-pressure
+    condition is stored.
+  gases: >-
+    The experimental procedure identifies air and a CO-CO2 gas mixture. The
+    mixing ratios are calculated using Deines et al. (1974), but the paper does
+    not assign run-specific gas ratios to Table 1 samples; no gas ratio is
+    promoted onto a row.
+  analysis: >-
+    Glass bulk compositions are measured by ARL-SEMQ electron microprobe with
+    modified Bence-Albee correction. FeO is measured by calorimetric wet
+    chemistry with ferric-interference correction. Fe2O3 is determined by
+    subtracting FeO from total iron; the total-iron values are not tabulated.
+    The 10.93 ± 0.21 (2σ) wt% FeO calibration applies to repeated JDFD-2
+    measurements, not the Table 1 column.
+  fe2o3_evidence: >-
+    The 52 Fe2O3 cells retain method_class author_derived. The total-iron input
+    is unprinted, so the migrator queues these cells for missing measured
+    lineage; the extraction does not relabel them to evade that gate.
+    Fe3+/Fe2+ ratios are reduced from the printed Fe2O3 and FeO cells by the
+    committed script and name those two stored rows as derived_from parents.
+schema_gaps:
+  - record: kc89_table2_equation3_fit_coefficients
+    claim: >-
+      The five-coefficient regression set is retained as a typed-refused context
+      bundle because there is no exact observation family for a mixed fit
+      coefficient set. The closed family is tools/validate_literature_extracts.py::OBSERVATION_TYPES;
+      Quantity.INTERACTION_PARAMETER is a single interaction coefficient, not
+      the bundle of a, b/1000, c and two d_i values; Quantity and the quantity
+      aliases have no exact fit-set token.
+    code_symbols:
+      - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      - simulator/battery/migrate.py::QUANTITY_ALIASES
+      - simulator/battery/migrate.py::TYPE_QUANTITY
+      - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+  - record: kc89_table4_equations9_10_fit_parameters
+    claim: >-
+      The six mixed-unit regular-solution fit parameters are retained as a
+      typed-refused context bundle; no single observation quantity token means
+      this complete set. Quantity.INTERACTION_PARAMETER does not exactly name
+      the mixed set y, K2, ΔH0, ΔS0, ΔW_Si and ΔW_Ca.
+    code_symbols:
+      - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      - simulator/battery/migrate.py::QUANTITY_ALIASES
+      - simulator/battery/migrate.py::TYPE_QUANTITY
+      - simulator/battery/enums.py::Quantity.INTERACTION_PARAMETER
+  - record: kc89_table3_measured_predicted_residual_comparison
+    claim: >-
+      Table 3 combines measured cells, predictions, residuals and an E.S.D.
+      without row-level conditions. It remains context; the measured Table 1
+      values are separately stored with full conditions. No conditions are
+      copied onto the Table 3 sample rows.
+  - record: kc89_table5_dingwell_brearley_comparison
+    claim: >-
+      Table 5 comparator values lack per-row melt composition, temperature and
+      fO2 in this paper. The Dingwell and Brearley values and Kress-Carmichael
+      calculated comparisons remain context; no conditions are promoted.
+fit_lineage:
+  equation_3: >-
+    Table 2 does not enumerate fit-parent run identifiers. Table 3 compares 51
+    Table 1 samples and omits 245B, so it is not treated as a complete parent
+    list. No model_derived observation is emitted without the exact stored fit
+    parents required by the source.
+figure_read_candidates:
+  digitisation: undigitised
+  figures:
+    - figure: '1'
+      locator:
+        page: 3
+        published_page: 2885
+      candidate: starting melt compositions and quenchable versus unquenchable symbols
+    - figure: '2'
+      locator:
+        page: 4
+        published_page: 2886
+      candidate: measured FeO wt% versus normalized reflectivity for seven quenches
+    - figure: '3'
+      locator:
+        page: 4
+        published_page: 2886
+      candidate: ln(FeO1.5/FeO) contour plots against melt composition
+    - figure: '4'
+      locator:
+        page: 4
+        published_page: 2886
+      candidate: ln(FeO/FeO1.5) versus ln(fO2) for composition A
