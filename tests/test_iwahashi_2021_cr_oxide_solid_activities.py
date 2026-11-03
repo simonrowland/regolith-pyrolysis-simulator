@@ -107,6 +107,21 @@ def test_render_pins_cover_every_table2_and_table3_row_and_detect_mutations() ->
         )
         assert [row["values"]["activity"] for row in observations] == expected
 
+    table3_all = [
+        row
+        for formula in EXPECTED_TABLE3
+        for row in document["species"][formula]["observations"]
+        if row["locator"].get("table") == "3"
+    ]
+    assert len(table3_all) == 24
+    assert all(row["values"]["method_class"] == "measured_reduced" for row in table3_all)
+    assert all(
+        row["derivation"]["raw_inputs"]["state"] == {"tag": "value", "value": "not_printed"}
+        and row["derivation"]["raw_inputs"]["locator"]["page"] == 7
+        and row["derivation"]["raw_inputs"]["locator"]["table"] == "3"
+        for row in table3_all
+    )
+
     table1 = document["species"]["Cr2O3"]["context"]
     table1 = [row for row in table1 if row["locator"].get("table") == "1"]
     assert len(table1) == 3, "Table 1 render contains three phase-relation rows"
@@ -119,9 +134,20 @@ def test_render_pins_cover_every_table2_and_table3_row_and_detect_mutations() ->
     eq26 = _observation(document, "Cr2O3", f"{PREFIX}_eq26_log_activity_Cr2O3")
     eq27 = _observation(document, "Cr2O3", f"{PREFIX}_eq27_log_activity_Cr2O3")
     assert k14["values"]["log10_K_reaction"] == "23.94"
+    assert k14["values"]["method_class"] == "quoted_attributed"
     assert (k14["locator"]["page"], k14["locator"]["equation"]) == (4, "14")
     assert gamma["values"]["gamma"] == "1.54"
-    assert (gamma["locator"]["page"], gamma["locator"]["equation"]) == (4, "24")
+    assert (gamma["locator"]["page"], gamma["locator"]["equation"]) == (5, "24")
+    eq24_condition_locators = [
+        condition["locator"]
+        for condition in gamma["point_conditions"].values()
+        if condition.get("locator", {}).get("equation") == "24"
+    ]
+    assert len(eq24_condition_locators) == 4
+    assert all(
+        (locator["page"], locator["published_page"], locator["pdf_page_index"]) == (5, 1408, 4)
+        for locator in eq24_condition_locators
+    )
     assert eq26["values"]["activity"] == "-1.33"
     assert (eq26["locator"]["page"], eq26["locator"]["equation"]) == (6, "26")
     assert eq26["uncertainty"]["value"] == "0.09"
@@ -163,6 +189,8 @@ def test_isolated_migration_preserves_known_axes_and_explicitly_unknown_conditio
     admitted = sum(row.admission.status.value == "admitted" for row in observations)
     unavailable = sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations)
     print(f"migration observations={len(observations)} hard={len(result.validation.hard_issues)} unavailable={unavailable} admitted={admitted}")
+    assert unavailable == 0
+    assert admitted == 52
 
     by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in observations}
     table2 = [row for row in observations if "_p004_t02_" in row.observation_id]
@@ -187,7 +215,13 @@ def test_isolated_migration_preserves_known_axes_and_explicitly_unknown_conditio
     eq26 = by_id[f"{PREFIX}_eq26_log_activity_Cr2O3"]
     eq27 = by_id[f"{PREFIX}_eq27_log_activity_Cr2O3"]
     gamma = by_id[f"{PREFIX}_eq24_log_gamma_Cr"]
+    k14 = by_id[f"{PREFIX}_eq14_log10_K13"]
     table3_cao = by_id[f"{PREFIX}_p007_t03_r04_c02"]
+    table3_zero = by_id[f"{PREFIX}_p007_t03_r02_c02"]
+    assert k14.value.point == Decimal("23.94")
+    assert gamma.value.point == Decimal("34.67368504525316394529113171")
+    assert eq26.value.point == Decimal("0.04677351412871981935820903921")
+    assert table3_zero.value.point == Decimal("1")
     activity_experiment_id = f"{SID}-activity-equilibration-series"
     activity_experiment = next(
         row for row in _document()["experiments"]
