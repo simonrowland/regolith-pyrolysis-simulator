@@ -40,7 +40,7 @@ def test_oeltjen_tables_and_kems_registry_migrate_with_render_pins() -> None:
     assert len(result.works) == 1
     assert len(result.benches) == 1
     assert len(result.experiments) == 6
-    assert len(result.observations) == 37
+    assert len(result.observations) == 39
     assert sum(
         observation.value.kind.value == "unavailable"
         for observation in result.observations.values()
@@ -209,9 +209,9 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         for formula in ("K2O", "Na2O")
         for row in document["species"][formula]["observations"]
     ]
-    assert len(source_rows) == 37
+    assert len(source_rows) == 39
     assert Counter(row["values"]["printed_series_numeral"] for row in source_rows) == Counter(
-        {"1": 7, "2": 5, "3": 7, "4": 5, "5": 5, "6": 8}
+        {"1": 7, "2": 6, "3": 8, "4": 5, "5": 5, "6": 8}
     )
     figures = {
         row["locator"]["figure"]: row
@@ -243,6 +243,14 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
             for item in legends[figure]["values"]["pairings"]
         }
         assert set(pairings.values()) == set(record["printed_sample_labels"])
+    assert figures["6.21"]["values"]["experimental_point_count"] == 21
+    assert figures["6.22"]["values"]["experimental_point_count"] == 18
+    glyphs_621 = Counter(
+        row["values"]["marker_glyph"]
+        for row in source_rows
+        if row["locator"]["figure"] == "6.21"
+    )
+    assert glyphs_621 == Counter({"circle": 7, "square": 6, "triangle": 8})
     assert figures["6.22"]["values"]["excluded_non_data_markers"][0]["glyph"] == "square"
 
     migrated = {
@@ -307,7 +315,7 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
         assert reference.value.endmember.phase.value is Phase.L
         assert observation.derivation is not None
         assert "stöchiometrischer Verdampfung" in observation.derivation.relation
-    assert dict(by_sample) == {"1": 7, "2": 5, "3": 7, "4": 5, "5": 5, "6": 8}
+    assert dict(by_sample) == {"1": 7, "2": 6, "3": 8, "4": 5, "5": 5, "6": 8}
     sample5 = [
         observation.identity.temperature_K.value
         for observation in migrated.values()
@@ -315,3 +323,41 @@ def _assert_digitized_activities(document: dict, contexts: list, result) -> None
     ]
     assert min(sample5) < Decimal("1530")
     assert min(sample5) > Decimal("1520")
+
+
+# Centres re-read on the 600 dpi Figure 6.21 render. The opened-core centroid is the
+# same centre used for the other stored points. Equality is the rounded calibration,
+# which is tighter than the half-box read uncertainty.
+_MARKER_CENTRE_PX = {
+    "oeltjen_1999_fig621_s1_p01": (2316.31, 2046.99),
+    "oeltjen_1999_fig621_s2_p03": (3123.50, 2889.50),
+    "oeltjen_1999_fig621_s2_p04": (3367.03, 2991.66),
+    "oeltjen_1999_fig621_s3_p04": (2012.07, 2543.19),
+    "oeltjen_1999_fig621_s3_p08": (3366.12, 3035.00),
+}
+
+
+def test_stored_activities_match_marker_pixel_reads() -> None:
+    document = _load_extract()
+    figure = next(
+        row
+        for row in document["species"]["K2O"]["context"]
+        if row["observation_id"] == "oeltjen_1999_figure_6_21"
+    )
+    values = figure["values"]
+    slope_x = float(values["x_fit_slope_per_px"])
+    intercept_x = float(values["x_fit_intercept"])
+    slope_y = float(values["y_fit_slope_log10_per_px"])
+    intercept_y = float(values["y_fit_intercept_log10"])
+    rows = {
+        row["observation_id"]: row
+        for row in document["species"]["K2O"]["observations"]
+    }
+    for observation_id, (centre_x, centre_y) in _MARKER_CENTRE_PX.items():
+        row = rows[observation_id]
+        axis = f"{slope_x * centre_x + intercept_x:.5f}"
+        log10 = f"{slope_y * centre_y + intercept_y:.4f}"
+        assert row["values"]["axis_1000_per_K"] == axis
+        assert row["values"]["log10_activity"] == log10
+        half_box = Decimal(row["values"]["read_uncertainty_log10_activity"])
+        assert abs(Decimal(row["values"]["log10_activity"]) - Decimal(log10)) < half_box

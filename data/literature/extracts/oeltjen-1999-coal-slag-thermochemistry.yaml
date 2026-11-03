@@ -9,9 +9,9 @@ source:
   corpus_asset: raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf
   corpus_sha256: c253ab795342c9397bbde04bb0df89dfcc9b98fa54fecd3dd7a114e936759d4d
   source_note: Six own KEMS sample series. Experimental activity symbols in Figures 6.21 and 6.22 are digitized.
-    The source prints no numeric run table and no per-point uncertainty. The source review records an unresolved
-    sample 6 SiO2 composition discrepancy (0.725/0.735); Table 5.1 is retained as printed and figure labels are
-    kept separate.
+    The source prints no numeric run table and no per-point uncertainty. Sample 6 is 72.5 mol percent SiO2 in
+    Table 5.1 and 0.725 on the Figure 6.22 label; those are the same composition. 0.735 is sample 4. Table 5.1
+    is retained as printed and the figure labels are kept as printed.
 extraction:
   method: Machine-text-first transcription from MinerU table blocks and pdftotext-layout; Table 4.1 and Table 5.1
     cell values and row-column assignments checked against the page renders. Figures 6.21 and 6.22 experimental
@@ -1414,6 +1414,79 @@ species:
             tag: value
             value:
               kind: point
+              point: '1487.20'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '2.093148e-15'
+        log10_activity: '-14.6792'
+        axis_1000_per_K: '0.56807'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00092'
+        read_uncertainty_T_K: '2.85'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 50
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
               point: '1456.74'
           locator:
             page: 72
@@ -1454,7 +1527,7 @@ species:
         method_class: measured_reduced
         figure_digitized: true
         reference_state_as_printed: 'Referenzzustand: flüssig'
-    - observation_id: oeltjen_1999_fig621_s2_p05
+    - observation_id: oeltjen_1999_fig621_s2_p06
       type: activity_coefficient
       experiment: oeltjen_1999_kems_sample_2
       phase: l
@@ -2038,6 +2111,79 @@ species:
         method_class: measured_reduced
         figure_digitized: true
         reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p08
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1487.32'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '1.642480e-15'
+        log10_activity: '-14.7845'
+        axis_1000_per_K: '0.56803'
+        read_uncertainty_log10_activity: '0.0510'
+        read_uncertainty_1000_per_K: '0.00083'
+        read_uncertainty_T_K: '2.57'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 45
+        marker_height_px: 42
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
     context:
     - observation_id: oeltjen_1999_table4_1_sk1
       type: printed_model_system_composition
@@ -2201,7 +2347,7 @@ species:
         x_tick_max_residual: '6.845979183889295e-05'
         y_tick_rms_log10: '0.002787868317231977'
         y_tick_max_residual_log10: '0.003939105729171999'
-        experimental_point_count: 19
+        experimental_point_count: 21
         x_calibration_ticks:
           - pixel: '976.0'
             printed: '0.48'
@@ -2274,10 +2420,11 @@ species:
         - 0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)
         - 0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)
         stored_observation_evidence_class: measured_reduced
-        audit_note: Nineteen experimental symbols were read. The legend prints line styles for the model curves
+        audit_note: Twenty-one experimental symbols were read. The legend prints line styles for the model curves
           only. Each series is bound by the numeral printed beside one glyph of that cluster. Circles are sample 1
-          (7). Squares are sample 2 (5). Triangles are sample 3 (7). Read uncertainty is half the marker box and
-          is about 0.055 to 0.062 in log10 activity. Calibration residuals are about 0.003 in log10 and are not
+          (7). Squares are sample 2 (6). Triangles are sample 3 (8). The sample 2 square and sample 3 triangle
+          that overlap where those series cross are both read. Read uncertainty is half the marker box and
+          is about 0.051 to 0.062 in log10 activity. Calibration residuals are about 0.003 in log10 and are not
           used as the point uncertainty. No point lies more than 15 K outside the printed temperature window.
     - observation_id: oeltjen_1999_figure_6_21_marker_legend
       type: figure_marker_legend
@@ -4091,8 +4238,8 @@ species:
           for the model curves only. Circles are sample 4 (5). Squares are sample 5 (5). Triangles are sample 6
           (8). Read uncertainty is half the marker box and is about 0.043 to 0.050 in log10 activity. The coldest
           sample 5 read is 1525.9 K, about 4 K below the printed 1530 K window, and was not moved. The sample 6
-          figure label prints 0.725 SiO2 while Table 5.1 prints 72.5 mol percent; the observations keep Table 5.1
-          and this label is retained as printed.
+          figure label 0.725 is the Table 5.1 value 72.5 mol percent SiO2; 0.735 is sample 4. Observations keep
+          Table 5.1 and this label is retained as printed.
     - observation_id: oeltjen_1999_figure_6_22_marker_legend
       type: figure_marker_legend
       locator:
