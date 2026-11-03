@@ -1,0 +1,266 @@
+from __future__ import annotations
+
+from collections import Counter
+from decimal import Decimal
+from pathlib import Path
+from unittest.mock import patch
+
+import yaml
+
+import simulator.battery.migrate as migrate_module
+from simulator.battery.enums import Phase, ValueKind
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_EXTRACT = (
+    _REPO_ROOT
+    / "data/literature/extracts/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml"
+)
+_SOURCE_ID = "dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry"
+
+
+def _migrated():
+    with patch.object(migrate_module, "discover_extracts", return_value=[_EXTRACT]):
+        migrator = migrate_module.Migrator(root=_REPO_ROOT)
+        migrator.migrate_extracts()
+        migrator.finalize()
+    return migrator.result
+
+
+def _source_observation_id(observation):
+    return observation.observation_id.split("::", 2)[1]
+
+
+def _find(observations, observation_id):
+    matches = [
+        observation
+        for observation in observations
+        if _source_observation_id(observation) == observation_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def _raw_row(extract, species, observation_id):
+    matches = [
+        row
+        for row in extract["species"][species]["observations"]
+        if row["observation_id"] == observation_id
+    ]
+    assert len(matches) == 1
+    return matches[0]
+
+
+def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
+    result = _migrated()
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == _SOURCE_ID
+    ]
+    assert len(observations) == 67
+    assert len(result.validation.hard_issues) == 0
+    assert sum(
+        observation.value.kind is ValueKind.UNAVAILABLE
+        for observation in observations
+    ) == 67
+
+    table_counts = Counter(observation.locator.table for observation in observations)
+    assert table_counts == {
+        "I": 11,
+        "II": 18,
+        "III": 3,
+        "IV": 3,
+        "V": 9,
+        "VI": 11,
+        "VII": 12,
+    }
+
+    expected_quantity_unknown_ids = {
+        *(f"dai_1984_table1_r{row}_{species}" for row, species in (
+            (3, "na2o"),
+            (4, "na2o"),
+            (5, "na2o"),
+            (6, "na2o"),
+            (8, "na2o"),
+            (9, "feo"),
+            (10, "na"),
+            (11, "fe"),
+        )),
+        *(f"dai_1984_table2_{species}_{suffix}" for species, suffixes in (
+            ("feo", ("heat_evolution_1", "heat_evolution_2", "heat_evolution_3", "heat_evolution_average")),
+            ("na2o", ("heat_evolution_1", "heat_evolution_2", "heat_evolution_3", "heat_evolution_average")),
+            ("na2feo2", ("heat_evolution_1", "heat_evolution_2", "heat_evolution_3", "heat_evolution_4", "heat_evolution_average", "enthalpy_of_mixing")),
+            ("na4feo3", ("heat_evolution_1", "heat_evolution_2", "heat_evolution_average", "enthalpy_of_mixing")),
+        ) for suffix in suffixes),
+        "dai_1984_table3_na2fe2o4_gibbs_from_oxides",
+        "dai_1984_table3_na2feo2_gibbs_from_oxides",
+        "dai_1984_table3_na4feo3_gibbs_from_oxides",
+        *(f"dai_1984_table5_r{row}_reaction_gibbs" for row in range(1, 10)),
+        *(f"dai_1984_table6_r{row}_log_pressure_relation" for row in range(1, 12)),
+        "dai_1984_table7_r1_873_o2_log_pressure",
+        "dai_1984_table7_r1_873_na_log_pressure",
+        "dai_1984_table7_r1_1173_o2_log_pressure",
+        "dai_1984_table7_r1_1173_na_log_pressure",
+        *(f"dai_1984_table7_r{row}_873_{species}_log_pressure" for row in range(2, 6) for species in ("o2", "na")),
+    }
+    quantity_unknown_ids = {
+        _source_observation_id(observation)
+        for observation in observations
+        if observation.identity.quantity.is_unknown
+    }
+    assert quantity_unknown_ids == expected_quantity_unknown_ids
+    assert len(quantity_unknown_ids) == 61
+    assert all(
+        observation.identity.quantity.is_value
+        for observation in observations
+        if _source_observation_id(observation) not in expected_quantity_unknown_ids
+    )
+    assert all(
+        observation.identity.species is not None
+        and observation.identity.species.phase.is_value
+        for observation in observations
+    )
+    extract = yaml.safe_load(_EXTRACT.read_text(encoding="utf-8"))
+    raw_rows = {
+        row["observation_id"]: row
+        for block in extract["species"].values()
+        for row in block.get("observations", [])
+    }
+    for observation in observations:
+        conditions = observation.point_conditions
+        assert {"phase_assemblage", "fO2_Pa"} <= set(conditions)
+        assert "temperature_K" in conditions or "temperature_C" in conditions
+        for condition in conditions.values():
+            assert condition.state is not None
+            assert condition.locator is not None
+            assert condition.locator.page > 0
+        raw_conditions = raw_rows[_source_observation_id(observation)]["point_conditions"]
+        assert {"phase_assemblage", "fO2_Pa", "total_pressure_Pa"} <= set(raw_conditions)
+        assert raw_conditions["total_pressure_Pa"]["state"]["tag"] == "unknown"
+        assert raw_conditions["total_pressure_Pa"]["locator"]["page"] > 0
+        assert raw_conditions["phase_assemblage"]["locator"]["page"] > 0
+
+    # The source gives no numeric total pressure or oxygen pressure for these rows.
+    for observation in observations:
+        for axis_name in ("total_pressure_Pa", "fO2_Pa"):
+            axis = getattr(observation.identity, axis_name)
+            assert axis is None or not axis.is_value
+
+    calorimetry = _find(observations, "dai_1984_table2_feo_heat_evolution_1")
+    assert calorimetry.identity.temperature_K.is_value
+    assert calorimetry.identity.temperature_K.value == Decimal("313.15")
+    assert calorimetry.point_conditions["temperature_C"].state.value == Decimal("40")
+    assert calorimetry.point_conditions["temperature_C"].locator.page == 4
+    assert calorimetry.locator.table == "II"
+
+    phase_equilibrium = _find(observations, "dai_1984_table7_r1_873_o2_log_pressure")
+    assert phase_equilibrium.identity.species.phase.value is Phase.G
+    assert phase_equilibrium.identity.temperature_K.value == Decimal("873")
+    assert phase_equilibrium.point_conditions["temperature_K"].state.value == Decimal("873")
+    assert phase_equilibrium.locator.page == 6
+    assert phase_equilibrium.locator.table == "VII"
+
+    table_i_range = _find(observations, "dai_1984_table1_r1_fe2o3")
+    assert table_i_range.identity.temperature_K.is_unknown
+    assert table_i_range.point_conditions["temperature_K"].state.is_unknown
+
+    table3_na2feo2 = _find(observations, "dai_1984_table3_na2feo2_gibbs_from_oxides")
+    assert table3_na2feo2.identity.temperature_K.value == Decimal("1075")
+    assert table3_na2feo2.point_conditions["temperature_K"].locator.page == 4
+    assert table3_na2feo2.point_conditions["temperature_K"].locator.equation == "30"
+    table3_na4feo3 = _find(observations, "dai_1984_table3_na4feo3_gibbs_from_oxides")
+    assert table3_na4feo3.identity.temperature_K.value == Decimal("904")
+    assert table3_na4feo3.point_conditions["temperature_K"].locator.page == 5
+    assert table3_na4feo3.point_conditions["temperature_K"].locator.equation == "33"
+
+    # Independent render pins: the raw printed cells and their page/table locators.
+    rendered_cells = (
+        (
+            _raw_row(extract, "Na2O", "dai_1984_table1_r3_na2o"),
+            "equation_as_printed",
+            "-559460 + 264.14T",
+            3,
+            "I",
+        ),
+        (
+            _raw_row(extract, "Na2FeO2", "dai_1984_table2_na2feo2_heat_evolution_2"),
+            "value_as_printed",
+            "345600",
+            4,
+            "II",
+        ),
+        (
+            _raw_row(extract, "Na2Fe2O4", "dai_1984_table3_na2fe2o4_gibbs_from_oxides"),
+            "table_cell_as_printed",
+            "-86000 - 61.89T",
+            5,
+            "III",
+        ),
+        (
+            _raw_row(extract, "Na2Fe2O4", "dai_1984_table3_na2fe2o4_gibbs_from_oxides"),
+            "equation_16_as_printed",
+            "-86002 - 61.89T",
+            4,
+            None,
+        ),
+        (
+            _raw_row(extract, "O2", "dai_1984_table7_r1_873_o2_log_pressure"),
+            "value_as_printed",
+            "-25.27",
+            6,
+            "VII",
+        ),
+    )
+    for row, field, expected, page, table in rendered_cells:
+        assert row["values"][field] == expected
+        if table is None:
+            assert row["values"]["equation_16_as_printed"] == expected
+        else:
+            assert row["locator"]["page"] == page
+            assert row["locator"]["table"] == table
+    equation_16_sample = next(
+        sample
+        for sample in extract["fidelity_samples"]
+        if sample["path"].endswith("values.equation_16_as_printed")
+    )
+    assert equation_16_sample["locator"]["page"] == 4
+    assert equation_16_sample["locator"]["equation"] == "16"
+
+    oxide_formation = _raw_row(
+        extract, "Na4FeO3", "dai_1984_table3_na4feo3_gibbs_from_oxides"
+    )
+    assert oxide_formation["values"]["table_cell_as_printed"] == "-147988 + 164.80T"
+    assert oxide_formation["values"]["equation_34_as_printed"] == "-147998 + 164.8T"
+    equation_34_sample = next(
+        sample
+        for sample in extract["fidelity_samples"]
+        if sample["path"].endswith("values.equation_34_as_printed")
+    )
+    assert equation_34_sample["locator"]["page"] == 5
+    assert equation_34_sample["locator"]["equation"] == "34"
+
+    table4_na2feo2 = _raw_row(
+        extract, "Na2FeO2", "dai_1984_table4_na2feo2_gibbs_from_elements"
+    )
+    table4_na4feo3 = _raw_row(
+        extract, "Na4FeO3", "dai_1984_table4_na4feo3_gibbs_from_elements"
+    )
+    assert "dai_1984_table1_r6_na2o" in table4_na2feo2["derivation"]["inputs"]
+    assert "dai_1984_table1_r6_na2o" in table4_na4feo3["derivation"]["inputs"]
+    assert "dai_1984_table1_r5_na2o" not in table4_na2feo2["derivation"]["inputs"]
+    assert "dai_1984_table1_r5_na2o" not in table4_na4feo3["derivation"]["inputs"]
+
+    emf_context = extract["species"]["Na2Fe2O4"]["context"]
+    assert len(emf_context) == 1
+    assert emf_context[0]["type"] == "measurement_context"
+    assert emf_context[0]["values"]["admission_status"] == "typed_refusal"
+    assert emf_context[0]["values"]["quantity_as_printed"] == "electromotive force (EMF)"
+    assert "no electrochemical measurement observation type" in emf_context[0]["values"]["schema_gap"]
+    assert emf_context[0]["values"]["equation_as_printed"].startswith("E (mV) = 461.98")
+    table3_emf_reduction = _raw_row(
+        extract, "Na2Fe2O4", "dai_1984_table3_na2fe2o4_gibbs_from_oxides"
+    )
+    assert table3_emf_reduction["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert table3_emf_reduction["derivation"]["raw_inputs"]["locator"]["figure"] == "4"
+    assert emf_context[0]["point_conditions"]["reference_melt_composition"]["locator"]["page"] == 1
