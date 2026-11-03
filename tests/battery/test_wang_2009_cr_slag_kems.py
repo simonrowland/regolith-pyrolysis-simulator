@@ -87,12 +87,23 @@ def _assert_render_pins(extract: dict, page2: str, page4: str, page5: str) -> No
     )
     assert cro_a["values"]["A_as_printed"] == "-36066.0"
     assert cro_a["values"]["A_uncertainty_as_printed"] == "2827.4"
+    assert cro_a["values"]["temperature_fit_equation_as_printed"] == (
+        "log(p_i, Pa) = −A/T + B"
+    )
+    assert cro_a["values"]["sign_convention_ambiguity"].startswith(
+        "Taken literally, Table 4's printed log(p_i, Pa) = −A/T + B"
+    )
+    assert "+|A|/T" in cro_a["values"]["sign_convention_ambiguity"]
+    assert "falls with increasing temperature" in cro_a["values"]["sign_convention_ambiguity"]
     assert cro_a["locator"]["page"] == 5
     assert cro_a["locator"]["table"] == "4"
     assert cro_a["locator"]["table_row_number"] == 3
     assert cro_a["values"]["cr2o3_mole_fraction_as_printed_table4"] == "0.062"
     assert cro_a["values"]["composition_mol"]["Cr2O3"] == "0.066"
     assert cro2_a["values"]["A_as_printed"] == "-41668.5"
+    assert cro2_a["values"]["temperature_fit_equation_as_printed"] == (
+        "log(p_i, Pa) = −A/T + B"
+    )
     assert table5_fit_1["values"]["cr2o3_mole_fraction_as_printed_table5"] == "0.062"
     assert table5_fit_1["values"]["composition_mol"]["Cr2O3"] == "0.066"
     assert activity_1["values"]["points"][0]["activity"] == "0.010"
