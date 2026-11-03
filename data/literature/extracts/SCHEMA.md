@@ -651,7 +651,23 @@ are not measurements of a charge; retain their original evidence without
 pretending they are runs. Derived fits from this work can reference their
 underlying measurement series; their `model_derived` evidence class stays intact.
 
-The migrator defaults missing pressure evidence to unknown. When supplied,
+Missing pressure remains unknown unless the experiment has positive printed
+evidence of an open or flowing-gas furnace. Record that evidence once on the
+experiment, beside its apparatus and atmosphere fields:
+
+```yaml
+ambient_pressure_evidence:
+  evidence_class: gas_flow # gas_flow | gas_mixing | vented | atmospheric_pressure_statement
+  quote: "The sample was heated in a furnace with a continuous gas flow."
+  locator: {page: 3, section: Experimental method}
+```
+
+The quote is verbatim and the locator identifies its page, section, or table.
+This evidence lets the migrator use `total_pressure_Pa = 101325` with
+`derived_from_apparatus` authority when the observation requires total
+pressure and no printed point pressure is present. It does not override a
+printed pressure or apply to sealed, vacuum, Knudsen, or high-pressure
+apparatus. Without this field, missing pressure remains unknown. When supplied,
 `pressure_environment` requires `total_pressure_Pa` and `sweep_gas` as
 Located values, and `regime.regime_class` as a State. Do not confuse cell-side
 chamber pressure with sample vapour pressure. For `knudsen_effusion`, the experiment-level `total_pressure_Pa` is the chamber background consumed by the validity gates. It is not inherited into observation identity, engine-point system pressure, or sample oxygen-condition derivations used for prediction (including the vacuum total-pressure upper-bound route). There is no dedicated base-pressure
