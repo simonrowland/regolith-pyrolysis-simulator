@@ -275,19 +275,22 @@ points:
     ±0.05 K is numerical noise, not an accuracy tolerance.
   temperature_K: 295.08
   residual: -1.6103458955868177
+# Owner change: Rodebush Antoine -> Fink & Leibowitz Browning-Potter, ANL/RE-95/2.
 - key: Na_normal_boiling_point:Psat=1atm
   case_id: janaf-4th::Na_normal_boiling_point
   source_id: janaf-4th
   observation_type: transition_point
   species: Na
   residual_unit: K
-  residual_K: 23.584730718736182
+  residual_K: -1.30885260828245
   band_K: 0.05
   status: mismatch
-  note: Pure-component Antoine inversion residual (T_engine - T_obs) in Kelvin, not dex. Regression band
-    ±0.05 K is numerical noise, not an accuracy tolerance.
+  note: Fink & Leibowitz Browning-Potter (ANL/RE-95/2) replaces the Rodebush Antoine row. The 1 atm
+    inverse is 1154.6911473917175 K against the printed 1156 K (residual 23.584730718736182 ->
+    -1.30885260828245 K). Status stays mismatch because |residual| exceeds the 1 K absolute match
+    budget. Regression band ±0.05 K is numerical noise, not an accuracy tolerance.
   temperature_K: 1156.0
-  residual: 23.584730718736182
+  residual: -1.30885260828245
 - key: NaCl_normal_boiling_point:Psat=1atm
   case_id: janaf-4th::NaCl_normal_boiling_point
   source_id: janaf-4th
