@@ -7116,7 +7116,7 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
         migrated_ids = [
             key
             for key in migrated_rows
-            if key == base_id or key.startswith(f"{base_id}::points:")
+                if key == base_id or key.startswith(f"{base_id}::")
         ]
         assert migrated_ids, observation_id
 
@@ -7129,7 +7129,7 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
             migrated_id = next(
                 key
                 for key in migrated_rows
-                if key == base_id or key.startswith(f"{base_id}::points:")
+                if key == base_id or key.startswith(f"{base_id}::")
             )
             observation = migrated_rows[migrated_id]
             assert observation.point_conditions is not None

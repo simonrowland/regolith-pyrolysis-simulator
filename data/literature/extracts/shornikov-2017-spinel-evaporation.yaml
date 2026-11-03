@@ -846,21 +846,40 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
-      derived_from:
-        - shornikov_2017_table2_mgo_partial_pressure
-        - shornikov_2017_table2_mg_partial_pressure
+      derivation:
+        relation: >-
+          The authors calculated atomic oxygen partial pressure using Eq. (14) and the temperature-dependent equilibrium constant K10(T) from handbook reference [10].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(14)'
+            note: The article has no formal section heading for the equations; the method is in the prose immediately before Table 3.
+        method:
+          state: {tag: value, value: thermochemical equilibrium calculation}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(14)'
+        references:
+          - 'Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]'
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
+        method_class: model_derived
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
         standard_state: 'partial pressure of atomic O(g)'
         method_as_printed: 'thermochemical equilibrium calculation'
+        note: >-
+          Model result; equilibrium constants K10(T)–K13(T) are not transcribed, so the calculations are not fully reproducible from stored data.
         equation_as_printed: '(14)'
         thermochemical_data_reference_as_printed: '[10]'
-        attribution: 'Shornikov (2017) reports this author-calculated Eq. (14) value using K10(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
-        note: 'Quoted model output; K10(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -886,21 +905,40 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
-      derived_from:
-        - shornikov_2017_table2_alo_partial_pressure
-        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: >-
+          The authors calculated atomic oxygen partial pressure using Eq. (15) and the temperature-dependent equilibrium constant K11(T) from handbook reference [10].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(15)'
+            note: The article has no formal section heading for the equations; the method is in the prose immediately before Table 3.
+        method:
+          state: {tag: value, value: thermochemical equilibrium calculation}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(15)'
+        references:
+          - 'Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]'
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
+        method_class: model_derived
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
         standard_state: 'partial pressure of atomic O(g)'
         method_as_printed: 'thermochemical equilibrium calculation'
+        note: >-
+          Model result; equilibrium constants K10(T)–K13(T) are not transcribed, so the calculations are not fully reproducible from stored data.
         equation_as_printed: '(15)'
         thermochemical_data_reference_as_printed: '[10]'
-        attribution: 'Shornikov (2017) reports this author-calculated Eq. (15) value using K11(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
-        note: 'Quoted model output; K11(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -926,21 +964,40 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
-      derived_from:
-        - shornikov_2017_table2_al2o_partial_pressure
-        - shornikov_2017_table2_al_partial_pressure
+      derivation:
+        relation: >-
+          The authors calculated atomic oxygen partial pressure using Eq. (16) and the temperature-dependent equilibrium constant K12(T) from handbook reference [10].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(16)'
+            note: The article has no formal section heading for the equations; the method is in the prose immediately before Table 3.
+        method:
+          state: {tag: value, value: thermochemical equilibrium calculation}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(16)'
+        references:
+          - 'Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]'
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
+        method_class: model_derived
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
         standard_state: 'partial pressure of atomic O(g)'
         method_as_printed: 'thermochemical equilibrium calculation'
+        note: >-
+          Model result; equilibrium constants K10(T)–K13(T) are not transcribed, so the calculations are not fully reproducible from stored data.
         equation_as_printed: '(16)'
         thermochemical_data_reference_as_printed: '[10]'
-        attribution: 'Shornikov (2017) reports this author-calculated Eq. (16) value using K12(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
-        note: 'Quoted model output; K12(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
@@ -964,20 +1021,40 @@ species:
       units: atm
       T_range_K: [1851.0, 2089.0]
       point_conditions: *spinel_point_conditions
-      derived_from:
-        - shornikov_2017_table2_o2_partial_pressure
+      derivation:
+        relation: >-
+          The authors calculated atomic oxygen partial pressure using Eq. (17) and the temperature-dependent equilibrium constant K13(T) from handbook reference [10].
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(17)'
+            note: The article has no formal section heading for the equations; the method is in the prose immediately before Table 3.
+        method:
+          state: {tag: value, value: thermochemical equilibrium calculation}
+          locator:
+            page: 3
+            published_page: 12
+            pdf_page_index: 2
+            section: Thermodynamic equilibrium calculations (prose before Table 3)
+            equation: '(17)'
+        references:
+          - 'Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]'
       values:
         quantity: partial_pressure
-        method_class: quoted_attributed
+        method_class: model_derived
         gas_species: O
         formula: O
         reservoir_formula: MgAl2O4
         standard_state: 'partial pressure of atomic O(g)'
         method_as_printed: 'thermochemical equilibrium calculation'
+        note: >-
+          Model result; equilibrium constants K10(T)–K13(T) are not transcribed, so the calculations are not fully reproducible from stored data.
         equation_as_printed: '(17)'
         thermochemical_data_reference_as_printed: '[10]'
-        attribution: 'Shornikov (2017) reports this author-calculated Eq. (17) value using K13(T) from the Glushko handbook [10]; the numeric constant is not stored in the corpus.'
-        note: 'Quoted model output; K13(T) is not stored, so the calculation is not fully reproducible from stored inputs.'
         cell_material_as_printed: molybdenum
         composition_mol: {basis: stoichiometric_MgAl2O4_oxide_mole_fractions, MgO: '0.5', Al2O3: '0.5'}
         points:
