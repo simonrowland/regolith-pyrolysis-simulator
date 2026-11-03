@@ -110,6 +110,7 @@ from simulator.battery.migrate import (
     load_yaml,
     _convert_compilation_amount,
     _log_fO2_to_pa,
+    PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
@@ -362,6 +363,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
+    Quantity.WALL_DEPOSIT_AREAL_RATE: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
@@ -976,7 +978,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY
-    if quantity is Quantity.WALL_DEPOSIT_MASS:
+    if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
         return Rail.WALL_DEPOSITION
     if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
@@ -8831,6 +8833,253 @@ def predict_with_engine(
         )
 
 
+def _identity_decimal(state: object) -> Decimal | None:
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    if isinstance(state.value, Decimal):
+        return state.value
+    return None
+
+
+def _condition_decimal(observation: Observation, key: str) -> Decimal | None:
+    located = (observation.point_conditions or {}).get(key)
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    value = located.state.value
+    if isinstance(value, bool) or not isinstance(value, (Decimal, int, float, str)):
+        return None
+    try:
+        return as_decimal(value)
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+
+def _component_mole_fraction(identity: Identity, formula: str) -> Decimal | None:
+    composition = identity.composition
+    if (
+        composition is None
+        or not composition.is_value
+        or not isinstance(composition.value, Composition)
+    ):
+        return None
+    for name, amount in composition.value.components:
+        if name == formula:
+            return amount
+    return None
+
+
+def _gas_thermo_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formulas: Sequence[str],
+) -> EnginePrediction | None:
+    """Typed refusal when a depositing or dew-point species has no gas thermo."""
+
+    from simulator.condensation import _condensation_admission_refusal
+
+    missing: list[str] = []
+    codes: list[str] = []
+    for formula in formulas:
+        code = _condensation_admission_refusal(formula)
+        if code:
+            missing.append(formula)
+            codes.append(code)
+    if not missing:
+        return None
+    reason = codes[0]
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={"reason": reason, "species": tuple(missing)},
+        identity=identity,
+    )
+
+
+def _wall_flux_input_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    missing: Sequence[str],
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        refusal_detail={
+            "reason": "wall_flux_inputs_unprinted",
+            "missing": tuple(missing),
+        },
+        identity=identity,
+    )
+
+
+def _wall_areal_rate_from_existing_flux(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formula: str,
+) -> EnginePrediction:
+    """Mass flux from the wall model's series-resistance molar flux.
+
+    Temperature, total pressure, the species mole fraction, pipe diameter,
+    and the sticking coefficient must be printed. Nothing here invents a
+    pipe diameter or a sticking coefficient.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.condensation import (
+        DepositionInputRefusal,
+        WallSaturationPressureRefusal,
+        _series_resistance_deposition_flux_mol_m2_s,
+    )
+
+    missing: list[str] = []
+    temperature = _identity_decimal(identity.temperature_K)
+    pressure = _identity_decimal(identity.total_pressure_Pa)
+    if temperature is None:
+        missing.append("temperature_K")
+    if pressure is None:
+        missing.append("total_pressure_Pa")
+    fraction = _component_mole_fraction(identity, formula)
+    if fraction is None:
+        missing.append("partial_pressure_unprinted")
+    diameter = _condition_decimal(observation, "pipe_diameter_m")
+    if diameter is None:
+        missing.append("pipe_diameter_m")
+    alpha = _condition_decimal(observation, "sticking_coefficient")
+    if alpha is None:
+        alpha = _condition_decimal(observation, "alpha_s")
+    if alpha is None:
+        missing.append("sticking_coefficient")
+    if missing or temperature is None or pressure is None or fraction is None:
+        return _wall_flux_input_refusal(engine, identity, channel, sources, missing)
+    diagnostic: dict[str, object] = {}
+    try:
+        molar_flux = _series_resistance_deposition_flux_mol_m2_s(
+            formula,
+            float(fraction * pressure),
+            float(temperature),
+            float(alpha),
+            pipe_diameter_m=float(diameter),
+            diagnostic_out=diagnostic,
+        )
+    except (WallSaturationPressureRefusal, DepositionInputRefusal):
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "wall_saturation_pressure_refused",
+                "species": (formula,),
+            },
+            identity=identity,
+        )
+    if diagnostic.get("wall_saturation_pressure_refused"):
+        printed = diagnostic.get("wall_saturation_pressure_refusal_reason")
+        reason = (
+            printed
+            if isinstance(printed, str) and _short_refusal_token(printed) is not None
+            else "wall_saturation_pressure_refused"
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={"reason": reason, "species": (formula,)},
+            identity=identity,
+        )
+    try:
+        molar_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    except Exception:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+            refusal_detail={
+                "reason": "species_molar_mass_unresolved",
+                "formula": formula,
+            },
+            identity=identity,
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=Decimal(str(molar_flux)) * Decimal(str(molar_mass)),
+        unit=QUANTITY_UNITS[Quantity.WALL_DEPOSIT_AREAL_RATE],
+        authority=Authority.BRIDGE,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
+def _wall_deposition_quantity_prediction(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction | None:
+    """Dew point and areal wall flux. Other quantities fall through.
+
+    Gas thermo is checked before any temperature or pipe diameter is read.
+    A Na2SO4 dew point also needs NaOH, its equilibrium partner. An areal
+    rate checks only the depositing species.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    if not formula:
+        return None
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        subtype = identity.subtype
+        if (
+            subtype is None
+            or not subtype.is_value
+            or subtype.value != "dew_point"
+        ):
+            return None
+        partners = [formula]
+        if formula == "Na2SO4":
+            partners.append("NaOH")
+        return _gas_thermo_refusal(engine, identity, channel, sources, partners)
+    if quantity is not Quantity.WALL_DEPOSIT_AREAL_RATE:
+        return None
+    refusal = _gas_thermo_refusal(engine, identity, channel, sources, (formula,))
+    if refusal is not None:
+        return refusal
+    return _wall_areal_rate_from_existing_flux(
+        engine, observation, identity, channel, sources, formula
+    )
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8947,6 +9196,11 @@ def _predict_with_engine(
         return _predict_phase_row(
             engine, observation, identity, channel, sources, handles=handles
         )
+    wall_prediction = _wall_deposition_quantity_prediction(
+        engine, observation, identity, quantity, channel, sources
+    )
+    if wall_prediction is not None:
+        return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -11623,6 +11877,20 @@ def compile_residual(
             )
 
     if quantity is None:
+        if (
+            isinstance(identity, Identity)
+            and identity.quantity.is_unknown
+            and identity.quantity.reason == PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE
+        ):
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                {"reason": PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE},
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                exclusions=(
+                    "status_match_or_mismatch",
+                    "finite_numeric_point_endpoints",
+                ),
+            )
         detail: dict[str, object] = {"reason": "quantity_unknown"}
         if reference.value.kind is ValueKind.CATEGORICAL:
             detail["value_kind"] = ValueKind.CATEGORICAL.value

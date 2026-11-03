@@ -65,7 +65,11 @@ from simulator.battery.polymorph_dictionary import (
     polymorph_matches_formula,
     resolve_formula_polymorph,
 )
-from simulator.battery.composition import parse_species_formula
+from simulator.battery.composition import (
+    ideal_gas_volume_amount_to_mole_fraction,
+    ideal_gas_volume_scale,
+    parse_species_formula,
+)
 from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
@@ -610,7 +614,11 @@ QUANTITY_ALIASES = {
     "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
     "open_furnace_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
     "residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    "surface_deposition_areal_mass_rate": Quantity.WALL_DEPOSIT_AREAL_RATE,
 }
+
+# t-1597. Batch particulate entrainment is not a wall-deposition quantity.
+PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE = "particulate_carryover_out_of_model_scope"
 
 # guard_09_05: legacy rail names including underscored aliases.
 RAIL_MAP = {
@@ -1400,8 +1408,148 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MASS_PERCENT)
 
 
+def _printed_mole_component_name(name: str) -> bool:
+    """Oxide allowlist or a parsed formula. Arbitrary strings stay rejected."""
+
+    if name in _COMPOSITION_COMPONENTS:
+        return True
+    return parse_species_formula(name) is not None
+
+
 def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
-    return _percent_components(payload, AmountBasis.MOLE_PERCENT)
+    pairs = _percent_pairs(payload, AmountBasis.MOLE_PERCENT)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names) or any(
+        not _printed_mole_component_name(name) for name in names
+    ):
+        return None
+    return dict(pairs)
+
+
+def _component_entries(payload: Mapping[str, Any]) -> list[Any] | None:
+    components = payload.get("components")
+    if isinstance(components, Mapping):
+        return list(components.items())
+    if isinstance(components, (list, tuple)):
+        return list(components)
+    return None
+
+
+def _ideal_gas_volume_rows(
+    payload: Mapping[str, Any],
+) -> list[tuple[str, Decimal, str]] | None:
+    """Printed ``(name, amount, verbatim basis)`` for an ideal-gas volume map.
+
+    ``None`` means this payload is not a volume map. A volume token that
+    does not parse raises ``ValueError``; the component is not dropped.
+    Percent amounts stay on the printed 100-closure. Volume-ppm amounts
+    are extra and do not enter that closure.
+    """
+
+    entries = _component_entries(payload)
+    if not entries:
+        return None
+    payload_basis = payload.get("basis")
+    payload_scale = (
+        ideal_gas_volume_scale(payload_basis)
+        if isinstance(payload_basis, str)
+        else None
+    )
+    has_component_scale = any(
+        isinstance(item, (list, tuple))
+        and len(item) >= 3
+        and ideal_gas_volume_scale(item[2]) is not None
+        for item in entries
+    )
+    if payload_scale is None and not has_component_scale:
+        return None
+    rows: list[tuple[str, Decimal, str]] = []
+    for item in entries:
+        if not isinstance(item, (list, tuple)) or len(item) not in {2, 3}:
+            raise ValueError(
+                "ideal-gas volume composition component must be a pair or a printed-basis triple"
+            )
+        name = str(item[0])
+        amount = _as_dec_or_none(item[1])
+        if amount is None or not amount.is_finite() or amount < 0:
+            raise ValueError(
+                "mole-percent composition contains a negative or non-finite amount"
+            )
+        if len(item) == 3:
+            verbatim = str(item[2])
+            if ideal_gas_volume_scale(verbatim) is None:
+                raise ValueError(
+                    f"unrecognised ideal-gas volume basis {verbatim!r}"
+                )
+        elif payload_scale is None or not isinstance(payload_basis, str):
+            raise ValueError(
+                f"ideal-gas volume component {name!r} has no printed volume basis"
+            )
+        else:
+            verbatim = payload_basis
+        if not _printed_mole_component_name(name):
+            raise ValueError(
+                "mole-percent composition contains unsupported or ambiguous components: "
+                f"{name}"
+            )
+        rows.append((name, amount, verbatim))
+    names = [name for name, _amount, _basis in rows]
+    if len(set(names)) != len(names):
+        raise ValueError(
+            "mole-percent composition contains unsupported or ambiguous components"
+        )
+    return rows
+
+
+def _ideal_gas_volume_printed_bases(payload: object) -> tuple[str, ...] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    if _enum(AmountBasis, payload.get("amount_basis")) is not AmountBasis.MOLE_PERCENT:
+        return None
+    rows = _ideal_gas_volume_rows(payload)
+    if rows is None:
+        return None
+    seen: list[str] = []
+    for _name, _amount, verbatim in rows:
+        if verbatim not in seen:
+            seen.append(verbatim)
+    return tuple(seen)
+
+
+def _composition_from_ideal_gas_volume(
+    payload: Mapping[str, Any], metadata: Mapping[str, str | None]
+) -> Composition | None:
+    if _enum(AmountBasis, payload.get("amount_basis")) is not AmountBasis.MOLE_PERCENT:
+        return None
+    rows = _ideal_gas_volume_rows(payload)
+    if rows is None:
+        return None
+    percent = {
+        name: amount
+        for name, amount, verbatim in rows
+        if ideal_gas_volume_scale(verbatim) == "percent"
+    }
+    if percent:
+        closure_error = _mole_percent_closure_error(percent)
+        if closure_error is not None:
+            raise ValueError(closure_error)
+    payload_basis = payload.get("basis")
+    basis = (
+        str(payload_basis)
+        if isinstance(payload_basis, str) and ideal_gas_volume_scale(payload_basis)
+        else "ideal_gas_volume_fraction"
+    )
+    return Composition(
+        basis=basis,
+        components=tuple(
+            (name, ideal_gas_volume_amount_to_mole_fraction(amount, verbatim))
+            for name, amount, verbatim in rows
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        **metadata,
+    )
 
 
 def _mole_percent_closure_error(components: Mapping[str, Decimal]) -> str | None:
@@ -1470,10 +1618,19 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 locator=source.locator,
                 inference=source.inference,
             )
+        inference = source.inference
+        printed_bases = _ideal_gas_volume_printed_bases(body)
+        if printed_bases is not None:
+            inference = Derivation(
+                relation=NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION.value,
+                inputs=printed_bases,
+                parameters=(),
+                output_unit="mole_fraction",
+            )
         return Located(
             State.of(composition),
             locator=source.locator,
-            inference=source.inference,
+            inference=inference,
         )
     wt = _mass_percent_components(payload)
     if wt is not None:
@@ -1755,6 +1912,9 @@ def _composition_from_plain(payload: object) -> Composition:
         if wt is not None:
             return replace(wt_pct_to_mole_fraction(wt), **metadata)
     elif amount_basis is AmountBasis.MOLE_PERCENT:
+        volume = _composition_from_ideal_gas_volume(payload, metadata)
+        if volume is not None:
+            return volume
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
             raise ValueError(
@@ -3472,6 +3632,54 @@ def convert_areal_mass_to_kg_per_m2(
     return None, f"unmapped areal mass unit {units!r}"
 
 
+def _areal_rate_unit_key(units: str) -> str:
+    text = str(units).strip().lower()
+    suffix = " as printed"
+    if text.endswith(suffix):
+        text = text[: -len(suffix)].strip()
+    return (
+        text.replace("·", "/")
+        .replace("•", "/")
+        .replace("⋅", "/")
+        .replace(" ", "")
+        .replace("²", "2")
+        .replace("^", "")
+        .replace("−", "-")
+        .replace("⁻", "-")
+        .replace("/hr", "/h")
+        .replace("hr-1", "h-1")
+    )
+
+
+def convert_areal_rate_to_kg_per_m2_s(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Convert a printed wall-deposition flux to kg m^-2 s^-1.
+
+    Premise: 1 mg = 1e-6 kg, 1 cm^2 = 1e-4 m^2, 1 h = 3600 s (SI).
+    Algebra: 1 mg cm^-2 h^-1 = 1e-6 / (1e-4 * 3600) = 1/360000
+    kg m^-2 s^-1. 1 mg m^-2 s^-1 = 1e-6 kg m^-2 s^-1.
+    Unit check: kg / (m^2 * s) = kg m^-2 s^-1.
+    Sanity: 0.38 mg cm^-2 h^-1 = 0.38/360000 = 1.0555...e-6
+    kg m^-2 s^-1, which is 1.056e-6 at 4 significant figures.
+    1.60/360000 = 4.444...e-6. 2.9 mg m^-2 s^-1 = 2.9e-6.
+    """
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal rate value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal rate unit"
+    key = _areal_rate_unit_key(str(units))
+    if key in {"kg/m2/s", "kg/m2s-1", "kgm-2s-1", "kgperm2pers", "kg_per_m2_s"}:
+        return amount, "identity:kg_per_m2_s"
+    if key in {"mg/cm2/h", "mg/cm2h-1", "mgcm-2h-1", "mgpercm2perh", "mg_per_cm2_per_h"}:
+        return amount / Decimal(360000), "mg_per_cm2_h_to_kg_per_m2_s"
+    if key in {"mg/m2/s", "mg/m2s-1", "mgm-2s-1", "mgperm2pers", "mg_per_m2_per_s"}:
+        return amount * Decimal("1e-6"), "mg_per_m2_s_to_kg_per_m2_s"
+    return None, f"unmapped areal rate unit {units!r}"
+
+
 def convert_mass_to_kg(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -3673,6 +3881,18 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "rho_kg_per_m3 = rho_g_per_cm3 × 1000",
         "kg_per_m3",
         "g_per_cm3",
+    ),
+    "mg_per_cm2_h_to_kg_per_m2_s": (
+        Decimal(360000),
+        "J_kg_per_m2_s = J_mg_per_cm2_h / 360000",
+        "kg_per_m2_s",
+        "mg/cm2/h",
+    ),
+    "mg_per_m2_s_to_kg_per_m2_s": (
+        Decimal("1e-6"),
+        "J_kg_per_m2_s = J_mg_per_m2_s * 1e-6",
+        "kg_per_m2_s",
+        "mg/m2/s",
     ),
     "mg_per_cm2_to_kg_per_m2": (
         Decimal("100"),
@@ -7105,6 +7325,9 @@ def map_quantity(
                 "quoted_from_other_workers rows"
             )
             return State.unknown(reason), reason
+        if isinstance(raw, str) and "carryover" in raw.casefold():
+            reason = PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE
+            return State.unknown(reason), reason
         if isinstance(raw, str) and raw in QUANTITY_ALIASES:
             inferred = QUANTITY_ALIASES[raw]
             contradiction = _quantity_contradiction(inferred, obs_type, values, units, row)
@@ -10004,6 +10227,10 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "delta_q_replicate_1",
         "delta_q_replicate_2",
     ),
+    Quantity.WALL_DEPOSIT_AREAL_RATE: (
+        "value",
+        "surface_deposition_areal_mass_rate",
+    ),
     Quantity.DENSITY: (
         "density_g_cm3",
         "density_kg_m3_also_printed",
@@ -11772,6 +11999,19 @@ def _selection_from_named_field(
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
             )
+        if q_token is Quantity.WALL_DEPOSIT_AREAL_RATE:
+            amount, trail = convert_areal_rate_to_kg_per_m2_s(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal deposition rate",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2_s", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -11852,6 +12092,19 @@ def _selection_from_named_field(
                 )
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
+        if q_token is Quantity.WALL_DEPOSIT_AREAL_RATE:
+            amount, trail = convert_areal_rate_to_kg_per_m2_s(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal deposition rate",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2_s", payload, condition_ranges
             )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
@@ -18604,6 +18857,10 @@ class Migrator:
             }
             and value_sel.available
             and value_sel.field_name
+        ) or (
+            q_token is Quantity.WALL_DEPOSIT_AREAL_RATE
+            and value_sel.available
+            and value_sel.field_name
         ):
             original_raw = values.get(value_sel.field_name)
             if isinstance(original_raw, Mapping):
@@ -18760,6 +19017,11 @@ class Migrator:
                         detail=reason,
                     )
                 )
+        if (
+            q_token is Quantity.WALL_DEPOSIT_AREAL_RATE
+            and ident_kwargs.get("per") is None
+        ):
+            ident_kwargs["per"] = State.of(PerBasis.AREA_TIME)
         if source_reference_state is not None:
             ident_kwargs["reference_state"] = source_reference_state
             if source_reference_state.is_unknown:
@@ -21756,6 +22018,7 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
+        gas_volume_bases: tuple[str, ...] | None = None
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
@@ -21782,6 +22045,24 @@ class Migrator:
                         and raw_composition.amount_basis is AmountBasis.MOL_INVENTORY
                         and len(raw_composition.components) > 1
                     )
+                    gas_inference = located_composition.inference
+                    subtype_value = (
+                        identity.subtype.value
+                        if identity.subtype is not None and identity.subtype.is_value
+                        else None
+                    )
+                    promotes_gas_volume = (
+                        isinstance(gas_inference, Derivation)
+                        and gas_inference.relation
+                        == NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION.value
+                        and (
+                            q_token_point is Quantity.WALL_DEPOSIT_AREAL_RATE
+                            or (
+                                q_token_point is Quantity.TRANSITION_TEMPERATURE
+                                and subtype_value == "dew_point"
+                            )
+                        )
+                    )
                     promotes_typed_composition = (
                         q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}
                         or (
@@ -21791,11 +22072,14 @@ class Migrator:
                             and "melt" in phase_as_printed.casefold()
                         )
                         or is_printed_mol_inventory
+                        or promotes_gas_volume
                     )
                     if promotes_typed_composition:
                         identity = replace(
                             identity, composition=State.of(raw_composition)
                         )
+                        if promotes_gas_volume:
+                            gas_volume_bases = tuple(gas_inference.inputs)
                 elif q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}:
                     converted_composition = _composition_located_from_plain(
                         {
@@ -21824,6 +22108,15 @@ class Migrator:
                         identity, total_pressure_Pa=State.of(pressure)
                     )
         child_notices = list(notices)
+        if gas_volume_bases and isinstance(q_token_point, Quantity):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION,
+                    affected_quantities=(q_token_point,),
+                    reason="; ".join(gas_volume_bases),
+                    origin=point_id,
+                )
+            )
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
