@@ -3323,6 +3323,8 @@ def test_invalid_recipe_local_furnace_field_is_rejected(
 
 
 def test_in_window_c2a_run_captures_na_product() -> None:
+    from simulator.condensation import _cached_alpha_s_evaluation
+
     profile = _c2a_window_profile(1400.0, 1450.0, 18)
     profile["seed_recipes"][0]["patch"]["campaigns"][
         "C2A_continuous"
@@ -3348,10 +3350,12 @@ def test_in_window_c2a_run_captures_na_product() -> None:
         allow_unmeasured_alpha_fallback=True,
     )
     session = run._start_session()
+    _cached_alpha_s_evaluation.cache_clear()
     result = run._run_session(session)
 
     assert result["status"] == "ok"
     assert session.simulator.product_ledger()["Na"] > 0.0
+    assert _cached_alpha_s_evaluation.cache_info().hits > 0
     in_window_hours = sum(
         1400.0 <= float(summary["T_C"]) <= 1450.0
         for summary in session.per_hour_summaries()

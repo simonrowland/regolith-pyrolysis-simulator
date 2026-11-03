@@ -80,6 +80,7 @@ The Fe → SiO separation (Stage 1 → Stage 3):
 from __future__ import annotations
 
 import copy
+from functools import lru_cache
 import math
 import warnings
 from collections.abc import Mapping, MutableMapping
@@ -1291,7 +1292,26 @@ class _ArrheniusAlphaUnderflow(ValueError):
     """
 
 
-def _alpha_s_evaluation(
+class _AlphaSpecCacheKey:
+    """Content key for the small executable alpha spec used by one solve."""
+
+    __slots__ = ("spec", "fingerprint")
+
+    def __init__(self, spec: Any) -> None:
+        self.spec = spec
+        self.fingerprint = repr(spec)
+
+    def __hash__(self) -> int:
+        return hash(self.fingerprint)
+
+    def __eq__(self, other: object) -> bool:
+        return (
+            isinstance(other, _AlphaSpecCacheKey)
+            and self.fingerprint == other.fingerprint
+        )
+
+
+def _alpha_s_evaluation_uncached(
     species: str,
     T_K: float,
     spec: Any,
@@ -1446,6 +1466,38 @@ def _alpha_s_evaluation(
         'alpha_s_temperature_K': T_K,
         'alpha_s_extrapolated': False,
     }
+
+
+@lru_cache(maxsize=512)
+def _cached_alpha_s_evaluation(
+    species: str,
+    T_K: float,
+    spec_key: _AlphaSpecCacheKey,
+) -> tuple[float, dict[str, Any]]:
+    return _alpha_s_evaluation_uncached(species, T_K, spec_key.spec)
+
+
+def _alpha_s_evaluation(
+    species: str,
+    T_K: float,
+    spec: Any,
+) -> tuple[float, dict[str, Any]]:
+    try:
+        T_K = float(T_K)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f'alpha_s({species}): T_K must be numeric') from exc
+    if not math.isfinite(T_K) or T_K <= 0.0:
+        raise ValueError(f'alpha_s({species}): T_K must be finite and > 0')
+
+    try:
+        spec_key = _AlphaSpecCacheKey(spec)
+    except Exception:
+        # Some Mapping implementations or nested values can have stateful or
+        # failing repr methods. Preserve their prior validation path instead
+        # of making cache-key construction a new input requirement.
+        return _alpha_s_evaluation_uncached(species, T_K, spec)
+    cached = _cached_alpha_s_evaluation(str(species), T_K, spec_key)
+    return cached[0], copy.deepcopy(cached[1])
 
 
 def alpha_s(

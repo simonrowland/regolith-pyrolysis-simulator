@@ -11,7 +11,7 @@ import yaml
 from engines.builtin.evaporation_flux import BuiltinEvaporationFluxProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
-from simulator.condensation import alpha_s
+from simulator.condensation import _cached_alpha_s_evaluation, alpha_s
 from simulator.evaporation import (
     _load_evaporation_alpha_envelope_by_species,
     _load_evaporation_alpha_by_species,
@@ -72,6 +72,24 @@ def test_alpha_surface_loads_expected_species_values():
         SIO_ALPHA_FORM_T_K,
         {"coefficient_spec": alpha_by_species["SiO"]},
     ) == pytest.approx(SIO_ALPHA_AT_1500C)
+
+
+def test_alpha_evaluation_cache_reuses_specs_and_observes_mutation():
+    spec = dict(
+        _load_evaporation_alpha_by_species(_vapor_pressure_data())["SiO"]
+    )
+    _cached_alpha_s_evaluation.cache_clear()
+
+    first = alpha_s("SiO", SIO_ALPHA_FORM_T_K, {"coefficient_spec": spec})
+    second = alpha_s("SiO", SIO_ALPHA_FORM_T_K, {"coefficient_spec": spec})
+    assert second == first
+    assert _cached_alpha_s_evaluation.cache_info().hits == 1
+    assert _cached_alpha_s_evaluation.cache_info().misses == 1
+
+    spec["A"] = float(spec["A"]) * 1.01
+    changed = alpha_s("SiO", SIO_ALPHA_FORM_T_K, {"coefficient_spec": spec})
+    assert changed != first
+    assert _cached_alpha_s_evaluation.cache_info().misses == 2
 
 
 def test_alpha_surface_sources_and_envelopes_are_present():
