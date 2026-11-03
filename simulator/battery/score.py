@@ -221,6 +221,7 @@ from simulator.battery.validity import (
     GateOutcome,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
+    apparatus_geometry_interval_notice,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
@@ -12961,11 +12962,27 @@ def compile_residual(
         if reference.value.approximate and quantity is not None
         else ()
     )
+    # The regime sentence is true only where the apparatus gates run.
+    # Model-derived rows skip those gates and must not claim the check.
+    apparatus_in_scope = evidence_class.is_value and (
+        evidence_class.value in MEASURED_EVIDENCE
+        or evidence_class.value is EvidenceClass.FIGURE_ONLY
+    )
+    geometry_interval_notices: tuple[Notice, ...] = ()
+    if apparatus_in_scope and experiment is not None and quantity is not None:
+        geometry_interval_notice = apparatus_geometry_interval_notice(
+            experiment,
+            quantity,
+            origin=reference.observation_id,
+        )
+        if geometry_interval_notice is not None:
+            geometry_interval_notices = (geometry_interval_notice,)
     notices = union_notices(
         reference.notices,
         flagged_notices,
         evidence_class_notices,
         approximate_value_notices,
+        geometry_interval_notices,
         _quench_notices(reference),
     )
     liquid_sample_domain_notice = (
