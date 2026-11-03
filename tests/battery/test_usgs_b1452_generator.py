@@ -39,10 +39,10 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
+# t-1620 generator census: the printed decimal oxygen subscripts on terbium oxides parse.
 B1452_RAW = 55707
-B1452_STORE_STORED = 15155
-B1452_STORED = 15160
-B1452_REFUSED = 19713
+B1452_STORED = 15231
+B1452_REFUSED = 19642
 B1452_EXCLUDED = 20834
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
@@ -57,8 +57,10 @@ B1452_IDENTITY_10X = 205
 B1452_IDENTITY_1X_10X = 9
 HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
-B1452_FORMULA_UNRESOLVED_HT = 49
-B1452_FORMULA_UNRESOLVED_298K_ROWS = 53
+B1452_FORMULA_UNRESOLVED_HT = 47
+B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
+# Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
+B1452_STORE_STORED = 15226
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
