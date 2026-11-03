@@ -1,0 +1,96 @@
+source_id: wang-2009-cr-slag-kems-original
+input_order:
+- MinerU content-list HTML tables and markdown
+- pdftotext-layout machine text
+- PDF renders for sign, row/column, and composition-conflict checks
+tables:
+- page: 2
+  table: '1'
+  printed_rows: 20
+  disposition: comparison_only
+  render_verified: Table 1 sample 1 Cr2O3 mole fraction 0.062 checked against the page render to confirm the conflicting
+    initial-charge value.
+- page: 3
+  table: '2'
+  printed_rows: 8
+  disposition: excluded_materials_table
+  printed_rows_note: Eight material rows; not a results table.
+- page: 4
+  table: '3'
+  printed_rows: 20
+  disposition: condition_composition
+  columns_as_printed:
+  - Cr2O3
+  - CaO
+  - MgO
+  - Al2O3
+  - SiO2
+  mapping: All five post-FeO-vaporization mole-fraction cells are bound to each Table 4 and Table 5 observation
+    through composition_mol and point_conditions.composition.
+  render_verified: All 20 rows and five oxide columns checked against the PDF page render.
+- page: 5
+  table: '4'
+  printed_rows: 20
+  disposition: typed_refused_fit_coefficients
+  columns_as_printed:
+  - sample
+  - Cr2O3 mole fraction
+  - CrO A ± width
+  - CrO B ± width
+  - CrO2 A ± width
+  - CrO2 B ± width
+  mapping: Two typed-refused fit rows per printed sample; A, B, and their printed ± widths are retained separately.
+    Table 4 own mole fraction is retained on both species rows.
+  render_verified: All 20 rows, all six columns, minus signs, and ± widths checked against the PDF page render.
+    The formula/table sign conflict is preserved.
+- page: 5
+  table: '5'
+  printed_rows: 20
+  disposition: activities_and_typed_refused_fit_coefficients
+  columns_as_printed:
+  - sample
+  - Cr2O3 mole fraction
+  - A ± width
+  - B ± width
+  - activity at 1950 K
+  - activity at 2035 K
+  mapping: One typed-refused log-activity fit row plus one activity observation with two located temperature points
+    per sample; Table 5 own mole fraction is retained.
+  render_verified: All 20 rows, all six columns, signs, ± widths, activities, and row/column assignments checked
+    against the PDF page render.
+composition_discrepancy: Table 4 and Table 5 captions assign the results to Table 3 compositions. Their printed
+  Cr2O3 mole-fraction fields instead reproduce Table 1 initial-charge values; sample 1 is 0.062 in Table 1 and Tables
+  4–5 versus 0.066 in Table 3. The source does not explain the discrepancy. Table 3 is bound as identity composition;
+  both result-table fields remain verbatim.
+sign_convention: Table 4 caption prints log(p_i, Pa) = −A/T + B, while the printed A entries are themselves negative
+  (for example, CrO sample 1 A = −36066.0 ± 2827.4). The equation and coefficient signs are internally inconsistent;
+  both are retained verbatim with no sign correction. The prose, Eqn. (22), and Figs. 1–2 do not identify whether
+  the caption or coefficient signs are the misprint.
+schema_gaps:
+- printed_form: log partial-pressure temperature-fit coefficients A and B
+  quantity_label: log_partial_pressure_temperature_fit_coefficients
+  reason: Table 4 reports fitted coefficients for a partial-pressure temperature relation, not point pressures.
+    No exact fit-coefficient quantity exists in simulator/battery/migrate.py::QUANTITY_ALIASES or ::TYPE_QUANTITY;
+    binding the partial_pressure observation type to p_partial would misstate A/B as a pressure. The cells are retained
+    as typed-refused coefficient records.
+- printed_form: log Cr2O3 activity temperature-fit coefficients A and B
+  quantity_label: log_activity_temperature_fit_coefficients
+  reason: Table 5 reports coefficients for log activity, not activity coefficients. simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+    is a near miss for this distinct printed observable; simulator/battery/migrate.py::QUANTITY_ALIASES and ::TYPE_QUANTITY
+    have no exact log-activity temperature-fit coefficient token. The coefficients are retained as typed-refused
+    records.
+conditions: KEMS rows have T range 1950–2035 K (exact point temperatures for Table 5 activities), Table 3 sample
+  composition, known tungsten-cell/1:100 area ratio and gold-pressure calibration; no numeric experiment total pressure
+  or fO2 is printed. The qualitatively stated high vacuum and low oxygen pressure remain text conditions.
+figure_read_candidates:
+- figure: '1'
+  page: 6
+  candidate: Pressure traces for Fe, Cr, CrO×10, CrO2×10, SiO×10, Ca, and Al×10 over sample 17; no points digitized.
+- figure: '2'
+  page: 7
+  candidate: Pressure traces for Fe, Cr, CrO×10, SiO×10, Ca, Mg×10, and Al×10 over sample 18; CrO2 is omitted from
+    this figure but tabulated in Table 4; no points digitized.
+unprinted_numeric_results: The text gives detection onsets (Fe+ about 1750 K; Cr+ 1850–1900 K; CrO+ and CrO2+ at
+  1900 K and higher) but prints no numeric ion-current intensity values. Atomic Cr and O2 pressure data are not
+  tabulated; figure-only pressure values remain out of scope.
+cell_audit_csv: wang-2009-cr-slag-kems-original.cell-audit.csv
