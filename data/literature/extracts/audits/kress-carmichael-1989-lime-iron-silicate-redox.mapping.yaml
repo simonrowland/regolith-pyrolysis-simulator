@@ -163,19 +163,25 @@ method_and_condition_decisions:
     samples quenched completely to glass are considered; rows use phase glass
     and quench_state asserted_preserved, located on PDF page 4.
   oxygen_reference: >-
-    Table 1 gives log(fO2) values with at most two decimal places and does not
-    print a pressure reference. The printed logarithm is stored with an empty
-    unit so the migrator bare-log convention owns the frame. This is separate
-    from total experimental pressure, which remains unknown.
+    Every one of the 52 Table 1 samples has a printed log(fO2) value, already
+    stored verbatim with its sample row and PDF page 3 / published page 2885
+    locator. The render and cell audit confirm 48 values of -0.68 and the four
+    reducing values 93A -7.32, 98B -8.98, 99A -8.98, and 101A -10.46. The bare
+    log(fO2) header gives no pressure reference or unit; the raw logarithms
+    retain an empty unit and the extract adds no base. This is separate from
+    total experimental pressure, which remains unknown.
   total_pressure: >-
     The paper prints no total experimental pressure for Table 1. No pressure is
     inferred from the air or CO-CO2 atmosphere, and no 1 bar total-pressure
     condition is stored.
   gases: >-
-    The experimental procedure identifies air and a CO-CO2 gas mixture. The
-    mixing ratios are calculated using Deines et al. (1974), but the paper does
-    not assign run-specific gas ratios to Table 1 samples; no gas ratio is
-    promoted onto a row.
+    The experimental procedure on PDF page 2 / published page 2884 identifies
+    experiments in air and under reducing conditions imposed by a CO-CO2 gas
+    mixture. The mixing ratios are calculated using Deines et al. (1974), but
+    neither the procedure nor Table 1 assigns a gas ratio or atmosphere to an
+    individual sample. Table 1 does print a log(fO2) for every sample, so no
+    sample lacks a printed oxygen condition and no gas ratio or air convention
+    is inferred.
   analysis: >-
     Glass bulk compositions are measured by ARL-SEMQ electron microprobe with
     modified Bence-Albee correction. FeO is measured by calorimetric wet

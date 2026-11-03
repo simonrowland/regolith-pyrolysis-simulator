@@ -132,9 +132,16 @@ def _assert_table1_matches_render(document):
             assert observation["locator"]["published_page"] == 2885
             assert observation["locator"]["table"] == "1"
             assert observation["locator"]["row"] == sample
-            assert observation["point_conditions"]["fO2_log"]["state"]["value"] == log_fo2
-            assert observation["point_conditions"]["fO2_log"]["units"] == ""
-            assert "note" not in observation["point_conditions"]["fO2_log"]
+            oxygen = observation["point_conditions"]["fO2_log"]
+            assert oxygen["state"] == {"tag": "value", "value": log_fo2}
+            assert oxygen["units"] == ""
+            assert oxygen["locator"]["page"] == 3
+            assert oxygen["locator"]["published_page"] == 2885
+            assert oxygen["locator"]["table"] == "1"
+            assert oxygen["locator"]["row"] == sample
+            assert oxygen["locator"]["column"] == "log(fO2)"
+            assert oxygen["locator"]["note"] == f"Table 1 sample {sample}."
+            assert "note" not in oxygen
             pressure = observation["point_conditions"]["total_pressure_Pa"]
             assert pressure["state"]["tag"] == "unknown"
             assert "does not report total experimental pressure" in pressure["state"]["reason"]
@@ -196,6 +203,13 @@ def test_interior_render_cell_mutation_is_rejected():
     observations["kc89_table1_11A_Fe2O3"]["values"]["component_amount"] = "24.52"
     with pytest.raises(AssertionError):
         _assert_table1_matches_render(document)
+
+    oxygen_mutation = deepcopy(load_extract())
+    observation_map(oxygen_mutation)["kc89_table1_11A_Fe2O3"][
+        "point_conditions"
+    ]["fO2_log"]["state"]["value"] = "-0.67"
+    with pytest.raises(AssertionError):
+        _assert_table1_matches_render(oxygen_mutation)
 
 
 def _assert_bare_log_identity(observation, sample: str, log_fo2: str) -> None:
