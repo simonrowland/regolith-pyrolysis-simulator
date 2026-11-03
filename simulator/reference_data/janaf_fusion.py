@@ -13,6 +13,11 @@ from simulator.reference_data.janaf import SIDECAR_PATH, TABLES_DIR, load_table_
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
+# Chase 1998, NIST-JANAF 4th ed., Monograph 9, p. 10 §3.4: R in the
+# printed JANAF identities is 8.31441 J/(mol K). Keep that source value for
+# fusion and reference-state conversions; do not substitute a newer constant.
+JANAF_R_J_PER_MOL_K = Decimal("8.31441")
+
 _FUSION_TABLES = {
     "CaO": ("Ca-027", "Ca-028"),
     "Al2O3": ("Al-096", "Al-100"),
@@ -187,6 +192,61 @@ def _missing_node_for_interpolation(
     return None
 
 
+def _complete_fusion_overlap_nodes(
+    oxide: str,
+    solid_table_id: str,
+    liquid_table_id: str,
+    solid_points: tuple[tuple[Decimal, Decimal], ...],
+    liquid_points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+) -> tuple[
+    tuple[Decimal, ...],
+    tuple[Decimal, ...],
+    tuple[Decimal, ...],
+]:
+    """Validate shared solid/liquid nodes and target-T Gibbs interpolation."""
+
+    solid_missing = _fusion_missing_gibbs_temperatures(solid_table_id)
+    liquid_missing = _fusion_missing_gibbs_temperatures(liquid_table_id)
+    overlap = sorted(
+        {
+            temperature
+            for temperature, _ in solid_points
+            if liquid_points[0][0] <= temperature <= liquid_points[-1][0]
+        }
+        | {
+            temperature
+            for temperature, _ in liquid_points
+            if solid_points[0][0] <= temperature <= solid_points[-1][0]
+        }
+    )
+    if not overlap:
+        raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
+    overlap = [
+        node
+        for node in overlap
+        if _missing_node_for_interpolation(solid_points, solid_missing, node) is None
+        and _missing_node_for_interpolation(liquid_points, liquid_missing, node) is None
+    ]
+    if len(overlap) < 2:
+        raise ValueError(
+            f"{oxide}: JANAF tables have fewer than two complete overlap nodes"
+        )
+    for table_id, points, missing in (
+        (solid_table_id, solid_points, solid_missing),
+        (liquid_table_id, liquid_points, liquid_missing),
+    ):
+        missing_node = _missing_node_for_interpolation(
+            points, missing, temperature_K
+        )
+        if missing_node is not None:
+            raise ValueError(
+                f"{table_id}: needed JANAF formation Gibbs row missing at "
+                f"{missing_node} K for interpolation at {temperature_K} K"
+            )
+    return tuple(overlap), solid_missing, liquid_missing
+
+
 def _interpolate_table_points(
     points: tuple[tuple[Decimal, Decimal], ...],
     temperature_K: Decimal,
@@ -255,30 +315,14 @@ def d144_fusion_delta_g_kJ_per_mol(
     temperature = Decimal(str(temperature_K))
     solid_points, _solid_digest = _fusion_table_points(pair[0])
     liquid_points, _liquid_digest = _fusion_table_points(pair[1])
-    solid_missing = _fusion_missing_gibbs_temperatures(pair[0])
-    liquid_missing = _fusion_missing_gibbs_temperatures(pair[1])
-    overlap = sorted(
-        {t for t, _ in solid_points if liquid_points[0][0] <= t <= liquid_points[-1][0]}
-        | {t for t, _ in liquid_points if solid_points[0][0] <= t <= solid_points[-1][0]}
+    _complete_fusion_overlap_nodes(
+        oxide,
+        pair[0],
+        pair[1],
+        solid_points,
+        liquid_points,
+        temperature,
     )
-    overlap = [
-        node
-        for node in overlap
-        if _missing_node_for_interpolation(solid_points, solid_missing, node) is None
-        and _missing_node_for_interpolation(liquid_points, liquid_missing, node) is None
-    ]
-    if len(overlap) < 2:
-        raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
-    for points, missing in (
-        (solid_points, solid_missing),
-        (liquid_points, liquid_missing),
-    ):
-        missing_node = _missing_node_for_interpolation(points, missing, temperature)
-        if missing_node is not None:
-            raise ValueError(
-                f"JANAF formation Gibbs interpolation spans missing grid node "
-                f"{missing_node} K at {temperature} K"
-            )
     return _fusion_gibbs_difference_from_points(
         solid_points, liquid_points, temperature
     )
