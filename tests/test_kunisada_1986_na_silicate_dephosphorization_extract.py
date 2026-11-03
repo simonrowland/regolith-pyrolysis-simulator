@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 import csv
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
+from simulator.battery.enums import MethodToken, Phase, PhaseRole, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 
@@ -93,6 +94,30 @@ def _assert_sc456_reduced_classes(document: dict) -> None:
         assert values["method_class"] == "measured_reduced"
         assert values["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
         assert values["derivation"]["raw_inputs"]["locator"]
+
+
+def _assert_quench_equilibration_method(document: dict) -> None:
+    assert document["experiments"]
+    assert all(
+        experiment["method"] == "quench_equilibration"
+        for experiment in document["experiments"]
+    )
+    phase_rows = [
+        row
+        for _, row in _rows(document).values()
+        if row.get("values", {}).get("quantity") == "equilibrium_phase_composition"
+    ]
+    assert len(phase_rows) == 202
+    assert all(row["regime"] == "quench_equilibration" for row in phase_rows)
+    methods = next(
+        context["values"]
+        for group in document["species"].values()
+        for context in group.get("context", [])
+        if context["observation_id"] == "kunisada_1986_experimental_methods"
+    )
+    assert methods["method_detail_as_printed"].startswith(
+        "“The experiment was carried out in a Tammann furnace"
+    )
 
 
 def test_tables_match_render_samples_and_complete_cell_audit() -> None:
@@ -212,6 +237,12 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert len(phase_rows) == 202
     assert all(row.identity.composition.is_value for row in phase_rows)
     assert all(row.point_conditions["composition"].state.is_value for row in phase_rows)
+    assert all(
+        migrator.result.experiments[row.experiment_id].method.is_value
+        and migrator.result.experiments[row.experiment_id].method.value
+        is MethodToken.QUENCH_EQUILIBRATION
+        for row in phase_rows
+    )
 
     contexts = [
         context
@@ -236,6 +267,12 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     methods = context_rows["kunisada_1986_experimental_methods"]["values"]
     assert methods["crucible_as_printed"] == (
         "recrystallized magnesia (MgO), 40 mm I.D., 60 mm H"
+    )
+    assert methods["method_detail_as_printed"].startswith(
+        "“The experiment was carried out in a Tammann furnace"
+    )
+    assert context_rows["kunisada_1986_experimental_methods"]["locator"]["section"] == (
+        "II. Experimental Method"
     )
     assert methods["furnace_and_tube_as_printed"] == (
         "Tammann furnace with an alumina reaction tube"
@@ -414,3 +451,24 @@ def test_sc456_reduced_class_pin_rejects_quote_reversion() -> None:
     _rows(document)[target][1]["values"]["method_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):
         _assert_sc456_reduced_classes(document)
+
+
+def test_quench_equilibration_method_pin_rejects_static_reversion() -> None:
+    document = _document()
+    _assert_quench_equilibration_method(document)
+
+    mutated = deepcopy(document)
+    mutated["experiments"][0]["method"] = "static_equilibrium"
+    with pytest.raises(AssertionError):
+        _assert_quench_equilibration_method(mutated)
+
+    mutated = deepcopy(document)
+    first_slag_row = next(
+        row
+        for _, row in _rows(mutated).values()
+        if row.get("values", {}).get("phase_label") == "slag"
+        and row.get("values", {}).get("basis") == "wt_percent"
+    )
+    first_slag_row["regime"] = "static_equilibrium"
+    with pytest.raises(AssertionError):
+        _assert_quench_equilibration_method(mutated)
