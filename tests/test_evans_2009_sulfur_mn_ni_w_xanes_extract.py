@@ -128,13 +128,89 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
     table_1 = record("evans_2009_table_1_run_conditions")["values"]["rows_as_printed"]
     assert "B020806 | Mn | 1–10 | -7.18 | -0.84 | -0.61 | -0.7" in table_1
     assert "B190906 | Ni | 1–10 | -3.09 | -11.88 | -1.52 | 3.3" in table_1
-    run_fO2 = {
-        fields[0].strip(): fields[3].strip()
+    run_table_rows = [
+        [field.strip() for field in line.split("|")]
         for line in table_1.splitlines()
         if line.strip()
-        for fields in [line.split("|")]
+    ]
+    run_fO2 = {
+        fields[0]: fields[3]
+        for fields in run_table_rows
     }
     assert len(run_fO2) == 20
+
+    run_phase_evidence = record("evans_2009_table_1_run_conditions")["values"][
+        "run_phase_evidence"
+    ]
+    product = run_phase_evidence["run_product_description"]
+    assert product["as_printed"] == (
+        "After 24 h the runs were quenched by release of the melt beads into water "
+        "so quench was close to instantaneous."
+    )
+    assert product["locator"] == {
+        "page": 3,
+        "published_page": 6849,
+        "pdf_page_index": 2,
+        "section": "2.1. Preparation of synthetic glasses",
+    }
+    product_runs = product["applies_to_runs"]
+    assert [item["run_as_printed"] for item in product_runs] == list(run_fO2)
+    assert all(
+        item["locator"]["table"] == "1"
+        and item["locator"]["page"] == 4
+        and item["locator"]["row"] == item["run_as_printed"]
+        for item in product_runs
+    )
+
+    sulfide = run_phase_evidence["sulfide_phase"]
+    assert sulfide["as_printed"] == (
+        "Values for the Ni-bearing glasses were meaningless, because the loss of the "
+        "immiscible sulphide phase led to a drop in S content to below the CMAS value."
+    )
+    assert sulfide["locator"] == {
+        "page": 19,
+        "published_page": 6865,
+        "pdf_page_index": 18,
+        "section": "4.6. Evidence for formation of metal–S melt species from metal XAS",
+    }
+    assert sulfide["condition_scope_as_printed"] == (
+        "the experiments performed at a log10 fO2 of −9.6 and log10 fS2 of −1.91"
+    )
+    assert sulfide["condition_scope_locator"] == {
+        "page": 18,
+        "published_page": 6864,
+        "pdf_page_index": 17,
+        "section": "4.6. Evidence for formation of metal–S melt species from metal XAS",
+        "note": "This sentence continues onto physical page 19.",
+    }
+    sulfide_runs = [item["run_as_printed"] for item in sulfide["applies_to_runs"]]
+    assert sulfide_runs == [
+        fields[0]
+        for fields in run_table_rows
+        if fields[1] == "Ni" and fields[3] == "-9.60" and fields[4] == "-1.91"
+    ]
+    assert sulfide_runs == [
+        "B231205",
+        "B220306",
+        "B070406",
+        "B010806",
+        "B140906",
+    ]
+    assert all(
+        item["locator"]["table"] == "1"
+        and item["locator"]["page"] == 4
+        and item["locator"]["row"] == item["run_as_printed"]
+        for item in sulfide["applies_to_runs"]
+    )
+    rows_by_run = {
+        run: sum(point["run_as_printed"] == run for point in all_source_points)
+        for run in run_fO2
+    }
+    assert sum(rows_by_run.values()) == 381
+    assert sum(rows_by_run[run] for run in sulfide_runs) == 76
+    assert len(run_fO2) - len(sulfide_runs) == 15
+    assert sum(rows_by_run[run] for run in run_fO2 if run not in sulfide_runs) == 305
+
     for point in all_source_points:
         run = point["run_as_printed"]
         condition = point["point_conditions"]["fO2_log"]
