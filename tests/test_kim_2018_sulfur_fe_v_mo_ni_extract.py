@@ -218,9 +218,16 @@ def test_named_table_compositions_migrate_without_reusing_metal_analyses(tmp_pat
     expected_50_50 = wt_pct_to_mole_fraction(
         {'CaO': Decimal('50'), 'Al2O3': Decimal('50')}
     )
-    assert rows['kim2018_p003_t01_r03_slag_S'].identity.composition.value == expected_40_60
-    assert rows['kim2018_p004_t02_r03_L_S'].identity.composition.value == expected_40_60
-    assert rows['kim2018_p003_t01_r06_slag_S'].identity.composition.value == expected_50_50
+    # t-1617 / d-323: the located nominal slag matrices are printed starting
+    # bulks, while the unprinted metal starts below remain unknown.
+    for observation_id, expected in (
+        ('kim2018_p003_t01_r03_slag_S', expected_40_60),
+        ('kim2018_p004_t02_r03_L_S', expected_40_60),
+        ('kim2018_p003_t01_r06_slag_S', expected_50_50),
+    ):
+        composition = rows[observation_id].identity.composition.value
+        assert composition.components == expected.components
+        assert composition.input_provenance == 'printed_starting_bulk'
 
     metal_composition = rows['kim2018_p004_t02_r03_metal_S'].identity.composition
     assert metal_composition.is_unknown
