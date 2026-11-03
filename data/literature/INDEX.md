@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 744
-- Extracts (`literature_extract.v1`): 742
+- Sources: 745
+- Extracts (`literature_extract.v1`): 743
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 742
+- Extracts with no PDF: 743
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -209,6 +209,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `inoue-suito-1982-na-silicate-sulfur-partitions` | Inoue, R. and Suito, H. (1982), “Sulfur Partitions between Carbon-saturated Iron Melt and Na2O-SiO2 Slags”, Transactions of the Iron and Steel Institute of Japan, 22, 514–523. | 10.2355/isijinternational1966.22.514 | ABSENT, `` | `raw/inoue-suito-1982-na-silicate-sulfur-partitions/inoue-suito-1982-na-silicate-sulfur-partitions.pdf` (present, fc30a0fb); `text/inoue-suito-1982-na-silicate-sulfur-partitions/` (42 files, exists); `tables/inoue-suito-1982-na-silicate-sulfur-partitions/` (0 files, ABSENT) | `data/literature/extracts/inoue-suito-1982-na-silicate-sulfur-partitions.yaml` (267 rows, draft) | `ledger/inoue-suito-1982-na-silicate-sulfur-partitions.yaml`: — (—) |
 | `inoue-suito-1982-vanadium-mgo-saturated-slag` | Inoue, R. and Suito, H. (1982), “Distribution of Vanadium between Liquid Iron and MgO Saturated Slags of the System CaO-MgO-FeOx-SiO2”, Transactions of the Iron and Steel Institute of Japan, 22(9), 705–714. | 10.2355/isijinternational1966.22.705 | ABSENT, `` | `raw/inoue-suito-1982-vanadium-mgo-saturated-slag/inoue-suito-1982-vanadium-mgo-saturated-slag.pdf` (present, 1cfa6c9d); `text/inoue-suito-1982-vanadium-mgo-saturated-slag/` (43 files, exists); `tables/inoue-suito-1982-vanadium-mgo-saturated-slag/` (0 files, ABSENT) | `data/literature/extracts/inoue-suito-1982-vanadium-mgo-saturated-slag.yaml` (549 rows, draft) | `ledger/inoue-suito-1982-vanadium-mgo-saturated-slag.yaml`: — (—) |
 | `itoh-1985-beta-alumina-na2o-emf` | Itoh, M., Kimura, K. and Kozuka, Z. (1985), "Measurement of Na2O Activity in Beta-Alumina by EMF Method", Transactions of the Japan Institute of Metals 26(5), 353–361. | 10.2320/matertrans1960.26.353 | ABSENT, `` | `raw/itoh-1985-beta-alumina-na2o-emf/itoh-1985-beta-alumina-na2o-emf.pdf` (present, 21140367); `text/itoh-1985-beta-alumina-na2o-emf/` (58 files, exists); `tables/itoh-1985-beta-alumina-na2o-emf/` (0 files, ABSENT) | `data/literature/extracts/itoh-1985-beta-alumina-na2o-emf.yaml` (9 rows, draft) | `ledger/itoh-1985-beta-alumina-na2o-emf.yaml`: — (—) |
+| `itoh-1988-na2s-beta-alumina-emf` | Itoh, M., Yamamoto, T. and Kozuka, Z. (1988), "The determination of Gibbs energy of the exchange reaction of sulphides using beta-alumina solid electrolyte", Journal of Materials Science 23(4), 1395–1398. | 10.1007/BF01154606 | ABSENT, `` | `raw/itoh-1988-na2s-beta-alumina-emf/itoh-1988-na2s-beta-alumina-emf.pdf` (present, 1405c1fb); `text/itoh-1988-na2s-beta-alumina-emf/` (33 files, exists); `tables/itoh-1988-na2s-beta-alumina-emf/` (0 files, ABSENT) | `data/literature/extracts/itoh-1988-na2s-beta-alumina-emf.yaml` (169 rows, draft) | `ledger/itoh-1988-na2s-beta-alumina-emf.yaml`: — (—) |
 | `itoh-1989-zno-solid-zinc-silicate` | Itoh, S. and Azakami, T. (1989), Thermodynamic Studies of ZnO in Solid Zinc Silicate, Shigen-to-Sozai 105(9):685-692. | 10.2473/shigentosozai.105.685 | ABSENT, `` | `raw/itoh-1989-zno-solid-zinc-silicate/itoh-1989-zno-solid-zinc-silicate.pdf` (present, 5c590ca3); `text/itoh-1989-zno-solid-zinc-silicate/` (61 files, exists); `tables/itoh-1989-zno-solid-zinc-silicate/` (0 files, ABSENT) | `data/literature/extracts/itoh-1989-zno-solid-zinc-silicate.yaml` (67 rows, draft) | `ledger/itoh-1989-zno-solid-zinc-silicate.yaml`: — (—) |
 | `itoh-hino-banya-1997-mg-deoxidation` | Itoh, H., Hino, M. and Ban-Ya, S. (1997), "Deoxidation Equilibrium of Magnesium in Liquid Iron", Tetsu-to-Hagané 83(10), 623-628. | 10.2355/tetsutohagane1955.83.10_623 | ABSENT, `` | `raw/itoh-hino-banya-1997-mg-deoxidation/itoh-hino-banya-1997-mg-deoxidation.pdf` (present, 814f29d3); `text/itoh-hino-banya-1997-mg-deoxidation/` (64 files, exists); `tables/itoh-hino-banya-1997-mg-deoxidation/` (0 files, ABSENT) | `data/literature/extracts/itoh-hino-banya-1997-mg-deoxidation.yaml` (3 rows, draft) | `ledger/itoh-hino-banya-1997-mg-deoxidation.yaml`: acquired (2026-09-06) |
 | `itoh-hino-banya-1998-spinel` | Itoh, H., Hino, M. and Ban-Ya, S. (1998), "Thermodynamics on the Formation of Spinel (MgO·Al2O3) Nonmetallic Inclusions in Liquid Steel", Tetsu-to-Hagané 84(2), 85–90. | 10.2355/tetsutohagane1955.84.2_85 | ABSENT, `` | `raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf` (present, acd9f520); `text/itoh-hino-banya-1998-spinel/` (57 files, exists); `tables/itoh-hino-banya-1998-spinel/` (0 files, ABSENT) | `data/literature/extracts/itoh-hino-banya-1998-spinel.yaml` (2 rows, draft, private_path) | `ledger/itoh-hino-banya-1998-spinel.yaml`: acquired (2026-09-06) |
@@ -960,6 +961,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `inoue-suito-1982-na-silicate-sulfur-partitions`
 - `inoue-suito-1982-vanadium-mgo-saturated-slag`
 - `itoh-1985-beta-alumina-na2o-emf`
+- `itoh-1988-na2s-beta-alumina-emf`
 - `itoh-1989-zno-solid-zinc-silicate`
 - `itoh-hino-banya-1997-mg-deoxidation`
 - `itoh-hino-banya-1998-spinel`
