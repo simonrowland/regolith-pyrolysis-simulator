@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import math
-import re
 from dataclasses import replace
 from decimal import Decimal
 from functools import lru_cache
@@ -449,13 +448,13 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
     # identity.fO2_Pa as 1e5 Pa times 10 to that power. Those 57 rows now
     # match the stub's copied identity, so they carry a dex residual. Table 2
     # prints no per-row gamma uncertainty, so the decision rule stays missing.
-    # Composition remains unknown on 15 rows. Distin has no recorded N0, so its
-    # printed point stays on the Temkin frame and is not retagged; its missing
-    # independent fO2 is still the refusal. Neither refusal is the reference state.
+    # Composition remains unknown on 15 rows. Distin's tabulated activity is
+    # the same iron-saturated oxygen ratio, so it takes the same gas-line
+    # factor; its missing independent fO2 is still the refusal. Neither
+    # refusal is the reference state.
     refusal_fields: dict[tuple[str, ...], int] = {}
     scored = 0
     extrapolated = 0
-    distin_unconverted = 0
     ad10 = 0
     ad10_scored = 0
     for observation in rows:
@@ -468,45 +467,34 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         )
         temperature = temperature_of(observation.identity)
         assert temperature is not None
-        distin = observation.source_id == _DISTIN
+        notice = _conversion_notice(residual.notices)
+        source, converted = notice.reason.split("source_value=", 1)[1].split(
+            "; converted_value=", 1
+        )
+        converted_value, _rest = converted.split("; factor=", 1)
+        assert Decimal(converted_value) == Decimal(source) * _independent_factor(
+            temperature
+        )
         band = [
             item
             for item in residual.notices
             if item.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         ]
         outside = temperature < Decimal("1649.15") or temperature > Decimal("1766.15")
-        if distin:
-            unrecorded = [
-                item
-                for item in residual.notices
-                if "distin_masson_temkin_frame_unrecorded_n0" in item.reason
-            ]
-            assert len(unrecorded) == 1
-            assert "printed a_D is unchanged" in unrecorded[0].reason
-            assert not any(
-                item.reason.startswith(
-                    "source_flagged_less_reliable: basis=Darken & Gurry 1946"
-                )
-                for item in residual.notices
-            )
-            assert band == []
-            distin_unconverted += 1
+        composition = next(
+            item
+            for item in residual.notices
+            if item.reason.startswith("fe_saturation_composition_owner_supplied")
+        )
+        if outside:
+            assert len(band) == 1
+            assert band[0].reason == _EXTRAPOLATED
+            assert band[0].band == _WINDOW
+            assert composition.authority is Authority.EXTRAPOLATED
+            extrapolated += 1
         else:
-            notice = _conversion_notice(residual.notices)
-            source, converted = notice.reason.split("source_value=", 1)[1].split(
-                "; converted_value=", 1
-            )
-            converted_value, _rest = converted.split("; factor=", 1)
-            assert Decimal(converted_value) == Decimal(source) * _independent_factor(
-                temperature
-            )
-            if outside:
-                assert len(band) == 1
-                assert band[0].reason == _EXTRAPOLATED
-                assert band[0].band == _WINDOW
-                extrapolated += 1
-            else:
-                assert band == []
+            assert band == []
+            assert composition.authority is Authority.DERIVED
         assert residual.refusal is not None
         assert "reference_state_mismatch" not in json.dumps(
             residual.refusal.detail, default=str
@@ -544,23 +532,16 @@ def test_every_iron_saturated_feo_row_is_scored_or_named(migration) -> None:
         assert isinstance(state, StandardState)
         assert phase_token(state.endmember) is Phase.L
         assert state.reference_pressure_bar == Decimal("1.01325")
-        if distin:
-            assert state.endmember.formula == "Fe(1-x)O"
-            assert state.component_basis == "Fe(1-x)O"
-        else:
-            assert state.endmember.formula == "FeO"
-            assert state.component_basis == "FeO"
+        assert state.endmember.formula == "FeO"
+        assert state.component_basis == "FeO"
     assert scored == 57
     assert ad10 == 2
     assert ad10_scored == 1
-    assert distin_unconverted == 24
     assert refusal_fields == {
         ("composition",): 15,
         ("fO2_Pa",): 24,
     }
-    # The previous 32 counted these 24 Distin rows. They no longer take the
-    # gas-line extrapolation.
-    assert extrapolated == 8
+    assert extrapolated == 32
 
 
 def test_distin_scored_refusal_by_engine_without_typed_fe_saturation(migration) -> None:
@@ -643,23 +624,27 @@ def test_distin_closed_fe_saturated_solve_scores_all_rows(migration) -> None:
         residuals.append(residual)
         assert residual.status is ResidualStatus.NO_BAND
         assert residual.numeric is not None
-        # Seq 4 withdrew the no-conversion / 0.01 dex reading and the hardcoded
-        # N_Fe2+ table. Live Distin rows have no recorded N0, so the printed
-        # point is left unchanged on the scoring path.
         assert not any(
             notice.reason.startswith("reference_converted_via_iron_saturation;")
+            or "distin_masson_temkin_frame" in notice.reason
             for notice in residual.notices
         )
-        unrecorded = [
-            notice
-            for notice in residual.notices
-            if "distin_masson_temkin_frame_unrecorded_n0" in notice.reason
-        ]
-        assert len(unrecorded) == 1
-        assert unrecorded[0].kind is NoticeKind.DERIVATION_USES_COMPILATION
-        assert "printed a_D is unchanged" in unrecorded[0].reason
+        conversion = _conversion_notice(residual.notices)
         if observation.observation_id.endswith("distin1971_t1_1880_1_4"):
             assert observation.value.point == Decimal("0.952")
+            assert (Decimal("0.60") / Decimal("0.63")).quantize(
+                Decimal("0.001")
+            ) == Decimal("0.952")
+            temperature = temperature_of(observation.identity)
+            assert temperature == Decimal("2153.15")
+            source, converted = conversion.reason.split("source_value=", 1)[1].split(
+                "; converted_value=", 1
+            )
+            converted_value, _rest = converted.split("; factor=", 1)
+            assert Decimal(source) == Decimal("0.952")
+            assert Decimal(converted_value) == Decimal("0.952") * _independent_factor(
+                temperature
+            )
         for engine, reason in {
             Engine.INTERNAL_ANALYTICAL: RefusalReason.IDENTITY_INCOMPLETE,
             Engine.ALPHAMELTS: RefusalReason.UNSUPPORTED,
@@ -925,12 +910,6 @@ def _with_saturation(row: object, recorded: IronSaturationComposition) -> object
     )
 
 
-def _reason_field(reason: str, key: str) -> str:
-    match = re.search(rf"(?:^|; ){re.escape(key)}=([^;]*)", reason)
-    assert match is not None, reason
-    return match.group(1).strip()
-
-
 def _ruled_segment(
     temperature_K: Decimal,
     left: tuple[Decimal, Decimal],
@@ -954,7 +933,12 @@ def test_owner_supplies_darken_gurry_composition_inside_the_window() -> None:
     assert decision.n_fe2_plus.quantize(Decimal("0.0001")) == Decimal("0.9212")
     assert decision.authority is Authority.DERIVED
     assert decision.extrapolated is False
-    assert decision.band_dex is not None and decision.band_dex > 0
+    # |log10(N0(1.0394) / N0(Fe0.947O))|. The review prints this through
+    # 17 decimal places as 0.01590791249755476. A constant band fails it.
+    assert decision.band_dex.quantize(Decimal("1e-17")) == Decimal(
+        "0.01590791249755476"
+    )
+    assert decision.band_dex != Decimal("1")
     midpoint = iron_saturation_composition(
         _wustite_row((Decimal("1649.15") + Decimal("1709.15")) / 2)
     )
@@ -977,8 +961,13 @@ def test_cited_coughlin_composition_is_used_exactly() -> None:
     assert decision.failure is None
     assert decision.band_dex is None
     assert decision.authority is None
-    assert decision.n_fe2_plus is not None
-    assert decision.n_fe2_plus.quantize(Decimal("0.001")) == Decimal("0.888")
+    # Review digits, not the 0.001 rounding 0.888. The owner's full
+    # precision continues past this prefix.
+    assert str(decision.n_fe2_plus).startswith("0.8880675818373812")
+    assert decision.n_fe2_plus.quantize(Decimal("1e-16")) == Decimal(
+        "0.8880675818373812"
+    )
+    assert decision.n_fe2_plus != decision.n_fe2_plus.quantize(Decimal("0.001"))
     assert decision.n_fe2_plus != owner.n_fe2_plus
     converted = fusion_comparison_reference(row, engine=Engine.INTERNAL_ANALYTICAL)
     assert converted.value.point == _independent_factor(Decimal("1649.15"))
@@ -1001,15 +990,14 @@ def test_unparseable_cited_composition_does_not_fall_through() -> None:
     assert decision.failure is not None
     assert decision.n_fe2_plus is None
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    assert converted.value.point == Decimal("1")
-    assert converted.identity.reference_state.value.endmember.formula == "Fe(1-x)O"
+    # The activity step is f and does not read the failed formula.
+    assert converted.value.point == _independent_factor(Decimal("1649.15"))
+    standard = converted.identity.reference_state.value
+    assert isinstance(standard, StandardState)
+    assert standard.endmember.formula == "FeO"
     assert any(
         notice.reason.startswith("fe_saturation_composition_from_cited_standard")
         and "not-a-formula" in notice.reason
-        for notice in converted.notices
-    )
-    assert not any(
-        "distin_masson_temkin_frame_unrecorded_n0" in notice.reason
         for notice in converted.notices
     )
     assert not any(
@@ -1031,8 +1019,7 @@ def test_owner_extrapolates_the_end_segment_and_does_not_clamp() -> None:
     )
     assert cold.o_over_fe > anchor.o_over_fe
     assert cold.n_fe2_plus != anchor.n_fe2_plus
-    assert cold.band_dex is not None and anchor.band_dex is not None
-    assert cold.band_dex >= anchor.band_dex
+    assert cold.band_dex == anchor.band_dex
     hot = iron_saturation_composition(_wustite_row(Decimal("1800")))
     assert hot.authority is Authority.EXTRAPOLATED
     assert hot.o_over_fe != Decimal("1.0265")
@@ -1041,6 +1028,13 @@ def test_owner_extrapolates_the_end_segment_and_does_not_clamp() -> None:
         (Decimal("1709.15"), Decimal("1.0287")),
         (Decimal("1766.15"), Decimal("1.0265")),
     )
+    # Local spread at 1800 K, above the 1766.15 K anchor spread. A band
+    # clamped to the window value, or a constant, fails this.
+    assert hot.band_dex.quantize(Decimal("1e-17")) == Decimal(
+        "0.02910062656820004"
+    )
+    assert hot.band_dex != anchor.band_dex
+    assert hot.band_dex > anchor.band_dex
 
 
 def test_recorded_source_analysis_composition_precedes_the_owner_line() -> None:
@@ -1064,46 +1058,22 @@ def test_recorded_source_analysis_composition_precedes_the_owner_line() -> None:
     )
 
 
-def test_distin_without_recorded_n0_is_unconverted_on_every_engine() -> None:
-    row = replace(
-        _wustite_row(Decimal("2153.15"), Decimal("0.952")), source_id=_DISTIN
+def test_distin_oxygen_ratio_converts_by_the_gibbs_factor() -> None:
+    """Stored a_FeO is O_metal/O_sat. a_F019 = a_D * f. a_D = 1 maps to f."""
+
+    assert (Decimal("0.43") / Decimal("0.44")).quantize(Decimal("0.001")) == Decimal(
+        "0.977"
     )
-    for engine in (
-        None,
-        Engine.OPENIMCC,
-        Engine.INTERNAL_ANALYTICAL,
-        Engine.ALPHAMELTS,
-        Engine.MAGEMIN,
-        Engine.THERMOENGINE,
-        Engine.VAPOROCK,
-    ):
-        converted = fusion_comparison_reference(row, engine=engine)
-        assert converted.value.point == Decimal("0.952")
-        standard = converted.identity.reference_state.value
-        assert isinstance(standard, StandardState)
-        assert standard.endmember.formula == "Fe(1-x)O"
-        assert not any(
-            "reference_converted_via_iron_saturation" in notice.reason
-            or notice.reason.startswith("source_flagged_less_reliable:")
-            for notice in converted.notices
-        )
-        if engine is Engine.VAPOROCK:
-            continue
-        assert any(
-            "distin_masson_temkin_frame_unrecorded_n0" in notice.reason
-            for notice in converted.notices
-        )
-
-
-def test_distin_recorded_n0_converts_temkin_frame_on_every_melt_engine() -> None:
+    assert (Decimal("0.60") / Decimal("0.63")).quantize(Decimal("0.001")) == Decimal(
+        "0.952"
+    )
+    assert (Decimal("0.78") / Decimal("0.84")).quantize(Decimal("0.001")) == Decimal(
+        "0.929"
+    )
     temperature = Decimal("2153.15")
-    n0 = Decimal("0.90")
     point = Decimal("0.952")
-    row = _with_saturation(
-        replace(_wustite_row(temperature, point), source_id=_DISTIN),
-        _derived_saturation(n0, Decimal("0.02")),
-    )
-    expected = point * _independent_factor(temperature) / n0
+    row = replace(_wustite_row(temperature, point), source_id=_DISTIN)
+    factor = _independent_factor(temperature)
     for engine in (
         None,
         Engine.OPENIMCC,
@@ -1113,114 +1083,45 @@ def test_distin_recorded_n0_converts_temkin_frame_on_every_melt_engine() -> None
         Engine.THERMOENGINE,
     ):
         converted = fusion_comparison_reference(row, engine=engine)
-        assert converted.value.point == expected
+        assert converted.value.point == point * factor
         standard = converted.identity.reference_state.value
         assert isinstance(standard, StandardState)
         assert standard.endmember.formula == "FeO"
-        assert standard.component_basis == "FeO"
-        frame = next(
+        composition = next(
             notice
             for notice in converted.notices
-            if notice.reason.startswith("distin_masson_temkin_frame_converted")
+            if notice.reason.startswith("fe_saturation_composition_owner_supplied")
         )
-        assert frame.authority is Authority.EXTRAPOLATED
-        assert frame.kind is NoticeKind.DERIVATION_USES_COMPILATION
-        assert any(
-            notice.reason == _EXTRAPOLATED for notice in converted.notices
-        )
-        assert any(
-            notice.reason.startswith("composition_derived_from_source_analyses")
-            for notice in converted.notices
-        )
+        assert composition.authority is Authority.EXTRAPOLATED
+        assert any(notice.reason == _EXTRAPOLATED for notice in converted.notices)
+    saturated = replace(_wustite_row(temperature, Decimal("1")), source_id=_DISTIN)
+    assert (
+        fusion_comparison_reference(saturated, engine=Engine.OPENIMCC).value.point
+        == factor
+    )
+    vaporock = fusion_comparison_reference(row, engine=Engine.VAPOROCK)
+    assert vaporock.value.point == point
 
 
-def test_temkin_ideal_saturation_converts_to_the_gibbs_factor() -> None:
-    """a_D = N0 implies a_F019 = f. Seq 4 sanity identity."""
-
+def test_recorded_n0_does_not_scale_a_distin_oxygen_ratio() -> None:
     temperature = Decimal("2153.15")
+    point = Decimal("0.952")
     n0 = Decimal("0.90")
     row = _with_saturation(
-        replace(_wustite_row(temperature, n0), source_id=_DISTIN),
+        replace(_wustite_row(temperature, point), source_id=_DISTIN),
         _derived_saturation(n0, Decimal("0.02")),
     )
     converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    assert converted.value.point == _independent_factor(temperature)
-
-
-def test_distin_frame_band_combines_n0_spread_and_extrapolated_f() -> None:
-    temperature = Decimal("2153.15")
-    edge = Decimal("1766.15")
-    n0_band = Decimal("0.02")
-    row = _with_saturation(
-        replace(_wustite_row(temperature, Decimal("0.5")), source_id=_DISTIN),
-        _derived_saturation(Decimal("0.90"), n0_band),
-    )
-    converted = fusion_comparison_reference(row, engine=None)
-
-    def width(temperature_K: Decimal) -> Decimal:
-        low, high = _independent_jackknife(temperature_K)
-        return (high / low).log10()
-
-    f_band = abs(width(temperature) - width(edge)) + abs(width(edge))
-    combined = (n0_band * n0_band + f_band * f_band).sqrt()
-    frame = next(
-        notice
-        for notice in converted.notices
-        if notice.reason.startswith("distin_masson_temkin_frame_converted")
-    )
-    assert Decimal(_reason_field(frame.reason, "n0_band_dex")) == n0_band
-    assert Decimal(_reason_field(frame.reason, "f_band_dex")) == f_band
-    assert Decimal(_reason_field(frame.reason, "band_dex")) == combined
-    assert frame.band == f"{format(combined, 'f')} dex"
-
-
-def test_distin_frame_inside_the_gas_window_is_derived() -> None:
-    temperature = Decimal("1709.15")
-    n0_band = Decimal("0.02")
-    n0 = Decimal("0.90")
-    point = Decimal("0.5")
-    row = _with_saturation(
-        replace(_wustite_row(temperature, point), source_id=_DISTIN),
-        _derived_saturation(n0, n0_band),
-    )
-    converted = fusion_comparison_reference(row, engine=None)
-    assert converted.value.point == point * _independent_factor(temperature) / n0
-    frame = next(
-        notice
-        for notice in converted.notices
-        if notice.reason.startswith("distin_masson_temkin_frame_converted")
-    )
-    assert frame.authority is Authority.DERIVED
-    assert not any(notice.reason == _EXTRAPOLATED for notice in converted.notices)
-    f_band = (Decimal("1.94") / Decimal("1.792")).log10()
-    combined = (n0_band * n0_band + f_band * f_band).sqrt()
-    assert Decimal(_reason_field(frame.reason, "f_band_dex")) == f_band
-    assert Decimal(_reason_field(frame.reason, "band_dex")) == combined
-
-
-def test_distin_cited_composition_is_the_frame_denominator() -> None:
-    temperature = Decimal("2153.15")
-    point = Decimal("0.952")
-    row = _with_saturation(
-        replace(_wustite_row(temperature, point), source_id=_DISTIN),
-        _cited_saturation("Fe0.947O"),
-    )
+    assert converted.value.point == point * _independent_factor(temperature)
+    assert converted.value.point != point * _independent_factor(temperature) / n0
     decision = iron_saturation_composition(row)
-    assert decision.n_fe2_plus is not None
-    assert decision.n_fe2_plus.quantize(Decimal("0.001")) == Decimal("0.888")
-    assert decision.band_dex is None
-    converted = fusion_comparison_reference(row, engine=Engine.OPENIMCC)
-    assert (
-        converted.value.point
-        == point * _independent_factor(temperature) / decision.n_fe2_plus
-    )
-    frame = next(
-        notice
+    assert decision.n_fe2_plus == n0
+    assert decision.notice == "composition_derived_from_source_analyses"
+    assert any(
+        notice.reason.startswith("composition_derived_from_source_analyses")
+        and "N0=0.90" in notice.reason
         for notice in converted.notices
-        if notice.reason.startswith("distin_masson_temkin_frame_converted")
     )
-    assert "fe_saturation_composition_from_cited_standard" in frame.reason
-    assert Decimal(_reason_field(frame.reason, "n0_band_dex")) == Decimal(0)
 
 
 def test_openimcc_branch_has_no_hardcoded_distin_ion_fraction() -> None:

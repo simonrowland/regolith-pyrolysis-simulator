@@ -2477,8 +2477,6 @@ _COUGHLIN_FE_PER_O = Decimal("0.947")
 _CITED_SATURATION_NOTICE = "fe_saturation_composition_from_cited_standard"
 _DERIVED_SATURATION_NOTICE = "composition_derived_from_source_analyses"
 _OWNER_SATURATION_NOTICE = "fe_saturation_composition_owner_supplied"
-_DISTIN_FRAME_NOTICE = "distin_masson_temkin_frame_converted"
-_DISTIN_UNRECORDED_N0_NOTICE = "distin_masson_temkin_frame_unrecorded_n0"
 _FE_PER_O_FORMULA = re.compile(r"^Fe([0-9]+(?:\.[0-9]+)?)O$")
 _KELVIN_FROM_CELSIUS = Decimal("273.15")
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
@@ -2910,40 +2908,6 @@ def iron_saturation_composition(reference: Observation) -> IronSaturationDecisio
     )
 
 
-def _feo_extrapolation_band_dex(
-    calibration: _IronSaturatedFeOCalibration,
-    temperature_K: Decimal,
-    delta_g_w_J: tuple[Decimal, ...],
-) -> Decimal:
-    """Dex width of f outside the D&G gas window, t-1624's band shape.
-
-    d(T) is the pair-fit log10 width of f, the spread of ΔG_w among Table
-    III B's three liquid-oxide gas points. The ruling sizes the extrapolated
-    uncertainty as |d(T) - d(edge)| + |d(edge)|: extrapolation drift plus the
-    base offset, continuous at the edge, without adding |d(edge)| a second
-    time. The central f stays the full three-point line. Inside the window
-    this jackknife remains a sensitivity, not the Holzheid credible-route band.
-    """
-
-    def width(temperature: Decimal) -> Decimal:
-        low, high = _feo_jackknife_factors(calibration, temperature, delta_g_w_J)
-        return (high / low).log10()
-
-    if temperature_K <= calibration.window_low_K:
-        edge = calibration.window_low_K
-    else:
-        edge = calibration.window_high_K
-    at_edge = width(edge)
-    at_temperature = width(temperature_K)
-    return abs(at_temperature - at_edge) + abs(at_edge)
-
-
-def _quadrature_dex(left: Decimal, right: Decimal) -> Decimal:
-    """Independent dex contributions combine in quadrature."""
-
-    return (left * left + right * right).sqrt()
-
-
 def _composition_notice(
     reference: Observation,
     decision: IronSaturationDecision,
@@ -2990,144 +2954,6 @@ def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
             standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
         ),
         component_basis=_FEO_STOICHIOMETRIC_FORMULA,
-    )
-
-
-def _distin_temkin_frame(
-    reference: Observation,
-    *,
-    quantity: Quantity,
-    standard_state: StandardState,
-    decision: IronSaturationDecision,
-) -> Observation:
-    """Map Distin's Temkin-frame activity onto JANAF Fe-019.
-
-    Distin prints a_D = a_sat * N0(T) on Masson's Temkin frame: a_sat is
-    relative to the iron-saturated FeO–Fe2O3 liquid at T, and N0 is that
-    binary's Fe2+ ion fraction. This frame is not JANAF Fe-019. The earlier
-    no-conversion / ~0.01 dex reading is withdrawn.
-
-    Our frame is a_F019 = a_sat * f(T), with
-    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Eliminating a_sat gives
-    a_F019 = a_D * f(T) / N0(T). Sanity: a Temkin-ideal binary at saturation
-    has a_D = N0, so a_F019 = f. N0 comes only from a recorded rule-1.5 (or
-    cited) composition. Applying f alone, or a hardcoded ion fraction, is
-    not this relation. The band is the N0 method spread and f's extrapolated
-    uncertainty, in quadrature.
-    """
-
-    if decision.failure:
-        # A cited formula that does not parse stays a failure. It does not
-        # fall through to the D&G line, and it is not the unrecorded-N0 case.
-        return replace(
-            reference,
-            notices=union_notices(
-                reference.notices,
-                (_composition_notice(reference, decision, quantity),),
-            ),
-        )
-    if not decision.recorded or decision.n_fe2_plus is None:
-        notice = Notice(
-            kind=NoticeKind.DERIVATION_USES_COMPILATION,
-            affected_quantities=(quantity,),
-            reason=(
-                f"{_DISTIN_UNRECORDED_N0_NOTICE}: printed a_D is unchanged; "
-                "rule-1.5 N0 is not recorded on the row; the D&G factor is "
-                "not applied alone"
-            ),
-            origin=reference.observation_id,
-        )
-        return replace(
-            reference, notices=union_notices(reference.notices, (notice,))
-        )
-    temperature_K = temperature_of(reference.identity)
-    if temperature_K is None:
-        notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(quantity,),
-            reason=(
-                f"{_IRON_SATURATED_FEO_MISSING_INPUT} Distin frame step "
-                "requires temperature_K"
-            ),
-            origin=reference.observation_id,
-            band="Distin Temkin-to-Fe-019 conversion requires temperature_K",
-        )
-        return replace(
-            reference, notices=union_notices(reference.notices, (notice,))
-        )
-    try:
-        calibration, delta_g_w = _iron_saturated_feo_calibration()
-        factor = _feo_reference_factor(calibration, temperature_K)
-    except ValueError as exc:
-        notice = Notice(
-            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-            affected_quantities=(quantity,),
-            reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {exc}",
-            origin=reference.observation_id,
-            band=f"Darken & Gurry / JANAF FeO reference: {exc}",
-        )
-        return replace(
-            reference, notices=union_notices(reference.notices, (notice,))
-        )
-    converted = reference.value.point * factor / decision.n_fe2_plus
-    outside = (
-        temperature_K < calibration.window_low_K
-        or temperature_K > calibration.window_high_K
-    )
-    if outside:
-        f_band = _feo_extrapolation_band_dex(
-            calibration, temperature_K, delta_g_w
-        )
-        authority = Authority.EXTRAPOLATED
-    else:
-        f_band = (
-            Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
-        ).log10()
-        authority = Authority.DERIVED
-    n0_band = decision.band_dex if decision.band_dex is not None else Decimal(0)
-    combined = _quadrature_dex(n0_band, f_band)
-    notice = Notice(
-        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-        affected_quantities=(quantity,),
-        reason=(
-            f"{_DISTIN_FRAME_NOTICE}; a_F019=a_D*f/N0; "
-            f"f={format(factor, 'f')}; N0={format(decision.n_fe2_plus, 'f')}; "
-            f"source_value={reference.value.point}; converted_value={format(converted, 'f')}; "
-            f"n0_band_dex={format(n0_band, 'f')}; "
-            f"f_band_dex={format(f_band, 'f')}; "
-            f"band_dex={format(combined, 'f')}; "
-            f"T={temperature_K} K; composition_notice={decision.notice}"
-        ),
-        origin=reference.observation_id,
-        band=f"{format(combined, 'f')} dex",
-        authority=authority,
-        source=decision.source,
-    )
-    notices: tuple[Notice, ...] = (
-        notice,
-        _composition_notice(reference, decision, quantity),
-    )
-    if outside:
-        notices += (
-            Notice(
-                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
-                affected_quantities=(quantity,),
-                reason="D&G iron-boundary line extrapolated",
-                origin=reference.observation_id,
-                band=(
-                    f"{calibration.window_low_K}-{calibration.window_high_K} K"
-                ),
-                authority=Authority.EXTRAPOLATED,
-            ),
-            )
-    return replace(
-        reference,
-        identity=replace(
-            reference.identity,
-            reference_state=State.of(_stoichiometric_standard(standard_state)),
-        ),
-        value=replace(reference.value, point=converted),
-        notices=union_notices(reference.notices, notices),
     )
 
 
@@ -3205,12 +3031,25 @@ def _iron_saturated_feo_comparison(
     mu_FeO = mu_Fe + mu_O. a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
     carries that partial onto JANAF Fe-019. Page 801's N_O/N_Fe = (3r−1)/(2r)
     fixes the saturation composition and does not multiply this partial.
-    The composition itself comes from iron_saturation_composition.
+    The composition itself comes from iron_saturation_composition. It does
+    not scale the activity.
 
-    Distin's printed activity is on Masson's Temkin frame, not Fe-019. The
-    frame step is a_F019 = a_D * f / N0, and only when the row records N0.
-    The earlier no-conversion reading and the ~0.01 dex band are withdrawn.
-    No ion-fraction constant lives in this module.
+    Distin's tabulated activity is the oxygen ratio a_D = O_metal / O_sat
+    on that same iron-saturated standard (p. 74). O_sat is the oxygen
+    solubility of iron under pure iron oxide at that T. Printed p. 75
+    divides the measured metal oxygen by 0.44, 0.63 and 0.83 wt% at
+    1785, 1880 and 1960 °C (0.43/0.44 rounds to the stored 0.977). This
+    paper's eight references do not include Taylor & Chipman. The
+    levitation technique is their own prior paper (6), Can. Met. Quart.
+    10(1): 13 (1971); the saturation sentence does not say whether those
+    three percents were measured there or taken from an uncited table.
+    The extract records the printed percents in derivation prose and
+    carries no cited solubility source. That source is follow-up data,
+    not a number invented here. a_F019 = a_D * f, with
+    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Sanity: an iron-saturated melt
+    (a_D = 1) maps to f. The Temkin-frame reading a_F019 = a_D * f / N0
+    is withdrawn: the stored column is the oxygen ratio, and Masson's N0
+    multiply is not this Fe-019 step. No ion-fraction constant lives here.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
@@ -3249,13 +3088,6 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
-    if reference.source_id == _DISTIN_SOURCE_ID:
-        return _distin_temkin_frame(
-            reference,
-            quantity=quantity,
-            standard_state=standard_state,
-            decision=iron_saturation_composition(reference),
-        )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
         if engine is None:
@@ -3363,9 +3195,9 @@ def fusion_comparison_reference(
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Holzheid's iron-saturated Fe(1-x)O(l) activities move onto
-    stoichiometric FeO(l) by the Darken & Gurry oxygen potential. Distin's
-    Temkin-frame activities move by a_D * f / N0 only when the row records N0.
+    energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
+    tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
+    & Gurry factor f. A recorded saturation composition does not scale them.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
