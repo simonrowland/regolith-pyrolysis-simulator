@@ -96,22 +96,53 @@ def test_borosilicate_measurements_are_preserved_and_redox_is_not_overstated() -
             assert phase_assemblage["locator"]["page"] == 5
             phase_assemblage_points.append(point)
     assert len(phase_assemblage_points) == 55
-    assert run_compositions["0V"] == {
-        "Na2O": "28.97",
-        "B2O3": "16.27",
-        "SiO2": "46.81",
-        "Al2O3": "7.94",
-        "V2O5": "0",
-        "SO3": "0",
+    expected_run_compositions = {
+        "0V": {
+            "Na2O": "28.97", "B2O3": "16.27", "SiO2": "46.81",
+            "Al2O3": "7.94", "V2O5": "0", "SO3": "0",
+        },
+        "1V": {
+            "Na2O": "28.16", "B2O3": "15.82", "SiO2": "45.51",
+            "Al2O3": "7.72", "V2O5": "2.78", "SO3": "0",
+        },
+        "2.5V": {
+            "Na2O": "27.00", "B2O3": "15.17", "SiO2": "43.62",
+            "Al2O3": "7.40", "V2O5": "6.77", "SO3": "0",
+        },
+        "5V": {
+            "Na2O": "25.21", "B2O3": "14.16", "SiO2": "40.74",
+            "Al2O3": "6.91", "V2O5": "12.98", "SO3": "0",
+        },
+        "7.5V": {
+            "Na2O": "23.56", "B2O3": "13.23", "SiO2": "38.07",
+            "Al2O3": "6.46", "V2O5": "18.68", "SO3": "0",
+        },
+        "9V": {
+            "Na2O": "22.63", "B2O3": "12.71", "SiO2": "36.56",
+            "Al2O3": "6.20", "V2O5": "21.89", "SO3": "0",
+        },
+        "1V-1.25S": {
+            "Na2O": "26.89", "B2O3": "15.76", "SiO2": "45.35",
+            "Al2O3": "7.70", "V2O5": "2.77", "SO3": "1.53",
+        },
+        "2.5V-1.75S": {
+            "Na2O": "25.27", "B2O3": "15.10", "SiO2": "43.44",
+            "Al2O3": "7.37", "V2O5": "6.74", "SO3": "2.08",
+        },
+        "5V-3S": {
+            "Na2O": "22.38", "B2O3": "14.05", "SiO2": "40.42",
+            "Al2O3": "6.86", "V2O5": "12.88", "SO3": "3.40",
+        },
+        "7.5V-6S": {
+            "Na2O": "18.19", "B2O3": "13.04", "SiO2": "37.51",
+            "Al2O3": "6.36", "V2O5": "18.41", "SO3": "6.48",
+        },
+        "9V-6.5S": {
+            "Na2O": "16.97", "B2O3": "12.51", "SiO2": "36.00",
+            "Al2O3": "6.11", "V2O5": "21.55", "SO3": "6.81",
+        },
     }
-    assert run_compositions["1V-1.25S"] == {
-        "Na2O": "26.89",
-        "B2O3": "15.76",
-        "SiO2": "45.35",
-        "Al2O3": "7.70",
-        "V2O5": "2.77",
-        "SO3": "1.53",
-    }
+    assert run_compositions == expected_run_compositions
     zero_v_point = next(point for point in typed_points if point["sample"] == "0V")
     assert "90%Pt –10%Rh crucibles" in zero_v_point["point_conditions"][
         "method_detail_as_printed"
@@ -120,10 +151,28 @@ def test_borosilicate_measurements_are_preserved_and_redox_is_not_overstated() -
     assert "Pt–Rh crucible was loaded" in sulfur_point["point_conditions"][
         "method_detail_as_printed"
     ]["state"]["value"]
+    assert zero_v_point["point_conditions"]["method_detail_as_printed"]["locator"] == {
+        "page": 2,
+        "published_page": 2,
+        "pdf_page_index": 1,
+        "section": "2.1 Synthesis of sulfur-free glasses",
+    }
+    assert sulfur_point["point_conditions"]["method_detail_as_printed"]["locator"] == {
+        "page": 3,
+        "published_page": 3,
+        "pdf_page_index": 2,
+        "section": "2.2 Synthesis of sulfur-containing glasses",
+    }
     assert all(
         point["point_conditions"]["T_C"]["state"]["value"] == "1200"
         and "atmosphere" not in point["point_conditions"]
         and point["point_conditions"]["T_C"]["locator"]["page"] == 2
+        and point["point_conditions"]["method_detail_as_printed"]["locator"]["page"]
+        == (3 if point["sample"].endswith("S") else 2)
+        and point["point_conditions"]["method_detail_as_printed"]["locator"]["published_page"]
+        == (3 if point["sample"].endswith("S") else 2)
+        and point["point_conditions"]["method_detail_as_printed"]["locator"]["pdf_page_index"]
+        == (2 if point["sample"].endswith("S") else 1)
         and point["locator"]["page"] == 3
         and point["locator"]["published_page"] == 3
         for point in typed_points
