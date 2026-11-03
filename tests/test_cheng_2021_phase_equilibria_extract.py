@@ -67,7 +67,7 @@ def _assert_cheng_scoring_source_bindings(row: dict) -> None:
     oxygen = row["values"]["oxygen_partial_pressure"]
     assert oxygen["value"] == "0.21"
     assert oxygen["units"] == "atm"
-    assert oxygen["locator"]["page"] == 6
+    assert oxygen["locator"]["page"] == 7
     assert oxygen["locator"]["section"] == "2. EXPERIMENTAL METHODOLOGY"
 
     assemblage = row["values"]["phase_assemblage_as_printed"]
@@ -112,20 +112,28 @@ def test_cheng_table_rows_and_600_dpi_render_pins() -> None:
             if observation.get("uncertainty"):
                 assert float(observation["uncertainty"]["value"]) > 0
 
-    paired = [
-        observation
-        for block in document["species"].values()
-        for observation in block["observations"]
-        if observation["observation_id"].startswith("cheng21_t5_e119_")
-        and observation["values"].get("printed_phase_label") in {"Liq 1", "Liq 2"}
-    ]
-    assert {
-        observation["values"]["printed_phase_label"] for observation in paired
-    } == {"Liq 1", "Liq 2"}
-    assert {
-        observation["point_conditions"]["tie_line_id"]["state"]["value"]
-        for observation in paired
-    } == {"cheng21_t5_e119::tie-line"}
+    assert (
+        _observation(document, "cheng21_t5_e119_liq_1_sio2")["values"][
+            "printed_phase_label"
+        ]
+        == "Liq 1"
+    )
+    assert (
+        _observation(document, "cheng21_t5_e119_liq_2_sio2")["values"][
+            "printed_phase_label"
+        ]
+        == "Liq 2"
+    )
+    for observation_id in (
+        "cheng21_t5_e119_liq_1_sio2",
+        "cheng21_t5_e119_liq_2_sio2",
+    ):
+        assert (
+            _observation(document, observation_id)["point_conditions"][
+                "tie_line_id"
+            ]["state"]["value"]
+            == "cheng21_t5_e119::tie-line"
+        )
 
 
 def test_cheng_render_pin_rejects_a_changed_cell() -> None:

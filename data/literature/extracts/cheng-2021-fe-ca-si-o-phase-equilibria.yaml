@@ -11,8 +11,7 @@ source:
   version: Author Accepted Manuscript, 38 pages
 extraction:
   method: manual transcription from born-digital pdftotext-layout.txt; 600 dpi render checked Table 5 layout on
-    PDF pp. 16-22 and cell layout on each page; MinerU table tool had no input because this source has no MinerU
-    content-list JSON
+    PDF pp. 16-22; phase labels checked against the rowspan-expanded MinerU table and the page renders.
   date: '2026-10-18'
   worker: w8-1018
   composition_conversion: Table 3 and Table 5 phase mol% values were divided by 100 to store mole fractions; printed values remain in values.value and rounded row totals are preserved.
@@ -1172,9 +1171,9 @@ species:
           value: "0.21"
           units: atm
           locator: &cheng_air_pO2
-            page: 6
-            published_page: 6
-            pdf_page_index: 5
+            page: 7
+            published_page: 7
+            pdf_page_index: 6
             section: "2. EXPERIMENTAL METHODOLOGY"
             note: "The bottom of the furnace was open to ensure ambient air atmosphere inside, p(O2) = 0.21 atm."
         quantity: equilibrium_phase_composition
