@@ -12,28 +12,101 @@ extraction:
   worker: w1103cw2-gl13
 review_status: draft
 evidence_policy:
-  classification: quoted_fits_model_output_context_and_figure_candidates
+  classification: measured_reductions_quoted_comparisons_model_output_and_figure_candidates
   measurement_claim: >-
-    The authors measured SiO vapour pressure using Knudsen-cell mass loss and a quartz crystal microbalance. Numeric pressure points are plotted only in Figure 3 and are not transcribed. Equation (4) is the printed fit to those measurements. Nuth and Donn's onset-rate estimates and the later empirical fit are quoted from this paper; their input points are plotted only in Figures 5 and 6. Table 1 is the authors' dust-driven-wind model output and is retained as model_derived context.
+    The authors measured SiO vaporisation coefficient and equilibrium vapour pressure using Knudsen-cell mass loss measured by a quartz crystal microbalance. Equations (3) and (4) are their measured reductions; numeric figure points in Figures 2 and 3 are not transcribed. Equations (6) and (7) are comparison vapour-pressure relations quoted from Ferguson & Nuth (2008) and Schick (1960). Nuth and Donn's onset-rate estimates and the later empirical fit are quoted from this paper; their input points are plotted only in Figures 5 and 6. Table 1 is the authors' dust-driven-wind model output and is retained as model_derived context.
   missing_values: >-
-    No plotted points were digitized. The three nucleation-rate rows remain unavailable with quantity unknown because the schema has no nucleation_rate quantity; no point temperature or total pressure was assigned where the paper gives no single value for the quoted range or fit.
+    Figure 2 and Figure 3 points are represented by figure_only rows and were not digitized. The three nucleation-rate rows remain unavailable with quantity unknown because the schema has no nucleation_rate quantity; no point temperature or total pressure was assigned where the paper gives no single value for the quoted range or fit.
 species:
   SiO:
     observations:
+      - observation_id: gail_2013_sio_vaporisation_coefficient_fit_eq3
+        type: alpha
+        locator:
+          page: 3
+          published_page: 3
+          section: 2.3 Experimental results
+          equation: '3'
+        T_range_K:
+          - 1275
+          - 1525
+        phase: gas
+        units: dimensionless
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Equation (3) is a fit over 1275 K to 1525 K and gives no single point temperature.
+            locator:
+              page: 3
+              equation: '3'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: No experimental total pressure is printed for the coefficient measurements.
+            locator:
+              page: 3
+              equation: '3'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity is printed for the Knudsen-cell coefficient measurements.
+            locator:
+              page: 3
+              equation: '3'
+        derivation:
+          relation: The vaporisation coefficient derived from the experimental mass-loss results is fitted by the Arrhenius form in equation (3).
+          locator:
+            page: 3
+            equation: '3'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              figure: '2'
+              note: Figure 2 plots the measured vaporisation coefficient; numeric point values are not tabulated.
+        uncertainty:
+          coefficients_as_printed: 'α0 = 0.521 ± 0.156; T0 = 3 686 ± 428'
+          confidence_level: not_stated
+          notice: Confidence level not stated.
+        values:
+          quantity: alpha
+          method_class: measured_reduced
+          equation_as_printed: 'α(T) = α0 exp(−T0/T)'
+          alpha0_as_printed: '0.521 ± 0.156'
+          T0_as_printed: '3 686 ± 428'
+          temperature_domain_as_printed: 1275 K to 1525 K
+          orifice_diameters_as_printed: 0.50 mm and 0.79 mm
+          measurement_method_as_printed: >-
+            Knudsen-cell mass-loss rates were measured with a quartz crystal microbalance; the cell was heated by electron bombardment with an electron-beam evaporator.
       - observation_id: gail_2013_sio_vapor_pressure_fit_eq4
         type: psat_series
         locator:
           page: 3
           published_page: 3
-          section: 2.2 Experimental setup
+          section: 2.3 Experimental results
           equation: '4'
+        T_range_K:
+          - 1275
+          - 1525
         phase: gas
         units: dyn cm−2
+        derivation:
+          relation: The authors reduced their Knudsen-cell mass-loss measurements using equations (1)–(3) and fitted the equilibrium vapour pressure in equation (4).
+          locator:
+            page: 3
+            equation: '4'
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              figure: '3'
+              note: Figure 3 plots the measured vapour-pressure points; numeric point values are not tabulated.
         point_conditions:
           temperature_K:
             state:
               tag: unknown
-              reason: The fitted equation is a function of T and no single point temperature is printed.
+              reason: The fitted equation covers 1275 K to 1525 K and gives no single point temperature.
             locator:
               page: 3
               equation: '4'
@@ -57,19 +130,152 @@ species:
           notice: Confidence level not stated.
         values:
           quantity: pure_vapor_pressure
-          method_class: quoted_attributed
-          attribution: Gail et al. (2013), equation (4), fitted to their measured SiO vapour-pressure data; the laboratory measurements are also described in Wetzel et al. (2012a).
+          method_class: measured_reduced
           equation_as_printed: P = exp(−T_v/T + S_v)
           coefficients_as_printed:
             T_v: 49 520 ± 1 400 K
             S_v: 32.52 ± 0.97
           pressure_species: SiO(g)
-          condensed_reservoir: solid SiO
+          reservoir:
+            tag: unknown
+            reason: The paper prints solid silicon monoxide (solid SiO), but Phase.CR would assert crystalline SiO; no phase token represents solid without that assertion.
+            locator:
+              page: 3
+              equation: '4'
           fit_basis_as_printed: Best fit to the experimental data points.
+          temperature_domain_as_printed: 1275 K to 1525 K
+          orifice_diameters_as_printed: 0.50 mm and 0.79 mm
           measurement_method_as_printed: >-
             Knudsen method; the cell mass-loss rate was measured with a quartz crystal microbalance. Two cell orifices of 0.50 mm and 0.79 mm diameter were used to determine vapour pressure and vaporisation coefficient. The cell was heated by electron bombardment with an electron-beam evaporator.
           reduction_as_printed: >-
             The Knudsen-cell mass-loss measurement gives P_K(T) by equation (1); the equilibrium vapour pressure is obtained using the Whitman–Motzfeld equation (2) and the vaporisation coefficient fit (3).
+      - observation_id: gail_2013_figure_2_vaporisation_coefficient
+        type: alpha
+        locator:
+          page: 3
+          published_page: 3
+          figure: '2'
+        phase: gas
+        units: dimensionless
+        values:
+          method_class: figure_only
+          quantity: alpha
+          species: SiO(g)
+          condensed_phase_as_printed: solid SiO
+          temperature_as_printed: T [K]
+          x_axis_as_printed: 10^4 K/T
+          y_axis_as_printed: vaporisation coefficient α
+          caption_as_printed: >-
+            Fig. 2. Vaporisation coefficient of solid SiO derived from the experimental measurements of the mass-loss rate obtained for two orifice diameters of the Knudsen cell. The full line is the approximation according to Eq. (3).
+          digitisation: deferred to a figure pass
+      - observation_id: gail_2013_figure_3_vapor_pressure
+        type: psat_series
+        locator:
+          page: 3
+          published_page: 3
+          figure: '3'
+        phase: gas
+        units: dyn cm−2
+        values:
+          method_class: figure_only
+          quantity: pure_vapor_pressure
+          species: SiO(g)
+          condensed_phase_as_printed: solid SiO
+          temperature_as_printed: T [K]
+          x_axis_as_printed: 10^4 K/T
+          y_axis_as_printed: equilibrium vapour pressure
+          caption_as_printed: >-
+            Fig. 3. Equilibrium vapour pressure of solid SiO derived from the experimental measurements of the mass-loss rate obtained for two orifice diameters of the Knudsen cell (filled circles). The full line is the analytic approximation according to Eq. (4).
+          digitisation: deferred to a figure pass
+      - observation_id: gail_2013_ferguson_nuth_vapor_pressure_eq6
+        type: psat_series
+        locator:
+          page: 4
+          published_page: 4
+          section: 3. Stability limits
+          equation: '6'
+        phase: gas
+        units: dyn cm−2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The quoted vapour-pressure relation is a function of T and gives no single point temperature.
+            locator:
+              page: 4
+              equation: '6'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Vapour pressure is the output; the paper prints no experimental total pressure for this comparison formula.
+            locator:
+              page: 4
+              equation: '6'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity is printed for the quoted Ferguson and Nuth vapour-pressure relation.
+            locator:
+              page: 4
+              equation: '6'
+        values:
+          quantity: pure_vapor_pressure
+          method_class: quoted_attributed
+          attribution: Ferguson & Nuth (2008), as reported by Gail et al. (2013), equation (6).
+          equation_form_as_printed: The pressure follows equation (4) with the coefficients printed in equation (6).
+          coefficients_as_printed:
+            T_v: 40 850 ± 1 270 K
+            S_v: 32.93 ± 0.90
+          pressure_species: SiO(g)
+          reservoir:
+            tag: unknown
+            reason: The paper prints vapour pressure over solid silicon monoxide (solid SiO), but Phase.CR would assert crystalline SiO; no phase token represents solid without that assertion.
+            locator:
+              page: 4
+              equation: '6'
+      - observation_id: gail_2013_schick_vapor_pressure_eq7
+        type: psat_series
+        locator:
+          page: 4
+          published_page: 4
+          section: 3. Stability limits
+          equation: '7'
+        phase: gas
+        units: dyn cm−2
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The quoted Schick vapour-pressure relation is a function of T and gives no single point temperature.
+            locator:
+              page: 4
+              equation: '7'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Vapour pressure is the output; the paper prints no experimental total pressure for this comparison formula.
+            locator:
+              page: 4
+              equation: '7'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity is printed for the quoted Schick vapour-pressure relation.
+            locator:
+              page: 4
+              equation: '7'
+        values:
+          quantity: pure_vapor_pressure
+          method_class: quoted_attributed
+          attribution: Schick (1960), as reported by Gail et al. (2013), equation (7).
+          equation_as_printed: pvap = exp(26.66 − 25670/T)
+          pressure_species: SiO(g)
+          reservoir:
+            tag: unknown
+            reason: The paper prints vapour pressure over solid silicon monoxide (solid SiO), but Phase.CR would assert crystalline SiO; no phase token represents solid without that assertion.
+            locator:
+              page: 4
+              equation: '7'
       - observation_id: gail_2013_nuth_donn_smoke_onset_rate_range
         type: rate_series
         locator:
@@ -290,12 +496,42 @@ schema_gaps:
     reason: >-
       Table 1 mixes stellar parameters, sonic-point properties, condensation fractions, terminal velocity, and optical depths. There is no single exact observation quantity or model_output observation type for this table; its complete row data remain in the existing unscored context container with method_class model_derived.
 fidelity_samples:
+  - path: species.SiO.observations[gail_2013_sio_vaporisation_coefficient_fit_eq3].values.alpha0_as_printed
+    value: 0.521 ± 0.156
+    locator:
+      page: 3
+      equation: '3'
+    note: Coefficient read from the page 3 render.
+  - path: species.SiO.observations[gail_2013_sio_vaporisation_coefficient_fit_eq3].values.T0_as_printed
+    value: 3 686 ± 428
+    locator:
+      page: 3
+      equation: '3'
+    note: Coefficient read from the page 3 render.
   - path: species.SiO.observations[gail_2013_sio_vapor_pressure_fit_eq4].values.coefficients_as_printed.T_v
     value: 49 520 ± 1 400 K
     locator:
       page: 3
       equation: '4'
     note: Coefficient read from the page 3 render.
+  - path: species.SiO.observations[gail_2013_ferguson_nuth_vapor_pressure_eq6].values.coefficients_as_printed.T_v
+    value: 40 850 ± 1 270 K
+    locator:
+      page: 4
+      equation: '6'
+    note: Coefficient read from the page 4 render.
+  - path: species.SiO.observations[gail_2013_ferguson_nuth_vapor_pressure_eq6].values.coefficients_as_printed.S_v
+    value: 32.93 ± 0.90
+    locator:
+      page: 4
+      equation: '6'
+    note: Coefficient read from the page 4 render.
+  - path: species.SiO.observations[gail_2013_schick_vapor_pressure_eq7].values.equation_as_printed
+    value: pvap = exp(26.66 − 25670/T)
+    locator:
+      page: 4
+      equation: '7'
+    note: Formula read from the page 4 render.
   - path: species.SiO.observations[gail_2013_sio_vapor_pressure_fit_eq4].values.coefficients_as_printed.S_v
     value: 32.52 ± 0.97
     locator:
