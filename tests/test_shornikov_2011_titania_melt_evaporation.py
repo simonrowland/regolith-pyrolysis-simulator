@@ -118,6 +118,28 @@ def _assert_rendered_cells(document) -> None:
         assert row["locator"]["page"] == 1
 
 
+def test_authors_own_model_results_are_not_classified_as_citations():
+    document = _load()
+    observations = {
+        row["observation_id"]: row
+        for _formula, row in _observations(document)
+    }
+    for observation_id in (
+        "shornikov_2011_titania_melt_evaporation_p001_t01_r03_c02",
+        "shornikov_2011_fig1a_line5_CaO_not_sampled",
+    ):
+        observation = observations[observation_id]
+        values = observation["values"]
+        assert values["method_class"] == "model_derived"
+        method = observation["derivation"]["method"]["state"]["value"].lower()
+        assert "ideal associated solutions" in method
+        assert "Glushko et al. (1978–1982)" in observation["derivation"]["references"]
+        method_locator = observation["derivation"]["method"]["locator"]
+        assert method_locator["page"] > 0
+        assert method_locator["section"]
+        assert "equation" not in method_locator
+
+
 def test_table_and_figure_reads_are_pinned():
     document = _load()
     gibbs = [
@@ -272,7 +294,6 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     ]
     assert len(migrated) == 114
     assert not result.registry_issues
-    assert not result.validation.hard_issues
 
     gibbs = [row for row in migrated if row.identity.quantity.value.value == "delta_fG"]
     activities = [
@@ -306,6 +327,10 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     for row in migrated:
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value
+        assert row.point_conditions
+        for condition in row.point_conditions.values():
+            assert condition.state is not None
+            assert condition.locator is not None
 
     sample = next(row for row in activities if "fig1a_CaO_activity" in row.observation_id)
     assert sample.identity.temperature_K.value == Decimal("2050")
@@ -329,3 +354,4 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     # 5.0e-5 atm = 5.06625 Pa. The store keeps pascals.
     assert pressure.value.point == Decimal("5.066250")
     assert pressure.identity.temperature_K.value == Decimal("2300")
+    assert not result.validation.hard_issues
