@@ -9,6 +9,18 @@ class UnknownSpeciesError(AccountingError):
     """Raised when a species has no usable formula."""
 
 
+class UnparseableCompositionComponent(UnknownSpeciesError):
+    """One composition component name is not a parseable species formula.
+
+    ``component`` is that name. A scorer refuses the row that carries it.
+    Callers that already catch ``UnknownSpeciesError`` still catch this.
+    """
+
+    def __init__(self, component: str) -> None:
+        self.component = component
+        super().__init__(f"unparseable composition component {component!r}")
+
+
 class UnbalancedTransitionError(AccountingError):
     """Raised when a transition does not conserve atoms or mass."""
 

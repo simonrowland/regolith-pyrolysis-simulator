@@ -6182,6 +6182,8 @@ def _fe_redox_material(
             {"reason": "missing_input", "input": "composition"},
         )
     composition = composition_state.value
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -6190,6 +6192,9 @@ def _fe_redox_material(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+    except UnparseableCompositionComponent:
+        # ValueError would swallow this. The row refusal lives in compile_residual.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
@@ -11976,11 +11981,27 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
-        prediction = predictor(
-            engine,
-            _melt_prediction_reference(implied_alpha_reference or reference),
-            **predictor_kwargs,
-        )
+        from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+        try:
+            prediction = predictor(
+                engine,
+                _melt_prediction_reference(implied_alpha_reference or reference),
+                **predictor_kwargs,
+            )
+        except UnparseableCompositionComponent as exc:
+            # One unparseable component refuses this row. It must not abort
+            # score_store. fo2_ladder._weight_percent still catches the base
+            # UnknownSpeciesError and returns None; that caller is not a
+            # store-wide residual loop, so it is left as it is.
+            return _refused(
+                RefusalReason.INVALID_SOURCE,
+                {
+                    "reason": "unparseable_composition_component",
+                    "component": exc.component,
+                },
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+            )
 
     notices = union_notices(notices, prediction.notices)
     identity_composition = (
