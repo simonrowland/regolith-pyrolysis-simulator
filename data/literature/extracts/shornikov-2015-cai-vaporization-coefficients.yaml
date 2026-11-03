@@ -1119,13 +1119,15 @@ species:
         method:
           state:
             tag: value
-            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+            value: "Table 5 reports the crystalline evaporation coefficient under αvap (cr)."
           locator:
-            page: 1
-            pdf_page_index: 0
-            published_page: 1080
-            section: Abstract
-            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
+            page: 7
+            pdf_page_index: 6
+            published_page: 1086
+            table: '5'
+            row_label: $Al_2O_3$
+            column_header: αvap (cr)
+            note: Table 5 prints this crystalline evaporation coefficient; no separate calculation is assigned to the cell.
       values:
         quantity: alpha
         method_class: compilation_assessed
@@ -1659,13 +1661,15 @@ species:
         method:
           state:
             tag: value
-            value: "Based on the analysis of theoretical and experimental data, the following vaporization coefficients are suggested for crystalline oxides contained in Ca–Al–inclusions in chondrites:"
+            value: "Table 5 reports the crystalline evaporation coefficient under αvap (cr)."
           locator:
-            page: 1
-            pdf_page_index: 0
-            published_page: 1080
-            section: Abstract
-            note: The abstract introduces the six crystalline oxide coefficients as suggested recommendations.
+            page: 7
+            pdf_page_index: 6
+            published_page: 1086
+            table: '5'
+            row_label: FeO
+            column_header: αvap (cr)
+            note: Table 5 prints this crystalline evaporation coefficient; no separate calculation is assigned to the cell.
       values:
         quantity: alpha
         method_class: compilation_assessed
@@ -1720,7 +1724,7 @@ species:
         - Glushko et al., 1978–1982
       values:
         quantity: alpha
-        method_class: model_derived
+        method_class: compilation_assessed
         admission_status: rejected
         attribution: Evaluated in this study from experimental data (Darken and Gurry, 1946) and thermochemical data in Glushko et al. (1978–1982).
         consistency_note: >-

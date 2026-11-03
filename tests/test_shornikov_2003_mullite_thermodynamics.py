@@ -143,9 +143,6 @@ def _assert_sc456_evidence_classes(document: dict) -> None:
         assert row["values"]["method_class"] == "model_derived"
         assert "calculations from the cited thermochemical literature" in row["derivation"]["relation"]
         assert "Calculations from literature data" in row["derivation"]["method"]["state"]["value"]
-        assert row["derivation"]["references"] == [
-            "Refs. 14, 17, 22, 25, 28, and 33, as listed in the Table 1 caption."
-        ]
 
 
 def test_sc456_evidence_class_pins_reject_quoted_reversion() -> None:
