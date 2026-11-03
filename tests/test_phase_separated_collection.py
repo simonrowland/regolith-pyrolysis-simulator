@@ -93,7 +93,19 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 
 
 def test_diverted_alkali_sio_numeric_pin():
-    """Pin the merged bypass route while the silica cartridge is isolated."""
+    """Pin the merged bypass route while the silica cartridge is isolated.
+
+    Cause: stage D_AB is evaluated at T_film = (T_gas,in + T_wall) / 2.
+    This model leaves gas_temperature_C at the 1500 C wall default, so
+    Stage 4's film is below the old bulk-gas diffusivity temperature.
+    Production route() stage-4 kg, old then new: SiO 0.9986994551767132
+    to 0.9649098291677289, Na 0.0006999999999980907 to
+    0.0006937176899052765, K 9.999996447226044e-05 to
+    9.999996255610596e-05. Terminal remainder, old then new: SiO stays 0,
+    Na 0 to 1.2660217650805803e-17, K 3.877722869009954e-17 to
+    1.5580120859887416e-15. The uncaptured mass is still collected on the
+    colder downstream stages; the hex strings are that production output.
+    """
     model = _model("divert", hard_gate=False)
     result = model.route(
         EvaporationFlux({"SiO": 1.0, "Na": 0.0007, "K": 0.0001}),
@@ -101,14 +113,14 @@ def test_diverted_alkali_sio_numeric_pin():
     )
     assert 3 not in result.condensed_by_stage_species
     assert {sp: kg.hex() for sp, kg in result.condensed_by_stage_species[4].items()} == {
-        "SiO": "0x1.ff5588f508b46p-1",
-        "Na": "0x1.6f0068db875fdp-11",
-        "K": "0x1.a36e24edb9570p-14",
+        "SiO": "0x1.ee08a93fba8b2p-1",
+        "Na": "0x1.6bb536538edccp-11",
+        "K": "0x1.a36e2466e2f83p-14",
     }
     assert {sp: kg.hex() for sp, kg in result.remaining_by_species.items()} == {
         "SiO": "0x0.0p+0",
-        "Na": "0x0.0p+0",
-        "K": "0x1.65a8247d00000p-55",
+        "Na": "0x1.d314600000000p-57",
+        "K": "0x1.c111003818000p-50",
     }
 
 

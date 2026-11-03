@@ -4743,6 +4743,9 @@ class CondensationModel:
                 continue
 
             diagnostic: dict[str, Any] = {}
+            # D_AB at the film temperature. HKL and the R*T denominator
+            # stay at T_gas_K. See _stage_film_temperature_K.
+            film_T_K = _stage_film_temperature_K(T_gas_K, sample_T_K)
             pressure_options = dict(
                 vapor_pressure_data=self.vapor_pressure_data,
                 equilibrium_pressure_pa=(
@@ -4768,6 +4771,7 @@ class CondensationModel:
                     T_gas_K=T_gas_K,
                     overhead_pressure_pa=overhead_pressure_pa,
                     carrier_gas=self.carrier_gas,
+                    diffusivity_temperature_K=film_T_K,
                     **pressure_options,
                 )
             except WallSaturationPressureRefusal:
@@ -5592,6 +5596,60 @@ def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
     if temperature_K <= 0.0:
         raise DepositionInputRefusal('T_surface_K', temperature_K, 'must be above absolute zero')
     return temperature_K
+
+
+def _stage_film_temperature_K(gas_inlet_K: float, wall_K: float) -> float:
+    """Film temperature for stage-collector gas properties.
+
+    Premise. Heat and mass transfer share one NTU (Chilton–Colburn;
+    Le ~ 1 for alkali vapour in N2). At a Stage-4 NTU of about 0.2 the
+    bulk gas barely cools inside the collector, so the property
+    temperature is the film mean, not the wall. ``gas_inlet_K`` is the
+    train-wide bulk inlet, ``CondensationModel.gas_temperature_C`` (the
+    overhead conductance temperature, equal to the melt temperature
+    because the upstream ducts stay hot). ``wall_K`` is the same
+    per-sample wall the band integration already passes as
+    ``T_surface``. Neither temperature is a second literal. A per-stage
+    bulk temperature from an energy balance is a new thermal-train
+    output (t-1604b) and is not computed here. Do not use the 1000 K
+    radiator split or the 150 K floor.
+
+    Algebra. T_film = (T_gas,in + T_wall) / 2.
+
+    Chapman–Enskog (Bird, Stewart & Lightfoot Eq. 17.3-10):
+    D_AB [m²/s] ∝ T[K]^1.5 / P[Pa], times 1/Ω_D(T*). Unit check: T in
+    kelvin and P in pascal give D in m²/s after the cm²→m² factor in
+    ``_chapman_enskog_d_ab_m2_s``.
+
+    Sanity, Stage 4, ignoring the 0.15 K Celsius offset and Ω_D.
+    Bulk 1450 °C is 1723 K, wall 250 °C is 523 K,
+    T_film = (1723 + 523) / 2 = 1123 K,
+    D(T_film) / D(1723 K) = (1123 / 1723)^1.5 = 0.526.
+    The code's offset is 273.15, so the same walls are 1723.15 K and
+    523.15 K and the pure power is (1123.15 / 1723.15)^1.5.
+
+    The Sherwood number on this path is 3.66 times the square root of
+    the radial stir factor. It has no Schmidt number, viscosity,
+    Reynolds number, or temperature, so D_AB is the only gas property
+    that moves with T_film. The ideal-gas factor in
+    k_MT [mol/(m²·s·Pa)] = Sh·D / (D_h·R·T) stays at the bulk inlet:
+    the driving force is the bulk partial pressure, and
+    Q = n_dot·R·T_bulk / p_in, so NTU = k_c·A / Q equals
+    k_G·A·p / n_dot only when k_G = k_c / (R·T_bulk). The HKL kinetic
+    temperature stays at that same bulk inlet. A non-positive
+    temperature is a typed refusal.
+    """
+    gas_inlet_K = _deposition_finite_scalar('T_gas_K', gas_inlet_K)
+    wall_K = _deposition_finite_scalar('T_surface_K', wall_K)
+    if gas_inlet_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_gas_K', gas_inlet_K, 'must be above absolute zero',
+        )
+    if wall_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_surface_K', wall_K, 'must be above absolute zero',
+        )
+    return 0.5 * (gas_inlet_K + wall_K)
 
 
 def _stage_alpha_s(
@@ -7290,6 +7348,7 @@ def _series_resistance_deposition_flux_mol_m2_s(
     antoine_extrapolation_warnings: list[str] | None = None,
     diagnostic_out: MutableMapping[str, Any] | None = None,
     equilibrium_pressure_pa: float | None = None,
+    diffusivity_temperature_K: float | None = None,
 ) -> float:
     """Series-resistance deposition flux (Bird/Stewart/Lightfoot canonical
     form), regime-aware: ``1/k_total = 1/(α_s · k_HKL) + (1 − f) / k_MT``,
@@ -7496,9 +7555,15 @@ def _series_resistance_deposition_flux_mol_m2_s(
             diagnostic_out.update(rate.to_dict())
         return flux
 
-    # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk) sets
-    # the ideal-gas denominator; T_surface (wall) sets the saturation
-    # pressure (already consumed by the driving_pressure_pa above).
+    # k_MT per Pa: Sh_eff × D_AB / (L_pipe × R × T_gas). T_gas (bulk)
+    # sets the ideal-gas denominator; T_surface (wall) sets the
+    # saturation pressure (already consumed by driving_pressure_pa).
+    # D_AB is evaluated at diffusivity_temperature_K when the stage
+    # path supplies the film temperature; otherwise at T_gas. Sh has no
+    # Schmidt factor, so no other gas property moves. See
+    # _stage_film_temperature_K. The denominator stays at bulk T_gas:
+    # Q = n_dot*R*T_bulk/p_in, and NTU = (Sh*D/Dh)*A/Q equals
+    # k_MT*A*p/n_dot only with that bulk T.
     # 0.5.3 Phase B: Sh enhancement reads the RADIAL stirring axis as a
     # configured gas-side transport proxy; no EM/vortex field is solved here.
     # Backward-compat: if the caller passes only the legacy positional
@@ -7509,11 +7574,23 @@ def _series_resistance_deposition_flux_mol_m2_s(
         stir_factor,
         radial_stir_factor=radial_stir_factor,
     )
+    if diffusivity_temperature_K is None:
+        diffusivity_T_K = effective_T_gas_K
+    else:
+        diffusivity_T_K = _deposition_finite_scalar(
+            'diffusivity_temperature_K', diffusivity_temperature_K,
+        )
+        if diffusivity_T_K <= 0.0:
+            raise DepositionInputRefusal(
+                'diffusivity_temperature_K',
+                diffusivity_temperature_K,
+                'must be above absolute zero',
+            )
     if (overhead_pressure_pa is not None
             and math.isfinite(overhead_pressure_pa)
             and overhead_pressure_pa > 0.0):
         d_ab_m2_s = _chapman_enskog_d_ab_m2_s(
-            species, effective_T_gas_K,
+            species, diffusivity_T_K,
             float(overhead_pressure_pa),
             carrier=carrier_gas,
         )
