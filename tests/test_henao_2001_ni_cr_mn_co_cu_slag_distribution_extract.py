@@ -15,6 +15,37 @@ from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/henao-2001-ni-cr-mn-co-cu-slag-distribution.yaml"
+# Table 3's page render places these paired mass percentages under Fe and Ni.
+TABLE3_ALLOY_FE_NI = {
+    "C-1": ("8.8", "91.2"),
+    "C-2": ("12.7", "87.2"),
+    "C-3": ("20.4", "81.4"),
+    "C-4": ("17.0", "79.1"),
+    "C-5": ("15.9", "86.9"),
+    "C-6": ("19.6", "77.5"),
+    "C-7": ("25.2", "78.8"),
+    "C-8": ("9.1", "86.5"),
+    "C-9": ("12.4", "89.3"),
+    "C-10": ("10.9", "80.4"),
+    "C-11": ("11.5", "86.5"),
+    "C-12": ("16.2", "79.5"),
+    "C-13": ("18.9", "75.0"),
+    "C-14": ("13.9", "88.7"),
+    "C-15": ("18.2", "74.9"),
+    "C-16": ("11.3", "89.9"),
+    "C-17": ("29.4", "69.1"),
+    "C-18": ("12.4", "90.3"),
+    "C-19": ("16.9", "84.8"),
+    "C-20": ("20.0", "75.4"),
+    "C-21": ("19.0", "80.2"),
+    "C-22": ("26.9", "73.0"),
+    "C-23": ("21.0", "75.9"),
+    "C-24": ("9.9", "85.8"),
+    "C-25": ("18.8", "77.4"),
+    "C-26": ("18.4", "75.6"),
+    "C-27": ("23.7", "71.1"),
+    "C-28": ("22.3", "72.6"),
+}
 
 
 def _document() -> dict:
@@ -48,7 +79,15 @@ def _assert_render_pins(document: dict) -> None:
     assert observations["henao_2001_t1_A-1_slag_SiO2"]["values"]["component_amount"] == "11.3"
     assert observations["henao_2001_t1_A-1_alloy_Fe"]["values"]["component_amount"] == "11.2"
     assert observations["henao_2001_t1_A-1_alloy_Ni"]["values"]["component_amount"] == "91.7"
-    assert observations["henao_2001_t3_C-1_alloy_Co"]["values"]["component_amount"] == "91.2"
+    for sample, (iron, nickel) in TABLE3_ALLOY_FE_NI.items():
+        assert (
+            observations[f"henao_2001_t3_{sample}_alloy_Fe"]["values"]["component_amount"]
+            == iron
+        )
+        assert (
+            observations[f"henao_2001_t3_{sample}_alloy_Ni"]["values"]["component_amount"]
+            == nickel
+        )
     assert observations["henao_2001_t1_A-1_alloy_Fe"]["values"]["phase_label"] == "metal"
     first = observations["henao_2001_t1_A-1_slag_Fe"]["values"]
     assert first["log_fO2"]["value"] == "-6.8"
@@ -121,6 +160,7 @@ def test_typed_cell_mutation_is_detected_by_independent_pdf_pins() -> None:
     for observation_id, amount in (
         ("henao_2001_t1_A-1_slag_Fe", "42.6"),
         ("henao_2001_t1_A-1_slag_MgO", "21.9"),
+        ("henao_2001_t3_C-1_alloy_Fe", "8.9"),
     ):
         mutated = deepcopy(_document())
         row = next(
