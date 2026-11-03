@@ -16,8 +16,7 @@ extraction:
     behavior, neglect dimers, monoxides, and atomic oxygen, use pO2 = pNa/4,
     and take Kp from the FACT pure-substance database. The activity values
     reduce measured partial pressures through Eq. 3, but the pressure inputs
-    for these points are not stored, so the reported activities are
-    quoted_attributed. The calibration
+    for these points are not stored. The calibration
     constant was determined against pure silver partial pressure. The source
     does not report the KEMS run total pressure or oxygen fugacity; the
     apparatus vacuum statement is not assigned to the sample as a pressure.
@@ -52,9 +51,19 @@ species:
         note: The paper reports AlSi8Na1 was partly molten and contained mullite and cristobalite after measurement.
         values:
           quantity: activity
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: admitted
-          attribution: 'Willenborg et al. (2006), present work.'
+          derivation:
+            relation: The authors reduced measured sodium partial pressures to Na2O activity using Eq. (3).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 2595
+                pdf_page_index: 2
+                section: Results and Discussion
+                equation: '3'
+                note: Numeric partial-pressure inputs for the reported activities are not stored.
           activity: 5e-14
           approximate: true
           activity_as_published: about 5 × 10^-14
@@ -82,9 +91,19 @@ species:
         uncertainty: {note: No per-run uncertainty is printed.}
         values:
           quantity: activity
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: admitted
-          attribution: 'Willenborg et al. (2006), present work.'
+          derivation:
+            relation: The authors reduced measured sodium partial pressures to Na2O activity using Eq. (3).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 2595
+                pdf_page_index: 2
+                section: Results and Discussion
+                equation: '3'
+                note: Numeric partial-pressure inputs for the reported activities are not stored.
           activity: 2e-13
           approximate: true
           activity_as_published: about 2 × 10^-13
@@ -131,8 +150,19 @@ species:
         units: dimensionless activity as printed
         values:
           quantity: activity
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_refusal
+          derivation:
+            relation: The authors reduced measured alkali partial pressures to the reported oxide activities using Eq. (3).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 2595
+                pdf_page_index: 2
+                section: Results and Discussion
+                equation: '3'
+                note: The numerical partial-pressure inputs for the plotted activity series are not stored.
           reason: 'identity incomplete: prose groups SiO2 and TiO2 treatments without an individual treatment composition for each value.'
           temperature_as_published: 1400 °C
           sodium_oxide_activity_as_published: 'Untreated slag about 3 × 10^-10; slag with 5% SiO2 or TiO2 about 2 × 10^-10; slag with 10% SiO2 or TiO2 about 6 × 10^-11.'
@@ -144,8 +174,18 @@ species:
         units: Pa as printed
         values:
           quantity: partial_pressure
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_refusal
+          derivation:
+            relation: The reported alkali partial-pressure summaries are the authors' reduction of their KEMS measurements.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 4
+                published_page: 2596
+                pdf_page_index: 3
+                section: Results and Discussion
+                note: Numeric ion-current inputs for the reported pressure summaries are not stored.
           reason: 'species not reported: the source says alkali partial pressures but does not identify a gas species.'
           partial_pressures_as_published: ['about 0.6 Pa over untreated slag', 'about 0.3 Pa over slag with 10% SiO2']
           relative_change_as_published: decrease of 50%
@@ -155,8 +195,19 @@ species:
         units: relative activity as printed
         values:
           quantity: relative activity comparison
-          method_class: quoted_attributed
+          method_class: measured_reduced
           admission_status: typed_refusal
+          derivation:
+            relation: The authors compared Na2O activities reduced from measured sodium partial pressures using Eq. (3).
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 5
+                published_page: 2597
+                pdf_page_index: 4
+                section: Results and Discussion
+                equation: '3'
+                note: Numeric partial-pressure inputs for these compositions are not stored.
           reason: 'schema gap: the paper prints only an activity ratio, about two times, without absolute activity values; no activity-ratio quantity is defined.'
           comparison_as_published: 'The sodium oxide activity in AlSi8Mg8Na5 is about 2 times higher than in AlSi8Mg4Na5.'
           source_compositions: 'Table 2 identifies both sorbent compositions, but no absolute activities are printed for this comparison.'
