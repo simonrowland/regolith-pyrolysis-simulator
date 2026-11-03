@@ -85,15 +85,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: &yan_2020_table1_total_pressure_unknown
-          tag: unknown
-          reason: "The source does not report the total gas pressure for this run. Section 2.1 gives the CO/CO2 ratio and gas flow rates but no chamber total pressure."
-          locator:
-            source_path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
-            pdf_page_index: 4
-            page: 5
-            section: "2.1 Determination of phase equilibria in the CaO–SiO2–VOx system"
-            note: "Run pressure is not stated in the experimental procedure."
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -103,6 +94,16 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: &yan_2020_table1_total_pressure_unknown
+            state:
+              tag: unknown
+              reason: "The source does not report the total gas pressure for this run. Section 2.1 gives the CO/CO2 ratio and gas flow rates but no chamber total pressure."
+            locator:
+              source_path: raw/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.pdf
+              pdf_page_index: 4
+              page: 5
+              section: "2.1 Determination of phase equilibria in the CaO–SiO2–VOx system"
+              note: "Run pressure is not stated in the experimental procedure."
           pO2_Pa:
             state:
               tag: value
@@ -147,7 +148,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -157,6 +157,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -201,7 +202,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -211,6 +211,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -255,7 +256,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -265,6 +265,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -302,7 +303,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -312,6 +312,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -349,7 +350,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -359,6 +359,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -396,7 +397,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -406,6 +406,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -450,7 +451,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -460,6 +460,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -504,7 +505,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -514,6 +514,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -558,7 +559,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -568,6 +568,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -605,7 +606,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -615,6 +615,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -652,7 +653,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -662,6 +662,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -699,7 +700,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -709,6 +709,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -753,7 +754,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -763,6 +763,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -807,7 +808,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -817,6 +817,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -861,7 +862,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -871,6 +871,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -908,7 +909,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -918,6 +918,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -955,7 +956,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -965,6 +965,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1002,7 +1003,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1012,6 +1012,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1056,7 +1057,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1066,6 +1066,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1110,7 +1111,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1120,6 +1120,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1164,7 +1165,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1174,6 +1174,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1211,7 +1212,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1221,6 +1221,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1258,7 +1259,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1268,6 +1268,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1305,7 +1306,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1315,6 +1315,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1359,7 +1360,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1369,6 +1369,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1413,7 +1414,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1423,6 +1423,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1467,7 +1468,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1477,6 +1477,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1514,7 +1515,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1524,6 +1524,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1561,7 +1562,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1571,6 +1571,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1608,7 +1609,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1618,6 +1618,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1662,7 +1663,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1672,6 +1672,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1716,7 +1717,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1726,6 +1726,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1770,7 +1771,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1780,6 +1780,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1817,7 +1818,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1827,6 +1827,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1864,7 +1865,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -1874,6 +1874,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1911,7 +1912,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -1921,6 +1921,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -1965,7 +1966,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -1975,6 +1975,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2019,7 +2020,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2029,6 +2029,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2073,7 +2074,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2083,6 +2083,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2120,7 +2121,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2130,6 +2130,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2167,7 +2168,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2177,6 +2177,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2214,7 +2215,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2224,6 +2224,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2268,7 +2269,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2278,6 +2278,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2322,7 +2323,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2332,6 +2332,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2376,7 +2377,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2386,6 +2386,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2423,7 +2424,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2433,6 +2433,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2470,7 +2471,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2480,6 +2480,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2517,7 +2518,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2527,6 +2527,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2571,7 +2572,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2581,6 +2581,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2625,7 +2626,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2635,6 +2635,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2679,7 +2680,6 @@ species:
         liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2689,6 +2689,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2726,7 +2727,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2736,6 +2736,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2773,7 +2774,6 @@ species:
         oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2783,6 +2783,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2820,7 +2821,6 @@ species:
         < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2830,6 +2830,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2874,7 +2875,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -2884,6 +2884,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2928,7 +2929,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -2938,6 +2938,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -2982,7 +2983,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -2992,6 +2992,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3029,7 +3030,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3039,6 +3039,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3076,7 +3077,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3086,6 +3086,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3123,7 +3124,6 @@ species:
         < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3133,6 +3133,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3177,7 +3178,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3187,6 +3187,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3231,7 +3232,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3241,6 +3241,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3285,7 +3286,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3295,6 +3295,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3332,7 +3333,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3342,6 +3342,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3379,7 +3380,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3389,6 +3389,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3426,7 +3427,6 @@ species:
         < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3436,6 +3436,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3480,7 +3481,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3490,6 +3490,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3534,7 +3535,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3544,6 +3544,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3588,7 +3589,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3598,6 +3598,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3635,7 +3636,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3645,6 +3645,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3682,7 +3683,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3692,6 +3692,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3729,7 +3730,6 @@ species:
         < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3739,6 +3739,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3783,7 +3784,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3793,6 +3793,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3837,7 +3838,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3847,6 +3847,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3891,7 +3892,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -3901,6 +3901,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3938,7 +3939,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -3948,6 +3948,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -3985,7 +3986,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -3995,6 +3995,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4032,7 +4033,6 @@ species:
         < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4042,6 +4042,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4086,7 +4087,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4096,6 +4096,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4140,7 +4141,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4150,6 +4150,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4194,7 +4195,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4204,6 +4204,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4241,7 +4242,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4251,6 +4251,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4288,7 +4289,6 @@ species:
         (0 < δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4298,6 +4298,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4336,7 +4337,6 @@ species:
         after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4346,6 +4346,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4391,7 +4392,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4401,6 +4401,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4446,7 +4447,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4456,6 +4456,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4501,7 +4502,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4511,6 +4511,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4549,7 +4550,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4559,6 +4559,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4597,7 +4598,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4607,6 +4607,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4645,7 +4646,6 @@ species:
         after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4655,6 +4655,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4700,7 +4701,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4710,6 +4710,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4755,7 +4756,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4765,6 +4765,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4810,7 +4811,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4820,6 +4820,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4858,7 +4859,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -4868,6 +4868,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4906,7 +4907,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -4916,6 +4916,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -4954,7 +4955,6 @@ species:
         after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -4964,6 +4964,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5009,7 +5010,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5019,6 +5019,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5064,7 +5065,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5074,6 +5074,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5119,7 +5120,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -5129,6 +5129,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5167,7 +5168,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5177,6 +5177,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5215,7 +5216,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5225,6 +5225,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5263,7 +5264,6 @@ species:
         after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -5273,6 +5273,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5318,7 +5319,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5328,6 +5328,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5373,7 +5374,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5383,6 +5383,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5428,7 +5429,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -5438,6 +5438,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5476,7 +5477,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5486,6 +5486,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5524,7 +5525,6 @@ species:
         glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5534,6 +5534,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5571,7 +5572,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -5581,6 +5581,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5625,7 +5626,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5635,6 +5635,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5679,7 +5680,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5689,6 +5689,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5733,7 +5734,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -5743,6 +5743,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5780,7 +5781,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -5790,6 +5790,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -5827,7 +5828,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -5837,6 +5837,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6504,7 +6505,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -6514,6 +6514,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6558,7 +6559,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -6568,6 +6568,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6612,7 +6613,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -6622,6 +6622,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6666,7 +6667,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -6676,6 +6676,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6713,7 +6714,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -6723,6 +6723,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6760,7 +6761,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -6770,6 +6770,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6807,7 +6808,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -6817,6 +6817,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6861,7 +6862,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -6871,6 +6871,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6915,7 +6916,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -6925,6 +6925,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -6969,7 +6970,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -6979,6 +6979,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7016,7 +7017,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7026,6 +7026,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7063,7 +7064,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7073,6 +7073,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7110,7 +7111,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7120,6 +7120,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7164,7 +7165,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7174,6 +7174,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7218,7 +7219,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7228,6 +7228,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7272,7 +7273,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7282,6 +7282,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7319,7 +7320,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7329,6 +7329,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7366,7 +7367,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7376,6 +7376,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7413,7 +7414,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7423,6 +7423,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7467,7 +7468,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7477,6 +7477,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7521,7 +7522,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7531,6 +7531,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7575,7 +7576,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7585,6 +7585,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7622,7 +7623,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7632,6 +7632,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7669,7 +7670,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7679,6 +7679,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7716,7 +7717,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7726,6 +7726,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7770,7 +7771,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7780,6 +7780,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7824,7 +7825,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7834,6 +7834,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7878,7 +7879,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -7888,6 +7888,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7925,7 +7926,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -7935,6 +7935,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -7972,7 +7973,6 @@ species:
         is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -7982,6 +7982,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8722,7 +8723,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -8732,6 +8732,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8776,7 +8777,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -8786,6 +8786,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8830,7 +8831,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -8840,6 +8840,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8884,7 +8885,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -8894,6 +8894,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8931,7 +8932,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -8941,6 +8941,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -8978,7 +8979,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -8988,6 +8988,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9025,7 +9026,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9035,6 +9035,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9079,7 +9080,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9089,6 +9089,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9133,7 +9134,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9143,6 +9143,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9187,7 +9188,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9197,6 +9197,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9234,7 +9235,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9244,6 +9244,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9281,7 +9282,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9291,6 +9291,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9328,7 +9329,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9338,6 +9338,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9382,7 +9383,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9392,6 +9392,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9436,7 +9437,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9446,6 +9446,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9490,7 +9491,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9500,6 +9500,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9537,7 +9538,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9547,6 +9547,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9584,7 +9585,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9594,6 +9594,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9631,7 +9632,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9641,6 +9641,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9685,7 +9686,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9695,6 +9695,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9739,7 +9740,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9749,6 +9749,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9793,7 +9794,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9803,6 +9803,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9840,7 +9841,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9850,6 +9850,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9887,7 +9888,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -9897,6 +9897,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9934,7 +9935,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -9944,6 +9944,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -9988,7 +9989,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -9998,6 +9998,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -10042,7 +10043,6 @@ species:
         < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -10052,6 +10052,7 @@ species:
         method_class: measured_direct
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -10096,7 +10097,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: CaO
         phase_label: melt
@@ -10106,6 +10106,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -10143,7 +10144,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: SiO2
         phase_label: melt
@@ -10153,6 +10153,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value
@@ -10190,7 +10191,6 @@ species:
         δ < 0.1). The oxide liquid is the 1873 K liquid, represented by the glass after quenching.'
       phase: l
       values:
-        total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
         quantity: equilibrium_phase_composition
         formula: V2O3
         phase_label: melt
@@ -10200,6 +10200,7 @@ species:
         method_class: measured_reduced
         admission_status: admitted
         point_conditions:
+          total_pressure_Pa: *yan_2020_table1_total_pressure_unknown
           pO2_Pa:
             state:
               tag: value

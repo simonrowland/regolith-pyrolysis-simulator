@@ -16,6 +16,10 @@ EXTRACT = (
     / "data/literature/extracts/yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy.yaml"
 )
 SOURCE_ID = "yan-wang-deng-wu-dong-2020-cao-sio2-vox-gibbs-energy"
+TOTAL_PRESSURE_REASON = (
+    "The source does not report the total gas pressure for this run. Section 2.1 "
+    "gives the CO/CO2 ratio and gas flow rates but no chamber total pressure."
+)
 TABLE1_LIQUID_GRID = """
 101|25/70/5|33.2 ± 0.4|58.1 ± 0.6|4.7 ± 0.2|96.0 ± 0.4|34.6/60.5/4.9
 102|22.5/70/7.5|31.6 ± 0.2|59.1 ± 0.6|8.0 ± 0.2|98.7 ± 0.8|32.0/59.9/8.1
@@ -212,12 +216,35 @@ def _assert_scoring_gap_bindings(document: dict[str, object]) -> None:
         "yan_2020_table_1_sample_102_measured_liquid_sio2",
         "yan_2020_table_1_sample_129_normalized_liquid_v2o3",
     ):
-        pressure = observations[observation_id]["values"].get("total_pressure_Pa")
+        point_conditions = observations[observation_id]["values"].get(
+            "point_conditions"
+        )
+        assert isinstance(point_conditions, dict)
+        pressure = point_conditions.get("total_pressure_Pa")
         assert isinstance(pressure, dict)
-        assert pressure["tag"] == "unknown"
-        assert "does not report the total gas pressure" in pressure["reason"]
+        assert pressure["state"]["tag"] == "unknown"
+        assert pressure["state"]["reason"] == TOTAL_PRESSURE_REASON
         assert pressure["locator"]["pdf_page_index"] == 4
         assert pressure["locator"]["section"].startswith("2.1 ")
+
+    for body in species.values():
+        if not isinstance(body, dict):
+            continue
+        for observation in body.get("observations", []):
+            if (
+                observation["locator"].get("table") != "1"
+                or observation["values"].get("quantity")
+                != "equilibrium_phase_composition"
+            ):
+                continue
+            point_conditions = observation["values"].get("point_conditions")
+            assert isinstance(point_conditions, dict)
+            pressure = point_conditions.get("total_pressure_Pa")
+            assert isinstance(pressure, dict)
+            assert pressure["state"]["tag"] == "unknown"
+            assert pressure["state"]["reason"] == TOTAL_PRESSURE_REASON
+            assert pressure["locator"]["pdf_page_index"] == 4
+            assert pressure["locator"]["section"].startswith("2.1 ")
 
     experiments = {row["experiment_id"]: row for row in document["experiments"]}
     calcium = experiments["yan_2020_yan_2020_gamma_ca_calculated"]
@@ -238,7 +265,7 @@ def test_scoring_gap_bindings_are_located_and_migrate() -> None:
         for row in body.get("observations", [])
         if row["observation_id"] == "yan_2020_table_1_sample_101_measured_liquid_cao"
     )
-    del sample_101_cao["values"]["total_pressure_Pa"]
+    del sample_101_cao["values"]["point_conditions"]["total_pressure_Pa"]
     with pytest.raises(AssertionError):
         _assert_scoring_gap_bindings(missing_pressure)
 
@@ -260,6 +287,32 @@ def test_scoring_gap_bindings_are_located_and_migrate() -> None:
     ]
     assert pressure_row.identity.total_pressure_Pa is not None
     assert pressure_row.identity.total_pressure_Pa.is_unknown
+    pressure = pressure_row.point_conditions["total_pressure_Pa"]
+    assert pressure.state.is_unknown
+    assert pressure.state.reason == TOTAL_PRESSURE_REASON
+    assert pressure.locator is not None
+    assert pressure.locator.pdf_page_index == 4
+    assert pressure.locator.section.startswith("2.1 ")
+
+    for body in document["species"].values():
+        if not isinstance(body, dict):
+            continue
+        for source_row in body.get("observations", []):
+            if (
+                source_row["locator"].get("table") != "1"
+                or source_row["values"].get("quantity")
+                != "equilibrium_phase_composition"
+            ):
+                continue
+            migrated_row = migrated[
+                f"{SOURCE_ID}::{source_row['observation_id']}"
+            ]
+            condition = migrated_row.point_conditions["total_pressure_Pa"]
+            assert condition.state.is_unknown
+            assert condition.state.reason == TOTAL_PRESSURE_REASON
+            assert condition.locator is not None
+            assert condition.locator.pdf_page_index == 4
+            assert condition.locator.section.startswith("2.1 ")
 
     calcium_row = migrated[f"{SOURCE_ID}::yan_2020_gamma_ca_calculated"]
     calcium_experiment = migrator.result.experiments[calcium_row.experiment_id]
