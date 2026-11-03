@@ -30,6 +30,7 @@ from typing import Any, Generic, Mapping, TypeVar
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
+    AmbientPressureEvidenceClass,
     AssetRole,
     Authority,
     BoundDirection,
@@ -1256,6 +1257,19 @@ class PressureEnvironment:
 
 
 @dataclass(frozen=True)
+class AmbientPressureEvidence:
+    evidence_class: AmbientPressureEvidenceClass
+    quote: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        if not self.quote.strip():
+            raise ValueError("AmbientPressureEvidence.quote is required")
+        if self.locator is None:
+            raise ValueError("AmbientPressureEvidence.locator is required")
+
+
+@dataclass(frozen=True)
 class Experiment:
     experiment_id: str
     kind: ExperimentKind
@@ -1267,6 +1281,7 @@ class Experiment:
     simulated_experiment_id: str | None = None
     locator: Locator | None = None
     apparatus: Apparatus | None = None
+    ambient_pressure_evidence: AmbientPressureEvidence | None = None
     fO2_control: FO2Control | None = None
     bench_id: str | None = None
     # FK to the work record's context row holding this experiment's equipment

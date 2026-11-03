@@ -103,6 +103,7 @@ from simulator.battery.source_lineage import _is_unknown_source_asset
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
+    AmbientPressureEvidenceClass,
     AssetRole,
     Authority,
     BoundDirection,
@@ -113,7 +114,9 @@ from simulator.battery.enums import (
     FUSION_QUANTITIES,
     FO2Channel,
     IdentityEqualKind,
+    KINETIC_YIELD_QUANTITIES,
     MEASURED_EVIDENCE,
+    MELT_ACTIVITY_QUANTITIES,
     MethodToken,
     NoticeKind,
     PHASE_BASIS_TOKENS,
@@ -169,6 +172,7 @@ from simulator.battery.stable_ids import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
     Annotations,
@@ -3105,6 +3109,28 @@ def _thermal_schedule_from_plain(payload: object) -> ThermalSchedule | None:
     )
 
 
+def _ambient_pressure_evidence_from_plain(
+    payload: object,
+) -> AmbientPressureEvidence | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, Mapping):
+        raise TypeError("ambient_pressure_evidence must be a mapping")
+    quote = payload.get("quote")
+    if not isinstance(quote, str) or not quote.strip():
+        raise ValueError("ambient_pressure_evidence.quote must be nonempty text")
+    locator = _locator_from_plain(payload.get("locator"))
+    if locator is None:
+        raise ValueError("ambient_pressure_evidence.locator is required")
+    return AmbientPressureEvidence(
+        evidence_class=AmbientPressureEvidenceClass(
+            str(payload.get("evidence_class") or "")
+        ),
+        quote=quote,
+        locator=locator,
+    )
+
+
 def experiment_from_plain(payload: object) -> Experiment:
     return _experiment_from_plain(payload, registry_issues=None)
 
@@ -3170,6 +3196,9 @@ def _experiment_from_plain(
         simulated_experiment_id=payload.get("simulated_experiment_id"),
         locator=_locator_from_plain(payload.get("locator")),
         apparatus=_apparatus_from_plain(payload.get("apparatus")),
+        ambient_pressure_evidence=_ambient_pressure_evidence_from_plain(
+            payload.get("ambient_pressure_evidence")
+        ),
         fO2_control=fo2_control,
         bench_id=None if payload.get("bench_id") is None else str(payload["bench_id"]),
         equipment_context_id=None
@@ -14559,6 +14588,7 @@ def _looked_for_reason(field: str, vocabulary: tuple[VocabEntry, ...]) -> str:
 _DEST_CACHE: dict[str, tuple[str, str | None]] = {}
 _EXPERIMENT_SECTIONS: dict[str, type] = {
     "apparatus": Apparatus,
+    "ambient_pressure_evidence": AmbientPressureEvidence,
     "sample": Sample,
     "pressure_environment": PressureEnvironment,
 }
@@ -18232,6 +18262,97 @@ def compilation_source_basis(
 # ---------------------------------------------------------------------------
 # Migrator
 # ---------------------------------------------------------------------------
+
+
+_AMBIENT_PRESSURE_TOTAL_PA = Decimal("101325")
+_CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES = (
+    MELT_ACTIVITY_QUANTITIES
+    | PHASE_COMPOSITION_QUANTITIES
+    | PRINTED_CAPACITY_QUANTITIES
+    | frozenset(
+        {
+            Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+            Quantity.CONDENSATE_COMPOSITION,
+            Quantity.LIQUIDUS_COMPOSITION,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        }
+    )
+)
+_ABSOLUTE_PRESSURE_QUANTITIES = (
+    KINETIC_YIELD_QUANTITIES
+    - {Quantity.EVAPORATION_COEFFICIENT_ALPHA, Quantity.CONDENSATE_COMPOSITION}
+    | {
+        Quantity.FUGACITY,
+        Quantity.MASS_LOSS_AREAL_DENSITY,
+        Quantity.P_PARTIAL,
+        Quantity.WALL_DEPOSIT_AREAL_RATE,
+    }
+)
+
+
+def _ambient_pressure_band_for(
+    quantity: Quantity | None,
+    *,
+    species_formula: str,
+    experiment: Experiment,
+) -> tuple[str | None, str]:
+    ratio_pair: frozenset[str] = frozenset()
+    control = experiment.fO2_control
+    if control is not None and control.gas_ratio is not None:
+        ratio_pair = frozenset(
+            {
+                control.gas_ratio.numerator_species.strip().casefold(),
+                control.gas_ratio.denominator_species.strip().casefold(),
+            }
+        )
+
+    mixture_species: set[str] = set()
+    sweep_gas = experiment.pressure_environment.sweep_gas.state
+    if sweep_gas.is_value and isinstance(sweep_gas.value, SweepGas):
+        mixture_species = {
+            component.species.strip().casefold()
+            for component in (sweep_gas.value.components or ())
+        }
+
+    h2_co2_mix = ratio_pair == {"h2", "co2"} or {
+        "h2",
+        "co2",
+    }.issubset(mixture_species)
+    co2_co_ratio = ratio_pair == {"co2", "co"}
+    oxygen_partial_pressure = (
+        quantity in {Quantity.P_PARTIAL, Quantity.FUGACITY}
+        and species_formula.strip().casefold() == "o2"
+    )
+
+    if h2_co2_mix and (
+        quantity not in _ABSOLUTE_PRESSURE_QUANTITIES or oxygen_partial_pressure
+    ):
+        return (
+            None,
+            "H2/CO2 gas speciation is weakly pressure-dependent through H2O/CO; "
+            "flagged without a band",
+        )
+    if co2_co_ratio and (
+        quantity not in _ABSOLUTE_PRESSURE_QUANTITIES or oxygen_partial_pressure
+    ):
+        return (
+            None,
+            "pO2 set by the CO2/CO ratio carries no total-pressure dependence",
+        )
+    if quantity in _ABSOLUTE_PRESSURE_QUANTITIES:
+        # Premise: gas-film diffusion has D ∝ 1/P, and lab altitude spans about
+        # 0.8–1.03 atm. Algebra: Δlog10(P/P_ambient) = [log10(0.8),
+        # log10(1.03)] = [-0.0969, +0.0128] dex. Units are dex of the absolute
+        # pressure ratio; round to -0.10/+0.01 dex, a sanity-sized band near 1 atm.
+        return (
+            "-0.10/+0.01 dex",
+            "absolute-pressure quantity uses the d-327 lab-altitude pressure band",
+        )
+    if quantity in _CONDENSED_PHASE_PRESSURE_INSENSITIVE_QUANTITIES:
+        # For condensed phases, V ΔP ≈ 0.2 J/mol versus RT ≈ 1.4×10⁴ J/mol,
+        # so Δln(a) ≈ 1×10⁻⁵; this is too small to justify a band.
+        return None, "condensed-phase VdP/RT is about 1e-5; no band assigned"
+    return None, "d-327 assigns no pressure band to this quantity category"
 
 
 class Migrator:
@@ -21968,6 +22089,65 @@ class Migrator:
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
         )
+        ambient_pressure_notice: Notice | None = None
+        ambient_experiment = self.result.experiments.get(experiment_id)
+        if (
+            identity_profile is not None
+            and "total_pressure_Pa" in identity_profile.required
+            and "total_pressure_Pa" not in uncompared_identity_axes
+            and ambient_experiment is not None
+            and ambient_experiment.ambient_pressure_evidence is not None
+            and not ambient_experiment.pressure_environment.total_pressure_Pa.state.is_value
+        ):
+            point_pressure = (point_conditions or {}).get("total_pressure_Pa")
+            printed_point_pressure = (
+                isinstance(point_pressure, Located) and point_pressure.state.is_value
+            )
+            current_pressure = ident_kwargs.get("total_pressure_Pa")
+            pressure_missing = current_pressure is None or (
+                isinstance(current_pressure, State) and current_pressure.is_unknown
+            )
+            if printed_point_pressure and pressure_missing:
+                point_value = point_pressure.state.value
+                if isinstance(point_value, Value):
+                    if point_value.kind is ValueKind.POINT and point_value.point is not None:
+                        ident_kwargs["total_pressure_Pa"] = State.of(point_value.point)
+                        pressure_missing = False
+                else:
+                    point_amount = _as_dec_or_none(point_value)
+                    if point_amount is not None:
+                        ident_kwargs["total_pressure_Pa"] = State.of(point_amount)
+                        pressure_missing = False
+            if pressure_missing and not printed_point_pressure:
+                ambient_pressure_evidence = (
+                    ambient_experiment.ambient_pressure_evidence
+                )
+                ident_kwargs["total_pressure_Pa"] = State.of(
+                    _AMBIENT_PRESSURE_TOTAL_PA
+                )
+                band, category_reason = _ambient_pressure_band_for(
+                    q_token,
+                    species_formula=species.formula,
+                    experiment=ambient_experiment,
+                )
+                ambient_pressure_notice = Notice(
+                    kind=NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE,
+                    affected_quantities=(q_token,),
+                    reason=(
+                        f"total_pressure_Pa=101325 Pa derived from explicit "
+                        "ambient_pressure_evidence "
+                        f"class={ambient_pressure_evidence.evidence_class.value}; "
+                        f"{category_reason}"
+                    ),
+                    origin=obs_id,
+                    band=band,
+                    authority=Authority.DERIVED_FROM_APPARATUS,
+                )
+                identity_provenance += (
+                    "identity.total_pressure_Pa=derived from explicit "
+                    "ambient_pressure_evidence "
+                    f"class={ambient_pressure_evidence.evidence_class.value}",
+                )
         refreshed_oxygen = _refresh_buffer_decision(
             oxygen_decision,
             _positive_pressure_pa(ident_kwargs.get("total_pressure_Pa")),
@@ -22726,6 +22906,8 @@ class Migrator:
                 verbatim["source_uncertainty"] = obs.get("uncertainty")
             uncertainty = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=verbatim)
         observation_notices: list[Notice] = []
+        if ambient_pressure_notice is not None:
+            observation_notices.append(ambient_pressure_notice)
         identity, point_conditions, observation_notices = (
             _initial_charge_only_missing_composition(
                 identity,
