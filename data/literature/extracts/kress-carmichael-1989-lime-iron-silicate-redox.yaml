@@ -545,6 +545,17 @@ fidelity_samples:
 experiments:
 - experiment_id: kress_carmichael_1989_table1_runs
   series: CaO-FeO-Fe2O3-SiO2 liquid experiments listed in Table 1
+  atmosphere_evidence:
+    experiment_gases_as_printed:
+    - air
+    - CO-CO2 gas mixture
+    experiment_gases_quote_as_printed: >-
+      Experiments were carried out both in air and under reducing conditions. Oxygen fugacity in the reducing experiments was imposed by a CO-CO2 gas mixture.
+    locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2884
+      section: Experimental procedure
   locator:
     page: 3
     pdf_page_index: 2
@@ -12832,11 +12843,6 @@ species:
         section: Experimental procedure
       units: as printed
       values:
-        experiment_gases_as_printed:
-        - air
-        - CO-CO2 gas mixture
-        experiment_gases_quote_as_printed: >-
-          Experiments were carried out both in air and under reducing conditions. Oxygen fugacity in the reducing experiments was imposed by a CO-CO2 gas mixture.
         CO_CO2_ratios: Mixing ratios are calculated using equations from Deines et al. (1974), but run-specific
           ratios are not tabulated or assigned to Table 1 rows.
         quench_methods_as_printed:
