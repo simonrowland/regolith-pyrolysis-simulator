@@ -89,6 +89,7 @@ def test_shults_1994_migrates_printed_pressure_and_activity_cells() -> None:
 def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
     result = _migrate("ostrovski-2000-cao-tio2-sio2.yaml")
     assert len(result.observations) == 40
+    assert result.validation.hard_issues == ()
     assert _point(result, "ostrovski_2000_table4_s7_activity") == Decimal("0.84")
     assert _point(result, "ostrovski_2000_table4_s7_activity_coefficient") == Decimal(
         "1.615"
@@ -103,6 +104,30 @@ def test_ostrovski_2000_migrates_printed_activity_cells() -> None:
         observation.point_conditions["temperature_K"].state.is_value
         and observation.point_conditions["temperature_K"].locator is not None
         for observation in located
+    )
+
+    source_path = EXTRACTS / "ostrovski-2000-cao-tio2-sio2.yaml"
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    context_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("context") or []
+    }
+    sc456_context_ids = {
+        *(f"ostrovski_2000_qualifying_statement_{index:02}" for index in range(1, 11)),
+        "ostrovski_2000_qualifying_statement_22",
+        "ostrovski_2000_verbatim_statement_04",
+        "ostrovski_2000_verbatim_statement_05",
+        "ostrovski_2000_verbatim_statement_07",
+        "ostrovski_2000_verbatim_statement_09",
+        "ostrovski_2000_verbatim_statement_10",
+        "ostrovski_2000_verbatim_statement_11",
+    }
+    assert sc456_context_ids <= context_rows.keys()
+    assert all(
+        context_rows[observation_id]["values"]["method_class"]
+        == "quoted_attributed"
+        for observation_id in sc456_context_ids
     )
 
 
