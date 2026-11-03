@@ -5,8 +5,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
-from simulator.battery.migrate import Migrator
+from simulator.battery.enums import PhaseRole, Quantity
+from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +28,8 @@ def test_borosilicate_measurements_are_preserved_and_redox_is_not_overstated() -
         for observation in component_species["observations"]:
             if observation["type"] != "equilibrium_phase_composition":
                 continue
+            assert observation["values"]["phase_label"] == "glass"
+            assert observation["values"]["basis"] == "wt_percent"
             for point in observation["values"]["points"]:
                 typed_points.append(point)
                 typed_vectors.setdefault(point["sample"], {})[formula] = point["value_as_published"]
@@ -55,9 +57,73 @@ def test_borosilicate_measurements_are_preserved_and_redox_is_not_overstated() -
     ]
     assert len(typed_points) == 59
     assert "SO3" not in typed_vectors["0V"]
+    run_compositions = {}
+    phase_assemblage_points = []
+    for point in typed_points:
+        condition = point["point_conditions"]["composition"]
+        assert condition["state"]["tag"] == "value"
+        assert condition["state"]["value"]["amount_basis"] == "mass_percent"
+        assert condition["state"]["value"]["semantics"] == "nominal_as_printed"
+        assert condition["locator"]["table"] == "1"
+        run_composition = dict(condition["state"]["value"]["components"])
+        prior = run_compositions.setdefault(point["sample"], run_composition)
+        assert prior == run_composition
+        assert point["point_conditions"]["fO2_Pa"]["state"] == {
+            "tag": "unknown",
+            "reason": "No oxygen fugacity or synthesis atmosphere is reported.",
+        }
+        phase_assemblage = point["point_conditions"].get("phase_assemblage")
+        if point["sample"] == "0V":
+            assert phase_assemblage is None
+        elif point["sample"].endswith("S"):
+            assert phase_assemblage is not None
+            assert phase_assemblage["state"] == {
+                "tag": "value",
+                "value": "All the sulfur-containing glasses (within the solubility limit) are XRD amorphous, as shown in Fig. 8a.",
+            }
+            assert phase_assemblage["locator"]["figure"] == "8"
+            assert phase_assemblage["locator"]["panel"] == "a"
+            assert phase_assemblage["locator"]["page"] == 9
+            phase_assemblage_points.append(point)
+        else:
+            assert phase_assemblage is not None
+            assert phase_assemblage["state"] == {
+                "tag": "value",
+                "value": "All xV glasses have been found to be XRD amorphous, as shown in Fig. 2a.",
+            }
+            assert phase_assemblage["locator"]["figure"] == "2"
+            assert phase_assemblage["locator"]["panel"] == "a"
+            assert phase_assemblage["locator"]["page"] == 5
+            phase_assemblage_points.append(point)
+    assert len(phase_assemblage_points) == 55
+    assert run_compositions["0V"] == {
+        "Na2O": "28.97",
+        "B2O3": "16.27",
+        "SiO2": "46.81",
+        "Al2O3": "7.94",
+        "V2O5": "0",
+        "SO3": "0",
+    }
+    assert run_compositions["1V-1.25S"] == {
+        "Na2O": "26.89",
+        "B2O3": "15.76",
+        "SiO2": "45.35",
+        "Al2O3": "7.70",
+        "V2O5": "2.77",
+        "SO3": "1.53",
+    }
+    zero_v_point = next(point for point in typed_points if point["sample"] == "0V")
+    assert "90%Pt –10%Rh crucibles" in zero_v_point["point_conditions"][
+        "method_detail_as_printed"
+    ]["state"]["value"]
+    sulfur_point = next(point for point in typed_points if point["sample"] == "1V-1.25S")
+    assert "Pt–Rh crucible was loaded" in sulfur_point["point_conditions"][
+        "method_detail_as_printed"
+    ]["state"]["value"]
     assert all(
         point["point_conditions"]["T_C"]["state"]["value"] == "1200"
         and "atmosphere" not in point["point_conditions"]
+        and point["point_conditions"]["T_C"]["locator"]["page"] == 2
         and point["locator"]["page"] == 3
         and point["locator"]["published_page"] == 3
         for point in typed_points
@@ -103,6 +169,57 @@ def test_borosilicate_measurements_are_preserved_and_redox_is_not_overstated() -
         if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ]
     assert len(migrated) == 59
-    assert all(row.identity.temperature_K.value == Decimal("1473.15") for row in migrated)
-    assert all(row.point_conditions["T_C"].state.value == Decimal("1200") for row in migrated)
+    assert all(
+        row.identity.temperature_K.value == Decimal("1473.15")
+        for row in migrated
+    )
+    assert all(
+        row.identity.phase_role.is_value
+        and row.identity.phase_role.value is PhaseRole.GLASS
+        for row in migrated
+    )
+    assert all(row.point_conditions["composition"].state.is_value for row in migrated)
+    assert all(
+        row.point_conditions["method_detail_as_printed"].state.is_value
+        for row in migrated
+    )
+    assert all(
+        row.point_conditions["fO2_Pa"].state.is_unknown
+        and row.point_conditions["fO2_Pa"].state.reason
+        == "No oxygen fugacity or synthesis atmosphere is reported."
+        for row in migrated
+    )
+    assert all(
+        row.point_conditions["T_C"].state.value == Decimal("1200")
+        for row in migrated
+    )
+    migrated_phase_assemblages = [
+        row for row in migrated if "phase_assemblage" in row.point_conditions
+    ]
+    assert len(migrated_phase_assemblages) == 55
+    assert all(
+        row.point_conditions["phase_assemblage"].state.is_value
+        and "XRD amorphous" in row.point_conditions["phase_assemblage"].state.value
+        for row in migrated_phase_assemblages
+    )
+    assert all(
+        row.point_conditions["T_C"].locator.page == 2
+        for row in migrated
+    )
     assert all(row.locator.page == 3 and row.locator.published_page == 3 for row in migrated)
+    expected_zero_v = wt_pct_to_mole_fraction(
+        {
+            "Na2O": Decimal("28.97"),
+            "B2O3": Decimal("16.27"),
+            "SiO2": Decimal("46.81"),
+            "Al2O3": Decimal("7.94"),
+            "V2O5": Decimal("0"),
+            "SO3": Decimal("0"),
+        }
+    )
+    zero_v = next(
+        row
+        for row in migrated
+        if row.point_conditions["composition"].state.value == expected_zero_v
+    )
+    assert zero_v.point_conditions["composition"].state.value == expected_zero_v
