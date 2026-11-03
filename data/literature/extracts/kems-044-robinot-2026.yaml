@@ -409,8 +409,7 @@ species:
           the model is closed-system equilibrium
       values:
         quantity: equilibrium_molecular_oxygen_yield
-        method_class: quoted_attributed
-        attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
+        method_class: model_derived
         admission_status: model_output_not_measurement
         gas_species: O2
         mass_yield_percent_about: 1.37
@@ -419,6 +418,28 @@ species:
         code: HSC Chemistry version 10
         authors_caveat: Both results appeared to be close, however this comparison would be invalid as
           the model does not accurately reflect the experiment.
+      derivation:
+        relation: >-
+          Gibbs energy minimization with HSC Chemistry version 10 produces the
+          reported equilibrium oxygen yield for the stated EAC-1 composition,
+          temperature, and pressure.
+        method:
+          state: {tag: value, value: Gibbs energy minimization using HSC Chemistry version 10}
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 4
+            section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 4
+            section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+            note: HSC species data and the model result grid are not tabulated.
+        references:
+          - Šeško et al. (2024), EAC-1 composition; the HSC 10 database species data have no cited source in the located method.
     - observation_id: robinot_2026_fig1_hsc_figure_only
       experiment: solar-pyrolysis-series
       type: rate_series
@@ -438,8 +459,7 @@ species:
         note: figure-only model curves; MinerU numeric dump was all zeros and was rejected
       values:
         quantity: model_oxygen_mass_fraction_vs_T
-        method_class: quoted_attributed
-        attribution: Robinot et al. (2026), HSC Chemistry version 10 thermodynamic simulation
+        method_class: model_derived
         admission_status: figure_only
         semantics: bound_not_point_ordering
         pressures_bar_as_printed:
@@ -455,6 +475,27 @@ species:
         O_atom_excluded_from_theoretical_yield: true
         note: Printed prose numbers on p. 3 are retained. The Fig. 1 curves were not digitised. Atomic
           O was not taken into account for theoretical oxygen yield estimation.
+      derivation:
+        relation: >-
+          Fig. 1 plots the authors' Gibbs energy minimization results from HSC
+          Chemistry version 10 for the EAC-1 simulant at the stated pressures.
+        method:
+          state: {tag: value, value: Gibbs energy minimization using HSC Chemistry version 10}
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 4
+            section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 3
+            pdf_page_index: 4
+            section: 2. Thermodynamic equilibrium modelling of the EAC-1 simulant pyrolysis
+            note: HSC species data and the model result grid are not tabulated.
+        references:
+          - Šeško et al. (2024), EAC-1 composition; the HSC 10 database species data have no cited source in the located method.
     - observation_id: robinot_2026_fig8_80kg_astronaut_o2
       experiment: solar-pyrolysis-series
       type: rate_series
