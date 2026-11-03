@@ -246,6 +246,16 @@ def _isolate_vapor_payload_cache_between_tests():
         module._VAPOR_PAYLOAD_CACHE.clear()
 
 
+@pytest.fixture(autouse=True)
+def crash_input_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Keep retained alphaMELTS crash inputs inside each test's tmp_path."""
+    from simulator.melt_backend import alphamelts
+
+    root = tmp_path / "alphamelts-diagnostics"
+    monkeypatch.setattr(alphamelts, "_regolith_diagnostics_root", lambda: root)
+    return root
+
+
 @pytest.fixture
 def isolated_engine_config(tmp_path: Path) -> Iterator[Path]:
     from simulator import engine_local_config

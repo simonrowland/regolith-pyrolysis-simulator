@@ -3,7 +3,6 @@ from __future__ import annotations
 import hashlib
 import math
 import os
-import tempfile
 import time
 from pathlib import Path
 from types import SimpleNamespace
@@ -864,17 +863,6 @@ _ISOLATED_WORKER_STDERR_TAIL_CHARS = 4000
 _CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
 
 
-@pytest.fixture(autouse=True)
-def crash_input_root(tmp_path, monkeypatch):
-    """Keep retained .melts files inside this test's tmp_path."""
-    root = tmp_path / 'diagnostics-root'
-    monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts._regolith_diagnostics_root',
-        lambda: root,
-    )
-    return root
-
-
 def _aborting_stderr_backend(tmp_path: Path, stderr_text: str):
     """Fake alphaMELTS: record input.melts, write stderr, die with SIGABRT."""
     witness = tmp_path / 'witness.melts'
@@ -953,12 +941,6 @@ def test_negative_returncode_keeps_stderr_tail_and_melts_input(
         assert retained_path.parent == (
             crash_input_root / _CRASH_INPUT_DIR_NAME
         )
-        real_store = (
-            Path(tempfile.gettempdir())
-            / 'regolith-pyrolysis-simulator'
-            / _CRASH_INPUT_DIR_NAME
-        )
-        assert not str(retained_path).startswith(str(real_store))
     finally:
         if retained_path is not None:
             retained_path.unlink(missing_ok=True)
@@ -1054,3 +1036,50 @@ def test_crash_input_store_keeps_the_two_newest_of_three(
         for path in (crash_input_root / _CRASH_INPUT_DIR_NAME).glob('*.melts')
     }
     assert remaining == {f'{digests[1]}.melts', f'{digests[2]}.melts'}
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='flock contract is POSIX')
+def test_crash_input_publish_and_prune_hold_exclusive_lock(
+    tmp_path,
+    monkeypatch,
+    crash_input_root,
+):
+    """Pruning runs while the crash-input store's exclusive lock is held."""
+    import fcntl
+
+    import simulator.melt_backend.alphamelts as alphamelts
+
+    source = tmp_path / 'input.melts'
+    source.write_bytes(b'crash input for lock regression\n')
+    directory = crash_input_root / _CRASH_INPUT_DIR_NAME
+    lock_path = directory / '.retention.lock'
+    real_prune = alphamelts._prune_crash_melt_inputs
+    observed = {}
+
+    def check_lock_then_prune(directory_arg, protected):
+        assert directory_arg == directory
+        with lock_path.open('a+b') as contender:
+            try:
+                fcntl.flock(
+                    contender.fileno(),
+                    fcntl.LOCK_EX | fcntl.LOCK_NB,
+                )
+            except BlockingIOError:
+                observed['held'] = True
+            else:
+                observed['held'] = False
+                fcntl.flock(contender.fileno(), fcntl.LOCK_UN)
+        real_prune(directory_arg, protected)
+
+    monkeypatch.setattr(
+        alphamelts,
+        '_prune_crash_melt_inputs',
+        check_lock_then_prune,
+    )
+    digest, retained = alphamelts._retain_crash_melts_input(source)
+
+    assert observed['held'] is True
+    assert lock_path.is_file()
+    assert not lock_path.match('*.melts')
+    assert Path(retained).name == f'{digest}.melts'
+    assert Path(retained).is_file()
