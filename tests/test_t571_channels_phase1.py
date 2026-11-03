@@ -1116,6 +1116,7 @@ def _provider_and_request(
 
 def test_builtin_linear_rail_o2_bit_identity_differential():
     from engines.builtin.vapor_pressure import (
+        BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
         physical_melt_dissociation_pO2_bar,
     )
     from simulator.chemistry.ellingham_thermo import (
@@ -1123,7 +1124,6 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
         ellingham_stoichiometry,
     )
     from simulator.chemistry.melt_activity import melt_oxide_activity
-    from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
     # The provider's Ellingham path evaluates K_decomp with the legacy
     # simulator.state gas constant (8.31446), not the CODATA value in
     # simulator.physical_constants — the recomputation must use the same one.
@@ -1238,9 +1238,9 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
                 a_oxide = oxide_activity.equivalent_parent_activity(
                     n_ox / n_M
                 )
-                if T_K > VAPOROCK_T_MAX_K:
-                    # Above the VapoRock cap the melt-activity AUTHORITY is
-                    # openimcc (owner ruling 2026-09-26); only the activity
+                if T_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K:
+                    # Above the d-207 vapour-channel boundary the
+                    # melt-activity authority is OpenIMCC; only the activity
                     # source changes, the Ellingham algebra does not.
                     # Derivation: 2 M + O2 = 2 MO gives n_M = n_ox = 2, so
                     # root = (K * a_MO**2 / pO2)**0.5 = a_MO * sqrt(K / pO2),

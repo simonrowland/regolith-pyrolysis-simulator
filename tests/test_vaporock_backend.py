@@ -345,10 +345,8 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             pressure_bar=2e-6,
         )
 
-    # The hot case is 1800 K: above the certified [1073.15, 1700] K band but
-    # inside the adapter's hard [1350, 1950] K gate. The certified lower T
-    # bound is unreachable through that gate, so only the upper bound can
-    # produce a temperature notice here.
+    # The hot case is outside the MELTS band but inside the VapoRock band;
+    # the cold case is below both bands and carries both notices.
     cases = {
         'in_band': (1400.0, {'SiO2': 50.0, 'Na2O': 50.0}, None, None),
         'low_sio2': (
@@ -369,6 +367,12 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             'temperature_range',
             ('temperature_range',),
         ),
+        'cold': (
+            1000.0 - 273.15,
+            {'SiO2': 50.0, 'Na2O': 50.0},
+            'temperature_range',
+            ('temperature_range',),
+        ),
     }
     notice_warning = (
         'CommissioningNotice: out of certified band; '
@@ -383,7 +387,7 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
         )
         # A/B: the same point with the assessment stubbed to no-notice must
         # give byte-identical predicted values and identical diagnostics
-        # modulo the three notice keys.
+        # modulo the notice fields.
         monkeypatch.setattr(
             vaporock_module,
             'assess_engine_commissioning',
@@ -403,9 +407,24 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
         stripped = {
             key: value
             for key, value in result.diagnostics.items()
-            if key not in ('commissioning_notice', 'authority', 'certified_band')
+            if key not in (
+                'commissioning_notice',
+                'authority',
+                'certified_band',
+                'vaporock_temperature_notice',
+            )
         }
-        assert stripped == bare.diagnostics, label
+        bare_stripped = {
+            key: value
+            for key, value in bare.diagnostics.items()
+            if key not in (
+                'commissioning_notice',
+                'authority',
+                'certified_band',
+                'vaporock_temperature_notice',
+            )
+        }
+        assert stripped == bare_stripped, label
 
         notice = result.diagnostics.get('commissioning_notice')
         if reason is None:
@@ -430,6 +449,12 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             assert [
                 w for w in result.warnings if w != notice_warning
             ] == bare.warnings
+            if label == 'hot':
+                assert 'vaporock_temperature_notice' not in result.diagnostics
+            if label == 'cold':
+                assert result.diagnostics['vaporock_temperature_notice'][
+                    'reason'
+                ] == 'temperature_range'
     # The fake engine depends on its inputs, so the A/B equalities above are
     # not tautological: distinct compositions give distinct pressures.
     assert observed['low_sio2'] != observed['in_band']
@@ -708,6 +733,14 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
 
 
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
+    from engines.builtin import vapor_pressure as builtin_vapor_pressure
+
+    monkeypatch.setattr(
+        builtin_vapor_pressure,
+        "openimcc_binding_selected_by_inputs",
+        lambda **_kwargs: False,
+    )
+
     class FakeSystem:
         def set_melt_comp(self, composition):
             self.composition = dict(composition)
@@ -1552,14 +1585,14 @@ def _fake_system_module(log10_bar_by_species, *, track=None):
     return types.SimpleNamespace(System=FakeSystem), FakeSystem
 
 
-def test_domain_helpers_admit_only_1350_to_1950_K():
+def test_domain_helpers_pin_vaporock_certified_band_1350_to_1950_K():
+    from engines.engine_commissioning import vaporock_temperature_in_domain
     from simulator.melt_backend.vaporock import (
         VAPOROCK_T_MAX_K,
         VAPOROCK_T_MIN_K,
         temperature_C_to_K,
         vaporock_liquid_fraction_admitted,
         vaporock_sum_pressure_sane,
-        vaporock_temperature_in_domain,
     )
 
     assert VAPOROCK_T_MIN_K == 1350.0
@@ -1594,54 +1627,65 @@ def test_domain_helpers_admit_only_1350_to_1950_K():
     assert sum_bar == pytest.approx(VAPOROCK_PROBE_10000K_SUM_P_BAR)
 
 
-def test_temperature_domain_gate_refuses_outside_envelope(monkeypatch):
-    calls = {"n": 0}
-
-    def calc_vapor_pressures(**_):
-        calls["n"] += 1
-        return {"Na": 1.0}
-
-    fake_module = types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
+@pytest.mark.parametrize("temperature_K", [1200.0, 2000.0, 10000.0])
+def test_finite_temperature_outside_vaporock_band_runs_and_is_flagged(
+    monkeypatch,
+    temperature_K,
+):
+    fake_module, fake_system = _fake_system_module({"Na(g)": -4.0})
     _install_fake_import(monkeypatch, fake_module)
     backend = VapoRockBackend()
     assert backend.initialize({"warm_worker": False}) is True
 
-    # 10000 K (probe fabrication point): refuse before any engine call.
-    t_c_10000k = 10000.0 - 273.15
     result = backend.equilibrate(
-        t_c_10000k,
+        temperature_K - 273.15,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "non_authoritative"
+    assert result.diagnostics["temperature_K"] == pytest.approx(temperature_K)
+    assert len(fake_system.instances) == 1
+    assert len(fake_system.instances[0].eval_calls) == 1
+    assert fake_system.instances[0].eval_calls[0][0] == pytest.approx(
+        temperature_K
+    )
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {
+        "Na": pytest.approx(10.0)
+    }
+    notice = result.diagnostics["vaporock_temperature_notice"]
+    assert notice["kind"] == "engine_commissioning"
+    assert notice["reason"] == "temperature_range"
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band"] == {
+        "temperature_K": [1350.0, 1950.0]
+    }
+    _assert_h2_melt_envelope(
+        result.diagnostics,
+        temperature_K=temperature_K,
+        status=(
+            "in_calibration" if temperature_K <= 1700.0 else "extrapolated"
+        ),
+    )
+
+def test_out_of_band_sum_pressure_ceiling_still_refuses(monkeypatch):
+    fake_module, fake_system = _fake_system_module({"Na(g)": 2.0})
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1200.0 - 273.15,
         composition_mol={"SiO2": 1.0, "Na2O": 0.1},
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
     assert result.status == "out_of_domain"
     assert result.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
     )
-    assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
-    assert result.vapor_pressures_Pa == {}
-    assert getattr(result, "vaporock_full_speciation_Pa", {}) in ({}, None) or not getattr(
-        result, "vaporock_full_speciation_Pa", {}
-    )
-    assert calls["n"] == 0
-    assert any("outside admitted domain" in w for w in result.warnings)
-    _assert_h2_melt_envelope(
-        result.diagnostics,
-        temperature_K=10000.0,
-        status="extrapolated",
-    )
-
-    # Below floor.
-    result_lo = backend.equilibrate(
-        1350.0 - 273.15 - 1.0,
-        composition_mol={"SiO2": 1.0},
-        fO2_log=-8.0,
-    )
-    assert result_lo.status == "out_of_domain"
-    assert result_lo.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
-    )
-    assert calls["n"] == 0
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(100.0)
+    assert len(fake_system.instances[0].eval_calls) == 1
 
 
 @pytest.mark.parametrize(
@@ -1690,7 +1734,7 @@ def test_nonfinite_temperature_has_fail_closed_h2_envelope(
     assert calls["n"] == 0
 
 
-def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
+def test_vaporock_certified_band_edges_run_without_range_notice(monkeypatch):
     seen_T = []
 
     class FakeSystem:
@@ -1723,6 +1767,7 @@ def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
             temperature_K=t_k,
             status="in_calibration" if t_k <= 1700.0 else "extrapolated",
         )
+        assert "vaporock_temperature_notice" not in result.diagnostics
 
     assert seen_T == pytest.approx([1350.0, 1950.0])
 
@@ -1762,13 +1807,31 @@ def test_liquid_fraction_gate_refuses_subliquid(monkeypatch):
     assert calls["n"] == 1
 
 
+def test_out_of_band_liquid_fraction_gate_still_refuses(monkeypatch):
+    fake_module, fake_system = _fake_system_module({"Na(g)": -4.0})
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1200.0 - 273.15,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        liquid_fraction=0.94,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.LIQUID_STATE.value
+    )
+    assert fake_system.instances == []
+
+
 def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     """Defense-in-depth: even in-domain T, absurd totals are refused.
 
     Fixture source: docs-private/research/2026-07-31-vaporock-probe/findings.md
-    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). The T gate would catch 10000 K
-    first; this test injects the probe-scale total at an admitted T to pin
-    the sum-pressure gate itself.
+    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). Inject it at an admitted T to
+    isolate the sum-pressure guard from the new finite-temperature notice.
     """
     from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
 
@@ -1807,8 +1870,10 @@ def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     assert any("10000 K" in w for w in result.warnings)
 
 
-def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch):
-    """HI-8: 10000 K is refused by the T gate before any engine call.
+def test_10000K_finite_fabrication_regression_refuses_at_sum_pressure_ceiling(
+    monkeypatch,
+):
+    """HI-8: 10000 K reaches the engine but the finite sum still refuses.
 
     The 2026-07-31 probe stored sum_P_bar ≈ 8.3e5 as a fixture. Tests
     replay that literal through a fake System; they do not recompute it
@@ -1824,7 +1889,7 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
 
         def eval_gas_abundances(self, temperature, log_fO2):
             engine_calls["n"] += 1
-            # Would return probe-scale garbage if reached.
+            # Replays the probe-scale finite total through the existing guard.
             return {"SiO(g)": math.log10(VAPOROCK_PROBE_10000K_SUM_P_BAR)}
 
     fake_module = types.SimpleNamespace(System=FakeSystem)
@@ -1838,12 +1903,15 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
         fO2_log=3.025,  # probe IW-at-10000K-ish
         pressure_bar=1e-6,
     )
-    assert engine_calls["n"] == 0
+    assert engine_calls["n"] == 2
     assert result.status == "out_of_domain"
     assert result.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
     )
     assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(
+        VAPOROCK_PROBE_10000K_SUM_P_BAR
+    )
     # Stored 2026-07-31 fixture identity, not a live-engine recompute.
     assert VAPOROCK_PROBE_10000K_SUM_P_BAR == pytest.approx(8.323344495585738e5)
 
@@ -2364,16 +2432,17 @@ def test_warm_pool_owns_system_lifecycle_live():
         sum_bar = float(result.diagnostics.get("sum_pressure_bar") or 0.0)
         assert sum_bar < 10.0
 
-        # 10000 K still refused by the parent-side domain gate (no worker call).
-        refused = backend.equilibrate(
-            10000.0 - 273.15,
+        # Finite cold extrapolation reaches the warm worker and is flagged.
+        extrapolated = backend.equilibrate(
+            1200.0 - 273.15,
             composition_kg=_MARE_PROBE_WT_PCT,
-            fO2_log=3.0,
+            fO2_log=-9.94,
             pressure_bar=1e-6,
         )
-        assert refused.status == "out_of_domain"
-        assert refused.diagnostics["backend_status_reason"] == (
-            OutOfDomainReason.TEMPERATURE_RANGE.value
+        assert extrapolated.status == "non_authoritative"
+        assert extrapolated.diagnostics["temperature_K"] == pytest.approx(1200.0)
+        assert extrapolated.diagnostics["vaporock_temperature_notice"]["reason"] == (
+            "temperature_range"
         )
     finally:
         backend.close()
