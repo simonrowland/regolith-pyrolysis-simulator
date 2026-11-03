@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, MethodToken, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tools.validate_literature_extracts import validate_extract_document
@@ -399,14 +399,43 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert not [row for row in observations.values() if row.identity.quantity.is_unknown]
     assert not [row for row in observations.values() if row.identity.species.phase.is_unknown]
     assert not [row for row in observations.values() if row.value.point is None]
+
+    source_experiment = document["experiments"][0]
+    assert source_experiment["method"] == "quench_equilibration"
+    method_detail = source_experiment["method_detail_as_printed"]
+    assert "controlled oxygen fugacity" in method_detail
+    assert "CO2-H2-N2 gas" in method_detail
+    assert "almost pure (a_Fe=1)" in method_detail
+    assert "molten Fe0.947O" in method_detail
+    assert source_experiment["locator"]["published_page"] == 2633
+    source_rows = {
+        row["observation_id"]: row for row in document["species"]["FeO"]["observations"]
+    }
+    assert len(source_rows) == 167
+    assert all(
+        row["experiment"] == source_experiment["experiment_id"]
+        and row["derivation"]["method"]["state"]["value"] == method_detail
+        and row["derivation"]["method"]["locator"]["published_page"] == 2633
+        for row in source_rows.values()
+    )
+    experiment_ids = {row.experiment_id for row in observations.values()}
+    assert len(experiment_ids) == 1
+    experiment = result.experiments[experiment_ids.pop()]
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
+    assert all(
+        row.derivation is not None
+        and row.derivation.method is not None
+        and row.derivation.method.state.is_value
+        and row.derivation.method.state.value == method_detail
+        and row.derivation.method.locator.published_page == 2633
+        for row in observations.values()
+    )
     assert Counter(entry.why for entry in result.queue) == Counter({
         "source standard_state is not typed: molten Fe0.947O": 167,
         "source does not state method": 167,
     })
 
-    source_rows = {
-        row["observation_id"]: row for row in document["species"]["FeO"]["observations"]
-    }
     for panel, row_number, activity, *tail in TABLE1A_ROWS:
         composition_values = tail[:6]
         uncertainty = next(row[2] for row in TABLE1B_ROWS if row[1] == activity)
