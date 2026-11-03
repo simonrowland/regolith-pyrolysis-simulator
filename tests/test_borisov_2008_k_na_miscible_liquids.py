@@ -21,6 +21,14 @@ EXTRACT_NAME = f"{SID}.yaml"
 EXTRACT = ROOT / "data" / "literature" / "extracts" / EXTRACT_NAME
 CORPUS = Path(os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos" / "regolith-corpus"))
 TEXT = CORPUS / "text" / SID / "pdftotext-layout.txt"
+METHOD_DETAIL = (
+    "A small quartz crucible (15 mm inner diameter and 22 mm height) is filled by one-third "
+    "with an alkali-rich melt of the SiO2 ± Na2O ± K2O composition, which serves subsequently "
+    "as a source of Na and/or K vapors. After being held at the desired temperature and oxygen "
+    "fugacity, the samples were quenched in the upper cold zone of the furnace. Quenched glasses "
+    "were analyzed using a JEOL Superprobe electron microprobe at the Institut für Geologie und "
+    "Mineralogie, Universität zu Köln (Germany)."
+)
 
 # These grids were transcribed independently from 600 dpi renders of the printed tables.
 TABLE1_RENDER = tuple(tuple(line.split("|")) for line in """\
@@ -145,6 +153,25 @@ def _observations(document: dict) -> dict[str, tuple[str, dict]]:
         for container, block in document["species"].items()
         for row in block.get("observations") or []
     }
+
+
+def _table3_compositions(source_rows: dict[str, tuple[str, dict]]) -> dict[str, dict[str, Decimal]]:
+    compositions = {}
+    oxides = {"SiO2", "Al2O3", "MgO", "CaO", "Na2O", "K2O"}
+    for observation_id, (_container, row) in source_rows.items():
+        if not observation_id.startswith("borisov2008_t3_"):
+            continue
+        values = row["values"]
+        sample_id = values["sample_id"]
+        printed = values["composition_as_published"]
+        composition = {
+            oxide: Decimal(str(amount))
+            for oxide, amount in printed.items()
+            if oxide in oxides and amount not in DASHES
+        }
+        previous = compositions.setdefault(sample_id, composition)
+        assert previous == composition
+    return compositions
 
 
 def _assert_render_grids(document: dict, table1, table2, table3, table4) -> None:
@@ -280,6 +307,8 @@ def test_independent_render_grids_match_primary_text_when_corpus_is_present():
     normalized = " ".join(text.split())
     assert "held under desired T– f O2 parameters for several hours" in normalized
     assert "become simultaneously saturated with alkalis" in normalized
+    assert "a source of Na" in normalized
+    assert "and/or K vapors" in normalized
     assert "held at the desired temperature and oxygen fugacity, the" in normalized
     assert "samples were quenched in the upper cold zone of the" in normalized
     assert "Quenched glasses were analyzed using a JEOL" in normalized
@@ -292,6 +321,7 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     raw = _observations(document)
+    table3_compositions = _table3_compositions(raw)
     migrated = {
         observation.observation_id.split("::", 1)[-1]: observation
         for observation in result.observations.values()
@@ -333,25 +363,30 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
         if "composition" in conditions:
             source_state = conditions["composition"]["state"]
             if source_state["tag"] == "unknown":
-                sample_id = values.get("sample_id")
-                sample_maps = [
-                    row["values"]["composition_wt_pct"]
-                    for _other_id, (_other_container, row) in raw.items()
-                    if row["values"].get("sample_id") == sample_id
-                    and "composition_wt_pct" in row["values"]
-                ]
-                if sample_maps:
-                    assert all(item == sample_maps[0] for item in sample_maps)
-                    expected = wt_pct_to_mole_fraction(
-                        {
-                            oxide: Decimal(str(amount))
-                            for oxide, amount in sample_maps[0].items()
-                        }
-                    )
-                    assert observation.point_conditions["composition"].state.is_value
-                    assert observation.point_conditions["composition"].state.value == expected
-                else:
-                    assert observation.point_conditions["composition"].state.is_unknown
+                assert observation.identity.composition is not None
+                assert observation.identity.composition.is_unknown
+                assert observation.point_conditions["composition"].state.is_unknown
+            else:
+                printed = source_state["value"]
+                assert printed["amount_basis"] == "mass_percent"
+                sample_id = conditions["sample_id"]["state"]["value"]
+                printed_wt = {
+                    oxide: Decimal(str(amount))
+                    for oxide, amount in printed["components"]
+                }
+                assert printed_wt == table3_compositions[sample_id]
+                expected = wt_pct_to_mole_fraction(
+                    table3_compositions[sample_id]
+                )
+                assert observation.identity.composition is not None
+                assert observation.identity.composition.is_value
+                assert observation.identity.composition.value == expected
+                condition = observation.point_conditions["composition"]
+                assert condition.state.is_value
+                assert condition.state.value == expected
+                assert condition.locator is not None
+                assert condition.locator.table == "3"
+                assert condition.locator.record == conditions["sample_id"]["state"]["value"]
         if source_row.get("phase") == "l":
             assert observation.identity.species.phase.value == "l"
             assert source_row["quench_statement"]["preservation"] == "asserted_preserved"
@@ -375,9 +410,7 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
         assert experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
         source_row = raw[observation.observation_id.split("::", 1)[1]][1]
         declaration = experiment_declarations[source_row["experiment"]]
-        assert declaration["method_detail_as_printed"] == (
-            "crucible-supported loop; alkali vapor saturation"
-        )
+        assert declaration["method_detail_as_printed"] == METHOD_DETAIL
         assert declaration["locator"] == {
             "page": 2,
             "pdf_page_index": 1,
@@ -416,33 +449,70 @@ def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
         tmp_path / "candidate", EXTRACT_NAME, extract_doc=document
     )
     source_rows = _observations(document)
+    table3_compositions = _table3_compositions(source_rows)
     migrated = {
         observation.observation_id.split("::", 1)[-1]: observation
         for observation in result.observations.values()
     }
 
-    composition_rows = {
+    phase_composition_rows = {
         observation_id: row
         for observation_id, (_container, row) in source_rows.items()
-        if "composition_wt_pct" in row["values"]
+        if row["type"] == "equilibrium_phase_composition"
+        and (
+            observation_id.startswith("borisov2008_t3_")
+            or (
+                observation_id.startswith("borisov2008_t2_")
+                and ("_initial_" in observation_id or "_final_" in observation_id)
+            )
+        )
     }
-    assert len(composition_rows) == 259
-    for observation_id, row in composition_rows.items():
-        printed_wt = {
-            oxide: Decimal(str(amount))
-            for oxide, amount in row["values"]["composition_wt_pct"].items()
-        }
-        expected = wt_pct_to_mole_fraction(printed_wt)
+    assert len(phase_composition_rows) == 259
+    for observation_id, row in phase_composition_rows.items():
+        assert "composition_wt_pct" not in row["values"]
+        refusal = row["point_conditions"]["composition"]
+        assert refusal["state"]["tag"] == "unknown"
+        assert refusal["locator"] is not None
+        assert refusal["state"]["reason"]
         observation = migrated[observation_id]
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_unknown
+        condition = observation.point_conditions["composition"]
+        assert condition.state.is_unknown
+        assert condition.locator is not None
+
+    gamma_rows = {
+        observation_id: row
+        for observation_id, (_container, row) in source_rows.items()
+        if row["type"] == "activity_coefficient"
+    }
+    assert len(gamma_rows) == 33
+    for observation_id, row in gamma_rows.items():
+        observation = migrated[observation_id]
+        composition = row["point_conditions"]["composition"]
+        if row["point_conditions"]["sample_id"]["state"]["value"] == "DAS25Na-13":
+            assert composition["state"]["tag"] == "unknown"
+            assert observation.identity.composition is not None
+            assert observation.identity.composition.is_unknown
+            assert observation.point_conditions["composition"].state.is_unknown
+            continue
+        assert composition["state"]["tag"] == "value"
+        assert composition["locator"]["table"] == "3"
+        sample_id = row["point_conditions"]["sample_id"]["state"]["value"]
+        assert composition["locator"]["record"] == sample_id
+        printed = composition["state"]["value"]
+        printed_wt = {
+            oxide: Decimal(str(amount)) for oxide, amount in printed["components"]
+        }
+        assert printed_wt == table3_compositions[sample_id]
+        expected = wt_pct_to_mole_fraction(
+            table3_compositions[sample_id]
+        )
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
         assert observation.identity.composition.value == expected
-        condition = observation.point_conditions["composition"]
-        assert condition.state.is_value
-        assert condition.state.value == expected
-        assert condition.locator is not None
-        expected_table = "3" if observation_id.startswith("borisov2008_t3_") else "2"
-        assert condition.locator.table == expected_table
+        assert observation.point_conditions["composition"].state.is_value
+        assert observation.point_conditions["composition"].state.value == expected
 
     temperature_rows = {
         observation_id: row
@@ -466,9 +536,12 @@ def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
         assert condition.locator.table == "2"
 
     mutated = copy.deepcopy(document)
-    for _container, row in _observations(mutated).values():
-        if row["values"].get("sample_id") == "CSA6Na-3":
-            row["values"].pop("composition_wt_pct", None)
+    mutated_phase = _observations(mutated)["borisov2008_t3_csa6na_3_sio2"][1]
+    mutated_phase["point_conditions"].pop("composition")
+    mutated_phase["values"]["composition_wt_pct"] = {
+        "SiO2": "99.99",
+        "Al2O3": "0.01",
+    }
     mutated_result = _migrate_real_extract(
         tmp_path / "mutated", EXTRACT_NAME, extract_doc=mutated
     )
@@ -478,4 +551,7 @@ def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
         if observation.observation_id.endswith("borisov2008_t3_csa6na_3_sio2")
     )
     assert changed.identity.composition is not None
-    assert changed.identity.composition.is_unknown
+    assert changed.identity.composition.is_value
+    assert changed.identity.composition.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("99.99"), "Al2O3": Decimal("0.01")}
+    )
