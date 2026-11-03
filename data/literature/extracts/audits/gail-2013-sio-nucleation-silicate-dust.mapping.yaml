@@ -1,0 +1,31 @@
+source_id: gail-2013-sio-nucleation-silicate-dust
+table:
+  draft_table_id: p007-t01
+  page: 7
+  published_page: 6
+  printed_table: '1'
+  caption: >-
+    Models of spherically-symmetric and stationary dust-driven winds of AGB stars with different mass-loss rates, based on the empirical nucleation rate for SiO, equation (16).
+  printed_body_rows: 13
+  numeric_columns: 3-10
+  row_label_columns: 1-2
+  printed_unit_column: 11
+mapping:
+  destination: species.SiO.context[gail_2013_table1_wind_model_outputs].values.rows_as_printed
+  kind: model_output_table_context
+  method_class: model_derived
+  case_axis: >-
+    The eight model columns are ordered by the Mass-loss row values 1, 2, 3, 5, 10, 20, 30, 50, with the printed unit factor 10−5 M⊙ yr−1.
+  fields:
+    - table_quantity_to: quantity_as_printed
+    - table_symbol_to: symbol_as_printed
+    - table_value_columns_3_to_10_to: values_as_printed
+    - table_unit_column_11_to: unit_as_printed
+  reason: >-
+    Table 1 mixes stellar parameters, sonic-point properties, condensation fractions, terminal velocity, and optical depths. No single exact observation quantity represents all rows, so the complete table is retained in the existing context container and not mapped to invented scoreable observations.
+numeric_audit:
+  numeric_cells: 107
+  agreement: >-
+    The table draft QA found 1.000 numeric agreement with pdftotext for all 107 numeric cells. The 104 body values are identical between MinerU and pdftotext; the three powers of ten in the printed unit cells are also preserved.
+  render_check: >-
+    A render of absolute PDF page 7 confirmed the table layout: columns 3–10 are the eight model cases, column 11 carries the row units, and the body is grouped under stellar parameters, sonic point, and dust shell. No row/column disagreement required correction.
