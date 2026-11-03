@@ -6,6 +6,7 @@ import csv
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
@@ -59,6 +60,18 @@ IDENTITY_FORMULA_OVERRIDES = {
     "kunisada_1986_table2_flux_i_experimental_total_FeO_content": "FeOT",
 }
 
+SC456_REDUCED_ROWS = {
+    "kunisada_1986_carbon_calculated_amount_flux_E",
+    "kunisada_1986_carbon_calculated_increment_flux_E",
+    "kunisada_1986_initial_dephosphorization_rate_flux_C2",
+    "kunisada_1986_initial_dephosphorization_rate_fluxes_E_to_I",
+    "kunisada_1986_na2o_loss_flux_A",
+    "kunisada_1986_na2o_loss_flux_B",
+    "kunisada_1986_na2o_loss_flux_C",
+    "kunisada_1986_na2o_loss_flux_D",
+    *(f"kunisada_1986_table2_flux_{letter}_calculated_FeO_content" for letter in "efghi"),
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -72,8 +85,19 @@ def _rows(document: dict) -> dict[str, tuple[str, dict]]:
     }
 
 
+def _assert_sc456_reduced_classes(document: dict) -> None:
+    rows = _rows(document)
+    assert SC456_REDUCED_ROWS <= rows.keys()
+    for observation_id in SC456_REDUCED_ROWS:
+        values = rows[observation_id][1]["values"]
+        assert values["method_class"] == "measured_reduced"
+        assert values["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+        assert values["derivation"]["raw_inputs"]["locator"]
+
+
 def test_tables_match_render_samples_and_complete_cell_audit() -> None:
     document = _document()
+    _assert_sc456_reduced_classes(document)
     rows = _rows(document)
 
     with CELL_AUDIT.open(encoding="utf-8", newline="") as stream:
@@ -257,6 +281,8 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         "where, (%Fe_tO) calculated from the total iron content in the slag "
         "was used instead of (%FeO)."
     )
+
+
     figure_contexts = [
         context
         for context in context_rows.values()
@@ -380,3 +406,11 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         assert row["values"]["formula"] == "FeOT"
         migrated_row = migrated[f"{SOURCE_ID}::{row['observation_id']}"]
         assert migrated_row.identity.species.formula == "FeOT"
+
+
+def test_sc456_reduced_class_pin_rejects_quote_reversion() -> None:
+    document = _document()
+    target = next(iter(SC456_REDUCED_ROWS))
+    _rows(document)[target][1]["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_reduced_classes(document)
