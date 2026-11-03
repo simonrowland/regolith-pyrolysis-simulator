@@ -15400,7 +15400,17 @@ def test_guo_mgo_periclase_reference_matches_magemin_native_basis() -> None:
     converted = fusion_comparison_reference(reference, engine=Engine.MAGEMIN)
     standard = converted.identity.reference_state.value
 
-    assert converted is reference
+    assert converted is not reference
+    assert converted.value == reference.value
+    assert converted.identity == reference.identity
+    notice = next(
+        notice
+        for notice in converted.notices
+        if notice.reason == "engine_activity_standard_state_uncertified"
+    )
+    assert notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+    assert notice.origin == reference.observation_id
+    assert "b-1123" in (notice.band or "")
     assert standard.endmember.polymorph.value is Polymorph.PERICLASE
     assert _reference_matches(
         standard, _ENGINE_REPORTED_ACTIVITY["magemin"], "magemin"
