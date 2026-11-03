@@ -175,8 +175,19 @@ species:
       values:
         quantity: condensate_composition
         evidence_class: model_derived
-        method_class: quoted_attributed
-        attribution: Fegley and Cameron (1987), Table 4; output of the MAGMA vaporization code using ideal and Hastie-model nonideal silicate melts
+        method_class: model_derived
+        derivation:
+          relation: Table 4 condensate compositions are outputs of the authors' MAGMA vaporization calculations using the initial composition and thermodynamic data tables.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, published_page: 210, pdf_page_index: 3, section: '2.1 Description of thermodynamic model', note: 'The article prints summary thermodynamic coefficients, but not the underlying reference data cited in [14–26].'}
+          method:
+            state: {tag: value, value: MAGMA chemical-equilibrium vaporization calculation with ideal oxide-solution and nonideal IMCC magma models; equilibrium distribution calculated by Gibbs free-energy minimization.}
+            locator: {page: 3, published_page: 209, pdf_page_index: 2, section: '2.1 Description of thermodynamic model', equation: '2 and 3'}
+          references:
+          - Hastie and co-workers [14–17] for the IMCC model
+          - Anders and Ebihara [18] for solar-system abundances
+          - Thermochemical data sources cited in Tables 1–2 [19–26]
         model_generator: MAGMA; ideal solution at 3000 K and nonideal IMCC solution at 2500, 3000, and 3500 K
         condition: mean uncompressed planetary density = 5.3 g/cm3
         model_columns: ['1 ideal 3000 K', '2 nonideal 2500 K', '3 nonideal 3000 K', '4 nonideal 3500 K']
@@ -199,8 +210,19 @@ species:
       values:
         quantity: vaporization_model_results
         evidence_class: model_derived
-        method_class: quoted_attributed
-        attribution: Fegley and Cameron (1987), sections 2.3–2.4; output of the MAGMA vaporization code using ideal and Hastie-model nonideal silicate melts
+        method_class: model_derived
+        derivation:
+          relation: Sections 2.3–2.4 report outputs of the authors' MAGMA vaporization calculations.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 4, published_page: 210, pdf_page_index: 3, section: '2.1 Description of thermodynamic model', note: 'The article prints summary thermodynamic coefficients, but not the underlying reference data cited in [14–26].'}
+          method:
+            state: {tag: value, value: MAGMA chemical-equilibrium vaporization calculation with ideal oxide-solution and nonideal IMCC magma models; equilibrium distribution calculated by Gibbs free-energy minimization.}
+            locator: {page: 3, published_page: 209, pdf_page_index: 2, section: '2.1 Description of thermodynamic model', equation: '2 and 3'}
+          references:
+          - Hastie and co-workers [14–17] for the IMCC model
+          - Anders and Ebihara [18] for solar-system abundances
+          - Thermochemical data sources cited in Tables 1–2 [19–26]
         model_generator: MAGMA with ideal solution and IMCC nonideal solution models
         printed_results:
         - {result: ideal_magma_first_elements_lost, value: 'Na and K; K more volatile; Si follows, then Fe and Mg', locator: 'p. 212, section 2.3'}
