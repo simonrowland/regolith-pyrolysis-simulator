@@ -348,6 +348,12 @@ class NoticeKind(StrEnum):
     # value band; a raw-rate reduction puts the propagated dex band on
     # Notice.band. Not a flagged stratum.
     APPARATUS_GEOMETRY_INTERVAL_PRINTED = "apparatus_geometry_interval_printed"
+    # t-1624 / d-324 extension. T is past every table and fit that sizes
+    # this buffer. The central curve is still evaluated. The band is not a
+    # number. Advisory. out_of_certified_band remains the flagged stratum.
+    BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
+        "buffer_band_unsized_beyond_all_calibrations"
+    )
 
 
 class ReferenceStateConvention(StrEnum):
