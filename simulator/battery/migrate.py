@@ -1343,6 +1343,12 @@ def _derivation_from_plain(
     return derivation
 
 
+def _percent_to_fraction(amount: Decimal) -> Decimal:
+    """Convert a recognized percent amount to its dimensionless fraction."""
+
+    return amount / Decimal("100")
+
+
 def _percent_pairs(
     payload: object, amount_basis: AmountBasis
 ) -> list[tuple[str, Decimal]] | None:
@@ -1766,7 +1772,7 @@ def _composition_from_plain(payload: object) -> Composition:
         return Composition(
             basis=str(payload.get("basis") or "printed_mole_percent"),
             components=tuple(
-                (name, amount / Decimal("100"))
+                (name, _percent_to_fraction(amount))
                 for name, amount in mole_percent.items()
             ),
             amount_basis=AmountBasis.MOLE_FRACTION,
@@ -6852,7 +6858,7 @@ def _named_fraction_bound_selection(
         bound = value.bound_value
         trail = "identity"
         if _percent_named_fraction_field(key, field_units):
-            bound /= Decimal("100")
+            bound = _percent_to_fraction(bound)
             trail = "percent_to_fraction"
         return replace(
             selection,
@@ -6905,7 +6911,7 @@ def _named_fraction_bound_selection(
     )
     trail = "identity"
     if percent:
-        bound /= Decimal("100")
+        bound = _percent_to_fraction(bound)
         trail = "percent_to_fraction"
     return SourceSelection(
         value=_value_from_plain(
@@ -11699,11 +11705,11 @@ def _selection_from_named_field(
             if isinstance(raw_range, (list, tuple)) and len(raw_range) == 2:
                 low, high = (_as_dec_or_none(value) for value in raw_range)
                 if low is not None and high is not None and low <= high:
-                    # The field is explicitly wt%; divide each published bound by 100
-                    # to store the same interval on the dimensionless fraction basis.
+                    # The field is explicitly wt%; scale each published bound to
+                    # the same interval on the dimensionless fraction basis.
                     return _interval_selection(
-                        low / Decimal("100"),
-                        high / Decimal("100"),
+                        _percent_to_fraction(low),
+                        _percent_to_fraction(high),
                         key,
                         payload,
                         condition_ranges,
@@ -11801,7 +11807,7 @@ def _selection_from_named_field(
             or key == "water_released_wt_pct_as_printed"
         ):
             # Percent-valued yield fields use the scorer's dimensionless fraction basis.
-            amount = amount / Decimal("100")
+            amount = _percent_to_fraction(amount)
             trail = "percent_to_fraction"
         return _point_selection(
             amount, key, trail, approximate_payload, condition_ranges
@@ -11876,7 +11882,7 @@ def _selection_from_named_field(
             Quantity.O2_YIELD,
             Quantity.VALENCE_RATIO,
         } and _percent_named_fraction_field(key, units):
-            amount /= Decimal("100")
+            amount = _percent_to_fraction(amount)
             trail = "percent_to_fraction"
         return _point_selection(amount, key, trail, payload, condition_ranges)
     if density_refusal is not None:
