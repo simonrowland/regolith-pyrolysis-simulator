@@ -7102,3 +7102,58 @@ def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> 
     migrator.finalize()
     assert migrator.result.validation is not None
     assert migrator.result.validation.hard_issues == ()
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    [pytest.param("fujisawa-1994-na-sn-carbonate-thermodynamics", id="fujisawa-1994-na-sn-carbonate-thermodynamics")],
+)
+def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
+    extract_path = EXTRACTS / f"{source_id}.yaml"
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, extract_path, index=None, aliases={}
+    )
+    migrator.finalize()
+
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    assert not migrator.result.registry_issues
+    source_rows = {
+        row["observation_id"]
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    migrated_rows = migrator.result.observations
+    for observation_id in source_rows:
+        base_id = f"{source_id}::{observation_id}"
+        migrated_ids = [
+            key
+            for key in migrated_rows
+            if key == base_id or key.startswith(f"{base_id}::points:")
+        ]
+        assert migrated_ids, observation_id
+
+    for species in document["species"].values():
+        for row in species.get("observations", []):
+            source_conditions = row.get("point_conditions") or {}
+            if not source_conditions:
+                continue
+            base_id = f"{source_id}::{row['observation_id']}"
+            migrated_id = next(
+                key
+                for key in migrated_rows
+                if key == base_id or key.startswith(f"{base_id}::points:")
+            )
+            observation = migrated_rows[migrated_id]
+            assert observation.point_conditions is not None
+            for name, condition in source_conditions.items():
+                migrated_name = "temperature_K" if name == "temperature_C" else name
+                migrated_condition = observation.point_conditions.get(migrated_name)
+                if name in {"temperature_C", "temperature_K"}:
+                    assert migrated_condition is not None
+                    assert migrated_condition.locator is not None
+                elif condition.get("locator") and migrated_condition is not None:
+                    assert migrated_condition.locator is not None
+                if condition.get("state") and migrated_condition is not None:
+                    assert migrated_condition.state.tag.value == condition["state"]["tag"]
