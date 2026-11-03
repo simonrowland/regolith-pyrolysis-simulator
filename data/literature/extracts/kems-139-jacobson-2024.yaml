@@ -184,8 +184,7 @@ species:
       units: bar as printed
       values:
         quantity: predicted_partial_pressure
-        method_class: quoted_attributed
-        attribution: Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)
+        method_class: model_derived
         semantics: bound_not_point_ordering
         factsage_note: factsage_model_output_not_measurement
         model_as_printed: SLAG database in FactSage at 2500 K
@@ -197,6 +196,28 @@ species:
         T_K_as_printed: 2500
         SiO_g_p_bar: 0.004541139
         SiO_g_p_bar_as_printed: '0.004541139'
+      derivation:
+        relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database in FactSage at 2500 K.
+        method:
+          state:
+            tag: value
+            value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+          locator:
+            page: 19
+            published_page: 18
+            section: 2.5 Assignment of ion peaks in the mass spectra
+        references:
+        - Bale et al. [115]
+        - Snyder et al. [117]
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 19
+            published_page: 18
+            table: '1'
+            note: Table 1 gives the basalt composition but does not print the FactSage input files or intermediate calculation inputs.
         points:
         - species_as_printed: PO2(g)
           species_id: PO2
@@ -684,8 +705,7 @@ species:
       units: none (figure-only; no tabulated points)
       values:
         quantity: vant_hoff_plot_figure_only
-        method_class: quoted_attributed
-        attribution: Jacobson et al. 2024, Figure 16, second-law vaporization fit
+        method_class: measured_reduced
         semantics: bound_not_point_ordering
         admission_status: rejected_no_figure_reading
         completeness: figure-only
@@ -696,5 +716,25 @@ species:
         printed_fit_on_figure_as_printed: y= -41162x + 44.532; R² = 0.9999
         note: Figure not digitised. Printed slope/intercept remain on the figure; not copied as a measured
           Psat series.
+      derivation:
+        relation: Second-law enthalpy from the van't Hoff slope in Equation (23b) for the Au vaporization plot.
+        method:
+          state:
+            tag: value
+            value: Van't Hoff second-law fit of the Au vaporization data using Equation (23b).
+          locator:
+            page: 23
+            published_page: 22
+            section: 3.1.1 Second law thermodynamic method
+            equation: 23b
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 24
+            published_page: 23
+            figure: '16'
+            note: Figure 16 shows the van't Hoff fit but does not tabulate the underlying measurements.
       uncertainty:
         note: not applicable; figure-only
