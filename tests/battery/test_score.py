@@ -230,8 +230,9 @@ def _without_activity_reference_polymorph(identity: Identity) -> Identity:
     """Pure solid whose polymorph axis was never set.
 
     An omitted source polymorph (``State.unknown``) stays on the printed
-    number (d-165, c1ec62344). ``polymorph is None`` is the melt-benchmark
-    solid, and 800194114 still converts it with the stable JANAF crystal.
+    number unless the oxide is in the d-144 constant and T is below T_fus
+    (t-1616). ``polymorph is None`` is the melt-benchmark solid, and
+    800194114 still converts it with the stable JANAF crystal.
     """
 
     reference_state = identity.reference_state
@@ -13298,8 +13299,8 @@ def test_fusion_conversion_combines_printed_uncertainty_and_keeps_flag(
     )
     resolve_energy = score_module._janaf_fusion_energy_for_reference
 
-    def resolve_with_printed_sigma(row, temperature_K):
-        energy = resolve_energy(row, temperature_K)
+    def resolve_with_printed_sigma(row, temperature_K, polymorph=None):
+        energy = resolve_energy(row, temperature_K, polymorph=polymorph)
         return replace(
             energy,
             sigma_delta_g_fus_kJ_per_mol=Decimal("1"),
@@ -13592,10 +13593,11 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
 @pytest.mark.parametrize(
     "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
+def test_unnamed_cao_below_fusion_converts_by_d144_single_polymorph(
     temperature: Decimal,
 ) -> None:
     from simulator.battery.score import fusion_comparison_reference
+    from tests.battery.test_t1616_d144_single_polymorph import hand_liquid_activity
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -13619,12 +13621,18 @@ def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
 
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert converted.value.point == reference.value.point
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
-        for item in converted.notices
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point == hand_liquid_activity(
+        "Ca-027", "Ca-028", temperature, Decimal("0.25")
     )
+    notice = next(
+        item
+        for item in converted.notices
+        if item.reason == "single_polymorph_identity_d144"
+    )
+    assert notice.authority is Authority.CERTIFIED
+    assert "Ca-027" in notice.band
+    assert "lime" in notice.band
 
 
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
@@ -14056,8 +14064,14 @@ def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> 
     )
 
 
-def test_unnamed_cao_reference_phase_is_not_converted() -> None:
+def test_d144_single_polymorph_converts_unnamed_cao_at_1873() -> None:
+    """The observation id is historical. The trigger is the d-144 constant.
+
+    'One JANAF crystal table' is not enough: Al2O3 stays refused.
+    """
+
     from simulator.battery.score import fusion_comparison_reference
+    from tests.battery.test_t1616_d144_single_polymorph import hand_liquid_activity
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14080,9 +14094,15 @@ def test_unnamed_cao_reference_phase_is_not_converted() -> None:
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert comparison.value.point == hand_liquid_activity(
+        "Ca-027", "Ca-028", Decimal("1873"), Decimal("0.3")
+    )
     assert any(
+        notice.reason == "single_polymorph_identity_d144"
+        for notice in comparison.notices
+    )
+    assert not any(
         notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in comparison.notices
     )
@@ -14110,9 +14130,10 @@ def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
     32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
 
     b150r applied this shift to an omitted polymorph. c1ec62344 (d-165)
-    leaves that record on the printed number, and dropped the
-    "source polymorph is unknown" clause from the conversion notice.
-    800194114 keeps the same shift for a polymorph axis that was never set.
+    left that record on the printed number outside the d-144 constant.
+    t-1616 resolves omitted CaO and MgO below T_fus from that constant.
+    This test is the axis that was never set: 800194114 still converts
+    it with the stable JANAF crystal and the same shift.
     """
     from simulator.battery.score import fusion_comparison_reference
 
@@ -14782,15 +14803,25 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     if polymorph is None:
+        # Omitted CaO below T_fus is lime by the d-144 constant, not because
+        # the polymorph string was missing. Quartz is still not a CaO crystal.
+        from tests.battery.test_t1616_d144_single_polymorph import (
+            hand_liquid_activity,
+        )
+
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert comparison.value.point == hand_liquid_activity(
+            "Ca-027", "Ca-028", Decimal("1933"), Decimal("0.3")
+        )
         assert any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason == "single_polymorph_identity_d144"
             for notice in comparison.notices
         )
         return
 
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert not any(
         notice.reason.startswith("reference_converted_via_fusion;")
         for notice in comparison.notices
@@ -16849,7 +16880,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(allibert_cao_rows) == 8
         assert all(
             any(
-                notice.reason == "fusion_source_reference_phase_unprinted"
+                notice.reason == "single_polymorph_identity_d144"
+                for notice in row.notices
+            )
+            and any(
+                notice.reason.startswith("reference_converted_via_fusion;")
                 for notice in row.notices
             )
             for row in allibert_cao_rows
@@ -16879,7 +16914,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             row.refusal is not None
             and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
             and "fusion_source_reference_phase_unprinted"
-            in row.refusal.detail.get("secondary_reasons", ())
+            not in row.refusal.detail.get("secondary_reasons", ())
             for row in affected_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
@@ -17074,10 +17109,17 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
     residual = next(row for row in residuals if row.reference == observation_id)
 
-    assert residual.numeric is None
-    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.status is ResidualStatus.NO_BAND
     assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
     assert any(
+        notice.reason == "single_polymorph_identity_d144"
+        for notice in residual.notices
+    )
+    assert not any(
         notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in residual.notices
     )

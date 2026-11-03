@@ -2620,6 +2620,23 @@ _JANAF_POLYMORPH_BY_TABLE = {
 }
 
 
+def _d144_single_polymorph(oxide: str) -> tuple[str, Polymorph] | None:
+    """Fusion solid table and polymorph when the oxide is in the d-144 identity.
+
+    Keyed through `_FUSION_TABLES`: the oxide's solid table id must be in
+    `_D144_SINGLE_POLYMORPH_TABLES`. Both dicts are read at call time.
+    """
+
+    pair = _FUSION_TABLES.get(oxide)
+    if pair is None:
+        return None
+    solid_table = pair[0]
+    polymorph = _D144_SINGLE_POLYMORPH_TABLES.get(solid_table)
+    if polymorph is None:
+        return None
+    return solid_table, polymorph
+
+
 class JANAFFusionPolymorphUnavailable(ValueError):
     """No unique JANAF solid table represents the stated fusion polymorph."""
 
