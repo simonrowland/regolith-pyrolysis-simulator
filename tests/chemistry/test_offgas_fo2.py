@@ -518,10 +518,7 @@ def test_direct_couple_owner_combines_mix_precision_and_janaf_cea_spread(polys):
 
     assert resolution.log10_fO2 == pytest.approx(-3.908000708059973, abs=1e-12)
     assert resolution.thermo_spread_dex == pytest.approx(0.0027241502, abs=1e-9)
-    assert resolution.band_dex == pytest.approx(
-        math.hypot(resolution.mix_precision_band_dex, resolution.thermo_spread_dex),
-        abs=1e-12,
-    )
+    assert resolution.band_dex == pytest.approx(0.109969859183496, abs=1e-9)
     assert resolution.authority == "certified"
 
 

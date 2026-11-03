@@ -16246,28 +16246,39 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
 
 
 _ATM_BAR = Decimal("1.01325")
-_ATM_PA = Decimal("101325")
 _AIR_O2_MOLE_FRACTION = Decimal("0.2095")
 
 
-def _atmosphere_kind(as_printed: str) -> tuple[str, Decimal] | None:
+def _atmosphere_kind(
+    as_printed: str,
+) -> tuple[str, Decimal, Decimal | None] | None:
     """Recognise only explicitly printed air or pure oxygen atmospheres."""
 
     text = as_printed.strip().casefold().replace("₂", "2")
     compact = re.sub(r"\s+", " ", text)
-    if re.fullmatch(r"(?:dry )?air(?: at 1(?:\.0+)? atm)?", compact):
-        return "air", _AIR_O2_MOLE_FRACTION
-    if re.fullmatch(
-        r"(?:pure )?(?:o2|oxygen)(?: at 1(?:\.0+)? atm)?", compact
-    ):
-        return "pure O2", Decimal(1)
+    air = re.fullmatch(r"(?:dry )?air(?: at 1(?:\.0+)? (atm|bar))?", compact)
+    if air is not None:
+        unit = air.group(1)
+        total_pressure_bar = (
+            _ATM_BAR if unit == "atm" else Decimal(1) if unit == "bar" else None
+        )
+        return "air", _AIR_O2_MOLE_FRACTION, total_pressure_bar
+    oxygen = re.fullmatch(
+        r"(?:pure )?(?:o2|oxygen)(?: at 1(?:\.0+)? (atm|bar))?", compact
+    )
+    if oxygen is not None:
+        unit = oxygen.group(1)
+        total_pressure_bar = (
+            _ATM_BAR if unit == "atm" else Decimal(1) if unit == "bar" else None
+        )
+        return "pure O2", Decimal(1), total_pressure_bar
     # A row such as Jayasuriya's "O2 100.0 × 200 SCCM" explicitly prints a
     # single-species atmosphere; it is not a mixed-gas equilibrium.
     if re.fullmatch(
         r"o2\s+\d+(?:\.\d+)?\s*[×x]\s*\d+(?:\.\d+)?\s*sccm",
         compact,
     ):
-        return "pure O2", Decimal(1)
+        return "pure O2", Decimal(1), None
     return None
 
 
@@ -16349,20 +16360,25 @@ def _bare_log_frame_decision(
 ) -> PrintedOxygenDecision:
     """Apply the IW plausibility window, then printed atmosphere consistency.
 
-    Air at 1 bar has pO2 = 0.2095 bar, hence log10(fO2/bar) = -0.6788,
-    sanity-rounded to -0.679. At 1 atm, pO2 = 0.2095 × 1.01325 bar and the
-    bar-frame value is -0.6731. The atm-frame value differs by
-    log10(1.01325) = 0.0057 dex, below the 0.01 dex minimum tolerance.
-    Pure O2 at 1 atm is +0.0057 in the bar frame and 0.00 in the atm frame.
+    These anchors are all log10(fO2/bar): air is -0.6788 at 1 bar total and
+    -0.6731 at 1 atm total (0.2095 × 1.01325 bar); pure O2 is 0.0000 at
+    1 bar total and +0.0057 at 1 atm total. Convert the printed log with
+    1 bar = 100000 Pa regardless of which total-pressure anchor matches.
+    The anchors differ by log10(1.01325) = 0.0057 dex, below the 0.01 dex
+    minimum printed tolerance.
     No atmosphere is inferred: only these explicit prints can open the frame
     check; every other gas needs its equilibrium owner and sized band.
     """
 
     candidates = tuple(item.strip() for item in printed_atmospheres if item.strip())
+    has_total_pressure = (
+        total_pressure_pa is not None
+        and total_pressure_pa.is_finite()
+        and total_pressure_pa > 0
+    )
     pressure_bar = (
         total_pressure_pa / _BAR_PA
-        if total_pressure_pa is not None and total_pressure_pa.is_finite()
-        and total_pressure_pa > 0
+        if has_total_pressure
         else (_ATM_BAR if candidates else Decimal(1))
     )
     ceiling = pressure_bar.ln() / Decimal(10).ln()
@@ -16515,30 +16531,61 @@ def _bare_log_frame_decision(
                 continue
             unsupported.append(atmosphere)
             continue
-        _label, mole_fraction = kind
-        expected_bar = (mole_fraction * pressure_bar).ln() / Decimal(10).ln()
-        expected_atm = expected_bar - _ATM_BAR.ln() / Decimal(10).ln()
-        frames = (("bar", expected_bar), ("atm", expected_atm))
-        matched_frame, matched_expected = min(
-            frames, key=lambda item: abs(log10_fO2 - item[1])
+        _label, mole_fraction, atmosphere_total_pressure_bar = kind
+        matched_total_pressure_bar = (
+            pressure_bar
+            if has_total_pressure
+            else atmosphere_total_pressure_bar
         )
-        checked.append((atmosphere, expected_bar, Decimal(0)))
+        if matched_total_pressure_bar is not None:
+            matched_expected = (
+                (mole_fraction * matched_total_pressure_bar).ln()
+                / Decimal(10).ln()
+            )
+            matched_frame = (
+                "bar" if matched_total_pressure_bar == Decimal(1)
+                else "atm" if matched_total_pressure_bar == _ATM_BAR
+                else None
+            )
+            if matched_frame is None:
+                matched_anchor = (
+                    f"matched P_total={_dec_str(matched_total_pressure_bar)} bar"
+                )
+            else:
+                matched_total = "1 atm" if matched_frame == "atm" else "1 bar"
+                matched_anchor = (
+                    f"matched {matched_total} total-pressure anchor "
+                    f"(matched {matched_frame} frame at "
+                    f"P_total={_dec_str(matched_total_pressure_bar)} bar)"
+                )
+        else:
+            anchors = (
+                (
+                    "1 atm",
+                    (mole_fraction * _ATM_BAR).ln() / Decimal(10).ln(),
+                ),
+                ("1 bar", mole_fraction.ln() / Decimal(10).ln()),
+            )
+            matched_total, matched_expected = min(
+                anchors, key=lambda item: abs(log10_fO2 - item[1])
+            )
+            matched_frame = "atm" if matched_total == "1 atm" else "bar"
+            matched_anchor = (
+                f"matched {matched_total} total-pressure anchor "
+                f"(matched {matched_frame} frame)"
+            )
+        checked.append((atmosphere, matched_expected, Decimal(0)))
         if abs(log10_fO2 - matched_expected) <= tolerance:
             message = (
                 "bare fO2 frame matched printed atmosphere "
                 f"{atmosphere!r}; expected log10(fO2/bar)="
-                f"{_display_fo2_dex(expected_bar)}; matched {matched_frame} frame; "
-                "1 atm and 1 bar differ by 0.0057 dex, below the 0.01 dex "
-                "minimum tolerance"
+                f"{_display_fo2_dex(matched_expected)}; {matched_anchor}; "
+                "bar-vs-atm unit ambiguity (0.0057 dex) is below the printed "
+                "precision"
             )
             return PrintedOxygenDecision(
                 "log",
-                State.of(
-                    _log_fO2_to_pa(
-                        log10_fO2,
-                        _BAR_PA if matched_frame == "bar" else _ATM_PA,
-                    )
-                ),
+                State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
                 notice_reason=message,
                 notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
             )
