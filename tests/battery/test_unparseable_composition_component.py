@@ -154,6 +154,70 @@ def test_successful_parse_formula_wins_over_janaf_atoms() -> None:
     assert weights["MgO"] == pytest.approx(40.148624821939094, abs=1e-12)
 
 
+def _atoms(formula: str) -> dict[str, float]:
+    parsed = parse_formula(formula)
+    assert parsed.species == formula
+    return {element: float(count) for element, count in parsed.elements.items()}
+
+
+def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None:
+    """A printed decimal subscript is one species. A hydrate dot still splits.
+
+    Expected decimal atoms come from JANAF formula_composition, the other
+    tokenizer. Hydrate atoms are the water count: CuSO4 plus five H2O is
+    Cu1 S1 O9 H10. JANAF reads the ASCII dot as decimal oxygen (O 5.5),
+    so an O of 9 is the adduct split and an O of 5.5 would mean it was lost.
+    """
+
+    from simulator.battery.composition import parse_species_formula as composition_parse
+    from simulator.battery.score import parse_species_formula as score_parse
+    from simulator.reference_data.janaf import formula_composition
+
+    decimals = (
+        "FeO1.5",
+        "AlO1.5",
+        "NaO0.5",
+        "KO0.5",
+        "Fe0.947O",
+        "FeO1.33",
+        "SiO1.5C0.5",
+    )
+    for formula in decimals:
+        atoms = _atoms(formula)
+        janaf = formula_composition(formula)
+        assert janaf is not None
+        assert atoms == dict(janaf)
+        assert atoms_parse_formula_else_janaf(formula) == janaf
+        assert score_parse(formula) == janaf
+        assert composition_parse(formula) == janaf
+    assert _atoms("FeO1.5") == {"Fe": 1.0, "O": 1.5}
+    assert _atoms("FeO1.5") != _atoms("Fe2O3")
+    assert _atoms("Fe0.947O") == {"Fe": 0.947, "O": 1.0}
+    assert _atoms("AlO1.5") != _atoms("Al2O3")
+
+    five_waters = {"Cu": 1.0, "S": 1.0, "O": 9.0, "H": 10.0}
+    assert _atoms("CuSO4·5H2O") == five_waters
+    assert _atoms("CuSO4.5H2O") == five_waters
+    janaf_dot = dict(formula_composition("CuSO4.5H2O") or ())
+    assert janaf_dot.get("O") == 5.5
+    assert janaf_dot.get("H") == 2.0
+    assert _atoms("3Al2O3.2SiO2") == {"Al": 6.0, "O": 13.0, "Si": 2.0}
+    assert _atoms("Na2O.SiO2") == {"Na": 2.0, "O": 3.0, "Si": 1.0}
+    assert _atoms("K2O.2SiO2") == {"K": 2.0, "O": 5.0, "Si": 2.0}
+
+    for junk in ("foobar", "not-a-formula", "Fe_tO", "Fe(1-x)O", "unknown"):
+        with pytest.raises(AccountingError):
+            parse_formula(junk)
+        assert atoms_parse_formula_else_janaf(junk) is None
+        assert composition_parse(junk) is None
+        assert score_parse(junk) is None
+
+    # Printed x is an element token, not a decimal subscript.
+    with pytest.raises(AccountingError, match="Ox"):
+        parse_formula("FeOx")
+    assert atoms_parse_formula_else_janaf("FeOx") == formula_composition("FeOx")
+
+
 def test_decimal_subscript_batch_moles_use_the_mass_owner() -> None:
     weights = composition_wt_pct(_moles(("FeO1.5", "1"), ("SiO2", "1")))
     assert weights is not None
