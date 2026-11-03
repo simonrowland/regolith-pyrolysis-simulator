@@ -1,0 +1,53 @@
+source_id: dohmen-1998-olivine-fe-gas
+source:
+  citation: Dohmen et al. (1998), American Mineralogist 83, 970-984.
+extraction:
+  method: >-
+    Table 1 mapping from the MinerU draft. The draft classified all seven
+    experiment rows as headers; render_verified product cells confirm the
+    printed row assignments. Full numeric cell audit is in the companion
+    audit markdown.
+review_status: draft
+tables:
+- page: 4
+  table_index: 1
+  type: composition_series
+  quantity: olivine_product_endmember_composition_not_equilibrium_phase_composition
+  evidence_class: measured_direct
+  unit: as printed
+  phase: cr
+  rows: all
+  experiment: Experiment column, run ID
+  temperature: Per-row thermal history column; T_C is retained on each numeric observation.
+  conditions: >-
+    Run-specific fO2 and chamber pressure are linked through each experiment
+    record. They are not promoted to in-cell sample total pressure.
+  values:
+  - column: 5
+    species: Fe
+    phase: cr
+    evidence_class: measured_direct
+    unit: as printed
+    quantity: olivine_product_endmember_composition_not_equilibrium_phase_composition
+  render_verified:
+  - row: 3
+    column: 5
+    text: Fa6Fo94; homogeneous grains
+  - row: 4
+    column: 5
+    text: Fo100; single phase
+  - row: 5
+    column: 5
+    text: Fa2Fo98-Fa4Fo96; individual grains unzoned
+  - row: 6
+    column: 5
+    text: Fa26Fo74; individual grains unzoned†
+  - row: 7
+    column: 5
+    text: Fayalitic films†
+  - row: 8
+    column: 5
+    text: Fayalitic films
+  - row: 9
+    column: 5
+    text: "Molten sample: Fa74Fo26†"
