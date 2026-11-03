@@ -1878,8 +1878,16 @@ class CampaignManager:
             melt.p_total_mbar = self._pressure_config_float(
                 campaign, 'p_total_mbar', 'p_total_mbar_default')
 
-        # Apply runtime overrides (pO₂, stir_factor)
+        # Apply runtime overrides (total pressure, pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
+        if 'p_total_mbar' in ovr:
+            raw_override_pressure = ovr['p_total_mbar']
+            if not is_declared_real_scalar(
+                raw_override_pressure,
+                allow_numeric_str=True,
+            ):
+                raise ValueError("campaign p_total_mbar override must be numeric")
+            melt.p_total_mbar = float(raw_override_pressure)
         if 'pO2_mbar' in ovr:
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
