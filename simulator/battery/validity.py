@@ -22,10 +22,13 @@ Ambiguity resolutions:
   geometry; absolute-flux effusion and Langmuir pressure/alpha require their
   respective geometry. Determinants must be grounded VALUES (unknown
   calibration fails), physically valid (area > 0, Clausing in (0, 1]), and
-  present for TGA/solar/vacuum kinetic area. A printed positive interval
-  for orifice diameter or area is a usable value (d-326): calibrated KEMS
-  does not band the pressure from it, and a raw-rate reduction evaluates
-  the geometric-mean diameter.
+  present for TGA/solar/vacuum kinetic area. A printed positive orifice
+  diameter interval (locator, no inference) is usable for calibrated KEMS
+  pressure (d-326 case 1: no value band; the coded p/d regime check runs
+  at both ends) and for a raw-rate Knudsen reduction (case 2: geometric-mean
+  diameter and a dex band). An inferred or unlocated interval is not.
+  Activity, activity coefficient, log10 Kf, and reference pressure still
+  require a point orifice. An area interval is not a point area.
   Missing required geometry is ``underdetermined_apparatus``. Unknown
   method is ``method_unknown`` when the quantity class is one the schema
   scopes by method (effusion pressure, Langmuir pressure/alpha,
@@ -202,15 +205,26 @@ def _positive_extent(
     return low, high, kind
 
 
-def _orifice_extent_known(geometry: object) -> bool:
-    """True when area or diameter is a positive point or closed interval."""
+def _printed_positive_diameter_interval(
+    located: Located[Value | Decimal] | None,
+) -> bool:
+    """Printed positive closed orifice-diameter interval (d-326).
 
-    if geometry is None:
+    Printed means a source locator and no inference. A point, a bound,
+    and an inferred or unlocated interval are not this interval. The same
+    locator test is inline in ``_printed_diameter_extent``; it stays there
+    so this fix does not move that helper.
+    """
+
+    if (
+        located is None
+        or located.inference is not None
+        or located.locator is None
+        or not located.locator.has_location()
+    ):
         return False
-    return (
-        _positive_extent(getattr(geometry, "orifice_area_m2", None)) is not None
-        or _positive_extent(getattr(geometry, "orifice_diameter_m", None)) is not None
-    )
+    extent = _positive_extent(located)
+    return extent is not None and extent[2] == "interval"
 
 
 def _calibration_grounded(calibration: object) -> bool:
@@ -486,21 +500,24 @@ def underdetermined_apparatus(
         if not calibrated and not calibration_flagged:
             return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
         # A calibrated KEMS pressure does not need geometry when it is absent.
-        # Supplied geometry must be a positive point or a positive closed
-        # interval (d-326). Area does not enter p = k I T, so an interval
-        # is not a value band. A bound, a non-positive end, or an inverted
-        # interval is still missing.
+        # A supplied point must be positive. A supplied diameter interval is
+        # usable only when it is printed: area does not enter p = k I T, so
+        # that interval is not a value band (d-326 case 1). An inferred or
+        # unlocated interval, a bound, and an area interval stay missing.
         if geometry is not None:
             if (
                 geometry.orifice_area_m2 is not None
                 and geometry.orifice_area_m2.state.is_value
-                and _positive_extent(geometry.orifice_area_m2) is None
+                and _finite_positive(geometry.orifice_area_m2) is None
             ):
                 missing.append("orifice_area_m2")
             if (
                 geometry.orifice_diameter_m is not None
                 and geometry.orifice_diameter_m.state.is_value
-                and _positive_extent(geometry.orifice_diameter_m) is None
+                and _finite_positive(geometry.orifice_diameter_m) is None
+                and not _printed_positive_diameter_interval(
+                    geometry.orifice_diameter_m
+                )
             ):
                 missing.append("orifice_diameter_m")
             if (
@@ -570,7 +587,10 @@ def underdetermined_apparatus(
         elif geometry is None:
             missing.extend(["orifice_area_m2", "clausing_factor"])
         else:
-            if not _orifice_extent_known(geometry):
+            if (
+                _finite_positive(geometry.orifice_area_m2) is None
+                and _finite_positive(geometry.orifice_diameter_m) is None
+            ):
                 missing.append("orifice_area_m2")
             if not _clausing_ok(geometry.clausing_factor):
                 missing.append("clausing_factor")
@@ -619,10 +639,22 @@ def underdetermined_apparatus(
             if not wall or "temperature_K" not in wall or "material" not in wall:
                 missing.append("wall.temperature_K/material")
         if method is MethodToken.KNUDSEN_EFFUSION:
-            # A is fixed by a positive diameter, including a printed interval
-            # whose reduction uses d_gm (d-326 case 2). A point area still
-            # satisfies the same determinant.
-            if not _orifice_extent_known(geometry) and "orifice_area_m2" not in missing:
+            # Case 2 (d-326): a printed diameter interval is the orifice.
+            # The reduction evaluates d_gm and carries the dex band. A point
+            # area still satisfies the determinant. A point diameter does
+            # not, and neither does an inferred or unlocated interval.
+            printed_diameter_interval = geometry is not None and (
+                _printed_positive_diameter_interval(geometry.orifice_diameter_m)
+            )
+            point_area = (
+                geometry is not None
+                and _finite_positive(geometry.orifice_area_m2) is not None
+            )
+            if (
+                not printed_diameter_interval
+                and not point_area
+                and "orifice_area_m2" not in missing
+            ):
                 missing.append("orifice_area_m2")
         elif geometry is None or (
             _finite_positive(geometry.exposed_area_m2) is None
@@ -643,7 +675,7 @@ def underdetermined_apparatus(
         if interval_notice is not None:
             # Case 1: the interval is recorded, not folded into the pressure.
             detail["apparatus_geometry_interval_printed"] = True
-            detail["regime_checked_at"] = "d_max"
+            detail["regime_checked_at"] = _interval_regime_check_label(experiment)
             detail["value_band"] = None
     checks.append(GateCheck("geometry_determinants", not missing, detail))
     if missing:
@@ -697,27 +729,38 @@ def effusion_regime_unverified(
             )
         return _pass(checks)
 
-    diameter = _printed_orifice_diameter(experiment)
+    diameters = _regime_diameters(experiment)
     cell_pressure = (
         None if observation is None else _printed_in_cell_total_pressure(observation)
     )
-    if diameter is not None and cell_pressure is not None and observation is not None:
-        pressure_limit = _in_cell_pressure_limit(experiment)
-        ratio_Pa_per_mm = cell_pressure / (diameter * Decimal("1000"))
-        passed = cell_pressure <= pressure_limit
+    if diameters and cell_pressure is not None and observation is not None:
+        # Every printed diameter must admit the pressure. A point has one
+        # diameter, so that row stays on min(10 Pa, d * 1000). An interval
+        # checks both ends. The coded limit rises with d, so the strict end
+        # is d_min; the recorded limit is that minimum.
+        end_limits = tuple(_p_over_d_limit(diameter) for diameter in diameters)
+        passed = all(cell_pressure <= limit for limit in end_limits)
+        pressure_limit = min(end_limits)
+        strict_diameter = min(diameters)
+        ratio_Pa_per_mm = cell_pressure / (strict_diameter * Decimal("1000"))
+        detail = {
+            "in_cell_total_pressure_Pa": str(cell_pressure),
+            "orifice_diameter_m": str(strict_diameter),
+            "pressure_to_diameter_Pa_per_mm": str(ratio_Pa_per_mm),
+            "threshold_Pa_per_mm": "1",
+            "pressure_limit_Pa": str(pressure_limit),
+            "limit_source": "Drowart et al. 2005, p. 689",
+            "route": "printed_orifice_diameter_and_cell_pressure",
+        }
+        if len(diameters) == 2:
+            detail["orifice_diameter_low_m"] = str(diameters[0])
+            detail["orifice_diameter_high_m"] = str(diameters[1])
+            detail["regime_checked_at"] = "both_ends"
         checks.append(
             GateCheck(
                 "orifice_pressure_to_diameter",
                 passed,
-                {
-                    "in_cell_total_pressure_Pa": str(cell_pressure),
-                    "orifice_diameter_m": str(diameter),
-                    "pressure_to_diameter_Pa_per_mm": str(ratio_Pa_per_mm),
-                    "threshold_Pa_per_mm": "1",
-                    "pressure_limit_Pa": str(pressure_limit),
-                    "limit_source": "Drowart et al. 2005, p. 689",
-                    "route": "printed_orifice_diameter_and_cell_pressure",
-                },
+                detail,
             )
         )
         if not passed:
@@ -778,7 +821,7 @@ def effusion_regime_unverified(
     pressure_limit = _in_cell_pressure_limit(experiment)
     diameter_basis = (
         "printed_orifice_diameter_p_over_d"
-        if diameter is not None
+        if diameters
         else "Drowart_standalone_usual_10_Pa_limit; no defensible d printed"
     )
     pressure_detail.update(
@@ -809,7 +852,9 @@ def effusion_regime_unverified(
         )
     passed = pressure_sum <= pressure_limit
     if passed:
-        missing_orifice = "orifice Kn not printed" if diameter is not None else "orifice not printed"
+        missing_orifice = (
+            "orifice Kn not printed" if diameters else "orifice not printed"
+        )
         pressure_detail["flag"] = (
             f"{missing_orifice}; regime verified from printed in-cell pressure sum "
             "(limit source: Drowart et al. 2005, p. 689; "
@@ -1106,23 +1151,39 @@ def _printed_diameter_extent(
     return _positive_extent(located_diameter)
 
 
-def _printed_orifice_diameter(experiment: Experiment) -> Decimal | None:
-    """Diameter the effusion-regime predicate evaluates.
+def _regime_diameters(experiment: Experiment) -> tuple[Decimal, ...] | None:
+    """Diameters at which the coded p/d predicate must pass.
 
-    A point returns that point, so an existing point row keeps its limit.
-    A printed interval returns d_max (d-326). Molecular effusion asks
-    d << mean free path, so the allowed pressure falls as d rises. The
-    coded Drowart check is p/d <= 1 Pa/mm (looser at larger d). Do not
-    flip that predicate: a point row must stay bit-identical. For an
-    interval, d-326 still runs the existing predicate at d_max, and a
-    pass there is a pass for the whole printed range.
+    A printed point is that one diameter, so a point row keeps
+    ``p_limit = min(10 Pa, d_m * 1000)``. A printed interval is both ends.
+    The coded limit rises with diameter, so the strict end is ``d_min``.
+    Every diameter between the ends is looser than ``d_min``. Do not flip
+    the point-row formula: a mean-free-path product would move point rows,
+    and that predicate is a separate ruling.
     """
 
     extent = _printed_diameter_extent(experiment)
     if extent is None:
         return None
-    _low, high, _kind = extent
-    return high
+    low, high, kind = extent
+    if kind == "point":
+        return (low,)
+    return (low, high)
+
+
+def _interval_regime_check_label(experiment: Experiment) -> str:
+    """Which regime evidence an interval notice may claim.
+
+    A printed orifice Kn is taken before any diameter. The notice may say
+    both ends were checked only when that diameter path is the one that runs.
+    """
+
+    kn = _located_decimal(
+        experiment.pressure_environment.regime.knudsen_number_orifice
+    )
+    if kn is not None:
+        return "printed_orifice_kn"
+    return "both_ends"
 
 
 def _printed_in_cell_total_pressure(observation: Observation) -> Decimal | None:
@@ -1137,16 +1198,25 @@ def _printed_in_cell_total_pressure(observation: Observation) -> Decimal | None:
     return _finite_positive(located)
 
 
+def _p_over_d_limit(diameter_m: Decimal) -> Decimal:
+    """Coded Drowart limit ``min(10 Pa, d_m * 1000)``. Not a P·d product."""
+
+    return min(KEMS_CELL_PRESSURE_MAX_PA, diameter_m * Decimal("1000"))
+
+
 def _in_cell_pressure_limit(
     experiment: Experiment,
 ) -> Decimal:
-    diameter = _printed_orifice_diameter(experiment)
-    if diameter is None:
+    """Strict coded limit over every printed regime diameter.
+
+    A point uses that point. An interval must pass at both ends. The coded
+    limit rises with diameter, so that minimum is the limit at ``d_min``.
+    """
+
+    diameters = _regime_diameters(experiment)
+    if not diameters:
         return KEMS_CELL_PRESSURE_MAX_PA
-    # Drowart's printed p/d <= 1 Pa/mm is 1000 Pa/m times the printed d.
-    # An interval contributes d_max via _printed_orifice_diameter.
-    pressure_to_diameter_limit = diameter * Decimal("1000")
-    return min(KEMS_CELL_PRESSURE_MAX_PA, pressure_to_diameter_limit)
+    return min(_p_over_d_limit(diameter) for diameter in diameters)
 
 
 def apparatus_geometry_interval_notice(
@@ -1158,8 +1228,10 @@ def apparatus_geometry_interval_notice(
     """Advisory notice for a printed orifice-diameter interval (d-326 case 1).
 
     Calibrated KEMS pressures are p = k I T. Orifice area does not enter,
-    so the interval is not a value band. The effusion-regime check uses
-    d_max. This notice is not a flagged stratum.
+    so the interval is not a value band. When orifice Kn is absent, the
+    regime gate applies the coded p/d limit at both ends. A printed Kn is
+    the regime check instead, and this notice does not claim the diameter
+    path. This notice is not a flagged stratum.
     """
 
     method_state = experiment.method
@@ -1173,13 +1245,20 @@ def apparatus_geometry_interval_notice(
     low, high, kind = extent
     if kind != "interval":
         return None
+    if _interval_regime_check_label(experiment) == "printed_orifice_kn":
+        regime_clause = "effusion regime uses the printed orifice Knudsen number; "
+    else:
+        regime_clause = (
+            f"effusion regime checked at both ends ({low} m and {high} m); "
+        )
     return Notice(
         kind=NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED,
         affected_quantities=(quantity,),
         reason=(
             "apparatus_geometry_interval_printed: printed orifice diameter "
-            f"interval {low}-{high} m; effusion regime checked at d_max={high} m; "
-            "orifice area does not enter the calibrated KEMS pressure; no value band"
+            f"interval {low}-{high} m; "
+            + regime_clause
+            + "orifice area does not enter the calibrated KEMS pressure; no value band"
         ),
         origin=origin,
     )
@@ -1348,8 +1427,7 @@ def knudsen_effusion_pressure_from_mass_rate(
             reason=(
                 "apparatus_geometry_interval_printed: printed orifice diameter "
                 f"interval {low}-{high} m evaluated at geometric mean {d_gm} m; "
-                f"effusion pressure band +/-{band} dex from A ~ d^2; "
-                f"effusion regime checked at d_max={high} m"
+                f"effusion pressure band +/-{band} dex from A ~ d^2"
             ),
             origin=origin,
             band=f"+/-{band} dex",
