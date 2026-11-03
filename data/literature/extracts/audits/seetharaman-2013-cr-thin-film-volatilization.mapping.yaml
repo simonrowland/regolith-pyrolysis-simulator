@@ -1,11 +1,37 @@
 source_id: seetharaman-2013-cr-thin-film-volatilization
 scope: >-
-  New Seetharaman et al. 2013 extract. Prioritize measured Cr loss and whole-sample mass change, retain every printed table row, quote the prior-work CrO3 pressure estimate with attribution, and keep plotted values undigitized.
+  New Seetharaman et al. 2013 extract. Prioritize measured Cr loss and whole-sample mass change, retain every printed table row, quote the prior-work CrO3 pressure estimate with attribution, and leave unlabelled plotted values undigitized.
 source_order:
   - MinerU table HTML and markdown
   - born-digital pdftotext-layout
   - 600 dpi PDF page render for table layout, flagged cells, prose checks, and figure legend verification
 supplement: No supporting binary supplement was present.
+fidelity_samples:
+  - path: species.Cr.observations[seetharaman2013_prose_cr_loss_2h_oxygen].values.component_amount_as_published
+    value: '0.27'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_2h_argon].values.component_amount_as_published
+    value: '1,62'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_4h_air].values.component_amount_as_published
+    value: '1,25'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_6h_oxygen].values.component_amount_as_published
+    value: '0.04'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_24h_oxygen].values.component_amount_as_published
+    value: '0,02'
+    locator:
+      page: 6
+      figure: '9'
 table_audit:
   - table: I
     page: 3
@@ -47,7 +73,7 @@ table_audit:
 draft_comparison:
   result_rows: 0
   disposition: >-
-    The compare tool emits no point comparisons because all three structured at.% Cr observations have component_amount null under the controller's typed-refusal ruling. All printed Table I-IV cells remain in the extract context and are covered by the cell audit and independent table pins.
+    The compare tool emits no point comparisons because all seven structured at.% Cr observations have component_amount null under the controller's typed-refusal ruling. All printed Table I-IV cells remain in the extract context and are covered by the cell audit and independent table pins.
 figure_audit:
   - figure: '1'
     page: 2
@@ -75,14 +101,13 @@ figure_audit:
     disposition: Polished sample surface photograph after 2 h at 1673 K; no quantitative data extracted.
   - figure: '9'
     page: 6
-    disposition: Average Cr at.% at 1873 K; legend colors and condition labels retained. Printed numeric bar labels were not transcribed under the figure-only rule.
+    disposition: Average Cr at.% at 1873 K; legend colors and condition labels retained. Printed bar labels are transcribed as measured values, while no unlabelled bar height is digitized.
 figure_read_candidates:
   - Figure 1: FACTSAGE CrO3 pressure curve numeric points.
   - Figure 2: dimensionless whole-sample mass-loss versus time points.
   - Figure 5: average Cr content versus temperature points.
   - Figure 6: average Cr content versus temperature for 2 h and 6 h points.
   - Figure 7: dimensionless whole-sample mass-loss versus time points.
-  - Figure 9: numeric bar labels for average Cr content.
 condition_audit:
   - Main TGA experiment atmospheres are identified as air, pure oxygen, and argon; numerical experimental pO2 is not reported.
   - Figure 1 reports pO2 = 9 × 10^4 Pa only as a FACTSAGE model condition.
@@ -101,15 +126,15 @@ evidence_audit:
   - Table IV WDS elemental values are author measurements, measured_direct; no reduction equation is printed for the cell values.
   - The quoted 0.1 Pa CrO3 pressure is attributed to Okretic et al. [7], not a present-work measurement.
   - Figures 2 and 7 are TGA whole-sample mass-change measurements, not Cr-specific loss; plotted data stay in figure_record.
-  - The prose “about 0.4 times” rate comparison is an author summary of plotted measurements. It remains quoted_attributed context because the underlying numeric curve points are excluded and cannot be stored as derivation parents.
-  - The “about 50 pct” and “zero value” statements are prose summaries of Figure 5, with source wording retained; no plotted point is substituted.
-  - The 0.27 at.% post-treatment result is an explicit textual WDS result. No Cr-loss percentage was calculated from the initial and remaining concentrations.
+  - The prose “about 0.4 times” rate comparison is an author_estimate summary of plotted measurements; the underlying numeric curve points remain excluded.
+  - The “about 50 pct” and “zero value” statements are author_estimate summaries of Figure 5, with source wording retained; no plotted point is substituted.
+  - Figure 9's printed 0.27 at.% 2h O2 bar label and the matching prose statement refer to one WDS result, represented once. No Cr-loss percentage was calculated from the initial and remaining concentrations.
   - Related Cr-specific volatilization precedent: Khedim and Abdelouhab (2011) retains a calculated Cr2O3 loss in context because its supporting measured inputs cannot be stored; it does not supply an exact quantity token for this paper's at.% Cr result.
 migration_expectation:
-  scored_observations: 3
+  observation_records: 7
   hard_issues: 0
-  unavailable_values: 3
-  typed_refusal_admissions: 3
+  unavailable_values: 7
+  typed_refusal_admissions: 7
   context_records: 19
   identity_axes: >-
-    All three Cr observations bind temperature and the Table II starting composition. Total pressure and numeric fO2 are unknown because the source prints neither; the oxygen atmosphere label is retained as printed.
+    All seven Cr observations bind temperature and the Table II starting composition. Total pressure and numeric fO2 are unknown because the source prints neither; each gas label is retained as printed.

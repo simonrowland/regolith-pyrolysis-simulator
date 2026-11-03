@@ -65,27 +65,91 @@ def _observations_by_id(document: dict) -> dict[str, dict]:
 def _assert_cr_measurement_render_pins(document: dict) -> None:
     rows = _observations_by_id(document)
     expected = {
-        "seetharaman2013_table4_spinel_cr": ("0.03", 5, "IV", "Spinel"),
-        "seetharaman2013_table4_matrix_cr": ("0.00", 5, "IV", "Matrix"),
+        "seetharaman2013_table4_spinel_cr": (
+            "0.03", 5, "IV", "Spinel", None, None, "oxygen", "24"
+        ),
+        "seetharaman2013_table4_matrix_cr": (
+            "0.00", 5, "IV", "Matrix", None, None, "oxygen", "24"
+        ),
         "seetharaman2013_prose_cr_loss_2h_oxygen": (
             "0.27",
             6,
             None,
             None,
+            "9",
+            "2h O2 bar label",
+            "O2",
+            "2",
+        ),
+        "seetharaman2013_figure9_cr_2h_argon": (
+            "1,62",
+            6,
+            None,
+            None,
+            "9",
+            "2h Ar bar label",
+            "Ar",
+            "2",
+        ),
+        "seetharaman2013_figure9_cr_4h_air": (
+            "1,25",
+            6,
+            None,
+            None,
+            "9",
+            "4h Air bar label",
+            "Air",
+            "4",
+        ),
+        "seetharaman2013_figure9_cr_6h_oxygen": (
+            "0.04",
+            6,
+            None,
+            None,
+            "9",
+            "6h O2 bar label",
+            "O2",
+            "6",
+        ),
+        "seetharaman2013_figure9_cr_24h_oxygen": (
+            "0,02",
+            6,
+            None,
+            None,
+            "9",
+            "24h O2 bar label",
+            "O2",
+            "24",
         ),
     }
     assert set(rows) == set(expected)
-    for observation_id, (printed, page, table, row) in expected.items():
+    for observation_id, (
+        printed,
+        page,
+        table,
+        row,
+        figure,
+        figure_note,
+        atmosphere,
+        duration,
+    ) in expected.items():
         observation = rows[observation_id]
         assert observation["values"]["component_amount_as_published"] == printed
         assert observation["values"]["value_units_as_published"] == "at.%"
         assert observation["units"] == "at.%"
         assert observation["locator"]["page"] == page
         assert observation["locator"].get("table") == table
+        assert observation["locator"].get("figure") == figure
+        assert observation["locator"].get("note") == figure_note
         if row is not None:
             assert observation["locator"]["row"] == row
             assert observation["locator"]["column"] == "Cr"
         assert observation["values"]["component_amount"] is None
+        assert observation["values"]["method_class"] == "measured_direct"
+        assert observation["values"]["admission_status"] == "typed_refusal"
+        assert "t-1600" in observation["values"]["reason"]
+        assert observation["values"]["atmosphere_as_published"] == atmosphere
+        assert observation["values"]["treatment_duration_h"] == duration
 
 
 def _assert_table_rows_match_render(document: dict) -> None:
@@ -152,6 +216,43 @@ def test_independent_table_and_figure_pins_reject_mutations() -> None:
     ] = "0.04"
     with pytest.raises(AssertionError):
         _assert_cr_measurement_render_pins(changed_measurement)
+
+    changed_amount = deepcopy(document)
+    _observations_by_id(changed_amount)[
+        "seetharaman2013_prose_cr_loss_2h_oxygen"
+    ]["values"]["component_amount"] = "0.27"
+    with pytest.raises(AssertionError):
+        _assert_cr_measurement_render_pins(changed_amount)
+
+    changed_figure9 = deepcopy(document)
+    _observations_by_id(changed_figure9)[
+        "seetharaman2013_figure9_cr_2h_argon"
+    ]["values"]["component_amount_as_published"] = "1.62"
+    with pytest.raises(AssertionError):
+        _assert_cr_measurement_render_pins(changed_figure9)
+
+    changed_reason = deepcopy(document)
+    _observations_by_id(changed_reason)[
+        "seetharaman2013_figure9_cr_2h_argon"
+    ]["values"]["reason"] = "at.% scaling is unavailable"
+    with pytest.raises(AssertionError):
+        _assert_cr_measurement_render_pins(changed_reason)
+
+    observations = _observations_by_id(document)
+    assert len(observations) == 7
+    contexts = _context_by_id(document)
+    summary = contexts["seetharaman2013_prose_cr_loss_temperature_summary"]
+    relative_rate = contexts["seetharaman2013_prose_relative_mass_loss_rate"]
+    assert summary["values"]["method_class"] == "author_estimate"
+    assert "attribution" not in summary["values"]
+    assert relative_rate["values"]["method_class"] == "author_estimate"
+    assert "attribution" not in relative_rate["values"]
+    figure2 = contexts["seetharaman2013_figure2_mass_loss"]
+    assert figure2["axes_as_printed"] == "x: t (s); y: σ"
+    assert (
+        contexts["seetharaman2013_quoted_okretic_cro3_vapor_pressure"]["values"]["method_class"]
+        == "quoted_attributed"
+    )
 
     changed_figure = deepcopy(document)
     figure2 = _context_by_id(changed_figure)["seetharaman2013_figure2_mass_loss"]
@@ -235,7 +336,7 @@ def test_extract_validates_and_isolated_migration_refuses_atomic_percent() -> No
     result = migrator.result
     assert not result.validation.hard_issues
     assert not result.registry_issues
-    assert len(result.observations) == 3
+    assert len(result.observations) == 7
     _assert_cr_measurement_render_pins(document)
     source_observations = _observations_by_id(document)
     migrated = {
@@ -247,6 +348,10 @@ def test_extract_validates_and_isolated_migration_refuses_atomic_percent() -> No
         "seetharaman2013_table4_spinel_cr": "slag",
         "seetharaman2013_table4_matrix_cr": "glass",
         "seetharaman2013_prose_cr_loss_2h_oxygen": "slag",
+        "seetharaman2013_figure9_cr_2h_argon": "slag",
+        "seetharaman2013_figure9_cr_4h_air": "slag",
+        "seetharaman2013_figure9_cr_6h_oxygen": "slag",
+        "seetharaman2013_figure9_cr_24h_oxygen": "slag",
     }
     for observation_id, row in migrated.items():
         source = source_observations[observation_id]
