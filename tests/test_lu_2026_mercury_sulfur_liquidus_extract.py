@@ -371,8 +371,9 @@ def test_isolated_migration_keeps_species_temperature_and_conditions(tmp_path: P
         assert delta_iw.state.value == Decimal(str(raw_delta).replace("−", "-"))
         assert observation.identity.phase_role.is_value
         assert observation.identity.phase_role.value.value == "melt"
-        assert observation.identity.fO2_Pa.is_unknown
-        assert "buffer-relative fO2 (iron-wüstite (IW))" in observation.identity.fO2_Pa.reason
+        # t-1619 / d-324: Table 2 prints ΔIW(Si-SiO2), which now resolves to
+        # an absolute fO2 identity through the buffer owner.
+        assert observation.identity.fO2_Pa.is_value
 
 
 def test_source_locators_resolve_on_the_cited_physical_pages() -> None:
