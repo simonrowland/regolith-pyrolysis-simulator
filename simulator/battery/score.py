@@ -3208,6 +3208,22 @@ def fusion_comparison_reference(
     if _source_polymorph_is_rejected(standard_state.endmember.polymorph):
         return reference
 
+    if engine is Engine.MAGEMIN and magemin_native_formula and formula == "MgO":
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=RefusalReason.ENGINE_ACTIVITY_STANDARD_STATE_UNCERTIFIED.value,
+            origin=reference.observation_id,
+            band=(
+                "MAGEMin MgO activity standard state is uncertified; adapter mapping "
+                "engines/magemin/domain.py:28-30; direct native-field parser "
+                "simulator/melt_backend/magemin.py:3502-3516; see b-1123"
+            ),
+        )
+        reference = replace(
+            reference, notices=union_notices(reference.notices, (notice,))
+        )
+
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
@@ -12034,6 +12050,29 @@ def compile_residual(
                 fo2_mode=result_mode,
             ),
             candidate,
+        )
+
+    uncertified_magemin_activity = (
+        next(
+            (
+                notice
+                for notice in notices
+                if notice.reason
+                == RefusalReason.ENGINE_ACTIVITY_STANDARD_STATE_UNCERTIFIED.value
+            ),
+            None,
+        )
+        if engine is Engine.MAGEMIN and formula == "MgO"
+        else None
+    )
+    if uncertified_magemin_activity is not None:
+        return _refused(
+            RefusalReason.ENGINE_ACTIVITY_STANDARD_STATE_UNCERTIFIED,
+            {
+                "reason": RefusalReason.ENGINE_ACTIVITY_STANDARD_STATE_UNCERTIFIED.value,
+                "notice": uncertified_magemin_activity.band,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
         )
 
     if _is_quantity_not_predicted(quantity):
