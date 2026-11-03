@@ -32,6 +32,25 @@ GOLDEN_TRACE = (
 # byte-identical. VOLATILE_KEYS strip timestamps/run ids; two-pass
 # self-equality still proves determinism of the live path. Do NOT
 # soft-xfail again; rebaseline from the executable only (Hard Invariant 7).
+# Regenerated from the executable after car1 merge bef9af1e7. The
+# pre-merge tree at 4b6555249 matches the previous golden (62233 bytes,
+# 33 refusal species). HEAD matches the merge trace. The C0B hour-1
+# panel is at 225 C (225 + 273.15 = 498.15 K) and now counts 35: the
+# same 33 plus Mg and MnO_gas, both
+# upstream_vapour_carrier_non_authoritative.
+# - 336fac01a evaluates a cold metal source fit below its certified
+#   band and keeps a certification notice. Mg's certified floor is
+#   701 K, so 498.15 K used to raise VaporPressureRangeError
+#   (metal_vapor_pressure_out_of_source_certified_range) and omit
+#   the carrier.
+# - eb49ee6fc continues a declared-domain typed_refusal row with a
+#   notice instead of omitting it. MnO_gas (domain floor 1519 K) is
+#   the only such row this lunar_mare_low_ti feedstock carries;
+#   CoO_gas is the other typed_refusal row and has no flux here.
+# Byte 2218 is the n_species digit 3 -> 5. The remaining growth
+# (62233 -> 146429 bytes) is alphamelts_reference_pressure
+# (b56619a8f) copied onto evaporation notices, which sorts ahead of
+# composition_projected_notice (c8ef1bd29).
 
 VOLATILE_KEYS = {
     "duration_s",

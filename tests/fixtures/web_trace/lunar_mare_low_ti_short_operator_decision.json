@@ -74,7 +74,7 @@
         "diagnostic_only": true,
         "has_refusals": true,
         "message": "Per-species condensation refusals / efficiency pass-through outcomes (VR-11 B2/B3).",
-        "n_species": 33,
+        "n_species": 35,
         "status": "ok",
         "tick_view": "compact"
       },
@@ -189,6 +189,44 @@
           },
           "provider": "magemin",
           "redox": {
+            "alphamelts_reference_pressure": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "sio2_wt_pct": [
+                  30.0,
+                  80.0
+                ],
+                "temperature_K": [
+                  1073.15,
+                  1700.0
+                ]
+              },
+              "commissioning_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "failed_constraints": [
+                  "temperature_range"
+                ],
+                "kind": "engine_commissioning",
+                "reason": "temperature_range",
+                "sio2_wt_pct": 45.805455481214615,
+                "temperature_K": 2473.15,
+                "warnings": [
+                  "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                ]
+              },
+              "condensed_phase_reference_pressure_bar": 1.0,
+              "physical_overhead_pressure_bar": 0.001
+            },
             "composition_projected_notice": {
               "authority": "extrapolated",
               "certified_band": {
@@ -220,6 +258,263 @@
               ],
               "kind": "composition_projected",
               "reason": "composition_projected"
+            },
+            "gate_provider_step_down": {
+              "failed_providers": [
+                {
+                  "diagnostic": {
+                    "backend_diagnostics": {
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "composition_projected_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "bulk_components": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "database": "ig",
+                          "engine": "magemin"
+                        },
+                        "dropped_components": [
+                          {
+                            "component": "MnO",
+                            "mass_fraction": 0.0020586721564590836
+                          },
+                          {
+                            "component": "P2O5",
+                            "mass_fraction": 0.0010293360782295418
+                          }
+                        ],
+                        "kind": "composition_projected",
+                        "reason": "composition_projected"
+                      },
+                      "exception_class": "LiquidusSampleError",
+                      "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "input_composition_projection": {
+                        "backend": "MAGEMin",
+                        "bulk_dropped_wt_pct": 0.3088008234688715,
+                        "bulk_projected_sum_wt_pct": 99.69119917653114,
+                        "bulk_source_sum_wt_pct": 100.00000000000001,
+                        "composition_projected": {
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_mass_fraction": 0.0030880082346887144
+                        },
+                        "dropped_bulk_components": [
+                          "MnO",
+                          "P2O5"
+                        ],
+                        "dropped_component_mass_fractions": {
+                          "MnO": 0.0020586721564590836,
+                          "P2O5": 0.0010293360782295418
+                        },
+                        "dropped_mass_fraction": 0.0030880082346887144,
+                        "input_melt_mass_kg": 997.8861904708707,
+                        "magemin_bulk_order": [
+                          "SiO2",
+                          "Al2O3",
+                          "CaO",
+                          "MgO",
+                          "FeOt",
+                          "K2O",
+                          "Na2O",
+                          "TiO2",
+                          "O",
+                          "Cr2O3",
+                          "H2O"
+                        ],
+                        "magemin_bulk_projected_components": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeOt",
+                          "K2O",
+                          "MgO",
+                          "Na2O",
+                          "O",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "magemin_database": "ig",
+                        "magemin_projected_composition_wt_pct": {
+                          "Al2O3": 13.896037056098818,
+                          "CaO": 11.32269686052496,
+                          "Cr2O3": 0.3602676273803397,
+                          "FeOt": 15.092949718385377,
+                          "K2O": 0.1029336078229542,
+                          "MgO": 9.264024704065879,
+                          "Na2O": 0.4117344312918168,
+                          "O": 1.8910955724020682,
+                          "SiO2": 45.80545548121462,
+                          "TiO2": 1.5440041173443129
+                        },
+                        "merged_bulk_components": [
+                          "FeO->FeOt+O"
+                        ],
+                        "projected_species": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeO",
+                          "K2O",
+                          "MgO",
+                          "MnO",
+                          "Na2O",
+                          "P2O5",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "reason": "input_composition_projected",
+                        "retained_basis_melt_mass_kg": 997.8861904708707,
+                        "status": "projected"
+                      },
+                      "projected_liquidus_diagnostics": {},
+                      "projected_liquidus_status": "ok"
+                    },
+                    "backend_status": "out_of_domain",
+                    "backend_status_reason": "composition_projected",
+                    "backend_warnings": [
+                      "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                      "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                      "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "MAGEMin: native fO2_log=-9.2192 differs from requested -9; one QFM correction to --buffer_n=19.852299",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-9.069836 differs from requested -9; one QFM correction to --buffer_n=17.129951",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-8.965841 differs from requested -9; one QFM correction to --buffer_n=14.785764",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                      "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                    ],
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "magemin-shadow",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": 1.0,
+                    "liquidus_T_C": 1370.3125,
+                    "liquidus_T_K": 1643.4625,
+                    "mode": "subprocess",
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phases_present": [],
+                    "solidus_T_C": 918.75
+                  },
+                  "provider": "magemin-shadow",
+                  "reason": "composition_projected; composition_projected",
+                  "status": "out_of_domain"
+                },
+                {
+                  "diagnostic": {
+                    "activity_coefficients": {},
+                    "applied_fe3fet": 0.0,
+                    "backend_diagnostics": {
+                      "authority": "extrapolated",
+                      "backend_status_reason": "not_converged",
+                      "certified_band": {
+                        "sio2_wt_pct": [
+                          30.0,
+                          80.0
+                        ],
+                        "temperature_K": [
+                          1073.15,
+                          1700.0
+                        ]
+                      },
+                      "commissioning_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "failed_constraints": [
+                          "temperature_range"
+                        ],
+                        "kind": "engine_commissioning",
+                        "reason": "temperature_range",
+                        "sio2_wt_pct": 45.805455481214615,
+                        "temperature_K": 2473.15,
+                        "warnings": [
+                          "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                        ]
+                      },
+                      "completed_rows": 0,
+                      "condensed_phase_reference_pressure_bar": 1.0,
+                      "last_completed_temperature_C": null,
+                      "physical_overhead_pressure_bar": 0.001,
+                      "reason": "incomplete_cooling_path"
+                    },
+                    "backend_status": "not_converged",
+                    "backend_status_reason": "not_converged",
+                    "backend_warnings": [
+                      "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                      "cooling start is not superliquidus"
+                    ],
+                    "bulk_composition_wt_pct": {},
+                    "chem_potentials": null,
+                    "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "fO2_log": null,
+                    "fe_redox_policy": "intrinsic",
+                    "intrinsic_fO2_log": -9.0,
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "alphamelts-diagnostic",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": null,
+                    "liquid_fraction_path": [],
+                    "liquidus_T_C": null,
+                    "liquidus_T_K": null,
+                    "mode": "subprocess",
+                    "phase_affinities": null,
+                    "phase_compositions": {},
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phase_thermo": {},
+                    "phases_present": [],
+                    "solid_composition_wt_pct": {},
+                    "solidus_T_C": null,
+                    "system_chisqr": null,
+                    "system_dVdP": null,
+                    "system_dVdT": null,
+                    "system_enthalpy": null,
+                    "system_entropy": null,
+                    "system_fO2_delta_QFM": null,
+                    "system_heat_capacity_Cp": null,
+                    "system_phi": null,
+                    "system_solid_density_rhos": null,
+                    "system_volume": null
+                  },
+                  "provider": "alphamelts-diagnostic",
+                  "reason": "not_converged; not_converged; incomplete_cooling_path",
+                  "status": "not_converged"
+                }
+              ],
+              "realized_provider": null,
+              "requested_provider_order": [
+                "magemin-shadow",
+                "alphamelts-diagnostic"
+              ]
             },
             "liquidus_T_C": 1370.3125,
             "solidus_T_C": 918.75,
@@ -347,6 +642,44 @@
             },
             "provider": "magemin",
             "redox": {
+              "alphamelts_reference_pressure": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "commissioning_notice": {
+                  "authority": "extrapolated",
+                  "certified_band": {
+                    "sio2_wt_pct": [
+                      30.0,
+                      80.0
+                    ],
+                    "temperature_K": [
+                      1073.15,
+                      1700.0
+                    ]
+                  },
+                  "failed_constraints": [
+                    "temperature_range"
+                  ],
+                  "kind": "engine_commissioning",
+                  "reason": "temperature_range",
+                  "sio2_wt_pct": 45.805455481214615,
+                  "temperature_K": 2473.15,
+                  "warnings": [
+                    "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                  ]
+                },
+                "condensed_phase_reference_pressure_bar": 1.0,
+                "physical_overhead_pressure_bar": 0.001
+              },
               "composition_projected_notice": {
                 "authority": "extrapolated",
                 "certified_band": {
@@ -378,6 +711,263 @@
                 ],
                 "kind": "composition_projected",
                 "reason": "composition_projected"
+              },
+              "gate_provider_step_down": {
+                "failed_providers": [
+                  {
+                    "diagnostic": {
+                      "backend_diagnostics": {
+                        "backend_status": "out_of_domain",
+                        "backend_status_reason": "composition_projected",
+                        "composition_projected_notice": {
+                          "authority": "extrapolated",
+                          "certified_band": {
+                            "bulk_components": [
+                              "SiO2",
+                              "Al2O3",
+                              "CaO",
+                              "MgO",
+                              "FeOt",
+                              "K2O",
+                              "Na2O",
+                              "TiO2",
+                              "O",
+                              "Cr2O3",
+                              "H2O"
+                            ],
+                            "database": "ig",
+                            "engine": "magemin"
+                          },
+                          "dropped_components": [
+                            {
+                              "component": "MnO",
+                              "mass_fraction": 0.0020586721564590836
+                            },
+                            {
+                              "component": "P2O5",
+                              "mass_fraction": 0.0010293360782295418
+                            }
+                          ],
+                          "kind": "composition_projected",
+                          "reason": "composition_projected"
+                        },
+                        "exception_class": "LiquidusSampleError",
+                        "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                        "input_composition_projection": {
+                          "backend": "MAGEMin",
+                          "bulk_dropped_wt_pct": 0.3088008234688715,
+                          "bulk_projected_sum_wt_pct": 99.69119917653114,
+                          "bulk_source_sum_wt_pct": 100.00000000000001,
+                          "composition_projected": {
+                            "dropped_component_mass_fractions": {
+                              "MnO": 0.0020586721564590836,
+                              "P2O5": 0.0010293360782295418
+                            },
+                            "dropped_components": [
+                              "MnO",
+                              "P2O5"
+                            ],
+                            "dropped_mass_fraction": 0.0030880082346887144
+                          },
+                          "dropped_bulk_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_mass_fraction": 0.0030880082346887144,
+                          "input_melt_mass_kg": 997.8861904708707,
+                          "magemin_bulk_order": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "magemin_bulk_projected_components": [
+                            "Al2O3",
+                            "CaO",
+                            "Cr2O3",
+                            "FeOt",
+                            "K2O",
+                            "MgO",
+                            "Na2O",
+                            "O",
+                            "SiO2",
+                            "TiO2"
+                          ],
+                          "magemin_database": "ig",
+                          "magemin_projected_composition_wt_pct": {
+                            "Al2O3": 13.896037056098818,
+                            "CaO": 11.32269686052496,
+                            "Cr2O3": 0.3602676273803397,
+                            "FeOt": 15.092949718385377,
+                            "K2O": 0.1029336078229542,
+                            "MgO": 9.264024704065879,
+                            "Na2O": 0.4117344312918168,
+                            "O": 1.8910955724020682,
+                            "SiO2": 45.80545548121462,
+                            "TiO2": 1.5440041173443129
+                          },
+                          "merged_bulk_components": [
+                            "FeO->FeOt+O"
+                          ],
+                          "projected_species": [
+                            "Al2O3",
+                            "CaO",
+                            "Cr2O3",
+                            "FeO",
+                            "K2O",
+                            "MgO",
+                            "MnO",
+                            "Na2O",
+                            "P2O5",
+                            "SiO2",
+                            "TiO2"
+                          ],
+                          "reason": "input_composition_projected",
+                          "retained_basis_melt_mass_kg": 997.8861904708707,
+                          "status": "projected"
+                        },
+                        "projected_liquidus_diagnostics": {},
+                        "projected_liquidus_status": "ok"
+                      },
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "backend_warnings": [
+                        "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                        "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                        "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                        "MAGEMin: native fO2_log=-9.2192 differs from requested -9; one QFM correction to --buffer_n=19.852299",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                        "MAGEMin: native fO2_log=-9.069836 differs from requested -9; one QFM correction to --buffer_n=17.129951",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                        "MAGEMin: native fO2_log=-8.965841 differs from requested -9; one QFM correction to --buffer_n=14.785764",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                        "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                      ],
+                      "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                      "kernel_fallback_reason": "no_authoritative_provider",
+                      "kernel_fallback_requested_provider": "none",
+                      "kernel_fallback_used": "magemin-shadow",
+                      "liquid_composition_wt_pct": {},
+                      "liquid_fraction": 1.0,
+                      "liquidus_T_C": 1370.3125,
+                      "liquidus_T_K": 1643.4625,
+                      "mode": "subprocess",
+                      "phase_masses_kg": {},
+                      "phase_modes_wt_pct": {},
+                      "phases_present": [],
+                      "solidus_T_C": 918.75
+                    },
+                    "provider": "magemin-shadow",
+                    "reason": "composition_projected; composition_projected",
+                    "status": "out_of_domain"
+                  },
+                  {
+                    "diagnostic": {
+                      "activity_coefficients": {},
+                      "applied_fe3fet": 0.0,
+                      "backend_diagnostics": {
+                        "authority": "extrapolated",
+                        "backend_status_reason": "not_converged",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "commissioning_notice": {
+                          "authority": "extrapolated",
+                          "certified_band": {
+                            "sio2_wt_pct": [
+                              30.0,
+                              80.0
+                            ],
+                            "temperature_K": [
+                              1073.15,
+                              1700.0
+                            ]
+                          },
+                          "failed_constraints": [
+                            "temperature_range"
+                          ],
+                          "kind": "engine_commissioning",
+                          "reason": "temperature_range",
+                          "sio2_wt_pct": 45.805455481214615,
+                          "temperature_K": 2473.15,
+                          "warnings": [
+                            "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                          ]
+                        },
+                        "completed_rows": 0,
+                        "condensed_phase_reference_pressure_bar": 1.0,
+                        "last_completed_temperature_C": null,
+                        "physical_overhead_pressure_bar": 0.001,
+                        "reason": "incomplete_cooling_path"
+                      },
+                      "backend_status": "not_converged",
+                      "backend_status_reason": "not_converged",
+                      "backend_warnings": [
+                        "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                        "cooling start is not superliquidus"
+                      ],
+                      "bulk_composition_wt_pct": {},
+                      "chem_potentials": null,
+                      "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                      "fO2_log": null,
+                      "fe_redox_policy": "intrinsic",
+                      "intrinsic_fO2_log": -9.0,
+                      "kernel_fallback_reason": "no_authoritative_provider",
+                      "kernel_fallback_requested_provider": "none",
+                      "kernel_fallback_used": "alphamelts-diagnostic",
+                      "liquid_composition_wt_pct": {},
+                      "liquid_fraction": null,
+                      "liquid_fraction_path": [],
+                      "liquidus_T_C": null,
+                      "liquidus_T_K": null,
+                      "mode": "subprocess",
+                      "phase_affinities": null,
+                      "phase_compositions": {},
+                      "phase_masses_kg": {},
+                      "phase_modes_wt_pct": {},
+                      "phase_thermo": {},
+                      "phases_present": [],
+                      "solid_composition_wt_pct": {},
+                      "solidus_T_C": null,
+                      "system_chisqr": null,
+                      "system_dVdP": null,
+                      "system_dVdT": null,
+                      "system_enthalpy": null,
+                      "system_entropy": null,
+                      "system_fO2_delta_QFM": null,
+                      "system_heat_capacity_Cp": null,
+                      "system_phi": null,
+                      "system_solid_density_rhos": null,
+                      "system_volume": null
+                    },
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "not_converged; not_converged; incomplete_cooling_path",
+                    "status": "not_converged"
+                  }
+                ],
+                "realized_provider": null,
+                "requested_provider_order": [
+                  "magemin-shadow",
+                  "alphamelts-diagnostic"
+                ]
               },
               "liquidus_T_C": 1370.3125,
               "solidus_T_C": 918.75,
@@ -679,13 +1269,13 @@
           "n_species": 44,
           "schema": "condensation_authority.v1",
           "status_counts": {
-            "refused": 11,
-            "status_bearing": 33
+            "refused": 9,
+            "status_bearing": 35
           }
         },
         "condensation_refusals": {
           "has_refusals": true,
-          "n_species": 33,
+          "n_species": 35,
           "schema": "condensation_refusals.v1"
         },
         "diagnostic_only": true,
@@ -696,8 +1286,8 @@
         "message": "Exact-key vapour channel answers and advisory diagnostics; not flux-authoritative until an R-family flip.",
         "n_channel_species": 44,
         "n_flux_active": 23,
-        "n_refused": 11,
-        "n_refused_species": 11,
+        "n_refused": 9,
+        "n_refused_species": 9,
         "n_requested": 44,
         "shadow_equal": false,
         "shadow_outcome": "missing_keys",
@@ -835,6 +1425,44 @@
           },
           "provider": "magemin",
           "redox": {
+            "alphamelts_reference_pressure": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "sio2_wt_pct": [
+                  30.0,
+                  80.0
+                ],
+                "temperature_K": [
+                  1073.15,
+                  1700.0
+                ]
+              },
+              "commissioning_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "failed_constraints": [
+                  "temperature_range"
+                ],
+                "kind": "engine_commissioning",
+                "reason": "temperature_range",
+                "sio2_wt_pct": 45.805455481214615,
+                "temperature_K": 2473.15,
+                "warnings": [
+                  "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                ]
+              },
+              "condensed_phase_reference_pressure_bar": 1.0,
+              "physical_overhead_pressure_bar": 0.001
+            },
             "composition_projected_notice": {
               "authority": "extrapolated",
               "certified_band": {
@@ -866,6 +1494,263 @@
               ],
               "kind": "composition_projected",
               "reason": "composition_projected"
+            },
+            "gate_provider_step_down": {
+              "failed_providers": [
+                {
+                  "diagnostic": {
+                    "backend_diagnostics": {
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "composition_projected_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "bulk_components": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "database": "ig",
+                          "engine": "magemin"
+                        },
+                        "dropped_components": [
+                          {
+                            "component": "MnO",
+                            "mass_fraction": 0.0020586721564590836
+                          },
+                          {
+                            "component": "P2O5",
+                            "mass_fraction": 0.0010293360782295418
+                          }
+                        ],
+                        "kind": "composition_projected",
+                        "reason": "composition_projected"
+                      },
+                      "exception_class": "LiquidusSampleError",
+                      "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "input_composition_projection": {
+                        "backend": "MAGEMin",
+                        "bulk_dropped_wt_pct": 0.3088008234688715,
+                        "bulk_projected_sum_wt_pct": 99.69119917653114,
+                        "bulk_source_sum_wt_pct": 100.00000000000001,
+                        "composition_projected": {
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_mass_fraction": 0.0030880082346887144
+                        },
+                        "dropped_bulk_components": [
+                          "MnO",
+                          "P2O5"
+                        ],
+                        "dropped_component_mass_fractions": {
+                          "MnO": 0.0020586721564590836,
+                          "P2O5": 0.0010293360782295418
+                        },
+                        "dropped_mass_fraction": 0.0030880082346887144,
+                        "input_melt_mass_kg": 997.8861904708707,
+                        "magemin_bulk_order": [
+                          "SiO2",
+                          "Al2O3",
+                          "CaO",
+                          "MgO",
+                          "FeOt",
+                          "K2O",
+                          "Na2O",
+                          "TiO2",
+                          "O",
+                          "Cr2O3",
+                          "H2O"
+                        ],
+                        "magemin_bulk_projected_components": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeOt",
+                          "K2O",
+                          "MgO",
+                          "Na2O",
+                          "O",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "magemin_database": "ig",
+                        "magemin_projected_composition_wt_pct": {
+                          "Al2O3": 13.896037056098818,
+                          "CaO": 11.32269686052496,
+                          "Cr2O3": 0.3602676273803397,
+                          "FeOt": 15.092949718385377,
+                          "K2O": 0.1029336078229542,
+                          "MgO": 9.264024704065879,
+                          "Na2O": 0.4117344312918168,
+                          "O": 1.8910955724020682,
+                          "SiO2": 45.80545548121462,
+                          "TiO2": 1.5440041173443129
+                        },
+                        "merged_bulk_components": [
+                          "FeO->FeOt+O"
+                        ],
+                        "projected_species": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeO",
+                          "K2O",
+                          "MgO",
+                          "MnO",
+                          "Na2O",
+                          "P2O5",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "reason": "input_composition_projected",
+                        "retained_basis_melt_mass_kg": 997.8861904708707,
+                        "status": "projected"
+                      },
+                      "projected_liquidus_diagnostics": {},
+                      "projected_liquidus_status": "ok"
+                    },
+                    "backend_status": "out_of_domain",
+                    "backend_status_reason": "composition_projected",
+                    "backend_warnings": [
+                      "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                      "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                      "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "MAGEMin: native fO2_log=-9.2192 differs from requested -9; one QFM correction to --buffer_n=19.852299",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-9.069836 differs from requested -9; one QFM correction to --buffer_n=17.129951",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-8.965841 differs from requested -9; one QFM correction to --buffer_n=14.785764",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                      "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                    ],
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "magemin-shadow",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": 1.0,
+                    "liquidus_T_C": 1370.3125,
+                    "liquidus_T_K": 1643.4625,
+                    "mode": "subprocess",
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phases_present": [],
+                    "solidus_T_C": 918.75
+                  },
+                  "provider": "magemin-shadow",
+                  "reason": "composition_projected; composition_projected",
+                  "status": "out_of_domain"
+                },
+                {
+                  "diagnostic": {
+                    "activity_coefficients": {},
+                    "applied_fe3fet": 0.0,
+                    "backend_diagnostics": {
+                      "authority": "extrapolated",
+                      "backend_status_reason": "not_converged",
+                      "certified_band": {
+                        "sio2_wt_pct": [
+                          30.0,
+                          80.0
+                        ],
+                        "temperature_K": [
+                          1073.15,
+                          1700.0
+                        ]
+                      },
+                      "commissioning_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "failed_constraints": [
+                          "temperature_range"
+                        ],
+                        "kind": "engine_commissioning",
+                        "reason": "temperature_range",
+                        "sio2_wt_pct": 45.805455481214615,
+                        "temperature_K": 2473.15,
+                        "warnings": [
+                          "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                        ]
+                      },
+                      "completed_rows": 0,
+                      "condensed_phase_reference_pressure_bar": 1.0,
+                      "last_completed_temperature_C": null,
+                      "physical_overhead_pressure_bar": 0.001,
+                      "reason": "incomplete_cooling_path"
+                    },
+                    "backend_status": "not_converged",
+                    "backend_status_reason": "not_converged",
+                    "backend_warnings": [
+                      "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                      "cooling start is not superliquidus"
+                    ],
+                    "bulk_composition_wt_pct": {},
+                    "chem_potentials": null,
+                    "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "fO2_log": null,
+                    "fe_redox_policy": "intrinsic",
+                    "intrinsic_fO2_log": -9.0,
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "alphamelts-diagnostic",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": null,
+                    "liquid_fraction_path": [],
+                    "liquidus_T_C": null,
+                    "liquidus_T_K": null,
+                    "mode": "subprocess",
+                    "phase_affinities": null,
+                    "phase_compositions": {},
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phase_thermo": {},
+                    "phases_present": [],
+                    "solid_composition_wt_pct": {},
+                    "solidus_T_C": null,
+                    "system_chisqr": null,
+                    "system_dVdP": null,
+                    "system_dVdT": null,
+                    "system_enthalpy": null,
+                    "system_entropy": null,
+                    "system_fO2_delta_QFM": null,
+                    "system_heat_capacity_Cp": null,
+                    "system_phi": null,
+                    "system_solid_density_rhos": null,
+                    "system_volume": null
+                  },
+                  "provider": "alphamelts-diagnostic",
+                  "reason": "not_converged; not_converged; incomplete_cooling_path",
+                  "status": "not_converged"
+                }
+              ],
+              "realized_provider": null,
+              "requested_provider_order": [
+                "magemin-shadow",
+                "alphamelts-diagnostic"
+              ]
             },
             "liquidus_T_C": 1370.3125,
             "solidus_T_C": 918.75,
@@ -920,7 +1805,7 @@
     "payload": {
       "O2_kg": 0.0,
       "c0_exit": {
-        "C_evac_kg_hr": 4.794582587158566,
+        "C_evac_kg_hr": 4.794586116633707,
         "C_evac_temperature_C": 950.0,
         "M_C0_gas_kg": 0.0,
         "Na_plus_K_feed_loss_fraction": 6.3923327179535005e-06,
@@ -1184,6 +2069,44 @@
           },
           "provider": "magemin",
           "redox": {
+            "alphamelts_reference_pressure": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "sio2_wt_pct": [
+                  30.0,
+                  80.0
+                ],
+                "temperature_K": [
+                  1073.15,
+                  1700.0
+                ]
+              },
+              "commissioning_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "failed_constraints": [
+                  "temperature_range"
+                ],
+                "kind": "engine_commissioning",
+                "reason": "temperature_range",
+                "sio2_wt_pct": 45.805455481214615,
+                "temperature_K": 2473.15,
+                "warnings": [
+                  "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                ]
+              },
+              "condensed_phase_reference_pressure_bar": 1.0,
+              "physical_overhead_pressure_bar": 0.009
+            },
             "composition_projected_notice": {
               "authority": "extrapolated",
               "certified_band": {
@@ -1215,6 +2138,263 @@
               ],
               "kind": "composition_projected",
               "reason": "composition_projected"
+            },
+            "gate_provider_step_down": {
+              "failed_providers": [
+                {
+                  "diagnostic": {
+                    "backend_diagnostics": {
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "composition_projected_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "bulk_components": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "database": "ig",
+                          "engine": "magemin"
+                        },
+                        "dropped_components": [
+                          {
+                            "component": "MnO",
+                            "mass_fraction": 0.0020586721564590836
+                          },
+                          {
+                            "component": "P2O5",
+                            "mass_fraction": 0.0010293360782295418
+                          }
+                        ],
+                        "kind": "composition_projected",
+                        "reason": "composition_projected"
+                      },
+                      "exception_class": "LiquidusSampleError",
+                      "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "input_composition_projection": {
+                        "backend": "MAGEMin",
+                        "bulk_dropped_wt_pct": 0.3088008234688715,
+                        "bulk_projected_sum_wt_pct": 99.69119917653114,
+                        "bulk_source_sum_wt_pct": 100.00000000000001,
+                        "composition_projected": {
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_mass_fraction": 0.0030880082346887144
+                        },
+                        "dropped_bulk_components": [
+                          "MnO",
+                          "P2O5"
+                        ],
+                        "dropped_component_mass_fractions": {
+                          "MnO": 0.0020586721564590836,
+                          "P2O5": 0.0010293360782295418
+                        },
+                        "dropped_mass_fraction": 0.0030880082346887144,
+                        "input_melt_mass_kg": 997.8861904708707,
+                        "magemin_bulk_order": [
+                          "SiO2",
+                          "Al2O3",
+                          "CaO",
+                          "MgO",
+                          "FeOt",
+                          "K2O",
+                          "Na2O",
+                          "TiO2",
+                          "O",
+                          "Cr2O3",
+                          "H2O"
+                        ],
+                        "magemin_bulk_projected_components": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeOt",
+                          "K2O",
+                          "MgO",
+                          "Na2O",
+                          "O",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "magemin_database": "ig",
+                        "magemin_projected_composition_wt_pct": {
+                          "Al2O3": 13.896037056098818,
+                          "CaO": 11.32269686052496,
+                          "Cr2O3": 0.3602676273803397,
+                          "FeOt": 15.092949718385377,
+                          "K2O": 0.1029336078229542,
+                          "MgO": 9.264024704065879,
+                          "Na2O": 0.4117344312918168,
+                          "O": 1.8910955724020682,
+                          "SiO2": 45.80545548121462,
+                          "TiO2": 1.5440041173443129
+                        },
+                        "merged_bulk_components": [
+                          "FeO->FeOt+O"
+                        ],
+                        "projected_species": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeO",
+                          "K2O",
+                          "MgO",
+                          "MnO",
+                          "Na2O",
+                          "P2O5",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "reason": "input_composition_projected",
+                        "retained_basis_melt_mass_kg": 997.8861904708707,
+                        "status": "projected"
+                      },
+                      "projected_liquidus_diagnostics": {},
+                      "projected_liquidus_status": "ok"
+                    },
+                    "backend_status": "out_of_domain",
+                    "backend_status_reason": "composition_projected",
+                    "backend_warnings": [
+                      "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                      "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                      "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "MAGEMin: native fO2_log=-9.219198 differs from requested -9; one QFM correction to --buffer_n=19.852297",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-9.069834 differs from requested -9; one QFM correction to --buffer_n=17.129949",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-8.96584 differs from requested -9; one QFM correction to --buffer_n=14.785763",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                      "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                    ],
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "magemin-shadow",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": 1.0,
+                    "liquidus_T_C": 1370.3125,
+                    "liquidus_T_K": 1643.4625,
+                    "mode": "subprocess",
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phases_present": [],
+                    "solidus_T_C": 918.75
+                  },
+                  "provider": "magemin-shadow",
+                  "reason": "composition_projected; composition_projected",
+                  "status": "out_of_domain"
+                },
+                {
+                  "diagnostic": {
+                    "activity_coefficients": {},
+                    "applied_fe3fet": 0.0,
+                    "backend_diagnostics": {
+                      "authority": "extrapolated",
+                      "backend_status_reason": "not_converged",
+                      "certified_band": {
+                        "sio2_wt_pct": [
+                          30.0,
+                          80.0
+                        ],
+                        "temperature_K": [
+                          1073.15,
+                          1700.0
+                        ]
+                      },
+                      "commissioning_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "failed_constraints": [
+                          "temperature_range"
+                        ],
+                        "kind": "engine_commissioning",
+                        "reason": "temperature_range",
+                        "sio2_wt_pct": 45.805455481214615,
+                        "temperature_K": 2473.15,
+                        "warnings": [
+                          "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                        ]
+                      },
+                      "completed_rows": 0,
+                      "condensed_phase_reference_pressure_bar": 1.0,
+                      "last_completed_temperature_C": null,
+                      "physical_overhead_pressure_bar": 0.009,
+                      "reason": "incomplete_cooling_path"
+                    },
+                    "backend_status": "not_converged",
+                    "backend_status_reason": "not_converged",
+                    "backend_warnings": [
+                      "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                      "cooling start is not superliquidus"
+                    ],
+                    "bulk_composition_wt_pct": {},
+                    "chem_potentials": null,
+                    "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "fO2_log": null,
+                    "fe_redox_policy": "intrinsic",
+                    "intrinsic_fO2_log": -9.0,
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "alphamelts-diagnostic",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": null,
+                    "liquid_fraction_path": [],
+                    "liquidus_T_C": null,
+                    "liquidus_T_K": null,
+                    "mode": "subprocess",
+                    "phase_affinities": null,
+                    "phase_compositions": {},
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phase_thermo": {},
+                    "phases_present": [],
+                    "solid_composition_wt_pct": {},
+                    "solidus_T_C": null,
+                    "system_chisqr": null,
+                    "system_dVdP": null,
+                    "system_dVdT": null,
+                    "system_enthalpy": null,
+                    "system_entropy": null,
+                    "system_fO2_delta_QFM": null,
+                    "system_heat_capacity_Cp": null,
+                    "system_phi": null,
+                    "system_solid_density_rhos": null,
+                    "system_volume": null
+                  },
+                  "provider": "alphamelts-diagnostic",
+                  "reason": "not_converged; not_converged; incomplete_cooling_path",
+                  "status": "not_converged"
+                }
+              ],
+              "realized_provider": null,
+              "requested_provider_order": [
+                "magemin-shadow",
+                "alphamelts-diagnostic"
+              ]
             },
             "liquidus_T_C": 1370.3125,
             "solidus_T_C": 918.75,
@@ -1342,6 +2522,44 @@
             },
             "provider": "magemin",
             "redox": {
+              "alphamelts_reference_pressure": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "commissioning_notice": {
+                  "authority": "extrapolated",
+                  "certified_band": {
+                    "sio2_wt_pct": [
+                      30.0,
+                      80.0
+                    ],
+                    "temperature_K": [
+                      1073.15,
+                      1700.0
+                    ]
+                  },
+                  "failed_constraints": [
+                    "temperature_range"
+                  ],
+                  "kind": "engine_commissioning",
+                  "reason": "temperature_range",
+                  "sio2_wt_pct": 45.805455481214615,
+                  "temperature_K": 2473.15,
+                  "warnings": [
+                    "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                  ]
+                },
+                "condensed_phase_reference_pressure_bar": 1.0,
+                "physical_overhead_pressure_bar": 0.009
+              },
               "composition_projected_notice": {
                 "authority": "extrapolated",
                 "certified_band": {
@@ -1373,6 +2591,263 @@
                 ],
                 "kind": "composition_projected",
                 "reason": "composition_projected"
+              },
+              "gate_provider_step_down": {
+                "failed_providers": [
+                  {
+                    "diagnostic": {
+                      "backend_diagnostics": {
+                        "backend_status": "out_of_domain",
+                        "backend_status_reason": "composition_projected",
+                        "composition_projected_notice": {
+                          "authority": "extrapolated",
+                          "certified_band": {
+                            "bulk_components": [
+                              "SiO2",
+                              "Al2O3",
+                              "CaO",
+                              "MgO",
+                              "FeOt",
+                              "K2O",
+                              "Na2O",
+                              "TiO2",
+                              "O",
+                              "Cr2O3",
+                              "H2O"
+                            ],
+                            "database": "ig",
+                            "engine": "magemin"
+                          },
+                          "dropped_components": [
+                            {
+                              "component": "MnO",
+                              "mass_fraction": 0.0020586721564590836
+                            },
+                            {
+                              "component": "P2O5",
+                              "mass_fraction": 0.0010293360782295418
+                            }
+                          ],
+                          "kind": "composition_projected",
+                          "reason": "composition_projected"
+                        },
+                        "exception_class": "LiquidusSampleError",
+                        "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                        "input_composition_projection": {
+                          "backend": "MAGEMin",
+                          "bulk_dropped_wt_pct": 0.3088008234688715,
+                          "bulk_projected_sum_wt_pct": 99.69119917653114,
+                          "bulk_source_sum_wt_pct": 100.00000000000001,
+                          "composition_projected": {
+                            "dropped_component_mass_fractions": {
+                              "MnO": 0.0020586721564590836,
+                              "P2O5": 0.0010293360782295418
+                            },
+                            "dropped_components": [
+                              "MnO",
+                              "P2O5"
+                            ],
+                            "dropped_mass_fraction": 0.0030880082346887144
+                          },
+                          "dropped_bulk_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_mass_fraction": 0.0030880082346887144,
+                          "input_melt_mass_kg": 997.8861904708707,
+                          "magemin_bulk_order": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "magemin_bulk_projected_components": [
+                            "Al2O3",
+                            "CaO",
+                            "Cr2O3",
+                            "FeOt",
+                            "K2O",
+                            "MgO",
+                            "Na2O",
+                            "O",
+                            "SiO2",
+                            "TiO2"
+                          ],
+                          "magemin_database": "ig",
+                          "magemin_projected_composition_wt_pct": {
+                            "Al2O3": 13.896037056098818,
+                            "CaO": 11.32269686052496,
+                            "Cr2O3": 0.3602676273803397,
+                            "FeOt": 15.092949718385377,
+                            "K2O": 0.1029336078229542,
+                            "MgO": 9.264024704065879,
+                            "Na2O": 0.4117344312918168,
+                            "O": 1.8910955724020682,
+                            "SiO2": 45.80545548121462,
+                            "TiO2": 1.5440041173443129
+                          },
+                          "merged_bulk_components": [
+                            "FeO->FeOt+O"
+                          ],
+                          "projected_species": [
+                            "Al2O3",
+                            "CaO",
+                            "Cr2O3",
+                            "FeO",
+                            "K2O",
+                            "MgO",
+                            "MnO",
+                            "Na2O",
+                            "P2O5",
+                            "SiO2",
+                            "TiO2"
+                          ],
+                          "reason": "input_composition_projected",
+                          "retained_basis_melt_mass_kg": 997.8861904708707,
+                          "status": "projected"
+                        },
+                        "projected_liquidus_diagnostics": {},
+                        "projected_liquidus_status": "ok"
+                      },
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "backend_warnings": [
+                        "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                        "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                        "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                        "MAGEMin: native fO2_log=-9.219198 differs from requested -9; one QFM correction to --buffer_n=19.852297",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                        "MAGEMin: native fO2_log=-9.069834 differs from requested -9; one QFM correction to --buffer_n=17.129949",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                        "MAGEMin: native fO2_log=-8.96584 differs from requested -9; one QFM correction to --buffer_n=14.785763",
+                        "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                        "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                      ],
+                      "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                      "kernel_fallback_reason": "no_authoritative_provider",
+                      "kernel_fallback_requested_provider": "none",
+                      "kernel_fallback_used": "magemin-shadow",
+                      "liquid_composition_wt_pct": {},
+                      "liquid_fraction": 1.0,
+                      "liquidus_T_C": 1370.3125,
+                      "liquidus_T_K": 1643.4625,
+                      "mode": "subprocess",
+                      "phase_masses_kg": {},
+                      "phase_modes_wt_pct": {},
+                      "phases_present": [],
+                      "solidus_T_C": 918.75
+                    },
+                    "provider": "magemin-shadow",
+                    "reason": "composition_projected; composition_projected",
+                    "status": "out_of_domain"
+                  },
+                  {
+                    "diagnostic": {
+                      "activity_coefficients": {},
+                      "applied_fe3fet": 0.0,
+                      "backend_diagnostics": {
+                        "authority": "extrapolated",
+                        "backend_status_reason": "not_converged",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "commissioning_notice": {
+                          "authority": "extrapolated",
+                          "certified_band": {
+                            "sio2_wt_pct": [
+                              30.0,
+                              80.0
+                            ],
+                            "temperature_K": [
+                              1073.15,
+                              1700.0
+                            ]
+                          },
+                          "failed_constraints": [
+                            "temperature_range"
+                          ],
+                          "kind": "engine_commissioning",
+                          "reason": "temperature_range",
+                          "sio2_wt_pct": 45.805455481214615,
+                          "temperature_K": 2473.15,
+                          "warnings": [
+                            "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                          ]
+                        },
+                        "completed_rows": 0,
+                        "condensed_phase_reference_pressure_bar": 1.0,
+                        "last_completed_temperature_C": null,
+                        "physical_overhead_pressure_bar": 0.009,
+                        "reason": "incomplete_cooling_path"
+                      },
+                      "backend_status": "not_converged",
+                      "backend_status_reason": "not_converged",
+                      "backend_warnings": [
+                        "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                        "cooling start is not superliquidus"
+                      ],
+                      "bulk_composition_wt_pct": {},
+                      "chem_potentials": null,
+                      "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                      "fO2_log": null,
+                      "fe_redox_policy": "intrinsic",
+                      "intrinsic_fO2_log": -9.0,
+                      "kernel_fallback_reason": "no_authoritative_provider",
+                      "kernel_fallback_requested_provider": "none",
+                      "kernel_fallback_used": "alphamelts-diagnostic",
+                      "liquid_composition_wt_pct": {},
+                      "liquid_fraction": null,
+                      "liquid_fraction_path": [],
+                      "liquidus_T_C": null,
+                      "liquidus_T_K": null,
+                      "mode": "subprocess",
+                      "phase_affinities": null,
+                      "phase_compositions": {},
+                      "phase_masses_kg": {},
+                      "phase_modes_wt_pct": {},
+                      "phase_thermo": {},
+                      "phases_present": [],
+                      "solid_composition_wt_pct": {},
+                      "solidus_T_C": null,
+                      "system_chisqr": null,
+                      "system_dVdP": null,
+                      "system_dVdT": null,
+                      "system_enthalpy": null,
+                      "system_entropy": null,
+                      "system_fO2_delta_QFM": null,
+                      "system_heat_capacity_Cp": null,
+                      "system_phi": null,
+                      "system_solid_density_rhos": null,
+                      "system_volume": null
+                    },
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "not_converged; not_converged; incomplete_cooling_path",
+                    "status": "not_converged"
+                  }
+                ],
+                "realized_provider": null,
+                "requested_provider_order": [
+                  "magemin-shadow",
+                  "alphamelts-diagnostic"
+                ]
               },
               "liquidus_T_C": 1370.3125,
               "solidus_T_C": 918.75,
@@ -1830,6 +3305,44 @@
           },
           "provider": "magemin",
           "redox": {
+            "alphamelts_reference_pressure": {
+              "authority": "extrapolated",
+              "certified_band": {
+                "sio2_wt_pct": [
+                  30.0,
+                  80.0
+                ],
+                "temperature_K": [
+                  1073.15,
+                  1700.0
+                ]
+              },
+              "commissioning_notice": {
+                "authority": "extrapolated",
+                "certified_band": {
+                  "sio2_wt_pct": [
+                    30.0,
+                    80.0
+                  ],
+                  "temperature_K": [
+                    1073.15,
+                    1700.0
+                  ]
+                },
+                "failed_constraints": [
+                  "temperature_range"
+                ],
+                "kind": "engine_commissioning",
+                "reason": "temperature_range",
+                "sio2_wt_pct": 45.805455481214615,
+                "temperature_K": 2473.15,
+                "warnings": [
+                  "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                ]
+              },
+              "condensed_phase_reference_pressure_bar": 1.0,
+              "physical_overhead_pressure_bar": 0.009
+            },
             "composition_projected_notice": {
               "authority": "extrapolated",
               "certified_band": {
@@ -1861,6 +3374,263 @@
               ],
               "kind": "composition_projected",
               "reason": "composition_projected"
+            },
+            "gate_provider_step_down": {
+              "failed_providers": [
+                {
+                  "diagnostic": {
+                    "backend_diagnostics": {
+                      "backend_status": "out_of_domain",
+                      "backend_status_reason": "composition_projected",
+                      "composition_projected_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "bulk_components": [
+                            "SiO2",
+                            "Al2O3",
+                            "CaO",
+                            "MgO",
+                            "FeOt",
+                            "K2O",
+                            "Na2O",
+                            "TiO2",
+                            "O",
+                            "Cr2O3",
+                            "H2O"
+                          ],
+                          "database": "ig",
+                          "engine": "magemin"
+                        },
+                        "dropped_components": [
+                          {
+                            "component": "MnO",
+                            "mass_fraction": 0.0020586721564590836
+                          },
+                          {
+                            "component": "P2O5",
+                            "mass_fraction": 0.0010293360782295418
+                          }
+                        ],
+                        "kind": "composition_projected",
+                        "reason": "composition_projected"
+                      },
+                      "exception_class": "LiquidusSampleError",
+                      "exception_message": "MAGEMin: database 'ig' merged FeO->FeOt+O; MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5; MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "input_composition_projection": {
+                        "backend": "MAGEMin",
+                        "bulk_dropped_wt_pct": 0.3088008234688715,
+                        "bulk_projected_sum_wt_pct": 99.69119917653114,
+                        "bulk_source_sum_wt_pct": 100.00000000000001,
+                        "composition_projected": {
+                          "dropped_component_mass_fractions": {
+                            "MnO": 0.0020586721564590836,
+                            "P2O5": 0.0010293360782295418
+                          },
+                          "dropped_components": [
+                            "MnO",
+                            "P2O5"
+                          ],
+                          "dropped_mass_fraction": 0.0030880082346887144
+                        },
+                        "dropped_bulk_components": [
+                          "MnO",
+                          "P2O5"
+                        ],
+                        "dropped_component_mass_fractions": {
+                          "MnO": 0.0020586721564590836,
+                          "P2O5": 0.0010293360782295418
+                        },
+                        "dropped_mass_fraction": 0.0030880082346887144,
+                        "input_melt_mass_kg": 997.8861904708707,
+                        "magemin_bulk_order": [
+                          "SiO2",
+                          "Al2O3",
+                          "CaO",
+                          "MgO",
+                          "FeOt",
+                          "K2O",
+                          "Na2O",
+                          "TiO2",
+                          "O",
+                          "Cr2O3",
+                          "H2O"
+                        ],
+                        "magemin_bulk_projected_components": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeOt",
+                          "K2O",
+                          "MgO",
+                          "Na2O",
+                          "O",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "magemin_database": "ig",
+                        "magemin_projected_composition_wt_pct": {
+                          "Al2O3": 13.896037056098818,
+                          "CaO": 11.32269686052496,
+                          "Cr2O3": 0.3602676273803397,
+                          "FeOt": 15.092949718385377,
+                          "K2O": 0.1029336078229542,
+                          "MgO": 9.264024704065879,
+                          "Na2O": 0.4117344312918168,
+                          "O": 1.8910955724020682,
+                          "SiO2": 45.80545548121462,
+                          "TiO2": 1.5440041173443129
+                        },
+                        "merged_bulk_components": [
+                          "FeO->FeOt+O"
+                        ],
+                        "projected_species": [
+                          "Al2O3",
+                          "CaO",
+                          "Cr2O3",
+                          "FeO",
+                          "K2O",
+                          "MgO",
+                          "MnO",
+                          "Na2O",
+                          "P2O5",
+                          "SiO2",
+                          "TiO2"
+                        ],
+                        "reason": "input_composition_projected",
+                        "retained_basis_melt_mass_kg": 997.8861904708707,
+                        "status": "projected"
+                      },
+                      "projected_liquidus_diagnostics": {},
+                      "projected_liquidus_status": "ok"
+                    },
+                    "backend_status": "out_of_domain",
+                    "backend_status_reason": "composition_projected",
+                    "backend_warnings": [
+                      "MAGEMin: database 'ig' merged FeO->FeOt+O",
+                      "MAGEMin: database 'ig' dropped components outside documented bulk order: MnO, P2O5",
+                      "MAGEMin refused projected composition; dropped components have no documented ig endmember: MnO, P2O5",
+                      "MAGEMin: native fO2_log=-9.219198 differs from requested -9; one QFM correction to --buffer_n=19.852297",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 673.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-9.069834 differs from requested -9; one QFM correction to --buffer_n=17.129949",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 723.15 K (extrapolated)",
+                      "MAGEMin: native fO2_log=-8.96584 differs from requested -9; one QFM correction to --buffer_n=14.785763",
+                      "MAGEMin QFM initial-offset reference: out_of_certified_band at 773.15 K (extrapolated)",
+                      "MAGEMin liquidus is the projected bulk; dropped components stay a composition_projected refusal, not status=ok"
+                    ],
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "magemin-shadow",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": 1.0,
+                    "liquidus_T_C": 1370.3125,
+                    "liquidus_T_K": 1643.4625,
+                    "mode": "subprocess",
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phases_present": [],
+                    "solidus_T_C": 918.75
+                  },
+                  "provider": "magemin-shadow",
+                  "reason": "composition_projected; composition_projected",
+                  "status": "out_of_domain"
+                },
+                {
+                  "diagnostic": {
+                    "activity_coefficients": {},
+                    "applied_fe3fet": 0.0,
+                    "backend_diagnostics": {
+                      "authority": "extrapolated",
+                      "backend_status_reason": "not_converged",
+                      "certified_band": {
+                        "sio2_wt_pct": [
+                          30.0,
+                          80.0
+                        ],
+                        "temperature_K": [
+                          1073.15,
+                          1700.0
+                        ]
+                      },
+                      "commissioning_notice": {
+                        "authority": "extrapolated",
+                        "certified_band": {
+                          "sio2_wt_pct": [
+                            30.0,
+                            80.0
+                          ],
+                          "temperature_K": [
+                            1073.15,
+                            1700.0
+                          ]
+                        },
+                        "failed_constraints": [
+                          "temperature_range"
+                        ],
+                        "kind": "engine_commissioning",
+                        "reason": "temperature_range",
+                        "sio2_wt_pct": 45.805455481214615,
+                        "temperature_K": 2473.15,
+                        "warnings": [
+                          "temperature 2473.15 K outside certified band [1073.15, 1700] K"
+                        ]
+                      },
+                      "completed_rows": 0,
+                      "condensed_phase_reference_pressure_bar": 1.0,
+                      "last_completed_temperature_C": null,
+                      "physical_overhead_pressure_bar": 0.009,
+                      "reason": "incomplete_cooling_path"
+                    },
+                    "backend_status": "not_converged",
+                    "backend_status_reason": "not_converged",
+                    "backend_warnings": [
+                      "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
+                      "cooling start is not superliquidus"
+                    ],
+                    "bulk_composition_wt_pct": {},
+                    "chem_potentials": null,
+                    "engine_version": "alphamelts2 (/Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/engines/alphamelts/alphamelts-app-2.3.1-macos-arm64/alphamelts2) (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "fO2_log": null,
+                    "fe_redox_policy": "intrinsic",
+                    "intrinsic_fO2_log": -9.0,
+                    "kernel_fallback_reason": "no_authoritative_provider",
+                    "kernel_fallback_requested_provider": "none",
+                    "kernel_fallback_used": "alphamelts-diagnostic",
+                    "liquid_composition_wt_pct": {},
+                    "liquid_fraction": null,
+                    "liquid_fraction_path": [],
+                    "liquidus_T_C": null,
+                    "liquidus_T_K": null,
+                    "mode": "subprocess",
+                    "phase_affinities": null,
+                    "phase_compositions": {},
+                    "phase_masses_kg": {},
+                    "phase_modes_wt_pct": {},
+                    "phase_thermo": {},
+                    "phases_present": [],
+                    "solid_composition_wt_pct": {},
+                    "solidus_T_C": null,
+                    "system_chisqr": null,
+                    "system_dVdP": null,
+                    "system_dVdT": null,
+                    "system_enthalpy": null,
+                    "system_entropy": null,
+                    "system_fO2_delta_QFM": null,
+                    "system_heat_capacity_Cp": null,
+                    "system_phi": null,
+                    "system_solid_density_rhos": null,
+                    "system_volume": null
+                  },
+                  "provider": "alphamelts-diagnostic",
+                  "reason": "not_converged; not_converged; incomplete_cooling_path",
+                  "status": "not_converged"
+                }
+              ],
+              "realized_provider": null,
+              "requested_provider_order": [
+                "magemin-shadow",
+                "alphamelts-diagnostic"
+              ]
             },
             "liquidus_T_C": 1370.3125,
             "solidus_T_C": 918.75,
