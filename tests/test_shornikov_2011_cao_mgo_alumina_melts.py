@@ -168,7 +168,20 @@ def _render_pins(document: dict) -> None:
     )
     assert minimum["values"]["value_as_printed"] == "−31.5"
     assert minimum["values"]["value"] == "-31.5"
-    assert minimum["values"]["method_class"] == "quoted_attributed"
+    assert minimum["values"]["method_class"] == "model_derived"
+    assert minimum["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert minimum["values"]["derivation"]["method"]["locator"] == {
+        "page": 2,
+        "pdf_page_index": 1,
+        "section": "Results",
+        "figure": "1",
+        "note": "Panel d, the Gibbs-energy result.",
+    }
+    assert minimum["values"]["derivation"]["references"] == [
+        "Glushko et al. (1978–1982)",
+        "Allibert et al. (1979)",
+        "Shornikov et al. (1997)",
+    ]
     assert minimum["values"]["composition_Al2O3_mole_pct_as_printed"] == "45"
     assert minimum["values"]["T_K"] == "1960"
     assert minimum["phase"] == "l"
@@ -240,8 +253,8 @@ def test_render_pins_fail_when_migrated_evidence_class_is_mutated() -> None:
     document = deepcopy(_document())
     row = _observation(
         document,
-        "Al2O3",
-        "shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c02",
+        "CaO-MgO-Al2O3_melt",
+        "shornikov_2011_text_minimum_delta_fG1960_melt",
     )
     row["values"]["method_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):

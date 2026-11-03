@@ -35,7 +35,8 @@ def test_mogul_derived_rows_have_located_lineage_and_keep_values() -> None:
     ]
     isotope_inputs = isotope["values"]["derivation"]["raw_inputs"]
     assert isotope_inputs["state"]["value"] == "not_printed"
-    assert isotope_inputs["locator"]["page"] == 13
+    assert isotope_inputs["locator"]["page"] == 14
+    assert isotope_inputs["locator"]["pdf_page_index"] == 13
     assert isotope_inputs["locator"]["section"] == "3.9"
 
     density_parent = (
@@ -63,7 +64,8 @@ def test_mogul_derived_rows_have_located_lineage_and_keep_values() -> None:
     assert methane["derived_from"] == methane_parents
     assert methane["values"]["derivation"]["inputs"] == methane_parents
     assert methane["values"]["derivation"]["method"]["locator"] == {
-        "page": 19,
+        "page": 18,
+        "pdf_page_index": 17,
         "section": "4.3",
         "note": (
             "The paper names no external input references for this conversion; "
@@ -123,5 +125,5 @@ def test_mogul_derived_rows_have_located_lineage_and_keep_values() -> None:
         assert observation.derived_from == migrated_methane_parents
         assert observation.derivation is not None
         assert observation.derivation.method is not None
-        assert observation.derivation.method.locator.page == 19
+        assert observation.derivation.method.locator.page == 18
         assert observation.derivation.method.locator.section == "4.3"

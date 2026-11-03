@@ -29,7 +29,7 @@ species:
     - observation_id: mogul_2023_co2_isotope_ratios
       type: concentration_series
       locator:
-        published_page: 13
+        published_page: 14
         pdf_page_index: 13
         section: 3.9
         note: ratios derived from fitted LNMS CO2 isotopologue signals across 25 spectra
@@ -47,7 +47,8 @@ species:
           raw_inputs:
             state: {tag: value, value: not_printed}
             locator:
-              page: 13
+              page: 14
+              pdf_page_index: 13
               section: '3.9'
               note: The row-level isotopologue counts used to form the ratios are not printed.
         spectra: 25
@@ -109,8 +110,8 @@ species:
     - observation_id: mogul_2023_ch4_mixing_ratio_model
       type: gas_speciation
       locator:
-        published_page: 19
-        pdf_page_index: 19
+        published_page: 18
+        pdf_page_index: 17
         section: 4.3
         note: preliminary external methane conversion; upper/lower correction outcomes retained
       phase: Venus_atmosphere_CH4
@@ -138,7 +139,8 @@ species:
                 against CO2 and N2 abundances with correction for apparent
                 m/z-dependent getter efficiency.
             locator:
-              page: 19
+              page: 18
+              pdf_page_index: 17
               section: '4.3'
               note: >-
                 The paper names no external input references for this
