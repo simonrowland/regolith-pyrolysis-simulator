@@ -552,6 +552,10 @@ class Authority(StrEnum):
     CERTIFIED = "certified"
     BRIDGE = "bridge"
     EXTRAPOLATED = "extrapolated"
+    # d-333: a saturation composition supplied by the score-time owner, or by a
+    # recorded reduction of the source's own analyses. Not a scoring eligibility
+    # token; authority_allowed does not treat it as certified.
+    DERIVED = "derived"
     CONVENTION = "convention"
     REFUSED = "refused"
 
