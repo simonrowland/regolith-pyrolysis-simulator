@@ -24,10 +24,11 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import Identity
 from simulator.battery.input_provenance import (
+    phase_map_provenance,
+    printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.battery.input_provenance import printed_single_melt_evidence
-from simulator.battery.records import Composition, Derivation, Species
+from simulator.battery.records import Composition, Derivation, Locator, Species
 from simulator.battery.score import (
     _fe_redox_material,
     _input_composition_echo_detail,
@@ -420,13 +421,19 @@ def test_fe3_row_feeds_feo_t_not_the_split(monkeypatch: pytest.MonkeyPatch) -> N
     experiment = _experiment("The charge remained crystal-free.")
     material = _fe_redox_material(observation, identity, experiment)
     assert not hasattr(material, "reason")
-    assert "FeO" not in material.composition_wt
     assert "Fe2O3" not in material.composition_wt
-    assert material.composition_wt["FeO_T"] == pytest.approx(expected, abs=1e-9)
+    assert "FeO_T" not in material.composition_wt
+    assert material.composition_wt["FeO"] == pytest.approx(expected, abs=1e-9)
     assert any(
         notice.reason.startswith("input_composition_from_analysed_melt:")
+        and "FeO_T" in notice.reason
         for notice in material.notices
     )
+    from simulator.diagnostic_helpers.binary_pot_battery import composition_kg_and_mol
+
+    kg, _mol = composition_kg_and_mol(material.composition_wt)
+    assert kg["FeO"] == pytest.approx(expected / 100.0, abs=1e-9)
+    assert kg["FeO"] > 0.0
 
     seen: dict[str, dict[str, float]] = {}
     import simulator.diagnostic_helpers.binary_pot_battery as pot
@@ -466,9 +473,9 @@ def test_fe3_row_feeds_feo_t_not_the_split(monkeypatch: pytest.MonkeyPatch) -> N
         experiment=experiment,
     )
     assert prediction.refusal_reason is None
-    assert "FeO" not in seen["wt"]
     assert "Fe2O3" not in seen["wt"]
-    assert seen["wt"]["FeO_T"] == pytest.approx(expected, abs=1e-9)
+    assert "FeO_T" not in seen["wt"]
+    assert seen["wt"]["FeO"] == pytest.approx(expected, abs=1e-9)
 
 
 def test_scss_with_sulfide_passes_and_keeps_a_crystal_prediction(
@@ -542,23 +549,30 @@ def test_scss_with_sulfide_passes_and_keeps_a_crystal_prediction(
     )
 
 
-def test_single_liquid_policy_ignores_a_missing_fraction() -> None:
-    evidence = printed_single_melt_evidence(())
+def test_missing_liquid_fraction_refuses_an_unstated_printed_bulk() -> None:
+    unstated = printed_single_melt_evidence(())
+    for fraction in (None, float("nan")):
+        policy = single_phase_printed_bulk_policy(
+            provenance="printed_starting_bulk",
+            quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            liquid_fraction=fraction,
+            evidence=unstated,
+        )
+        assert policy is not None
+        assert (
+            policy.refusal
+            is RefusalReason.SINGLE_PHASE_BULK_IDENTITY_ASSEMBLAGE_UNSTATED
+        )
+    crystalline = printed_single_melt_evidence(
+        (("sample.characterization", GOROJOVSKY_CRYSTALLINE),)
+    )
+    assert crystalline.crystalline
     assert (
         single_phase_printed_bulk_policy(
             provenance="printed_starting_bulk",
             quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
             liquid_fraction=None,
-            evidence=evidence,
-        )
-        is None
-    )
-    assert (
-        single_phase_printed_bulk_policy(
-            provenance="printed_starting_bulk",
-            quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-            liquid_fraction=float("nan"),
-            evidence=evidence,
+            evidence=crystalline,
         )
         is None
     )
@@ -815,3 +829,66 @@ def test_t1593_mixture_token_passes_the_guard(tmp_path: Path) -> None:
     assert composition.input_provenance == "named_material_mixture_of_printed_starts"
     identity = _identity("SiO2", composition, role=PhaseRole.MELT)
     assert _input_composition_echo_detail(identity) is None
+
+
+def test_batched_and_nominal_match_as_words() -> None:
+    assert (
+        phase_map_provenance(Locator(table="1", note="batched charge"), None)
+        == "printed_starting_bulk"
+    )
+    assert (
+        phase_map_provenance(Locator(table="1", note="nominal bulk"), None)
+        == "printed_starting_bulk"
+    )
+    assert (
+        phase_map_provenance(
+            Locator(table="1", note="unbatched and nominally dry"),
+            None,
+        )
+        == "scored_phase_analysis"
+    )
+
+
+def test_pt_loop_hyphen_and_quench_crystals_are_not_crystal_bearing() -> None:
+    sampled = printed_single_melt_evidence(
+        (("sample.characterization", "The melt was sampled on a Pt-loop."),)
+    )
+    assert sampled.kind == "positive_sampled"
+    formed = printed_single_melt_evidence(
+        (("sample.characterization", "Crystals formed on quench."),)
+    )
+    assert formed.kind == "positive_quench"
+    assert not formed.crystalline
+    bare = printed_single_melt_evidence(
+        (("sample.characterization", "quench crystals"),)
+    )
+    assert bare.kind == "positive_quench"
+    crystalline = printed_single_melt_evidence(
+        (("sample.characterization", GOROJOVSKY_CRYSTALLINE),)
+    )
+    assert crystalline.crystalline
+
+
+def test_jin_table4_valence_rows_stamp_the_measured_glass() -> None:
+    from simulator.battery.identity import quantity_token
+
+    migrator = _load("jin-2022-cl-cr-sulfur-glass-solubility.yaml")
+    rows = [
+        item
+        for item in migrator.result.observations.values()
+        if "jin_2022_table4_cr_vi_fraction" in item.observation_id
+        and quantity_token(item.identity) is Quantity.VALENCE_RATIO
+    ]
+    assert len(rows) == 4
+    for observation in rows:
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.input_provenance == "scored_phase_analysis"
+        names = {name for name, _amount in composition.value.components}
+        assert "Fe2O3" in names
+        assert "FeO" not in names
+        experiment = migrator.result.experiments.get(observation.experiment_id)
+        material = _fe_redox_material(observation, observation.identity, experiment)
+        assert getattr(material, "reason", None) is (
+            RefusalReason.INPUT_PHASE_ASSEMBLAGE_UNSTATED
+        )

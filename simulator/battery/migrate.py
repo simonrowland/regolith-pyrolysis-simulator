@@ -5692,6 +5692,32 @@ def _identity_phase_role(ident_kwargs: Mapping[str, Any]) -> PhaseRole | None:
     return None
 
 
+def _stamp_promoted_point_composition(
+    composition: Composition,
+    locator: Locator | None,
+) -> Composition:
+    """Provenance for a composition copied onto a valence or density point.
+
+    The copy happens after ``_finalize_input_provenance``. The composition
+    locator is classified on its own: the point row's table is a different
+    table, and that comparison would call a measured glass a starting bulk.
+    """
+
+    if composition.input_provenance is not None:
+        return composition
+    if composition.proxy_flag == "composition_from_sample_catalog":
+        return composition
+    if composition.basis in {
+        ELEMENT_WT_PERCENT_BASIS,
+        ELEMENT_WT_PERCENT_FEO_T_BASIS,
+    }:
+        return composition
+    return composition_with_provenance(
+        composition,
+        phase_map_provenance(locator, locator),
+    )
+
+
 def _finalize_input_provenance(
     ident_kwargs: dict[str, Any],
     *,
@@ -23735,8 +23761,17 @@ class Migrator:
                         or promotes_gas_volume
                     )
                     if promotes_typed_composition:
+                        promoted = raw_composition
+                        if q_token_point in {
+                            Quantity.VALENCE_RATIO,
+                            Quantity.DENSITY,
+                        }:
+                            promoted = _stamp_promoted_point_composition(
+                                raw_composition,
+                                located_composition.locator,
+                            )
                         identity = replace(
-                            identity, composition=State.of(raw_composition)
+                            identity, composition=State.of(promoted)
                         )
                         if promotes_gas_volume:
                             gas_volume_bases = tuple(gas_inference.inputs)
@@ -23747,9 +23782,19 @@ class Migrator:
                             "components": raw_composition,
                         }
                     )
-                    if converted_composition.state.is_value:
+                    converted_state = converted_composition.state
+                    if (
+                        converted_state.is_value
+                        and isinstance(converted_state.value, Composition)
+                    ):
                         identity = replace(
-                            identity, composition=converted_composition.state
+                            identity,
+                            composition=State.of(
+                                _stamp_promoted_point_composition(
+                                    converted_state.value,
+                                    located_composition.locator,
+                                )
+                            ),
                         )
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
