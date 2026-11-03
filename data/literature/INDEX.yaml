@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 734
-  extracts: 732
+  sources: 735
+  extracts: 733
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 732
+  extracts_without_pdf: 733
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -680,6 +680,7 @@ gaps:
   - takeda-1986-liquid-copper-soda-slag
   - takeda-1990-sn-slag-matertrans
   - taniguchi-1997-feo-cas
+  - tatsumi-2004-iron-condensation
   - terashima-2026-sro-slag-activity-preprint
   - thomas-2022-chlorine-bonding-silicate-melts
   - thomas-wood-2021-chlorine-silicate-melts
@@ -40036,6 +40037,64 @@ sources:
       last_stage: acquired
       date: '2026-10-04'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: tatsumi-2004-iron-condensation
+  aliases: []
+  citation: 'Tatsumi, K., Nagahara, H., Ozawa, K., and Tachibana, S. (2004). Condensation kinetics of
+    metallic iron: an experimental study. Lunar and Planetary Science XXXV, abstract 2013.'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/tatsumi-2004-iron-condensation.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf
+      present: true
+      sha256: 74399ab05f65432d12eeeac919ad1bb12cdfc1d27f6183c5946d190aae462cae
+      matches_simulator: null
+    sidecar:
+      path: raw/tatsumi-2004-iron-condensation/sidecar.yaml
+      present: true
+    text:
+      path: text/tatsumi-2004-iron-condensation
+      exists: true
+      file_count: 13
+    tables:
+      path: tables/tatsumi-2004-iron-condensation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/tatsumi-2004-iron-condensation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/tatsumi-2004-iron-condensation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: terashima-2026-sro-slag-activity-preprint
   aliases: []
   citation: Terashima, D., Urata, K., Kobayashi, Y., Irisawa, E., Amano, M., and Kikuchi, T. (2026), “Measurement
