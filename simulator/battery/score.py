@@ -9938,10 +9938,7 @@ def _predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         )
                     )
-            elif activity.warning or (
-                activity.evidence_tier == "UNCERTIFIED"
-                and reference_state_notice is None
-            ):
+            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
