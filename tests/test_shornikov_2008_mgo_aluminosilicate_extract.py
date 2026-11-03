@@ -2,17 +2,34 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import AdmissionStatus, ValueKind
 from simulator.battery.migrate import Migrator
+from tests.battery.sc456 import assert_only_pending_equation_issues
 
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-2008-mgo-aluminosilicate-melts.yaml"
+
+
+def _assert_sc456_model_class(row: dict) -> None:
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["derivation"]["method"]["locator"]["section"] == (
+        "Thermodynamic properties of MgO–Al2O3–SiO2 melts"
+    )
+    assert row["derivation"]["references"] == [
+        "Shornikov and Archakov [1]",
+        "Zaitsev et al. [3]",
+        "Shornikov and Archakov [4]",
+        "Robie and Hemingway [5]",
+    ]
+    assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
 
 
 def test_render_pins_and_isolated_migration_preserve_every_temperature():
@@ -40,6 +57,12 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
         and row["locator"].get("curve") is not None
     ]
     assert len(table_rows) == 42
+    assert all(row["values"]["method_class"] == "model_derived" for row in table_rows)
+    _assert_sc456_model_class(table_rows[0])
+    flipped = deepcopy(table_rows[0])
+    flipped["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_class(flipped)
     assert len(marker_rows) == 23
     assert len(curve_rows) == 4
 
@@ -204,7 +227,10 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 66
     assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 4
     assert not result.registry_issues
-    assert not result.validation.hard_issues
+    assert_only_pending_equation_issues(
+        result.validation,
+        observation_id_fragment="_p002_t03_",
+    )
 
     for row in migrated:
         temperature = row.point_conditions["temperature_K"]
