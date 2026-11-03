@@ -28,7 +28,6 @@ from simulator.battery.enums import (
     UncertaintyKind,
     ValueKind,
 )
-from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.battery.identity import (
     _format_enthalpy_increment_subtype,
     log10K_from_delta_fG_kJ_mol,
@@ -70,7 +69,6 @@ from simulator.reference_data.janaf import (
     NON_DATA_MARKER_KIND,
     NON_DATA_MARKER_REASON,
     REFUSED_LAYOUT_KIND,
-    SIDECAR_PATH,
     TABLES_DIR,
     formula_composition,
     is_nist_tail_signed_repair_cell,
@@ -78,6 +76,18 @@ from simulator.reference_data.janaf import (
     load_manifest,
     load_table_document,
     table_printed_temperatures,
+)
+from simulator.reference_data.janaf_fusion import (
+    _D144_SINGLE_POLYMORPH_TABLES,
+    _FUSION_TABLES,
+    _checked_fusion_table_rows,
+    _fusion_gibbs_difference_from_points,
+    _fusion_missing_gibbs_temperatures,
+    _fusion_table_points,
+    _interpolate_formation_gibbs,
+    _interpolate_table_points,
+    _missing_node_for_interpolation,
+    _sidecar_hashes,
 )
 from tools.harvest_janaf_compilation import parse_table
 
@@ -2587,31 +2597,11 @@ class JANAFFusionEnergy:
         object.__setattr__(self, "sigma_delta_g_fus_kJ_per_mol", sigma)
 
 
-_FUSION_TABLES = {
-    "CaO": ("Ca-027", "Ca-028"),
-    "Al2O3": ("Al-096", "Al-100"),
-    # Mg-009 is the MgO(l) Gibbs function; like Al-100 and Ca-028, its
-    # observation series is phase-unknown around JANAF's GLASS <--> LIQUID row.
-    "MgO": ("Mg-008", "Mg-009"),
-    # High cristobalite is the high-temperature solid branch immediately
-    # below the accepted SiO2 melting point; the quartz table is metastable.
-    "SiO2": ("O-035", "O-038"),
-}
-
-# d-144 closed single-polymorph identity (ruling 2026-11-03). At 1 bar,
-# CaO and MgO each have exactly one crystal structure up to melting
-# (rock-salt lime / periclase), so a printed '(s)' below T_fus is that
-# structure. This is not "JANAF lists one crystal table": Al2O3 has
-# untabulated metastable gamma/delta/theta forms. Only these two table
-# ids are that identity. `_JANAF_POLYMORPH_BY_TABLE` spreads this dict;
-# do not copy the pairs.
-_D144_SINGLE_POLYMORPH_TABLES: dict[str, Polymorph] = {
-    "Ca-027": Polymorph.LIME,
-    "Mg-008": Polymorph.PERICLASE,
-}
-
 _JANAF_POLYMORPH_BY_TABLE = {
-    **_D144_SINGLE_POLYMORPH_TABLES,
+    **{
+        table_id: Polymorph(polymorph)
+        for table_id, polymorph in _D144_SINGLE_POLYMORPH_TABLES.items()
+    },
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
@@ -2634,7 +2624,7 @@ def _d144_single_polymorph(oxide: str) -> tuple[str, Polymorph] | None:
     polymorph = _D144_SINGLE_POLYMORPH_TABLES.get(solid_table)
     if polymorph is None:
         return None
-    return solid_table, polymorph
+    return solid_table, Polymorph(polymorph)
 
 
 class JANAFFusionPolymorphUnavailable(ValueError):
@@ -2826,64 +2816,12 @@ def _janaf_stable_fusion_polymorph(
     )
 
 
-# The source hashes identify the JANAF text; pin the extracted temperature-node
-# sets too so a dropped compiled row cannot silently widen interpolation.
-_FUSION_NODE_SET_SHA256 = {
-    "Al-096": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "Al-097": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "Al-098": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "Al-099": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "Al-100": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
-    "Ca-027": "0b4adb5cf7b86a053c456688e9e635947ca38276f7b703cb00062ca5f00dbb5c",
-    "Ca-028": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
-    "Mg-008": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
-    "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
-    "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
-}
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
 }
-
-
-@lru_cache(maxsize=2 * len(_FUSION_TABLES))
-def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], ...], str]:
-    rows, digest = _checked_fusion_table_rows(table_id)
-    points: list[tuple[Decimal, Decimal]] = []
-    temperatures: set[Decimal] = set()
-    for row in rows:
-        if not isinstance(row, Mapping):
-            continue
-        temperature = row.get("temperature")
-        gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping):
-            continue
-        t_value = temperature.get("value")
-        if t_value is None:
-            continue
-        t = Decimal(str(t_value))
-        temperatures.add(t)
-        g_value = gibbs.get("value") if isinstance(gibbs, Mapping) else None
-        if g_value is not None:
-            points.append((t, Decimal(str(g_value))))
-    node_set_sha256 = hashlib.sha256(
-        "\n".join(
-            str(temperature.normalize()) for temperature in sorted(temperatures)
-        ).encode()
-    ).hexdigest()
-    expected_node_set_sha256 = _FUSION_NODE_SET_SHA256.get(table_id)
-    if (
-        expected_node_set_sha256 is not None
-        and node_set_sha256 != expected_node_set_sha256
-    ):
-        raise ValueError(f"{table_id}: needed JANAF table node row missing or changed")
-    points.sort()
-    if len(points) < 2:
-        raise ValueError(f"{table_id}: JANAF table has fewer than two Gibbs points")
-    return tuple(points), digest
 
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))
@@ -2923,22 +2861,6 @@ def _fusion_entropy_points(
     table_id: str,
 ) -> tuple[tuple[tuple[Decimal, Decimal], ...], str, tuple[Decimal, ...]]:
     return _fusion_property_points(table_id, "entropy")
-
-
-def _checked_fusion_table_rows(table_id: str) -> tuple[list[Mapping], str]:
-    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
-    extraction = document.get("extraction")
-    table = document.get("table")
-    if not isinstance(extraction, Mapping) or not isinstance(table, Mapping):
-        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
-    digest = str(extraction.get("source_sha256") or "")
-    expected = _sidecar_hashes().get(f"{table_id}.txt")
-    if not digest or digest != expected:
-        raise ValueError(f"{table_id}: JANAF cache hash does not match source sidecar")
-    rows = table.get("values")
-    if not isinstance(rows, list):
-        raise ValueError(f"{table_id}: JANAF table values are missing")
-    return rows, digest
 
 
 def janaf_fusion_enthalpy(
@@ -3017,121 +2939,6 @@ def _janaf_fusion_entropy_with_crossing_reason(
     except (KeyError, ValueError) as exc:
         return delta_s, None, str(exc)
     return delta_s, crossing, None
-
-
-@lru_cache(maxsize=2 * len(_FUSION_TABLES))
-def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
-    """Return table nodes with a temperature but no formation-Gibbs value."""
-
-    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
-    table = document.get("table")
-    if not isinstance(table, Mapping):
-        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
-    rows = table.get("values")
-    if not isinstance(rows, list):
-        raise ValueError(f"{table_id}: JANAF table values are missing")
-    missing: set[Decimal] = set()
-    for row in rows:
-        if not isinstance(row, Mapping):
-            continue
-        temperature = row.get("temperature")
-        gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping):
-            continue
-        temperature_value = temperature.get("value")
-        gibbs_value = gibbs.get("value") if isinstance(gibbs, Mapping) else None
-        if temperature_value is not None and gibbs_value is None:
-            missing.add(Decimal(str(temperature_value)))
-    return tuple(sorted(missing))
-
-
-def _interpolate_formation_gibbs(
-    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
-) -> Decimal:
-    if temperature_K < points[0][0] or temperature_K > points[-1][0]:
-        raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
-    if missing_node is not None:
-        raise ValueError(
-            f"JANAF formation Gibbs interpolation spans missing grid node "
-            f"{missing_node} K at {temperature_K} K"
-        )
-    return _interpolate_table_points(points, temperature_K)
-
-
-def _interpolate_table_points(
-    points: tuple[tuple[Decimal, Decimal], ...],
-    temperature_K: Decimal,
-    *,
-    extrapolate: bool = False,
-) -> Decimal:
-    if temperature_K < points[0][0]:
-        if not extrapolate:
-            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-        left, right = points[0], points[1]
-    elif temperature_K > points[-1][0]:
-        if not extrapolate:
-            raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-        left, right = points[-2], points[-1]
-    else:
-        left, right = next(
-            (a, b)
-            for a, b in zip(points, points[1:])
-            if a[0] <= temperature_K <= b[0]
-        )
-    return left[1] + (right[1] - left[1]) * (temperature_K - left[0]) / (
-        right[0] - left[0]
-    )
-
-
-def _missing_node_for_interpolation(
-    points: tuple[tuple[Decimal, Decimal], ...],
-    missing_nodes: tuple[Decimal, ...],
-    temperature_K: Decimal,
-) -> Decimal | None:
-    if any(node_temperature == temperature_K for node_temperature, _ in points):
-        return None
-    temperatures = tuple(temperature for temperature, _ in points)
-    gaps = tuple(right - left for left, right in zip(temperatures, temperatures[1:]))
-    for gap_index, ((left, _), (right, _)) in enumerate(zip(points, points[1:])):
-        if left < temperature_K < right:
-            absent_grid_nodes = tuple(
-                Decimal(candidate)
-                for candidate in range(
-                    int(left // 100) * 100 + 100,
-                    int(right // 100) * 100 + 1,
-                    100,
-                )
-                if left < Decimal(candidate) < right
-            )
-            for node in sorted(
-                {node for node in missing_nodes if left < node < right}
-                | set(absent_grid_nodes)
-            ):
-                run_start = gap_index
-                run_end = gap_index + 1
-                while run_start > 0 and gaps[run_start - 1] in (
-                    Decimal("200"),
-                    Decimal("400"),
-                ):
-                    run_start -= 1
-                while run_end < len(gaps) and gaps[run_end] in (
-                    Decimal("200"),
-                    Decimal("400"),
-                ):
-                    run_end += 1
-                sparse_ladder = (
-                    left >= Decimal("3000")
-                    and right - left in (Decimal("200"), Decimal("400"))
-                    and run_end - run_start >= 2
-                )
-                reference_interval = (
-                    left == Decimal("298.15") and right == Decimal("500")
-                )
-                if not sparse_ladder and not reference_interval:
-                    return node
-            return None
-    return None
 
 
 @dataclass(frozen=True)
@@ -3315,9 +3122,7 @@ def _janaf_fusion_energy_for_pair(
         raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
 
     def difference(t: Decimal) -> Decimal:
-        return _interpolate_formation_gibbs(
-            liquid, t
-        ) - _interpolate_formation_gibbs(crystal, t)
+        return _fusion_gibbs_difference_from_points(crystal, liquid, t)
 
     crossings: list[Decimal] = []
     for left, right in zip(overlap, overlap[1:]):
@@ -3361,17 +3166,6 @@ def _janaf_fusion_energy_for_pair(
         liquid_table=liquid_table,
         source_sha256=(crystal_sha, liquid_sha),
     )
-
-
-def _sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
-    payload = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
-    if not isinstance(payload, Mapping) or not isinstance(payload.get("files"), list):
-        raise ValueError(f"{path}: invalid JANAF source sidecar")
-    result: dict[str, str] = {}
-    for row in payload["files"]:
-        if isinstance(row, Mapping) and row.get("name") and row.get("sha256"):
-            result[str(row["name"])] = str(row["sha256"])
-    return result
 
 
 def documents_from_raw(directory: Path) -> Iterable[Mapping[str, Any]]:
