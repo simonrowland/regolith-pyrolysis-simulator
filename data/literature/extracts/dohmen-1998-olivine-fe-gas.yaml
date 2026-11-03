@@ -49,13 +49,25 @@ source_caveats:
     row: V937
   quote: 'Molten sample: Fa74Fo26'
   note: >-
-    The table labels the V937 product as molten and states that all samples
-    were characterized after the experiments; its footnote says every run was
-    cooled at 20 °C/min. The article explicitly describes quenched fayalitic
-    glass for the V933 overgrowth, but does not say whether the V937 Fa74Fo26
-    assay was made on glass after quench or measured in situ while liquid.
-    This value stays in the full Table 1 context grid pending the phase
-    ruling; it is not yet a typed observation.
+    "Molten sample" is the run state at 1400 °C, not the measured phase of the
+    after-run assay. The row is also emitted as an observation with phase
+    unknown; the paper does not report whether the analyzed material remained
+    glass, crystallized partly, or was analyzed in situ. The footnote records
+    cooling at 20 °C/min, not a quench.
+- locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 973
+    section: Experiments
+  quote: >-
+    All samples were characterized after the experiments using X-ray diffraction
+    (XRD) (mainly to determine the oxidation states of the Fe present) and
+    electron microprobe analysis (EMPA).
+  note: >-
+    This locates the characterization after the run and identifies XRD and
+    electron microprobe analysis. The paper does not describe the V937 assay as
+    bulk wet chemistry or a defocused-beam average, so its measured phase
+    remains unknown.
 - locator:
     page: 2
     pdf_page_index: 1
@@ -559,6 +571,10 @@ experiments:
 - experiment_id: dohmen-1998-kems-v937
   method: knudsen_effusion
   locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
+  sample:
+    form:
+      state: {tag: value, value: Molten sample}
+      locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937, note: 'Run state at 1400 C, not the phase of the after-run assay.'}
   conditions:
     temperature_K:
       state: {tag: value, value: {kind: point, point: '1673.15'}}
@@ -612,6 +628,9 @@ fidelity_samples:
 - path: species.Fe.observations[dohmen_1998_table1_v929_product].values.composition_as_published
   value: Fa26Fo74
   locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V929}
+- path: species.Fe.observations[dohmen_1998_table1_v937_product].values.composition_as_published
+  value: Fa74Fo26
+  locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
 species:
   Fe:
     observations:
@@ -754,6 +773,38 @@ species:
           starting_composition:
             state: {tag: value, value: Fo100 synthetic polycrystalline forsterite}
             locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V929}
+    - observation_id: dohmen_1998_table1_v937_product
+      experiment: dohmen-1998-kems-v937
+      type: composition_series
+      phase: unknown
+      units: as printed
+      locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
+      values:
+        quantity: olivine_product_endmember_composition_not_equilibrium_phase_composition
+        method_class: measured_direct
+        T_C: '1400'
+        composition_as_published: Fa74Fo26
+        schema_gap: >-
+          Measured post-run olivine endmember composition is not asserted to be
+          an equilibrium phase composition in every Table 1 run. Quantity and
+          phase-role exclusions are documented on the V892 row; the same
+          printed-form gap applies to this product composition.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: {kind: point, point: '1673.15'}}
+            locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
+          fO2_Pa:
+            state: {tag: unknown, reason: buffer assemblage is printed but no absolute fO2 point is reported}
+            locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
+          fO2_control:
+            state: {tag: value, value: iron metal + magnetite}
+            locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: in-cell sample total pressure not published}
+            locator: {page: 3, pdf_page_index: 2, published_page: 972, section: 'Knudsen-cell experiments, Setup'}
+          starting_composition:
+            state: {tag: value, value: Fo100 synthetic polycrystalline forsterite}
+            locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V937}
     context:
     - observation_id: dohmen_1998_table1_full_grid
       type: table_record

@@ -41,10 +41,15 @@ focused test.
 | V937 | Fe + magnetite (synthetic, polycrystalline) | Fo100 (synthetic, polycrystalline) | Heat to 1400 °C at 5 °C/min; anneal 20 h | Molten sample: Fa74Fo26† | (b), page 4, row V937, columns 1–5 |
 
 The table footnotes are “Always cooled at 20 °C/min” and “Spinel formation on
-alumina crucible cell.” V937's product is kept in the table grid while the
-actual measured phase is clarified: the table calls it molten, but says all
-samples were characterized after the experiments. It does not directly state
-whether this assay was on quenched glass or was an in-situ liquid value.
+alumina crucible cell.” For V937, Table 1's “Molten sample” is recorded on its
+experiment as the run state at 1400 °C. The paper says, “All samples were
+characterized after the experiments using X-ray diffraction (XRD) (mainly to
+determine the oxidation states of the Fe present) and electron microprobe
+analysis (EMPA)” (PDF page 4 / printed page 973, Experiments). This establishes
+that the Fa74Fo26 assay was post-run. The source does not identify the
+post-cooling phase or describe the analysis as bulk wet chemistry or a
+defocused-beam average. Since the sample was cooled at 20 °C/min, the measured
+phase is stored as typed unknown; neither glass nor in-situ liquid is inferred.
 
 The starting materials are recorded per run in Table 1 positions A and B.
 These are separate solids in a diffusion couple, not a printed bulk melt
@@ -79,9 +84,11 @@ Figures 1–12 remain figure-only candidates and were not digitized. MinerU
 
 ## Typed rows and schema gaps
 
-Four Table 1 product observations (V892, V893, V914, V929) preserve the printed
-olivine endmember strings as measured-direct typed refusals. Their migrated
-phase is `cr`, temperature is known, and quantity is unknown. The exact missing
+Five Table 1 product observations (V892, V893, V914, V929, V937) preserve the
+printed olivine endmember strings as measured-direct typed refusals. V892,
+V893, V914, and V929 migrate with `cr` phase; V937 has typed-unknown measured
+phase per the controller ruling. All five have known temperature and unknown
+quantity. The exact missing
 quantity is non-equilibrium crystalline olivine endmember composition:
 `composition_series` is admitted by
 `tools/validate_literature_extracts.py::OBSERVATION_TYPES`, but it has no
@@ -97,17 +104,20 @@ equilibrated Pt–V metal and does not type these post-run olivine products.
 The measured “up to 300 μm” film thickness is retained as context with a
 schema-gap note: the closed observation types and quantity tokens do not
 provide a thickness measurement. It is not relabelled as concentration or
-pressure. V937 is preserved in the Table 1 grid but not yet emitted as an
-observation until its measured phase is settled.
+pressure. V937 is also retained as a typed observation with its measured phase
+unknown; its run state “Molten sample” and after-run characterization remain
+separately located.
 
 ## Isolated migration
 
-The real migrator on this extract produced **4 observations, 0 hard issues, and
-4 unavailable values**. All four observations have known `cr` phase and the
-printed temperature reaches both `identity.temperature_K` and the located
+The real migrator on this extract produced **5 observations, 0 hard issues, and
+5 unavailable values**. Four observations have known `cr` phase; V937 has
+typed-unknown phase. The printed temperature reaches both
+`identity.temperature_K` and the located
 `point_conditions.temperature_K`. Their linked per-run experiments retain the
-printed fO2 state, chamber pressure interval, and complete published ramp
-counts/rates. The source observation rows retain located fO2 and sample-pressure
+printed fO2 state, chamber pressure interval, complete published ramp
+counts/rates, and V937's located “Molten sample” run state. The source
+observation rows retain located fO2 and sample-pressure
 states too; the migrator exposes only temperature in `point_conditions` for
 these typed refusals. The sample-pressure state stays unknown, and the
 chamber-background interval is separately identified in the linked experiment.
@@ -118,18 +128,25 @@ available through their experiment references. The 1-atm experiment records
 retain 1300 °C, 10^-12 bar, 1 atm, and 115 h; unknown gas ratio and the absent
 duration on the 1600 °C test remain unknown.
 
-Table 1's V937 Fa74Fo26 cell is in the full seven-row context record. The
-expected store delta before its phase ruling is one work record, ten
-experiment records, four context records, and four typed-refused observations;
-no generated store files are committed.
+Table 1's V937 Fa74Fo26 cell is both in the full seven-row context record and a
+typed-unknown-phase observation. The expected store delta is one work record,
+ten experiment records, four context records, and five typed-refused
+observations; no generated store files are committed.
 
-For the first three migrated observations, the identity axes print as:
+The isolated migration printed the identity axes for the first three migrated
+observations as follows. Their descriptive typed-refusal quantity has no
+quantity profile, so the migrator does not construct comparison identity axes
+for composition, total pressure, or fO2. The source does not report one bulk
+starting-mixture composition, an in-cell total pressure, or an absolute fO2
+point for these three runs; it gives separate starting solids, no sample
+pressure, and either a buffer-relative condition or no fO2 value. Temperature
+is mapped from Table 1.
 
 | Run | Composition | Total pressure (Pa) | fO2 (Pa) | Temperature (K) |
 |---|---|---|---|---:|
-| V892 | unknown (no single starting-mixture composition) | unknown | unknown (below Fe–FeO buffer, no absolute point) | 1673.15 |
-| V893 | unknown (no single starting-mixture composition) | unknown | unknown (not reported) | 1773.15 |
-| V914 | unknown (no single starting-mixture composition) | unknown | unknown (below Fe–FeO buffer, no absolute point) | 1673.15 |
+| V892 | not mapped (A and B are separate starting solids) | not mapped (in-cell pressure not reported) | not mapped (below Fe–FeO buffer; no absolute point) | 1673.15 |
+| V893 | not mapped (A and B are separate starting solids) | not mapped (in-cell pressure not reported) | not mapped (not reported) | 1773.15 |
+| V914 | not mapped (A and B are separate starting solids) | not mapped (in-cell pressure not reported) | not mapped (below Fe–FeO buffer; no absolute point) | 1673.15 |
 
 These `composition_series` rows have no quantity profile because the quantity
 is typed-refused, so the identity axes other than temperature are unavailable
@@ -149,8 +166,9 @@ all 17 tests.
 
 The focused migration test passed all three cases, including its deliberate
 Table 1 product mutation check. The extract-specific literature validator
-passed, and the repo-wide fidelity-sample parameterization passed all 637
-cases. This extract's fidelity case was rerun after its final edits and passed.
+passed. The repo-wide fidelity-sample parameterization has 637 extract cases;
+its `-k dohmen` rerun passed both Dohmen cases, including this extract after
+the V937 addition.
 The full `tests/test_literature_extracts.py`
 run and the all-extract validator case exceeded their 300-second local caps;
 the repository suite is **UNVERIFIED-local** beyond the passing filtered
