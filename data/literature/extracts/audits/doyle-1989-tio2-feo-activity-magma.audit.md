@@ -30,6 +30,20 @@ The layout text mangles the model equations in the theory section. The PDF p. 2 
 
 ## Activity method and controller ruling
 
+### Scoring-gap review (2026-11-03)
+
+The paper does print the method for the 167 Table 1A activities: samples are
+equilibrated with reagent-grade metallic iron under controlled oxygen fugacity
+at 1600 K, and the activity is calculated from the resulting oxygen fugacity
+using Equation (8) (PDF p. 3 / printed p. 2633, “Control of the activity of
+FeO”). This is gas equilibration with an iron buffer, not Knudsen effusion.
+The closed `MethodToken` vocabulary has no gas-equilibration token. Its
+`static_equilibrium` token is used for static closed-vessel pressure
+measurements, while `quench_equilibration` would conflate the activity method
+with the later quench and glass analysis. A controller ruling is required
+before binding the worklist’s `experiment.method` field or expanding the
+public method schema.
+
 Equation (8) is printed as `a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837)` and specifies absolute temperature. The text says that the activity follows from equilibrium of metallic Fe with O2/FeO and a known equilibrium constant. Gas fugacities are calculated by Brinkley's method using the Van Zeggern and Storey algorithm; the paper assumes ideal gases. The standard state is explicitly “molten Fe0.947O.” Temperature accuracy is better than ±2 K; Tables 1A and 1B caption the experiments at 1600±2 K.
 
 Table 1A has 167 activity cells and per-row run-product glass compositions. Its caption says all melts coexist with metallic iron and a CO2-H2-N2 gas (Table 1B). Table 1B gives five `-log10 fO2` values keyed by the same printed a_FeO values. Controller ruling seq 8 approves joining the Table 1B condition to each Table 1A row with the exact same printed a_FeO key because of the explicit caption cross-reference. No fuzzy match is used; the exact key and cross-reference basis are recorded in each joined fO2 locator. All 167 Table 1A keys match one of the five setpoints. The positive printed `-log10 fO2` and its shared ±0.02 header are also retained in the Table 1B context row. The pressure reference is unstated; each value has two decimal places, so the requested migrator bar default is applicable, with that unstated reference retained in the row note.
