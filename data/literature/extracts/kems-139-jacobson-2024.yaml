@@ -196,28 +196,6 @@ species:
         T_K_as_printed: 2500
         SiO_g_p_bar: 0.004541139
         SiO_g_p_bar_as_printed: '0.004541139'
-      derivation:
-        relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database in FactSage at 2500 K.
-        method:
-          state:
-            tag: value
-            value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
-          locator:
-            page: 19
-            published_page: 18
-            section: 2.5 Assignment of ion peaks in the mass spectra
-        references:
-        - Bale et al. [115]
-        - Snyder et al. [117]
-        raw_inputs:
-          state:
-            tag: value
-            value: not_printed
-          locator:
-            page: 19
-            published_page: 18
-            table: '1'
-            note: Table 1 gives the basalt composition but does not print the FactSage input files or intermediate calculation inputs.
         points:
         - species_as_printed: PO2(g)
           species_id: PO2
@@ -369,6 +347,29 @@ species:
         table_csv: tables/kems-139-jacobson-2024/t1.csv
         quote: Predicted vapor species of a lunar basalt at 2500 K (from FactSage115 calculations) compared
           to experimentally observed species reported by De Maria et al.118
+      derivation:
+        relation: Predicted vapor species and partial pressures calculated for the lunar basalt composition with the SLAG database in FactSage at 2500 K.
+        method:
+          state:
+            tag: value
+            value: Gibbs free energy minimization with the SLAG database in FactSage at 2500 K.
+          locator:
+            page: 19
+            published_page: 18
+            section: >-
+              2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; item 6: Comparison to calculated/estimated vapor pressures for the condensed phase in the Knudsen cell
+        references:
+        - Bale et al. [115]
+        - Snyder et al. [117]
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 19
+            published_page: 18
+            table: '1'
+            note: Table 1 gives the basalt composition but does not print the FactSage input files or intermediate calculation inputs.
       uncertainty:
         note: none stated; FactSage model output
     - observation_id: jacobson_2024_t1_demaria_observed_species
