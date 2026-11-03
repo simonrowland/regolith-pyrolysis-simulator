@@ -147,6 +147,23 @@ species:
         reported_status: not_reported
         note: Figure 2 prints no uncertainties.
     - observation_id: stolyarova_2013_fig2_bao_gltas_contours_model
+      derivation:
+        relation: "The Figure 2 model output is calculated according to GLTAS [50], as stated in the paper."
+        method:
+          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
+          locator:
+            published_page: "62"
+            figure: "2"
+            section: "Figure 2 caption"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: "62"
+            figure: "2"
+            section: "Figure 2 caption"
+            note: The figure does not report the numeric GLTAS model inputs for these curves.
+        references:
+        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -158,8 +175,7 @@ species:
       units: log10 activity
       values:
         quantity: BaO_GLTAS_isoactivity_contours
-        method_class: quoted_attributed
-        attribution: Stolyarova (2013), Figure 2; GLTAS [50] thermodynamic model contours
+        method_class: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
@@ -207,6 +223,23 @@ species:
         reported_status: not_reported
         note: Figure 3 prints no uncertainties.
     - observation_id: stolyarova_2013_fig3_b2o3_gltas_contours_model
+      derivation:
+        relation: "The Figure 3 model output is calculated according to GLTAS [50], as stated in the paper."
+        method:
+          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
+          locator:
+            published_page: "63"
+            figure: "3"
+            section: "Figure 3 caption"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: "63"
+            figure: "3"
+            section: "Figure 3 caption"
+            note: The figure does not report the numeric GLTAS model inputs for these curves.
+        references:
+        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -219,8 +252,7 @@ species:
       units: log10 activity
       values:
         quantity: B2O3_GLTAS_isoactivity_contours
-        method_class: quoted_attributed
-        attribution: Stolyarova (2013), Figure 3; GLTAS [50] thermodynamic model contours
+        method_class: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
@@ -267,6 +299,23 @@ species:
         reported_status: not_reported
         note: Figure 4 prints no uncertainties.
     - observation_id: stolyarova_2013_fig4_sio2_gltas_contours_model
+      derivation:
+        relation: "The Figure 4 model output is calculated according to GLTAS [50], as stated in the paper."
+        method:
+          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
+          locator:
+            published_page: "63"
+            figure: "4"
+            section: "Figure 4 caption"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: "63"
+            figure: "4"
+            section: "Figure 4 caption"
+            note: The figure does not report the numeric GLTAS model inputs for these curves.
+        references:
+        - "GLTAS [50], as cited in the figure caption."
       type: activity_coefficient
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -278,8 +327,7 @@ species:
       units: log10 activity
       values:
         quantity: SiO2_GLTAS_isoactivity_contours
-        method_class: quoted_attributed
-        attribution: Stolyarova (2013), Figure 4; GLTAS [50] thermodynamic model contours
+        method_class: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
@@ -324,6 +372,23 @@ species:
         reported_status: not_reported
         note: Figure 5 prints no uncertainties.
     - observation_id: stolyarova_2013_fig5_gibbs_gltas_contours_model
+      derivation:
+        relation: "The Figure 5 model output is calculated according to GLTAS [50], as stated in the paper."
+        method:
+          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
+          locator:
+            published_page: "64"
+            figure: "5"
+            section: "Figure 5 caption"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: "64"
+            figure: "5"
+            section: "Figure 5 caption"
+            note: The figure does not report the numeric GLTAS model inputs for these curves.
+        references:
+        - "GLTAS [50], as cited in the figure caption."
       type: gibbs_table
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -335,8 +400,7 @@ species:
       units: not stated in figure or caption
       values:
         quantity: GLTAS_Gibbs_energy_of_formation_contours
-        method_class: quoted_attributed
-        attribution: Stolyarova (2013), Figure 5; GLTAS [50] thermodynamic model contours
+        method_class: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
@@ -353,6 +417,23 @@ species:
       uncertainty:
         note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
     - observation_id: stolyarova_2013_fig6_gibbs_gltas_model_figure_only
+      derivation:
+        relation: "The Figure 6 model output is calculated according to GLTAS [50], as stated in the paper."
+        method:
+          state: {tag: value, value: "General Lattice Theory of Associated Solutions (GLTAS)"}
+          locator:
+            published_page: "65"
+            figure: "6"
+            section: "Figure 6 caption"
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: "65"
+            figure: "6"
+            section: "Figure 6 caption"
+            note: The figure does not report the numeric GLTAS model inputs for these curves.
+        references:
+        - "GLTAS [50], as cited in the figure caption."
       type: gibbs_table
       locator:
         source_path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
@@ -364,8 +445,7 @@ species:
       units: kJ/mol as printed on the figure y axis
       values:
         quantity: GLTAS_Gibbs_energy_curves
-        method_class: quoted_attributed
-        attribution: Stolyarova (2013), Figure 6; GLTAS [50] thermodynamic model curves
+        method_class: model_derived
         evidence_kind: model
         evidence_class: thermodynamic_model_output
         measurement_status: model_output_not_measurement
