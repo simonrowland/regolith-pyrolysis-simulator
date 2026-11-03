@@ -18386,11 +18386,20 @@ def test_filtered_score_context_resolves_cross_source_validation_parent(
     )
 
 
-def _printed_diameter_experiment(diameter: Value, *, kn: Decimal | None = None):
+def _printed_diameter_experiment(
+    diameter: Value,
+    *,
+    kn: Decimal | None = None,
+    inference: Derivation | None = None,
+    located: bool = True,
+    calibrated: bool = False,
+    clausing: Decimal | None = None,
+):
     experiment = F.kems_experiment(
-        orifice_area=None, clausing=None, kn=kn, calibrated=False
+        orifice_area=None, clausing=None, kn=kn, calibrated=calibrated
     )
     assert experiment.apparatus is not None
+    page = F.loc(page=221, section="Experimental")
     return replace(
         experiment,
         apparatus=replace(
@@ -18398,8 +18407,14 @@ def _printed_diameter_experiment(diameter: Value, *, kn: Decimal | None = None):
             geometry=ApparatusGeometry(
                 orifice_diameter_m=Located(
                     State.of(diameter),
-                    locator=F.loc(page=221, section="Experimental"),
-                )
+                    locator=page if located else None,
+                    inference=inference,
+                ),
+                clausing_factor=(
+                    None
+                    if clausing is None
+                    else Located(State.of(clausing), locator=page)
+                ),
             ),
         ),
     )
@@ -18493,7 +18508,7 @@ def test_shornikov_2025_printed_orifice_interval_passes_apparatus_geometry_gate(
         )
         assert geometry.detail["missing"] == []
         assert geometry.detail["apparatus_geometry_interval_printed"] is True
-        assert geometry.detail["regime_checked_at"] == "d_max"
+        assert geometry.detail["regime_checked_at"] == "both_ends"
         assert geometry.detail["value_band"] is None
         notice = apparatus_geometry_interval_notice(
             experiment, quantity, origin=observation.observation_id
@@ -18501,7 +18516,8 @@ def test_shornikov_2025_printed_orifice_interval_passes_apparatus_geometry_gate(
         assert notice is not None
         assert notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
         assert notice.band is None
-        assert "effusion regime checked at d_max=" in notice.reason
+        assert "effusion regime checked at both ends" in notice.reason
+        assert "d_max" not in notice.reason
         assert "no value band" in notice.reason
         assert flagged_strata((notice,)) == ()
         assert observation.value.kind is ValueKind.POINT
@@ -18605,7 +18621,9 @@ def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> Non
     assert result.notice is not None
     assert result.notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
     assert result.notice.band == f"+/-{result.band_dex} dex"
-    assert "effusion regime checked at d_max=" in result.notice.reason
+    assert "geometric mean" in result.notice.reason
+    assert "effusion regime checked" not in result.notice.reason
+    assert "d_max" not in result.notice.reason
     assert flagged_strata((result.notice,)) == ()
 
     with pytest.raises(ValueError, match="missing clausing_factor"):
@@ -18712,10 +18730,12 @@ def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
 
 
 def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
-    """Interval 0.25-0.30 mm. The coded p/d limit at d_max is 0.30 Pa.
+    """Interval 0.25-0.30 mm must pass the coded p/d limit at both ends.
 
-    0.28 Pa passes only because the check uses d_max. The same pressure
-    would fail the limit at d_min (0.25 Pa). 1 Pa fails at d_max.
+    The limit is min(10 Pa, d_m * 1000): 0.25 Pa at 0.25 mm and 0.30 Pa at
+    0.30 mm. 0.28 Pa passes the loose end and fails the strict end, so the
+    interval refuses. 0.25 Pa passes both ends. 1 Pa fails both. A point
+    0.30 mm row keeps the 0.30 Pa limit in the point-geometry test.
     """
 
     experiment = _printed_diameter_experiment(
@@ -18735,13 +18755,33 @@ def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
     check = next(
         item for item in refused.checks if item.name == "orifice_pressure_to_diameter"
     )
-    assert Decimal(check.detail["orifice_diameter_m"]) == Decimal("0.00030")
-    assert Decimal(check.detail["pressure_limit_Pa"]) == Decimal("0.30")
+    assert Decimal(check.detail["orifice_diameter_low_m"]) == Decimal("0.00025")
+    assert Decimal(check.detail["orifice_diameter_high_m"]) == Decimal("0.00030")
+    assert check.detail["regime_checked_at"] == "both_ends"
+    assert Decimal(check.detail["orifice_diameter_m"]) == Decimal("0.00025")
+    assert Decimal(check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+
+    borderline = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+    )
+    assert borderline.passed is False
+    assert borderline.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    borderline_check = next(
+        item
+        for item in borderline.checks
+        if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(borderline_check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+    assert Decimal(borderline_check.detail["in_cell_total_pressure_Pa"]) > Decimal(
+        borderline_check.detail["pressure_limit_Pa"]
+    )
 
     passed = effusion_regime_unverified(
         experiment,
         Quantity.P_PARTIAL,
-        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.25")),
     )
     assert passed.passed
     passed_check = next(
@@ -18749,7 +18789,152 @@ def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
         for item in passed.checks
         if item.name == "orifice_pressure_to_diameter"
     )
-    assert Decimal(passed_check.detail["orifice_diameter_m"]) == Decimal("0.00030")
-    assert Decimal(passed_check.detail["in_cell_total_pressure_Pa"]) < Decimal(
+    assert Decimal(passed_check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+    assert Decimal(passed_check.detail["in_cell_total_pressure_Pa"]) <= Decimal(
         passed_check.detail["pressure_limit_Pa"]
     )
+
+
+def _geometry_missing(outcome) -> list[str]:
+    return next(
+        check.detail["missing"]
+        for check in outcome.checks
+        if check.name == "geometry_determinants"
+    )
+
+
+def test_unprinted_diameter_interval_stays_underdetermined_apparatus() -> None:
+    """An interval is geometry only when printed, and only for case 1 or case 2.
+
+    Activity, activity coefficient, log10 Kf, and reference pressure keep a
+    point orifice. A point diameter does not satisfy the kinetic area
+    determinant. An area interval is not a point area.
+    """
+
+    interval = Value(
+        ValueKind.INTERVAL,
+        interval_low=Decimal("0.00025"),
+        interval_high=Decimal("0.00030"),
+    )
+    for experiment in (
+        _printed_diameter_experiment(
+            interval,
+            inference=Derivation("diameter read from a figure", (), (), "m"),
+        ),
+        _printed_diameter_experiment(interval, located=False),
+    ):
+        gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+        assert gate.passed is False
+        assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        assert _geometry_missing(gate) == ["orifice_diameter_m"]
+        geometry = next(
+            check for check in gate.checks if check.name == "geometry_determinants"
+        )
+        assert "apparatus_geometry_interval_printed" not in geometry.detail
+        assert (
+            apparatus_geometry_interval_notice(
+                experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+            )
+            is None
+        )
+        identity = replace(F.psat_identity("Ca"), quantity=Quantity.P_PARTIAL)
+        observation = F.observation(
+            "unprinted-interval",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.01"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        regime = effusion_regime_unverified(
+            experiment, Quantity.P_PARTIAL, observation=observation
+        )
+        assert regime.passed is False
+        pressure = next(
+            check
+            for check in regime.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert Decimal(pressure.detail["pressure_limit_Pa"]) == Decimal("10")
+        assert pressure.detail["limit_basis"].startswith("Drowart_standalone")
+
+    activity = _printed_diameter_experiment(
+        interval, calibrated=True, clausing=Decimal("0.8")
+    )
+    for quantity in (
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.LOG10_KF,
+        Quantity.P_REFERENCE,
+    ):
+        gate = underdetermined_apparatus(activity, quantity)
+        assert gate.passed is False, quantity
+        assert _geometry_missing(gate) == ["orifice_area_m2"], quantity
+
+    point_diameter = _printed_diameter_experiment(Value.point_of(Decimal("0.00030")))
+    point_rate = underdetermined_apparatus(point_diameter, Quantity.MASS_LOSS_RATE)
+    assert point_rate.passed is False
+    assert _geometry_missing(point_rate) == ["orifice_area_m2"]
+
+    inferred_rate = underdetermined_apparatus(
+        _printed_diameter_experiment(
+            interval,
+            inference=Derivation("diameter read from a figure", (), (), "m"),
+        ),
+        Quantity.MASS_LOSS_RATE,
+    )
+    assert inferred_rate.passed is False
+    assert _geometry_missing(inferred_rate) == ["orifice_area_m2"]
+
+    area_host = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    assert area_host.apparatus is not None
+    area_interval = replace(
+        area_host,
+        apparatus=replace(
+            area_host.apparatus,
+            geometry=ApparatusGeometry(
+                orifice_area_m2=Located(
+                    State.of(interval),
+                    locator=F.loc(page=221, section="Experimental"),
+                )
+            ),
+        ),
+    )
+    area_gate = underdetermined_apparatus(area_interval, Quantity.P_PARTIAL)
+    assert area_gate.passed is False
+    assert _geometry_missing(area_gate) == ["orifice_area_m2"]
+
+
+def test_printed_knudsen_number_notice_does_not_claim_both_ends() -> None:
+    """A printed orifice Kn is the regime check. Do not claim the diameter path."""
+
+    experiment = _printed_diameter_experiment(
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.00025"),
+            interval_high=Decimal("0.00030"),
+        ),
+        kn=Decimal("20"),
+    )
+    notice = apparatus_geometry_interval_notice(
+        experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+    )
+    assert notice is not None
+    assert "Knudsen" in notice.reason
+    assert "both ends" not in notice.reason
+    assert "d_max" not in notice.reason
+    assert notice.band is None
+    gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+    assert gate.passed
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert geometry.detail["regime_checked_at"] == "printed_orifice_kn"
+    regime = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+    )
+    assert regime.passed
+    assert regime.checks[0].name == "orifice_knudsen"

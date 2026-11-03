@@ -343,9 +343,10 @@ class NoticeKind(StrEnum):
     # Advisory. Not a flagged stratum. Extrapolation still uses
     # out_of_certified_band, which is the flagged stratum.
     DELTA_IW_FROM_IDEAL_FEO_FE_RATIO = "delta_iw_from_ideal_feo_fe_ratio"
-    # d-326: a printed study-level orifice interval. Advisory. The regime
-    # check used d_max. Case 1 carries no value band; a raw-rate reduction
-    # puts the propagated dex band on Notice.band. Not a flagged stratum.
+    # d-326: a printed study-level orifice interval. Advisory. The coded
+    # p/d regime check uses both ends of the interval. Case 1 carries no
+    # value band; a raw-rate reduction puts the propagated dex band on
+    # Notice.band. Not a flagged stratum.
     APPARATUS_GEOMETRY_INTERVAL_PRINTED = "apparatus_geometry_interval_printed"
 
 
