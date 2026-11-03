@@ -45,7 +45,127 @@ fidelity_samples:
     printed_cell: '.5'
 experiments:
 - experiment_id: table1-sample-15
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: &inoue_suito_sulfur_method_details
+    temperature:
+      state:
+        tag: value
+        value: 'experimental temperature (1 250 and 1 350 °C) was kept constant within ±2 °C by CHINO PID controller'
+      locator:
+        page: 2
+        published_page: 515
+        pdf_page_index: 1
+        section: II. Experiments, 2. Procedure
+    atmosphere:
+      state:
+        tag: value
+        value: 'an argon atmosphere was chosen in the present experiments for the slags with Na2O/SiO2=3/2 and 1/1'
+      locator:
+        page: 2
+        published_page: 515
+        pdf_page_index: 1
+        section: II. Experiments, 2. Procedure
+    gas_mixture:
+      state:
+        tag: value
+        value: 'Argon gas with a flow rate of 200 ml/min was introduced after drying by phosphorus pentoxide and deoxidizing by copper net at 400 °C'
+      locator:
+        page: 2
+        published_page: 515
+        pdf_page_index: 1
+        section: II. Experiments, 2. Procedure
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The procedure reports the gas flow and crucible but does not report an imposed or measured oxygen fugacity.
+      locator:
+        page: 2
+        published_page: 515
+        pdf_page_index: 1
+        section: II. Experiments, 2. Procedure
+    crucible:
+      magnesia:
+        state:
+          tag: value
+          value: 'a fused magnesia crucible'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 2. Procedure
+      graphite:
+        state:
+          tag: value
+          value: 'a graphite crucible'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 2. Procedure
+    equilibration_time:
+      state:
+        tag: value
+        value: 'It was found that the equilibrium attained within 10 min for the slag of Na2O/SiO2=3/2 and 20 min for that of Na2O/SiO2=1/1, but it did not attain within 120 min for the slag of Na2O/SiO2=2/3 and 240 min for Na2O/SiO2=1/3. Therefore, the stirring by an alumina rod was made in a graphite crucible for 10, 20, 60, and 120 min corresponding to the slags with the compositions of Na2O/SiO2 and (Na2O+CaO)/SiO2=3/2, 1/1, 2/3, and 1/3, respectively.'
+      locator:
+        page: 3
+        published_page: 517
+        pdf_page_index: 2
+        section: III. Results and Discussion, 2. Attainment of Equilibrium
+    quench:
+      state:
+        tag: unknown
+        reason: No quench or cooling step is stated in this article.
+      locator:
+        page: 2
+        published_page: 515
+        pdf_page_index: 1
+        section: II. Experiments
+    analysis_method:
+      slag_sodium:
+        state:
+          tag: value
+          value: 'Sodium was determined by the atomic absorption spectrochemical analysis (JIS-M-8204).'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 3. Chemical Analysis
+      slag_sulfur_silica:
+        state:
+          tag: value
+          value: 'The samples of Na2O/SiO2=3/2 and 1/1 are soluble in water and mineral acid, but those of Na2O/SiO2=2/3 and 1/3 are difficult to dissolve. In the latter samples, total sulfur was determined by gravimetric method of sulfur precipitated as barium sulfate (JIS-M-8217) and silica was determined gravimetrically by dehydration (JIS-M-8214) after dissolving the samples by alkali fusion mixture (Na2CO3+NaNO3).'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 3. Chemical Analysis
+      slag_other_oxides:
+        state:
+          tag: value
+          value: 'After the removal of silica by treating slag samples in hydrofluoric acid and perchloric acid, CaO was determined by titration with EDTA (JIS-M-8221) and/or by the atomic absorption spectrochemical analysis (JIS-M-8204). MgO was determined by titration with EDTA (JIS-M-8222) and/or the atomic absorption spectrochemical analysis (JIS-M-8204). Total iron was determined by titration with EDTA and/or by the atomic absorption spectrochemical analysis and Al2O3 by the atomic absorption spectrochemical analysis (JIS-M-8204) and/or by eriochrome-cyanine R method.'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 3. Chemical Analysis
+      metal_sulfur_carbon:
+        state:
+          tag: value
+          value: 'Sulfur and carbon in metal samples were analyzed by the coulometric titration method.'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 3. Chemical Analysis
+      metal_silicon:
+        state:
+          tag: value
+          value: 'Silicon in metal was determined by the absorption spectrometry of molybdenum blue (JIS-G-1212).'
+        locator:
+          page: 2
+          published_page: 515
+          pdf_page_index: 1
+          section: II. Experiments, 3. Chemical Analysis
   locator: &id001
     page: 5
     table: '1'
@@ -66,7 +186,8 @@ experiments:
   note: MgO crucible; equilibration time 10 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-16
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id002
     page: 5
     table: '1'
@@ -87,7 +208,8 @@ experiments:
   note: MgO crucible; equilibration time 10 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-20
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id003
     page: 5
     table: '1'
@@ -108,7 +230,8 @@ experiments:
   note: MgO crucible; equilibration time 20 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-19
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id004
     page: 5
     table: '1'
@@ -129,7 +252,8 @@ experiments:
   note: MgO crucible; equilibration time 20 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-24
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id005
     page: 5
     table: '1'
@@ -150,7 +274,8 @@ experiments:
   note: MgO crucible; equilibration time 120 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-22
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id006
     page: 5
     table: '1'
@@ -171,7 +296,8 @@ experiments:
   note: MgO crucible; equilibration time 120 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-29
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id007
     page: 5
     table: '1'
@@ -192,7 +318,8 @@ experiments:
   note: MgO crucible; equilibration time 240 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-28
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id008
     page: 5
     table: '1'
@@ -213,7 +340,8 @@ experiments:
   note: MgO crucible; equilibration time 240 min. Starting charge and initial slag assays are printed in Table 1.
     No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-98
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id009
     page: 5
     table: '1'
@@ -234,7 +362,8 @@ experiments:
   note: graphite crucible; equilibration time 115 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-99
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id010
     page: 5
     table: '1'
@@ -255,7 +384,8 @@ experiments:
   note: graphite crucible; equilibration time 67 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-100
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id011
     page: 5
     table: '1'
@@ -276,7 +406,8 @@ experiments:
   note: graphite crucible; equilibration time 32 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-101
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id012
     page: 5
     table: '1'
@@ -297,7 +428,8 @@ experiments:
   note: graphite crucible; equilibration time 13 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-151
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id013
     page: 5
     table: '1'
@@ -318,7 +450,8 @@ experiments:
   note: graphite crucible; equilibration time 175 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-152
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id014
     page: 5
     table: '1'
@@ -339,7 +472,8 @@ experiments:
   note: graphite crucible; equilibration time 113 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-105
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id015
     page: 5
     table: '1'
@@ -360,7 +494,8 @@ experiments:
   note: graphite crucible; equilibration time 87 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-106
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id016
     page: 5
     table: '1'
@@ -381,7 +516,8 @@ experiments:
   note: graphite crucible; equilibration time 36 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-107
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id017
     page: 5
     table: '1'
@@ -402,7 +538,8 @@ experiments:
   note: graphite crucible; equilibration time 9 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-108
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id018
     page: 5
     table: '1'
@@ -423,7 +560,8 @@ experiments:
   note: graphite crucible; equilibration time 6 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-153
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id019
     page: 5
     table: '1'
@@ -444,7 +582,8 @@ experiments:
   note: graphite crucible; equilibration time 116 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table1-sample-154
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id020
     page: 5
     table: '1'
@@ -465,7 +604,8 @@ experiments:
   note: graphite crucible; equilibration time 55 min. Starting charge and initial slag assays are printed in Table
     1. No total pressure or absolute oxygen fugacity is stated.
 - experiment_id: table3-sample-102
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id021
     page: 7
     table: '3'
@@ -486,7 +626,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table3-sample-103
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id022
     page: 7
     table: '3'
@@ -507,7 +648,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table3-sample-104
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id023
     page: 7
     table: '3'
@@ -528,7 +670,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table3-sample-155
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id024
     page: 7
     table: '3'
@@ -549,7 +692,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table3-sample-156
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id025
     page: 7
     table: '3'
@@ -570,7 +714,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table3-sample-157
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id026
     page: 7
     table: '3'
@@ -591,7 +736,8 @@ experiments:
   note: Graphite crucible; Table 3 gives starting and final slag assays. Total pressure and absolute oxygen fugacity
     not stated.
 - experiment_id: table2-sample-98
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id027
     page: 6
     table: '2'
@@ -606,7 +752,8 @@ experiments:
       locator: *id009
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-99
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id028
     page: 6
     table: '2'
@@ -621,7 +768,8 @@ experiments:
       locator: *id010
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-100
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id029
     page: 6
     table: '2'
@@ -636,7 +784,8 @@ experiments:
       locator: *id011
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-101
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id030
     page: 6
     table: '2'
@@ -651,7 +800,8 @@ experiments:
       locator: *id012
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-151
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id031
     page: 6
     table: '2'
@@ -666,7 +816,8 @@ experiments:
       locator: *id013
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-105
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id032
     page: 6
     table: '2'
@@ -681,7 +832,8 @@ experiments:
       locator: *id015
   note: Table 2 sample corresponds to Table 1. Total pressure and absolute oxygen fugacity not stated.
 - experiment_id: table2-sample-106
-  method: static_equilibrium
+  method: quench_equilibration
+  method_detail_as_printed: *inoue_suito_sulfur_method_details
   locator: &id033
     page: 6
     table: '2'

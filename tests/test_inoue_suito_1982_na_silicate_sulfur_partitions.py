@@ -24,6 +24,49 @@ SOURCE_ID = "inoue-suito-1982-na-silicate-sulfur-partitions"
 
 def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_path: Path) -> None:
     doc = yaml.safe_load(SOURCE.read_text(encoding="utf-8"))
+    source_experiments = [
+        experiment
+        for experiment in doc["experiments"]
+        if experiment["experiment_id"].startswith(
+            ("table1-sample-", "table2-sample-", "table3-sample-")
+        )
+    ]
+    assert len(source_experiments) == 33
+    assert all(
+        experiment["method"] == "quench_equilibration"
+        for experiment in source_experiments
+    )
+    for experiment in source_experiments:
+        detail = experiment["method_detail_as_printed"]
+        assert set(detail) == {
+            "temperature",
+            "atmosphere",
+            "gas_mixture",
+            "fO2_control",
+            "crucible",
+            "equilibration_time",
+            "quench",
+            "analysis_method",
+        }
+        for key in ("temperature", "atmosphere", "gas_mixture", "equilibration_time"):
+            assert detail[key]["state"]["tag"] == "value"
+            assert detail[key]["locator"]["page"]
+        assert detail["fO2_control"]["state"]["tag"] == "unknown"
+        assert detail["fO2_control"]["state"].get("reason")
+        assert detail["quench"]["state"]["tag"] == "unknown"
+        assert detail["quench"]["state"].get("reason")
+        for group in ("crucible", "analysis_method"):
+            for item in detail[group].values():
+                assert item["state"]["tag"] == "value"
+                assert item["locator"]["page"]
+    method_detail = source_experiments[0]["method_detail_as_printed"]
+    assert method_detail["temperature"]["state"]["value"] == (
+        "experimental temperature (1 250 and 1 350 °C) was kept constant within "
+        "±2 °C by CHINO PID controller"
+    )
+    assert method_detail["quench"]["state"]["reason"] == (
+        "No quench or cooling step is stated in this article."
+    )
     mapping = yaml.safe_load(
         (ROOT / "data/literature/extracts/audits/inoue-suito-1982-na-silicate-sulfur-partitions.mapping.yaml").read_text(
             encoding="utf-8"
@@ -374,6 +417,26 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
     assert len(result.observations) == 267
     assert not result.validation.hard_issues
 
+    from simulator.battery.enums import Rail
+    from simulator.battery.score import rail_for_quantity
+
+    measured_phase_rows = [
+        row
+        for row in result.observations.values()
+        if row.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "equilibrium_phase_composition"
+    ]
+    assert len(measured_phase_rows) == 149
+    assert all(
+        result.experiments[row.experiment_id].method.value.value == "quench_equilibration"
+        and rail_for_quantity(
+            row.identity.quantity.value,
+            species_formula=row.identity.species.formula,
+        ) is Rail.MELT_ACTIVITY
+        for row in measured_phase_rows
+    )
+
     by_id = {row.observation_id.split("::", 1)[-1]: row for row in result.observations.values()}
     assert sum(row.value.kind is ValueKind.POINT for row in result.observations.values()) == 240
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 27
@@ -383,6 +446,12 @@ def test_inoue_suito_table_cells_and_migration_are_pinned_to_printed_pages(tmp_p
         plain = to_plain(row)
         assert plain["identity"]["temperature_K"]["tag"] == "value"
         assert plain["point_conditions"]
+        temperature = plain["point_conditions"]["temperature_K"]
+        assert temperature["state"]["tag"] == "value"
+        assert temperature["locator"]
+        assert Decimal(temperature["state"]["value"]) == Decimal(
+            plain["identity"]["temperature_K"]["value"]
+        )
         assert any("state" in condition and "locator" in condition for condition in plain["point_conditions"].values())
     for sample_id, expected in {"151": ".0194", "152": ".0113"}.items():
         migrated = by_id[f"inoue_suito_1982_t1_sample_{sample_id}_metal_S_metal_s_wt"]
