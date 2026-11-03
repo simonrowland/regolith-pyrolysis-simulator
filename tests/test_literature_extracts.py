@@ -7103,8 +7103,6 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
     migrator.finalize()
 
     assert migrator.result.validation is not None
-    assert not migrator.result.validation.hard_issues
-    assert not migrator.result.registry_issues
     source_rows = {
         row["observation_id"]
         for species in document["species"].values()
@@ -7150,3 +7148,5 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
                     and name != "composition"
                 ):
                     assert migrated_condition.state.tag.value == condition["state"]["tag"]
+    assert not migrator.result.registry_issues
+    assert not migrator.result.validation.hard_issues

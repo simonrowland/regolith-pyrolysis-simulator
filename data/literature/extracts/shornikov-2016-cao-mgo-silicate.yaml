@@ -31,12 +31,37 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": &shornikov2016_gibbs_derivation
+          "relation": >-
+            Gibbs formation energies were calculated in the present study within
+            ideal associated solutions theory using experimental and theoretical
+            data cited from Glushko et al. (1978–1982), Bale et al. (2009), and
+            Shornikov and Yakovlev (2015).
+          "raw_inputs":
+            "state": {"tag": "value", "value": "not_printed"}
+            "locator":
+              "page": 1
+              "pdf_page_index": 0
+              "published_page": 40
+              "section": "Thermodynamic properties of minerals and fluids"
+              "note": >-
+                The numerical values from the cited reference datasets are not
+                itemized as inputs in the paper; Table 1 reports the calculated
+                Gibbs formation energies.
+          "method":
+            "state": {"tag": "value", "value": "ideal associated solutions theory; Gibbs energy minimization method"}
+            "locator":
+              "page": 1
+              "pdf_page_index": 0
+              "published_page": 40
+              "section": "Thermodynamic properties of minerals and fluids"
+          "references":
+            - "Glushko et al. (1978–1982)"
+            - "Bale et al. (2009)"
+            - "Shornikov and Yakovlev (2015)"
         "T_K": "2000"
         "value": "-421.511"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -66,12 +91,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-409.450"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -95,12 +118,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-74.308"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -139,9 +160,67 @@
           "pdf_page_index": 1
           "figure": "1"
           "note": "The caption does not state the activity standard state (pure oxide or a stated reference)."
+      "derived_from": &shornikov2016_gibbs_inputs
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r03_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r04_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r05_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r06_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r06_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r07_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r07_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r08_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r09_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r09_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r10_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r11_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r11_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r12_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r13_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r14_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r14_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c02"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c04"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r15_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r16_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r17_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r18_c06"
+        - "shornikov_2016_cao_mgo_silicate_p002_t02_r19_c06"
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": &shornikov2016_activity_derivation
+          "relation": >-
+            The present study calculated the CaO–MgO–SiO2 activity curves by
+            Gibbs-energy minimization within ideal associated solutions theory,
+            using the Gibbs formation energies tabulated in Table 1. The model
+            parameters cite Glushko et al. (1978–1982), Bale et al. (2009), and
+            Shornikov and Yakovlev (2015).
+          "inputs": *shornikov2016_gibbs_inputs
+          "method":
+            "state": {"tag": "value", "value": "ideal associated solutions theory; Gibbs energy minimization method"}
+            "locator":
+              "page": 1
+              "pdf_page_index": 0
+              "published_page": 40
+              "section": "Thermodynamic properties of minerals and fluids"
+          "references":
+            - "Glushko et al. (1978–1982)"
+            - "Bale et al. (2009)"
+            - "Shornikov and Yakovlev (2015)"
         "formula": "CaO"
         "activity_name_as_reported": "CaO activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -149,10 +228,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -180,9 +255,11 @@
       "phase": "l"
       "units": "dimensionless"
       "standard_state": *id002
+      "derived_from": *shornikov2016_gibbs_inputs
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_activity_derivation
         "formula": "CaO"
         "activity_name_as_reported": "CaO activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -190,10 +267,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -656,12 +729,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-21.080"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -687,12 +758,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1058.628"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -722,12 +791,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1064.401"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -753,12 +820,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "77.075"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -784,12 +849,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1531.242"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -813,12 +876,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1522.120"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -844,12 +905,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1945.934"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -881,12 +940,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-57.263"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -912,12 +969,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2577.486"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -949,12 +1004,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "34.314"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -980,12 +1033,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-376.430"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1015,12 +1066,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-345.380"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -1044,12 +1093,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-108.759"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1074,9 +1121,11 @@
       "phase": "l"
       "units": "dimensionless"
       "standard_state": *id002
+      "derived_from": *shornikov2016_gibbs_inputs
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_activity_derivation
         "formula": "MgO"
         "activity_name_as_reported": "MgO activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -1084,10 +1133,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -1115,9 +1160,11 @@
       "phase": "l"
       "units": "dimensionless"
       "standard_state": *id002
+      "derived_from": *shornikov2016_gibbs_inputs
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_activity_derivation
         "formula": "MgO"
         "activity_name_as_reported": "MgO activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -1125,10 +1172,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -1401,12 +1444,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-956.936"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1438,12 +1479,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "167.228"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1469,12 +1508,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1360.399"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1504,12 +1541,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1351.811"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -1535,12 +1570,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "216.304"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1566,12 +1599,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-1461.894"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1603,12 +1634,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "265.892"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1634,12 +1663,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2038.188"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1669,12 +1696,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2065.893"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -1700,12 +1725,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "409.396"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1731,12 +1754,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2478.460"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1766,12 +1787,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2498.156"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -1797,12 +1816,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-248.438"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1828,12 +1845,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-2976.156"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1865,12 +1880,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-314.875"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -1894,12 +1907,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-550.476"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "cr"
       "per": "mol_species"
       "point_conditions":
@@ -1929,12 +1940,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-550.520"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "l"
       "per": "mol_species"
       "point_conditions":
@@ -1959,9 +1968,11 @@
       "phase": "l"
       "units": "dimensionless"
       "standard_state": *id002
+      "derived_from": *shornikov2016_gibbs_inputs
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_activity_derivation
         "formula": "SiO2"
         "activity_name_as_reported": "SiO2 activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -1969,10 +1980,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -2000,9 +2007,11 @@
       "phase": "l"
       "units": "dimensionless"
       "standard_state": *id002
+      "derived_from": *shornikov2016_gibbs_inputs
       "values":
         "quantity": "activity"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_activity_derivation
         "formula": "SiO2"
         "activity_name_as_reported": "SiO2 activity"
         "plot_ordinate_as_printed": "lg a_i"
@@ -2010,10 +2019,6 @@
         "reason": "Symbols 1-3 are calculated oxide activities of the present study. The curve is a model\
           \ curve, so its markers are not stored as numeric figure evidence."
         "unavailable_reason": "model_curve_not_sampled"
-        "attribution": "Figure 1 caption: symbols 1-3 were obtained in the present study. The text says\
-          \ the activities come from the Gibbs energies in Table 1. Those parents are the table rows already\
-          \ stored; the per-point minimizer inputs are not itemized, so this curve is not given model_derived\
-          \ lineage. No numeric points are stored."
       "T_K": "1873"
       "point_conditions":
         "temperature_K":
@@ -2950,12 +2955,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "-546.135"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -2981,12 +2984,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "121.662"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -3018,12 +3019,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "0.000"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -3055,12 +3054,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "273.851"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
@@ -3092,12 +3089,10 @@
       "mineru_flags": []
       "values":
         "quantity": "delta_fG"
-        "method_class": "quoted_attributed"
+        "method_class": "model_derived"
+        "derivation": *shornikov2016_gibbs_derivation
         "T_K": "2000"
         "value": "193.351"
-        "attribution": "Table caption: \"calculated in present study\"; formation from elements at 2000\
-          \ K. The text cites the model inputs (Glushko et al., 1978-1982; Bale et al., 2009; Shornikov\
-          \ and Yakovlev, 2015) but those parents are not stored in this extract, so the rows are quoted_attributed."
       "phase": "g"
       "per": "mol_species"
       "point_conditions":
