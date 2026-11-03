@@ -263,15 +263,12 @@ def _non_monotonic_intervals(
             if previous_direction and direction != previous_direction:
                 assert previous_change is not None
                 before, middle, before_delta = previous_change
-                totals = [
-                    value
-                    for value in (
-                        before["sum_pressure_bar"],
-                        middle["sum_pressure_bar"],
-                        upper["sum_pressure_bar"],
-                    )
-                    if value is not None
-                ]
+                # The adapter returns live statuses only after its inclusive
+                # sum-pressure guard passes; do not recalculate the ceiling.
+                sum_pressure_guard_passed = all(
+                    point["backend_status"] in {"ok", "non_authoritative"}
+                    for point in (before, middle, upper)
+                )
                 findings.append({
                     "species": species_name,
                     "previous_interval_T_K": [
@@ -282,7 +279,7 @@ def _non_monotonic_intervals(
                     ],
                     "previous_delta_log10_p_bar": before_delta,
                     "reversing_delta_log10_p_bar": delta,
-                    "below_10_bar": bool(totals) and max(totals) < 10.0,
+                    "below_10_bar": sum_pressure_guard_passed,
                 })
             previous_direction = direction
             previous_change = (lower, upper, delta)
