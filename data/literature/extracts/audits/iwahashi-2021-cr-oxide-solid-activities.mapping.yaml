@@ -4,8 +4,8 @@ source:
     of Components in CaO–SiO2–Cr2O3 Ternary System. ISIJ International, 61(5), 1404–1411.
 extraction:
   method: Two independent machine reads (MinerU and pdftotext) transcribed into the extract; table 1/2 row-column
-    assignment checked on PDF page 4, table 3 and Eq. 26/27 on page 7/6 renders. Compare output and full cell audit
-    accompany this mapping.
+    assignment checked on PDF page 4, Eq. 24 on page 5, Table 3 on page 7 and Eqs. 26/27 on page 6 renders.
+    Compare output and full cell audit accompany this mapping.
   date: '2026-11-03'
   worker: w1103cw3-iw21
   review_status: draft
@@ -74,14 +74,15 @@ tables:
   type: activity_coefficient
   quantity: activity
   unit: dimensionless, printed log10
-  evidence_class: quoted_attributed
+  evidence_class: measured_reduced
   phase: cr
   columns:
     '2': log a_CaO
     '3': log a_SiO2
     '4': log a_Cr2O3
   draft_rows: 2-9; 8 assemblages × 3 component activities = 24 numeric values
-  disposition: Calculated from listed reaction Gibbs energy changes; inputs are not stored.
+  disposition: Authors' calculated activities; each row declares its cell-specific reaction-energy inputs not printed,
+    with a page 7/Table 3 locator for lineage.
 equations:
   '14':
     page: 4
@@ -90,7 +91,7 @@ equations:
     evidence_class: quoted_attributed
     attribution: Turkdogan [2] (1980), as cited in the paper.
   '24':
-    page: 4
+    page: 5
     value: log gamma_Cr = 1.54
     quantity: activity_coefficient
     evidence_class: measured_reduced
@@ -116,7 +117,9 @@ equations:
     quantity: activity
     evidence_class: measured_reduced
 figure_candidates_not_digitized:
+- Fig. 5 XRD patterns
 - Fig. 2 phase diagram
 - Fig. 6 activity vs X_Cr
 - Fig. 7 log X_Cr vs log P_O2
 - Fig. 8(b) derived phase diagram
+- Fig. 9 ΔG°(17) vs temperature; Eq. 49 prints extrapolated a_Cr2O3 = 0.09 at 1 873 K.

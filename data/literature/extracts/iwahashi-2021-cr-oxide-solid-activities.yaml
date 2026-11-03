@@ -115,9 +115,9 @@ fidelity_samples:
 - path: species.Cr.observations[iwahashi_2021_cr_oxide_solid_activities_eq24_log_gamma_Cr].values.gamma
   value: '1.54'
   locator:
-    page: 4
-    published_page: 1407
-    pdf_page_index: 3
+    page: 5
+    published_page: 1408
+    pdf_page_index: 4
     equation: '24'
   note: Henry-law range is X_Cr < 10^-2.
 - path: species.Cr2O3.observations[iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3].values.activity
@@ -2981,9 +2981,9 @@ species:
       experiment: iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
       type: activity_coefficient
       locator:
-        page: 4
-        pdf_page_index: 3
-        published_page: 1407
+        page: 5
+        pdf_page_index: 4
+        published_page: 1408
         equation: '24'
         note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
       phase: l
@@ -2996,9 +2996,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 4
-            pdf_page_index: 3
-            published_page: 1407
+            page: 5
+            pdf_page_index: 4
+            published_page: 1408
             equation: '24'
             note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
         total_pressure_Pa:
@@ -3017,9 +3017,9 @@ species:
             tag: unknown
             reason: Eq. 24 is a regression over multiple chromium mole fractions below 10^-2, not one composition.
           locator:
-            page: 4
-            pdf_page_index: 3
-            published_page: 1407
+            page: 5
+            pdf_page_index: 4
+            published_page: 1408
             equation: '24'
             note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
         fO2_Pa:
@@ -3028,9 +3028,9 @@ species:
             reason: Eq. 24 fits measurements across multiple Table 2 oxygen potentials; no single fO2 belongs to
               the fitted coefficient.
           locator:
-            page: 4
-            pdf_page_index: 3
-            published_page: 1407
+            page: 5
+            pdf_page_index: 4
+            published_page: 1408
             equation: '24'
             note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
         fO2_control:
@@ -3038,9 +3038,9 @@ species:
             tag: value
             value: Ar + H2 + CO2 gas mixtures; values vary by Table 2 run.
           locator:
-            page: 4
-            pdf_page_index: 3
-            published_page: 1407
+            page: 5
+            pdf_page_index: 4
+            published_page: 1408
             equation: '24'
             note: Eq. 24 reports log gamma_Cr = 1.54 at 1 573 K; regression range X_Cr < 10^-2.
       derived_from:
@@ -3240,18 +3240,24 @@ species:
             table: '3'
             row_label: CaO + Ca3SiO5 + CaCr2O4
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.33'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: CaO + Ca3SiO5 + CaCr2O4
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c04
       type: activity_coefficient
       locator:
@@ -3326,18 +3332,24 @@ species:
             table: '3'
             row_label: Ca3SiO5 + Ca2SiO4 + CaCr2O4
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.31'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: Ca3SiO5 + Ca2SiO4 + CaCr2O4
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c04
       type: activity_coefficient
       locator:
@@ -3412,18 +3424,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + CaCr2O4 + Cr2O3
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: Ca2SiO4 + CaCr2O4 + Cr2O3
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c04
       type: activity_coefficient
       locator:
@@ -3498,18 +3516,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + Ca3Si2O7 + Cr2O3
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: Ca2SiO4 + Ca3Si2O7 + Cr2O3
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c04
       type: activity_coefficient
       locator:
@@ -3584,18 +3608,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c04
       type: activity_coefficient
       locator:
@@ -3670,18 +3700,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-0.35'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c04
       type: activity_coefficient
       locator:
@@ -3756,18 +3792,24 @@ species:
             table: '3'
             row_label: CaSiO3 + SiO2 + Ca3Cr2Si3O12
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-0.35'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: CaSiO3 + SiO2 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c04
       type: activity_coefficient
       locator:
@@ -3842,18 +3884,24 @@ species:
             table: '3'
             row_label: SiO2 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_Cr2O3
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: Cr2O3
         phase_assemblage_as_reported: SiO2 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid Cr2O3 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_eq26_log_activity_Cr2O3
       experiment: iwahashi-2021-cr-oxide-solid-activities-activity-equilibration-series
       type: activity_coefficient
@@ -4553,18 +4601,24 @@ species:
             table: '3'
             row_label: CaO + Ca3SiO5 + CaCr2O4
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: CaO + Ca3SiO5 + CaCr2O4
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c02
       type: activity_coefficient
       locator:
@@ -4639,18 +4693,24 @@ species:
             table: '3'
             row_label: Ca3SiO5 + Ca2SiO4 + CaCr2O4
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-0.02'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: Ca3SiO5 + Ca2SiO4 + CaCr2O4
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c02
       type: activity_coefficient
       locator:
@@ -4725,18 +4785,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + CaCr2O4 + Cr2O3
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.33'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: Ca2SiO4 + CaCr2O4 + Cr2O3
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c02
       type: activity_coefficient
       locator:
@@ -4811,18 +4877,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + Ca3Si2O7 + Cr2O3
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.66'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: Ca2SiO4 + Ca3Si2O7 + Cr2O3
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c02
       type: activity_coefficient
       locator:
@@ -4897,18 +4969,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.84'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c02
       type: activity_coefficient
       locator:
@@ -4983,18 +5061,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-2.07'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c02
       type: activity_coefficient
       locator:
@@ -5069,18 +5153,24 @@ species:
             table: '3'
             row_label: CaSiO3 + SiO2 + Ca3Cr2Si3O12
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-2.92'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: CaSiO3 + SiO2 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c02
       type: activity_coefficient
       locator:
@@ -5155,18 +5245,24 @@ species:
             table: '3'
             row_label: SiO2 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_CaO
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-3.04'
         printed_form: log10
         composition_component: CaO
         phase_assemblage_as_reported: SiO2 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid CaO component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
   SiO2:
     observations:
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r02_c03
@@ -5243,18 +5339,24 @@ species:
             table: '3'
             row_label: CaO + Ca3SiO5 + CaCr2O4
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-4.81'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: CaO + Ca3SiO5 + CaCr2O4
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r03_c03
       type: activity_coefficient
       locator:
@@ -5329,18 +5431,24 @@ species:
             table: '3'
             row_label: Ca3SiO5 + Ca2SiO4 + CaCr2O4
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-4.75'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: Ca3SiO5 + Ca2SiO4 + CaCr2O4
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r04_c03
       type: activity_coefficient
       locator:
@@ -5415,18 +5523,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + CaCr2O4 + Cr2O3
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-2.12'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: Ca2SiO4 + CaCr2O4 + Cr2O3
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r05_c03
       type: activity_coefficient
       locator:
@@ -5501,18 +5615,24 @@ species:
             table: '3'
             row_label: Ca2SiO4 + Ca3Si2O7 + Cr2O3
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.46'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: Ca2SiO4 + Ca3Si2O7 + Cr2O3
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r06_c03
       type: activity_coefficient
       locator:
@@ -5587,18 +5707,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-1.20'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: Ca3Si2O7 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r07_c03
       type: activity_coefficient
       locator:
@@ -5673,18 +5799,24 @@ species:
             table: '3'
             row_label: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '-0.85'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: Ca3Si2O7 + CaSiO3 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r08_c03
       type: activity_coefficient
       locator:
@@ -5759,18 +5891,24 @@ species:
             table: '3'
             row_label: CaSiO3 + SiO2 + Ca3Cr2Si3O12
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: CaSiO3 + SiO2 + Ca3Cr2Si3O12
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
     - observation_id: iwahashi_2021_cr_oxide_solid_activities_p007_t03_r09_c03
       type: activity_coefficient
       locator:
@@ -5845,15 +5983,21 @@ species:
             table: '3'
             row_label: SiO2 + Ca3Cr2Si3O12 + Cr2O3
             column_header: loga_SiO2
+      derivation:
+        relation: The authors calculate component activities from standard Gibbs energy changes for Reactions 17, 30, 32, 36, 38 and 40.
+        output_unit: dimensionless
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 7
+            table: "3"
+            note: The cell-specific combination of reaction energies is not printed.
       values:
         quantity: activity
-        method_class: quoted_attributed
+        method_class: measured_reduced
         admission_status: admitted
         activity: '0'
         printed_form: log10
         composition_component: SiO2
         phase_assemblage_as_reported: SiO2 + Ca3Cr2Si3O12 + Cr2O3
         standard_state_as_printed: Pure solid SiO2 component standard state.
-        attribution: Iwahashi et al. (2021), Table 3; calculated from the standard Gibbs energy changes of Reactions
-          17, 30, 32, 36, 38 and 40. Those input values are not stored in this extract, so the tabulated calculation
-          is quoted_attributed.
