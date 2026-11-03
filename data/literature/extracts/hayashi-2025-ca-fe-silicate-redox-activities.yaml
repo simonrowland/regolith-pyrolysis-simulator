@@ -1,5 +1,6 @@
 schema_version: literature_extract.v1
 source_id: hayashi-2025-ca-fe-silicate-redox-activities
+review_status: draft
 source:
   citation: Hayashi, M., Takatsuji, S., Kubuki, S., Watanabe, T., Endo, R., and Susa, M. (2025). Effect of Coordination
     Structure of Iron Ions on Iron Oxide Activity Coefficients in the CaO-SiO2-FeO-Fe2O3 Slags at 1573 K Under Oxygen
@@ -13,7 +14,6 @@ extraction:
     companion audit.
   date: '2026-11-02'
   worker: codex
-  review_status: draft
   note: 'Table 1 prints 14 sample rows, although the experimental prose says 7 of 13 samples had Mössbauer measurements.
     Only seven sample-specific valence rows are printed. No total Fe3+/Fe2+ ratio is printed: the measured Fe2+/Fetotal
     percent is typed; the octahedral and tetrahedral Fe3+/Fetotal percentages are typed-refused because no exact
@@ -30,6 +30,13 @@ fidelity_samples:
   observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r17_c15
   field: gamma
   value: '5.42'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2400068 (3 of 8)
+    table: 1(e)
+    row: E2
+    column: gammaFeO1.5
   note: Table 1(e), sample E2, physical PDF page 3 render.
 - path: species.FeO.observations[hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r16_c12].values.activity
   value: '.564'
@@ -40,9 +47,9 @@ experiments:
   method_as_printed: About 0.3 g of master sample was equilibrated in a Pt container in a SiC resistance furnace
     at 1573 K under CO-CO2 or Ar-O2 gas mixtures; the samples were quenched into iced water.
   locator:
-    page: 7
-    pdf_page_index: 6
-    published_page: 2400068 (7 of 8)
+    page: 8
+    pdf_page_index: 7
+    published_page: 2400068 (8 of 8)
     section: Equilibrium Experiments
 species:
   Fe:
@@ -62,8 +69,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '78.3'
         unit: '%'
@@ -109,9 +126,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -132,9 +149,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A1
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -165,9 +182,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A1
             section: Experimental Section
         equilibration_time_h: &id008
@@ -185,9 +202,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A1
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -197,9 +214,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -218,8 +235,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '20.7'
         unit: '%'
@@ -260,9 +287,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -283,8 +310,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '1.0'
         unit: '%'
@@ -325,9 +362,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -348,8 +385,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '69.7'
         unit: '%'
@@ -395,9 +442,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -418,9 +465,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A2
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -451,9 +498,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A2
             section: Experimental Section
         equilibration_time_h: &id017
@@ -471,9 +518,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A2
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -483,9 +530,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -504,8 +551,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '15.3'
         unit: '%'
@@ -546,9 +603,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -569,8 +626,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '15.0'
         unit: '%'
@@ -611,9 +678,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -634,8 +701,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '77.2'
         unit: '%'
@@ -681,9 +758,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -704,9 +781,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A3
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -737,9 +814,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A3
             section: Experimental Section
         equilibration_time_h: &id026
@@ -757,9 +834,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A3
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -769,9 +846,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -790,8 +867,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '11.5'
         unit: '%'
@@ -832,9 +919,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -855,8 +942,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '11.4'
         unit: '%'
@@ -897,9 +994,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -920,8 +1017,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '64.4'
         unit: '%'
@@ -967,9 +1074,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -990,9 +1097,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A4
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -1023,9 +1130,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A4
             section: Experimental Section
         equilibration_time_h: &id035
@@ -1043,9 +1150,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A4
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -1055,9 +1162,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1076,8 +1183,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '16.3'
         unit: '%'
@@ -1118,9 +1235,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1141,8 +1258,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '19.3'
         unit: '%'
@@ -1183,9 +1310,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1206,8 +1333,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '64.0'
         unit: '%'
@@ -1253,9 +1390,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -1276,9 +1413,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A5
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -1309,9 +1446,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A5
             section: Experimental Section
         equilibration_time_h: &id044
@@ -1329,9 +1466,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: A5
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -1341,9 +1478,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1362,8 +1499,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '17.4'
         unit: '%'
@@ -1404,9 +1551,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1427,8 +1574,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '18.7'
         unit: '%'
@@ -1469,9 +1626,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1492,8 +1649,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '48.2'
         unit: '%'
@@ -1539,9 +1706,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -1562,9 +1729,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C1
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -1595,9 +1762,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id046
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C1
             section: Experimental Section
         equilibration_time_h: &id054
@@ -1610,9 +1777,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C1
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -1622,9 +1789,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1643,8 +1810,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '32.5'
         unit: '%'
@@ -1685,9 +1862,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1708,8 +1885,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '19.2'
         unit: '%'
@@ -1750,9 +1937,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1773,8 +1960,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: valence_ratio
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: admitted
         value: '13.9'
         unit: '%'
@@ -1819,9 +2016,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -1842,9 +2039,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: E1
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -1875,9 +2072,9 @@ species:
             tag: value
             value: Ar–O2 gas mixture supplied by a gas supplier
           locator: &id056
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: E1
             section: Experimental Section
         equilibration_time_h: &id064
@@ -1891,9 +2088,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1912,8 +2109,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_oct_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '51.7'
         unit: '%'
@@ -1952,9 +2159,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -1975,8 +2182,18 @@ species:
       regime: quench_equilibration
       values:
         quantity: Fe3plus_tetr_over_total_Fe
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        derivation:
+          relation: Mössbauer percentages are fitted from relative subspectral absorption areas.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 4
+              pdf_page_index: 3
+              published_page: 2400068 (4 of 8)
+              figure: '1'
+              note: Figure 1 presents spectra; numerical subspectral absorption areas are not tabulated.
         admission_status: typed_refusal
         value: '34.4'
         unit: '%'
@@ -2015,9 +2232,9 @@ species:
         preservation: not_stated
         quench_direction: not_stated
         locator:
-          page: 7
-          pdf_page_index: 6
-          published_page: 2400068 (7 of 8)
+          page: 8
+          pdf_page_index: 7
+          published_page: 2400068 (8 of 8)
           section: Equilibrium Experiments
       uncertainty:
         note: No row-specific uncertainty is printed.
@@ -2038,7 +2255,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '10.4'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2057,7 +2274,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '9.70'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2076,7 +2293,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '11.7'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2095,7 +2312,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '11.1'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2114,7 +2331,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '5.87'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2133,7 +2350,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '4.48'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2152,7 +2369,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '8.98'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2171,7 +2388,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '6.64'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2190,7 +2407,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '7.15'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2209,7 +2426,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '2.20'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2228,7 +2445,7 @@ species:
         quantity_as_printed: CFe(Pt), iron concentration in the platinum container
         quantity_token: context input to the activity determination
         CFe_Pt_mass_percent_as_printed: '2.48'
-        method_class: quoted_attributed
+        method_class: measured_reduced
         attribution: Present authors, Table 1(c).
         reduction_as_printed: Calculated from X-ray intensities with background and ZAF correction using Equation
           (4); raw intensities and CFe(slag) inputs are not tabulated.
@@ -2344,11 +2561,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r07_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_A4_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r08_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -2458,11 +2675,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r08_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_A5_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r09_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -2520,9 +2737,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -2543,9 +2760,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B1
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -2576,9 +2793,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id065
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B1
             section: Experimental Section
         equilibration_time_h: &id073
@@ -2591,9 +2808,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B1
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -2663,11 +2880,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r09_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_B1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r10_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -2725,9 +2942,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -2748,9 +2965,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B2
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -2781,9 +2998,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id075
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B2
             section: Experimental Section
         equilibration_time_h: &id083
@@ -2796,9 +3013,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: B2
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -2868,11 +3085,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r10_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_B2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r11_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -2982,11 +3199,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r11_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r12_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3044,9 +3261,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -3067,9 +3284,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C2
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -3100,9 +3317,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id085
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C2
             section: Experimental Section
         equilibration_time_h: &id093
@@ -3115,9 +3332,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C2
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -3187,11 +3404,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r12_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r13_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3249,9 +3466,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -3272,9 +3489,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C3
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -3305,9 +3522,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id095
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C3
             section: Experimental Section
         equilibration_time_h: &id103
@@ -3320,9 +3537,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: C3
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -3392,11 +3609,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r13_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C3_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r14_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3454,9 +3671,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -3477,9 +3694,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: D1
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -3510,9 +3727,9 @@ species:
             tag: value
             value: CO–CO2 gas mixture; individual CO/CO2 flow ratio not printed
           locator: &id105
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: D1
             section: Experimental Section
         equilibration_time_h: &id113
@@ -3525,9 +3742,9 @@ species:
             tag: value
             value: 100 mL min-1
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: D1
             section: Experimental Section
             note: Total CO–CO2 flow as printed; per-gas flow rates are not given.
@@ -3597,11 +3814,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r14_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_D1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r15_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3658,9 +3875,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -3681,9 +3898,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: D2
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -3714,9 +3931,9 @@ species:
             tag: value
             value: Ar–O2 gas mixture supplied by a gas supplier
           locator: &id115
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: D2
             section: Experimental Section
         equilibration_time_h: &id123
@@ -3788,11 +4005,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r15_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_D2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r16_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3898,11 +4115,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r16_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_E1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r17_c12
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -3959,9 +4176,9 @@ species:
             tag: value
             value: '1573'
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: all samples
             section: Equilibrium Experiments
             note: The experiment temperature was fixed at 1573 K.
@@ -3982,9 +4199,9 @@ species:
             tag: unknown
             reason: No experimental total pressure is stated; the printed 100 mL min-1 value is gas flow, not pressure.
           locator:
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: E2
             section: Experimental Section
             note: The method reports gas flow and pO2 but no total pressure.
@@ -4015,9 +4232,9 @@ species:
             tag: value
             value: Ar–O2 gas mixture supplied by a gas supplier
           locator: &id124
-            page: 7
-            pdf_page_index: 6
-            published_page: 2400068 (7 of 8)
+            page: 8
+            pdf_page_index: 7
+            published_page: 2400068 (8 of 8)
             row: E2
             section: Experimental Section
         equilibration_time_h: &id132
@@ -4089,11 +4306,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r17_c12
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_E2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     context:
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_table1b_A4_composition
       type: typed_context
@@ -4149,7 +4366,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: B1
         composition_as_published:
           basis: mol pct
@@ -4170,7 +4388,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: B2
         composition_as_published:
           basis: mol pct
@@ -4212,7 +4431,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: C2
         composition_as_published:
           basis: mol pct
@@ -4233,7 +4453,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: C3
         composition_as_published:
           basis: mol pct
@@ -4254,7 +4475,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: D1
         composition_as_published:
           basis: mol pct
@@ -4275,7 +4497,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: D2
         composition_as_published:
           basis: mol pct
@@ -4317,7 +4540,8 @@ species:
       units: mol%
       values:
         quantity_as_printed: EPMA and Mössbauer sample composition
-        method_class: measured_direct
+        method_class: model_derived
+        derivation_as_printed: Estimated from Equations (1)-(3), as stated for this sample on page 4.
         sample_as_published: E2
         composition_as_published:
           basis: mol pct
@@ -4437,11 +4661,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r07_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_A4_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r08_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -4551,11 +4775,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r08_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_A5_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r09_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -4665,11 +4889,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r09_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_B1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r10_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -4779,11 +5003,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r10_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_B2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r11_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -4893,11 +5117,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r11_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r12_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5007,11 +5231,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r12_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r13_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5121,11 +5345,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r13_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_C3_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r14_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5235,11 +5459,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r14_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_D1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r15_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5345,11 +5569,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r15_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_D2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r16_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5455,11 +5679,11 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r16_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_E1_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.
     - observation_id: hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r17_c13
       type: activity_coefficient
       experiment: hayashi_2025_ca_fe_silicate_equilibrium
@@ -5565,8 +5789,8 @@ species:
         - hayashi-2025-ca-fe-silicate-redox-activities::hayashi_2025_ca_fe_silicate_redox_activities_p003_t01_r17_c13
         - hayashi-2025-ca-fe-silicate-redox-activities::context::hayashi_2025_ca_fe_silicate_redox_activities_table1b_E2_composition
         locator:
-          page: 4
-          pdf_page_index: 3
-          published_page: 2400068 (4 of 8)
+          page: 5
+          pdf_page_index: 4
+          published_page: 2400068 (5 of 8)
           section: Activities and Activity Coefficients of FeO and FeO1.5 in Slag
-          note: The printed text gives gammaFeO = aFeO xFeO; Table 1(e) reports the row values.
+          note: The printed text states 'aFeO = γFeO xFeO'; Table 1(e) reports gamma_i = a_i / x_i.

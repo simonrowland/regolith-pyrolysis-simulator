@@ -140,3 +140,55 @@ def test_hayashi_isolated_migration_binds_conditions_and_only_declared_schema_ga
     ]
     assert a_feo.derived_from[0] in contexts
     assert gamma_plain["derived_from"][1] in contexts
+
+
+def test_hayashi_reviewed_evidence_classes_and_experiment_locator() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    assert document["review_status"] == "draft"
+
+    fe_observations = document["species"]["Fe"]["observations"]
+    assert len(fe_observations) == 21
+    a1_fe2 = next(row for row in fe_observations if row["observation_id"] == _obs_id(4, 3))
+    assert a1_fe2["values"]["method_class"] == "measured_reduced"
+    assert a1_fe2["values"]["evidence_class"] == "measured_reduced"
+    assert a1_fe2["values"]["attribution"] == "Present authors, Table 1(a); Figure 1 spectra are not digitized."
+
+    all_contexts = [
+        row
+        for block in document["species"].values()
+        for row in block.get("context", [])
+    ]
+    cfe_rows = [row for row in all_contexts if "table1c_" in row["observation_id"]]
+    assert len(cfe_rows) == 11
+    assert {row["values"]["method_class"] for row in cfe_rows} == {"measured_reduced"}
+
+    compositions = {
+        row["values"]["sample_as_published"]: row
+        for row in all_contexts
+        if row["observation_id"].endswith("_composition")
+    }
+    for sample in ("B1", "B2", "C2", "C3", "D1", "D2", "E2"):
+        assert compositions[sample]["values"]["method_class"] == "model_derived"
+        assert "Equations (1)-(3)" in compositions[sample]["values"]["derivation_as_printed"]
+    for sample in ("A4", "A5", "C1", "E1"):
+        assert compositions[sample]["values"]["method_class"] == "measured_direct"
+
+    experiment = document["experiments"][0]
+    assert experiment["locator"] == {
+        "page": 8,
+        "pdf_page_index": 7,
+        "published_page": "2400068 (8 of 8)",
+        "section": "Equilibrium Experiments",
+    }
+    a1_duration = a1_fe2["point_conditions"]["equilibration_time_h"]
+    assert a1_duration["locator"]["page"] == 2
+
+    gamma_sample = document["fidelity_samples"][2]
+    assert gamma_sample["locator"] == {
+        "page": 3,
+        "pdf_page_index": 2,
+        "published_page": "2400068 (3 of 8)",
+        "table": "1(e)",
+        "row": "E2",
+        "column": "gammaFeO1.5",
+    }
