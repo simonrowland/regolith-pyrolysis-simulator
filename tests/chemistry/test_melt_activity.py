@@ -10,6 +10,7 @@ import pytest
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_ACTIVITY_LIMITATION,
+    MELT_OXIDE_ACTIVITY_REFERENCE_STATE,
     P2O5_ACTIVITY_COEFFICIENT,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
@@ -111,22 +112,52 @@ def test_liquid_reference_oxide_gammas_are_unchanged(parent: str) -> None:
     assert activity.effective_gamma == pytest.approx(gamma)
 
 
-@pytest.mark.parametrize("parent", ["MnO", "Cr2O3"])
-def test_solid_reference_uncertainty_is_visible_without_changing_gamma(
+@pytest.mark.parametrize(
+    ("parent", "temperature_K", "expected_warning"),
+    [
+        (
+            "MnO",
+            1873.0,
+            "gamma_reference_state_solid_unconverted",
+        ),
+        ("Al2O3", 1873.0, "gamma_reference_state_unverified"),
+        ("SiO2", 1873.0, "gamma_reference_state_unverified"),
+        ("TiO2", 1873.0, "gamma_reference_state_unverified"),
+        ("P2O5", 1873.0, "gamma_reference_state_unverified"),
+        ("K2O", 1500.0, "gamma_reference_state_unprinted"),
+        ("Cr2O3", 1773.0, None),
+        ("Na2O", 1673.0, None),
+    ],
+)
+def test_reference_state_notice_comes_from_primary_evidence(
     parent: str,
+    temperature_K: float,
+    expected_warning: str | None,
 ) -> None:
-    gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].gamma
+    gamma = (
+        P2O5_ACTIVITY_COEFFICIENT.gamma
+        if parent == "P2O5"
+        else MELT_OXIDE_ACTIVITY_COEFFICIENTS[parent].gamma
+    )
     activity = melt_oxide_activity(
         parent,
         {parent: 1.0, "SiO2": 4.0},
-        temperature_K=1873.0,
+        temperature_K=temperature_K,
     )
     assert activity is not None
     assert activity.gamma == pytest.approx(gamma)
-    assert activity.warning == "gamma_reference_state_unverified"
-    assert activity.provenance()["melt_oxide_activity_warning"] == (
-        "gamma_reference_state_unverified"
+    assert activity.provenance()["melt_oxide_activity_reference_state"] == (
+        MELT_OXIDE_ACTIVITY_REFERENCE_STATE
     )
+    if expected_warning is None:
+        assert activity.warning is None
+        assert "melt_oxide_activity_warning" not in activity.provenance()
+    else:
+        assert activity.warning is not None
+        assert expected_warning in activity.warning
+        assert activity.provenance()["melt_oxide_activity_warning"] == (
+            activity.warning
+        )
 
 
 @pytest.mark.parametrize("temperature_K", [float("nan"), float("inf"), 0.0, -1.0])

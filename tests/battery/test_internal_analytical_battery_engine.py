@@ -255,9 +255,18 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
     assert abs(float(residual.numeric.value)) < 0.1
 
 
-@pytest.mark.parametrize("formula", ["MnO", "Cr2O3"])
-def test_internal_analytical_row_notices_unverified_gamma_reference(
+@pytest.mark.parametrize(
+    ("formula", "notice_reason"),
+    [
+        ("MnO", "gamma_reference_state_solid_unconverted"),
+        ("K2O", "gamma_reference_state_unprinted"),
+        ("Al2O3", "gamma_reference_state_unverified"),
+        ("Cr2O3", None),
+    ],
+)
+def test_internal_analytical_row_uses_gamma_reference_notice(
     formula: str,
+    notice_reason: str | None,
 ) -> None:
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.5"), (formula, "0.5")),
@@ -272,10 +281,16 @@ def test_internal_analytical_row_notices_unverified_gamma_reference(
         isolated=False,
     )
     assert prediction.execution.state is ExecutionState.PRODUCED
-    assert any(
-        notice.reason == "gamma_reference_state_unverified"
-        for notice in prediction.notices
-    )
+    if notice_reason is None:
+        assert not any(
+            notice.reason.startswith("gamma_reference_state_")
+            for notice in prediction.notices
+        )
+    else:
+        assert any(
+            notice.reason.startswith(notice_reason)
+            for notice in prediction.notices
+        )
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:
