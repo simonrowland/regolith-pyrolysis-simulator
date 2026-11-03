@@ -162,6 +162,9 @@ def test_printed_calibration_and_fit_context_retains_sources_and_lineage():
     ]
     assert equation_fits[0]["parent_observation_ids"]
     assert equation_fits[2]["evidence_class"] == "quoted_attributed"
+    assert equation_fits[1]["parent_observation_ids"] == [
+        f"watne_1977_table12_row_{row:02d}_absorbance" for row in (2, 3, 4)
+    ]
 
     fits = {
         row["locator"]["figure"]: row
@@ -169,6 +172,24 @@ def test_printed_calibration_and_fit_context_retains_sources_and_lineage():
         if row["type"] == "calibration_fit_summary" and "figure" in row["locator"]
     }
     assert fits["18"]["values"]["fits"][0]["slope_as_printed"] == "-21400"
-    assert len(fits["18"]["values"]["fits"][0]["parent_observation_ids"]) == 22
+    excluded_fit_rows = {
+        "watne_1977_table14_row_01_absorbance",
+        "watne_1977_table14_row_14_absorbance",
+        "watne_1977_table15_row_20_absorbance",
+        "watne_1977_table12_row_01_absorbance",
+    }
+    assert not excluded_fit_rows.intersection(
+        fits["15"]["values"]["fits"][1]["parent_observation_ids"]
+    )
+    assert fits["18"]["values"]["fits"][0]["parent_observation_ids"] == [
+        f"watne_1977_table14_row_{row:02d}_absorbance" for row in range(2, 14)
+    ] + [f"watne_1977_table14_row_{row:02d}_absorbance" for row in range(15, 23)]
+    assert not excluded_fit_rows.intersection(
+        fits["18"]["values"]["fits"][0]["parent_observation_ids"]
+    )
+    table15_fit = fits["18"]["values"]["fits"][1]
+    assert table15_fit["intercept_as_printed"] == "-5.42"
+    assert table15_fit["intercept_caption_text_as_printed"] == "Intercept - 5.42"
+    assert not excluded_fit_rows.intersection(table15_fit["parent_observation_ids"])
     assert fits["19"]["values"]["fits"][1]["intercept_as_printed"] == "9.26"
     assert len(fits["19"]["values"]["fits"][1]["parent_observation_ids"]) == 15

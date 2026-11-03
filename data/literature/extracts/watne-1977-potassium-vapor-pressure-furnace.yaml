@@ -82,7 +82,8 @@ notes:
     equation: '2'
 - text: Figure 15 fits are for log absorbance versus reciprocal temperature and use Table 12 rows; Figure 18 fits
     use Tables 14 and 15; Figure 19 fits use Tables 16 and 17. Only printed fit parameters are retained. Curve points
-    are not digitised. The fit records list exactly the corresponding stored observation IDs as their inputs.
+    are not digitised. Fit parent lists omit rows the thesis marks as not used in calculations, and omit the
+    zero-absorbance Table 12 row from log fits.
   locator:
     page: 114
     figure: '15'
@@ -8917,6 +8918,7 @@ species:
     context:
     - observation_id: watne_1977_plante_potassium_pressure_calibration_equation_2
       type: calibration_relation
+      units: pressure unit not stated
       locator:
         page: 109
         equation: '2'
@@ -8933,6 +8935,7 @@ species:
         note: This is the cited calibration relation; it is not a pointwise pressure measured by Watne.
     - observation_id: watne_1977_equations_3_to_5_temperature_fits
       type: calibration_fit_summary
+      units: log absorbance versus reciprocal temperature (K^-1)
       locator:
         page: 111
         section: Potassium vapor pressure calibration
@@ -8956,7 +8959,6 @@ species:
           intercept_as_printed: '14.1'
           evidence_class: model_derived
           parent_observation_ids:
-          - watne_1977_table12_row_01_absorbance
           - watne_1977_table12_row_02_absorbance
           - watne_1977_table12_row_03_absorbance
           - watne_1977_table12_row_04_absorbance
@@ -8969,6 +8971,7 @@ species:
         pressure_unit_as_printed: not stated for Equation 5
     - observation_id: watne_1977_figure15_calibration_fits
       type: calibration_fit_summary
+      units: log absorbance versus reciprocal temperature (K^-1)
       locator:
         page: 114
         figure: '15'
@@ -8990,7 +8993,6 @@ species:
           correlation_coefficient_as_printed: '0.99'
           evidence_class: model_derived
           parent_observation_ids:
-          - watne_1977_table12_row_01_absorbance
           - watne_1977_table12_row_02_absorbance
           - watne_1977_table12_row_03_absorbance
           - watne_1977_table12_row_04_absorbance
@@ -9003,6 +9005,7 @@ species:
           cited source.
     - observation_id: watne_1977_figure18_calibration_fits
       type: calibration_fit_summary
+      units: log absorbance versus reciprocal temperature (K^-1)
       locator:
         page: 133
         figure: '18'
@@ -9018,7 +9021,6 @@ species:
           correlation_coefficient_as_printed: '0.958'
           evidence_class: model_derived
           parent_observation_ids:
-          - watne_1977_table14_row_01_absorbance
           - watne_1977_table14_row_02_absorbance
           - watne_1977_table14_row_03_absorbance
           - watne_1977_table14_row_04_absorbance
@@ -9031,7 +9033,6 @@ species:
           - watne_1977_table14_row_11_absorbance
           - watne_1977_table14_row_12_absorbance
           - watne_1977_table14_row_13_absorbance
-          - watne_1977_table14_row_14_absorbance
           - watne_1977_table14_row_15_absorbance
           - watne_1977_table14_row_16_absorbance
           - watne_1977_table14_row_17_absorbance
@@ -9046,7 +9047,12 @@ species:
           gas_as_printed: Ar-4%H2
           slope_as_printed: '-6600'
           intercept_as_printed: '-5.42'
+          intercept_caption_text_as_printed: Intercept - 5.42
           correlation_coefficient_as_printed: '0.977'
+          note: >-
+            The 600 dpi render shows a single hyphen in this intercept, unlike the equals glyphs on the sibling
+            caption lines; retain the printed -5.42. This conflicts with the retained points: their least-squares
+            intercept is +5.428 against the printed slope -6600.
           evidence_class: model_derived
           parent_observation_ids:
           - watne_1977_table15_row_01_absorbance
@@ -9068,7 +9074,6 @@ species:
           - watne_1977_table15_row_17_absorbance
           - watne_1977_table15_row_18_absorbance
           - watne_1977_table15_row_19_absorbance
-          - watne_1977_table15_row_20_absorbance
           - watne_1977_table15_row_21_absorbance
           - watne_1977_table15_row_22_absorbance
           - watne_1977_table15_row_23_absorbance
@@ -9077,6 +9082,7 @@ species:
           - watne_1977_table15_row_26_absorbance
     - observation_id: watne_1977_figure19_calibration_fits
       type: calibration_fit_summary
+      units: log absorbance versus reciprocal temperature (K^-1)
       locator:
         page: 139
         figure: '19'

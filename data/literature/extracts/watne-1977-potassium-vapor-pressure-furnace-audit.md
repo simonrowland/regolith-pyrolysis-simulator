@@ -34,7 +34,9 @@ Table 12 retains its printed temperature uncertainties and absorbance uncertaint
 
 ## Calibration and fits
 
-Equation 2 retains the Plante [45] relation `log P_K(K2O·9Al2O3) = -21453/T°K + 7.4866`; the pressure unit is not stated, and it is not a pointwise pressure measurement from this thesis. Equations 3 and 4 retain the printed graphite and platinum log-absorbance fits; Equation 5 retains the NBS log-pressure relation attributed to [45]. Figure 15 also prints the corresponding slopes, intercepts, and correlation coefficients. Figure 18 fits use the Table 14 and 15 observations; Figure 19 fits use Tables 16 and 17. Fit context lists exactly the rows used as parents. Figure curves were not digitised.
+Equation 2 retains the Plante [45] relation `log P_K(K2O·9Al2O3) = -21453/T°K + 7.4866`; the pressure unit is not stated, and it is not a pointwise pressure measurement from this thesis. Equations 3 and 4 retain the printed graphite and platinum log-absorbance fits; Equation 5 retains the NBS log-pressure relation attributed to [45]. Figure 15 also prints the corresponding slopes, intercepts, and correlation coefficients. Figure 18 fits use the Table 14 and 15 observations; Figure 19 fits use Tables 16 and 17. Parent lists omit the recorder-limited rows identified as not used in calculations and omit the zero-absorbance platinum row, for which log absorbance is undefined. Figure curves were not digitised.
+
+The 600 dpi render of Figure 18 (PDF page 133) prints the Table 15 caption as `Intercept - 5.42`, with a single hyphen; its sibling caption uses a visibly doubled equals glyph. The single hyphen is retained as printed. This conflicts with the retained Table 15 points: the least-squares intercept is +5.428 against the printed slope -6600.
 
 ## Full-cell audit
 
