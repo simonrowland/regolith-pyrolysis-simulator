@@ -613,7 +613,11 @@ def test_provider_henrian_path_without_engine_evidence():
             mole_fraction=mole_fraction,
         )
 
-    upper = resolve("CaO", 0.2)
+    solid_reference = resolve("CaO", 0.2)
+    assert solid_reference.verdict is ActivityVerdictKind.REFUSAL
+    assert solid_reference.refusal_code is ActivityRefusalCode.MONOTONICITY_UNPROVED
+
+    upper = resolve("Na2O", 0.2)
     assert upper.verdict is ActivityVerdictKind.UPPER_BOUND
     assert upper.bound_direction is BoundDirection.UPPER
     assert upper.value == pytest.approx(0.2)
