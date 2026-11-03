@@ -72,7 +72,7 @@ def _assert_every_table1a_cell(document):
         assert control_details["gas_flow_locator"]["published_page"] == 1831
         assert control_details["gas_flow_locator"]["table"] == "1B"
         assert control_details["gas_flow_locator"]["note"] == (
-            "Table 1B. Compositions of input gases (c.c./min) used in the experiments "
+            "Table 1B. Compositions of input gases (c.c.s/min) used in the experiments "
             "to determine aFeO at 1600±2K in [SiO₂-KAlO₂-CaAl₂Si₂O₈]-FeO liquids."
         )
         assert method_details["metal_phase"]["phase_as_printed"] == "reagent-grade (99.94%) metallic iron-wire"
