@@ -293,6 +293,7 @@ class NoticeKind(StrEnum):
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
+    FO2_FRAME_FROM_PRINTED_ATMOSPHERE = "fo2_frame_from_printed_atmosphere"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
     PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"

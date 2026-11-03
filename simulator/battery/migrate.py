@@ -1113,7 +1113,7 @@ def _bare_log_notice(
     if any(notice.reason == decision.notice_reason for notice in existing):
         return None
     return Notice(
-        kind=NoticeKind.INPUT_OMITTED,
+        kind=decision.notice_kind,
         affected_quantities=(quantity,),
         reason=decision.notice_reason,
         origin=origin,
@@ -16222,6 +16222,7 @@ class PrintedOxygenDecision:
     kind: str
     state: State
     notice_reason: str | None = None
+    notice_kind: NoticeKind = NoticeKind.INPUT_OMITTED
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
@@ -16238,6 +16239,160 @@ def _oxygen_pressure_point(located: object) -> Decimal | None:
     if isinstance(raw, Decimal) and raw.is_finite():
         return raw
     return None
+
+
+_ATM_BAR = Decimal("1.01325")
+_AIR_O2_MOLE_FRACTION = Decimal("0.2095")
+
+
+def _atmosphere_kind(as_printed: str) -> tuple[str, Decimal] | None:
+    """Recognise only explicitly printed air or pure oxygen atmospheres."""
+
+    text = as_printed.strip().casefold().replace("₂", "2")
+    compact = re.sub(r"\s+", " ", text)
+    if re.fullmatch(r"(?:dry )?air(?: at 1(?:\.0+)? atm)?", compact):
+        return "air", _AIR_O2_MOLE_FRACTION
+    if re.fullmatch(
+        r"(?:pure )?(?:o2|oxygen)(?: at 1(?:\.0+)? atm)?", compact
+    ):
+        return "pure O2", Decimal(1)
+    # A row such as Jayasuriya's "O2 100.0 × 200 SCCM" explicitly prints a
+    # single-species atmosphere; it is not a mixed-gas equilibrium.
+    if re.fullmatch(
+        r"o2\s+\d+(?:\.\d+)?\s*[×x]\s*\d+(?:\.\d+)?\s*sccm",
+        compact,
+    ):
+        return "pure O2", Decimal(1)
+    return None
+
+
+def _last_printed_digit(value: Decimal) -> Decimal:
+    exponent = value.as_tuple().exponent
+    return Decimal(1).scaleb(exponent)
+
+
+def _display_fo2_dex(value: Decimal) -> str:
+    return format(value.quantize(Decimal("0.0001")), "+.4f")
+
+
+def _row_printed_atmospheres(
+    raw_item: object, experiment_atmospheres: Sequence[str]
+) -> tuple[str, ...]:
+    """A run's explicit gas label narrows its experiment-set evidence."""
+
+    if isinstance(raw_item, Mapping):
+        for key in ("gas_mix_as_printed", "atmosphere_as_printed"):
+            value = raw_item.get(key)
+            if isinstance(value, str) and value.strip():
+                return (value.strip(),)
+    return tuple(experiment_atmospheres)
+
+
+def _bare_log_frame_decision(
+    log10_fO2: Decimal,
+    temperature_K: Decimal | None,
+    *,
+    printed_atmospheres: Sequence[str] = (),
+    total_pressure_pa: Decimal | None = None,
+) -> PrintedOxygenDecision:
+    """Apply the IW plausibility window, then printed atmosphere consistency.
+
+    Air at 1 bar has pO2 = 0.2095 bar, hence log10(fO2/bar) = -0.6788,
+    sanity-rounded to -0.679. At 1 atm, pO2 = 0.2095 × 1.01325 bar and the
+    bar-frame value is -0.6731. The atm-frame value differs by
+    log10(1.01325) = 0.0057 dex, below the 0.01 dex minimum tolerance.
+    Pure O2 at 1 atm is +0.0057 in the bar frame and 0.00 in the atm frame.
+    No atmosphere is inferred: only these explicit prints can open the frame
+    check; every other gas needs its equilibrium owner and sized band.
+    """
+
+    candidates = tuple(item.strip() for item in printed_atmospheres if item.strip())
+    pressure_bar = (
+        total_pressure_pa / _BAR_PA
+        if total_pressure_pa is not None and total_pressure_pa.is_finite()
+        and total_pressure_pa > 0
+        else (_ATM_BAR if candidates else Decimal(1))
+    )
+    ceiling = pressure_bar.ln() / Decimal(10).ln()
+    if log10_fO2 > ceiling:
+        reason = (
+            "bare log fO2 exceeds the total-pressure pO2 ceiling: "
+            f"printed={_dec_str(log10_fO2)} log10(bar), "
+            f"ceiling={_dec_str(ceiling)} at P_total={_dec_str(pressure_bar)} bar"
+        )
+        return PrintedOxygenDecision(
+            "refusal",
+            State.unknown(reason),
+            notices=(
+                PrintedOxygenNotice(
+                    kind=NoticeKind.SOURCE_VALUE_OUTSIDE_PHYSICAL_RANGE,
+                    reason=reason,
+                ),
+            ),
+        )
+
+    state, notice = _bare_log_convention(log10_fO2, temperature_K)
+    if state.is_value:
+        return PrintedOxygenDecision("log", state, notice_reason=notice)
+
+    tolerance = max(_last_printed_digit(log10_fO2), Decimal("0.01"))
+    checked: list[tuple[str, Decimal]] = []
+    unsupported: list[str] = []
+    for atmosphere in candidates:
+        kind = _atmosphere_kind(atmosphere)
+        if kind is None:
+            unsupported.append(atmosphere)
+            continue
+        label, mole_fraction = kind
+        expected_bar = (mole_fraction * pressure_bar).ln() / Decimal(10).ln()
+        expected_atm = expected_bar - _ATM_BAR.ln() / Decimal(10).ln()
+        frames = (("bar", expected_bar), ("atm", expected_atm))
+        matched_frame, matched_expected = min(
+            frames, key=lambda item: abs(log10_fO2 - item[1])
+        )
+        checked.append((atmosphere, expected_bar))
+        if abs(log10_fO2 - matched_expected) <= tolerance:
+            message = (
+                "bare fO2 frame matched printed atmosphere "
+                f"{atmosphere!r}; expected log10(fO2/bar)="
+                f"{_display_fo2_dex(expected_bar)}; matched {matched_frame} frame; "
+                "1 atm and 1 bar differ by 0.0057 dex, below the 0.01 dex "
+                "minimum tolerance"
+            )
+            return PrintedOxygenDecision(
+                "log",
+                State.of(_log_fO2_to_pa(log10_fO2, _BAR_PA)),
+                notice_reason=message,
+                notice_kind=NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE,
+            )
+
+    if checked:
+        expected = "; ".join(
+            f"{name!r}: log10(fO2/bar)={_display_fo2_dex(value)}"
+            for name, value in checked
+        )
+        reason = (
+            "bare log fO2 does not match any printed atmosphere within "
+            f"{_dec_str(tolerance)} dex; printed={_dec_str(log10_fO2)}; "
+            f"expected {expected}"
+        )
+        notices = (
+            PrintedOxygenNotice(
+                kind=NoticeKind.PROBABLE_SOURCE_MISPRINT,
+                reason=f"possible source misprint: {reason}",
+            ),
+        )
+        return PrintedOxygenDecision(
+            "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN), notices=notices
+        )
+    if unsupported:
+        reason = "gas_mix_fo2_band_unavailable: " + ", ".join(
+            repr(item) for item in unsupported
+        )
+        return PrintedOxygenDecision("refusal", State.unknown(reason))
+    return PrintedOxygenDecision(
+        "refusal", State.unknown(_BARE_LOG_SCALE_UNKNOWN)
+    )
 
 
 def _present_non_point_oxygen_reason(
@@ -16870,6 +17025,7 @@ def printed_oxygen_decision(
     scope: str,
     run_temperature_K: Decimal | None = None,
     total_pressure_pa: Decimal | None = None,
+    printed_atmospheres: Sequence[str] = (),
 ) -> PrintedOxygenDecision | None:
     """Turn one oxygen scope into one identity state, for every quantity.
 
@@ -16961,11 +17117,16 @@ def printed_oxygen_decision(
         return PrintedOxygenDecision("refusal", State.unknown(reason))
     if has_log:
         if facts.bare_log:
-            state, notice = _bare_log_convention(log_point, run_temperature_K)
-            return PrintedOxygenDecision(
-                "refusal" if state.is_unknown else "log",
-                state,
-                notice_reason=notice,
+            resolved_pressure = _point_total_pressure_pa(point_conditions)
+            if resolved_pressure is None:
+                resolved_pressure = total_pressure_pa
+            return _bare_log_frame_decision(
+                log_point,
+                run_temperature_K,
+                printed_atmospheres=_row_printed_atmospheres(
+                    raw_item, printed_atmospheres
+                ),
+                total_pressure_pa=resolved_pressure,
             )
         return PrintedOxygenDecision(
             "log",
@@ -17048,6 +17209,7 @@ def _scoped_oxygen_decision(
     row_point_conditions: Mapping[str, Any] | None,
     run_temperature_K: Decimal | None = None,
     total_pressure_pa: Decimal | None = None,
+    printed_atmospheres: Sequence[str] = (),
 ) -> tuple[PrintedOxygenDecision | None, bool]:
     """Row oxygen first. Inherited facts fill only when the row has none."""
 
@@ -17062,6 +17224,7 @@ def _scoped_oxygen_decision(
         scope="row",
         run_temperature_K=run_temperature_K,
         total_pressure_pa=resolved_pressure,
+        printed_atmospheres=printed_atmospheres,
     )
     if row_decision is not None or not from_fallback:
         return row_decision, False
@@ -17073,6 +17236,7 @@ def _scoped_oxygen_decision(
             scope="inherited",
             run_temperature_K=run_temperature_K,
             total_pressure_pa=resolved_pressure,
+            printed_atmospheres=printed_atmospheres,
         ),
         True,
     )
@@ -18057,6 +18221,102 @@ def iter_extract_observations(
             for obs in body.get("observations") or []:
                 if isinstance(obs, Mapping):
                     yield str(formula), dict(obs)
+
+
+def _quoted_atmosphere_values(
+    container: Mapping[str, Any], locator: object
+) -> tuple[str, ...]:
+    """Atmosphere labels count only with their quote and source locator."""
+
+    if not isinstance(locator, Mapping) or not locator:
+        return ()
+    candidates: list[str] = []
+    for key in ("experiment_gases_as_printed", "atmospheres_as_printed"):
+        raw = container.get(key)
+        if not isinstance(raw, (list, tuple)):
+            continue
+        quote_key = (
+            "experiment_gases_quote_as_printed"
+            if key == "experiment_gases_as_printed"
+            else "atmospheres_quote_as_printed"
+        )
+        quote = container.get(quote_key)
+        if not isinstance(quote, str) or not quote.strip():
+            continue
+        candidates.extend(
+            item.strip()
+            for item in raw
+            if isinstance(item, str) and item.strip()
+        )
+    raw_atmosphere = container.get("atmosphere_as_printed")
+    quote = container.get("atmosphere_quote_as_printed")
+    if (
+        isinstance(raw_atmosphere, str)
+        and raw_atmosphere.strip()
+        and isinstance(quote, str)
+        and quote.strip()
+    ):
+        candidates.append(raw_atmosphere.strip())
+    return tuple(dict.fromkeys(candidates))
+
+
+def _printed_atmosphere_index(
+    rows: Sequence[tuple[str, dict[str, Any]]],
+    experiments: Sequence[Mapping[str, Any]],
+) -> tuple[tuple[str, ...], dict[str, tuple[str, ...]]]:
+    """Collect quoted experiment-set atmospheres without assigning runs."""
+
+    general: list[str] = []
+    by_experiment: dict[str, list[str]] = defaultdict(list)
+
+    def add(names: Sequence[str], experiment_key: object = None) -> None:
+        if not names:
+            return
+        target = (
+            by_experiment[str(experiment_key)]
+            if experiment_key is not None
+            else general
+        )
+        target.extend(name for name in names if name not in target)
+
+    for experiment in experiments:
+        key = experiment.get("experiment_id") or experiment.get("id")
+        atmosphere_evidence = experiment.get("atmosphere_evidence")
+        if isinstance(atmosphere_evidence, Mapping):
+            add(
+                _quoted_atmosphere_values(
+                    atmosphere_evidence, atmosphere_evidence.get("locator")
+                ),
+                key,
+            )
+        conditions = experiment.get("conditions")
+        if isinstance(conditions, Mapping):
+            locator = conditions.get("locator") or experiment.get("locator")
+            add(_quoted_atmosphere_values(conditions, locator), key)
+    for _formula, observation in rows:
+        if str(observation.get("type") or "").casefold() != "method":
+            continue
+        values = observation.get("values")
+        if not isinstance(values, Mapping):
+            continue
+        add(
+            _quoted_atmosphere_values(values, observation.get("locator")),
+            observation.get("experiment"),
+        )
+    return tuple(general), {key: tuple(value) for key, value in by_experiment.items()}
+
+
+def _printed_atmospheres_for_experiment(
+    source_context: Mapping[str, Any], experiment_key: object
+) -> tuple[str, ...]:
+    by_experiment = source_context.get("printed_atmospheres_by_experiment")
+    if (
+        experiment_key is not None
+        and isinstance(by_experiment, Mapping)
+        and str(experiment_key) in by_experiment
+    ):
+        return tuple(by_experiment[str(experiment_key)])
+    return tuple(source_context.get("printed_atmospheres_for_set", ()))
 
 
 # b-555: absence may be correct; silence is not. Extract-level typed refusal
@@ -20093,6 +20353,9 @@ class Migrator:
             and (row.get("experiment_id") or row.get("id"))
         }
         sample_compositions: dict[str, tuple[dict[str, Decimal], Locator | None]] = {}
+        printed_atmospheres_for_set, printed_atmospheres_by_experiment = (
+            _printed_atmosphere_index(rows, raw_experiments)
+        )
         ambiguous_sample_compositions: set[str] = set()
         for _formula, row in rows:
             row_values = row.get("values")
@@ -20128,6 +20391,12 @@ class Migrator:
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
         source_context["experiment_source_rows"] = experiment_source_rows
+        source_context["printed_atmospheres_for_set"] = (
+            printed_atmospheres_for_set
+        )
+        source_context["printed_atmospheres_by_experiment"] = (
+            printed_atmospheres_by_experiment
+        )
         source_context["sample_compositions"] = sample_compositions
         source_context["named_material_composition_records"] = (
             named_material_composition_records
@@ -20446,6 +20715,9 @@ class Migrator:
             else None
         )
         experiment_key = obs.get("experiment")
+        printed_atmospheres = _printed_atmospheres_for_experiment(
+            context, experiment_key
+        )
         experiment_source_row = (
             context.get("experiment_source_rows", {}).get(experiment_key)
             if isinstance(experiment_key, str)
@@ -22120,6 +22392,7 @@ class Migrator:
             total_pressure_pa=_positive_pressure_pa(
                 ident_kwargs.get("total_pressure_Pa")
             ),
+            printed_atmospheres=printed_atmospheres,
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -22602,6 +22875,7 @@ class Migrator:
                     source_id=source_id,
                     source_key=source_key,
                     experiment_id=experiment_id,
+                    printed_atmospheres=printed_atmospheres,
                     locator=locator,
                     identity_base=(yield_quantity, species, ident_kwargs),
                     evidence=evidence,
@@ -22721,6 +22995,7 @@ class Migrator:
                         source_id=source_id,
                         source_key=source_key,
                         experiment_id=experiment_id,
+                        printed_atmospheres=printed_atmospheres,
                         locator=locator,
                         identity_base=(quantity, point_species, ident_kwargs),
                         evidence=evidence,
@@ -22845,6 +23120,7 @@ class Migrator:
                     source_id=source_id,
                     source_key=source_key,
                     experiment_id=experiment_id,
+                    printed_atmospheres=printed_atmospheres,
                     locator=locator,
                     identity_base=(quantity, species, ident_kwargs),
                     evidence=evidence,
@@ -23030,6 +23306,7 @@ class Migrator:
                         source_id=source_id,
                         source_key=source_key,
                         experiment_id=experiment_id,
+                        printed_atmospheres=printed_atmospheres,
                         locator=locator,
                         identity_base=(
                             quantity,
@@ -23585,6 +23862,7 @@ class Migrator:
         source_key: str,
         experiment_id: str,
         locator: Locator,
+        printed_atmospheres: Sequence[str],
         identity_base: tuple[Quantity | State[Quantity], Species, dict[str, Any]],
         evidence: Evidence,
         admission: Admission,
@@ -24746,6 +25024,7 @@ class Migrator:
             total_pressure_pa=_positive_pressure_pa(
                 getattr(identity, "total_pressure_Pa", None)
             ),
+            printed_atmospheres=printed_atmospheres,
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,
