@@ -13948,9 +13948,9 @@ def _quartz_silica_activity_observation():
 def _corrupt_o037_janaf_source_hash(monkeypatch: pytest.MonkeyPatch) -> None:
     from copy import deepcopy
 
-    from simulator.battery.generators import janaf
+    from simulator.reference_data import janaf_fusion
 
-    original_loader = janaf.load_table_document
+    original_loader = janaf_fusion.load_table_document
 
     def corrupt_o037_hash(path):
         document = original_loader(path)
@@ -14914,9 +14914,9 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
         ]
         return incomplete
 
-    monkeypatch.setattr(janaf, "load_table_document", missing_alumina_row)
-    janaf._fusion_table_points.cache_clear()
-    janaf._fusion_missing_gibbs_temperatures.cache_clear()
+    monkeypatch.setattr(janaf_fusion, "load_table_document", missing_alumina_row)
+    janaf_fusion._fusion_table_points.cache_clear()
+    janaf_fusion._fusion_missing_gibbs_temperatures.cache_clear()
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14959,6 +14959,7 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators import janaf
+    from simulator.reference_data import janaf_fusion
 
     original_points = janaf._fusion_table_points
 
@@ -14969,7 +14970,9 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
-    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr(
+        janaf_fusion, "_fusion_missing_gibbs_temperatures", lambda _table_id: ()
+    )
 
     with pytest.raises(ValueError, match="1700"):
         janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
@@ -14980,6 +14983,7 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
 ) -> None:
     from simulator.battery.generators import janaf
     from simulator.battery.score import fusion_comparison_reference
+    from simulator.reference_data import janaf_fusion
 
     original_points = janaf._fusion_table_points
 
@@ -14990,7 +14994,9 @@ def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
         return points, digest
 
     monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
-    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    monkeypatch.setattr(
+        janaf_fusion, "_fusion_missing_gibbs_temperatures", lambda _table_id: ()
+    )
     experiment = F.kems_experiment()
     reference = F.observation(
         "silica-activity-across-missing-janaf-node",

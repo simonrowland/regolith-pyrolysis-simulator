@@ -339,6 +339,11 @@ class MeltOxideActivity:
             "melt_oxide_gamma_limitation": MELT_OXIDE_ACTIVITY_LIMITATION,
             "alphamelts_cross_check_status": ALPHAMELTS_CROSS_CHECK_STATUS,
         }
+        reference_state_notice = _gamma_reference_state_notice(self.parent_oxide)
+        if reference_state_notice is not None:
+            payload["melt_oxide_activity_reference_state_notice"] = (
+                reference_state_notice
+            )
         if self.temperature_K is not None:
             payload["melt_oxide_activity_temperature_K"] = self.temperature_K
             domain_authority = melt_oxide_gamma_domain_authority(
@@ -625,7 +630,7 @@ def _melt_oxide_gamma_for_activity(
     gamma_s: float,
     temperature_K: float | None,
 ) -> tuple[float, str | None]:
-    """Return the activity gamma on the declared liquid basis and its notice."""
+    """Return the liquid-basis gamma and separate reference-state notice."""
 
     provenance = reference_state_provenance.get(parent_oxide)
     gamma = float(gamma_s)
@@ -654,13 +659,7 @@ def _melt_oxide_gamma_for_activity(
             # and a factor ~0.14; the JANAF chord gives the Kume row
             # a_l/a_s factor ~0.16.
             gamma *= math.exp(-delta_g_fus / (R_KJ_PER_MOL_K * temperature))
-        return gamma, _gamma_reference_state_notice(parent_oxide)
     return gamma, _gamma_reference_state_notice(parent_oxide)
-
-
-def _combine_activity_warnings(*warnings: str | None) -> str | None:
-    combined = "; ".join(warning for warning in warnings if warning)
-    return combined or None
 
 
 def melt_oxide_activity(
@@ -724,9 +723,6 @@ def melt_oxide_activity(
                 "melt_oxide_activity unity-gamma fallback: P2O5 literature "
                 "gamma requires temperature_K; result is non-authoritative"
             )
-            warning = _combine_activity_warnings(
-                warning, _gamma_reference_state_notice(parent)
-            )
             citation = (
                 "ASSUMED unity fallback; temperature_K required for the "
                 "Turkdogan/Sossi-Fegley P2O5 gamma envelope"
@@ -776,10 +772,10 @@ def melt_oxide_activity(
         )
 
     activity_authority_status = "temperature_not_supplied"
-    gamma, reference_state_warning = _melt_oxide_gamma_for_activity(
+    gamma, _ = _melt_oxide_gamma_for_activity(
         parent, coeff.gamma, resolved_temperature_K
     )
-    activity_warning = reference_state_warning
+    activity_warning = None
     if resolved_temperature_K is not None and coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
         if low <= resolved_temperature_K <= high:
@@ -793,9 +789,7 @@ def melt_oxide_activity(
                 f"parent_oxide={parent} temperature_K={resolved_temperature_K:.3f} "
                 f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
             )
-            activity_warning = _combine_activity_warnings(
-                domain_warning, reference_state_warning
-            )
+            activity_warning = domain_warning
 
     if x_single_cation <= 0.0:
         return MeltOxideActivity(

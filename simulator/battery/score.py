@@ -9900,30 +9900,16 @@ def _predict_with_engine(
             tier_notice = _payload_fo2_notice(quantity, activity_payload)
             if tier_notice is not None:
                 notices.append(tier_notice)
-            warning_field = activity.provenance().get(
-                "melt_oxide_activity_warning"
+            activity_provenance = activity.provenance()
+            reference_state_notice = activity_provenance.get(
+                "melt_oxide_activity_reference_state_notice"
             )
-            warning_parts = tuple(
-                part.strip()
-                for part in str(warning_field or "").split(";")
-                if part.strip()
-            )
-            reference_state_warnings = tuple(
-                part
-                for part in warning_parts
-                if part.startswith("gamma_reference_state_")
-            )
-            other_activity_warning = "; ".join(
-                part
-                for part in warning_parts
-                if not part.startswith("gamma_reference_state_")
-            )
-            for reference_warning in reference_state_warnings:
+            if reference_state_notice is not None:
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
-                        reason=reference_warning,
+                        reason=str(reference_state_notice),
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
@@ -9952,13 +9938,16 @@ def _predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         )
                     )
-            elif activity.evidence_tier == "UNCERTIFIED" or other_activity_warning:
+            elif activity.warning or (
+                activity.evidence_tier == "UNCERTIFIED"
+                and reference_state_notice is None
+            ):
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
                         reason=(
-                            other_activity_warning
+                            activity.warning
                             or "melt_oxide_activity has no certified evidence tier"
                         ),
                         origin=(
