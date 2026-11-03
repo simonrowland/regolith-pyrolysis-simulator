@@ -1643,7 +1643,7 @@ def test_finite_temperature_outside_vaporock_band_runs_and_is_flagged(
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
-    assert result.status != "out_of_domain"
+    assert result.status == "non_authoritative"
     assert result.diagnostics["temperature_K"] == pytest.approx(temperature_K)
     assert len(fake_system.instances) == 1
     assert len(fake_system.instances[0].eval_calls) == 1
