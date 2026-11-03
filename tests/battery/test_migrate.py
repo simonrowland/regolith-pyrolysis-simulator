@@ -17923,18 +17923,16 @@ def test_bare_log_convention_pins_existing_iw_window() -> None:
 def test_bare_log_accepts_printed_air_atmosphere() -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
-    from simulator.battery.oxygen_identity import log10_fo2_to_pa
 
     decision = _bare_log_frame_decision(
         Decimal("-0.68"), Decimal("1600"), printed_atmospheres=("air",)
     )
     assert decision.state.is_value
-    assert decision.state.value == log10_fo2_to_pa(
-        Decimal("-0.68"), Decimal("101325")
-    )
+    assert decision.state.value == Decimal("20892.96130854039483122233736")
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert "expected log10(fO2/bar)=-0.6731" in decision.notice_reason
-    assert "matched atm frame" in decision.notice_reason
+    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "matched 1 bar total-pressure anchor" in decision.notice_reason
+    assert "bar-vs-atm unit ambiguity (0.0057 dex)" in decision.notice_reason
 
 
 def test_bare_log_air_at_one_bar_uses_the_bar_frame() -> None:
@@ -17968,10 +17966,31 @@ def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
         printed_atmospheres=("O2 100.0 × 200 SCCM",),
     )
     assert decision.state.is_value
-    assert decision.state.value == Decimal("101325")
+    assert decision.state.value == Decimal("100000")
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=+0.0000" in decision.notice_reason
+    assert "matched 1 bar total-pressure anchor" in decision.notice_reason
+
+
+def test_bare_log_accepts_explicit_one_atmosphere_pure_oxygen_anchor() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    printed_log = Decimal("0.0057")
+    decision = _bare_log_frame_decision(
+        printed_log,
+        Decimal("1600"),
+        printed_atmospheres=("pure O2 at 1 atm",),
+    )
+
+    assert decision.state.is_value
+    assert decision.state.value == log10_fo2_to_pa(
+        printed_log, Decimal("100000")
+    )
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert "expected log10(fO2/bar)=+0.0057" in decision.notice_reason
-    assert "matched atm frame" in decision.notice_reason
+    assert "matched atm frame at P_total=1.01325 bar" in decision.notice_reason
 
 
 @pytest.mark.parametrize(
@@ -17994,6 +18013,7 @@ def test_bare_log_accepts_direct_printed_gas_couple_with_combined_band(
     )
 
     assert decision.state.is_value
+    assert decision.state.value == Decimal("20892.96130854039483122233736")
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert decision.notice_authority is Authority.CERTIFIED
     assert "combined_band=" in decision.notice_band
