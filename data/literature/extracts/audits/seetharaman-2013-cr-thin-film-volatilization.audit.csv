@@ -1,0 +1,98 @@
+cell_id,page,locator,row,column,printed_value,mineru_read,pdftotext_read,verification,disposition
+T1_R1_C2,3,Table I,Pt-wire,Purity (Percent),99.99,99.99,99.99,both reads agree; 600 dpi layout check,stored table context
+T1_R2_C2,3,Table I,Cr2O3,Purity (Percent),99.8,99.8,99.8,both reads agree; 600 dpi layout check,stored table context
+T1_R3_C2,3,Table I,SiO2,Purity (Percent),99 (reagent grade),99 (reagent grade),99 (reagent grade),flagged mixed text-number cell; render confirmed,stored table context
+T1_R4_C2,3,Table I,MgO,Purity (Percent),99,99,99,both reads agree; 600 dpi layout check,stored table context
+T1_R5_C2,3,Table I,CaO,Purity (Percent),99,99,99,both reads agree; 600 dpi layout check,stored table context
+T1_R6_C2,3,Table I,Al2O3,Purity (Percent),99.8,99.8,99.8,both reads agree; 600 dpi layout check,stored table context
+T2_R1_C1,3,Table II,sole row,Al2O3,45.0,45.0,45.0,both reads agree; 600 dpi row/column check,stored table context
+T2_R1_C2,3,Table II,sole row,CaO,20.0,20.0,20.0,both reads agree; 600 dpi row/column check,stored table context
+T2_R1_C3,3,Table II,sole row,SiO2,20.0,20.0,20.0,both reads agree; 600 dpi row/column check,stored table context
+T2_R1_C4,3,Table II,sole row,MgO,8.0,8.0,8.0,both reads agree; 600 dpi row/column check,stored table context
+T2_R1_C5,3,Table II,sole row,Cr2O3,7.0,7.0,7.0,both reads agree; 600 dpi row/column check,stored table context
+T2_CAPTION_BASICITY,3,Table II,caption,CaO/SiO2,1,1,1,both reads agree; caption checked against page,stored table context
+T3_H_C2,3,Table III,header,1673 K,1673 K (1400 °C),1673 K (1400 °C),1673 K (1400 °C),both reads agree; 600 dpi layout check,stored as temperature axis
+T3_H_C3,3,Table III,header,1773 K,1773 K (1500 °C),1773 K (1500 °C),1773 K (1500 °C),both reads agree; 600 dpi layout check,stored as temperature axis
+T3_H_C4,3,Table III,header,1873 K,1873 K (1600 °C),1873 K (1600 °C),1873 K (1600 °C),both reads agree; 600 dpi layout check,stored as temperature axis
+T3_R1_C2,3,Table III,ASlag-Liq#1,1673 K,61.0,61.0,61.0,both reads agree; 600 dpi layout check,stored model context
+T3_R1_C3,3,Table III,ASlag-Liq#1,1773 K,71.9,71.9,71.9,both reads agree; 600 dpi layout check,stored model context
+T3_R1_C4,3,Table III,ASlag-Liq#1,1873 K,78.0,78.0,78.0,both reads agree; 600 dpi layout check,stored model context
+T3_R2_C2,3,Table III,CaMg2Al16O27_Solid,1673 K,16.9,16.9,16.9,both reads agree; 600 dpi layout check,stored model context
+T3_R2_C3,3,Table III,CaMg2Al16O27_Solid,1773 K,0.0,0.0,0.0,both reads agree; render corrected row/column ambiguity from formula subscripts,stored model context
+T3_R2_C4,3,Table III,CaMg2Al16O27_Solid,1873 K,0.0,0.0,0.0,both reads agree; render corrected row/column ambiguity from formula subscripts,stored model context
+T3_R3_C2,3,Table III,ASpinel,1673 K,22.1,22.1,22.1,both reads agree; 600 dpi layout check,stored model context
+T3_R3_C3,3,Table III,ASpinel,1773 K,28.1,28.1,28.1,both reads agree; 600 dpi layout check,stored model context
+T3_R3_C4,3,Table III,ASpinel,1873 K,21.9,21.9,21.9,both reads agree; 600 dpi layout check,stored model context
+F1_MODEL_PO2,2,Figure 1 caption,model condition,pO2,9 × 10^4 Pa,9 × 10^4 Pa,9 × 10^4 Pa,caption/pdftotext and page render agree,stored as model-only pO2
+Q_OKRETIC_P,2,Introduction,quoted estimate,CrO3 vapor pressure,0.1 Pa,0.1 Pa,0.1 Pa,pdftotext and page render agree,stored quoted context
+Q_OKRETIC_T,2,Introduction,quoted estimate,temperature,1773 K,1773 K,1773 K,pdftotext and page render agree,stored quoted context
+METHOD_TUBE_ID,3,Materials and Sample Preparation,alumina tube,inner diameter,4 mm,4 mm,4 mm,pdftotext exact; method text page checked,stored method context
+METHOD_TUBE_OD,3,Materials and Sample Preparation,alumina tube,outer diameter,6 mm,6 mm,6 mm,pdftotext exact; method text page checked,stored method context
+METHOD_SLICE_1,3,Materials and Sample Preparation,slag slices,thickness,0.5 mm,0.5 mm,0.5 mm,pdftotext exact; method text page checked,stored method context
+METHOD_SLICE_2,3,Materials and Sample Preparation,slag slices,thickness,1.0 mm,1.0 mm,1.0 mm,pdftotext exact; method text page checked,stored method context
+METHOD_TMIN,3,Experimental,TGA lower temperature,temperature,1673 K,1673 K,1673 K,pdftotext exact; method text page checked,stored method context
+METHOD_TMAX,3,Experimental,TGA upper temperature,temperature,1873 K,1873 K,1873 K,pdftotext exact; method text page checked,stored method context
+METHOD_HEAT_RATE,3,Experimental,sample,heating rate,30 K/min,30 K/min,30 K/min,pdftotext exact; method text page checked,stored method context
+METHOD_COOL_RATE,3,Experimental,sample,cooling rate,40 K/min,40 K/min,40 K/min,pdftotext exact; method text page checked,stored method context
+METHOD_ARGON_FLOW,3,Experimental,Ar preheat,flow,50 Nml/min,50 Nml/min,50 Nml/min,pdftotext exact; method text page checked,stored method context
+METHOD_OXIDANT_FLOW,3,Experimental,oxidant gas,flow,320 Nml/min,320 Nml/min,320 Nml/min,pdftotext exact; method text page checked,stored method context
+METHOD_STARVATION_FLOW,3,Experimental,gas starvation rate,flow,300 Nml/min,300 Nml/min,300 Nml/min,pdftotext exact; method text page checked,stored method context
+METHOD_RECORDING_INTERVAL,3,Experimental,mass and temperature,recording interval,2 seconds,2 seconds,2 seconds,pdftotext exact; method text page checked,stored method context
+SHTT_TMIN,3,Results,preliminary SHTT,temperature range lower bound,1673 K,1673 K,1673 K,pdftotext exact; method/results page checked,stored qualitative result context
+SHTT_TMAX,3,Results,preliminary SHTT,temperature range upper bound,1873 K,1873 K,1873 K,pdftotext exact; method/results page checked,stored qualitative result context
+SHTT_DURATION,3,Results,preliminary SHTT,duration,nearly 24 hours,nearly 24 hours,nearly 24 hours,pdftotext exact; method/results page checked,stored qualitative result context
+RING_CR,4,Results,alumina ring,Cr content,up to 0.13 at. pct,0.13 at. pct,0.13 at. pct,pdftotext exact; 600 dpi prose render check,stored WDS context
+RING_ORIGINAL_CR,4,Results,slag sample,original Cr content,2.0 at. pct,2.0 at. pct,2.0 at. pct,pdftotext exact; 600 dpi prose render check,stored mass-balance context
+RING_WALL_VOLUME,4,Results,alumina ring wall,volume,15.7 mm3,15.7 mm3,15.7 mm3,pdftotext exact; 600 dpi prose render check,stored mass-balance context
+RING_SLAG_VOLUME,4,Results,slag sample,volume,12.5 mm3,12.5 mm3,12.5 mm3,pdftotext exact; 600 dpi prose render check,stored mass-balance context
+T4_TREATMENT_T,5,Table IV,caption,sample temperature,1873 K,1873 K,1873 K,both reads agree; 600 dpi table/caption check,stored table context
+T4_TREATMENT_TIME,5,Table IV,caption,sample duration,24 h,24 h,24 h,both reads agree; 600 dpi table/caption check,stored table context
+T4_SPINEL_O,5,Table IV,Spinel,O,61.82,61.82,61.82,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_MG,5,Table IV,Spinel,Mg,8.36,8.36,8.36,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_AL,5,Table IV,Spinel,Al,29.65,29.65,29.65,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_SI,5,Table IV,Spinel,Si,0.10,0.10,0.10,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_CA,5,Table IV,Spinel,Ca,0.04,0.04,0.04,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_SPINEL_CR,5,Table IV,Spinel,Cr,0.03,0.03,0.03,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_O,5,Table IV,Matrix,O,66.59,66.59,66.59,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_MG,5,Table IV,Matrix,Mg,3.07,3.07,3.07,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_AL,5,Table IV,Matrix,Al,17.84,17.84,17.84,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_SI,5,Table IV,Matrix,Si,8.03,8.03,8.03,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_CA,5,Table IV,Matrix,Ca,4.47,4.47,4.47,both reads agree; 600 dpi layout check,stored typed-refused context
+T4_MATRIX_CR,5,Table IV,Matrix,Cr,0.00,0.00,0.00,both reads agree; 600 dpi layout check,stored typed-refused context
+F2_T,4,Figure 2,caption,TGA,1873 K,1873 K,1873 K,pdftotext and 600 dpi page render agree,stored figure metadata
+F2_TIME,4,Figure 2,body text,soak duration,2 hours,2 hours,2 hours,pdftotext and 600 dpi page render agree,stored figure metadata
+F2_THICKNESS_1,4,Figure 2,legend,series 0.5mm O2,0.5 mm,0.5mm,0.5mm,600 dpi legend confirms thickness and gas; MinerU not run on page,stored figure metadata
+F2_THICKNESS_2,4,Figure 2,legend,series 1.0mm Air,1.0 mm,1.0mm,1.0mm,600 dpi legend confirms thickness and gas; MinerU not run on page,stored figure metadata
+F2_THICKNESS_3,4,Figure 2,legend,series 0.5mm Air,0.5 mm,0.5mm,0.5mm,600 dpi legend confirms thickness and gas; MinerU not run on page,stored figure metadata
+F3_T,4,Figure 3,caption,sample temperature,1873 K,1873 K,1873 K,pdftotext and render agree,stored figure metadata
+F3_TIME,4,Figure 3,caption,sample duration,24 h,24 h,24 h,pdftotext and render agree,stored figure metadata
+F4_T,4,Figure 4,caption,sample temperature,1873 K,1873 K,1873 K,pdftotext and render agree,stored figure metadata
+F4_TIME,4,Figure 4,caption,sample duration,24 h,24 h,24 h,pdftotext and render agree,stored figure metadata
+F5_TIME,5,Figure 5,caption,treatment time,6 h,6 h,6 h,pdftotext and 600 dpi render agree,stored figure metadata
+F5_THICKNESS,5,Figure 5,caption,sample thickness,0.5 mm,0.5 mm,0.5 mm,pdftotext and 600 dpi render agree,stored figure metadata
+F6_TIME_1,5,Figure 6,legend,series 2h O2,2 h,2h,2h,600 dpi legend confirms duration/gas,stored figure metadata
+F6_TIME_2,5,Figure 6,legend,series 6h O2,6 h,6h,6h,600 dpi legend confirms duration/gas,stored figure metadata
+F7_T,5,Figure 7,legend,all series,1873 K,1873K,1873K,600 dpi legend confirms temperature/gas labels,stored figure metadata
+F7_TIME,5,Figure 7,caption,soak duration,2 h,2 h,2 h,pdftotext and 600 dpi render agree,stored figure metadata
+F7_THICKNESS,5,Figure 7,caption,film thickness,0.5 mm,0.5 mm,0.5 mm,pdftotext and 600 dpi render agree,stored figure metadata
+F7_LABEL_O2,5,Figure 7,legend,oxygen series,1873K O2,1873K O2,1873K O2,600 dpi legend confirmed,stored figure metadata
+F7_LABEL_AIR,5,Figure 7,legend,air series,1873K Air,1873K Air,1873K Air,600 dpi legend confirmed,stored figure metadata
+F7_LABEL_AR,5,Figure 7,legend,argon series,1873K Ar,1873K Ar,1873K Ar,600 dpi legend confirmed,stored figure metadata
+F8_T,5,Figure 8,caption,sample temperature,1673 K,1673 K,1673 K,pdftotext and render agree,stored figure metadata
+F8_TIME,5,Figure 8,caption,sample duration,2 h,2 h,2 h,pdftotext and render agree,stored figure metadata
+F9_T,6,Figure 9,caption,soak temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored figure metadata
+F9_INITIAL_CR,6,Figure 9,caption,initial Cr content,2.0 atomic percent,2.0 atomic percent,2.0 atomic percent,pdftotext and render agree,stored figure metadata
+TEXT_CR_2H_INITIAL,6,Discussion,prose,initial Cr content,2 at. pct,2 at. pct,2 at. pct,pdftotext and 600 dpi render agree,stored textual WDS result context
+TEXT_CR_2H_REMAINING,6,Discussion,prose,Cr content after 2 h O2,0.27 at. pct,0.27 at. pct,0.27 at. pct,pdftotext and 600 dpi render agree,stored textual WDS result context
+TEXT_CR_2H_T,6,Discussion,prose,treatment temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored textual WDS result context
+TEXT_CR_2H_TIME,6,Discussion,prose,treatment duration,2 hours,2 hours,2 hours,pdftotext and 600 dpi render agree,stored textual WDS result context
+TEXT_CR_SUMMARY_TIME,5,Effect of Temperature,prose,treatment duration,6 hours,6 hours,6 hours,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
+TEXT_CR_SUMMARY_T1,5,Effect of Temperature,prose,temperature,1773 K,1773 K,1773 K,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
+TEXT_CR_SUMMARY_LOSS,5,Effect of Temperature,prose,loss at 1773 K,about 50 pct,about 50 pct,about 50 pct,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
+TEXT_CR_SUMMARY_T2,5,Effect of Temperature,prose,temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
+TEXT_CR_SUMMARY_ZERO,5,Effect of Temperature,prose,loss at 1873 K,zero value,zero value,zero value,pdftotext and 600 dpi render agree,stored textual Cr-loss summary context
+TEXT_RELATIVE_RATE,5,Effect of Oxygen Partial Pressure,prose,air-to-oxygen rate ratio,about 0.4 times,about 0.4 times,about 0.4 times,pdftotext and 600 dpi render agree,stored ratio context with schema gap
+TEXT_RELATIVE_RATE_T,5,Effect of Oxygen Partial Pressure,prose,figure treatment temperature,1873 K,1873 K,1873 K,pdftotext and 600 dpi render agree,stored ratio context
+TEXT_RELATIVE_RATE_TIME,5,Effect of Oxygen Partial Pressure,prose,figure treatment duration,2 hours,2 hours,2 hours,pdftotext and 600 dpi render agree,stored ratio context
+TEXT_MISMATCH_THICKNESS,5,Effect of Oxygen Partial Pressure,prose,quoted sample thickness,0.5 m,0.5 m,0.5 m,600 dpi render confirms “0.5 m”; Figure 2 legend disagrees with the prose comparison,retained verbatim and flagged as source mismatch
+TEXT_MISMATCH_AIR,5,Effect of Oxygen Partial Pressure,prose,air comparison thickness,1 mm,1 mm,1 mm,600 dpi render confirms 1 mm,retained prose wording; comparison remains ambiguous
