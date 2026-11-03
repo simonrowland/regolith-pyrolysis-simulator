@@ -1,0 +1,646 @@
+schema_version: literature_extract.v1
+source_id: wetzel-2012-heidelberg-thesis
+source:
+  citation: >-
+    Wetzel, S. (2012), Infrarotspektroskopische Untersuchung von Siliziumoxiden,
+    Silikaten, deren Wechselwirkung mit Metallinselfilmen sowie
+    Dampfdruckmessungen an Siliziummonoxid, PhD thesis, Heidelberg.
+  year: 2012
+  corpus_asset: raw/wetzel-2012-heidelberg-thesis/wetzel-2012-heidelberg-thesis.pdf
+extraction:
+  method: >-
+    SiO chapter machine text transcribed from the born-digital pdftotext layer;
+    MinerU table draft and QA found no tables in the available chunks. Rendered
+    PDF pages were used to verify apparatus values, the equation cells, and the
+    full Table 2.2 layout. Numeric points shown only in Figure 2.11 were not
+    digitized.
+  date: '2026-11-02'
+  worker: w1103cw2-wz12
+  overlap:
+    source_id: gail-2013-sio-nucleation-silicate-dust
+    note: >-
+      Gail et al. 2013 reuses the Wetzel 2012 Heidelberg Knudsen-cell/QCM SiO
+      measurements, including the plotted alpha and vapor-pressure series.
+      This extract records the thesis fit equations and Table 2.2, not duplicate
+      graph points; count this as the same experiment.
+schema_gaps:
+- observation_ids:
+  - wetzel_2012_sio_sublimation_enthalpy_1400K
+  - wetzel_2012_sio_sublimation_enthalpy_298K
+  quantity_label: sublimation_enthalpy
+  reason: >-
+    The printed SiO sublimation enthalpy has no exact quantity token. Quantity
+    only has second-law and third-law enthalpy-of-vaporization tokens;
+    QUANTITY_ALIASES has no exact sublimation-enthalpy alias, and TYPE_QUANTITY
+    would infer delta_fG for gibbs_table if the descriptive quantity were
+    omitted. The rows remain typed refusals with the printed values retained.
+  code_symbols:
+  - simulator/battery/enums.py::Quantity
+  - simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY
+  - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+benches:
+- id: wetzel_sio_knudsen_qcm
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Electron-bombardment heated Knudsen cell with quartz crystal balance
+    locator:
+      page: 21
+      published_page: 11
+      section: '2.2.1'
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion; QCM deposition rate used to determine cell mass loss
+    locator:
+      page: 21
+      published_page: 11
+      section: '2.2.1'
+  cell_materials:
+  - state:
+      tag: value
+      value: Ta
+    locator:
+      page: 24
+      published_page: 14
+      figure: '2.5'
+  detector:
+    state:
+      tag: value
+      value: Quartz crystal balance
+    locator:
+      page: 21
+      published_page: 11
+      section: '2.2.1'
+  temperature_calibration:
+    method:
+      state:
+        tag: value
+        value: >-
+          Thermocouple in a tungsten-powder-filled dummy charge compared against
+          an ice-water reference; thermocouple voltage isolated and read by
+          optocoupler and data-acquisition card.
+      locator:
+        page: 27
+        published_page: 17
+        section: '2.2.3'
+    validation:
+      state:
+        tag: value
+        value: Checked by observing copper melting in the calibrated range
+      locator:
+        page: 28
+        published_page: 18
+        section: '2.2.3'
+  other_facts:
+  - name: crucible_to_qcm_distance
+    unit: cm
+    printed_form: '9,7 cm'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '9.7'
+      locator:
+        page: 21
+        published_page: 11
+        section: '2.2.1'
+  - name: chamber_base_pressure_after_bakeout
+    unit: mbar
+    printed_form: '1 · 10⁻¹⁰ mbar'
+    note: Printed post-bakeout chamber base pressure, not the SiO run total-pressure condition.
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1e-10'
+      locator:
+        page: 21
+        published_page: 11
+        section: '2.2.1'
+  - name: qcm_resonant_frequency
+    unit: MHz
+    printed_form: '6 MHz'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6'
+      locator:
+        page: 21
+        published_page: 11
+        section: '2.2.1'
+  - name: qcm_mass_areal_change_per_frequency_change
+    unit: g/cm2 per Hz
+    printed_form: '1 Hz corresponds to 12,3 · 10⁻⁹ g/cm²'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.23e-8'
+      locator:
+        page: 21
+        published_page: 11
+        section: '2.2.1'
+  - name: filament_count
+    printed_form: 'four filaments'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+      locator:
+        page: 23
+        published_page: 13
+        section: '2.2.1'
+  - name: filament_length
+    unit: mm
+    printed_form: 'approximately 17 mm'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '17'
+          approximate: true
+      locator:
+        page: 23
+        published_page: 13
+        section: '2.2.1'
+  - name: thermocouple_accuracy
+    unit: '%'
+    printed_form: '1%'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1'
+      locator:
+        page: 27
+        published_page: 17
+        section: '2.2.3'
+  - name: temperature_calibration_error
+    unit: '%'
+    printed_form: '1,4%'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1.4'
+      locator:
+        page: 27
+        published_page: 17
+        section: '2.2.3'
+  - name: temperature_error_used_for_vapor_pressure
+    unit: '%'
+    printed_form: '2%'
+    note: Adopted in place of 1.4% because measurement was not in situ.
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+  - name: aperture_area_assumed_relative_error
+    unit: '%'
+    printed_form: '10%'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+  - name: sample_surface_area_assumed_relative_error
+    unit: '%'
+    printed_form: '10%'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+  - name: clausing_factor_relative_error
+    unit: '%'
+    printed_form: '4%'
+    note: >-
+      The L/r ratio uncertainty is described as being of the same order as the
+      10% area errors; the text gives 4% for the Clausing factors.
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '4'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+  - name: qcm_mass_rate_assumed_relative_error
+    unit: '%'
+    printed_form: '10%'
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+  - name: SiO_alpha_mean_statistical_deviation
+    unit: dimensionless
+    printed_form: '0,02'
+    note: Statistical deviation of the mean across series; confidence level not stated.
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.02'
+      locator:
+        page: 30
+        published_page: 20
+        section: '2.2.5'
+experiments:
+- experiment_id: wetzel_sio_orifice_0_79_mm
+  bench_id: wetzel_sio_knudsen_qcm
+  method: knudsen_effusion
+  locator:
+    page: 34
+    published_page: 24
+    section: '2.3.2'
+    figure: '2.11'
+  sample:
+    material: amorphous SiO powder
+    particle_size_as_printed: 325 mesh
+    purity:
+      value: 99.99
+      printed_form: '99,99% mass purity'
+      unit: '%'
+  apparatus:
+    geometry:
+      orifice_diameter:
+        value: 0.79
+        uncertainty: 0.06
+        printed_form: '0,79 ± 0,06 mm'
+        unit: mm
+- experiment_id: wetzel_sio_orifice_0_50_mm
+  bench_id: wetzel_sio_knudsen_qcm
+  method: knudsen_effusion
+  locator:
+    page: 34
+    published_page: 24
+    section: '2.3.2'
+    figure: '2.11'
+  sample:
+    material: amorphous SiO powder
+    particle_size_as_printed: 325 mesh
+    purity:
+      value: 99.99
+      printed_form: '99,99% mass purity'
+      unit: '%'
+  apparatus:
+    geometry:
+      orifice_diameter:
+        value: 0.5
+        uncertainty: 0.04
+        printed_form: '0,5 ± 0,04 mm'
+        unit: mm
+species:
+  SiO:
+    observations:
+    - observation_id: wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25
+      type: alpha
+      locator:
+        page: 34
+        published_page: 24
+        equation: '2.25'
+        section: '2.3.2'
+      phase: gas
+      regime: knudsen_effusion
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: measured_reduced
+        experiment_ids:
+        - wetzel_sio_orifice_0_79_mm
+        - wetzel_sio_orifice_0_50_mm
+        equation_as_printed: 'α (T ) = 0,20821 − 3,12269 · 10⁻⁴ · T/K + 1,35599 · 10⁻⁷ · T²/K²'
+        coefficients:
+          constant:
+            value: 0.20821
+            printed_form: '0,20821'
+          linear_per_K:
+            value: -0.000312269
+            printed_form: '−3,12269 · 10⁻⁴'
+          quadratic_per_K2:
+            value: 0.000000135599
+            printed_form: '1,35599 · 10⁻⁷'
+        derivation:
+          relation: Equation (2.9) determines alpha from the two aperture series; Equation (2.25) fits those measured values.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 35
+              published_page: 25
+              figure: '2.11'
+              note: Numeric alpha series points are plotted only and are not transcribed.
+        input_data_status: >-
+          The authors fit values shown in Figure 2.11a; no numeric alpha points
+          are tabulated, so figure points are not included.
+      uncertainty:
+        note: No coefficient uncertainty is printed; point-level alpha deviation is reported separately.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The fit is a function of T; no numeric point or fit interval is printed in text.
+          locator:
+            page: 34
+            published_page: 24
+            equation: '2.25'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No in-run total-pressure condition is printed for these measurements.
+          locator:
+            page: 34
+            published_page: 24
+            figure: '2.11'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity condition is printed for these measurements.
+          locator:
+            page: 34
+            published_page: 24
+            section: '2.3.2'
+    - observation_id: wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26
+      type: psat_series
+      locator:
+        page: 36
+        published_page: 26
+        equation: '2.26'
+        section: '2.3.2'
+      phase: gas
+      condensed_form:
+        state: amorphous
+        basis: explicit_author
+        note: Source identifies amorphous SiO powder as the starting solid.
+      standard_state: SiO(g) equilibrium vapor pressure above solid SiO
+      units: Pa
+      regime: knudsen_effusion
+      values:
+        quantity: pure_Psat
+        gas_species: SiO
+        reservoir:
+          formula: SiO
+          phase:
+            tag: value
+            value: cr
+        method_class: measured_reduced
+        experiment_ids:
+        - wetzel_sio_orifice_0_79_mm
+        - wetzel_sio_orifice_0_50_mm
+        source_form: ln(p_Pa) = A/T_K + B
+        equation_as_printed: 'ln(p_GG,fest / Pa) = (−50,4 ± 0,5) × 10³/(T/K) + (35,5 ± 0,4)'
+        coefficients:
+          A:
+            value: -50400
+            unit: K
+            printed_form: '(−50,4 ± 0,5) × 10³'
+            uncertainty: 500
+          B:
+            value: 35.5
+            printed_form: '(35,5 ± 0,4)'
+            uncertainty: 0.4
+        derivation:
+          relation: Equation (2.20) reduces the QCM mass rate to equilibrium vapor pressure; Equation (2.26) fits that series.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 35
+              published_page: 25
+              figure: '2.11'
+              note: Numeric pressure series points are plotted only and are not transcribed.
+          input_data_status: Numeric pressure points are shown in Figure 2.11b only and are not transcribed.
+      uncertainty:
+        note: Printed coefficient widths; confidence level not stated.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The fit is a function of T; no numeric point or fit interval is printed in text.
+          locator:
+            page: 36
+            published_page: 26
+            equation: '2.26'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: Equilibrium vapor pressure is the fitted output, not the experiment's total-pressure condition; no total pressure is printed.
+          locator:
+            page: 36
+            published_page: 26
+            equation: '2.26'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity condition is printed for these measurements.
+          locator:
+            page: 36
+            published_page: 26
+            section: '2.3.2'
+    - observation_id: wetzel_2012_sio_sublimation_enthalpy_1400K
+      type: gibbs_table
+      locator:
+        page: 36
+        published_page: 26
+        table: '2.2'
+        row: ΔH1400K
+        equation: '2.26'
+      phase: gas
+      standard_state: ΔH_sublimation(SiO) at 1400 K
+      units: kJ/mol
+      values:
+        quantity: sublimation_enthalpy
+        method_class: measured_reduced
+        value: 419
+        uncertainty: 4
+        printed_form: '419 ± 4'
+        unit: kJ/mol
+        T_K: 1400
+        derivation:
+          relation: Equation (2.4) applied to the measured pressure fit of Equation (2.26).
+      derived_from:
+      - wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1400'
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+            row: ΔH1400K
+          note: Property reference temperature, not an in-run temperature setpoint.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total-pressure condition is printed.
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity condition is printed.
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+    - observation_id: wetzel_2012_sio_sublimation_enthalpy_298K
+      type: gibbs_table
+      locator:
+        page: 36
+        published_page: 26
+        table: '2.2'
+        row: ΔH298K
+        equation: '2.27'
+      phase: gas
+      standard_state: ΔH_sublimation(SiO) at 298 K
+      units: kJ/mol
+      values:
+        quantity: sublimation_enthalpy
+        method_class: quoted_attributed
+        attribution: This work; 298 K reduction uses heat-capacity inputs from references [48] and [38].
+        value: 432
+        uncertainty: 4
+        printed_form: '432 ± 4'
+        unit: kJ/mol
+        T_K: 298
+        repeated_in_equation: '2.27'
+        comparisons:
+        - citation: '[58]'
+          value: 321
+          printed_form: '321'
+          method_class: quoted_attributed
+        - citation: '[60]'
+          value: 410
+          printed_form: '410'
+          method_class: quoted_attributed
+        - citation: '[61]'
+          value: 360
+          uncertainty: 4
+          printed_form: '360 ± 4'
+          method_class: quoted_attributed
+        - citation: '[62]'
+          value: 351
+          uncertainty: 11
+          printed_form: '351 ± 11'
+          method_class: quoted_attributed
+        derivation:
+          relation: >-
+            The authors adjust the 1400 K enthalpy to 298 K using heat capacities
+            and an integral described as taken from references [48] and [38].
+          external_inputs_as_printed:
+          - '[48] heat capacities; external numeric inputs not stored'
+          - '[38] heat capacities; external numeric inputs not stored'
+      derived_from:
+      - wetzel_2012_sio_sublimation_enthalpy_1400K
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '298'
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+            row: ΔH298K
+          note: Property reference temperature, not an in-run temperature setpoint.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total-pressure condition is printed.
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity condition is printed.
+          locator:
+            page: 36
+            published_page: 26
+            table: '2.2'
+      uncertainty:
+        note: Printed width; confidence level not stated.
+fidelity_samples:
+- path: species.SiO.observations[wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25].values.coefficients.constant.value
+  value: 0.20821
+  locator:
+    page: 34
+    published_page: 24
+    equation: '2.25'
+    note: Printed constant term 0,20821.
+- path: species.SiO.observations[wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25].values.coefficients.linear_per_K.value
+  value: -0.000312269
+  locator:
+    page: 34
+    published_page: 24
+    equation: '2.25'
+    note: Printed coefficient −3,12269 × 10⁻⁴.
+- path: species.SiO.observations[wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26].values.coefficients.A.value
+  value: -50400
+  locator:
+    page: 36
+    published_page: 26
+    equation: '2.26'
+    note: Printed coefficient (−50,4 ± 0,5) × 10³.
+- path: species.SiO.observations[wetzel_2012_sio_sublimation_enthalpy_1400K].values.value
+  value: 419
+  locator:
+    page: 36
+    published_page: 26
+    table: '2.2'
+    row: ΔH1400K
+    note: Table 2.2, this work.
+- path: species.SiO.observations[wetzel_2012_sio_sublimation_enthalpy_298K].values.comparisons[3].value
+  value: 351
+  locator:
+    page: 36
+    published_page: 26
+    table: '2.2'
+    row: ΔH298K
+    note: Table 2.2, [62] comparison.
