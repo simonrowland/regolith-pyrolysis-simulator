@@ -3839,8 +3839,7 @@ species:
           locator: *id064
       values:
         quantity: combined_log_partial_pressure_relation
-        method_class: quoted_attributed
-        attribution: Dai, Seetharaman & Staffansson (1984), Table VI, row 10.
+        method_class: model_derived
         status: typed_refused_schema_gap
         schema_gap: A combined logarithmic pressure relation is not a single-species
           pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
@@ -3849,8 +3848,36 @@ species:
         relation_as_printed: log(P_O2) = -19385/T - 3.07
         phase_assemblage_as_printed: Gas, Na2Fe2O4(s), wüstite
         temperature_variable_as_printed: T; no bounded interval printed
-        derivation_input_note: Table VI row 10 gives no reaction or other derivation
-          input; no reaction or parent is assigned.
+      derivation:
+        relation: The authors state that Table VI pressure functions were calculated
+          from Gibbs energy functions given in this work; no row-specific Gibbs input
+          is identified for this printed relation.
+        inputs: []
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            section: The phase stability diagram
+            note: The authors state that the pressure functions were calculated from
+              Gibbs energy functions given in this work; the row-specific inputs
+              are not printed.
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: Table VI pressure functions are calculated from Gibbs energy
+              functions given in this work; row 10 prints log(P_O2) = -19385/T - 3.07.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '10'
+            equation: log(P_O2) = -19385/T - 3.07
+        references:
+        - Dai, Seetharaman & Staffansson (1984), Gibbs energy functions given in this work.
     - observation_id: dai_1984_table7_r1_873_o2_log_pressure
       type: partial_pressure
       locator: &id065

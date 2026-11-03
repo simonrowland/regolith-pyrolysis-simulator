@@ -369,14 +369,28 @@ def test_dai_1984_printed_tables_survive_the_real_migrator_and_render_pins():
     assert "9920 J/mol constant-term gap" in table4_na2fe2o4["values"]["source_consistency_note"]
     table6_r10 = raw_rows["dai_1984_table6_r10_log_pressure_relation"]
     assert "derived_from" not in table6_r10
-    assert "derivation" not in table6_r10
-    assert table6_r10["values"]["method_class"] == "quoted_attributed"
+    assert table6_r10["values"]["method_class"] == "model_derived"
     assert table6_r10["values"]["relation_as_printed"] == "log(P_O2) = -19385/T - 3.07"
-    assert "no reaction or other derivation input" in table6_r10["values"]["derivation_input_note"]
+    assert not table6_r10["derivation"]["inputs"]
+    assert table6_r10["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert table6_r10["derivation"]["raw_inputs"]["locator"]["page"] == 5
+    assert table6_r10["derivation"]["method"]["locator"]["table"] == "VI"
+    assert table6_r10["derivation"]["method"]["locator"]["row"] == "10"
+    assert table6_r10["derivation"]["method"]["locator"]["equation"] == (
+        "log(P_O2) = -19385/T - 3.07"
+    )
     migrated_table6_r10 = _find(
         observations, "dai_1984_table6_r10_log_pressure_relation"
     )
-    assert migrated_table6_r10.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert migrated_table6_r10.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert not migrated_table6_r10.derived_from
+    assert migrated_table6_r10.derivation.declares_unprinted_raw_inputs
+    assert migrated_table6_r10.derivation.has_located_unprinted_raw_inputs
+    assert migrated_table6_r10.derivation.has_located_method
+    assert migrated_table6_r10.derivation.method.state.value == (
+        "Table VI pressure functions are calculated from Gibbs energy functions "
+        "given in this work; row 10 prints log(P_O2) = -19385/T - 3.07."
+    )
 
     emf_context = extract["species"]["Na2Fe2O4"]["context"]
     assert len(emf_context) == 1
