@@ -281,6 +281,67 @@ def test_runner_recipe_runtime_campaign_overrides_win_same_key(
 ) -> None:
     schema = RecipeSchema()
     recipe = schema.to_setpoints_patch(
+        # 0.05 mbar is under C4's 0.2 mbar total, but RecipeSchema floors
+        # campaigns.C4.pO2_mbar at the setpoints range low, 0.08. A recipe
+        # file of 0.05 never reaches the runner. 0.08 is that floor: still
+        # under the total, and distinct from the 0.15 mbar runtime override.
+        RecipePatch({
+            ("campaigns", "C4", "pO2_mbar"): 0.08,
+        })
+    )
+    recipe_path = tmp_path / "c4-po2.recipe.yaml"
+    recipe_path.write_text(yaml.safe_dump(recipe, sort_keys=True), encoding="utf-8")
+    output_path = tmp_path / "run.json"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "simulator.runner",
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--campaign",
+            "C4",
+            "--hours",
+            "1",
+            "--recipe",
+            str(recipe_path),
+            "--runtime-campaign-overrides",
+            json.dumps({"C4": {"pO2_mbar": 0.15}}),
+            "--allow-fallback-vapor",
+            "--started-at-utc",
+            "2026-05-15T00:00:00Z",
+            "--kernel-commit-sha",
+            "recipe-test",
+            "--output",
+            str(output_path),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["status"] == "ok"
+    # Premise: the winning runtime override is 0.15 mbar, and 1 bar = 1000 mbar.
+    # Algebra: pO2_bar = 0.15 / 1000 = 1.5e-4.
+    # Unit check: mbar / (mbar/bar) = bar.
+    # Limit: 0 mbar -> 0 bar; C4's 0.2 mbar total -> 2e-4 bar, still above this.
+    assert payload["per_hour_summary"][0]["pO2_bar"] == pytest.approx(0.00015)
+
+
+def test_runner_recipe_runtime_po2_above_total_refuses(
+    tmp_path: Path,
+) -> None:
+    """Runtime 0.3 mbar against C4's 0.2 mbar total is a typed refusal.
+
+    The runner catches that ValueError, writes the reason on the failure
+    document, and returns 1. This CLI path does not print the reason.
+    """
+    schema = RecipeSchema()
+    recipe = schema.to_setpoints_patch(
         RecipePatch({
             ("campaigns", "C4", "pO2_mbar"): 0.1,
         })
@@ -318,10 +379,11 @@ def test_runner_recipe_runtime_campaign_overrides_win_same_key(
         check=False,
     )
 
-    assert completed.returncode == 0, completed.stderr
+    assert completed.returncode != 0
     payload = json.loads(output_path.read_text(encoding="utf-8"))
-    assert payload["status"] == "ok"
-    assert payload["per_hour_summary"][0]["pO2_bar"] == pytest.approx(0.0003)
+    assert payload["status"] == "failed"
+    assert "melt_pressure_partial_exceeds_total" in payload["error_message"]
+    assert "pO2_mbar=0.3 > p_total_mbar=0.2" in payload["error_message"]
 
 
 def test_runner_recipe_cli_without_runtime_override_uses_recipe_same_key(

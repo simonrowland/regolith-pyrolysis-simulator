@@ -156,7 +156,7 @@ def test_session_merged_recipe_patch_has_no_implicit_override_layer() -> None:
     assert c4_config["pO2_mbar_default"] == pytest.approx(0.12)
 
 
-def test_loaded_recipe_patch_explicit_runtime_override_still_wins() -> None:
+def test_loaded_recipe_patch_runtime_po2_above_total_refuses() -> None:
     run = PyrolysisRun(
         feedstock_id=FEEDSTOCK,
         campaign="C4",
@@ -171,14 +171,13 @@ def test_loaded_recipe_patch_explicit_runtime_override_still_wins() -> None:
         runtime_campaign_overrides={"C4": {"pO2_mbar": 0.3}},
     )
 
-    session = SimSession().start(run._session_config())
+    config = run._session_config()
+    assert config.setpoints["campaigns"]["C4"]["p_total_mbar_default"] == pytest.approx(
+        0.1
+    )
 
-    assert session.simulator.campaign_mgr._campaign_config(CampaignPhase.C4)[
-        "pO2_mbar_default"
-    ] == pytest.approx(0.1)
-    assert session.simulator.campaign_mgr._campaign_overrides(CampaignPhase.C4)[
-        "pO2_mbar"
-    ] == pytest.approx(0.3)
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+        SimSession().start(config)
 
 
 def test_setpoints_patch_rejects_chemistry_kernel() -> None:

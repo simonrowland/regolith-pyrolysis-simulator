@@ -4411,20 +4411,21 @@ def _apply_sio_wall_sweep_controls(
 ) -> None:
     runtime_override = sim.campaign_mgr.overrides.setdefault("C2A", {})
     if pO2_mbar is not None:
+        # Bool and other non-scalars stay TypeError. The scalar-boundary
+        # gate pins that type. A numeric string is a declared real here
+        # and is coerced before the owner sees it. NaN is a declared
+        # real; `nan < 0` is false, so the owner, not this comparison,
+        # refuses it.
         if not is_declared_real_scalar(pO2_mbar, allow_numeric_str=True):
             raise TypeError("pO2_mbar must be numeric")
-        # VALIDATE THE RAW VALUE BEFORE ANY FLOOR. Order is load-bearing:
-        # max(0.0, -1.0) is 0.0, which is then written to melt.pO2_mbar
-        # and the C2A override and switches atmosphere to CONTROLLED_O2.
-        # The web path (_coerce_runtime_campaign_overrides) and session
-        # adjust already refuse pO2 < 0; this CLI/runner path did not.
-        # inf is not laundered by max(0, inf). A negative fugacity is.
         pO2_value = float(pO2_mbar)
-        if pO2_value < 0.0:
-            raise ValueError("pO2_mbar must be non-negative")
+        CampaignManager._validate_runtime_pressure_overrides(
+            "C2A",
+            {"pO2_mbar": pO2_value},
+            effective_p_total_mbar=sim.melt.p_total_mbar,
+        )
         runtime_override["pO2_mbar"] = pO2_value
         sim.melt.pO2_mbar = pO2_value
-        sim.melt.p_total_mbar = max(float(sim.melt.p_total_mbar), pO2_value)
         sim.overhead.composition["O2"] = max(
             float(sim.overhead.composition.get("O2", 0.0)),
             pO2_value,
@@ -5611,16 +5612,20 @@ def _parse_runtime_campaign_overrides_json(
     loaded = json.loads(raw_json)
     if not isinstance(loaded, Mapping):
         raise RunnerError(f"{flag_name} must decode to an object")
-    parsed: dict[str, dict[str, float]] = {}
+    parsed: dict[str, dict[str, Any]] = {}
     for campaign, fields in loaded.items():
         if not isinstance(fields, Mapping):
             raise RunnerError(
                 f"{flag_name}[{campaign!r}] must decode to an object"
             )
-        parsed[str(campaign)] = {
-            str(field): float(value)
-            for field, value in fields.items()
-        }
+        parsed[str(campaign)] = {}
+        for field, value in fields.items():
+            field_name = str(field)
+            parsed[str(campaign)][field_name] = (
+                value
+                if field_name in {"p_total_mbar", "pO2_mbar"}
+                else float(value)
+            )
     return parsed
 
 
