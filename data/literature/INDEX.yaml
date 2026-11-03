@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 753
-  extracts: 751
+  sources: 754
+  extracts: 752
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 751
+  extracts_without_pdf: 752
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -186,6 +186,7 @@ gaps:
   - hanson-jones-1998-am-cr-partitioning-olivine-liquid
   - hashimoto-nakano-2021-bubbles-to-chondrites-ii
   - haskin-1990-lunar-molten-regolith-electrolysis-nasa-report
+  - hayashi-2025-ca-fe-silicate-redox-activities
   - he-2017-karrooite-ordering-heat-capacity
   - henao-2001-ni-cr-mn-co-cu-slag-distribution
   - hendrix-2024-reactivity-reduced-simulants
@@ -11185,6 +11186,66 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: hayashi-2025-ca-fe-silicate-redox-activities
+  aliases: []
+  citation: Hayashi, M., Takatsuji, S., Kubuki, S., Watanabe, T., Endo, R., and Susa, M. (2025). Effect
+    of Coordination Structure of Iron Ions on Iron Oxide Activity Coefficients in the CaO-SiO2-FeO-Fe2O3
+    Slags at 1573 K Under Oxygen Partial Pressures Between 10^-9 and 10^-4 atm. Steel Research International,
+    96, 2400068.
+  doi: 10.1002/srin.202400068
+  report_number: null
+  identifier: 10.1002/srin.202400068
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/hayashi-2025-ca-fe-silicate-redox-activities.yaml
+    review_status: draft
+    rows: 65
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/hayashi-2025-ca-fe-silicate-redox-activities/hayashi-2025-ca-fe-silicate-redox-activities.pdf
+      present: true
+      sha256: 6fb6938fdc9d21e324d98d42a19cba5f650c502216529d3f7b6ce6d28edb8fd2
+      matches_simulator: null
+    sidecar:
+      path: raw/hayashi-2025-ca-fe-silicate-redox-activities/sidecar.yaml
+      present: true
+    text:
+      path: text/hayashi-2025-ca-fe-silicate-redox-activities
+      exists: true
+      file_count: 47
+    tables:
+      path: tables/hayashi-2025-ca-fe-silicate-redox-activities
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/hayashi-2025-ca-fe-silicate-redox-activities.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/hayashi-2025-ca-fe-silicate-redox-activities.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 7703951239c23a6e25deca4fae02e322649d8493
 - source_id: he-2017-karrooite-ordering-heat-capacity
   aliases: []
   citation: He, M., Winkler, B., Bauer, J. D., Bayarjargal, L., Ruiz-Fuertes, J., Alencar, I., Morgenroth,
