@@ -3367,7 +3367,10 @@ def test_non_phase_row_point_pressure_is_identity_and_overrides_parent_default(
                 },
                 "point_conditions": {
                     "total_pressure_Pa": {
-                        "state": {"tag": "value", "value": "80000"},
+                        "state": {
+                            "tag": "value",
+                            "value": {"kind": "point", "point": "80000"},
+                        },
                         "locator": {"table": "I", "page": 3},
                     }
                 },
@@ -3455,6 +3458,62 @@ def test_non_phase_scalar_point_pressure_is_identity(tmp_path: Path) -> None:
     observation = next(iter(result.observations.values()))
 
     assert observation.identity.total_pressure_Pa == State.of(as_decimal("80000"))
+
+
+def test_simeonov_gamma_printed_uncompared_pressure_is_identity(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "simeonov-sano-1985-na-bearing-mno-activities.yaml"
+    )
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith(
+            "::simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+        )
+    )
+
+    assert observation.identity.total_pressure_Pa == State.of(Decimal("101325"))
+
+
+def test_non_phase_uncompared_explicit_unknown_pressure_stays_unknown(
+    tmp_path: Path,
+) -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "simeonov-sano-1985-na-bearing-mno-activities.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    gamma = next(
+        observation
+        for observation in extract["species"]["Mn"]["observations"]
+        if observation["observation_id"]
+        == "simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+    )
+    gamma["point_conditions"]["total_pressure_Pa"]["state"] = {
+        "tag": "unknown",
+        "reason": "pressure not stated for this run",
+    }
+    result = _migrate_real_extract(
+        tmp_path,
+        "simeonov-sano-1985-na-bearing-mno-activities.yaml",
+        extract_doc=extract,
+    )
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith(
+            "::simeonov_sano_1985_gamma_mn_carbon_saturated_iron"
+        )
+    )
+
+    assert observation.identity.total_pressure_Pa == State.unknown(
+        "pressure not stated for this run"
+    )
 
 
 def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(

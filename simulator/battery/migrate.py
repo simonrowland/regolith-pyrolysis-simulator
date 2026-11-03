@@ -7307,19 +7307,31 @@ def _explicit_point_conditions(raw: object) -> dict[str, Located[Any]]:
     }
 
 
-def _required_point_pressure(
+def _point_pressure_for_identity(
     identity: Identity | None,
     point_conditions: Mapping[str, Located[Any]] | None,
 ) -> State[Decimal] | None:
-    if identity is None or "total_pressure_Pa" not in profile_for(identity).required:
+    if identity is None:
+        return None
+    if (
+        "total_pressure_Pa" not in profile_for(identity).required
+        and "total_pressure_Pa" not in _uncompared_axes_for(identity)
+    ):
         return None
     located = (point_conditions or {}).get("total_pressure_Pa")
     if not isinstance(located, Located):
         return None
     state = located.state
-    if state.is_value and not isinstance(state.value, Decimal):
+    if not state.is_value:
+        return state
+    value = state.value
+    if isinstance(value, Value):
+        if value.kind is not ValueKind.POINT:
+            return None
+        value = value.point
+    if not isinstance(value, Decimal):
         return None
-    return state
+    return State.of(value)
 
 
 def _located_explicit_point_composition(
@@ -22076,7 +22088,7 @@ class Migrator:
             else None
         )
         pressure_state = (
-            _required_point_pressure(identity_for_profile, point_conditions)
+            _point_pressure_for_identity(identity_for_profile, point_conditions)
             if not has_point_children
             else None
         )
@@ -24452,7 +24464,7 @@ class Migrator:
             and isinstance(q_token_point, Quantity)
             and isinstance(raw_item, Mapping)
         ):
-            row_pressure_state = _required_point_pressure(
+            row_pressure_state = _point_pressure_for_identity(
                 identity,
                 _explicit_point_conditions(raw_item.get("point_conditions")),
             )
