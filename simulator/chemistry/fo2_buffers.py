@@ -1,4 +1,9 @@
-"""Solid-buffer oxygen fugacity owner for printed IW, QFM, and NNO offsets.
+"""Solid-buffer oxygen fugacity owner for printed buffer offsets.
+
+IW, QFM, and NNO are the d-324 curves. Mo-MoO2, MH, and MW are the
+d-324 extension (t-1624): an EMF or assessed-table central inside its
+window, a JANAF route above that window, and an unsized band once every
+table and fit has ended.
 
 One module owns the calibrations migration may apply. Runtime redox still
 uses its own lines and must not import this module:
@@ -40,9 +45,10 @@ Frost's coefficient is not used.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from decimal import ROUND_HALF_UP, Decimal
-from typing import Callable
+from dataclasses import dataclass, replace
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
+from pathlib import Path
+from typing import Callable, Mapping
 
 # 1 atm = 1.01325 bar. log10(fO2/bar) = log10(fO2/atm) + log10(1.01325).
 _ATM_BAR = Decimal("1.01325")
@@ -77,8 +83,26 @@ class Calibration:
 
 
 @dataclass(frozen=True)
+class EdgeOffset:
+    """Signed log10(fO2/bar) offset between the region-2 central and one route.
+
+    ``signed_dex`` is central minus the named route, both already rounded
+    to the survey table's 0.0001. The sign does not depend on which region
+    the requested temperature falls in.
+    """
+
+    route_id: str
+    edge_temperature_K: Decimal
+    signed_dex: Decimal
+
+
+@dataclass(frozen=True)
 class BufferEvaluation:
-    """log10(fO2/bar) of one calibration, plus the band at that T and P."""
+    """log10(fO2/bar) of one calibration, plus the band at that T and P.
+
+    ``band_dex`` is None only for the extension's region 3, where no
+    calibration sizes the band. ``region`` is None for IW, QFM, and NNO.
+    """
 
     buffer: str
     calibration_id: str
@@ -86,10 +110,14 @@ class BufferEvaluation:
     temperature_K: Decimal
     pressure_bar: Decimal | None
     authority: str
-    band_dex: Decimal
+    band_dex: Decimal | None
     provenance: str
     pressure_coefficient_spread: bool
     valid_calibration_ids: tuple[str, ...]
+    region: int | None = None
+    edge_offsets: tuple[EdgeOffset, ...] = ()
+    unsized_notice: str | None = None
+    divergence_note: str | None = None
 
 
 def _in_window(cal: Calibration, temperature_K: Decimal) -> bool:
@@ -356,6 +384,415 @@ def _log_nno_charette(temperature_K: Decimal, pressure_bar: Decimal | None) -> D
     return _ab_atm("-24405", "8.867", temperature_K)
 
 
+# d-324 extension. Reactions are written per mole of O2, so
+# log10(fO2/bar) = ΔrG / (R T ln 10). The ruling's factor 2 is that
+# stoichiometric normalization (a half-O2 Ellingham reaction doubled onto
+# one mole of O2). It is not applied a second time.
+#
+# Mo-MoO2: Mo(cr) + O2 = MoO2(cr).
+#   ΔrG = ΔfG(MoO2) − ΔfG(Mo). JANAF Mo-009 and Mo-002.
+#   This is the formation reaction, so log10(fO2/bar) = −log10(Kf) when
+#   ΔfG(Mo) is 0. Unit check against the MoO2 log-Kf column (3 d.p., the
+#   table's precision), CODATA R = 8.31446261815324 J K^-1 mol^-1
+#   (simulator.physical_constants.GAS_CONSTANT, those digits stored here
+#   as Decimal so the float's binary expansion is not re-parsed):
+#   1000 K −21.1754
+#   rounds to the printed −21.176; 1400 K −12.5887 rounds to −12.589.
+#   A second factor of 2 would land near −25 at 1400 K. O'Neill's fit
+#   there is about −12.6, so the second factor is rejected.
+# MH: 4 Fe3O4(cr) + O2 = 6 Fe2O3(cr).
+#   ΔrG = 6 ΔfG(Fe2O3) − 4 ΔfG(Fe3O4). JANAF Fe-030 and Fe-032.
+#   Haas & Hemingway print the decomposition; the sign above is the
+#   oxidation, which is the form whose ΔrG / (R T ln 10) is log fO2.
+# MW: νw Fe0.947O(cr) + O2 = νm Fe3O4(cr), y = 0.053 so Fe_(1−y)O is the
+#   JANAF solid. νw = 6/(1−4y), νm = (2−2y)/(1−4y), the printed
+#   magnetite–wüstite coefficients. ΔrG = νm ΔfG(Fe3O4) − νw ΔfG(Fe0.947O).
+#   JANAF Fe-001 and Fe-032.
+# Haas equation (7.57) does not reproduce Table 10.7 (about +0.17 to
+# +0.24 dex). It is not a calibration.
+# Sanity at 1473 K, 1 bar, survey-rounded: JANAF Mo −11.5363 against
+# O'Neill 1986 −11.6492; JANAF MH −2.5237 against Haas Table 10.9
+# −2.7641; JANAF MW −9.8320 against Haas Table 10.7 −9.1649.
+# O'Neill μ fits keep R = 8.31441. The JANAF route uses the CODATA R.
+_R_CODATA = Decimal("8.31446261815324")
+# Region 3. The token is NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS.
+UNSIZED_BAND_NOTICE = "buffer_band_unsized_beyond_all_calibrations"
+_MW_DIVERGENCE_NOTE = (
+    "O'Neill 1988 warns against extrapolating equation (16): wustite in "
+    "equilibrium with magnetite changes from Fe0.945O at 833 K to Fe0.833O "
+    "at 1697 K; the JANAF route holds Fe0.947O, and that non-stoichiometry "
+    "is the known divergence."
+)
+_WUSTITE_Y = Decimal("0.053")
+_WUSTITE_DENOM = 1 - 4 * _WUSTITE_Y
+_NU_WUSTITE = Decimal(6) / _WUSTITE_DENOM
+_NU_MAGNETITE = (Decimal(2) - 2 * _WUSTITE_Y) / _WUSTITE_DENOM
+_JANAF_TABLES = Path(__file__).resolve().parents[2] / (
+    "data/literature/compilations/janaf/tables"
+)
+_JANAF_ROWS: dict[str, tuple[tuple[Decimal, Decimal], ...]] = {}
+
+# Haas & Hemingway 1992, one bar. log f(O2) is linear in 1/T between
+# printed nodes and exact on a node. Duplicate transition nodes in
+# Table 10.9 (849.10 K, 955.53 K) are one value and are stored once.
+_HAAS_10_7 = """
+839.15 -26.045
+850 -25.543
+900 -23.404
+950 -21.499
+1000 -19.786
+1050 -18.235
+1100 -16.822
+1150 -15.529
+1200 -14.339
+1250 -13.239
+1300 -12.217
+1350 -11.264
+1400 -10.373
+1450 -9.535
+1500 -8.745
+1550 -7.997
+1600 -7.285
+1650 -6.606
+1700 -5.955
+1750 -5.329
+1800 -4.724
+"""
+_HAAS_10_9 = """
+200 -112.392
+250 -87.224
+273.15 -78.678
+298.15 -70.935
+300 -70.413
+350 -58.396
+400 -49.382
+450 -42.370
+500 -36.758
+550 -32.163
+600 -28.327
+650 -25.072
+700 -22.271
+750 -19.827
+800 -17.667
+849.10 -15.760
+850 -15.727
+900 -13.975
+950 -12.423
+955.53 -12.263
+1000 -11.049
+1050 -9.812
+1100 -8.692
+1150 -7.670
+1200 -6.735
+1250 -5.876
+1300 -5.083
+1350 -4.351
+1400 -3.672
+1450 -3.040
+1500 -2.451
+1550 -1.901
+1600 -1.387
+1650 -0.904
+1700 -0.450
+1750 -0.023
+1800 0.380
+"""
+
+
+def _parse_log_table(text: str) -> tuple[tuple[Decimal, Decimal], ...]:
+    rows: list[tuple[Decimal, Decimal]] = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        temperature, log_f = line.split()
+        rows.append((Decimal(temperature), Decimal(log_f)))
+    if len(rows) < 2:
+        raise ValueError("a buffer table needs two rows")
+    return tuple(rows)
+
+
+_HAAS_TABLE_10_7 = _parse_log_table(_HAAS_10_7)
+_HAAS_TABLE_10_9 = _parse_log_table(_HAAS_10_9)
+
+
+def _dg_joule_to_log10(dg_j_mol: Decimal, temperature_K: Decimal) -> Decimal:
+    """ΔrG(J mol^-1) / (R T ln 10) = log10(fO2/bar) per mole of O2.
+
+    R is the CODATA value. R·T is J mol^-1 and ln(10) is dimensionless,
+    so the quotient is the log10 of a fugacity referred to 1 bar, which
+    is JANAF's p°.
+    """
+
+    return dg_j_mol / (_R_CODATA * temperature_K * _LN10)
+
+
+def _liquid_onset_K(table: Mapping[str, object]) -> Decimal | None:
+    """Temperature of a crystal–liquid marker that the YAML could not store.
+
+    Rows at and above that temperature are the liquid and are not the
+    pure solid the buffer reaction names. A solid–solid transition or a
+    Cp lambda stays in the table.
+    """
+
+    ambiguities = table.get("parse_ambiguities")
+    if not isinstance(ambiguities, list):
+        return None
+    for item in ambiguities:
+        if not isinstance(item, Mapping):
+            continue
+        raw = str(item.get("raw_line") or "")
+        if "LIQUID" not in raw.upper():
+            continue
+        token = raw.split(None, 1)[0]
+        return Decimal(token)
+    return None
+
+
+def _janaf_dg_rows(table_id: str) -> tuple[tuple[Decimal, Decimal], ...]:
+    """Solid ΔfG rows, kJ mol^-1, from the as-published JANAF cell.
+
+    Loaded on the first extended-buffer evaluation. A missing table is
+    an error: the route is not invented.
+    """
+
+    cached = _JANAF_ROWS.get(table_id)
+    if cached is not None:
+        return cached
+    from simulator.reference_data.janaf import load_table_document
+
+    path = _JANAF_TABLES / f"{table_id}.yaml"
+    if not path.is_file():
+        raise FileNotFoundError(f"JANAF table {table_id} is not at {path}")
+    document = load_table_document(path)
+    table = document.get("table")
+    if not isinstance(table, Mapping):
+        raise ValueError(f"{path} has no table mapping")
+    onset = _liquid_onset_K(table)
+    values = table.get("values")
+    if not isinstance(values, list):
+        raise ValueError(f"{path} has no values")
+    rows: list[tuple[Decimal, Decimal]] = []
+    for item in values:
+        if not isinstance(item, Mapping):
+            continue
+        temperature = item.get("temperature")
+        gibbs = item.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        try:
+            t_value = Decimal(str(temperature.get("as_published")))
+            dg_value = Decimal(str(gibbs.get("as_published")))
+        except (InvalidOperation, ValueError):
+            continue
+        if onset is not None and t_value >= onset:
+            continue
+        if rows and rows[-1][0] == t_value:
+            if rows[-1][1] != dg_value:
+                raise ValueError(f"{table_id} repeats {t_value} K with two ΔfG values")
+            continue
+        rows.append((t_value, dg_value))
+    if len(rows) < 2:
+        raise ValueError(f"{table_id} has fewer than two solid ΔfG rows")
+    rows.sort(key=lambda item: item[0])
+    stored = tuple(rows)
+    _JANAF_ROWS[table_id] = stored
+    return stored
+
+
+def _interp_segment(
+    rows: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    *,
+    extrapolate: bool,
+    inv_t: bool,
+) -> Decimal:
+    """Linear between the bracketing rows. Exact on a printed node.
+
+    ``inv_t`` interpolates in 1/T (Haas log f). Otherwise the abscissa is
+    T (JANAF ΔfG). Outside the table the same end segment continues when
+    ``extrapolate`` is set; otherwise this raises.
+    """
+
+    if temperature_K == rows[0][0]:
+        return rows[0][1]
+    if temperature_K == rows[-1][0]:
+        return rows[-1][1]
+    if rows[0][0] < temperature_K < rows[-1][0]:
+        for (left_t, left_y), (right_t, right_y) in zip(rows, rows[1:], strict=True):
+            if left_t < temperature_K <= right_t:
+                return _segment_value(
+                    left_t, left_y, right_t, right_y, temperature_K, inv_t=inv_t
+                )
+        raise RuntimeError(f"no bracket for {temperature_K}")
+    if not extrapolate:
+        raise ValueError(f"{temperature_K} is outside the printed table")
+    if temperature_K > rows[-1][0]:
+        left, right = rows[-2], rows[-1]
+    else:
+        left, right = rows[0], rows[1]
+    return _segment_value(left[0], left[1], right[0], right[1], temperature_K, inv_t=inv_t)
+
+
+def _segment_value(
+    left_t: Decimal,
+    left_y: Decimal,
+    right_t: Decimal,
+    right_y: Decimal,
+    temperature_K: Decimal,
+    *,
+    inv_t: bool,
+) -> Decimal:
+    if inv_t:
+        left_x = Decimal(1) / left_t
+        right_x = Decimal(1) / right_t
+        x_value = Decimal(1) / temperature_K
+    else:
+        left_x, right_x, x_value = left_t, right_t, temperature_K
+    return left_y + (right_y - left_y) * (x_value - left_x) / (right_x - left_x)
+
+
+def _table_covers(
+    rows: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+) -> bool:
+    return rows[0][0] <= temperature_K <= rows[-1][0]
+
+
+def _janaf_log(
+    terms: tuple[tuple[Decimal, str], ...],
+    temperature_K: Decimal,
+    *,
+    extrapolate: bool,
+) -> Decimal:
+    """Σ ν_i ΔfG_i(T), kJ mol^-1, then the per-mole-O2 log10."""
+
+    dg_kJ = Decimal(0)
+    for coefficient, table_id in terms:
+        rows = _janaf_dg_rows(table_id)
+        dg_kJ += coefficient * _interp_segment(
+            rows, temperature_K, extrapolate=extrapolate, inv_t=False
+        )
+    return _dg_joule_to_log10(dg_kJ * Decimal(1000), temperature_K)
+
+
+def _janaf_covers(table_ids: tuple[str, ...], temperature_K: Decimal) -> bool:
+    return all(_table_covers(_janaf_dg_rows(table_id), temperature_K) for table_id in table_ids)
+
+
+def _log_mo_oneill1986(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """O'Neill 1986 as O'Neill 1987 prints it. 1000 < T < 1450, 1 bar.
+
+    μ = −603268 + 337.460 T − 20.6892 T ln T, J mol^-1. No volume term
+    was printed, so a requested pressure does not move the curve. The
+    ±140 J fit precision is about 0.005 dex at 1473 K and is not the band.
+    O'Neill 2002 Table 6 quotes this equation; it is not a second calibration.
+    """
+
+    del pressure_bar
+    mu = (
+        Decimal("-603268")
+        + Decimal("337.460") * temperature_K
+        - Decimal("20.6892") * temperature_K * temperature_K.ln()
+    )
+    return _mu_to_log10(mu, temperature_K)
+
+
+def _log_mo_janaf(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """JANAF Mo(cr) + O2 = MoO2(cr). Extrapolates past the last solid row."""
+
+    del pressure_bar
+    return _janaf_log(
+        ((Decimal(1), "Mo-009"), (Decimal(-1), "Mo-002")),
+        temperature_K,
+        extrapolate=True,
+    )
+
+
+def _log_mh_haas(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """Haas & Hemingway 1992 Table 10.9, 200–1800 K, one bar.
+
+    No volume coefficient is printed for this table. Chou's C = 0.019 is
+    not glued on. Past the table the last (or first) 1/T segment continues.
+    """
+
+    del pressure_bar
+    return _interp_segment(
+        _HAAS_TABLE_10_9,
+        temperature_K,
+        extrapolate=True,
+        inv_t=True,
+    )
+
+
+def _log_mh_chou1978(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """Chou 1978 equation (12), atm, then +log10(1.01325).
+
+    He measured 873–1073 K and said equation (12) may be used from 950 K
+    to extrapolate. The closed window is not stated as a certification
+    bound, so selecting this curve is not a certified calibration. His
+    volume coefficient is not applied.
+    """
+
+    del pressure_bar
+    return _ab_atm("-26629", "15.288", temperature_K)
+
+
+def _log_mh_janaf(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """JANAF 4 Fe3O4 + O2 = 6 Fe2O3."""
+
+    del pressure_bar
+    return _janaf_log(
+        ((Decimal(6), "Fe-030"), (Decimal(-4), "Fe-032")),
+        temperature_K,
+        extrapolate=True,
+    )
+
+
+def _log_mw_oneill1988(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """O'Neill 1988 equation (16). 833 < T < 1270, 1 bar. No volume term.
+
+    μ = −581927 − 65.618 T + 38.7410 T ln T. He warns that extrapolating
+    is uncertain because wüstite changes from Fe0.945O at 833 K to
+    Fe0.833O at 1697 K. The polynomial itself has no data above 1270 K.
+    """
+
+    del pressure_bar
+    mu = (
+        Decimal("-581927")
+        - Decimal("65.618") * temperature_K
+        + Decimal("38.7410") * temperature_K * temperature_K.ln()
+    )
+    return _mu_to_log10(mu, temperature_K)
+
+
+def _log_mw_haas(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """Haas & Hemingway 1992 Table 10.7, 839.15–1800 K, one bar.
+
+    The printed reaction is (2−2y)/(1−4y) Fe3O4 = 6/(1−4y) Fe_(1−y)O + O2.
+    Equation (7.57) is not used. No volume coefficient. Past the table the
+    end 1/T segment continues.
+    """
+
+    del pressure_bar
+    return _interp_segment(
+        _HAAS_TABLE_10_7,
+        temperature_K,
+        extrapolate=True,
+        inv_t=True,
+    )
+
+
+def _log_mw_janaf(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
+    """JANAF νw Fe0.947O + O2 = νm Fe3O4, y = 0.053."""
+
+    del pressure_bar
+    return _janaf_log(
+        ((_NU_MAGNETITE, "Fe-032"), (-_NU_WUSTITE, "Fe-001")),
+        temperature_K,
+        extrapolate=True,
+    )
+
+
 def _window(
     low: str | None,
     high: str | None,
@@ -603,6 +1040,92 @@ _CALIBRATIONS: tuple[Calibration, ...] = (
         spread=True,
         window=_NONE,
     ),
+    _cal(
+        "oneill1986_via_oneill1987",
+        "Mo-MoO2",
+        "O'Neill 1986 as printed by O'Neill 1987",
+        "primary_emf",
+        ("oneill 1986", "oneill 1987"),
+        specific=True,
+        spread=True,
+        window=_window("1000", "1450", low_exclusive=True, high_exclusive=True),
+    ),
+    _cal(
+        "janaf_mo_moo2",
+        "Mo-MoO2",
+        "JANAF Mo-002 Mo(cr) and Mo-009 MoO2(cr)",
+        "tabulated_thermochemistry",
+        ("janaf", "nist janaf"),
+        specific=True,
+        spread=False,
+        window=_NONE,
+    ),
+    _cal(
+        "haas1992_table_10_9",
+        "MH",
+        "Haas & Hemingway 1992 Table 10.9",
+        "assessed_table",
+        ("haas and hemingway 1992", "haas hemingway 1992", "table 10.9"),
+        specific=True,
+        spread=True,
+        window=_window(
+            str(_HAAS_TABLE_10_9[0][0]),
+            str(_HAAS_TABLE_10_9[-1][0]),
+        ),
+    ),
+    _cal(
+        "chou1978_eq12",
+        "MH",
+        "Chou 1978 equation (12)",
+        "primary_h2_sensor",
+        ("chou 1978",),
+        specific=True,
+        spread=False,
+        window=_window("950", None),
+    ),
+    _cal(
+        "janaf_mh_fe3o4_fe2o3",
+        "MH",
+        "JANAF Fe-032 Fe3O4(cr) and Fe-030 Fe2O3(cr)",
+        "tabulated_thermochemistry",
+        ("janaf", "nist janaf"),
+        specific=True,
+        spread=False,
+        window=_NONE,
+    ),
+    _cal(
+        "oneill1988_eq16",
+        "MW",
+        "O'Neill 1988 equation (16)",
+        "primary_emf",
+        ("oneill 1988",),
+        specific=True,
+        spread=True,
+        window=_window("833", "1270", low_exclusive=True, high_exclusive=True),
+    ),
+    _cal(
+        "haas1992_table_10_7",
+        "MW",
+        "Haas & Hemingway 1992 Table 10.7",
+        "assessed_table",
+        ("haas and hemingway 1992", "haas hemingway 1992", "table 10.7"),
+        specific=True,
+        spread=True,
+        window=_window(
+            str(_HAAS_TABLE_10_7[0][0]),
+            str(_HAAS_TABLE_10_7[-1][0]),
+        ),
+    ),
+    _cal(
+        "janaf_mw_fe0_947o_fe3o4",
+        "MW",
+        "JANAF Fe-001 Fe0.947O(cr) and Fe-032 Fe3O4(cr)",
+        "tabulated_thermochemistry",
+        ("janaf", "nist janaf"),
+        specific=True,
+        spread=False,
+        window=_NONE,
+    ),
 )
 
 _LOG: dict[str, BufferLog] = {
@@ -626,6 +1149,14 @@ _LOG: dict[str, BufferLog] = {
     "oneill1987b_via_oneill1988_eq15": _log_nno_oneill1987b,
     "chou1978_table6_eugster_wones1962_nno": _log_nno_eugster,
     "chou1978_table6_charette_flengas1968": _log_nno_charette,
+    "oneill1986_via_oneill1987": _log_mo_oneill1986,
+    "janaf_mo_moo2": _log_mo_janaf,
+    "haas1992_table_10_9": _log_mh_haas,
+    "chou1978_eq12": _log_mh_chou1978,
+    "janaf_mh_fe3o4_fe2o3": _log_mh_janaf,
+    "oneill1988_eq16": _log_mw_oneill1988,
+    "haas1992_table_10_7": _log_mw_haas,
+    "janaf_mw_fe0_947o_fe3o4": _log_mw_janaf,
 }
 
 CANONICAL_CALIBRATION_ID = {
@@ -672,6 +1203,12 @@ def _buffer_name(buffer: str) -> str:
         return "QFM"
     if token in {"nno"}:
         return "NNO"
+    if token in {"mo-moo2", "mo-moo2."}:
+        return "Mo-MoO2"
+    if token in {"mh", "m-h"}:
+        return "MH"
+    if token in {"mw"}:
+        return "MW"
     raise KeyError(f"unknown buffer {buffer}")
 
 
@@ -719,6 +1256,368 @@ def _band(
     return width, valid_ids
 
 
+_EXTENDED_BUFFERS = frozenset({"Mo-MoO2", "MH", "MW"})
+_MO_EDGES = (Decimal(1000), Decimal(1450))
+_MH_EDGE = Decimal(1073)
+_MW_EDGE = Decimal(1270)
+
+
+def _signed_edge(central: Decimal, route: Decimal) -> Decimal:
+    return _survey_log(central) - _survey_log(route)
+
+
+def _pair_width(
+    central: Decimal,
+    route: Decimal,
+    edge_central: Decimal,
+    edge_route: Decimal,
+) -> Decimal:
+    """|central − route| at T plus the same absolute offset at the edge.
+
+    Each log is rounded to 0.0001 first, which is the survey table's place.
+    One comparison route is the ruling's band. Two routes take the wider
+    pair, so a crossing cannot drop a named curve.
+    """
+
+    return abs(_signed_edge(central, route)) + abs(_signed_edge(edge_central, edge_route))
+
+
+def _edge(route_id: str, temperature_K: Decimal, central: Decimal, route: Decimal) -> EdgeOffset:
+    return EdgeOffset(
+        route_id=route_id,
+        edge_temperature_K=temperature_K,
+        signed_dex=_signed_edge(central, route),
+    )
+
+
+def _member(calibration_id: str, temperature_K: Decimal) -> Decimal:
+    return _LOG[calibration_id](temperature_K, None)
+
+
+def _spread_band(buffer: str, temperature_K: Decimal) -> Decimal:
+    """Valid-at-T spread of the printed calibrations. One valid curve is 0."""
+
+    logs = tuple(
+        _survey_log(_member(item, temperature_K))
+        for item in valid_calibration_ids(buffer, temperature_K)
+    )
+    if len(logs) <= 1:
+        return Decimal(0)
+    return max(logs) - min(logs)
+
+
+def _evaluation(
+    *,
+    buffer: str,
+    calibration_id: str,
+    log_value: Decimal,
+    temperature_K: Decimal,
+    pressure_bar: Decimal | None,
+    authority: str,
+    band: Decimal | None,
+    provenance: str,
+    region: int,
+    edges: tuple[EdgeOffset, ...],
+    unsized: bool,
+    divergence: str | None,
+) -> BufferEvaluation:
+    return BufferEvaluation(
+        buffer=buffer,
+        calibration_id=calibration_id,
+        log10_fO2_bar=log_value,
+        temperature_K=temperature_K,
+        pressure_bar=pressure_bar,
+        authority=authority,
+        band_dex=band,
+        provenance=provenance,
+        pressure_coefficient_spread=False,
+        valid_calibration_ids=valid_calibration_ids(buffer, temperature_K),
+        region=region,
+        edge_offsets=edges,
+        unsized_notice=UNSIZED_BAND_NOTICE if unsized else None,
+        divergence_note=divergence,
+    )
+
+
+def _evaluate_extended(
+    name: str,
+    temperature_K: Decimal,
+    pressure_bar: Decimal | None,
+    calibration_id: str | None,
+) -> BufferEvaluation:
+    """Mo-MoO2, MH, and MW. IW, QFM, and NNO do not enter here.
+
+    Region 1 is the primary EMF fit inside its certified window, band equal
+    to the valid-at-T spread. Region 2 is the assessed table or the JANAF
+    route where every solid phase is still inside its table, band equal to
+    the comparison-route pair above. Region 3 continues that central curve
+    and does not invent a band width. A requested pressure is recorded and
+    does not move the log: none of these curves publishes a volume term.
+    """
+
+    canonical = _extended_canonical(name, temperature_K, pressure_bar)
+    if calibration_id is None:
+        return canonical
+    item = calibration(calibration_id)
+    if item.buffer != name:
+        raise KeyError(f"{calibration_id} is not a {name} calibration")
+    authority = "certified" if _in_window(item, temperature_K) else "extrapolated"
+    return replace(
+        canonical,
+        calibration_id=item.calibration_id,
+        log10_fO2_bar=_LOG[item.calibration_id](temperature_K, pressure_bar),
+        authority=authority,
+        provenance=item.provenance,
+    )
+
+
+def _extended_canonical(
+    name: str,
+    temperature_K: Decimal,
+    pressure_bar: Decimal | None,
+) -> BufferEvaluation:
+    if name == "Mo-MoO2":
+        return _canonical_mo(temperature_K, pressure_bar)
+    if name == "MH":
+        return _canonical_mh(temperature_K, pressure_bar)
+    if name == "MW":
+        return _canonical_mw(temperature_K, pressure_bar)
+    raise KeyError(f"unknown extended buffer {name}")
+
+
+def _mo_edges() -> tuple[EdgeOffset, ...]:
+    return tuple(
+        _edge(
+            "oneill1986_via_oneill1987",
+            edge,
+            _member("janaf_mo_moo2", edge),
+            _member("oneill1986_via_oneill1987", edge),
+        )
+        for edge in _MO_EDGES
+    )
+
+
+def _canonical_mo(
+    temperature_K: Decimal, pressure_bar: Decimal | None
+) -> BufferEvaluation:
+    edges = _mo_edges()
+    in_emf = _in_window(calibration("oneill1986_via_oneill1987"), temperature_K)
+    if in_emf:
+        return _evaluation(
+            buffer="Mo-MoO2",
+            calibration_id="oneill1986_via_oneill1987",
+            log_value=_member("oneill1986_via_oneill1987", temperature_K),
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            authority="certified",
+            band=Decimal(0),
+            provenance="primary_emf",
+            region=1,
+            edges=edges,
+            unsized=False,
+            divergence=None,
+        )
+    covered = _janaf_covers(("Mo-002", "Mo-009"), temperature_K)
+    janaf_log = _member("janaf_mo_moo2", temperature_K)
+    if covered:
+        edge_t = _MO_EDGES[1] if temperature_K >= _MO_EDGES[1] else _MO_EDGES[0]
+        band = _pair_width(
+            janaf_log,
+            _member("oneill1986_via_oneill1987", temperature_K),
+            _member("janaf_mo_moo2", edge_t),
+            _member("oneill1986_via_oneill1987", edge_t),
+        )
+        return _evaluation(
+            buffer="Mo-MoO2",
+            calibration_id="janaf_mo_moo2",
+            log_value=janaf_log,
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            authority="tabulated_thermochemistry",
+            band=band,
+            provenance="tabulated_thermochemistry",
+            region=2,
+            edges=edges,
+            unsized=False,
+            divergence=None,
+        )
+    return _evaluation(
+        buffer="Mo-MoO2",
+        calibration_id="janaf_mo_moo2",
+        log_value=janaf_log,
+        temperature_K=temperature_K,
+        pressure_bar=pressure_bar,
+        authority="extrapolated",
+        band=None,
+        provenance="tabulated_thermochemistry",
+        region=3,
+        edges=edges,
+        unsized=True,
+        divergence=None,
+    )
+
+
+def _mh_edges() -> tuple[EdgeOffset, ...]:
+    haas = _member("haas1992_table_10_9", _MH_EDGE)
+    return (
+        _edge("chou1978_eq12", _MH_EDGE, haas, _member("chou1978_eq12", _MH_EDGE)),
+        _edge(
+            "janaf_mh_fe3o4_fe2o3",
+            _MH_EDGE,
+            haas,
+            _member("janaf_mh_fe3o4_fe2o3", _MH_EDGE),
+        ),
+    )
+
+
+def _canonical_mh(
+    temperature_K: Decimal, pressure_bar: Decimal | None
+) -> BufferEvaluation:
+    """Haas Table 10.9 is the central through the whole printed table.
+
+    There is no region 1. Chou's measured window does not take the centre.
+    Above 1800 K the Haas 1/T segment continues and the band is unsized,
+    even though Chou's equation and the JANAF route still have numbers.
+    """
+
+    edges = _mh_edges()
+    haas_rows = _HAAS_TABLE_10_9
+    haas_log = _member("haas1992_table_10_9", temperature_K)
+    if _table_covers(haas_rows, temperature_K):
+        chou = _member("chou1978_eq12", temperature_K)
+        janaf = _member("janaf_mh_fe3o4_fe2o3", temperature_K)
+        chou_edge = _member("chou1978_eq12", _MH_EDGE)
+        janaf_edge = _member("janaf_mh_fe3o4_fe2o3", _MH_EDGE)
+        haas_edge = _member("haas1992_table_10_9", _MH_EDGE)
+        band = max(
+            _pair_width(haas_log, chou, haas_edge, chou_edge),
+            _pair_width(haas_log, janaf, haas_edge, janaf_edge),
+        )
+        return _evaluation(
+            buffer="MH",
+            calibration_id="haas1992_table_10_9",
+            log_value=haas_log,
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            authority="tabulated_thermochemistry",
+            band=band,
+            provenance="assessed_table",
+            region=2,
+            edges=edges,
+            unsized=False,
+            divergence=None,
+        )
+    return _evaluation(
+        buffer="MH",
+        calibration_id="haas1992_table_10_9",
+        log_value=haas_log,
+        temperature_K=temperature_K,
+        pressure_bar=pressure_bar,
+        authority="extrapolated",
+        band=None,
+        provenance="assessed_table",
+        region=3,
+        edges=edges,
+        unsized=True,
+        divergence=None,
+    )
+
+
+def _mw_edges() -> tuple[EdgeOffset, ...]:
+    haas = _member("haas1992_table_10_7", _MW_EDGE)
+    return (
+        _edge("oneill1988_eq16", _MW_EDGE, haas, _member("oneill1988_eq16", _MW_EDGE)),
+        _edge(
+            "janaf_mw_fe0_947o_fe3o4",
+            _MW_EDGE,
+            haas,
+            _member("janaf_mw_fe0_947o_fe3o4", _MW_EDGE),
+        ),
+    )
+
+
+def _canonical_mw(
+    temperature_K: Decimal, pressure_bar: Decimal | None
+) -> BufferEvaluation:
+    """O'Neill equation (16) inside his window, Haas Table 10.7 above it.
+
+    Region 1 uses only the valid printed curves. JANAF enters in region 2,
+    where the fixed Fe0.947O composition is the known divergence from
+    O'Neill's variable wüstite. Above 1800 K, and below the Haas table
+    when O'Neill's window has also ended, the Haas segment continues and
+    the band is unsized.
+    """
+
+    edges = _mw_edges()
+    oneill = calibration("oneill1988_eq16")
+    haas_rows = _HAAS_TABLE_10_7
+    in_oneill = _in_window(oneill, temperature_K)
+    in_haas = _table_covers(haas_rows, temperature_K)
+    divergence = _MW_DIVERGENCE_NOTE
+    if in_oneill:
+        return _evaluation(
+            buffer="MW",
+            calibration_id="oneill1988_eq16",
+            log_value=_member("oneill1988_eq16", temperature_K),
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            authority="certified",
+            band=_spread_band("MW", temperature_K),
+            provenance="primary_emf",
+            region=1,
+            edges=edges,
+            unsized=False,
+            divergence=None,
+        )
+    haas_log = _member("haas1992_table_10_7", temperature_K)
+    if in_haas and temperature_K >= _MW_EDGE:
+        oneill_log = _member("oneill1988_eq16", temperature_K)
+        janaf_log = _member("janaf_mw_fe0_947o_fe3o4", temperature_K)
+        haas_edge = _member("haas1992_table_10_7", _MW_EDGE)
+        band = max(
+            _pair_width(
+                haas_log,
+                oneill_log,
+                haas_edge,
+                _member("oneill1988_eq16", _MW_EDGE),
+            ),
+            _pair_width(
+                haas_log,
+                janaf_log,
+                haas_edge,
+                _member("janaf_mw_fe0_947o_fe3o4", _MW_EDGE),
+            ),
+        )
+        return _evaluation(
+            buffer="MW",
+            calibration_id="haas1992_table_10_7",
+            log_value=haas_log,
+            temperature_K=temperature_K,
+            pressure_bar=pressure_bar,
+            authority="tabulated_thermochemistry",
+            band=band,
+            provenance="assessed_table",
+            region=2,
+            edges=edges,
+            unsized=False,
+            divergence=divergence,
+        )
+    return _evaluation(
+        buffer="MW",
+        calibration_id="haas1992_table_10_7",
+        log_value=haas_log,
+        temperature_K=temperature_K,
+        pressure_bar=pressure_bar,
+        authority="extrapolated",
+        band=None,
+        provenance="assessed_table",
+        region=3,
+        edges=edges,
+        unsized=True,
+        divergence=divergence,
+    )
+
+
 def evaluate_buffer(
     buffer: str,
     temperature_K: Decimal,
@@ -730,13 +1629,17 @@ def evaluate_buffer(
 
     ``pressure_bar is None`` omits every volume term and does not claim a
     pressure was used. Authority is certified only when the calibration
-    used sits inside its stated window.
+    used sits inside its stated window. Mo-MoO2, MH, and MW are resolved
+    before that rule: their region-2 authority is tabulated_thermochemistry.
     """
 
     name = _buffer_name(buffer)
     temperature = Decimal(temperature_K)
     if temperature <= 0:
         raise ValueError("buffer temperature must be positive")
+    if name in _EXTENDED_BUFFERS:
+        pressure = None if pressure_bar is None else Decimal(pressure_bar)
+        return _evaluate_extended(name, temperature, pressure, calibration_id)
     chosen_id = calibration_id or CANONICAL_CALIBRATION_ID[name]
     item = calibration(chosen_id)
     if item.buffer != name:

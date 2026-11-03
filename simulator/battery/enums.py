@@ -325,6 +325,12 @@ class NoticeKind(StrEnum):
     # Advisory. Not a flagged stratum. Extrapolation still uses
     # out_of_certified_band, which is the flagged stratum.
     DELTA_IW_FROM_IDEAL_FEO_FE_RATIO = "delta_iw_from_ideal_feo_fe_ratio"
+    # t-1624 / d-324 extension. T is past every table and fit that sizes
+    # this buffer. The central curve is still evaluated. The band is not a
+    # number. Advisory. out_of_certified_band remains the flagged stratum.
+    BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
+        "buffer_band_unsized_beyond_all_calibrations"
+    )
 
 
 class ReferenceStateConvention(StrEnum):
