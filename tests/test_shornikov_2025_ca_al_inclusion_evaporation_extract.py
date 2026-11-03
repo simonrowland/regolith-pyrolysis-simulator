@@ -162,6 +162,22 @@ def test_table1_render_values_and_context_migration() -> None:
             "shornikov_2025_fig2_temperature_time_schedule",
         )
     } == {"1", "2"}
+    assert migrated_contexts[
+        "shornikov_2025_fig1_knudsen_effusion_apparatus_schematic"
+    ]["values"]["caption_as_printed"] == (
+        "Schematic representation of the Knudsen effusion mass spectrometric "
+        "method: (1) base and (2) lead of the tungsten effusion cell; (3) "
+        "rhenium insert; (4) test sample; (5) pyrometric window; (6) gas "
+        "molecules; (7) blocker of the molecular beam; (8) ionization box; "
+        "(9) ionized molecules; (10) channel of magnetic separator; (11) ion "
+        "detector; (12) vacuum system."
+    )
+    assert migrated_contexts[
+        "shornikov_2025_fig2_temperature_time_schedule"
+    ]["values"]["caption_as_printed"] == (
+        "Temperature regimes of the evaporation experiments with (1) CAIs of "
+        "type A, (2) CAIs of type B and (3) the Murchison chondrite."
+    )
     assert migrated_contexts["shornikov_2025_fig8_oxygen_pressure_and_ratio"][
         "values"
     ]["series_attribution"]["3"] == {
