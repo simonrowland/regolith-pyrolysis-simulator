@@ -3346,6 +3346,117 @@ def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) 
     assert pressure.state.value.interval_high == as_decimal("20")
 
 
+def test_non_phase_row_point_pressure_is_identity_and_overrides_parent_default(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "gibbs_table"
+    row["phase"] = "liquid"
+    row["units"] = "kJ/mol"
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        points=[
+            {
+                "T_K": 1200,
+                "partial_molar_enthalpy_as_printed": {
+                    "value": "-4",
+                    "units": "kJ/mol",
+                    "as_printed": "-4 kJ/mol",
+                },
+                "point_conditions": {
+                    "total_pressure_Pa": {
+                        "state": {"tag": "value", "value": "80000"},
+                        "locator": {"table": "I", "page": 3},
+                    }
+                },
+            }
+        ],
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+    )
+    row["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "100000"},
+            "locator": {"table": "I", "page": 2},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa == State.of(as_decimal("80000"))
+    assert observation.point_conditions["total_pressure_Pa"].locator.page == 3
+
+
+def test_non_phase_row_parent_only_pressure_remains_default(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = "gibbs_table"
+    row["phase"] = "liquid"
+    row["units"] = "kJ/mol"
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        points=[
+            {
+                "T_K": 1200,
+                "partial_molar_enthalpy_as_printed": {
+                    "value": "-4",
+                    "units": "kJ/mol",
+                    "as_printed": "-4 kJ/mol",
+                },
+            }
+        ],
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+    )
+    row["values"]["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "90000"},
+            "locator": {"table": "I", "page": 2},
+        }
+    }
+    row["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "100000"},
+            "locator": {"table": "I", "page": 1},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa.is_unknown
+    assert observation.point_conditions["total_pressure_Pa"].locator.page == 1
+
+
+def test_non_phase_scalar_point_pressure_is_identity(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["values"].pop("series")
+    row["values"].update(
+        quantity="partial_molar_enthalpy",
+        T_K=1200,
+        composition_wt_pct={"Na2O": 50, "SiO2": 50},
+        partial_molar_enthalpy_as_printed={
+            "value": "-4",
+            "units": "kJ/mol",
+            "as_printed": "-4 kJ/mol",
+        },
+    )
+    row["values"]["point_conditions"] = {
+        "total_pressure_Pa": {
+            "state": {"tag": "value", "value": "80000"},
+            "locator": {"table": "I", "page": 3},
+        }
+    }
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.identity.total_pressure_Pa == State.of(as_decimal("80000"))
+
+
 def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(
     tmp_path: Path,
 ) -> None:
