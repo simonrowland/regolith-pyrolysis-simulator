@@ -100,6 +100,7 @@ from simulator.battery.source_oxygen import (
     source_oxygen_closure_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
@@ -542,6 +543,202 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+
+
+@dataclass(frozen=True)
+class _FeOActivityStandard:
+    name: str
+    offset_j_mol: Decimal
+
+
+_INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
+    name="JANAF-type",
+    offset_j_mol=Decimal(0),
+)
+_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
+_OPENIMCC_DEFAULT_PACK_DIGEST = (
+    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+)
+_OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
+    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+)
+_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
+    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
+)
+_OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
+    name="JANAF-type",
+    offset_j_mol=Decimal(0),
+)
+
+
+def _source_value(sources: Sequence[str], prefix: str) -> str | None:
+    return next(
+        (source[len(prefix):] for source in sources if source.startswith(prefix)),
+        None,
+    )
+
+
+def _resolve_feo_activity_standard(
+    engine: Engine,
+    coefficient_sources: Sequence[str],
+) -> tuple[_FeOActivityStandard | None, ResidualRefusal | None]:
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        return _INTERNAL_ANALYTICAL_FEO_STANDARD, None
+    if engine is not Engine.OPENIMCC:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "feo_activity_standard_not_declared",
+                "engine": engine.value,
+            },
+        )
+
+    condensate_digest = _source_value(
+        coefficient_sources,
+        "openimcc-condensate-table:sha256:",
+    )
+    if condensate_digest is not None and condensate_digest != (
+        _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_condensate_table_digest_mismatch",
+                "expected_condensate_table_digest": (
+                    _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+                ),
+                "actual_condensate_table_digest": condensate_digest,
+            },
+        )
+
+    gas_load_failure = _source_value(
+        coefficient_sources,
+        "openimcc-gas-datapack-load-failure:",
+    )
+    if gas_load_failure is not None and condensate_digest is None:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": (
+                    "openimcc_feo_gas_datapack_load_failed_"
+                    "condensate_identity_missing"
+                ),
+                "gas_load_failure": gas_load_failure,
+                "missing_identity": "condensate_table_digest",
+            },
+        )
+
+    redox_pack_digest = _source_value(
+        coefficient_sources,
+        "openimcc-redox-pack:sha256:",
+    )
+    if redox_pack_digest is not None:
+        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
+                    "expected_redox_pack_digest": (
+                        _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+                    ),
+                    "actual_redox_pack_digest": redox_pack_digest,
+                },
+            )
+        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
+
+    pack_version = _source_value(
+        coefficient_sources,
+        "openimcc-pack-version:",
+    )
+    pack_digest = _source_value(
+        coefficient_sources,
+        "openimcc-pack-digest:",
+    )
+    if (
+        condensate_digest == _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        and pack_version == _OPENIMCC_DEFAULT_PACK_VERSION
+        and pack_digest == _OPENIMCC_DEFAULT_PACK_DIGEST
+    ):
+        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
+
+    return None, ResidualRefusal(
+        RefusalReason.METRIC_DOMAIN,
+        {
+            "reason": "feo_activity_standard_not_declared",
+            "engine": engine.value,
+            "profile": pack_version or "unknown",
+        },
+    )
+
+
+def _canonical_log10_feo_activity(
+    log10_engine_activity: Decimal,
+    temperature_K: Decimal,
+    offset_j_mol: Decimal,
+) -> Decimal:
+    """Convert one FeO activity from its engine standard to JANAF Fe-019."""
+
+    if offset_j_mol == 0:
+        return log10_engine_activity
+    # Premise: μ = μ° + RT ln a for the same FeO chemical potential. With
+    # offset = G°(FeO,l | engine) - G°(FeO,l | JANAF Fe-019), equating the two
+    # μ values gives ln(a_canon) = ln(a_engine) + offset/(RT), then dividing
+    # by ln(10) gives log10(a_canon) = log10(a_engine) + offset/(RT ln 10).
+    # Unit check: J/mol divided by (J/(mol K) × K × ln 10) is dimensionless;
+    # the ln-to-log10 conversion is the explicit ln(10) divisor. Sanity:
+    # +9701.7 J/mol at 1649.15 K gives +0.3073 dex.
+    denominator = (
+        Decimal(str(GAS_CONSTANT))
+        * temperature_K
+        * Decimal(10).ln()
+    )
+    return log10_engine_activity + offset_j_mol / denominator
+
+
+def _canonicalize_feo_activity_prediction(
+    prediction: EnginePrediction,
+    *,
+    identity: Identity | None = None,
+) -> tuple[EnginePrediction | None, ResidualRefusal | None]:
+    if prediction.value is None:
+        return prediction, None
+    comparison_identity = prediction.identity or identity
+    if not isinstance(comparison_identity, Identity):
+        return prediction, None
+    if (
+        quantity_token(comparison_identity) is not Quantity.ACTIVITY
+        or comparison_identity.species is None
+        or comparison_identity.species.formula.strip().casefold() != "feo"
+    ):
+        return prediction, None
+
+    standard, refusal = _resolve_feo_activity_standard(
+        prediction.engine,
+        prediction.coefficient_sources,
+    )
+    if refusal is not None:
+        return None, refusal
+    assert standard is not None
+    if standard.offset_j_mol == 0:
+        return prediction, None
+
+    temperature_K = temperature_of(comparison_identity)
+    if temperature_K is None or temperature_K <= 0:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "feo_activity_standard_temperature_missing",
+                "engine": prediction.engine.value,
+            },
+        )
+    if not prediction.value.is_finite() or prediction.value <= 0:
+        return prediction, None
+    log10_canonical = _canonical_log10_feo_activity(
+        prediction.value.log10(),
+        temperature_K,
+        standard.offset_j_mol,
+    )
+    return replace(prediction, value=Decimal(10) ** log10_canonical), None
 
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
@@ -6569,6 +6766,12 @@ def _predict_distin_closed_feo_activity(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
     )
+    # The pinned openimcc/data/packs/openimcc-redox-v1.json:294-318 row names
+    # JANAF Fe-019 and embeds its FeO(l) coefficients; its redox-pack digest
+    # therefore guards the standard used by this closed-redox result.
+    coefficient_sources = [
+        f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
+    ]
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -6580,9 +6783,7 @@ def _predict_distin_closed_feo_activity(
         unit="dimensionless",
         authority=authority,
         notices=(*notices, oxygen_notice),
-        coefficient_sources=(
-            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
-        ),
+        coefficient_sources=tuple(coefficient_sources),
         lineage_complete=False,
         certified_band={"temperature_K": band},
         identity=prediction_identity,
@@ -9843,6 +10044,14 @@ def _predict_with_engine(
                             identity_block.get("engine_binding_identity")
                         ),
                         *(
+                            (
+                                "openimcc-gas-datapack-load-failure:"
+                                f"{identity_block['gas_load_failure']}",
+                            )
+                            if identity_block.get("gas_load_failure")
+                            else ()
+                        ),
+                        *(
                             f"{label}:{value}"
                             for label, value in provenance
                             if value
@@ -12031,6 +12240,19 @@ def compile_residual(
         coefficient_sources=expanded_sources,
         lineage_complete=lineage_complete,
     )
+    if quantity is Quantity.ACTIVITY and formula.strip().casefold() == "feo":
+        canonical_prediction, standard_refusal = (
+            _canonicalize_feo_activity_prediction(prediction, identity=identity)
+        )
+        if standard_refusal is not None:
+            return _refused(
+                standard_refusal.reason,
+                standard_refusal.detail,
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+            )
+        assert canonical_prediction is not None
+        prediction = canonical_prediction
     from simulator.battery.compilation_tier import (
         is_compilation_evidence,
         uncertainty_text,
