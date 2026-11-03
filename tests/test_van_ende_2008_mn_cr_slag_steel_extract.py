@@ -185,11 +185,12 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
     assert steel_start["derivation"]["listed_sum_wt_percent"] == "30.518"
     assert steel_start["derivation"]["derived_fe_wt_percent"] == "69.482"
     assert "unlisted elements (p, s, cu, mo, ...) are assumed absent" in steel_start["derivation"]["assumption"].lower()
+    assert steel_start["derivation"]["steel_identity_locator"]["section"] == "3. Experimental"
     charge_masses = first_values["starting_charge_masses"]
     assert charge_masses["state"]["value"] == {"slag_g": "15", "steel_g": "25"}
     assert "15 g of slag" in charge_masses["quote"]
     assert "25 g of the high Mn stainless steel" in charge_masses["quote"]
-    assert charge_masses["locator"]["section"] == "2.3 Experimental Procedure"
+    assert charge_masses["locator"]["section"] == "3. Experimental"
     last_slag = source_by_id[last_id]["values"]["starting_slag_composition"]
     assert last_slag["locator"]["row"] == "6-2"
     assert last_slag["state"]["value"]["components"] == {
