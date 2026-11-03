@@ -15989,10 +15989,13 @@ class PrintedOxygenFacts:
     bare_log: bool = False
 
 
-# IW, FMQ, QFM, and NNO name a buffer curve in fo2_buffers. Any other
-# non-empty oxygen_buffer_as_published string stays a typed missing-input
-# refusal. The curve is not applied to a bounded or approximate print.
-_BUFFER_NAME_TOKENS = ("iw", "fmq", "qfm", "nno")
+# Tokens the buffer owner can evaluate. Longer tokens are first so the
+# alternation cannot take a prefix. Any other non-empty
+# oxygen_buffer_as_published string, including CO-CO2 with no ratio, stays
+# a typed missing-input refusal. The curve is not applied to a bounded or
+# approximate print.
+_BUFFER_TOKEN = r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
+_BUFFER_NAME_TOKENS = ("mo-moo2", "m-h", "fmq", "qfm", "nno", "mh", "mw", "iw")
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
 )
@@ -16196,23 +16199,23 @@ def _printed_oxygen_buffer_text(
 
 
 _BUFFER_TOKEN_RE = re.compile(
-    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])",
+    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
 _BUFFER_OFFSET_RE = re.compile(
-    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])"
+    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])"
     r"(?:\s*=)?\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
     re.IGNORECASE,
 )
 # A sign or equals with no number is an offset that failed to parse.
 # It must not fall through to the bare-name offset of 0.
 _BUFFER_OFFSET_INTRO_RE = re.compile(
-    r"(?<![a-z0-9])(?:nno|qfm|fmq|iw)(?![a-z0-9])\s*(?:=|[+-])",
+    rf"(?<![a-z0-9])(?:{_BUFFER_TOKEN})(?![a-z0-9])\s*(?:=|[+-])",
     re.IGNORECASE,
 )
 _LOG_UNITS_PHRASE_RE = re.compile(
     r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+log\s+units?\s+(?P<dir>below|above)\s+"
-    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])",
+    rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
 _APPROX_BUFFER_RE = re.compile(
@@ -16224,7 +16227,16 @@ _IDEAL_FEO_FE_RE = re.compile(
     r"delta_iw_from_ideal_feo_fe_ratio",
     re.IGNORECASE | re.DOTALL,
 )
-_BUFFER_FAMILY = {"iw": "IW", "qfm": "QFM", "fmq": "QFM", "nno": "NNO"}
+_BUFFER_FAMILY = {
+    "iw": "IW",
+    "qfm": "QFM",
+    "fmq": "QFM",
+    "nno": "NNO",
+    "mo-moo2": "Mo-MoO2",
+    "mh": "MH",
+    "m-h": "MH",
+    "mw": "MW",
+}
 _DELTA_FIELD_FAMILY = {
     "fO2_delta_IW": "IW",
     "delta_IW": "IW",
@@ -16259,7 +16271,7 @@ def _units_name_buffer(units: str) -> bool:
 
 
 def _buffer_named_in_mapping(mapping: Mapping[str, Any]) -> bool:
-    """True when this mapping prints an IW, QFM, FMQ, or NNO token."""
+    """True when this mapping prints a buffer token the owner can evaluate."""
 
     for key in ("fO2_control", "oxygen_buffer_as_published", *_CALIBRATION_TEXT_FIELDS):
         raw_value = mapping.get(key)
@@ -16401,7 +16413,7 @@ def _classify_buffer_phrase(
 ) -> tuple[str, Decimal | None, str | None, bool]:
     """Return family, offset, offset-as-printed, and whether the phrase is prose.
 
-    A bare IW/QFM/FMQ/NNO is offset 0. ``delta-IW`` with no number is prose.
+    A bare buffer name is offset 0. ``delta-IW`` with no number is prose.
     A printed sign or ``=`` whose number does not parse is prose, not offset 0.
     ``IW = -2`` is offset -2. Unicode minus, en dash, and em dash are minus.
     """
@@ -16610,8 +16622,20 @@ def _buffer_request_from_row(
     return _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
 
 
-def _band_text(width: Decimal) -> str:
+def _band_text(width: Decimal | None) -> str:
+    if width is None:
+        return "unsized"
     return _dec_str(width.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP))
+
+
+def _edge_offset_text(offset: object) -> str:
+    signed = format(offset.signed_dex, "f")
+    if not signed.startswith("-"):
+        signed = "+" + signed
+    return (
+        f"edge_offset={offset.route_id}@"
+        f"{_dec_str(offset.edge_temperature_K)}:{signed}"
+    )
 
 
 def _decision_for_buffer(
@@ -16647,10 +16671,15 @@ def _decision_for_buffer(
     if request.unmatched_calibration:
         parts.append(f"unmatched_calibration={request.unmatched_calibration}")
     parts.append(f"buffer_as_printed={request.buffer_as_printed}")
+    if evaluation.region is not None:
+        parts.append(f"region={evaluation.region}")
+    parts.extend(_edge_offset_text(item) for item in evaluation.edge_offsets)
+    if evaluation.divergence_note:
+        parts.append(evaluation.divergence_note)
     reason = "buffer-relative fO2 converted: " + " ".join(parts)
     authority = (
         Authority.CERTIFIED
-        if evaluation.authority == "certified"
+        if evaluation.authority in {"certified", "tabulated_thermochemistry"}
         else Authority.EXTRAPOLATED
     )
     kind = (
@@ -16674,6 +16703,15 @@ def _decision_for_buffer(
         notices.append(
             PrintedOxygenNotice(
                 kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                reason=reason,
+                band=band,
+                authority=authority,
+            )
+        )
+    if evaluation.unsized_notice:
+        notices.append(
+            PrintedOxygenNotice(
+                kind=NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS,
                 reason=reason,
                 band=band,
                 authority=authority,

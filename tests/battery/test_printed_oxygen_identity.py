@@ -11,6 +11,7 @@ absolute log still wins. A row with no printed oxygen stays unknown.
 
 from __future__ import annotations
 
+from collections import Counter
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
@@ -741,14 +742,14 @@ def test_ideal_feo_fe_ratio_diw_carries_its_notice(tmp_path: Path) -> None:
     assert ideal[0].authority is Authority.EXTRAPOLATED
 
 
-def test_unknown_buffer_stays_a_typed_refusal(tmp_path: Path) -> None:
+def _activity_buffer(tmp_path: Path, label: str, temperature_K: int):
     result = _migrate_fixture(
         tmp_path,
         quantity="activity",
         point={
-            "T_K": 1673,
+            "T_K": temperature_K,
             "activity": "0.2",
-            "oxygen_buffer_as_published": "Mo-MoO2",
+            "oxygen_buffer_as_published": label,
             "locator": {"published_page": 1, "table": "1", "row": "1"},
         },
     )
@@ -759,12 +760,192 @@ def test_unknown_buffer_stays_a_typed_refusal(tmp_path: Path) -> None:
         and observation.identity.quantity.value is Quantity.ACTIVITY
     ]
     assert len(matches) == 1
-    oxygen = matches[0].identity.fO2_Pa
+    return matches[0]
+
+
+def test_unknown_buffer_stays_a_typed_refusal(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "CCO", 1673)
+    oxygen = observation.identity.fO2_Pa
     assert oxygen is not None and oxygen.is_unknown
     assert oxygen.reason is not None
     assert oxygen.reason.startswith("buffer-relative fO2 (")
-    assert "Mo-MoO2" in oxygen.reason
+    assert "CCO" in oxygen.reason
     assert "no calibration in the buffer owner" in oxygen.reason
+    assert observation.notices == ()
+
+
+def test_co_co2_label_without_a_ratio_stays_a_typed_refusal(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "CO-CO2.", 1673)
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_unknown
+    assert oxygen.reason is not None
+    assert "CO-CO2." in oxygen.reason
+    assert "no calibration in the buffer owner" in oxygen.reason
+    assert not any(
+        notice.kind
+        in {
+            NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+            NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+            NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS,
+        }
+        for notice in observation.notices
+    )
+
+
+def _assert_extended_conversion(
+    observation,
+    *,
+    buffer: str,
+    temperature_K: Decimal,
+    region: int,
+) -> None:
+    evaluation = evaluate_buffer(buffer, temperature_K)
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    assert oxygen.value == _log_fO2_to_pa(evaluation.log10_fO2_bar)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(notices) == 1
+    reason = notices[0].reason
+    assert f"buffer={buffer}" in reason
+    assert f"calibration={evaluation.calibration_id}" in reason
+    assert f"T_K={temperature_K}" in reason
+    assert f"authority={evaluation.authority}" in reason
+    assert f"region={region}" in reason
+    assert f"band_dex={_band_text(evaluation.band_dex)}" in reason
+    for offset in evaluation.edge_offsets:
+        signed = format(offset.signed_dex, "f")
+        if not signed.startswith("-"):
+            signed = "+" + signed
+        assert f"edge_offset={offset.route_id}@" in reason
+        assert signed in reason
+    store_authority = (
+        Authority.CERTIFIED
+        if evaluation.authority in {"certified", "tabulated_thermochemistry"}
+        else Authority.EXTRAPOLATED
+    )
+    assert notices[0].authority is store_authority
+    extrapolated = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    ]
+    unsized = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS
+    ]
+    if evaluation.authority == "extrapolated":
+        assert len(extrapolated) == 1
+    else:
+        assert extrapolated == []
+    if evaluation.unsized_notice:
+        assert len(unsized) == 1
+        assert notices[0].band == "unsized"
+    else:
+        assert unsized == []
+    if evaluation.divergence_note:
+        assert evaluation.divergence_note in reason
+
+
+def test_mo_moo2_label_converts(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "Mo-MoO2.", 1473)
+    _assert_extended_conversion(
+        observation, buffer="Mo-MoO2", temperature_K=Decimal(1473), region=2
+    )
+
+
+def test_mh_and_m_h_labels_convert(tmp_path: Path) -> None:
+    mh = _activity_buffer(tmp_path, "MH", 1473)
+    _assert_extended_conversion(
+        mh, buffer="MH", temperature_K=Decimal(1473), region=2
+    )
+
+
+def test_m_h_hyphen_label_converts(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "M-H", 1423)
+    _assert_extended_conversion(
+        observation, buffer="MH", temperature_K=Decimal(1423), region=2
+    )
+
+
+def test_mw_label_converts_and_carries_the_wustite_warning(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "MW", 1281)
+    _assert_extended_conversion(
+        observation, buffer="MW", temperature_K=Decimal(1281), region=2
+    )
+    assert any(
+        "Fe0.947O" in notice.reason
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+
+
+def test_mh_above_1800_k_is_unsized(tmp_path: Path) -> None:
+    observation = _activity_buffer(tmp_path, "MH", 1873)
+    _assert_extended_conversion(
+        observation, buffer="MH", temperature_K=Decimal(1873), region=3
+    )
+
+
+def test_borisov_veksler_2021_rows_convert_per_buffer_family() -> None:
+    """Real supplement rows. Counts are component observations, not source rows."""
+
+    result = _migrated("borisov-veksler-2021-k-fe-supplement.yaml")
+    families = {
+        "mo-moo2": "Mo-MoO2",
+        "mh": "MH",
+        "m-h": "M-H",
+        "mw": "MW",
+        "co-co2": "CO-CO2",
+    }
+    converted: Counter[str] = Counter()
+    refused: Counter[str] = Counter()
+    seen_temperature = set()
+    for observation in result.observations.values():
+        control = (observation.point_conditions or {}).get("fO2_control")
+        if not isinstance(control, Located) or not control.state.is_value:
+            continue
+        label = str(control.state.value).strip()
+        family = families.get(label.casefold().rstrip("."))
+        if family is None:
+            continue
+        oxygen = observation.identity.fO2_Pa
+        conversion = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ]
+        if family == "CO-CO2":
+            assert oxygen is not None and oxygen.is_unknown
+            assert oxygen.reason is not None and "CO-CO2." in oxygen.reason
+            assert conversion == []
+            refused[family] += 1
+            continue
+        assert oxygen is not None and oxygen.is_value
+        assert len(conversion) == 1
+        reason = conversion[0].reason
+        temperature = observation.identity.temperature_K
+        assert temperature is not None and temperature.is_value
+        assert f"T_K={temperature.value}" in reason
+        buffer = "MH" if family == "M-H" else family
+        assert f"buffer={buffer}" in reason
+        pressure = observation.identity.total_pressure_Pa
+        if pressure is not None and pressure.is_value:
+            assert "P_bar=" in reason
+        seen_temperature.add(family)
+        converted[family] += 1
+    assert seen_temperature == {"Mo-MoO2", "MH", "M-H", "MW"}
+    assert dict(converted) == {
+        "Mo-MoO2": 2904,
+        "MH": 728,
+        "M-H": 78,
+        "MW": 52,
+    }
+    assert refused["CO-CO2"] == 72
 
 
 def test_approximate_buffer_phrase_is_not_a_point(tmp_path: Path) -> None:
