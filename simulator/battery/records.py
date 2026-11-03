@@ -499,7 +499,11 @@ class Derivation:
             isinstance(page, int) and not isinstance(page, bool) and page > 0
         ) or (isinstance(page, str) and bool(page.strip()))
         has_section_or_equation = locator is not None and any(
-            isinstance(location, str) and bool(location.strip())
+            (isinstance(location, str) and bool(location.strip()))
+            or (
+                isinstance(location, (int, float))
+                and not isinstance(location, bool)
+            )
             for location in (locator.section, locator.equation)
         )
         return (
