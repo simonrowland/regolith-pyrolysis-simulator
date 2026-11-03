@@ -1,0 +1,473 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/s0040-6031(03)00136-9
+  citation: Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part I. Mass spectrometric
+    study of Na–Fe oxides", Thermochimica Acta 405, 61–66.
+  source_ids:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      role: pdf
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.pdf
+      sha256:
+        tag: value
+        value: 6214768a8a7a5a1b7c5f9059b1868b9ad2ae295a232d6a4f23c3655c8926d885
+    - asset_id: pdftotext:huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      role: pdftotext
+      path: text/huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/s0040-6031(03)00136-9
+experiments:
+- experiment_id: 10.1016/s0040-6031(03)00136-9::experiment::huang2003_kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: No numeric pressure inside the K-cell is printed; the reported 10^-6 Pa is the vacuum system operating level.
+      locator:
+        page: 2
+        published_page: 62
+        pdf_page_index: 1
+        section: 2.1 Knudsen effusion mass spectrometer
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: High-purity argon is stated only for purging the system; no measurement carrier gas is identified.
+      locator:
+        page: 2
+        published_page: 62
+        pdf_page_index: 1
+        section: 2.1 Knudsen effusion mass spectrometer
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The cell is called a Knudsen effusion cell, but no numerical in-cell pressure or orifice-to-cell-area ratio
+          is reported.
+  work_id: 10.1016/s0040-6031(03)00136-9
+  locator:
+    page: 2
+    published_page: 62
+    pdf_page_index: 1
+    section: 2.1 Knudsen effusion mass spectrometer
+benches:
+- id: 10.1016/s0040-6031(03)00136-9::bench::huang2003_kems_system
+  work_id: 10.1016/s0040-6031(03)00136-9
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: quadrupole mass spectrometer with a Knudsen vapor effusion cell and vacuum chamber
+    locator:
+      page: 2
+      published_page: 62
+      pdf_page_index: 1
+      section: 2.1 Knudsen effusion mass spectrometer
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 3
+      published_page: 63
+      pdf_page_index: 2
+      section: 2.1 Knudsen effusion mass spectrometer
+      note: Platinum K-cell with a silver-coated cover.
+  other_facts: []
+context:
+- observation_id: huang2003_apparatus_system_pressure_and_purging
+  type: apparatus_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 62
+    pdf_page_index: 1
+    section: 2.1 Knudsen effusion mass spectrometer
+  values:
+    apparatus_as_printed: The system consists of a quadrupole mass spectrometer, Knudsen vapor effusion cell (K-cell), and
+      vacuum chamber.
+    model_as_printed: Microvision Plus LM70
+    supplier_as_printed: Spectra Instruments
+    vacuum_system_ultimate_pressure_as_printed: 10^-7 Pa
+    experiment_vacuum_system_pressure_as_printed: 10^-6 Pa level, even at high temperatures
+    pressure_scope: Vacuum system/chamber pressure; not stated as K-cell in-cell total pressure.
+    purge_gas_as_printed: High purity argon
+    purge_gas_role: Used for purging the system.
+    measurement_carrier_gas: Not stated.
+    mass_analyser_as_printed: Quadrupole mass spectrometer.
+    detector_as_printed:
+    - Faraday cup
+    - secondary electron multiplier
+    secondary_electron_multiplier_factor_calibration_as_printed: The factor is calibrated by the Faraday cup.
+    ionization_filament_as_printed: ThO2-Ir filament.
+    electron_impact_energy_as_printed: 9.8 eV
+    cell_orifice_diameter_as_printed: 1 mm
+    cell_material_as_printed: Pt
+    cell_cover_as_printed: Silver-coated cover
+    compatibility_tests_as_printed: Mo formed Na2MoO4 and Na2Mo3O6 with NaFeO2 around 1200 K; severe reaction with NaOH(liq)
+      around 900 K; Pt showed no interactions with Na-containing substances until 1400 K.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_apparatus_system_pressure_and_purging
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na4FeO3
+- observation_id: huang2003_delta_fG_derivation_eq5
+  type: reaction_thermodynamic_relation_context
+  units: J/mol
+  locator:
+    page: 4
+    published_page: 64
+    pdf_page_index: 3
+    equation: '5'
+    section: 4.1 Thermodynamic evaluation
+  values:
+    method_class: relation_as_printed
+    equation_as_printed: ΔfG°(Na3FeO3) = ΔrG°(T) − ΔfG°(Na, gas) + ΔfG°(Na4FeO3)
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_delta_fG_derivation_eq5
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_delta_fG_sgte_equation_quoted
+  type: quoted_thermodynamic_fit_context
+  units: J/mol
+  locator:
+    page: 5
+    published_page: 65
+    pdf_page_index: 4
+    section: 4.2 Discussion
+  values:
+    method_class: quoted_attributed
+    attribution: SGTE database given by Thermo-Calc [19]
+    quantity_as_printed: ΔfG°(Na, gas)
+    equation_as_printed: ΔfG°(Na, gas) = 104949 − 95.53×T
+    intercept_as_printed: '104949'
+    slope_as_printed: '95.53'
+    units_as_printed: J mol−1; T in K
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_delta_fG_sgte_equation_quoted
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_figures_undigitised
+  type: figure_read_candidate_context
+  units: Pa
+  locator:
+    page: 4
+    published_page: 64
+    pdf_page_index: 3
+    figure: '3'
+    note: Figure 3 plots the Table 1 sodium pressure behavior and does not supply separate values.
+  values:
+    method_class: figure_only
+    digitisation: undigitised
+    note: No additional Figure 3 points were extracted; its pressure series is represented by Table 1.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_figures_undigitised
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_malt2_comparison_undigitised
+  type: figure_read_candidate_context
+  units: J/mol
+  locator:
+    page: 5
+    published_page: 65
+    pdf_page_index: 4
+    figure: '4'
+    note: Figure 4 compares Na3FeO3 formation Gibbs energy with MALT2.
+  values:
+    method_class: figure_only
+    digitisation: undigitised
+    note: Figure values were not read from axes.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_malt2_comparison_undigitised
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_na2_relative_ion_intensity
+  type: ion_intensity_context
+  units: not_printed
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    vapor_species_as_printed: Na2(g)
+    relation_to_Na_ion_intensity_as_printed: Three to four orders of magnitude lower than the monomer.
+    numerical_ion_intensities: not printed
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na2_relative_ion_intensity
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na2
+- observation_id: huang2003_na2o_not_observed
+  type: vapor_species_detection_context
+  units: not_applicable
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    vapor_species_as_printed: Na2O(g)
+    observation_as_printed: Not observed due to the detection limit.
+    numeric_pressure_or_intensity: not printed
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na2o_not_observed
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na2O
+- observation_id: huang2003_na3feO3_delta_fG_fit_eq7
+  type: formation_gibbs_fit_context
+  units: J/mol
+  locator:
+    page: 5
+    published_page: 65
+    pdf_page_index: 4
+    equation: '7'
+    section: 4.2 Discussion
+  values:
+    quantity: delta_fG
+    method_class: model_derived
+    equation_as_printed: ΔfG°(Na3FeO3) = −1168629 + 338.34 × T, (298 < T < 720 K)
+    intercept_as_printed: −1168629
+    slope_as_printed: '338.34'
+    units_as_printed: J mol−1; T in K
+    temperature_range_as_printed: 298 < T < 720 K
+    uncertainty_as_printed: about ±7 kJ mol−1
+    uncertainty_basis: Source-data uncertainty; Bhat and Borgstedt [7] reported ±2100 J mol−1 for Na4FeO3.
+    uncertainty_confidence_level: not stated
+    derived_from:
+    - huang2003_table1_delta_rG_fit_eq4
+    - huang2003_delta_fG_sgte_equation_quoted
+    - huang2003_na4feo3_delta_fG_bhat_borgstedt_quoted
+    derivation_as_printed: Equation (5) derives ΔfG°(Na3FeO3) from the reaction ΔrG° and the Na(g) and Na4FeO3 formation Gibbs
+      functions.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na3feO3_delta_fG_fit_eq7
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_na4feo3_delta_fG_bhat_borgstedt_quoted
+  type: quoted_thermodynamic_fit_context
+  units: J/mol
+  locator:
+    page: 5
+    published_page: 65
+    pdf_page_index: 4
+    equation: '6'
+    section: 4.2 Discussion
+    note: Equation (6) on this page.
+  values:
+    method_class: quoted_attributed
+    attribution: Bhat and Borgstedt [7]
+    quantity_as_printed: ΔfG°(Na4FeO3)
+    equation_as_printed: ΔfG°(Na4FeO3) = −1212202 + 351.10 × T
+    intercept_as_printed: −1212202
+    slope_as_printed: '351.10'
+    units_as_printed: J mol−1; T in K
+    uncertainty_as_printed: ±2100 J mol−1
+    uncertainty_confidence_level: not stated
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na4feo3_delta_fG_bhat_borgstedt_quoted
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3
+- observation_id: huang2003_na_enthalpy_derivation_context
+  type: third_law_calculation_context
+  units: kJ/mol
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 2.2 Sample preparation and pressure calibration
+  values:
+    method_class: author_derived
+    relation_as_printed: Third-law treatment of the Na(liq) = Na(g) pressure-temperature relationship
+    resulting_value_as_printed: ΔfH°(298.15 K) = 107.6 ± 0.8 kJ mol−1
+    raw_temperature_pressure_points: not published
+    result_observation_id: huang2003_na_gas_delta_fh_298_15_this_work
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na_enthalpy_derivation_context
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na
+- observation_id: huang2003_na_pressure_calibration_standard_context
+  type: pressure_calibration_context
+  units: Pa
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 2.2 Sample preparation and pressure calibration
+  values:
+    calibration_standard_as_printed: Sodium (99.7%)
+    vapor_species_as_printed: Na(g)
+    calibration_reference_as_printed: Saturated sodium vapor pressure given in [17]
+    calibration_relation_as_printed: P(Na) = K × {I × T}
+    calibration_inputs_as_printed: I is Na+ ion intensity; T is the sample temperature.
+    proportional_constant_as_printed: K, calibrated from the saturated sodium vapor pressure in [17]; no numerical K or I
+      is printed.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na_pressure_calibration_standard_context
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na
+- observation_id: huang2003_na_pressure_fit_eq3
+  type: fitted_partial_pressure_context
+  units: Pa
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    equation: '3'
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    method_class: model_derived
+    quantity: partial_pressure
+    equation_as_printed: lnPNa = 24.376 − 17749/T
+    coefficient_A_as_printed: '24.376'
+    coefficient_B_as_printed: '17749'
+    temperature_as_printed: K
+    pressure_unit_as_printed: Pa per Table 1
+    temperature_range_as_printed: 590–717 K
+    standard_state_note: The equation prints lnPNa, Table 1 labels PNa/Pa, and no numeric reference pressure is stated.
+    derived_from:
+    - huang2003_table1_na_partial_pressure
+    inputs_note: Fit of the 25 experimental Table 1 pressure rows.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na_pressure_fit_eq3
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na
+- observation_id: huang2003_na_species_detection_context
+  type: vapor_species_detection_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    principal_vapor_species_as_printed: Na(g)
+    Na_detection_temperature_as_printed: about 550 K
+    sodium_role: main vapor species over Na4FeO3(s)
+    numeric_Na_ion_intensities: not printed
+    direct_Na_partial_pressures: Table 1
+    Na2_ion_intensity_comparison: Refer to species.Na2.context.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_na_species_detection_context
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na
+- observation_id: huang2003_nao_not_observed
+  type: vapor_species_detection_context
+  units: not_applicable
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    vapor_species_as_printed: NaO(g)
+    observation_as_printed: Not observed due to the detection limit.
+    numeric_pressure_or_intensity: not printed
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_nao_not_observed
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: NaO
+- observation_id: huang2003_sample_synthesis_and_changes
+  type: sample_preparation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 2.2 Sample preparation and pressure calibration
+  values:
+    source_materials_as_printed:
+    - Na2O(s) 99.4%
+    - FeO(s) 99.9%
+    starting_mole_ratio_as_printed: 2:1 Na2O(s):FeO(s)
+    sealing_container_as_printed: stainless steel container
+    preparation_atmosphere_as_printed: glove box; oxygen concentration less than 10 ppm; water vapor concentration less than
+      10 ppm
+    sintering_as_printed: 873 K for 100 h
+    identification_as_printed: XRD showed prepared sample almost pure Na4FeO3(s), JCPDS file No. 34-0891
+    premeasurement_storage_as_printed: Prepared sample was continuously stored in a glove box before transfer into the K-cell.
+    installation_atmosphere_as_printed: Sample installation was carried out in another glove box attached to the high-temperature
+      mass spectrometer.
+    reaction_1_as_printed: 2Na2O(s) + FeO(s) = Na4FeO3(s)
+    experiment_specimens_as_printed: Two separate measurements on Na4FeO3(s).
+    first_specimen_run_as_printed: 4 h over 590–717 K; post-run Na4FeO3(s):Na3FeO3(s) molar ratio 9:1.
+    second_specimen_run_as_printed: Evaporated about 30 h; complete decomposition from Na4FeO3(s) into Na3FeO3(s).
+    XRD_NaOH_as_printed: A small NaOH peak was attributed to possible moisture absorption from the environment during XRD.
+    table_row_assignment: Table 1 does not label row-to-specimen assignments; no row split is inferred.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_sample_synthesis_and_changes
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na4FeO3
+- observation_id: huang2003_standard_state_context
+  type: standard_state_context
+  units: not_applicable
+  locator:
+    page: 3
+    published_page: 63
+    pdf_page_index: 2
+    section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+  values:
+    standard_symbols_as_printed:
+    - ΔrG°
+    - ΔfG°
+    - ΔfH°
+    standard_pressure_or_fugacity_basis: not stated
+    Kp_standard_state: no unit or standard-pressure value printed
+    rule: No 1 bar or 1 atm standard pressure is inferred.
+    sampling_sequence_as_printed: Temperature was changed step by step while Na+ intensity was measured.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_standard_state_context
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na
+- observation_id: huang2003_table1_delta_rG_fit_eq4
+  type: reaction_gibbs_fit_context
+  units: J/mol
+  locator:
+    page: 4
+    published_page: 64
+    pdf_page_index: 3
+    equation: '4'
+    section: 4.1 Thermodynamic evaluation
+  values:
+    method_class: model_derived
+    quantity: reaction_gibbs_energy_as_printed
+    schema_gap: The fit is retained in context because reaction Gibbs energy has no exact quantity token.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+    equation_as_printed: ΔrG°(T) = (148522.2 ± 2753.8) − (108.29 ± 4.18) × T, (590 − 717 K)
+    intercept_as_printed: '148522.2'
+    intercept_uncertainty_as_printed: '2753.8'
+    slope_as_printed: '108.29'
+    slope_uncertainty_as_printed: '4.18'
+    intercept_unit: J mol−1
+    slope_unit: J mol−1 K−1
+    temperature_range_as_printed: 590–717 K
+    uncertainty_confidence_level: not stated
+    derived_from:
+    - huang2003_table1_reaction_gibbs_typed_refusal
+    fit_inputs: Table 1 reaction Gibbs-energy rows 1–25.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems::context::huang2003_table1_delta_rG_fit_eq4
+  work_id: 10.1016/s0040-6031(03)00136-9
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  species: Na3FeO3

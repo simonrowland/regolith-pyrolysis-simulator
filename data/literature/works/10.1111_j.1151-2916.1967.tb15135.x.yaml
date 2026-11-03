@@ -1,0 +1,536 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  citation: Hertl, W., and Pultz, W. W. (1967). Disproportionation and vaporization of solid silicon monoxide. Journal of
+    the American Ceramic Society, 50(7), 378–381.
+  source_ids:
+  - hertl-1967-solid-sio-disproportionation-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: a6871422ff04f6033afef12c4593f2df76704e17
+    files:
+    - asset_id: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+      role: pdf
+      path: raw/hertl-1967-solid-sio-disproportionation-vaporization/hertl-1967-solid-sio-disproportionation-vaporization.pdf
+      sha256:
+        tag: value
+        value: 892e01af79bb17d1eeceef91c5038a934b4906e4ee5e2748464aa08f7972703c
+    - asset_id: pdftotext:hertl-1967-solid-sio-disproportionation-vaporization
+      role: pdftotext
+      path: text/hertl-1967-solid-sio-disproportionation-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:hertl-1967-solid-sio-disproportionation-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1111/j.1151-2916.1967.tb15135.x
+experiments:
+- experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: III. Vaporization Experiments, Discussion
+context:
+- observation_id: hertl_1967_disproportionation_apparatus_and_procedure
+  type: laboratory_conditions
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    section: II. Experimental Procedure
+  units: as printed
+  values:
+    quantity: disproportionation_apparatus_and_procedure
+    method_class: method_only
+    disproportionation_apparatus_as_printed: 18 by 2 in. ID sillimanite muffle with water-cooled brass end caps; alumina boats
+      holding SiO powder on a platinum holder.
+    evacuation_as_printed: The muffle was evacuated to at least 10 to 75 μ with the charge in the cool end; after evacuation
+      it was usually filled to 1 atm with argon.
+    charge_motion_as_printed: The charge was pushed to the reaction site and withdrawn by a wire through the end-cap orifice.
+    orifice_dimensions_as_printed:
+      orifice_as_printed: a gasket-sealed orifice in the end cap
+      diameter:
+        state:
+          tag: unknown
+          reason: No diameter is printed for the gasket-sealed orifice.
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          section: II. Experimental Procedure
+    clausing_factor_as_printed:
+      state:
+        tag: unknown
+        reason: No Clausing factor is printed for the gasket-sealed orifice.
+      locator:
+        page: 2
+        published_page: 379
+        pdf_page_index: 1
+        section: II. Experimental Procedure
+    disproportionation_analysis_as_printed: Sample treated with hydrofluoric acid diluted with isopropyl alcohol; the residual
+      elemental silicon was dried and weighed.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_disproportionation_apparatus_and_procedure
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_disproportionation_numeric_results
+  type: laboratory_conditions
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: IV. Disproportionation Experiments, Results
+  units: as printed
+  values:
+    quantity: disproportionation_results_conditions_context
+    method_class: method_only
+    charge_weight_change_bound_mg_as_published: '1.5'
+    charge_weight_change_exception_as_printed: Except for several runs over very long periods.
+    reaction_temperature_attainment_time_as_printed: ~1 min
+    imperceptible_disproportionation_below_temperature_as_printed: about 1000°C
+    parallel_experiment_temperature_C_as_published: 1010
+    parallel_experiment_conditions_as_printed: Constant evacuation of the system and the added inert gas; no difference was
+      noted in the extent of disproportionation.
+    temperature_sequences_as_printed:
+    - stages:
+      - temperature_C: 1180
+        duration_as_printed: long enough to reach its terminal disproportionation value
+      - temperature_C: 1390
+        duration_as_printed: 1 min
+      result_as_printed: The extent of disproportionation corresponded to that at the higher temperature.
+    - stages:
+      - temperature_C: 1380
+        duration_as_printed: 5 min
+      - temperature_C: 1195
+        duration_as_printed: 16 hr
+      result_as_printed: The extent of disproportionation corresponded to the higher temperature; there was no indication
+        of reversibility.
+    superficial_oxidation_temperature_C_as_published: 800
+    silicon_globule_temperature_C_as_published: 1440
+    silicon_melting_point_C_as_published: 1412
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_disproportionation_numeric_results
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig1_marker_legend
+  type: figure_legend
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    figure: '1'
+  units: as printed
+  values:
+    quantity: marker_to_run_condition_legend
+    method_class: figure_only
+    marker_legend_as_printed:
+      ●: 1-hr run at 1200°C with constant evacuation of system
+      ○: 4-hr run at 1474°C in 1 atm argon
+    marker_check: Marker shapes and caption pairing checked on the 600 dpi render; no curve coordinates were read.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig1_marker_legend
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig1_sio_loss_vs_charge_weight_figure_only
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    figure: '1'
+  phase: condensed_solid
+  units: SiO loss in g as plotted; not digitized
+  values:
+    quantity: SiO mass loss versus charge weight, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: 'SiO loss as a function of charge weight (i.e. charge depth): (●) 1-hr run at 1200°C with constant
+      evacuation of system, (○) 4-hr run at 1474°C in 1 atm argon.'
+    marker_legend_context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig1_marker_legend
+    plotted_as_printed: SiO loss (g) versus charge weight (g); figure coordinates not digitized.
+    results_as_printed: At 1474°C in argon, charge weights beyond about 0.5 g had no further effect and charges of 0.5 g or
+      less were substantially exhausted; in vacuo at 1200°C, the breakover point was about 3.7 g and smaller charges were
+      substantially exhausted.
+    completeness_note: Figure-only data are recorded from the caption and prose summary; plotted coordinates were not digitized.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig1_sio_loss_vs_charge_weight_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig2_sio_loss_vs_time_figure_only
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    figure: '2'
+  phase: condensed_solid
+  units: SiO loss in g versus time in minutes; not digitized
+  values:
+    quantity: SiO mass loss versus time, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: SiO loss as a function of time for a charge of 1.000 g at 1160° to 1175°C with constant evacuation
+      of system.
+    charge_mass_g_as_printed: '1'
+    temperature_range_C_as_printed:
+    - 1160
+    - 1175
+    atmosphere_as_printed: constant evacuation of system
+    plotted_as_printed: SiO loss ΔW in g versus time t in minutes; figure coordinates not digitized.
+    results_as_printed: The vaporization rate was independent of time over the range studied, consistent with a zero-order
+      process.
+    point_conditions:
+      temperature:
+        state:
+          tag: unknown
+          reason: Temperature varies from 1160° to 1175°C across this figure.
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '2'
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: Caption states constant evacuation but gives no numeric pressure.
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '2'
+    completeness_note: Curve coordinates were not digitized.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig2_sio_loss_vs_time_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig3_sio_loss_vs_argon_flow_figure_only
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    figure: '3'
+  phase: condensed_solid
+  units: SiO loss in g versus argon flow in ml/min; not digitized
+  values:
+    quantity: SiO mass loss versus argon flow rate, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: SiO loss as a function of flow rate for a charge of 3.000 g in a 3-hr run at 1427°C in 1 atm argon.
+    charge_mass_g_as_printed: '3'
+    run_duration_hr_as_printed: 3
+    T_C: 1427
+    total_pressure_atm: 1
+    gas_mix_as_printed: argon
+    flow_rate_result_as_published: Rate increased with increasing flow up to about 1000 ml/min; above 1000 ml/min there was
+      no further increase in the amount vaporized.
+    plotted_as_printed: SiO loss ΔW in g versus argon flow in ml/min; figure coordinates not digitized.
+    point_conditions:
+      temperature:
+        state:
+          tag: value
+          value: 1427
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '3'
+      total_pressure_atm:
+        state:
+          tag: value
+          value: 1
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '3'
+      gas_mix:
+        state:
+          tag: value
+          value: argon
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '3'
+    completeness_note: Curve coordinates were not digitized; the prose plateau result is transcribed separately.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig3_sio_loss_vs_argon_flow_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig4_arrhenius_sio_weight_loss_figure_only
+  type: figure_record
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    figure: '4'
+  phase: condensed_solid
+  units: log(ΔW × 100) versus 1/T; weight losses normalized to 1 hr
+  values:
+    quantity: normalized SiO weight loss versus inverse temperature, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: Arrhenius plot of SiO weight loss from charge of 1.000 g in constantly evacuated system. The SiO weight
+      losses ΔW are all normalized to 1 hr.
+    charge_mass_g_as_printed: '1'
+    atmosphere_as_printed: constantly evacuated system
+    point_conditions:
+      temperature:
+        state:
+          tag: unknown
+          reason: Temperature varies across the Arrhenius plot.
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '4'
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: Caption states constantly evacuated but gives no numeric pressure.
+        locator:
+          page: 2
+          published_page: 379
+          pdf_page_index: 1
+          figure: '4'
+    completeness_note: The plot is linear within the limits of accuracy; curve coordinates were not digitized.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig4_arrhenius_sio_weight_loss_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig5_disproportionation_vs_time_figure_only
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    figure: '5'
+  phase: condensed_solid
+  units: elemental Si in mg versus time in seconds; not digitized
+  values:
+    quantity: elemental Si in residue versus reaction time, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: Amount of disproportionation as a function of time at various temperatures with charge weight of 0.250
+      g and 1 atm argon. A 100% disproportionation corresponds to 79.5 mg of Si.
+    charge_mass_g_as_printed: '0.25'
+    total_pressure_atm: 1
+    gas_mix_as_printed: argon
+    percent_to_Si_mass_mg_as_printed: '79.5'
+    marker_legend_context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig5_marker_legend
+    plotted_as_printed: Elemental Si mass in the residue versus time; figure coordinates not digitized.
+    results_as_printed: By the time the sample attained reaction temperature (about 1 min), the extent of disproportionation
+      reached a nearly fixed value; this value increased with temperature and became imperceptible below about 1000°C.
+    point_conditions:
+      temperature:
+        state:
+          tag: unknown
+          reason: Figure 5 contains multiple temperature series.
+        locator:
+          page: 3
+          published_page: 380
+          pdf_page_index: 2
+          figure: '5'
+      total_pressure_atm:
+        state:
+          tag: value
+          value: 1
+        locator:
+          page: 3
+          published_page: 380
+          pdf_page_index: 2
+          figure: '5'
+      gas_mix:
+        state:
+          tag: value
+          value: argon
+        locator:
+          page: 3
+          published_page: 380
+          pdf_page_index: 2
+          figure: '5'
+    completeness_note: No plotted coordinates were digitized.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig5_disproportionation_vs_time_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig5_marker_legend
+  type: figure_legend
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    figure: '5'
+  units: degrees Celsius as printed
+  values:
+    quantity: marker_to_temperature_legend
+    method_class: figure_only
+    marker_legend_as_printed:
+      △: 1440°C
+      ×: 1330°C
+      ○: 1210°C
+      ●: 1070°C (3600 sec)
+    shared_conditions_as_printed: charge weight 0.250 g and 1 atm argon, as stated in the Fig. 5 caption.
+    marker_check: Marker glyphs were matched to the adjacent curve temperature labels on the 600 dpi render; no curve coordinates
+      were read.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig5_marker_legend
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_fig6_arrhenius_terminal_disproportionation_figure_only
+  type: figure_record
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    figure: '6'
+  phase: condensed_solid
+  units: log of terminal percent disproportionation versus 1000/T
+  values:
+    quantity: terminal disproportionation percentage versus inverse temperature, figure record only
+    method_class: figure_only
+    evidence_class: figure_only
+    admission_status: figure_only
+    caption_as_printed: Arrhenius plot of terminal percent of disproportionation. Values are from Fig. 5.
+    printed_fit_label_as_published: E_a = 21.0 kcal/mole
+    source_figure_as_printed: Values are from Fig. 5.
+    plotted_as_printed: Log of terminal percent disproportionation versus 1000/T; figure coordinates not digitized.
+    point_conditions:
+      temperature:
+        state:
+          tag: unknown
+          reason: Temperature varies across the Arrhenius plot; no fitted interval is printed.
+        locator:
+          page: 3
+          published_page: 380
+          pdf_page_index: 2
+          figure: '6'
+    completeness_note: Figure 6 states its values are from Fig. 5; no pressure is printed in the Fig. 6 caption and none is
+      added here.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_fig6_arrhenius_terminal_disproportionation_figure_only
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_starting_material_characterization
+  type: laboratory_conditions
+  locator:
+    page: 1
+    published_page: 378
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+  units: as printed
+  values:
+    quantity: starting_material_and_vaporization_apparatus_context
+    method_class: method_only
+    sample_as_printed: Solid SiO powder, −325 mesh, select grade from the Linde Division of Union Carbide Company.
+    cation_impurity_levels_as_printed:
+      basis: oxide
+      ranges:
+      - range: 0.01 to 0.1%
+        oxides:
+        - Fe2O3
+        - Al2O3
+      - range: 0.005 to 0.05%
+        oxides:
+        - MgO
+        - MnO2
+      - range: 0.001 to 0.01%
+        oxides:
+        - B2O3
+        - SnO2
+        - NiO
+        - CuO
+        - ZrO2
+    optical_particle_size_range_as_printed: several tenths of a micron up to several microns in diameter
+    BET_particle_surface_area_m2_per_g_as_published: '1.4'
+    mean_particle_diameter_as_printed: 2.0μ
+    vaporization_apparatus_as_printed: 36 in. by 1½ or 2 in. ID sillimanite muffles inside a platinum-wound horizontal tube
+      furnace.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_starting_material_characterization
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_vaporization_measurement_and_atmosphere
+  type: laboratory_conditions
+  locator:
+    page: 2
+    published_page: 379
+    pdf_page_index: 1
+    section: II. Experimental Procedure
+  units: as printed
+  values:
+    quantity: vaporization_temperature_measurement_sample_holder_and_atmosphere
+    method_class: method_only
+    temperature_measurement_as_printed: Furnace hot-spot temperature recorded and controlled with a Pt-Pt10Rh thermocouple
+      and recorder-controller.
+    vaporization_sample_holder_as_printed: Shallow rectangular alumina tray with cross-sectional area 11.90 cm² at the furnace
+      hot spot; weight loss measured from the reaction boat after a run.
+    vaporization_atmosphere_sequence_as_printed: System evacuated while temperature was slowly raised to about 800°C; argon
+      was then added and temperature rapidly raised to the operating point; for runs in vacuo the furnace was pumped out at
+      that point.
+    vaporization_analysis_as_printed: Weight loss measured from the reaction boat after a run.
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_vaporization_measurement_and_atmosphere
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO
+- observation_id: hertl_1967_vaporization_methods_and_apparatus
+  type: laboratory_conditions
+  locator:
+    page: 1
+    published_page: 378
+    pdf_page_index: 0
+    section: Abstract
+  units: as printed
+  values:
+    quantity: vaporization_and_disproportionation_method_context
+    method_class: method_only
+    vaporization_temperature_range_C_as_published:
+    - 1005
+    - 1475
+    disproportionation_temperature_range_C_as_published:
+    - 1000
+    - 1440
+  context_id: hertl-1967-solid-sio-disproportionation-vaporization::context::hertl_1967_vaporization_methods_and_apparatus
+  work_id: 10.1111/j.1151-2916.1967.tb15135.x
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  species: SiO

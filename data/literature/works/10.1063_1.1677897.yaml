@@ -1,0 +1,430 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1063/1.1677897
+  citation: O'Hare, P. A. G. (1972), Thermochemical and Theoretical Investigations of the Sodium-Oxygen System. I. The Standard
+    Enthalpy of Formation of Sodium Oxide (Na2O), The Journal of Chemical Physics 56, 4513 (1972).
+  source_ids:
+  - ohare-1972-na2o-formation-enthalpy
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:ohare-1972-na2o-formation-enthalpy
+      role: pdf
+      path: raw/ohare-1972-na2o-formation-enthalpy/ohare-1972-na2o-formation-enthalpy.pdf
+      sha256:
+        tag: value
+        value: 4d5be06d8cf97dcb6ec6e6ab9497b019cd232f8efafcc99fc99354326eeaa15f
+    - asset_id: pdftotext:ohare-1972-na2o-formation-enthalpy
+      role: pdftotext
+      path: text/ohare-1972-na2o-formation-enthalpy
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:ohare-1972-na2o-formation-enthalpy
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1063/1.1677897
+experiments:
+- experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1063/1.1677897
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 1
+context:
+- observation_id: ohare72_atomization_equation_8
+  type: thermochemical_equation_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '8'
+  units: kcal mole−1
+  values:
+    equation_as_printed: ΔHa°(Na2O) = 2ΔHf°(Na,g) + ΔHf°(O,g) − ΔHf°(Na2O,g)
+    numeric_result_locator:
+      page: 5
+      published_page: 4516
+      pdf_page_index: 4
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_atomization_equation_8
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_discussion_uncertainty_assignment
+  type: author_uncertainty_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    paragraph: Discussion
+  units: kcal mole−1
+  values:
+    assigned_uncertainty_as_printed: ±1 kcal mole−1
+    assigned_to:
+    - Matsui et al.
+    - Roth
+    - Rengade
+    note: O'Hare calls this arbitrary; it is not printed as a Table II row uncertainty.
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_discussion_uncertainty_assignment
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_gross_wilson_formation_result_context
+  type: cited_formation_enthalpy_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '7'
+  units: kcal mole−1
+  values:
+    quantity_as_printed: ΔHf,298°(Na2O,c)
+    value: '-102.5'
+    attribution: O'Hare's 1972 derivation from Gross and Wilson [5] reaction datum and cited formation data
+    table_ii_duplicate_row: Gross and Wilson [5], Table II value -102.5
+    external_erratum_disposition: correction is discussed in the extraction audit; the 1972 value remains unchanged here
+    temperature_as_printed: 298 K
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_gross_wilson_formation_result_context
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_gunn_naoh_hf
+  type: attributed_enthalpy_input_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '3'
+  units: kJ mole−1
+  values:
+    quantity_as_printed: ΔHf,298°(NaOH·∞H2O, aq)
+    value: '-470.45'
+    uncertainty: '0.06'
+    formula_as_printed: NaOH·∞H2O(aq)
+    phase_as_printed: aq
+    attribution: Gunn [18]
+    used_in: ohare72_reaction_3_enthalpy
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_gunn_naoh_hf
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_hildenbrand_murad_hydroxide_removal_context
+  type: cited_sample_treatment_context
+  locator:
+    page: 2
+    published_page: 4513
+    pdf_page_index: 1
+    section: Purification and characterization
+  units: days; °C
+  values:
+    treatment: Na2O containing small amounts of NaOH heated under vacuum
+    treatment_duration: 2 days
+    treatment_temperature: 500 °C
+    result: hydroxide impurity eliminated
+    attribution: Hildenbrand and Murad [12]
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_hildenbrand_murad_hydroxide_removal_context
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_mean_bond_enthalpy_context
+  type: author_derived_enthalpy_context
+  locator:
+    page: 5
+    published_page: 4516
+    pdf_page_index: 4
+    paragraph: Atomization at 298.15 K
+  units: kcal mole−1
+  values:
+    quantity_as_printed: D̄298°(Na2O)
+    value: '60'
+    uncertainty: '2'
+    schema_gap: simulator/battery/enums.py::Quantity has no exact mean bond-enthalpy token.
+    derivation: Reported mean bond enthalpy; no exact atom-bond quantity is represented.
+    confidence_level: not stated
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_mean_bond_enthalpy_context
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_molecular_mass_na2o
+  type: printed_molecular_mass_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    paragraph: Reaction (1)
+  units: g mol−1
+  values:
+    formula: Na2O
+    molecular_mass_g_mol: '61.979'
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_molecular_mass_na2o
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_na2o_sublimation_enthalpy
+  type: attributed_enthalpy_input_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    paragraph: Sublimation and atomization enthalpies
+  units: kcal mole−1
+  values:
+    quantity_as_printed: ΔHsub°(Na2O)
+    value: '90.0'
+    uncertainty: '3.0'
+    attribution: Hildenbrand and Murad [12]
+    schema_gap: simulator/battery/enums.py::Quantity has no exact sublimation-enthalpy quantity token.
+    used_in: ohare72_na2o_gas_delta_fH_29815
+    confidence_level: not stated
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_na2o_sublimation_enthalpy
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_na_g_atom_delta_fH
+  type: attributed_enthalpy_input_context
+  locator:
+    page: 5
+    published_page: 4516
+    pdf_page_index: 4
+    paragraph: Atomization at 298.15 K
+  units: kcal mole−1
+  values:
+    quantity_as_printed: ΔHf°(Na,g)
+    value: '25.8'
+    temperature_as_printed: 298.15 K
+    attribution: literature value as cited by O'Hare
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_na_g_atom_delta_fH
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_o_g_atom_delta_fH
+  type: attributed_enthalpy_input_context
+  locator:
+    page: 5
+    published_page: 4516
+    pdf_page_index: 4
+    paragraph: Atomization at 298.15 K
+  units: kcal mole−1
+  values:
+    quantity_as_printed: ΔHf°(O,g)
+    value: '59.0'
+    temperature_as_printed: 298.15 K
+    attribution: literature value as cited by O'Hare
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_o_g_atom_delta_fH
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_parker_concentration_correction
+  type: attributed_enthalpy_correction_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '3'
+  units: kJ mole−1
+  values:
+    quantity_as_printed: enthalpy of concentration
+    value: '0.42'
+    sign_as_printed: +
+    attribution: Parker compilation [17]
+    used_in: ohare72_reaction_3_enthalpy
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_parker_concentration_correction
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_parker_dilution_input
+  type: attributed_enthalpy_input_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '2'
+  units: J mol−1
+  values:
+    quantity_as_printed: enthalpy of dilution
+    dilution_input_J_mol: '-38'
+    output_in_observation: ohare72_reaction_2_dilution_enthalpy
+    attribution: Parker compilation [17]
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_parker_dilution_input
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_prior_sample_compositions
+  type: cited_sample_composition_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    section: Discussion
+  units: '%'
+  values:
+    matsui_et_al_Na2O_content: 79%–98%
+    matsui_et_al_sample_phase_as_printed: Na2O, phase not specified for each Table II row
+    roth_Na2O_content: 94.19%
+    roth_Na2O2_content: 3.96%
+    gross_wilson_Na2O2_content: <0.05%
+    gross_wilson_other_impurities: possible NaOH or Na2CO3; no amount reported
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_prior_sample_compositions
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_reaction_scheme_1_2
+  type: thermochemical_reaction_scheme_context
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    section: The standard enthalpy of formation of sodium oxide
+  units: kJ mole−1
+  values:
+    reaction_equations_as_printed:
+    - number: '1'
+      equation: Na2O(c) + 5.263[NaOH·555.27 H2O(aq)] → 7.263[NaOH·402.23 H2O(aq)]
+    - number: '2'
+      equation: 7.263[NaOH·402.23 H2O(aq)] + 1111.53 H2O(l) → 7.263[NaOH·555.27 H2O(aq)]
+    reactions_1_and_2_temperature_as_printed: 298.15 K
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_reaction_scheme_1_2
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_reaction_scheme_3_7
+  type: thermochemical_reaction_scheme_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    section: The standard enthalpy of formation of sodium oxide and Discussion
+  units: kJ mole−1
+  values:
+    reaction_equations_as_printed:
+    - number: '3'
+      equation: 2[NaOH·555.27 H2O(aq)] → 2Na(c) + O2(g) + H2(g) + 1110.53 H2O(l)
+    - number: '4'
+      equation: ½O2(g) + H2(g) → H2O(l)
+    - number: '5'
+      equation: −ΔHf,298°(Na2O,c) = ΔH1 + ΔH2 + ΔH3 + ΔH4
+    - number: '6'
+      equation: 2Na(c) + ½O2(g) → Na2O(c)
+    - number: '7'
+      equation: Na2O(c) + 2HCl(aq, 3.5M) → 2NaCl(aq) + H2O(l)
+    reactions_3_and_4_temperature_as_printed: 298.15 K
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_reaction_scheme_3_7
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_sample_and_calorimetry_conditions
+  type: sample_composition_and_calorimetry_context
+  locator:
+    page: 2
+    published_page: 4513
+    pdf_page_index: 1
+    section: Purification and characterization
+  units: g; °C; h; %; ppm; J °K−1
+  values:
+    starting_Na2O_sample_mass: approximately 10 g
+    heat_treatment_temperature: 520±10 °C
+    heat_treatment_atmosphere: dynamic high vacuum
+    heat_treatment_duration: approximately 40 h
+    initial_sample_appearance: light grey and apparently inhomogeneous
+    hydrolysis_product_yield: 99.9±0.2%
+    hydrolysis_product_yield_basis: amount of NaOH expected from pure Na2O; not an assay of Na2O mass purity
+    metallic_contaminants: no significant amount detected by emission spectrography
+    free_sodium: not detected by gas chromatography after water addition
+    carbonate: not detected by gas chromatography after excess dilute HCl addition
+    NaOH_impurity: not assayed
+    peroxide: assumed absent because freshly prepared aqueous solutions were nonoxidizing
+    author_purity_inference: no significant impurities inferred from the stated observations
+    exposure_handling: operations were in vacuo or inert-gas glovebox
+    glovebox_water_vapor: customarily below 0.2 ppm
+    glovebox_exposure_check: 24 h exposure caused negligible weight increase
+    calorimeter_solution: 0.1M NaOH
+    accepted_calorimetric_runs: '9'
+    total_determinations: '10'
+    rejected_run: one run rejected because Na2O was contaminated by a small amount of moisture; no numerical result printed
+    calorimetric_run_phase_as_printed: Na2O(c)
+    table_I_mean_reaction_temperature: 25.0 °C
+    initial_final_calibration_difference: 0.4–0.8 J °K−1
+    calibration_description: energy equivalent is the mean of electrical calibrations immediately before and after each reaction
+      run
+    conditions_not_printed: total pressure or fO2 for the calorimeter experiments
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_sample_and_calorimetry_conditions
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O
+- observation_id: ohare72_table_ii_literature_formation_values
+  type: cited_thermochemistry_table_context
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    table: II
+  units: kcal mole−1
+  values:
+    quantity_as_printed: ΔHf,298°(Na2O)
+    caption_footnote_marker: a
+    footnote_as_printed: Results from Refs. 8–11 taken directly from JANAF.21a
+    printed_row_count: '7'
+    row_count_includes_current_work: true
+    rows:
+    - investigator: Forcrand
+      reference_marker: '11'
+      value: '-94.90'
+    - investigator: Matsui and Nakata
+      reference_marker: 8a
+      value: '-100.08'
+    - investigator: Matsui and Oka
+      reference_marker: 8b
+      value: '-99.89'
+    - investigator: Roth
+      reference_marker: '9'
+      value: '-100.60'
+    - investigator: Rengade
+      reference_marker: '10'
+      value: '-100.09'
+    - investigator: Gross and Wilson
+      reference_marker: '5'
+      value: '-102.5'
+    - investigator: This work
+      reference_marker: absent
+      value: '-99.14'
+    phase: not stated by Table II for its individual entries
+    table_ii_this_work_duplicates: ohare72_na2o_delta_fH_29815
+    marked_as_derived_from_table: false
+  context_id: ohare-1972-na2o-formation-enthalpy::context::ohare72_table_ii_literature_formation_values
+  work_id: 10.1063/1.1677897
+  source_id: ohare-1972-na2o-formation-enthalpy
+  species: Na2O

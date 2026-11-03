@@ -1,0 +1,5676 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml
+observations:
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_jsc1a_cdta_reaction_peak
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'thermite_exothermic_reaction_peak_temperature'
+    species:
+      formula: Mg
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'thermite_exothermic_reaction_peak_temperature';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: The source's reaction peak is a DSC/DTA event temperature, not a thermodynamic transition temperature.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: '3'
+        note: Text describes the c-DTA exothermic peak for 26 wt% Mg and 74 wt% JSC-1A as about 560°C.
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 3
+    figure: '3'
+    note: Text describes the c-DTA exothermic peak for 26 wt% Mg and 74 wt% JSC-1A as about 560°C.
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    composition:
+      state:
+        tag: unknown
+        reason: mass-percent composition contains invalid, duplicate, unsupported or ambiguous components
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: '3'
+        note: 'Figure 3 caption: 74 wt% JSC-1A and 26 wt% Mg.'
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The peak temperature is the measured reaction result; no fixed experimental temperature is stated.
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: '3'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source states argon flow but no oxygen fugacity or gas ratio.
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental
+    atmosphere:
+      state:
+        tag: value
+        value: Argon flow
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental
+    heating_rate_C_min:
+      state:
+        tag: value
+        value: '10'
+      locator:
+        page: 4
+        published_page: 4
+        pdf_page_index: 3
+        figure: '3'
+    argon_flow_mL_min:
+      state:
+        tag: value
+        value: '20'
+      locator:
+        page: 2
+        published_page: 2
+        pdf_page_index: 1
+        section: Experimental
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_jsc_1a::points:row=jsc-1a-[9]:h=43d0fdfaae2e
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).; row=Al2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).; row=Al2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=aebab3a54cbf
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).; row=Al2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).; row=Al2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_al2o3_mojave_mars::points:row=mojave-mars-[10]:h=7c240b795bed
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Al2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).; row=Al2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).; row=Al2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 4 (Al2O3), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_jsc_1a::points:row=jsc-1a-[9]:h=84ff8c10ff6c
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).; row=CaO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).; row=CaO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=4b9787add95f
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).; row=CaO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).; row=CaO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_cao_mojave_mars::points:row=mojave-mars-[10]:h=39959052d14e
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: CaO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).; row=CaO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).; row=CaO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 6 (CaO), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_jsc_1a::points:row=jsc-1a-[9]:h=83079d14745f
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).; row=Fe2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).; row=Fe2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=168359a315fd
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).; row=Fe2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).; row=Fe2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_fe2o3_mojave_mars::points:row=mojave-mars-[10]:h=2a8ffbf2907e
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Fe2O3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).; row=Fe2O3
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).; row=Fe2O3
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 5 (Fe2O3), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_jsc_1a::points:row=jsc-1a-[9]:h=ca00c239ffbe
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).; row=MgO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).; row=MgO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=6beef55e1bd7
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).; row=MgO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).; row=MgO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_mgo_mojave_mars::points:row=mojave-mars-[10]:h=98483bc63e88
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: MgO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).; row=MgO
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).; row=MgO
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 7 (MgO), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_jsc_1a::points:row=jsc-1a-[9]:h=56615a56fa00
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).; row=Na2O
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).; row=Na2O
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=92ca4353cd5a
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).; row=Na2O
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).; row=Na2O
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_na2o_mojave_mars::points:row=mojave-mars-[10]:h=fa8284c68bb7
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).; row=Na2O
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).; row=Na2O
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 8 (Na2O), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_jsc_1a::points:row=jsc-1a-[9]:h=fb4bc52098ae
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).; row=SiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).; row=SiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=2cbc1091ad4e
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).; row=SiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).; row=SiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_sio2_mojave_mars::points:row=mojave-mars-[10]:h=87aafa8eb4a3
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).; row=SiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).; row=SiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 3 (SiO2), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_jsc_1a::points:row=jsc-1a-[9]:h=14e994e8b520
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5185682344741459406833058768'
+        - - Al2O3
+          - '0.1083243717608209513283989293'
+        - - Fe2O3
+          - '0.05294115871225675091100066676'
+        - - CaO
+          - '0.1215784346535630879220028196'
+        - - MgO
+          - '0.147167672579868905411027766'
+        - - Na2O
+          - '0.03520059188729787280372776465'
+        - - TiO2
+          - '0.01621953593204649094053617758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).; row=TiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).; row=TiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5185682344741459406833058768'
+          - - Al2O3
+            - '0.1083243717608209513283989293'
+          - - Fe2O3
+            - '0.05294115871225675091100066676'
+          - - CaO
+            - '0.1215784346535630879220028196'
+          - - MgO
+            - '0.147167672579868905411027766'
+          - - Na2O
+            - '0.03520059188729787280372776465'
+          - - TiO2
+            - '0.01621953593204649094053617758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '45.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.2'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.9'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 2 (JSC-1A [9]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_jsc_mars_1a::points:row=jsc-mars-1a-[10]:h=f0fa3c52c3ae
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5413866133710032896145797573'
+        - - Al2O3
+          - '0.1620821346934584050371621295'
+        - - Fe2O3
+          - '0.07533313989057294022130507507'
+        - - CaO
+          - '0.08071238668823173772689389846'
+        - - MgO
+          - '0.07833103908269630142941701786'
+        - - Na2O
+          - '0.02824516478275256589780407465'
+        - - TiO2
+          - '0.03390952149128476007283804758'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).; row=TiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).; row=TiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5413866133710032896145797573'
+          - - Al2O3
+            - '0.1620821346934584050371621295'
+          - - Fe2O3
+            - '0.07533313989057294022130507507'
+          - - CaO
+            - '0.08071238668823173772689389846'
+          - - MgO
+            - '0.07833103908269630142941701786'
+          - - Na2O
+            - '0.02824516478275256589780407465'
+          - - TiO2
+            - '0.03390952149128476007283804758'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '43.48'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '22.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '16.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.05'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '4.22'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.34'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '3.62'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 3 (JSC-Mars-1A [10]).
+        output_unit: mole_fraction
+        references: []
+- observation_id: delgado-2015-mg-thermite-regolith::delgado_2015_table1_tio2_mojave_mars::points:row=mojave-mars-[10]:h=d323321bc717
+  experiment_id: 10.2514/6.2015-1179::delgado-2015-mg-thermite-regolith
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'regolith_simulant_feedstock_oxide_mass_percent'
+    species:
+      formula: TiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5624724412585187892929404542'
+        - - Al2O3
+          - '0.1147339286507133646021191336'
+        - - Fe2O3
+          - '0.04656781824003350818877279742'
+        - - CaO
+          - '0.127484512562222615415476758'
+        - - MgO
+          - '0.1032003899231550505911617593'
+        - - Na2O
+          - '0.03620415548081117065383581401'
+        - - TiO2
+          - '0.009336753884545501255693283538'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Table 1 cites references [9] and [10] in the printed simulant headings.
+  admission:
+    status: rejected
+    reason: No quantity token exactly represents a quoted component wt% in an initial regolith simulant.
+    decided_by:
+      worker: w1103dg-dg15
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).; row=TiO2
+  notices: []
+  source_id: delgado-2015-mg-thermite-regolith
+  locator:
+    page: 3
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).; row=TiO2
+  read_from: pdf:delgado-2015-mg-thermite-regolith
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 does not state a temperature for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 1 does not state an oxygen fugacity or gas condition for these quoted material compositions.
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5624724412585187892929404542'
+          - - Al2O3
+            - '0.1147339286507133646021191336'
+          - - Fe2O3
+            - '0.04656781824003350818877279742'
+          - - CaO
+            - '0.127484512562222615415476758'
+          - - MgO
+            - '0.1032003899231550505911617593'
+          - - Na2O
+            - '0.03620415548081117065383581401'
+          - - TiO2
+            - '0.009336753884545501255693283538'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3
+        pdf_page_index: 2
+        table: '1'
+        note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_Fe2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.87'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_Fe2O3_g_mol
+          - state:
+              tag: value
+              value: '159.687'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.45'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '6.08'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '1.09'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 3
+              published_page: 3
+              pdf_page_index: 2
+              table: '1'
+              note: Table 1 row 9 (TiO2), column 4 (Mojave Mars [10]).
+        output_unit: mole_fraction
+        references: []
