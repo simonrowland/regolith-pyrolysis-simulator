@@ -298,6 +298,19 @@ def test_missing_vaporock_row_fails_at_load(tmp_path: Path) -> None:
         parse_engine_commissioning_file(path)
 
 
+def test_vaporock_validation_notice_uses_the_owned_certified_band() -> None:
+    from engines.engine_commissioning import vaporock_temperature_notice
+
+    assert vaporock_temperature_notice(1500.0) is None
+    notice = vaporock_temperature_notice(1200.0)
+    assert notice is not None
+    assert notice['kind'] == 'engine_commissioning'
+    assert notice['reason'] == 'temperature_range'
+    assert notice['authority'] == 'extrapolated'
+    assert notice['certified_band'] == {'temperature_K': [1350.0, 1950.0]}
+    assert vaporock_temperature_notice(float('nan')) is None
+
+
 def test_missing_table_is_typed_error(tmp_path: Path) -> None:
     missing = tmp_path / 'no-such-commissioning.yaml'
     with pytest.raises(EngineCommissioningError, match='not found'):

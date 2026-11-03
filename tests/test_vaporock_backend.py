@@ -421,6 +421,7 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
                 'commissioning_notice',
                 'authority',
                 'certified_band',
+                'vaporock_temperature_notice',
             )
         }
         assert stripped == bare_stripped, label
@@ -1725,7 +1726,7 @@ def test_nonfinite_temperature_has_fail_closed_h2_envelope(
     assert calls["n"] == 0
 
 
-def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
+def test_vaporock_certified_band_edges_run_without_range_notice(monkeypatch):
     seen_T = []
 
     class FakeSystem:
