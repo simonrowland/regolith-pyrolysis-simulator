@@ -131,9 +131,15 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # 0d334cdfd5f0c0beb0f82b2227c42a83b7c692e3134c306004b78965f99c950e.
     # The same comparison on this laptop matches that prefix and suffix, so
     # the digest is not host-sensitive and the full post-removal SHA-256 is pinned.
+    # d230a39dc points the C2A_staged Na_FeO_crossover_C annotation (and its
+    # note and basis strings) at the computed root, 1181.5 -> 1183.67 C;
+    # test_physics_ground_truth pins that annotation to the computed value.
+    # Restoring only data/setpoints.yaml from 396b001d6 recovers
+    # c7f7b4dd7697329f4436e284bfde8f5574fa5f533570e703d36897d6854d764b;
+    # Studio-3 and this laptop give the same new digest.
     resolved_digest = hashlib.sha256(resolved).hexdigest()
     assert resolved_digest == (
-        "c7f7b4dd7697329f4436e284bfde8f5574fa5f533570e703d36897d6854d764b"
+        "867ebcf28c1c1b624e95e1880ac5b8f9d2d4648e0e9d6755cef48d2cdf54f8b0"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
