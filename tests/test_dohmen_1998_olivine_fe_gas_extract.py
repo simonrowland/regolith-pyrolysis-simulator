@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, ValueKind
+from simulator.battery.enums import FO2Channel, Phase, ValueKind
 from simulator.battery.migrate import Migrator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,10 +19,10 @@ TABLE1_RENDER_TRANSCRIPTION = (
     ("V892", "Fe + Fo100 (synthetic, polycrystalline)", "—", "Fa6Fo94; homogeneous grains"),
     ("V893", "Fo100 (synthetic, polycrystalline)", "—", "Fo100; single phase"),
     ("V914", "Fe (synthetic, polycrystalline)", "Fo100 (synthetic, polycrystalline)", "Fa2Fo98-Fa4Fo96; individual grains unzoned"),
-    ("V929", "Fe + wustite (synthetic, polycrystalline)", "Fo100 (synthetic, polycrystalline)", "Fa26Fo74; individual grains unzoned"),
-    ("V932", "Fe + wustite (synthetic, polycrystalline)", "San Carlos olivine (single crystal)", "Fayalitic films"),
+    ("V929", "Fe + wustite (synthetic, polycrystalline)", "Fo100 (synthetic, polycrystalline)", "Fa26Fo74; individual grains unzoned†"),
+    ("V932", "Fe + wustite (synthetic, polycrystalline)", "San Carlos olivine (single crystal)", "Fayalitic films†"),
     ("V933", "Fe (synthetic, polycrystalline)", "Fo90 + Fo100 (synthetic single crystals)", "Fayalitic films"),
-    ("V937", "Fe + magnetite (synthetic, polycrystalline)", "Fo100 (synthetic, polycrystalline)", "Molten sample: Fa74Fo26"),
+    ("V937", "Fe + magnetite (synthetic, polycrystalline)", "Fo100 (synthetic, polycrystalline)", "Molten sample: Fa74Fo26†"),
 )
 
 
@@ -58,6 +58,11 @@ def test_table1_rows_and_products_match_rendered_page_four() -> None:
     document = _document()
     _assert_table_matches_render(document)
     assert len(_table1_grid(document)) == 7
+    assert tuple(row[0] for row in _table1_grid(document) if "†" in row[3]) == (
+        "V929",
+        "V932",
+        "V937",
+    )
 
     changed_extract = deepcopy(document)
     record = next(
@@ -77,7 +82,7 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
     assert len(result.works) == 1
     assert len(result.observations) == 5
     assert len(result.experiments) == 10
-    assert sum(len(rows) for rows in result.context_by_work.values()) == 4
+    assert sum(len(rows) for rows in result.context_by_work.values()) == 5
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 5
 
     unknown_quantity_ids = {
@@ -206,8 +211,21 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
         for experiment in result.experiments.values()
         if experiment.experiment_id.endswith("kems-v932")
     )
-    assert v932.conditions["fO2_Pa"].state.value.point == Decimal("0.00002")
-    assert v932.conditions["fO2_Pa"].state.value.approximate
+    assert v932.conditions["fO2_Pa"].state.is_unknown
+    assert v932.conditions["fO2_Pa"].locator is not None
+    assert v932.conditions["fO2_Pa"].locator.page == 4
+    assert v932.fO2_control is not None
+    assert v932.fO2_control.channel.value is FO2Channel.BUFFER
+    assert v932.fO2_control.buffer is not None
+    assert v932.fO2_control.buffer.state.value == "iron-wustite buffer (Fe + wustite)"
+    powder = next(
+        experiment
+        for experiment in result.experiments.values()
+        if experiment.experiment_id.endswith("1atm-1600c-metal-olivine-test")
+    )
+    assert powder.pressure_environment.total_pressure_Pa.state.is_unknown
+    assert powder.pressure_environment.total_pressure_Pa.locator is not None
+    assert powder.pressure_environment.total_pressure_Pa.locator.page == 3
 
     # The 1400 C iron-wustite oxygen pressure is a printed buffer condition,
     # not an O2 KMS result. The per-run experiment carries it with its locator.
@@ -228,6 +246,21 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
     )
     assert diffusion.pressure_environment.total_pressure_Pa.state.value.point == Decimal("101325")
     assert diffusion.fO2_control.gas_ratio.value.state.is_unknown
+
+    migrated_ni = next(
+        record
+        for rows in result.context_by_work.values()
+        for record in rows
+        if str(record.get("context_id", "")).endswith(
+            "::context::dohmen_1998_text_v932_nickel_content"
+        )
+    )
+    assert migrated_ni["species"] == "Ni"
+    assert migrated_ni["locator"]["page"] == 8
+    assert migrated_ni["units"] == "mass ppm"
+    assert migrated_ni["values"]["basis"] == "ppm_mass"
+    assert migrated_ni["values"]["original_crystal_as_published"] == "approximately 3000 ppm"
+    assert migrated_ni["values"]["film_as_published"] == "<100 ppm"
 
 
 def test_figure_values_are_deferred_and_table_v937_is_preserved_verbatim() -> None:
@@ -252,6 +285,43 @@ def test_figure_values_are_deferred_and_table_v937_is_preserved_verbatim() -> No
         if item.get("quote") == "V937 (Fa = 70 mol%)"
     )
     assert prose["locator"]["page"] == 6
+    assert "round" not in prose["note"].casefold()
+    caveats_by_quote = {
+        item.get("quote"): item for item in document["source_caveats"]
+    }
+    expected_quotes = {
+        "Oriented single crystals of olivines (forsterite, Fo100, or San Carlos olivine, Fo92), polished on one side, were used to study the exact mechanism of the reaction.": 4,
+        "The crystals used were either pieces of synthetic forsterite (white in color, Fo100) or San Carlos olivine (pale green, Fo90-92).": 7,
+        "In one case (V932), two single crystals of both compositions were placed next to, but not touching, each other.": 7,
+        "BSE of forsterite (a) and San Carlos olivine (both experiment V933) (c) with thick film of overgrown Fe-rich olivine; (b) and (d): enlargement of fayalite-rich regions in (a) and (c), respectively.": 7,
+        "This is seen clearly in experiment V932 where two single crystals of olivine (Fo100 and Fo92) were used simultaneously.": 10,
+    }
+    for quote, page in expected_quotes.items():
+        assert caveats_by_quote[quote]["locator"]["page"] == page
+    dark_glass = next(
+        item
+        for item in document["source_caveats"]
+        if "dark glass" in item.get("quote", "")
+    )
+    assert dark_glass["locator"]["page"] == 7
+    assert "experiment V933" in dark_glass["note"]
+    v933_glass = next(
+        item
+        for item in document["source_caveats"]
+        if "sections from experiment V933" in item.get("quote", "")
+    )
+    assert v933_glass["locator"]["page"] == 8
+
+    nickel = next(
+        item
+        for item in document["species"]["Ni"]["context"]
+        if item["observation_id"] == "dohmen_1998_text_v932_nickel_content"
+    )
+    assert nickel["units"] == "mass ppm"
+    assert nickel["values"]["basis"] == "ppm_mass"
+    assert nickel["values"]["original_crystal_as_published"] == "approximately 3000 ppm"
+    assert nickel["values"]["film_as_published"] == "<100 ppm"
+    assert nickel["locator"]["page"] == 8
     film = next(
         item
         for item in document["species"]["Fe"]["context"]
