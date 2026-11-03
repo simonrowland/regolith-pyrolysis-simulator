@@ -67,7 +67,7 @@ def test_table1_render_values_and_context_migration() -> None:
         for item in work_contexts
     ]
     assert len(result.observations) == 0
-    assert len(contexts) == 9
+    assert len(contexts) == 12
     assert len(result.queue) == 1
     assert result.queue[0].why == "extract yielded no observations"
     assert not result.validation.hard_issues
@@ -92,10 +92,16 @@ def test_table1_render_values_and_context_migration() -> None:
     assert migrated_rows[3]["FUN1_mendybaev_2013_mol_pct"] == "33.1"
 
     migrated_summary = migrated_contexts[
-        "shornikov_2025_residue_and_pressure_prose_summary"
+        "shornikov_2025_residue_prose_model_summary"
     ]
     assert migrated_summary["locator"]["page"] == 5
+    assert migrated_summary["values"]["method_class"] == "model_derived"
     assert migrated_summary["values"]["facts"][2]["locator"]["page"] == 6
+    oxygen_summary = migrated_contexts[
+        "shornikov_2025_oxygen_ratio_prose_measurement_summary"
+    ]
+    assert oxygen_summary["values"]["method_class"] == "measured_reduced"
+    assert oxygen_summary["values"]["facts"][0]["value_as_printed"] == "one order of magnitude"
 
     figure4 = next(
         item
@@ -129,13 +135,12 @@ def test_table1_render_values_and_context_migration() -> None:
     assert unknown_conditions["sample_composition"]["state"]["tag"] == "unknown"
     assert unknown_conditions["sweep_gas"]["state"]["tag"] == "unknown"
     assert method["values"]["output_bound_not_a_condition"][
-        "total_vapor_pressure_over_melt_atm"
-    ] == "<10^-4"
+        "printed_statement"
+    ] == "did not allow the total vapor pressure over the melts to increase above 10^-4 atm"
 
     result_summary = migrated_summary
     facts = result_summary["values"]["facts"]
     assert "Figure 5 calculations" in result_summary["values"]["attribution"]
-    assert "Figure 8 O2/O trend" in result_summary["values"]["attribution"]
     assert facts[0]["value_as_printed"] == "zero"
     assert facts[0]["locator"]["page"] == 5
     assert facts[1]["fact"].endswith("2300°C, at low content.")
@@ -143,3 +148,24 @@ def test_table1_render_values_and_context_migration() -> None:
     assert facts[2]["locator"]["page"] == 6
     assert facts[3]["value_as_printed"] == "~16.5"
     assert facts[3]["locator"]["page"] == 6
+
+    figure6 = migrated_contexts["shornikov_2025_fig6_cai_type_a_mineral_activities"]
+    assert figure6["units"] == "log a_i"
+    assert figure6["values"]["axes_as_printed"]["y"] == "log a_i"
+    ions = method["values"]["detected_ions_as_printed"]
+    assert "CaWO3+" in ions
+    assert "CaWO4+" in ions
+    assert {
+        migrated_contexts[key]["locator"]["figure"]
+        for key in (
+            "shornikov_2025_fig1_knudsen_effusion_apparatus_schematic",
+            "shornikov_2025_fig2_temperature_time_schedule",
+        )
+    } == {"1", "2"}
+    assert migrated_contexts["shornikov_2025_fig8_oxygen_pressure_and_ratio"][
+        "values"
+    ]["series_attribution"]["3"] == {
+        "sample": "Murchison",
+        "method_class": "quoted_attributed",
+        "attribution": "Yakovlev et al. (1987)",
+    }
