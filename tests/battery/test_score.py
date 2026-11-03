@@ -81,7 +81,13 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
 )
-from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
+from simulator.battery.validity import (
+    apparatus_geometry_interval_notice,
+    effusion_regime_unverified,
+    knudsen_effusion_pressure_from_mass_rate,
+    run_validity_gates,
+    underdetermined_apparatus,
+)
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -18377,4 +18383,373 @@ def test_filtered_score_context_resolves_cross_source_validation_parent(
     assert full.hard_issues_by_observation.get(child_id) is None
     assert filtered.hard_issues_by_observation.get(child_id) == (
         full.hard_issues_by_observation.get(child_id)
+    )
+
+
+def _printed_diameter_experiment(diameter: Value, *, kn: Decimal | None = None):
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=kn, calibrated=False
+    )
+    assert experiment.apparatus is not None
+    return replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            geometry=ApparatusGeometry(
+                orifice_diameter_m=Located(
+                    State.of(diameter),
+                    locator=F.loc(page=221, section="Experimental"),
+                )
+            ),
+        ),
+    )
+
+
+def _cell_total_pressure_observation(experiment, pressure: Decimal):
+    identity = replace(
+        F.psat_identity("Ca"),
+        quantity=Quantity.P_PARTIAL,
+        total_pressure_Pa=State.of(pressure),
+    )
+    return F.observation(
+        f"cell-pressure-{pressure}",
+        experiment.experiment_id,
+        identity,
+        pressure,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+
+def test_shornikov_2025_printed_orifice_interval_passes_apparatus_geometry_gate() -> None:
+    """Shornikov 2025 prints 0.25-0.30 mm (p. 221). Calibrated KEMS has no value band."""
+
+    from simulator.battery.migrate import (
+        experiment_from_plain,
+        load_yaml,
+        observation_from_plain,
+    )
+    from simulator.battery.score import flagged_strata
+
+    root = Path(__file__).resolve().parents[2]
+    work = load_yaml(
+        root / "data/literature/works/10.1007_978-3-031-80664-3_20.yaml"
+    )
+    experiments = {
+        item["experiment_id"]: experiment_from_plain(item)
+        for item in work["experiments"]
+    }
+    store = load_yaml(
+        root
+        / "data/literature/extracts-v2/shornikov-2025-calcium-oxide-evaporation.yaml"
+    )
+    kems_rows = []
+    for payload in store["observations"]:
+        observation = observation_from_plain(payload)
+        quantity = quantity_token(observation.identity)
+        experiment = experiments.get(observation.experiment_id)
+        evidence = observation.evidence.class_
+        if (
+            quantity not in {Quantity.P_PARTIAL, Quantity.P_SAT}
+            or experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or not evidence.is_value
+            or evidence.value
+            not in {
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_TABULATED,
+                EvidenceClass.MEASURED_REDUCED,
+            }
+        ):
+            continue
+        kems_rows.append((experiment, observation, quantity))
+
+    # 14 series x 15 temperatures = 210 pressures. The 75 model_derived
+    # series are outside the apparatus gate. 105 tabulated + 30 reduced
+    # = 135 measured KEMS rows.
+    assert len(store["observations"]) == 210
+    assert len(kems_rows) == 135
+    assert (
+        sum(
+            observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
+            for _experiment, observation, _quantity in kems_rows
+        )
+        == 105
+    )
+    assert (
+        sum(
+            observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+            for _experiment, observation, _quantity in kems_rows
+        )
+        == 30
+    )
+    for experiment, observation, quantity in kems_rows:
+        gate = underdetermined_apparatus(
+            experiment, quantity, observation=observation
+        )
+        assert gate.passed, (observation.observation_id, gate)
+        geometry = next(
+            check for check in gate.checks if check.name == "geometry_determinants"
+        )
+        assert geometry.detail["missing"] == []
+        assert geometry.detail["apparatus_geometry_interval_printed"] is True
+        assert geometry.detail["regime_checked_at"] == "d_max"
+        assert geometry.detail["value_band"] is None
+        notice = apparatus_geometry_interval_notice(
+            experiment, quantity, origin=observation.observation_id
+        )
+        assert notice is not None
+        assert notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+        assert notice.band is None
+        assert "effusion regime checked at d_max=" in notice.reason
+        assert "no value band" in notice.reason
+        assert flagged_strata((notice,)) == ()
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.uncertainty.kind is UncertaintyKind.NONE
+
+    experiment, observation, quantity = kems_rows[0]
+    residual, _candidate = _compile(
+        observation,
+        experiment,
+        _predict(observation.value.point, observation.identity),
+    )
+    interval_notices = tuple(
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+    )
+    assert len(interval_notices) == 1
+    assert interval_notices[0].band is None
+    assert interval_notices[0].origin == observation.observation_id
+    assert flagged_strata(interval_notices) == ()
+
+
+def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> None:
+    """0.25-0.30 mm -> d_gm = 0.2739 mm and +/-0.079 dex (d-326)."""
+
+    from simulator.battery.score import flagged_strata
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    d_min = Decimal("0.00025")
+    d_max = Decimal("0.00030")
+    rate = Decimal("1e-10")
+    temperature = Decimal("1800")
+    molar_mass = Decimal("0.040078")
+    diameter = Located(
+        State.of(
+            Value(ValueKind.INTERVAL, interval_low=d_min, interval_high=d_max)
+        ),
+        locator=F.loc(page=221, section="Experimental"),
+    )
+    result = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        clausing_factor=Decimal("1"),
+        origin="synthetic-knudsen-interval",
+    )
+    d_gm = (d_min * d_max).sqrt()
+    # Ruling identity: (d_max / d_gm)^2 = d_max / d_min = 1.20.
+    assert d_max / d_min == Decimal("1.2")
+    assert abs((d_max / d_gm) ** 2 - (d_max / d_min)) < Decimal("1e-20")
+    assert (d_gm * Decimal("1000")).quantize(Decimal("0.0001")) == Decimal("0.2739")
+    assert result.evaluation_diameter_m == d_gm
+    ruling_band = Decimal("1.20").ln() / Decimal(10).ln()
+    assert result.band_dex is not None
+    assert abs(result.band_dex - ruling_band) < Decimal("1e-12")
+    assert result.band_dex.quantize(Decimal("0.001")) == Decimal("0.079")
+
+    # Independent of this reducer: invert the existing float kinetic coefficient.
+    coefficient = hertz_knudsen_k_kg_s_m2_pa(float(temperature), float(molar_mass))
+    area = math.pi * (float(result.evaluation_diameter_m) / 2) ** 2
+    independent_Pa = (float(rate) / area) / coefficient
+    assert abs(float(result.pressure_Pa) - independent_Pa) / independent_Pa < 1e-9
+
+    at_mean = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        d_gm,
+        clausing_factor=Decimal("1"),
+        origin="synthetic-knudsen-point-mean",
+    )
+    assert at_mean.pressure_Pa == result.pressure_Pa
+    assert at_mean.band_dex is None
+    assert at_mean.notice is None
+
+    constant_clausing = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        clausing_factor=Decimal("0.8"),
+        origin="synthetic-knudsen-constant-clausing",
+    )
+    assert abs(constant_clausing.band_dex - result.band_dex) < Decimal("1e-20")
+    assert abs(constant_clausing.band_dex - ruling_band) < Decimal("1e-12")
+    assert (
+        abs(constant_clausing.pressure_Pa * Decimal("0.8") - result.pressure_Pa)
+        / result.pressure_Pa
+        < Decimal("1e-24")
+    )
+    ideal = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        origin="synthetic-knudsen-ideal-orifice",
+    )
+    assert ideal.pressure_Pa == result.pressure_Pa
+
+    assert result.notice is not None
+    assert result.notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+    assert result.notice.band == f"+/-{result.band_dex} dex"
+    assert "effusion regime checked at d_max=" in result.notice.reason
+    assert flagged_strata((result.notice,)) == ()
+
+    with pytest.raises(ValueError, match="missing clausing_factor"):
+        knudsen_effusion_pressure_from_mass_rate(
+            rate,
+            temperature,
+            molar_mass,
+            diameter,
+            orifice_channel_length_m=Located(
+                State.of(Value.point_of("0.001")),
+                locator=F.loc(page=222),
+            ),
+            origin="synthetic-knudsen-length-without-clausing",
+        )
+
+    experiment = _printed_diameter_experiment(
+        Value(ValueKind.INTERVAL, interval_low=d_min, interval_high=d_max)
+    )
+    gate = underdetermined_apparatus(experiment, Quantity.MASS_LOSS_RATE)
+    assert gate.passed, gate
+
+
+def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
+    from simulator.battery.score import flagged_strata
+
+    diameter = Decimal("0.00030")
+    experiment = _printed_diameter_experiment(Value.point_of(diameter))
+    gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+    assert gate.passed
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert "apparatus_geometry_interval_printed" not in geometry.detail
+    assert apparatus_geometry_interval_notice(
+        experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+    ) is None
+
+    # Point limit stays min(10 Pa, d_mm). 0.30 mm -> 0.30 Pa.
+    passing = _cell_total_pressure_observation(experiment, Decimal("0.30"))
+    passing_gate = effusion_regime_unverified(
+        experiment, Quantity.P_PARTIAL, observation=passing
+    )
+    assert passing_gate.passed
+    passing_check = next(
+        check
+        for check in passing_gate.checks
+        if check.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(passing_check.detail["pressure_limit_Pa"]) == Decimal("0.30")
+    assert Decimal(passing_check.detail["orifice_diameter_m"]) == diameter
+    failing = _cell_total_pressure_observation(experiment, Decimal("0.31"))
+    failing_gate = effusion_regime_unverified(
+        experiment, Quantity.P_PARTIAL, observation=failing
+    )
+    assert failing_gate.passed is False
+    assert failing_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    reduced = knudsen_effusion_pressure_from_mass_rate(
+        Decimal("1e-10"),
+        Decimal("1800"),
+        Decimal("0.040078"),
+        diameter,
+        origin="point-geometry-row",
+    )
+    assert reduced.evaluation_diameter_m == diameter
+    assert reduced.band_dex is None
+    assert reduced.notice is None
+
+    identity = replace(F.psat_identity("Ca"), quantity=Quantity.P_PARTIAL)
+    reference = F.observation(
+        "point-geometry-kems",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.01"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, _candidate = _compile(
+        reference, experiment, _predict(Decimal("0.01"), identity)
+    )
+    assert not any(
+        item.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+        for item in residual.notices
+    )
+    assert NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED.value not in flagged_strata(
+        residual.notices
+    )
+
+    bound = _printed_diameter_experiment(
+        Value(
+            ValueKind.BOUND,
+            bound_operator="<=",
+            bound_value=Decimal("0.00030"),
+        )
+    )
+    bound_gate = underdetermined_apparatus(bound, Quantity.P_PARTIAL)
+    assert bound_gate.passed is False
+    assert bound_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    missing = next(
+        check.detail["missing"]
+        for check in bound_gate.checks
+        if check.name == "geometry_determinants"
+    )
+    assert missing == ["orifice_diameter_m"]
+
+
+def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
+    """Interval 0.25-0.30 mm. The coded p/d limit at d_max is 0.30 Pa.
+
+    0.28 Pa passes only because the check uses d_max. The same pressure
+    would fail the limit at d_min (0.25 Pa). 1 Pa fails at d_max.
+    """
+
+    experiment = _printed_diameter_experiment(
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.00025"),
+            interval_high=Decimal("0.00030"),
+        )
+    )
+    refused = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("1")),
+    )
+    assert refused.passed is False
+    assert refused.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    check = next(
+        item for item in refused.checks if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(check.detail["orifice_diameter_m"]) == Decimal("0.00030")
+    assert Decimal(check.detail["pressure_limit_Pa"]) == Decimal("0.30")
+
+    passed = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+    )
+    assert passed.passed
+    passed_check = next(
+        item
+        for item in passed.checks
+        if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(passed_check.detail["orifice_diameter_m"]) == Decimal("0.00030")
+    assert Decimal(passed_check.detail["in_cell_total_pressure_Pa"]) < Decimal(
+        passed_check.detail["pressure_limit_Pa"]
     )
