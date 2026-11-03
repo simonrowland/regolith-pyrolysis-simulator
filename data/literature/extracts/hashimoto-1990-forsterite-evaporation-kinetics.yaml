@@ -61,10 +61,7 @@ fidelity_samples:
       page: 3
       published_page: 55
       note: Alternate-vapour-species solid-forsterite alpha range; checked against the page render.
-  - species: SiO2
-    observable: composition_series
-    observation_id: hashimoto_1990_forsterite_residue_glass_sio2
-    field: SiO2_wt_pct
+  - path: species.SiO2.observations[hashimoto_1990_forsterite_residue_glass_sio2].values.points[0].SiO2_wt_pct
     value: '65'
     locator:
       page: 3
@@ -309,6 +306,12 @@ species:
         values:
           quantity: evaporation_coefficient_alpha
           method_class: quoted_attributed
+          status: typed_refusal
+          admission_status: typed_refusal
+          reason: >-
+            Source caveat on page 55: “impossible, according to the definition
+            of alpha_v”; Hashimoto says the over-unity value may reflect
+            underestimation of the experimental surface area.
           attribution: >-
             Hashimoto's reported alternate-species coefficient, calculated
             from measured J_v and theoretical J_e for pure SiO2(g); numeric
