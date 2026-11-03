@@ -3427,6 +3427,27 @@ def test_b704_nonclosing_mass_percent_stays_printed_and_refuses_engine_compositi
     )
 
 
+def test_plain_composition_reader_refuses_suffixed_nonclosing_oxide_map() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": {"SiO2_wt_pct": "45", "MgO_wt_pct": "45"},
+                },
+            }
+        }
+    )
+
+    assert composition.state.is_unknown
+    assert composition.state.reason == (
+        "mass-percent composition is not usable: mass-percent composition is a partial analysis: "
+        "kept sum=90 wt% is below 95 wt%"
+    )
+
+
 def test_plain_identity_reader_turns_nonoxide_mass_assay_into_unknown() -> None:
     # Taniguchi Table 1 row 101 prints metallic Fe alone, with no oxide map.
     identity = migrate_module._identity_from_plain(

@@ -1504,6 +1504,10 @@ def _percent_components(
     return dict(pairs)
 
 
+def _is_mass_percent_oxide_component(name: str) -> bool:
+    return _kume_formula_unit_oxide(_canonical_printed_oxide_name(name)) is not None
+
+
 def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     pairs = _mass_percent_pairs(payload)
     if pairs is None:
@@ -1514,10 +1518,7 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     if any(not name for name in names):
         return None
     if not any(
-        (
-            _kume_formula_unit_oxide(_canonical_printed_oxide_name(name))
-            is not None
-        )
+        _is_mass_percent_oxide_component(name)
         or _volatile_closure_component(name) is not None
         or _is_printed_chemical_component_name(name)
         or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
@@ -1700,9 +1701,7 @@ def _composition_located_from_plain(
             inference=source.inference,
         )
     wt = _mass_percent_components(body)
-    if wt is not None and any(
-        _kume_formula_unit_oxide(name) is not None for name in wt
-    ):
+    if wt is not None and any(_is_mass_percent_oxide_component(name) for name in wt):
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
         else:
