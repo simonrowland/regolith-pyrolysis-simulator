@@ -124,6 +124,9 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    ALPHA_GAS_SYSTEM_H2,
+    HK_RATIO_ALPHA_DEFINITION,
+    evaporation_alpha_family_key,
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -4845,6 +4848,16 @@ def _read_decision_band_ratchet(
     return entries, False, history
 
 
+# Same minimum the HK-ratio alpha family uses before a row can leave the
+# insufficient-sources hold. Two independent source_ids, not two rows.
+MINIMUM_INDEPENDENT_FAMILY_SOURCES = 2
+DERIVED_BAND_INSUFFICIENT_SOURCES = "derived_band_insufficient_sources"
+FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED = (
+    "forsterite_h2_equilibrium_gas_not_modelled"
+)
+_FORSTERITE_CRYSTAL_FORMULA = "Mg2SiO4"
+
+
 def _source_band_catalog(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
@@ -4906,8 +4919,8 @@ def _source_band_catalog(
     records: list[dict[str, object]] = []
     no_band_reasons: dict[str, str] = {}
     for key, by_source in sources.items():
-        if len(by_source) < 2:
-            no_band_reasons[key] = "derived_band_insufficient_sources"
+        if len(by_source) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+            no_band_reasons[key] = DERIVED_BAND_INSUFFICIENT_SOURCES
             continue
         if any(len(row["values"]) != 1 for row in by_source.values()):
             continue
@@ -11795,6 +11808,60 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
+def hk_ratio_alpha_predictor_refusal(
+    reference: Observation,
+    observations: Iterable[Observation],
+) -> dict[str, object] | None:
+    """Typed H2 refusal, or the existing two-source hold, for an HK-ratio alpha.
+
+    Only rows the migrator marked ``j_exp_over_hk_maximum`` are considered.
+    Forsterite crystal measured against an H2-reactive maximum is refused
+    because that equilibrium gas is not modelled, even when the H2 family
+    already has two sources. Any other marked family with fewer than
+    ``MINIMUM_INDEPENDENT_FAMILY_SOURCES`` independent source_ids is held
+    with ``derived_band_insufficient_sources``. A large enough vacuum family
+    falls through to the ordinary kinetic rail.
+    """
+
+    provenance = reference.provenance
+    if not isinstance(provenance, Mapping):
+        return None
+    if provenance.get("alpha_definition") != HK_RATIO_ALPHA_DEFINITION:
+        return None
+    key = evaporation_alpha_family_key(reference)
+    if key is None:
+        return None
+    phase, formula, gas = key
+    if (
+        gas == ALPHA_GAS_SYSTEM_H2
+        and phase == Phase.CR.value
+        and formula == _FORSTERITE_CRYSTAL_FORMULA
+    ):
+        return {
+            "reason": FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED,
+            "gas_system": gas,
+            "phase": phase,
+            "formula": formula,
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    rows = list(observations)
+    if all(row.observation_id != reference.observation_id for row in rows):
+        rows.append(reference)
+    sources = {
+        row.source_id
+        for row in rows
+        if row.source_id and evaporation_alpha_family_key(row) == key
+    }
+    if len(sources) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+        return {
+            "reason": DERIVED_BAND_INSUFFICIENT_SOURCES,
+            "n_sources": len(sources),
+            "family": {"phase": phase, "formula": formula, "gas_system": gas},
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    return None
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -12054,6 +12121,22 @@ def compile_residual(
             detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
+        )
+    hk_alpha_refusal = hk_ratio_alpha_predictor_refusal(
+        reference, context.observations.values()
+    )
+    if hk_alpha_refusal is not None:
+        hk_reason = hk_alpha_refusal.get("reason")
+        hk_execution = (
+            ExecutionState.UNSUPPORTED
+            if hk_reason == FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED
+            else ExecutionState.NOT_PROBED
+        )
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            hk_alpha_refusal,
+            execution=Execution(state=hk_execution),
+            exclusions=("status_match_or_mismatch",),
         )
     if rail is None:
         return _refused(
