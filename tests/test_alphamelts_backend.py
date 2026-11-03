@@ -10204,15 +10204,47 @@ def _initialize_melts_transport_for_oxygen_test(backend, monkeypatch, config):
     return backend.initialize(config)
 
 
+def _expected_transport_oxygen_notice(pO2_bar, floor_bar, admission='environment'):
+    from engines.builtin._common import transport_pO2_extrapolation_notice
+    from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
+
+    return transport_pO2_extrapolation_notice(IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={}, species_formula_registry={},
+        ),
+        temperature_C=0.0,
+        pressure_bar=0.0,
+        fO2_log=None,
+        control_inputs={
+            'pO2_bar': float(pO2_bar),
+            'vacuum_floor_bar': floor_bar,
+            'pO2_admission': admission,
+        },
+    ))
+
+
 @pytest.mark.parametrize('gas_bar', [1e-10, 1e-9, 2e-9, 1e-6])
 def test_alphamelts_transport_config_pin_before_shared_validation(
     monkeypatch, gas_bar,
 ):
+    from simulator.environment import vacuum_floor_bar_for_environment
+
     backend = AlphaMELTSBackend()
     assert _initialize_melts_transport_for_oxygen_test(
         backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
     )
+    floor = vacuum_floor_bar_for_environment()
+    expected = _expected_transport_oxygen_notice(gas_bar, floor)
     assert backend._vapor_transport_pO2_bar == gas_bar
+    assert backend._transport_pO2_extrapolation_notice == expected
+    if gas_bar < floor:
+        assert expected is not None
+        assert 'authority_level=extrapolated' in expected
+        assert 'certified_band=none' in expected
+        assert 'actual pO2 retained' in expected
+    else:
+        assert expected is None
 
 
 @pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
@@ -10549,6 +10581,17 @@ def test_live_transport_predicts_below_active_environment_floor(backend_cls, mon
     assert captured['fO2_log'] == -12.0
     assert backend._vapor_transport_pO2_bar == floor / 2
     assert backend._vapor_transport_floor_bar == floor
+    expected = _expected_transport_oxygen_notice(floor / 2, floor)
+    assert expected is not None
+    assert 'authority_level=extrapolated' in expected
+    assert 'certified_band=none' in expected
+    assert 'actual pO2 retained' in expected
+    assert backend._transport_pO2_extrapolation_notice == expected
+    assert result.diagnostics.get('transport_pO2_extrapolation_notice') == expected
+    _pressures, _sources, diagnostic = (
+        backend._builtin_vapor_projection_for_subprocess(result)
+    )
+    assert expected in diagnostic['control_audit']['notes']
 
 
 def test_core_direct_alphamelts_dispatch_keeps_isothermal(monkeypatch):

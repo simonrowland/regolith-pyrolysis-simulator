@@ -1113,6 +1113,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._configured_vapor_transport_pO2_bar = self._vapor_transport_pO2_bar
         self._vapor_transport_floor_bar = vacuum_floor_bar_for_environment()
         self._configured_vapor_transport_floor_bar = self._vapor_transport_floor_bar
+        self._transport_pO2_extrapolation_notice: Optional[str] = None
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
 
     def _set_vapor_transport_pO2_bar(
@@ -1121,6 +1122,7 @@ class _MELTSBackendSupport(MeltBackend):
         from engines.builtin._common import (
             resolve_request_vacuum_floor_bar,
             resolve_transport_pO2_bar,
+            transport_pO2_extrapolation_notice,
         )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
         from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
@@ -1149,6 +1151,11 @@ class _MELTSBackendSupport(MeltBackend):
         self._vapor_transport_pO2_bar = resolved_pO2
         self._vapor_transport_floor_bar = resolved_floor
         self._vapor_transport_pO2_admission = admission
+        # Same notice the builtin and VapoRock vapour audits record. A positive
+        # value below the numerical guard is kept; the flag stays with it.
+        self._transport_pO2_extrapolation_notice = (
+            transport_pO2_extrapolation_notice(request)
+        )
 
     def _initialize_vapor_transport(self, config: Mapping[str, object]) -> None:
         self._set_vapor_transport_pO2_bar(config.get(
@@ -1729,7 +1736,20 @@ class _MELTSBackendSupport(MeltBackend):
         }
         if call_timeout_s is not None and self.backend_name == 'thermoengine':
             prepared_kwargs['call_timeout_s'] = float(call_timeout_s)
-        return self._equilibrate_prepared(**prepared_kwargs)
+        return self._with_transport_oxygen_notice(
+            self._equilibrate_prepared(**prepared_kwargs)
+        )
+
+    def _with_transport_oxygen_notice(
+        self, result: EquilibriumResult,
+    ) -> EquilibriumResult:
+        notice = self._transport_pO2_extrapolation_notice
+        if not notice:
+            return result
+        diagnostics = dict(result.diagnostics or {})
+        diagnostics['transport_pO2_extrapolation_notice'] = notice
+        result.diagnostics = diagnostics
+        return result
 
     def _equilibrate_prepared(
         self,
@@ -5883,6 +5903,13 @@ class _MELTSBackendSupport(MeltBackend):
                 f'status={result.status!r}; warnings={list(result.warnings)!r}',
             )
         diagnostic = dict(result.diagnostic or {})
+        audit = getattr(result, 'control_audit', None)
+        if audit is not None:
+            diagnostic['control_audit'] = {
+                'requested': dict(audit.requested),
+                'applied': dict(audit.applied),
+                'notes': list(audit.notes),
+            }
         pressures = dict(diagnostic.get('vapor_pressures_Pa') or {})
         sources = dict(diagnostic.get('vapor_pressures_source') or {})
         if not pressures:
