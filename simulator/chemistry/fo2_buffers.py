@@ -1275,6 +1275,19 @@ _EXTENDED_BUFFERS = frozenset({"Mo-MoO2", "MH", "MW"})
 _MO_EDGES = (Decimal(1000), Decimal(1450))
 _MH_EDGE = Decimal(1073)
 _MW_EDGE = Decimal(1270)
+_REGION2_ROUTES = {
+    "Mo-MoO2": ("janaf_mo_moo2", "oneill1986_via_oneill1987"),
+    "MH": (
+        "haas1992_table_10_9",
+        "chou1978_eq12",
+        "janaf_mh_fe3o4_fe2o3",
+    ),
+    "MW": (
+        "haas1992_table_10_7",
+        "oneill1988_eq16",
+        "janaf_mw_fe0_947o_fe3o4",
+    ),
+}
 
 
 def _signed_edge(central: Decimal, route: Decimal) -> Decimal:
@@ -1287,17 +1300,24 @@ def _pair_width(
     edge_central: Decimal,
     edge_route: Decimal,
 ) -> Decimal:
-    """Count the edge offset once, plus any additional separation at T.
+    """Add the irreducible edge disagreement and drift beyond that baseline.
 
-    Each log is rounded to 0.0001 first, which is the survey table's place.
-    One comparison route is the ruling's band. Two routes take the wider
-    pair, so a crossing cannot drop a named curve.
-
-    The open O'Neill window puts Mo in region 2 at its 1000 K and 1450 K
-    endpoints. Let d(T) = log10(fO2/bar)_central − log10(fO2/bar)_route;
-    the band is |d(T) − d(edge)| + |d(edge)| dex. At 1000 K, d(T) and
-    d(edge) are both +0.1739 dex, giving |0| + 0.1739 = 0.1739 dex.
-    At 1450 K both are +0.1150 dex, giving |0| + 0.1150 = 0.1150 dex.
+    Let d(T) = log10(fO2/bar)_central − log10(fO2/bar)_route, rounded to
+    the survey precision of 0.0001 dex. The base |d(edge)| is the disagreement
+    where both routes are valid; we do not know which is right. The additional
+    |d(T) - d(edge)| is drift of the extrapolated route beyond that baseline,
+    the extrapolation error proper. Thus B = |d(T) - d(edge)| + |d(edge)| dex.
+    B is continuous at the edge and equals |d(edge)| there. By the triangle
+    inequality B >= |d(T)|, so it never understates the raw disagreement.
+    It exceeds that raw gap when drift reverses the baseline sign: for MH at
+    1673 K the +0.3367 dex drift opposes the −0.4907 dex baseline, giving
+    |−0.1540 − (−0.4907)| + 0.4907 = 0.8274 dex. The old sum
+    |d(T)| + |d(edge)| double-counted the baseline and gave 0.6447 dex
+    (0.645). For MW at 1274.15 K, d(T) = +0.5214 and d(edge) = +0.5191 dex,
+    so the +0.0023 dex drift gives B = 0.5214 dex; the old sum was 1.0405.
+    For Mo at 1473 K, |0.1129 − 0.1150| + 0.1150 = 0.1171 dex.
+    The units are dex throughout because each d is a difference of log10
+    fugacities relative to 1 bar.
     """
 
     at_temperature = _signed_edge(central, route)
@@ -1327,6 +1347,34 @@ def _spread_band(buffer: str, temperature_K: Decimal) -> Decimal:
     if len(logs) <= 1:
         return Decimal(0)
     return max(logs) - min(logs)
+
+
+def _region2_band(
+    buffer: str, central_calibration_id: str, temperature_K: Decimal
+) -> Decimal:
+    """Band for a region-2 central route against the other named curves."""
+
+    routes = _REGION2_ROUTES[buffer]
+    edge_temperature = {
+        "Mo-MoO2": (
+            _MO_EDGES[1] if temperature_K >= _MO_EDGES[1] else _MO_EDGES[0]
+        ),
+        "MH": _MH_EDGE,
+        "MW": _MW_EDGE,
+    }[buffer]
+    central = _member(central_calibration_id, temperature_K)
+    central_edge = _member(central_calibration_id, edge_temperature)
+    widths = tuple(
+        _pair_width(
+            central,
+            _member(route_id, temperature_K),
+            central_edge,
+            _member(route_id, edge_temperature),
+        )
+        for route_id in routes
+        if route_id != central_calibration_id
+    )
+    return max(widths, default=Decimal(0))
 
 
 def _evaluation(
@@ -1375,7 +1423,9 @@ def _evaluate_extended(
     route where every solid phase is still inside its table, band equal to
     the comparison-route pair above. Region 3 continues that central curve
     and does not invent a band width. A requested pressure is recorded and
-    does not move the log: none of these curves publishes a volume term.
+    does not move the log: none of these curves publishes a volume term. An
+    explicit calibration id applies those region and band rules to its own
+    table window.
     """
 
     canonical = _extended_canonical(name, temperature_K, pressure_bar)
@@ -1387,16 +1437,28 @@ def _evaluate_extended(
     in_own_window = _calibration_covers_own_window(item, temperature_K)
     if not in_own_window:
         authority = "extrapolated"
+        region = 3
+        band = None
+        unsized = True
     elif item.provenance in {"assessed_table", "tabulated_thermochemistry"}:
         authority = "tabulated_thermochemistry"
+        region = 2
+        band = _region2_band(name, item.calibration_id, temperature_K)
+        unsized = False
     else:
         authority = "certified"
+        region = 1
+        band = _spread_band(name, temperature_K)
+        unsized = False
     return replace(
         canonical,
         calibration_id=item.calibration_id,
         log10_fO2_bar=_LOG[item.calibration_id](temperature_K, pressure_bar),
         authority=authority,
         provenance=item.provenance,
+        region=region,
+        band_dex=band,
+        unsized_notice=UNSIZED_BAND_NOTICE if unsized else None,
     )
 
 
@@ -1451,13 +1513,7 @@ def _canonical_mo(
     )
     janaf_log = _member("janaf_mo_moo2", temperature_K)
     if covered:
-        edge_t = _MO_EDGES[1] if temperature_K >= _MO_EDGES[1] else _MO_EDGES[0]
-        band = _pair_width(
-            janaf_log,
-            _member("oneill1986_via_oneill1987", temperature_K),
-            _member("janaf_mo_moo2", edge_t),
-            _member("oneill1986_via_oneill1987", edge_t),
-        )
+        band = _region2_band("Mo-MoO2", "janaf_mo_moo2", temperature_K)
         return _evaluation(
             buffer="Mo-MoO2",
             calibration_id="janaf_mo_moo2",
@@ -1515,14 +1571,8 @@ def _canonical_mh(
     haas_rows = _HAAS_TABLE_10_9
     haas_log = _member("haas1992_table_10_9", temperature_K)
     if _table_covers(haas_rows, temperature_K):
-        chou = _member("chou1978_eq12", temperature_K)
-        janaf = _member("janaf_mh_fe3o4_fe2o3", temperature_K)
-        chou_edge = _member("chou1978_eq12", _MH_EDGE)
-        janaf_edge = _member("janaf_mh_fe3o4_fe2o3", _MH_EDGE)
-        haas_edge = _member("haas1992_table_10_9", _MH_EDGE)
-        band = max(
-            _pair_width(haas_log, chou, haas_edge, chou_edge),
-            _pair_width(haas_log, janaf, haas_edge, janaf_edge),
+        band = _region2_band(
+            "MH", "haas1992_table_10_9", temperature_K
         )
         return _evaluation(
             buffer="MH",
@@ -1602,22 +1652,8 @@ def _canonical_mw(
         )
     haas_log = _member("haas1992_table_10_7", temperature_K)
     if in_haas and temperature_K >= _MW_EDGE:
-        oneill_log = _member("oneill1988_eq16", temperature_K)
-        janaf_log = _member("janaf_mw_fe0_947o_fe3o4", temperature_K)
-        haas_edge = _member("haas1992_table_10_7", _MW_EDGE)
-        band = max(
-            _pair_width(
-                haas_log,
-                oneill_log,
-                haas_edge,
-                _member("oneill1988_eq16", _MW_EDGE),
-            ),
-            _pair_width(
-                haas_log,
-                janaf_log,
-                haas_edge,
-                _member("janaf_mw_fe0_947o_fe3o4", _MW_EDGE),
-            ),
+        band = _region2_band(
+            "MW", "haas1992_table_10_7", temperature_K
         )
         return _evaluation(
             buffer="MW",
