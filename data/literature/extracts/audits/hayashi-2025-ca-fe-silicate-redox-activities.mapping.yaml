@@ -1,0 +1,121 @@
+source_id: hayashi-2025-ca-fe-silicate-redox-activities
+source:
+  citation: Hayashi, M., Takatsuji, S., Kubuki, S., Watanabe, T., Endo, R., and Susa, M. (2025). Effect of Coordination
+    Structure of Iron Ions on Iron Oxide Activity Coefficients in the CaO-SiO2-FeO-Fe2O3 Slags at 1573 K Under Oxygen
+    Partial Pressures Between 10^-9 and 10^-4 atm. Steel Research International, 96, 2400068.
+  doi: 10.1002/srin.202400068
+extraction:
+  method: Table 1 sample and quantity columns mapped by printed subtable; the exact printed row/subtable locator
+    is in each extracted row.
+review_status: draft
+tables:
+- page: 3
+  table_index: 1
+  rows: all
+  render_verified:
+  - row: 4
+    column: 2
+    text: 10^-9
+  - row: 5
+    column: 2
+    text: 10^-9
+  - row: 6
+    column: 2
+    text: 10^-9
+  - row: 7
+    column: 2
+    text: 10^-9
+  - row: 8
+    column: 2
+    text: 10^-9
+  - row: 9
+    column: 2
+    text: 10^-8
+  - row: 10
+    column: 2
+    text: 10^-8
+  - row: 11
+    column: 2
+    text: 10^-7
+  - row: 12
+    column: 2
+    text: 10^-7
+  - row: 13
+    column: 2
+    text: 10^-7
+  - row: 14
+    column: 2
+    text: 10^-6
+  - row: 15
+    column: 2
+    text: 10^-6
+  - row: 16
+    column: 2
+    text: 10^-4
+  - row: 17
+    column: 2
+    text: 10^-4
+  values:
+  - column: 3
+    species: Fe
+    quantity: valence_ratio
+    phase: glass
+    unit: '%'
+    evidence_class: quoted_attributed
+  - column: 4
+    species: Fe
+    quantity: Fe3plus_oct_over_total_Fe_as_published
+    phase: glass
+    unit: '%'
+    evidence_class: quoted_attributed
+  - column: 5
+    species: Fe
+    quantity: Fe3plus_tetr_over_total_Fe_as_published
+    phase: glass
+    unit: '%'
+    evidence_class: quoted_attributed
+  - column: 6
+    species: FeO
+    quantity: composition
+    unit: mol%
+  - column: 7
+    species: FeO1.5
+    quantity: composition
+    unit: mol%
+  - column: 8
+    species: CaO
+    quantity: composition
+    unit: mol%
+  - column: 9
+    species: SiO2
+    quantity: composition
+    unit: mol%
+  - column: 11
+    species: Fe
+    quantity: CFe(Pt) context
+    unit: mass%
+    evidence_class: quoted_attributed
+  - column: 12
+    species: FeO
+    quantity: activity
+    phase: l
+    unit: dimensionless
+    evidence_class: model_derived
+  - column: 13
+    species: FeO1.5
+    quantity: activity
+    phase: l
+    unit: dimensionless
+    evidence_class: model_derived
+  - column: 14
+    species: FeO
+    quantity: activity_coefficient
+    phase: l
+    unit: dimensionless
+    evidence_class: model_derived
+  - column: 15
+    species: FeO1.5
+    quantity: activity_coefficient
+    phase: l
+    unit: dimensionless
+    evidence_class: model_derived
