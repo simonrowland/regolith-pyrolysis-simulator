@@ -26,6 +26,16 @@ EXTRACT = ROOT / (
     "kress-carmichael-1991-iron-redox-calibration.yaml"
 )
 SOURCE_ID = "kress-carmichael-1991-iron-redox-calibration"
+TABLE3_SAMPLED_TEXT = (
+    "Melts were sampled at high temperature with a Pt loop quenched into ice-water before, and after each set. "
+    "Micron-scale quench crystals in many of the Pt-loop samples reduced the precision of bulk-composition analyses "
+    "to about 0.7 wt% absolute."
+)
+TABLE4_METHOD_TEXT = (
+    "In order to account for the effect of Al2O3 contamination in NAFS and CAFS experiments, and the high iron "
+    "contents considered in the natural compositions, 33 additional Pt-loop drop-quench experiments were "
+    "performed on compositions and conditions spanning those explored in the ultrasonic experiments."
+)
 TABLE3_OXIDES = (
     "SiO2",
     "TiO2",
@@ -270,8 +280,9 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
         assert record.point_conditions is not None
         assert all(condition.locator is not None for condition in record.point_conditions.values())
         assert record.point_conditions["temperature_K"].state.is_value
-        assert record.point_conditions["composition"].state.is_value or record.point_conditions["composition"].state.is_unknown
+        assert record.point_conditions["composition"].state.is_unknown
         assert record.point_conditions["fO2_log"].state.is_value or record.point_conditions["fO2_log"].state.is_unknown
+        assert record.identity.composition is None or record.identity.composition.is_unknown
         migrated_composition_count += bool(
             record.identity.composition and record.identity.composition.is_value
         )
@@ -279,9 +290,9 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
         assert fo2_state.is_value or fo2_state.is_unknown
         migrated_fo2_count += fo2_state.is_value
 
-    assert composition_count == 144
+    assert composition_count == 0
     assert fo2_count == 130
-    assert migrated_composition_count == 144
+    assert migrated_composition_count == 0
     assert migrated_fo2_count == 130
     assert migrated_temperature_count == 835
 
@@ -294,6 +305,7 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     final = observations["kc91_t3_0011_0014_final_SiO2"]
     assert initial["phase_as_published"] == "glass"
     assert final["phase_as_published"] == "glass"
+    assert initial["quench_statement"]["text"] == TABLE3_SAMPLED_TEXT
     assert initial["point_conditions"]["composition"]["state"]["tag"] == "unknown"
     assert "not reused as run composition" in initial["point_conditions"]["composition"]["state"]["reason"]
     assert initial["point_conditions"]["fO2_log"]["state"]["reason"] == (
@@ -309,29 +321,22 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     assert final["values"]["T_C"]["locator"]["row"] == "0014"
 
     expected_table3 = _expected_table3()
-    initial_bulk = final["point_conditions"]["composition"]
-    assert initial_bulk["state"]["tag"] == "value"
-    assert initial_bulk["state"]["value"]["basis"] == "oxide wt% as printed in Table 3"
-    assert initial_bulk["state"]["value"]["amount_basis"] == "mass_percent"
-    assert initial_bulk["state"]["value"]["components"] == [
-        [oxide, expected_table3[("0011-0014 initial", oxide)]]
-        for oxide in TABLE3_OXIDES
-    ]
-    assert initial_bulk["locator"]["table"] == "3"
-    assert initial_bulk["locator"]["row"] == "0011-0014 initial"
+    assert initial["values"]["value_as_published"] == expected_table3[("0011-0014 initial", "SiO2")]
+    assert final["values"]["value_as_published"] == expected_table3[("0011-0014 final", "SiO2")]
+    final_run_composition = final["point_conditions"]["composition"]
+    assert final_run_composition["state"] == {
+        "tag": "unknown",
+        "reason": "input_is_same_run_analysed_melt",
+    }
+    assert final_run_composition["locator"]["row"] == "0011-0014 initial"
     final_record = records[f"{SOURCE_ID}::kc91_t3_0011_0014_final_SiO2"]
-    assert final_record.identity.composition.is_value
-    expected_mole_fractions = wt_pct_to_mole_fraction(
-        {
-            oxide: Decimal(expected_table3[("0011-0014 initial", oxide)])
-            for oxide in TABLE3_OXIDES
-        }
-    )
-    assert final_record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
+    assert final_record.identity.composition.is_unknown
 
     na_final = observations["kc91_t3_171_174_final_MnO"]
     assert na_final["point_conditions"]["composition"]["state"]["tag"] == "unknown"
-    assert "MnO as N.A." in na_final["point_conditions"]["composition"]["state"]["reason"]
+    assert na_final["point_conditions"]["composition"]["state"]["reason"] == (
+        "input_is_same_run_analysed_melt"
+    )
 
     table4 = observations["kc91_t4_Q01_SiO2"]["point_conditions"]
     assert table4["composition"]["state"]["tag"] == "unknown"
@@ -339,6 +344,7 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     assert table4["fO2_log"]["state"]["tag"] == "unknown"
     assert "neither a numeric fO2 nor a method" in table4["fO2_log"]["state"]["reason"]
     assert "air" not in table4["fO2_log"]["state"]["reason"].casefold()
+    assert observations["kc91_t4_Q01_SiO2"]["quench_statement"]["text"] == TABLE4_METHOD_TEXT
 
     table5 = observations["kc91_t5_B27_SiO2"]["point_conditions"]
     assert table5["composition"]["state"]["tag"] == "unknown"
@@ -347,6 +353,43 @@ def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
     assert table5["fO2_log"]["locator"]["table"] == "5"
     assert table5["fO2_log"]["locator"]["row"] == "B27"
     assert records[f"{SOURCE_ID}::kc91_t5_B27_SiO2"].identity.fO2_Pa.is_value
+
+    assemblage_notes = [
+        row
+        for row in document["species"]["SiO2"]["context"]
+        if row.get("type") == "phase_assemblage_evidence"
+    ]
+    assert len(assemblage_notes) == 19
+    assert {row["experiment"] for row in assemblage_notes} == {
+        f"kc91_t3_{run_id}"
+        for run_id in (
+            "0011_0014",
+            "0021_0025",
+            "021_023",
+            "031_036",
+            "041",
+            "051_056",
+            "081_086",
+            "091_0910",
+            "101_107",
+            "111_117",
+            "121_126",
+            "131_137",
+            "141_147",
+            "151_157",
+            "161_167",
+            "171_174",
+            "181_182",
+            "201_206",
+            "211_213",
+        )
+    }
+    for note in assemblage_notes:
+        assert note["values"]["evidence_type"] == "sampled-from-liquid"
+        assert note["values"]["run_products_as_printed"] == TABLE3_SAMPLED_TEXT
+        assert note["locator"]["page"] == 3
+        assert note["locator"]["published_page"] == 84
+    assert all(note["experiment"].startswith("kc91_t3_") for note in assemblage_notes)
 
 
 def test_phase_scoring_input_deletions_fail_the_focused_pins() -> None:
@@ -360,6 +403,13 @@ def test_phase_scoring_input_deletions_fail_the_focused_pins() -> None:
         lambda doc: doc["species"]["SiO2"]["observations"][1]["point_conditions"].pop("composition"),
         lambda doc: doc["species"]["SiO2"]["observations"][0]["point_conditions"]["fO2_log"]["state"].pop("reason"),
         lambda doc: doc["species"]["SiO2"]["observations"][0]["values"]["T_C"].pop("value"),
+        lambda doc: doc["species"]["SiO2"]["context"].pop(
+            next(
+                index
+                for index, row in enumerate(doc["species"]["SiO2"]["context"])
+                if row.get("type") == "phase_assemblage_evidence"
+            )
+        ),
     )
     for mutate in mutations:
         changed = deepcopy(document)
