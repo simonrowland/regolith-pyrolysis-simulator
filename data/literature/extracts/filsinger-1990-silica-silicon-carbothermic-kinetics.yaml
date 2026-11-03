@@ -1,0 +1,2452 @@
+schema_version: literature_extract.v1
+source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
+source:
+  citation: 'Filsinger, D. H. & Bourrie, D. B. (1990). Silica to Silicon: Key Carbothermic Reactions and Kinetics.
+    Journal of the American Ceramic Society, 73(6), 1726–1732.'
+  year: 1990
+  doi: 10.1111/j.1151-2916.1990.tb09820.x
+  corpus_asset: raw/filsinger-1990-silica-silicon-carbothermic-kinetics/filsinger-1990-silica-silicon-carbothermic-kinetics.pdf
+  corpus_sha256: e2c6012a2f35a6de17ecc406222006aac9af0c139a8ff60f4ec583e3525c4782
+extraction:
+  method: Manual transcription from MinerU and tesseract OCR for the scanned article; Tables I–III layout checked
+    against PDF renders at 300 dpi, and the ambiguous Table II residue cell at 600 dpi.
+  date: '2026-11-03'
+  worker: w1103cw4-fb90
+review_status: draft
+fidelity_samples:
+- path: species.SiO2.observations[filsinger90_t2_r01_final_residue].values.value
+  value: <11
+  locator:
+    page: 4
+    published_page: 1729
+    pdf_page_index: 3
+    table: II
+    row_label: SiO2/C 1/1
+    column: Final residue, 2000°C; reactants (wt%)
+- path: species.SiO2.observations[filsinger90_t2_r02_final_residue].values.value
+  value: '30'
+  locator:
+    page: 4
+    published_page: 1729
+    pdf_page_index: 3
+    table: II
+    row_label: SiO2/C 1/2
+    column: Final residue, 2000°C; reactants (wt%)
+- path: species.CO.observations[filsinger90_t3_r04_fit].values.value
+  value: '-6.10'
+  locator:
+    page: 7
+    published_page: 1732
+    pdf_page_index: 6
+    table: III
+    row_label: (2.8)SiO + SiC; 0.4 mm vent
+    column: A
+- path: species.CO.observations[filsinger90_t3_r05_fit].values.activation_energy_kJ_per_mol
+  value: '505'
+  locator:
+    page: 7
+    published_page: 1732
+    pdf_page_index: 6
+    table: III
+    row_label: (2.8)SiO + SiC; loose lid
+    column: E_s (kJ/mol)
+- path: species.SiO.context[filsinger90_figure6_legend].values.series[0].label_as_printed
+  value: 'A: SiO(s) → SiO(g)'
+  locator:
+    page: 6
+    published_page: 1731
+    pdf_page_index: 5
+    figure: '6'
+- path: species.CO.observations[filsinger90_p3_bn_crucible_rate_1725c].values.value
+  value: 49.2 × 10⁻⁴
+  locator:
+    page: 3
+    published_page: 1728
+    pdf_page_index: 2
+    section: (4) Identification of Carbothermic Reactions of Silica
+    note: Rendered prose rate for the BN-crucible SiO–SiC run.
+species:
+  SiO2:
+    observations:
+    - observation_id: filsinger90_t2_r01_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 3
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: <11
+        value_as_published:
+          value: <11
+          unit: wt%
+        reactants_as_printed: SiO2/C
+        mole_ratio_as_printed: 1/1
+        initial_weight_loss_temperature_C: '1300'
+        intermediate_material_as_printed: 11% β-SiC; 5% SiO2
+        intermediate_temperature_C: '1720'
+        final_residue_xrd_as_printed: None
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id001
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 3
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/C: 1/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 3
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 3
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '1'
+                - - C
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 3
+              table_column_number: 2
+      point_conditions: *id001
+      source_row_number: 1
+    - observation_id: filsinger90_t2_r02_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 4
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '30'
+        value_as_published:
+          value: '30'
+          unit: wt%
+        reactants_as_printed: SiO2/C
+        mole_ratio_as_printed: 1/2
+        initial_weight_loss_temperature_C: '1300'
+        intermediate_material_as_printed: 27% β-SiC; 5% SiO2; 3% C
+        intermediate_temperature_C: '1730'
+        final_residue_xrd_as_printed: 97% β-SiC; 2% Si
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id002
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 4
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/C: 1/2'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 4
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 4
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '1'
+                - - C
+                  - '2'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 4
+              table_column_number: 2
+      point_conditions: *id002
+      source_row_number: 2
+    - observation_id: filsinger90_t2_r03_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 5
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '42'
+        value_as_published:
+          value: '42'
+          unit: wt%
+        reactants_as_printed: SiO2/C
+        mole_ratio_as_printed: 1/3
+        initial_weight_loss_temperature_C: '1400'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: 73% β-SiC; 12% C
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id003
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 5
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/C: 1/3'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 5
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 5
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '1'
+                - - C
+                  - '3'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 5
+              table_column_number: 2
+      point_conditions: *id003
+      source_row_number: 3
+    - observation_id: filsinger90_t2_r04_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 6
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '29'
+        value_as_published:
+          value: '29'
+          unit: wt%
+        reactants_as_printed: SiO2/SiC
+        mole_ratio_as_printed: 1/1
+        initial_weight_loss_temperature_C: '1500'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: 42% Si; 36% β-SiC
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id004
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 6
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/SiC: 1/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 6
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 6
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '1'
+                - - SiC
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 6
+              table_column_number: 2
+      point_conditions: *id004
+      source_row_number: 4
+    - observation_id: filsinger90_t2_r05_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 7
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '50'
+        value_as_published:
+          value: '50'
+          unit: wt%
+        reactants_as_printed: SiO2/SiC
+        mole_ratio_as_printed: 1/2
+        initial_weight_loss_temperature_C: '1550'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: 71% β-SiC; 29% Si
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id005
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 7
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/SiC: 1/2'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 7
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 7
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '1'
+                - - SiC
+                  - '2'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 7
+              table_column_number: 2
+      point_conditions: *id005
+      source_row_number: 5
+    - observation_id: filsinger90_t2_r06_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 8
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '8'
+        value_as_published:
+          value: '8'
+          unit: wt%
+        reactants_as_printed: SiO2/SiC
+        mole_ratio_as_printed: 2/1
+        initial_weight_loss_temperature_C: '1520'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: ''
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id006
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 8
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO2/SiC: 2/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 8
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 8
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO2
+                  - '2'
+                - - SiC
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 8
+              table_column_number: 2
+      point_conditions: *id006
+      source_row_number: 6
+    context:
+    - observation_id: filsinger90_table_i_reagents
+      type: printed_data_context
+      locator:
+        page: 2
+        published_page: 1727
+        pdf_page_index: 1
+        table: I
+      units: as printed
+      values:
+        quantity: reagent_characterization_as_printed
+        method_class: measured_direct
+        printed_row_count: 6
+        rows:
+        - reagent: Si
+          source_as_printed: Hemlock Semiconductor Corp., Hemlock, MI; IVO190, lot S-03759
+          x_ray_analysis_as_printed: Si
+        - reagent: SiC
+          source_as_printed: Cerac Pure, Milwaukee, WI; S-1058, lot 1587; 7 μm average
+          x_ray_analysis_as_printed: α-SiC
+        - reagent: 'SiC: β form'
+          source_as_printed: Produced via SiO + 2C (see Table II)
+          x_ray_analysis_as_printed: 75% β-SiC; 2% C (graphite); remainder α-SiC
+        - reagent: SiO
+          source_as_printed: Cerac Pure, Milwaukee, WI; S-1064, lot 1858; 325 mesh
+          x_ray_analysis_as_printed: No crystalline phases detected
+        - reagent: SiO2
+          source_as_printed: Cerac Pure, Milwaukee, WI; S-1061, lot 2957; 325 mesh
+          x_ray_analysis_as_printed: α-quartz
+        - reagent: 'C: graphite'
+          source_as_printed: Cerac Pure, Milwaukee, WI; G-1059, lot 480; 325 mesh
+          x_ray_analysis_as_printed: Graphite
+    - observation_id: filsinger90_pure_silica_evaporation_context
+      type: printed_data_context
+      locator:
+        page: 2
+        published_page: 1727
+        pdf_page_index: 1
+        section: Thermal Analysis of Reactants
+      units: as printed
+      values:
+        quantity: pure_silica_weight_loss_context
+        method_class: measured_direct
+        weight_loss_as_printed: 6%
+        temperature_range_as_printed: 1700–2000°C
+        reactant_as_printed: α-quartz SiO2; no carbon in this run
+        phase_note: The interval crosses the printed 1710°C melting point; the source later refers to fused α-quartz.
+        atmosphere_as_printed: helium with <0.5 ppm oxygen
+        pressure_as_printed: not reported for this run
+        separation_note: Kept outside the carbothermic SiO kinetics; not described as vacuum evaporation.
+  SiO:
+    observations:
+    - observation_id: filsinger90_t2_r07_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 9
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '72'
+        value_as_published:
+          value: '72'
+          unit: wt%
+        reactants_as_printed: SiO/SiC (lid)
+        mole_ratio_as_printed: 1/1
+        initial_weight_loss_temperature_C: '1500'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: 92% β-SiC; 4% Si
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id007
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 9
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO/SiC (lid): 1/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 9
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 9
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO
+                  - '1'
+                - - SiC
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 9
+              table_column_number: 2
+      point_conditions: *id007
+      source_row_number: 7
+    - observation_id: filsinger90_t2_r08_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 10
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '22'
+        value_as_published:
+          value: '22'
+          unit: wt%
+        reactants_as_printed: SiO/SiC (lid)
+        mole_ratio_as_printed: 2.8/1
+        initial_weight_loss_temperature_C: '1500'
+        intermediate_material_as_printed: 20% Si; 8% TaSi2; 4% β-SiC
+        intermediate_temperature_C: '1800'
+        final_residue_xrd_as_printed: '>90% Si'
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id008
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 10
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO/SiC (lid): 2.8/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 10
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 10
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO
+                  - '2.8'
+                - - SiC
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 10
+              table_column_number: 2
+      point_conditions: *id008
+      source_row_number: 8
+    - observation_id: filsinger90_t2_r09_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 11
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '42'
+        value_as_published:
+          value: '42'
+          unit: wt%
+        reactants_as_printed: SiO/C
+        mole_ratio_as_printed: 1/1
+        initial_weight_loss_temperature_C: '1470'
+        intermediate_material_as_printed: 22% β-SiC; 3% SiC
+        intermediate_temperature_C: '1720'
+        final_residue_xrd_as_printed: 70% β-SiC; 19% Si
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id009
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 11
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO/C: 1/1'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 11
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 11
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO
+                  - '1'
+                - - C
+                  - '1'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 11
+              table_column_number: 2
+      point_conditions: *id009
+      source_row_number: 9
+    - observation_id: filsinger90_t2_r10_final_residue
+      type: mass_loss
+      locator:
+        page: 4
+        published_page: 1729
+        pdf_page_index: 3
+        table: II
+        table_row_number: 12
+        table_column_number: 6
+      phase: cr
+      units: wt%
+      note: The printed result is final residue as a percentage of initial reactants, not a mass-loss percentage;
+        retained as printed and typed-refused.
+      values:
+        quantity: final_residue_reactants_wt_percent
+        schema_gap: 'No exact quantity token represents the printed final-residue reactants wt%: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+          is mass loss, while the printed value is residue; simulator/battery/migrate.py::TYPE_QUANTITY maps mass_loss
+          to mass_loss_fraction. The value remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_direct
+        candidate_quantity_as_printed: Final residue, 2000°C; Reactants (wt%)
+        value: '40'
+        value_as_published:
+          value: '40'
+          unit: wt%
+        reactants_as_printed: SiO/C
+        mole_ratio_as_printed: 1/2
+        initial_weight_loss_temperature_C: '1450'
+        intermediate_material_as_printed: ''
+        intermediate_temperature_C: ''
+        final_residue_xrd_as_printed: 75% SiC; β:α = 3:1; 2% C
+        T_C: '2000'
+        heating_rate_as_printed: 20°C/min
+        average_helium_flow_as_printed: 3 mm/s
+        sample_tamping_pressure_as_printed: estimated 70 kPa; sample tamping pressure, not chamber pressure
+        point_conditions: &id010
+          temperature_C:
+            state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 12
+              table_column_number: 6
+          reactant_ratio_as_printed:
+            state:
+              tag: value
+              value: 'SiO/C: 1/2'
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 12
+              table_column_number: 2
+          gas_mix:
+            state:
+              tag: value
+              value: helium with <0.5 ppm oxygen
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+              note: The table gives a 2000°C residue; the prose says runs above 1600°C were at atmospheric pressure
+                but prints no numeric chamber pressure.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 12
+              table_column_number: 6
+          pressure_regime_as_printed:
+            state:
+              tag: value
+              value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+            locator:
+              page: 2
+              published_page: 1727
+              pdf_page_index: 1
+              section: TGA operating conditions
+          composition:
+            state:
+              tag: value
+              value:
+                amount_basis: mol_inventory
+                components:
+                - - SiO
+                  - '1'
+                - - C
+                  - '2'
+                basis: printed_stoichiometric_reactant_ratio
+              note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+            locator:
+              page: 4
+              published_page: 1729
+              pdf_page_index: 3
+              table: II
+              table_row_number: 12
+              table_column_number: 2
+      point_conditions: *id010
+      source_row_number: 10
+    - observation_id: filsinger90_t3_r02_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 4
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-4.18'
+        value_as_published:
+          value: '-4.18'
+          unit: A
+        A: '-4.18'
+        B: '17.55'
+        activation_energy_kJ_per_mol: '348'
+        preexponential_factor_as_printed: 10^6
+        reaction_as_printed: 2SiO2 + SiC → 3SiO + CO
+        crucible_vent_as_printed: Open
+        temperature_range_as_printed: 1833–2033
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1833'
+        - '2033'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1833'
+              maximum: '2033'
+          locator: &id011
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 4
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id011
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: 2SiO2 + SiC
+          locator: &id012
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 4
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: Open
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 4
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id012
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO2
+                - '2'
+              - - SiC
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 4
+            table_column_number: 1
+      T_range_K:
+      - 1833
+      - 2033
+      source_row_number: 2
+    - observation_id: filsinger90_t3_r06_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 8
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-4.06'
+        value_as_published:
+          value: '-4.06'
+          unit: A
+        A: '-4.06'
+        B: '13.79'
+        activation_energy_kJ_per_mol: '340'
+        preexponential_factor_as_printed: 10^6
+        reaction_as_printed: SiO(s) → SiO(g)
+        crucible_vent_as_printed: 0.4 mm
+        temperature_range_as_printed: 1833–2033
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1833'
+        - '2033'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1833'
+              maximum: '2033'
+          locator: &id013
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 8
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id013
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: SiO(s)
+          locator: &id014
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 8
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: 0.4 mm
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 8
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id014
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 8
+            table_column_number: 1
+      T_range_K:
+      - 1833
+      - 2033
+      source_row_number: 6
+    - observation_id: filsinger90_t3_r07_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 9
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-3.68'
+        value_as_published:
+          value: '-3.68'
+          unit: A
+        A: '-3.68'
+        B: '14.34'
+        activation_energy_kJ_per_mol: '305'
+        preexponential_factor_as_printed: 10^6
+        reaction_as_printed: SiO(s) → SiO(g)
+        crucible_vent_as_printed: Open
+        temperature_range_as_printed: 1683–1833
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1683'
+        - '1833'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1683'
+              maximum: '1833'
+          locator: &id015
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 9
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id015
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: SiO(s)
+          locator: &id016
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 9
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: Open
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 9
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id016
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 9
+            table_column_number: 1
+      T_range_K:
+      - 1683
+      - 1833
+      source_row_number: 7
+    - observation_id: filsinger90_t3_r08_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 10
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-4.18'
+        value_as_published:
+          value: '-4.18'
+          unit: A
+        A: '-4.18'
+        B: '16.95'
+        activation_energy_kJ_per_mol: '348'
+        preexponential_factor_as_printed: 10^7
+        reaction_as_printed: SiO2 + Si → 2SiO
+        crucible_vent_as_printed: Open
+        temperature_range_as_printed: 1683–1883
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1683'
+        - '1883'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1683'
+              maximum: '1883'
+          locator: &id017
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 10
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id017
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: SiO2 + Si
+          locator: &id018
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 10
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: Open
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 10
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id018
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO2
+                - '1'
+              - - Si
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 10
+            table_column_number: 1
+      T_range_K:
+      - 1683
+      - 1883
+      source_row_number: 8
+    context:
+    - observation_id: filsinger90_figure6_legend
+      type: figure_only
+      locator:
+        page: 6
+        published_page: 1731
+        pdf_page_index: 5
+        section: Kinetic Analysis
+        figure: '6'
+      units: as plotted; legend text only
+      values:
+        quantity: figure_only_arrhenius_plot_legend
+        method_class: figure_only
+        axes_as_printed: log(k) versus 10000/T (K^-1)
+        caption_as_printed: Arrhenius plots for SiO and SiO2 reactions.
+        series:
+        - label_as_printed: 'A: SiO(s) → SiO(g)'
+        - label_as_printed: 'B: SiO2 + Si → 2SiO'
+        - label_as_printed: 'C: SiO2 + 3C → SiC + 2CO'
+        - label_as_printed: 'D: SiO + 2C → SiC + CO (lid)'
+        - label_as_printed: 'E: SiO + SiC → 2Si + CO (loose lid)'
+        - label_as_printed: 'F: SiO + SiC → 2Si + CO (tight lid)'
+        - label_as_printed: 'G: 2SiO2 + SiC → 3SiO + CO'
+        - label_as_printed: 'H: SiO(s) → SiO(g) (lid)'
+        digitisation: No curve coordinates digitized in this wave.
+  CO:
+    observations:
+    - observation_id: filsinger90_t3_r01_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 3
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-4.68'
+        value_as_published:
+          value: '-4.68'
+          unit: A
+        A: '-4.68'
+        B: '18.82'
+        activation_energy_kJ_per_mol: '390'
+        preexponential_factor_as_printed: 10^8
+        reaction_as_printed: SiO2 + 3C → SiC + 2CO
+        crucible_vent_as_printed: Open
+        temperature_range_as_printed: 1733–1933
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1733'
+        - '1933'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1733'
+              maximum: '1933'
+          locator: &id019
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 3
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id019
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: SiO2 + 3C
+          locator: &id020
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 3
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: Open
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 3
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id020
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO2
+                - '1'
+              - - C
+                - '3'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 3
+            table_column_number: 1
+      T_range_K:
+      - 1733
+      - 1933
+      source_row_number: 1
+    - observation_id: filsinger90_t3_r03_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 5
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-5.69'
+        value_as_published:
+          value: '-5.69'
+          unit: A
+        A: '-5.69'
+        B: '23.76'
+        activation_energy_kJ_per_mol: '472'
+        preexponential_factor_as_printed: 10^10
+        reaction_as_printed: SiO + 2C → SiC + CO
+        crucible_vent_as_printed: 0.4 mm
+        temperature_range_as_printed: 1733–1933
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1733'
+        - '1933'
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1733'
+              maximum: '1933'
+          locator: &id021
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 5
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id021
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: SiO + 2C
+          locator: &id022
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 5
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: 0.4 mm
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 5
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id022
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '1'
+              - - C
+                - '2'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 5
+            table_column_number: 1
+      T_range_K:
+      - 1733
+      - 1933
+      source_row_number: 3
+    - observation_id: filsinger90_t3_r04_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 6
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-6.10'
+        value_as_published:
+          value: '-6.10'
+          unit: A
+        A: '-6.10'
+        B: '24.42'
+        activation_energy_kJ_per_mol: '505'
+        preexponential_factor_as_printed: 10^10
+        reaction_as_printed: (2.8)SiO + SiC → 2Si + CO
+        crucible_vent_as_printed: 0.4 mm
+        temperature_range_as_printed: 1963–2073
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1963'
+        - '2073'
+        pressure_regime_as_printed: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1963'
+              maximum: '2073'
+          locator: &id023
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 6
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id023
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: (2.8)SiO + SiC
+          locator: &id024
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 6
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: 0.4 mm
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 6
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id024
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '2.8'
+              - - SiC
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 6
+            table_column_number: 1
+      T_range_K:
+      - 1963
+      - 2073
+      source_row_number: 4
+    - observation_id: filsinger90_t3_r05_fit
+      type: rate_series
+      locator:
+        page: 7
+        published_page: 1732
+        pdf_page_index: 6
+        table: III
+        table_row_number: 7
+        table_column_number: 4
+      phase: gas
+      units: A and B dimensionless; E_s kJ/mol; Z s^-1
+      note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
+        parameters have no exact quantity token, so the row is typed-refused.
+      values:
+        quantity: arrhenius_kinetic_fit_parameters_as_published
+        schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no
+          more exact kinetic type. A, B, E_s, and Z therefore remain typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: '-6.99'
+        value_as_published:
+          value: '-6.99'
+          unit: A
+        A: '-6.99'
+        B: '25.10'
+        activation_energy_kJ_per_mol: '505'
+        preexponential_factor_as_printed: 10^11
+        reaction_as_printed: (2.8)SiO + SiC → 2Si + CO
+        crucible_vent_as_printed: Loose lid
+        temperature_range_as_printed: 1998–2073
+        log_rate_constant_relation_as_printed: ln k = A(10^4/T) + B
+        rate_constant_unit_as_printed: s^-1
+        T_range_K:
+        - '1998'
+        - '2073'
+        pressure_regime_as_printed: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+        average_helium_flow_as_printed: 3 mm/s
+        gas_impurity_as_printed: <0.5 ppm oxygen
+        derivation:
+          relation: The authors fit isothermal TGA weight responses using the first-order relation in equations
+            (5)–(6), then fit ln k = A(10^4/T) + B by equation (7); Table III reports the resulting A, B, E_s, and
+            Z.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 6
+              published_page: 1731
+              pdf_page_index: 5
+              figure: 3, 4, 6
+              note: The authors' numerical TGA weight/time and Arrhenius inputs are plotted in Figures 3, 4, and
+                6; no numeric input table is printed.
+      point_conditions:
+        temperature_range_K:
+          state:
+            tag: value
+            value:
+              minimum: '1998'
+              maximum: '2073'
+          locator: &id025
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 7
+            table_column_number: 3
+        temperature_K:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Table III fits a temperature interval; no single fitting temperature is given.
+          locator: *id025
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        reactant_ratio_as_printed:
+          state:
+            tag: value
+            value: (2.8)SiO + SiC
+          locator: &id026
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 7
+        crucible_vent_as_printed:
+          state:
+            tag: value
+            value: Loose lid
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 7
+            table_column_number: 2
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: No numeric total pressure is printed for this fit row. Prose says analyses above 1600°C were at
+              atmospheric pressure; that statement does not give a numeric pressure.
+          locator: *id026
+        composition:
+          state:
+            tag: value
+            value:
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '2.8'
+              - - SiC
+                - '1'
+              basis: printed_stoichiometric_reactant_ratio
+            note: As-charged solid reactant mole proportions; stored as printed quantities, not a melt composition.
+          locator:
+            page: 7
+            published_page: 1732
+            pdf_page_index: 6
+            table: III
+            table_row_number: 7
+            table_column_number: 1
+      T_range_K:
+      - 1998
+      - 2073
+      source_row_number: 5
+    - observation_id: filsinger90_p3_bn_crucible_rate_1725c
+      type: rate_series
+      locator: &id027
+        page: 3
+        published_page: 1728
+        pdf_page_index: 2
+        section: (4) Identification of Carbothermic Reactions of Silica
+      phase: gas
+      units: s^-1
+      note: The authors report the BN-crucible rate and state it is within 2% of the rate averaged from tantalum
+        crucibles; no tantalum average is printed.
+      point_conditions:
+        temperature_C:
+          state:
+            tag: value
+            value: '1725'
+          locator: *id027
+        gas_mix:
+          state:
+            tag: value
+            value: helium with <0.5 ppm oxygen
+          locator:
+            page: 2
+            published_page: 1727
+            pdf_page_index: 1
+            section: TGA operating conditions
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_stoichiometric_reactant_ratio
+              amount_basis: mol_inventory
+              components:
+              - - SiO
+                - '2.8'
+              - - SiC
+                - '1'
+            note: Reactant charge ratio from the printed (2.8)SiO + SiC reaction; this is a solid feed, not a melt.
+          locator: *id027
+        pressure_regime_as_printed:
+          state:
+            tag: value
+            value: atmospheric pressure for analyses above 1600°C; no numeric pressure given
+          locator:
+            page: 1
+            published_page: 1726
+            pdf_page_index: 0
+            section: Abstract
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: not_published
+            note: Atmospheric pressure is stated for high-temperature analyses, but no numeric chamber pressure
+              is printed.
+          locator: *id027
+        crucible_material_as_printed:
+          state:
+            tag: value
+            value: boron nitride; rate compared with tantalum crucibles
+          locator: *id027
+      values:
+        quantity: kinetic_rate_constant_as_reported
+        schema_gap: 'No exact kinetic rate-constant quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          is equilibrium log K and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is mass/time; simulator/battery/migrate.py::TYPE_QUANTITY
+          maps rate_series to MASS_LOSS_RATE. The printed kinetic rate remains typed-refused.'
+        admission_status: typed_refusal
+        method_class: measured_reduced
+        value: 49.2 × 10⁻⁴
+        value_as_published:
+          value: 49.2 × 10⁻⁴
+          unit: s^-1
+        printed_unit_as_published: s⁻¹
+        T_C: '1725'
+        T_C_as_published: 1725°C
+        reaction_as_printed: SiO (+1.8SiO) + SiC → 2Si + CO (+1.8SiO)
+        reactant_ratio_as_printed: '2.8 mol SiO : 1 mol SiC'
+        rate_comparison_as_printed: BN crucible rate was within 2% of the average rate with tantalum crucibles;
+          tantalum average not printed.
+        derivation:
+          relation: First-order TGA rate constant from the authors’ reaction-weight response analysis; the paper
+            states this rate at 1725°C for the BN crucible.
+          raw_inputs:
+            state:
+              tag: value
+              value: not_printed
+            locator:
+              page: 3
+              published_page: 1728
+              pdf_page_index: 2
+              section: (4) Identification of Carbothermic Reactions of Silica
+              note: The rate is printed, but the underlying BN crucible TGA weight/time inputs and tantalum average
+                are not numerically tabulated.
+    context:
+    - observation_id: filsinger90_figure3_weight_loss
+      type: figure_only
+      locator:
+        page: 6
+        published_page: 1731
+        pdf_page_index: 5
+        section: Kinetic Analysis
+        figure: '3'
+      units: as plotted; no numeric curve coordinates
+      values:
+        quantity: figure_only_isothermal_weight_loss_curve
+        method_class: figure_only
+        axes_as_printed: TGA weight loss and approximate reaction extent versus time (minutes)
+        caption_as_printed: Isothermal TGA analysis of reaction SiO2 + 3C → SiC + 2CO.
+        series:
+        - label_as_printed: SiO2 + 3C → SiC + 2CO
+          temperature_labels_as_printed: &id028
+          - 1460°C
+          - 1560°C
+          - 1610°C
+          - 1660°C
+        digitisation: No curve coordinates digitized in this wave.
+    - observation_id: filsinger90_figure4_log_weight
+      type: figure_only
+      locator:
+        page: 6
+        published_page: 1731
+        pdf_page_index: 5
+        section: Kinetic Analysis
+        figure: '4'
+      units: as plotted; no numeric curve coordinates
+      values:
+        quantity: figure_only_log_weight_time_curve
+        method_class: figure_only
+        axes_as_printed: ln(weight of reactants) versus time
+        caption_as_printed: Derivative of isothermal analysis of reaction SiO2 + 3C → SiC + 2CO.
+        series:
+        - label_as_printed: SiO2 + 3C → SiC + 2CO
+          temperature_labels_as_printed: *id028
+        digitisation: No curve coordinates digitized in this wave.
