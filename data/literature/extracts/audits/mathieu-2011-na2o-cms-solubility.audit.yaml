@@ -1,0 +1,674 @@
+source_id: mathieu-2011-na2o-cms-solubility
+source_provenance_path: raw/mathieu-2011-na2o-cms-solubility/mathieu-2011-na2o-cms-solubility.pdf
+scope:
+  target: Table 6 Na2O solubility and gamma values for unique CMS quenched glasses
+  admitted_sample_rows: 24
+  stored_observations: 48
+  table5_printed_rows: 37
+  table6_printed_rows: 33
+  row_accounting: 'Table 5: 29 CMS glass rows (5 repeat experiments excluded), 3 NCS glass rows (outside
+    CMS scope and repeated in the thesis), 2 crystal rows, and 3 sodium-source glass rows. Table 6: 29
+    CMS rows (24 unique plus 5 repeated), 3 repeated NCS rows, and one End-member-NS2 calibration row.
+    Thus the target is 24 unique CMS glasses.'
+  unextracted_table6_columns: NBO/T, K, and KNa are structural/basicity descriptors, not Na2O solubility/activity;
+    they are outside this sodium-priority extraction.
+  figure_read_candidates: Figures 7, 8, 11, and 12 show plotted solubility/activity relations. No plotted
+    coordinates were digitized; Table 6 supplies the tabulated results.
+overlap_crosswalk:
+- 2011_table5_row: ACMAS6 CMS27
+  2011_table6_row: CMS27
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas6_cms27_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas6_cms27_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS8 CMS1
+  2011_table6_row: CMS1
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas8_cms1_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas8_cms1_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS16 CMS22
+  2011_table6_row: CMS22
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas16_cms22_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas16_cms22_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS16 CMS28
+  2011_table6_row: CMS28
+  thesis_na2o_observation_id: mathieu_2009_t39_acmas16_cms28_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t39_acmas16_cms28_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS17 NCS3
+  2011_table6_row: NCS3
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs3_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs3_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS17 NCS4
+  2011_table6_row: NCS4
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs4_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs4_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS17 NCS7
+  2011_table6_row: NCS7
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas17_ncs7_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas17_ncs7_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+- 2011_table5_row: ACMAS40 CMS35
+  2011_table6_row: CMS35
+  thesis_na2o_observation_id: mathieu_2009_t38_acmas40_cms35_na2o_analysed
+  thesis_gamma_observation_id: mathieu_2009_t38_acmas40_cms35_gamma_na2o
+  action: excluded from 2011 admitted rows; do not double-count thesis data
+calibration_and_condition_cells:
+- table: '4'
+  page: 7
+  published_page: 614
+  row: Na2O–2SiO2
+  stored_as: shared point conditions on each Table 6 observation
+  cells:
+    number of runs: '19'
+    EDiAn Na2O: 12.44 (0.27)
+    source Na2O: 32.60 (0.30)
+    aNa2O: 2.10 × 10^-7 (3.10 × 10^-9)
+    PNa (atm): 1.25 × 10^-4 (1.20 × 10^-6)
+  verification: b
+  evidence: 600 dpi render of absolute PDF page 7 confirms the Table 4 NS2 row and all five cell
+    assignments; the Table 4 caption is on journal page 614.
+- page: 14
+  figure: '9'
+  panel: b
+  conditions:
+    T_C: '1400'
+    PNa: 1.25 × 10^-4 atm
+    aNa2O: 2.10 × 10^-7
+    fO2: 2.11 × 10^-6 atm
+  verification: b
+  evidence: 600 dpi render of page 14 Figure 9 caption; panel (a)'s P = 1 atm belongs only to the Na-free
+    comparison and is not assigned to these observations.
+- page: 3
+  published_page: 610
+  section: '2.2'
+  quench_statement: silica tube directly quenched into cold water
+  quench_preservation: not_stated
+  verification: b
+  evidence: page 3 text checked; rapid water quench is printed, but no chemical or structural preservation
+    claim is made.
+cell_audit:
+- table: '5'
+  page: 10
+  row: ACMS9 / CMS8 / Gl
+  stored_cells:
+    Na2O: 7.25 (0.14)
+    MgO: 4.67 (0.08)
+    SiO2: 49.44 (0.30)
+    CaO: 38.58 (0.20)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS10 / CMS9 / Gl
+  stored_cells:
+    Na2O: 10.98 (0.19)
+    MgO: 8.81 (0.11)
+    SiO2: 52.18 (0.21)
+    CaO: 28.00 (0.10)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS10 / CMS10 / Gl
+  stored_cells:
+    Na2O: 16.10 (0.25)
+    MgO: 8.87 (0.13)
+    SiO2: 56.78 (0.17)
+    CaO: 18.20 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS10 / CMS12 / Gl
+  stored_cells:
+    Na2O: 10.24 (0.09)
+    MgO: 11.96 (0.10)
+    SiO2: 50.70 (0.27)
+    CaO: 27.08 (0.18)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS10 / CMS13 / Gl
+  stored_cells:
+    Na2O: 14.07 (0.15)
+    MgO: 14.68 (0.09)
+    SiO2: 53.82 (0.26)
+    CaO: 17.39 (0.09)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS11 / CMS3 / Gl
+  stored_cells:
+    Na2O: 17.33 (0.12)
+    MgO: 21.93 (0.17)
+    SiO2: 56.07 (0.21)
+    CaO: 4.63 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS11 / CMS17 / Gl
+  stored_cells:
+    Na2O: 10.79 (0.18)
+    MgO: 19.79 (0.22)
+    SiO2: 50.74 (0.25)
+    CaO: 18.64 (0.03)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS11 / CMS18 / Gl
+  stored_cells:
+    Na2O: 14.53 (0.25)
+    MgO: 20.92 (0.20)
+    SiO2: 53.17 (0.18)
+    CaO: 11.33 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS11 / CMS19 / Gl
+  stored_cells:
+    Na2O: 6.79 (0.37)
+    MgO: 20.54 (0.82)
+    SiO2: 46.81 (0.77)
+    CaO: 26.32 (0.40)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS11 / CMS20 / Gl
+  stored_cells:
+    Na2O: 9.80 (0.24)
+    MgO: 22.67 (0.57)
+    SiO2: 48.77 (0.36)
+    CaO: 18.73 (0.45)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS21 / CMS23 / Gl
+  stored_cells:
+    Na2O: 11.61 (0.20)
+    MgO: 3.46 (0.05)
+    SiO2: 52.98 (0.17)
+    CaO: 31.92 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS21 / CMS24 / Gl
+  stored_cells:
+    Na2O: 15.37 (0.11)
+    MgO: 3.83 (0.06)
+    SiO2: 57.24 (0.23)
+    CaO: 23.53 (0.06)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS21 / CMS25 / Gl
+  stored_cells:
+    Na2O: 13.83 (0.08)
+    MgO: 5.96 (0.14)
+    SiO2: 57.23 (0.17)
+    CaO: 22.97 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMS21 / CMS26 / Gl
+  stored_cells:
+    Na2O: 17.39 (0.20)
+    MgO: 14.42 (0.08)
+    SiO2: 56.76 (0.24)
+    CaO: 11.39 (0.09)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS6 / CMS11 / Gl
+  stored_cells:
+    Na2O: 7.11 (0.14)
+    MgO: 13.35 (0.27)
+    SiO2: 44.22 (0.78)
+    CaO: 35.23 (0.29)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS6 / CMS15 / Gl
+  stored_cells:
+    Na2O: 5.77 (0.09)
+    MgO: 17.68 (0.17)
+    SiO2: 43.10 (0.31)
+    CaO: 33.41 (0.14)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS14 / CMS5 / Gl
+  stored_cells:
+    Na2O: 6.95 (0.62)
+    MgO: 14.63 (0.50)
+    SiO2: 47.19 (0.45)
+    CaO: 31.15 (0.20)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS14 / CMS31 / Gl
+  stored_cells:
+    Na2O: 6.71 (0.03)
+    MgO: 9.33 (0.26)
+    SiO2: 46.13 (1.14)
+    CaO: 37.79 (0.83)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS14 / CMS32 / Gl
+  stored_cells:
+    Na2O: 9.80 (0.20)
+    MgO: 8.98 (0.20)
+    SiO2: 48.80 (0.39)
+    CaO: 32.40 (0.13)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS14 / CMS33 / Gl
+  stored_cells:
+    Na2O: 12.54 (0.28)
+    MgO: 8.72 (0.22)
+    SiO2: 51.76 (0.25)
+    CaO: 26.95 (0.17)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS15 / CMS16 / Gl
+  stored_cells:
+    Na2O: 7.58 (0.15)
+    MgO: 19.04 (0.22)
+    SiO2: 46.83 (0.38)
+    CaO: 26.54 (0.18)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS16 / CMS21 / Gl
+  stored_cells:
+    Na2O: 13.56 (0.25)
+    MgO: 24.65 (0.12)
+    SiO2: 50.06 (0.30)
+    CaO: 11.71 (0.04)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS41 / CMS36 / Gl
+  stored_cells:
+    Na2O: 13.20 (0.12)
+    MgO: 11.10 (0.19)
+    SiO2: 51.94 (0.11)
+    CaO: 23.73 (0.22)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '5'
+  page: 10
+  row: ACMAS41 / CMS34 / Gl
+  stored_cells:
+    Na2O: 4.51 (0.12)
+    MgO: 9.93 (0.13)
+    SiO2: 43.92 (0.22)
+    CaO: 41.61 (0.17)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 10 render.
+- table: '6'
+  page: 11
+  row: CMS8
+  stored_cells:
+    Na2O wt%: 8.04 (0.32)
+    Na2O mol%: 7.46 (0.29)
+    gamma Na2O (×10^6): 2.83 (0.13)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS9
+  stored_cells:
+    Na2O wt%: 11.68 (0.36)
+    Na2O mol%: 10.71 (0.33)
+    gamma Na2O (×10^6): 1.97 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS10
+  stored_cells:
+    Na2O wt%: 17.13 (0.38)
+    Na2O mol%: 15.83 (0.36)
+    gamma Na2O (×10^6): 1.33 (0.04)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS12
+  stored_cells:
+    Na2O wt%: 10.90 (0.25)
+    Na2O mol%: 9.85 (0.23)
+    gamma Na2O (×10^6): 2.14 (0.06)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS13
+  stored_cells:
+    Na2O wt%: 14.97 (0.36)
+    Na2O mol%: 13.47 (0.32)
+    gamma Na2O (×10^6): 1.57 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS3
+  stored_cells:
+    Na2O wt%: 18.06 (0.17)
+    Na2O mol%: 15.82 (0.15)
+    gamma Na2O (×10^6): 1.33 (0.02)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS17
+  stored_cells:
+    Na2O wt%: 11.24 (0.21)
+    Na2O mol%: 9.85 (0.19)
+    gamma Na2O (×10^6): 2.14 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS18
+  stored_cells:
+    Na2O wt%: 15.14 (0.30)
+    Na2O mol%: 13.29 (0.26)
+    gamma Na2O (×10^6): 1.59 (0.04)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS19
+  stored_cells:
+    Na2O wt%: 7.07 (0.40)
+    Na2O mol%: 6.07 (0.35)
+    gamma Na2O (×10^6): 3.48 (0.22)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS20
+  stored_cells:
+    Na2O wt%: 10.21 (0.27)
+    Na2O mol%: 8.74 (0.24)
+    gamma Na2O (×10^6): 2.41 (0.08)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS23
+  stored_cells:
+    Na2O wt%: 11.75 (0.42)
+    Na2O mol%: 11.00 (0.24)
+    gamma Na2O (×10^6): 1.92 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS24
+  stored_cells:
+    Na2O wt%: 15.56 (0.39)
+    Na2O mol%: 14.64 (0.17)
+    gamma Na2O (×10^6): 1.44 (0.03)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS25
+  stored_cells:
+    Na2O wt%: 14.00 (0.15)
+    Na2O mol%: 12.94 (0.13)
+    gamma Na2O (×10^6): 1.63 (0.03)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS26
+  stored_cells:
+    Na2O wt%: 17.60 (0.28)
+    Na2O mol%: 15.88 (0.25)
+    gamma Na2O (×10^6): 1.33 (0.03)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS11
+  stored_cells:
+    Na2O wt%: 6.72 (0.02)
+    Na2O mol%: 5.91 (0.02)
+    gamma Na2O (×10^6): 3.52 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS15
+  stored_cells:
+    Na2O wt%: 5.507 (0.03)
+    Na2O mol%: 4.81 (0.03)
+    gamma Na2O (×10^6): 4.38 (0.05)
+  verification: b
+  evidence: The table QA flagged the extra decimal digit in 5.507; the 600 dpi page 11 render confirms
+    the printed Na2O wt% value is 5.507 (0.03), not a fused superscript reference.
+- table: '6'
+  page: 11
+  row: CMS5
+  stored_cells:
+    Na2O wt%: 6.71 (0.12)
+    Na2O mol%: 6.08 (0.10)
+    gamma Na2O (×10^6): 3.47 (0.06)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS31
+  stored_cells:
+    Na2O wt%: 6.81 (0.212)
+    Na2O mol%: 6.17 (0.11)
+    gamma Na2O (×10^6): 3.42 (0.08)
+  verification: b
+  evidence: The Na2O wt% uncertainty cell was render checked at 600 dpi; both machine reads gave 0.212
+    but the extra precision was flagged.
+- table: '6'
+  page: 11
+  row: CMS32
+  stored_cells:
+    Na2O wt%: 9.95 (0.22)
+    Na2O mol%: 9.07 (0.20)
+    gamma Na2O (×10^6): 2.33 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS33
+  stored_cells:
+    Na2O wt%: 12.73 (0.31)
+    Na2O mol%: 11.70 (0.29)
+    gamma Na2O (×10^6): 1.80 (0.06)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS16
+  stored_cells:
+    Na2O wt%: 8.17 (0.14)
+    Na2O mol%: 7.15 (0.12)
+    gamma Na2O (×10^6): 2.95 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS21
+  stored_cells:
+    Na2O wt%: 13.35 (0.41)
+    Na2O mol%: 11.41 (0.35)
+    gamma Na2O (×10^6): 1.85 (0.07)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS36
+  stored_cells:
+    Na2O wt%: 13.21 (0.26)
+    Na2O mol%: 12.03 (0.24)
+    gamma Na2O (×10^6): 1.75 (0.05)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+- table: '6'
+  page: 11
+  row: CMS34
+  stored_cells:
+    Na2O wt%: 4.68 (0.16)
+    Na2O mol%: 4.23 (0.15)
+    gamma Na2O (×10^6): 4.99 (0.02)
+  verification: a
+  evidence: MinerU and pdftotext match digits, signs, exponents, and parenthetical widths; this row's
+    column assignment was checked against the page 11 render.
+migration:
+  path: isolated extract migration through simulator/battery/migrate.py::Migrator
+  observations: 48
+  hard_issues: 0
+  unavailable_values: 0
+  quantity_unknown: 0
+  phase_unknown: 0
+  queued: 24
+  queue_reason: Gamma rows lack a separately stated reference state; no reference state is inferred.
+  percent_basis: All 24 Na2O values retain the printed percentage number (for example 8.04) and canonical
+    unit '%'. The quantity is equilibrium_phase_composition with subtype wt_percent; the migrator preserves
+    this closed phase-composition basis rather than scaling it to a dimensionless fraction. The focused
+    migration test pins the migrated point. This follows simulator/battery/enums.py::PHASE_BASIS_TOKENS
+    and simulator/battery/migrate.py::select_declared_source.
+  identity_axes:
+  - observation_id: mathieu_2011_table6_cms8_na2o_wt_percent
+    quantity: equilibrium_phase_composition
+    phase: glass
+    temperature_K: '1673.15'
+    fO2_Pa: '0.21379575'
+    composition: mapped from Table 5 CMS8 row as a four-oxide composition
+    total_pressure_Pa: unknown because the run pressure is not printed
+  - observation_id: mathieu_2011_table6_cms31_na2o_wt_percent
+    quantity: equilibrium_phase_composition
+    phase: glass
+    temperature_K: '1673.15'
+    fO2_Pa: '0.21379575'
+    composition: mapped from Table 5 CMS31 row as a four-oxide composition
+    total_pressure_Pa: unknown because the run pressure is not printed
+  - observation_id: mathieu_2011_table6_cms34_na2o_wt_percent
+    quantity: equilibrium_phase_composition
+    phase: glass
+    temperature_K: '1673.15'
+    fO2_Pa: '0.21379575'
+    composition: mapped from Table 5 CMS34 row as a four-oxide composition
+    total_pressure_Pa: unknown because the run pressure is not printed
+  validation:
+    yaml_flow_scalar_commas: 17 passed
+    focused_extract_test: 1 passed
+    literature_extract_suite: 890 passed; 3 tests are UNVERIFIED-local
+    unverified_local_tests:
+    - test_repo_extracts_validate_green: UNVERIFIED-local; interrupted after the invocation exceeded the 300 second cap.
+    - test_coverage_pending_stubs_not_found: UNVERIFIED-local; interrupted at 278.21 seconds before completion.
+    - test_pilot_extract_count_exact_and_merge_smoke: UNVERIFIED-local; interrupted at 278.76 seconds before completion.
+  mutation_check: An on-disk mutation changed CMS31's pinned wt% text from 6.81 to 6.82; the focused test failed on the Table 6 render pin. The original extract was restored exactly before the final passing focused run.
+compare:
+  tool: tools/mineru_table_draft.py compare
+  status: completed_with_manual_cell_review
+  output: mathieu-2011-na2o-cms-solubility.compare.csv
+  summary_output: mathieu-2011-na2o-cms-solubility.compare-summary.txt
+  result_counts: matched=0; no_match=0; mismatch=24; presence_only=0; needs_mapping=0; locator_error=0; unverifiable=0; total=24
+  manual_resolution: All 24 reported mismatches are Table 6 gamma rows. The comparison candidates contain the printed column values, but tools/mineru_table_draft.py::_phase_matches_column rejects phase glass, so the tool cannot match any of those rows. Each stored gamma equals its Table 6 central value times 10^-6 using the declared column scale; the page 11 cell audit confirms the values against MinerU and pdftotext, with the flagged CMS15 cell checked against the render. The 24 Na2O composition rows are not emitted in the compare output because tools/mineru_table_draft.py::_numeric_points does not select component_amount. The Table 4 locators now resolve on PDF page 7, so compare reports no unverifiable locators.
+qa_prescreen:
+  tool: tools/mineru_table_qa.py
+  page_7_table_4: numeric agreement 1.000; nine LaTeX flags; the selected NS2 calibration row was checked against the page 7 render.
+  page_11_table_6: numeric agreement 1.000; the extra precision in CMS15 Na2O wt% was flagged and the render confirms 5.507 (0.03).
+schema_and_identity:
+  quantity_tokens: equilibrium_phase_composition uses simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION;
+    activity_coefficient uses simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT.
+  phase_tokens: glass is the closed token simulator/battery/migrate.py::PHASE_MAP and PhaseRole.GLASS
+    is simulator/battery/enums.py::PhaseRole.GLASS.
+  composition_basis: The printed wt% composition uses the closed phase basis wt_percent and canonical
+    unit %; simulator/battery/enums.py::PHASE_BASIS_TOKENS includes wt_percent. These typed phase values
+    remain on their printed percentage scale in simulator/battery/migrate.py::select_declared_source; the
+    percent-to-fraction path is for dimensionless fraction quantities. The equivalent mol% is retained as
+    a source-value string and is not stored as a converted duplicate. The table's printed gamma column is
+    γ×10^6; the dimensionless coefficient is normalized by 10^-6, with the raw cell and multiplier retained.
+  absolute_fO2: 2.11 × 10^-6 atm from Figure 9(b), converted to 0.21379575 Pa for identity.
+  total_pressure: 'Not mapped: no total experimental pressure is printed for Figure 9(b) runs. The 1 atm
+    in Figure 9(a) applies only to the Na-free reference diagram; preparation vacuum is not a run pressure.'
+  reference_state: The paper reports gamma Na2O and Eq. (15), but does not separately name a reference
+    state in Table 6; none is inferred. The activity-coefficient identity therefore retains the source's
+    printed reference state wording as a note and may be unavailable for comparison.
+  evidence_class: Table 6 solubility is normalized using Eq. (9); gamma is calculated using Eq. (15).
+    The supporting Table 3–4 calibration inputs are not separately stored as observation rows, so both
+    reported calculated outputs use quoted_attributed per the d-110 fallback. This does not reclassify
+    the authors' direct EPMA measurements.
+  schema_gaps: []

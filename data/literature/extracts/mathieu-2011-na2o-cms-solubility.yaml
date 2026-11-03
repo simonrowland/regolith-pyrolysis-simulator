@@ -1,0 +1,3303 @@
+schema_version: literature_extract.v1
+source_id: mathieu-2011-na2o-cms-solubility
+source:
+  citation: Mathieu, R., Libourel, G., Deloule, E., Tissandier, L., Rapin, C. & Podor, R. (2011). Na2O
+    solubility in CaO–MgO–SiO2 melts. Geochimica et Cosmochimica Acta, 75(2), 608–628.
+  year: 2011
+  doi: 10.1016/j.gca.2010.11.028
+  provenance_path: raw/mathieu-2011-na2o-cms-solubility/mathieu-2011-na2o-cms-solubility.pdf
+  note: Table 6 has 29 CMS glass rows, 3 NCS rows, and the End-member-NS2 source row. Five CMS rows and
+    all three NCS rows repeat experiments in the Mathieu (2009) sodium-solubility thesis and are not admitted
+    again here. The NS2 source row is a calibration reference, not a CMS melt.
+extraction:
+  method: Transcribed from the born-digital pdftotext and MinerU table drafts. Table 5 row/column layout
+    checked against the page 10 render; Table 6 layout checked against page 11. Table 6 CMS31 Na2O wt%
+    uncertainty was render checked because MinerU and pdftotext read the flagged cell as 0.212.
+  date: '2026-11-03'
+  worker: w1103cw3-ma11
+  note: The extract retains the 24 unique CMS glass compositions in Table 6. It stores the printed Na2O
+    wt% as the single composition value; the equivalent mol% is retained as a source-value string rather
+    than a converted unit twin. Gamma is stored as a dimensionless coefficient normalized from the printed
+    γ×10^6 column; the printed cell and scale are retained. All Table 6 parenthetical uncertainties are
+    2 SD. The corrected Table 6 values use Eqs. (9) and (15); since the Table 3–4 calibration inputs are
+    not separately stored as scoreable observations, the authors' calculated outputs use quoted_attributed
+    evidence per d-110. The source's direct quench statement is preserved, but it does not assert glass
+    preservation. The paper reports total pressure only for preparation, not during the run; the 1 atm
+    in Fig. 9(a) is for the Na-free comparison and is not assigned to Fig. 9(b) CMS data. Figure-only
+    solubility/activity curves are noted as digitization candidates and are not sampled.
+review_status: draft
+fidelity_samples:
+- species: Na2O
+  observation_id: mathieu_2011_table6_cms8_na2o_wt_percent
+  field: component_amount_as_published
+  value: 8.04 (0.32) wt%
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 618
+    table: '6'
+    row: CMS8
+    column: Na2O (wt%)
+- species: Na2O
+  observation_id: mathieu_2011_table6_cms31_na2o_wt_percent
+  field: component_amount_as_published
+  value: 6.81 (0.212) wt%
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 618
+    table: '6'
+    row: CMS31
+    column: Na2O (wt%)
+- species: Na2O
+  observation_id: mathieu_2011_table6_cms34_gamma_na2o
+  field: gamma_as_printed
+  value: '4.99'
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 618
+    table: '6'
+    row: CMS34
+    column: gamma Na2O (×10^6)
+- species: Na2O
+  observation_id: mathieu_2011_table6_cms20_na2o_wt_percent
+  field: component_amount_as_published
+  value: 10.21 (0.27) wt%
+  locator:
+    page: 11
+    pdf_page_index: 10
+    published_page: 618
+    table: '6'
+    row: CMS20
+    column: Na2O (wt%)
+experiments:
+- experiment_id: mathieu_2011_cms_ns2_1400
+  method: CMS glass melt equilibrated in a sealed silica-tube thermochemical reactor with Na2O–2SiO2 source;
+    Na2O activity imposed by the source; final glass analyzed by electron-probe microanalysis.
+  locator: &id001
+    page: 10
+    pdf_page_index: 9
+    published_page: 617
+    table: '5'
+    note: Table 5 caption
+  conditions:
+    temperature_K: &id003
+      state:
+        tag: value
+        value: '1673.15'
+      locator: *id001
+    fO2_Pa: &id004
+      state:
+        tag: value
+        value: '0.21379575'
+      locator:
+        page: 14
+        pdf_page_index: 13
+        published_page: 621
+        figure: '9'
+        note: Figure 9(b) caption; conditions for the Na-bearing CMS section
+    fO2_control: &id005
+      state:
+        tag: value
+        value: Ni/NiO buffer
+      locator: *id001
+    p_Na_Pa: &id006
+      state:
+        tag: value
+        value: '12.665625'
+      locator: &id002
+        page: 7
+        pdf_page_index: 6
+        published_page: 614
+        table: '4'
+        row: Na2O–2SiO2
+        note: Table 4 calibration row, rendered at 600 dpi
+    a_Na2O: &id007
+      state:
+        tag: value
+        value: '2.10e-7'
+      locator: *id002
+    quench_state: &id008
+      state:
+        tag: value
+        value: not_stated
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 610
+        note: 'Section 2.2: silica tube directly quenched into cold water; no glass-preservation claim'
+  conditions_note: Table 4 gives NS2 aNa2O = 2.10 × 10^-7 (3.10 × 10^-9) and PNa = 1.25 × 10^-4 (1.20
+    × 10^-6) atm at 1400 °C. Figure 9(b) repeats PNa, aNa2O, and fO2 = 2.11 × 10^-6 atm for the CMS-bearing
+    section. No total experimental pressure is printed.
+species:
+  Na2O:
+    observations:
+    - observation_id: mathieu_2011_table6_cms8_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS8
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.32'
+        basis: wt_percent
+        verbatim: 0.32 wt% (two standard deviations)
+        locator: &id009
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS8
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS9
+        sample: CMS8
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id010
+          Na2O: 7.25 (0.14)
+          MgO: 4.67 (0.08)
+          SiO2: 49.44 (0.30)
+          CaO: 38.58 (0.20)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '8.04'
+        component_amount_as_published: 8.04 (0.32) wt%
+        Na2O_mol_pct_as_published: 7.46 (0.29) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id011
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '7.25'
+            MgO: '4.67'
+            SiO2: '49.44'
+            CaO: '38.58'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS9 / CMS8 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms8_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS8
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 6
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: '1.3E-7'
+        basis: dimensionless
+        verbatim: 0.13 × 10^-6 (two standard deviations)
+        locator: *id009
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS9
+        sample: CMS8
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id010
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000283'
+        gamma_as_printed: '2.83'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: '1.3E-7'
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id011
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms9_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS9
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.36'
+        basis: wt_percent
+        verbatim: 0.36 wt% (two standard deviations)
+        locator: &id012
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS9
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS9
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id013
+          Na2O: 10.98 (0.19)
+          MgO: 8.81 (0.11)
+          SiO2: 52.18 (0.21)
+          CaO: 28.00 (0.10)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '11.68'
+        component_amount_as_published: 11.68 (0.36) wt%
+        Na2O_mol_pct_as_published: 10.71 (0.33) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id014
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '10.98'
+            MgO: '8.81'
+            SiO2: '52.18'
+            CaO: '28.00'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS10 / CMS9 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms9_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS9
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 7
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 7E-8
+        basis: dimensionless
+        verbatim: 0.07 × 10^-6 (two standard deviations)
+        locator: *id012
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS9
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id013
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000197'
+        gamma_as_printed: '1.97'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 7E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id014
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms10_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS10
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.38'
+        basis: wt_percent
+        verbatim: 0.38 wt% (two standard deviations)
+        locator: &id015
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS10
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS10
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id016
+          Na2O: 16.10 (0.25)
+          MgO: 8.87 (0.13)
+          SiO2: 56.78 (0.17)
+          CaO: 18.20 (0.07)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '17.13'
+        component_amount_as_published: 17.13 (0.38) wt%
+        Na2O_mol_pct_as_published: 15.83 (0.36) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id017
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '16.10'
+            MgO: '8.87'
+            SiO2: '56.78'
+            CaO: '18.20'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS10 / CMS10 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms10_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS10
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 8
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 4E-8
+        basis: dimensionless
+        verbatim: 0.04 × 10^-6 (two standard deviations)
+        locator: *id015
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS10
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id016
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000133'
+        gamma_as_printed: '1.33'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 4E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id017
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms12_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS12
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.25'
+        basis: wt_percent
+        verbatim: 0.25 wt% (two standard deviations)
+        locator: &id018
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS12
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS12
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id019
+          Na2O: 10.24 (0.09)
+          MgO: 11.96 (0.10)
+          SiO2: 50.70 (0.27)
+          CaO: 27.08 (0.18)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '10.90'
+        component_amount_as_published: 10.90 (0.25) wt%
+        Na2O_mol_pct_as_published: 9.85 (0.23) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id020
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '10.24'
+            MgO: '11.96'
+            SiO2: '50.70'
+            CaO: '27.08'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS10 / CMS12 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms12_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS12
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 10
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 6E-8
+        basis: dimensionless
+        verbatim: 0.06 × 10^-6 (two standard deviations)
+        locator: *id018
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS12
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id019
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000214'
+        gamma_as_printed: '2.14'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 6E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id020
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms13_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS13
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.36'
+        basis: wt_percent
+        verbatim: 0.36 wt% (two standard deviations)
+        locator: &id021
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS13
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS13
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id022
+          Na2O: 14.07 (0.15)
+          MgO: 14.68 (0.09)
+          SiO2: 53.82 (0.26)
+          CaO: 17.39 (0.09)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '14.97'
+        component_amount_as_published: 14.97 (0.36) wt%
+        Na2O_mol_pct_as_published: 13.47 (0.32) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id023
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '14.07'
+            MgO: '14.68'
+            SiO2: '53.82'
+            CaO: '17.39'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS10 / CMS13 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms13_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS13
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 11
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id021
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS10
+        sample: CMS13
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id022
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000157'
+        gamma_as_printed: '1.57'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id023
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms3_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS3
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.17'
+        basis: wt_percent
+        verbatim: 0.17 wt% (two standard deviations)
+        locator: &id024
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS3
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS3
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id025
+          Na2O: 17.33 (0.12)
+          MgO: 21.93 (0.17)
+          SiO2: 56.07 (0.21)
+          CaO: 4.63 (0.05)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '18.06'
+        component_amount_as_published: 18.06 (0.17) wt%
+        Na2O_mol_pct_as_published: 15.82 (0.15) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id026
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '17.33'
+            MgO: '21.93'
+            SiO2: '56.07'
+            CaO: '4.63'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS11 / CMS3 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms3_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS3
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 4
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 2E-8
+        basis: dimensionless
+        verbatim: 0.02 × 10^-6 (two standard deviations)
+        locator: *id024
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS3
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id025
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000133'
+        gamma_as_printed: '1.33'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 2E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id026
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms17_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS17
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.21'
+        basis: wt_percent
+        verbatim: 0.21 wt% (two standard deviations)
+        locator: &id027
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS17
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS17
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id028
+          Na2O: 10.79 (0.18)
+          MgO: 19.79 (0.22)
+          SiO2: 50.74 (0.25)
+          CaO: 18.64 (0.03)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '11.24'
+        component_amount_as_published: 11.24 (0.21) wt%
+        Na2O_mol_pct_as_published: 9.85 (0.19) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id029
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '10.79'
+            MgO: '19.79'
+            SiO2: '50.74'
+            CaO: '18.64'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS11 / CMS17 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms17_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS17
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 14
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id027
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS17
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id028
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000214'
+        gamma_as_printed: '2.14'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id029
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms18_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS18
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.30'
+        basis: wt_percent
+        verbatim: 0.30 wt% (two standard deviations)
+        locator: &id030
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS18
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS18
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id031
+          Na2O: 14.53 (0.25)
+          MgO: 20.92 (0.20)
+          SiO2: 53.17 (0.18)
+          CaO: 11.33 (0.07)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '15.14'
+        component_amount_as_published: 15.14 (0.30) wt%
+        Na2O_mol_pct_as_published: 13.29 (0.26) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id032
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '14.53'
+            MgO: '20.92'
+            SiO2: '53.17'
+            CaO: '11.33'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS11 / CMS18 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms18_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS18
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 15
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 4E-8
+        basis: dimensionless
+        verbatim: 0.04 × 10^-6 (two standard deviations)
+        locator: *id030
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS18
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id031
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000159'
+        gamma_as_printed: '1.59'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 4E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id032
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms19_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS19
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.40'
+        basis: wt_percent
+        verbatim: 0.40 wt% (two standard deviations)
+        locator: &id033
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS19
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS19
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id034
+          Na2O: 6.79 (0.37)
+          MgO: 20.54 (0.82)
+          SiO2: 46.81 (0.77)
+          CaO: 26.32 (0.40)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '7.07'
+        component_amount_as_published: 7.07 (0.40) wt%
+        Na2O_mol_pct_as_published: 6.07 (0.35) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id035
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '6.79'
+            MgO: '20.54'
+            SiO2: '46.81'
+            CaO: '26.32'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS11 / CMS19 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms19_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS19
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 16
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: '2.2E-7'
+        basis: dimensionless
+        verbatim: 0.22 × 10^-6 (two standard deviations)
+        locator: *id033
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS19
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id034
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000348'
+        gamma_as_printed: '3.48'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: '2.2E-7'
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id035
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms20_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS20
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.27'
+        basis: wt_percent
+        verbatim: 0.27 wt% (two standard deviations)
+        locator: &id036
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS20
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS20
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id037
+          Na2O: 9.80 (0.24)
+          MgO: 22.67 (0.57)
+          SiO2: 48.77 (0.36)
+          CaO: 18.73 (0.45)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '10.21'
+        component_amount_as_published: 10.21 (0.27) wt%
+        Na2O_mol_pct_as_published: 8.74 (0.24) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id038
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '9.80'
+            MgO: '22.67'
+            SiO2: '48.77'
+            CaO: '18.73'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS11 / CMS20 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms20_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS20
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 17
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 8E-8
+        basis: dimensionless
+        verbatim: 0.08 × 10^-6 (two standard deviations)
+        locator: *id036
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS11
+        sample: CMS20
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id037
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000241'
+        gamma_as_printed: '2.41'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 8E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id038
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms23_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS23
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.42'
+        basis: wt_percent
+        verbatim: 0.42 wt% (two standard deviations)
+        locator: &id039
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS23
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS23
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id040
+          Na2O: 11.61 (0.20)
+          MgO: 3.46 (0.05)
+          SiO2: 52.98 (0.17)
+          CaO: 31.92 (0.05)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '11.75'
+        component_amount_as_published: 11.75 (0.42) wt%
+        Na2O_mol_pct_as_published: 11.00 (0.24) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id041
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '11.61'
+            MgO: '3.46'
+            SiO2: '52.98'
+            CaO: '31.92'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS21 / CMS23 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms23_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS23
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 20
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id039
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS23
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id040
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000192'
+        gamma_as_printed: '1.92'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id041
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms24_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS24
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.39'
+        basis: wt_percent
+        verbatim: 0.39 wt% (two standard deviations)
+        locator: &id042
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS24
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS24
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id043
+          Na2O: 15.37 (0.11)
+          MgO: 3.83 (0.06)
+          SiO2: 57.24 (0.23)
+          CaO: 23.53 (0.06)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '15.56'
+        component_amount_as_published: 15.56 (0.39) wt%
+        Na2O_mol_pct_as_published: 14.64 (0.17) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id044
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '15.37'
+            MgO: '3.83'
+            SiO2: '57.24'
+            CaO: '23.53'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS21 / CMS24 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms24_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS24
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 21
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 3E-8
+        basis: dimensionless
+        verbatim: 0.03 × 10^-6 (two standard deviations)
+        locator: *id042
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS24
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id043
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000144'
+        gamma_as_printed: '1.44'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 3E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id044
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms25_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS25
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.15'
+        basis: wt_percent
+        verbatim: 0.15 wt% (two standard deviations)
+        locator: &id045
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS25
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS25
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id046
+          Na2O: 13.83 (0.08)
+          MgO: 5.96 (0.14)
+          SiO2: 57.23 (0.17)
+          CaO: 22.97 (0.07)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '14.00'
+        component_amount_as_published: 14.00 (0.15) wt%
+        Na2O_mol_pct_as_published: 12.94 (0.13) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id047
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '13.83'
+            MgO: '5.96'
+            SiO2: '57.23'
+            CaO: '22.97'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS21 / CMS25 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms25_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS25
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 22
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 3E-8
+        basis: dimensionless
+        verbatim: 0.03 × 10^-6 (two standard deviations)
+        locator: *id045
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS25
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id046
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000163'
+        gamma_as_printed: '1.63'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 3E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id047
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms26_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS26
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.28'
+        basis: wt_percent
+        verbatim: 0.28 wt% (two standard deviations)
+        locator: &id048
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS26
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS26
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id049
+          Na2O: 17.39 (0.20)
+          MgO: 14.42 (0.08)
+          SiO2: 56.76 (0.24)
+          CaO: 11.39 (0.09)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '17.60'
+        component_amount_as_published: 17.60 (0.28) wt%
+        Na2O_mol_pct_as_published: 15.88 (0.25) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id050
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '17.39'
+            MgO: '14.42'
+            SiO2: '56.76'
+            CaO: '11.39'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMS21 / CMS26 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms26_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS26
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 23
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 3E-8
+        basis: dimensionless
+        verbatim: 0.03 × 10^-6 (two standard deviations)
+        locator: *id048
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMS21
+        sample: CMS26
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id049
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000133'
+        gamma_as_printed: '1.33'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 3E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id050
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms11_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS11
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.02'
+        basis: wt_percent
+        verbatim: 0.02 wt% (two standard deviations)
+        locator: &id051
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS11
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS6
+        sample: CMS11
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id052
+          Na2O: 7.11 (0.14)
+          MgO: 13.35 (0.27)
+          SiO2: 44.22 (0.78)
+          CaO: 35.23 (0.29)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '6.72'
+        component_amount_as_published: 6.72 (0.02) wt%
+        Na2O_mol_pct_as_published: 5.91 (0.02) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id053
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '7.11'
+            MgO: '13.35'
+            SiO2: '44.22'
+            CaO: '35.23'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS6 / CMS11 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms11_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS11
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 9
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id051
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS6
+        sample: CMS11
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id052
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000352'
+        gamma_as_printed: '3.52'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id053
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms15_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS15
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.03'
+        basis: wt_percent
+        verbatim: 0.03 wt% (two standard deviations)
+        locator: &id054
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS15
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS6
+        sample: CMS15
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id055
+          Na2O: 5.77 (0.09)
+          MgO: 17.68 (0.17)
+          SiO2: 43.10 (0.31)
+          CaO: 33.41 (0.14)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '5.507'
+        component_amount_as_published: 5.507 (0.03) wt%
+        Na2O_mol_pct_as_published: 4.81 (0.03) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id056
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '5.77'
+            MgO: '17.68'
+            SiO2: '43.10'
+            CaO: '33.41'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS6 / CMS15 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms15_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS15
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 12
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id054
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS6
+        sample: CMS15
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id055
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000438'
+        gamma_as_printed: '4.38'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id056
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms5_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS5
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.12'
+        basis: wt_percent
+        verbatim: 0.12 wt% (two standard deviations)
+        locator: &id057
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS5
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS5
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id058
+          Na2O: 6.95 (0.62)
+          MgO: 14.63 (0.50)
+          SiO2: 47.19 (0.45)
+          CaO: 31.15 (0.20)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '6.71'
+        component_amount_as_published: 6.71 (0.12) wt%
+        Na2O_mol_pct_as_published: 6.08 (0.10) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id059
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '6.95'
+            MgO: '14.63'
+            SiO2: '47.19'
+            CaO: '31.15'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS14 / CMS5 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms5_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS5
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 5
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 6E-8
+        basis: dimensionless
+        verbatim: 0.06 × 10^-6 (two standard deviations)
+        locator: *id057
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS5
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id058
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000347'
+        gamma_as_printed: '3.47'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 6E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id059
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms31_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS31
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.212'
+        basis: wt_percent
+        verbatim: 0.212 wt% (two standard deviations)
+        locator: &id060
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS31
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS31
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id061
+          Na2O: 6.71 (0.03)
+          MgO: 9.33 (0.26)
+          SiO2: 46.13 (1.14)
+          CaO: 37.79 (0.83)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '6.81'
+        component_amount_as_published: 6.81 (0.212) wt%
+        Na2O_mol_pct_as_published: 6.17 (0.11) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id062
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '6.71'
+            MgO: '9.33'
+            SiO2: '46.13'
+            CaO: '37.79'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS14 / CMS31 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms31_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS31
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 26
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 8E-8
+        basis: dimensionless
+        verbatim: 0.08 × 10^-6 (two standard deviations)
+        locator: *id060
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS31
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id061
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000342'
+        gamma_as_printed: '3.42'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 8E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id062
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms32_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS32
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.22'
+        basis: wt_percent
+        verbatim: 0.22 wt% (two standard deviations)
+        locator: &id063
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS32
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS32
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id064
+          Na2O: 9.80 (0.20)
+          MgO: 8.98 (0.20)
+          SiO2: 48.80 (0.39)
+          CaO: 32.40 (0.13)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '9.95'
+        component_amount_as_published: 9.95 (0.22) wt%
+        Na2O_mol_pct_as_published: 9.07 (0.20) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id065
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '9.80'
+            MgO: '8.98'
+            SiO2: '48.80'
+            CaO: '32.40'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS14 / CMS32 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms32_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS32
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 27
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 7E-8
+        basis: dimensionless
+        verbatim: 0.07 × 10^-6 (two standard deviations)
+        locator: *id063
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS32
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id064
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000233'
+        gamma_as_printed: '2.33'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 7E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id065
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms33_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS33
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.31'
+        basis: wt_percent
+        verbatim: 0.31 wt% (two standard deviations)
+        locator: &id066
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS33
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS33
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id067
+          Na2O: 12.54 (0.28)
+          MgO: 8.72 (0.22)
+          SiO2: 51.76 (0.25)
+          CaO: 26.95 (0.17)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '12.73'
+        component_amount_as_published: 12.73 (0.31) wt%
+        Na2O_mol_pct_as_published: 11.70 (0.29) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id068
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '12.54'
+            MgO: '8.72'
+            SiO2: '51.76'
+            CaO: '26.95'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS14 / CMS33 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms33_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS33
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 28
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 6E-8
+        basis: dimensionless
+        verbatim: 0.06 × 10^-6 (two standard deviations)
+        locator: *id066
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS14
+        sample: CMS33
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id067
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000180'
+        gamma_as_printed: '1.80'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 6E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id068
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms16_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS16
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.14'
+        basis: wt_percent
+        verbatim: 0.14 wt% (two standard deviations)
+        locator: &id069
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS16
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS15
+        sample: CMS16
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id070
+          Na2O: 7.58 (0.15)
+          MgO: 19.04 (0.22)
+          SiO2: 46.83 (0.38)
+          CaO: 26.54 (0.18)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '8.17'
+        component_amount_as_published: 8.17 (0.14) wt%
+        Na2O_mol_pct_as_published: 7.15 (0.12) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id071
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '7.58'
+            MgO: '19.04'
+            SiO2: '46.83'
+            CaO: '26.54'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS15 / CMS16 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms16_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS16
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 13
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 7E-8
+        basis: dimensionless
+        verbatim: 0.07 × 10^-6 (two standard deviations)
+        locator: *id069
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS15
+        sample: CMS16
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id070
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000295'
+        gamma_as_printed: '2.95'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 7E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id071
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms21_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS21
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.41'
+        basis: wt_percent
+        verbatim: 0.41 wt% (two standard deviations)
+        locator: &id072
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS21
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS16
+        sample: CMS21
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id073
+          Na2O: 13.56 (0.25)
+          MgO: 24.65 (0.12)
+          SiO2: 50.06 (0.30)
+          CaO: 11.71 (0.04)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '13.35'
+        component_amount_as_published: 13.35 (0.41) wt%
+        Na2O_mol_pct_as_published: 11.41 (0.35) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id074
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '13.56'
+            MgO: '24.65'
+            SiO2: '50.06'
+            CaO: '11.71'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS16 / CMS21 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms21_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS21
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 18
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 7E-8
+        basis: dimensionless
+        verbatim: 0.07 × 10^-6 (two standard deviations)
+        locator: *id072
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS16
+        sample: CMS21
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id073
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000185'
+        gamma_as_printed: '1.85'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 7E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id074
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms36_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS36
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.26'
+        basis: wt_percent
+        verbatim: 0.26 wt% (two standard deviations)
+        locator: &id075
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS36
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS41
+        sample: CMS36
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id076
+          Na2O: 13.20 (0.12)
+          MgO: 11.10 (0.19)
+          SiO2: 51.94 (0.11)
+          CaO: 23.73 (0.22)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '13.21'
+        component_amount_as_published: 13.21 (0.26) wt%
+        Na2O_mol_pct_as_published: 12.03 (0.24) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id077
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '13.20'
+            MgO: '11.10'
+            SiO2: '51.94'
+            CaO: '23.73'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS41 / CMS36 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms36_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS36
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 31
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 5E-8
+        basis: dimensionless
+        verbatim: 0.05 × 10^-6 (two standard deviations)
+        locator: *id075
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS41
+        sample: CMS36
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id076
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000175'
+        gamma_as_printed: '1.75'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 5E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id077
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms34_na2o_wt_percent
+      type: equilibrium_phase_composition
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS34
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: Na2O (wt%)
+      phase: glass
+      units: '%'
+      uncertainty:
+        kind: printed
+        value: '0.16'
+        basis: wt_percent
+        verbatim: 0.16 wt% (two standard deviations)
+        locator: &id078
+          page: 11
+          pdf_page_index: 10
+          published_page: 618
+          table: '6'
+          row: CMS34
+          note: Table 6 normalized Na2O solubility and activity-coefficient row
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS41
+        sample: CMS34
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: &id079
+          Na2O: 4.51 (0.12)
+          MgO: 9.93 (0.13)
+          SiO2: 43.92 (0.22)
+          CaO: 41.61 (0.17)
+        quantity: equilibrium_phase_composition
+        basis: wt_percent
+        units: '%'
+        component_amount: '4.68'
+        component_amount_as_published: 4.68 (0.16) wt%
+        Na2O_mol_pct_as_published: 4.23 (0.15) mol%
+        standard_deviation_note: Parentheses in Tables 1–6 are two standard deviations.
+        measurement_method_as_published: CAMECA SX100 electron microprobe analysis of the final glass
+          composition, followed by the authors' Eq. (9) normalization.
+        derivation_note: Table 6 reports normalized solubility after the authors' Eq. (9) correction from
+          Table 5 using the EDiAn reference values in Tables 3–4. The correction inputs are not stored
+          here as separate observation rows; this is retained as the authors' reported result under the
+          quoted_attributed fallback.
+        attribution: Mathieu et al. (2011), Table 6; Na2O wt% normalized to the Na2O–2SiO2 reference condition
+          using Eq. (9).
+      point_conditions: &id080
+        temperature_K: *id003
+        fO2_Pa: *id004
+        fO2_control: *id005
+        p_Na_Pa: *id006
+        a_Na2O: *id007
+        quench_state: *id008
+        composition:
+          amount_basis: mass_percent
+          components:
+            Na2O: '4.51'
+            MgO: '9.93'
+            SiO2: '43.92'
+            CaO: '41.61'
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 617
+            table: '5'
+            row: ACMAS41 / CMS34 / Gl
+            note: Table 5 final composition row; glass row
+      quench_state: *id008
+    - observation_id: mathieu_2011_table6_cms34_gamma_na2o
+      type: activity_coefficient
+      experiment: mathieu_2011_cms_ns2_1400
+      regime: quench_equilibration
+      locator:
+        page: 11
+        pdf_page_index: 10
+        published_page: 618
+        table: '6'
+        row: CMS34
+        note: Table 6 normalized Na2O solubility and activity-coefficient row
+        column: gamma Na2O (×10^6)
+      table_row_number: 29
+      table_column_number: 4
+      phase: glass
+      phase_role: glass
+      per: mol_species
+      units: dimensionless
+      uncertainty:
+        kind: printed
+        value: 2E-8
+        basis: dimensionless
+        verbatim: 0.02 × 10^-6 (two standard deviations)
+        locator: *id078
+      values:
+        method_class: quoted_attributed
+        admission_status: admitted
+        T_C: '1400'
+        run: ACMAS41
+        sample: CMS34
+        phase_role: glass
+        phase_label: glass
+        P_Na_as_printed: 1.25 × 10^-4 (1.20 × 10^-6) atm
+        a_Na2O_as_printed: 2.10 × 10^-7 (3.10 × 10^-9)
+        fO2_as_printed: 2.11 × 10^-6 atm
+        raw_Table5_composition_as_printed: *id079
+        quantity: activity_coefficient
+        species: Na2O
+        gamma: '0.00000499'
+        gamma_as_printed: '4.99'
+        gamma_scale_as_printed: ×10^6
+        gamma_standard_deviation: 2E-8
+        reference_state_as_published: Eq. (15) relates aNa2O(sample) to xNa2O(sample) × gammaNa2O(sample);
+          the paper does not separately name a reference state in Table 6.
+        calculation_method_as_published: The authors calculated gamma Na2O from the normalized composition
+          and NS2 source activity using Eq. (15).
+        derivation_note: The authors calculate the coefficient using Eq. (15), the normalized Table 6
+          mole fraction, and the NS2 source activity. These inputs are not all stored here as observation
+          rows, so the reported coefficient is retained with quoted_attributed evidence.
+        attribution: Mathieu et al. (2011), Table 6; gamma Na2O calculated from normalized Na2O and the
+          Na2O–2SiO2 source activity by Eq. (15).
+      point_conditions: *id080
+      quench_state: *id008
