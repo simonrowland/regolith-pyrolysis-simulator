@@ -22173,8 +22173,16 @@ class Migrator:
                             and entry.source == source_key
                             and entry.observation_id == obs_id
                             and entry.axes == ["total_pressure_Pa"]
-                            and entry.why
-                            == "source does not state a numeric total_pressure_Pa"
+                            and (
+                                entry.why
+                                == "source does not state a numeric total_pressure_Pa"
+                                or (
+                                    entry.why.startswith("source pressure_basis ")
+                                    and entry.why.endswith(
+                                        " is not a numeric pressure"
+                                    )
+                                )
+                            )
                         )
                     ]
         ambient_pressure_notices = (
@@ -24243,6 +24251,18 @@ class Migrator:
                 pressure_environment = run_experiment.pressure_environment
                 total_pressure = pressure_environment.total_pressure_Pa
                 if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                    ambient_pressure_notice = next(
+                        (
+                            notice
+                            for notice in notices
+                            if notice.kind
+                            is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+                        ),
+                        None,
+                    )
+                    ambient_identity_pressure = getattr(
+                        identity, "total_pressure_Pa", None
+                    )
                     initial = run_experiment.sample.initial_composition
                     composition = (
                         initial.state
@@ -24294,7 +24314,22 @@ class Migrator:
                         if total_pressure.state.is_value
                         else None
                     )
-                    if _knudsen_effusion_chamber_background_not_for_identity(
+                    if (
+                        ambient_pressure_notice is not None
+                        and isinstance(ambient_identity_pressure, State)
+                        and ambient_identity_pressure.is_value
+                    ):
+                        pressure = ambient_identity_pressure
+                        ambient_evidence = run_experiment.ambient_pressure_evidence
+                        total_pressure = Located(
+                            pressure,
+                            locator=(
+                                ambient_evidence.locator
+                                if ambient_evidence is not None
+                                else point_locator
+                            ),
+                        )
+                    elif _knudsen_effusion_chamber_background_not_for_identity(
                         run_experiment.method
                     ):
                         # Same rule as _experiment_identity_fields: chamber
