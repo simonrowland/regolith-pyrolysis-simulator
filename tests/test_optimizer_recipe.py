@@ -124,14 +124,25 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # target_status=unverified_design_target, decision=d-310 and a reason
     # string; no value changed. Removing exactly those nine leaves recovers
     # b8c8690e41376896aa578e93acb1db4c40a95b1fb46cbe8aa9a50b1c28ab55a0.
+    # 2f7b45e93 removed the obsolete chemistry_kernel.allow_unmeasured_alpha_fallback:
+    # false leaf from data/setpoints.yaml. That leaf is part of the resolved
+    # setpoints, so the digest moved. Restoring only that leaf recovers the
+    # Studio-3 value at c6aeacdc8,
+    # 0d334cdfd5f0c0beb0f82b2227c42a83b7c692e3134c306004b78965f99c950e.
+    # The same comparison on this laptop matches that prefix and suffix, so
+    # the digest is not host-sensitive and the full post-removal SHA-256 is pinned.
     resolved_digest = hashlib.sha256(resolved).hexdigest()
-    # The Studio-3 attribution supplies this SHA-256 by its prefix and suffix.
-    assert resolved_digest.startswith("0d334cdfd5f0")
-    assert resolved_digest.endswith("78965f99c950e")
+    assert resolved_digest == (
+        "c7f7b4dd7697329f4436e284bfde8f5574fa5f533570e703d36897d6854d764b"
+    )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
+    # bef9af1e7 adds 17 Stage-3 knobs to the bounds identity: 15 categorical
+    # stage3_route choices and the two purity fractions. Removing only those
+    # knobs from the production bounds payload recovers
+    # e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c.
     assert schema.bounds_digest == (
-        "e02d77339d524d397ba5850d386a62427f70dcad9a7efc270bc93fc61bd1ab0c"
+        "efff1f431132e8d04e67ca389bb673179880c8840c10420baedd797ee202542a"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -139,8 +150,12 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
     # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
+    # recipe_id hashes the empty canonical patch (still b"[]"), the schema
+    # version, the allowlist version, and bounds_digest. Substituting the
+    # pre-Stage-3 bounds digest recovers
+    # 17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786.
     assert empty.recipe_id(schema) == (
-        "17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786"
+        "c43b190bf7677f7828fa9699bc9e07480c7f497c32157731e2e52fd286a23f02"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -152,8 +167,13 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
     # Pin the live search identity directly; retired list-shaped paths stay out.
+    # The digest moves with bounds_digest and with the four searchable
+    # C2A-staged stage3_route knobs (search_enabled defaults true). Campaign
+    # stage3_route knobs stay out of the search list. Restoring the pre-Stage-3
+    # bounds digest and dropping those four paths recovers
+    # d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55.
     assert identity_digest == (
-        "d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55"
+        "452009fa2a64bb9641409526012124be10e69cc9999b63e0efb09956fdd7ce82"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
