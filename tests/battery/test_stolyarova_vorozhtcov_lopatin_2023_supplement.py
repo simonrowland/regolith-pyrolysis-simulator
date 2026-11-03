@@ -13,6 +13,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.validity import effusion_regime_unverified
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -508,3 +509,46 @@ def test_s7_s9_row_composition_and_locators_migrate_without_source_docx() -> Non
             affected += 1
 
     assert affected == 317
+
+
+def test_printed_in_cell_pressure_sum_remains_above_effusion_limit() -> None:
+    migrator = migrate_one_extract(ROOT, EXTRACT)
+    migrator.finalize()
+    result = migrator.result
+    assert not result.validation.hard_issues
+
+    source_rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.source_id == SID
+    ]
+    target = next(
+        observation
+        for observation in source_rows
+        if observation.observation_id.startswith(
+            f"{SID}::stolyarova_2023_s5_sample3_sro_experimental_activity::T=2533:"
+        )
+    )
+    experiment = result.experiments[target.experiment_id]
+    gate = effusion_regime_unverified(
+        experiment,
+        target.identity.quantity.value,
+        observation=target,
+        point_observations=source_rows,
+    )
+    pressure_check = next(
+        check
+        for check in gate.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    )
+
+    assert not gate.passed
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "15.12"
+    assert pressure_check.detail["printed_partial_pressures_Pa"] == {
+        "Al": "6.17",
+        "Al2O": "0.65",
+        "AlO": "0.39",
+        "O": "7.76",
+        "Sr": "0.15",
+    }
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
