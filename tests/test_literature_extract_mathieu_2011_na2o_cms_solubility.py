@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, Quantity, ValueKind
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_file
 
@@ -28,6 +28,35 @@ def _rows(document: dict) -> dict[str, dict]:
 def _assert_render_pins(document: dict) -> None:
     rows = _rows(document)
     assert len(rows) == 48
+
+    for observation_id, row in rows.items():
+        values = row["values"]
+        assert values["method_class"] == "measured_reduced", observation_id
+        assert "attribution" not in values
+        derivation = values["derivation"]
+        assert derivation["raw_inputs"]["state"] == {
+            "tag": "value",
+            "value": "not_printed",
+        }
+        locator = derivation["raw_inputs"]["locator"]
+        if row["type"] == "equilibrium_phase_composition":
+            assert "Eq. (9)" in derivation["relation"]
+            assert derivation["output_unit"] == "%"
+            assert locator["page"] == 10
+            assert locator["pdf_page_index"] == 9
+            assert locator["table"] == "5"
+            assert locator["row"] == f'{values["run"]} / {values["sample"]} / Gl'
+            assert "EDiAn reference values" in locator["note"]
+        else:
+            assert row["type"] == "activity_coefficient", observation_id
+            assert "Eq. (15)" in derivation["relation"]
+            assert derivation["output_unit"] == "dimensionless"
+            assert locator["page"] == 11
+            assert locator["pdf_page_index"] == 10
+            assert locator["table"] == "6"
+            assert locator["row"] == values["sample"]
+            assert locator["column"] == "Na2O (mol%)"
+            assert "Table 4" in locator["note"]
 
     cms8 = rows["mathieu_2011_table6_cms8_na2o_wt_percent"]
     assert cms8["values"]["component_amount_as_published"] == "8.04 (0.32) wt%"
@@ -64,6 +93,12 @@ def test_mathieu_2011_table6_render_pins_and_migration() -> None:
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
 
+    class_mutation = deepcopy(document)
+    for row in _rows(class_mutation).values():
+        row["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(class_mutation)
+
     assert validate_extract_file(EXTRACT) == []
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
@@ -81,6 +116,26 @@ def test_mathieu_2011_table6_render_pins_and_migration() -> None:
     assert set(migrated_rows) == set(raw_rows)
     assert all(row.identity.quantity.is_value for row in migrated_rows.values())
     assert all(row.identity.species.phase.is_value for row in migrated_rows.values())
+    assert all(
+        row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        for row in migrated_rows.values()
+    )
+    for observation_id, row in migrated_rows.items():
+        assert row.derivation is not None
+        assert row.derivation.has_located_unprinted_raw_inputs
+        input_locator = row.derivation.raw_inputs.locator
+        raw = raw_rows[observation_id]
+        if raw["type"] == "equilibrium_phase_composition":
+            assert input_locator.page == 10
+            assert input_locator.table == "5"
+            assert (
+                f'{raw["values"]["run"]} / {raw["values"]["sample"]} / Gl'
+                in input_locator.note
+            )
+        else:
+            assert input_locator.page == 11
+            assert input_locator.table == "6"
+            assert f'Table 6 row {raw["values"]["sample"]}' in input_locator.note
 
     composition_ids = [
         observation_id
