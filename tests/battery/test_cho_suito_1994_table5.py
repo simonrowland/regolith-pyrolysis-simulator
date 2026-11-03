@@ -269,18 +269,34 @@ def test_table5_migration_reaches_temperature_and_scored_composition(
             context=context,
             comparison_ids={observation.observation_id},
         )
-        # Crystal with an unstated polymorph refuses before prediction, so
-        # the oxide notice is not attached.
-        assert residual.execution.state is ExecutionState.NOT_PROBED
-        assert residual.refusal is not None
-        assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-        assert residual.refusal.detail["reason"] == (
-            "fusion_source_reference_phase_unprinted"
-        )
-        assert all(
-            item.kind is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
-            for item in residual.notices
-        )
+        formula = observation.identity.species.formula
+        if formula == "CaO":
+            # d-144: CaO(s) at 1873 K is lime and converts before prediction.
+            assert any(
+                notice.reason == "single_polymorph_identity_d144"
+                for notice in residual.notices
+            )
+            assert any(
+                notice.reason.startswith("reference_converted_via_fusion;")
+                for notice in residual.notices
+            )
+            assert residual.refusal is None or (
+                residual.refusal.detail.get("reason")
+                != "fusion_source_reference_phase_unprinted"
+            )
+        else:
+            # SiO2(s) and Al2O3(s) are outside the closed constant.
+            assert residual.execution.state is ExecutionState.NOT_PROBED
+            assert residual.refusal is not None
+            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert residual.refusal.detail["reason"] == (
+                "fusion_source_reference_phase_unprinted"
+            )
+            assert all(
+                item.kind
+                is not NoticeKind.COMPOSITION_OXIDE_FROM_ELEMENT_MASS_PERCENT
+                for item in residual.notices
+            )
         assert observation.identity.composition is point.state
         vaporock, _vaporock_candidate = compile_residual(
             observation,
