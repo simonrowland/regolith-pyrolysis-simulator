@@ -494,15 +494,31 @@ species:
         units: J mol-1 K-1; T in K
         values:
           quantity: cp
-          method_class: quoted_attributed
+          method_class: model_derived
           attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp fit.
           calculation_method_as_printed: CASTEP DFT with a quasi-harmonic model
           equation_as_printed: 'Cp (J mol-1 K-1)=97.42+1.46x10-6T^2+0,00792T-1532260T^-2'
+          derivation:
+            relation: The authors fitted the theoretical constant-pressure heat capacity with the printed regression law.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 13, section: 5.2 Results, figure: '5', table: '4'}
+            method:
+              state: {tag: value, value: CASTEP DFT calculations combined with a quasi-harmonic model.}
+              locator: {page: 13, section: 5.2 Results, equation: theoretical Cp regression}
+            references:
+              - '[25] J. L. Fleche, Thermodynamical functions for crystals with large unit cells such as zircon, coffinite, fluorapatite, and iodoapatite, Physical Review B 65 (2002) 245116.'
+              - '[26] S. J. Clark et al., First principles methods using CASTEP, Zeitschrift für Kristallographie 220(5-6) (2005) 567-570.'
+              - '[27] D. Vanderbilt, Soft self-consistent pseudopotentials in a generalized eigenvalue formalism, Physical Review B 41 (1990) 7892-7895.'
+              - '[28] J. P. Perdew, K. Burke, and M. Ernzerhof, Generalized gradient approximation made simple, Physical Review Letters 77 (1996) 3865-3868.'
+              - '[29] J. D. Pack and H. J. Monkhorst, Special points for Brillouin-zone integration – a reply, Physical Review B 16 (1977) 1748.'
+              - '[30] P. Vinet et al., Temperature effects on the universal equation of state of solid, Physical Review B 35 (1987) 1945-1953.'
+            input_reference_note: No separate structural-input citation is identified in the calculation description; reference [18] is cited as comparison data in Table 3.
           status: typed_refused_schema_gap
           schema_gap: >-
             The coefficient-only Cp function has no extract-to-battery point-series representation; the full E(V) model input is only plotted in Figure 5 and is not digitized.
           method_class_reason: >-
-            The paper reports a DFT/quasi-harmonic fit, but the model inputs are not all stored; quoted_attributed is retained under d-110.
+            This is the authors' own CASTEP/quasi-harmonic model result; its unprinted model inputs are located in the calculation section.
       - observation_id: chatain_2021_experimental_cp_fit
         type: heat_capacity_and_heat_content_series
         locator:
@@ -513,12 +529,20 @@ species:
         units: J K-1 mol-1; T in K
         values:
           quantity: cp
-          method_class: quoted_attributed
+          method_class: measured_reduced
           attribution: Chatain et al. (2021), authors' DSC data fit
           measurement_method_as_printed: DSC-111
           sample_scope_as_printed: commercial and experimental NaCrO2 powders
           temperature_range_C_as_printed: 25-600 °C
           equation_as_printed: '-80.575+0.04736xT(K)-2.9x10-5xT(K)^2-1641963/T(K)^2 (±1.5%)'
+          derivation:
+            relation: The authors fitted their experimental DSC heat-capacity results with the printed polynomial law.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 14, section: 6.1 Heat capacity measurements, figure: '6'}
+            method:
+              state: {tag: value, value: DSC-111 heat-capacity measurement followed by the authors' polynomial fit.}
+              locator: {page: 14, section: 6.1 Heat capacity measurements, figure: '6'}
           uncertainty_as_printed: ±1.5%
           confidence_level: not_stated
           mean_point_dispersion_as_printed: 3% experimental powder; 2% commercial powder
@@ -526,7 +550,7 @@ species:
           schema_gap: >-
             The polynomial coefficient fit is not a numeric Cp point series; the measured values are shown only in Figure 6 and are not digitized.
           method_class_reason: >-
-            This is the authors' fit to measured DSC data, but the input points are only plotted; quoted_attributed is retained under d-110.
+            This is the authors' reduction of their own DSC measurements; the numeric input points are shown in Figure 6 and are not tabulated.
       - observation_id: chatain_2021_formation_gibbs_fit
         type: gibbs_table
         locator:
@@ -537,20 +561,31 @@ species:
         units: kJ/mol O2 as printed
         values:
           quantity: delta_fG
-          method_class: quoted_attributed
+          method_class: model_derived
           attribution: Chatain et al. (2021), abstract and section 6.1
           equation_as_printed: '-876.094+0.191xT (±2%)'
           uncertainty_as_printed: ±2%
           confidence_level: not_stated
           calculation_inputs_as_printed: >-
             Experimental Cp, ΔfH° at 298 K, theoretical S°298K=94.53, and JANAF functions for the elements.
+          derivation:
+            relation: Equations (6)–(8) deduce formation Gibbs energy from the heat-capacity, enthalpy, entropy, and JANAF inputs.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 15, section: 6.1 Heat capacity measurements, figure: '6'}
+            method:
+              state: {tag: value, value: Equations (6)–(8) for formation Gibbs energy from heat-capacity measurements and reference thermodynamic data.}
+              locator: {page: 15, section: 6.1 Heat capacity measurements, equation: '6–8'}
+            references:
+              - '[13] P. Gross, G. L. Wilson, and W. A. Gutteridge, Composition and Heat of Combination of a Double Oxide of Chromium and Sodium, Journal of the Chemical Society (A) (1970) 1908-1913.'
+              - '[14] M. W. Chase, Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, Journal of Physical and Chemical Reference Data Monograph No. 9, American Chemical Society and American Institute for Physics (1998).'
           unavailable_inputs: >-
             Numerical Cp curve points are figure-only and the JANAF elemental function inputs are not reproduced in this extract.
           status: typed_refused_schema_gap
           schema_gap: >-
             The coefficient-only Gibbs-energy function has no extract-to-battery point-series representation; its full numerical inputs are not stored.
           method_class_reason: >-
-            This is the authors' fitted output from measured and model inputs, but those inputs are not fully stored; quoted_attributed is retained under d-110.
+            This is the authors' own calculation using their measured heat capacity, a model-derived entropy, and reference enthalpy and JANAF data.
       - observation_id: chatain_2021_gross_formation_enthalpy_298
         type: heat_capacity_and_heat_content_series
         locator:
@@ -616,13 +651,29 @@ species:
               section: 5.2 Results
         values:
           quantity: cp
-          method_class: quoted_attributed
+          method_class: model_derived
           attribution: Chatain et al. (2021), authors' CASTEP/quasi-harmonic Cp output.
           calculation_method_as_printed: CASTEP DFT with a quasi-harmonic model
           T_K: '298.15'
           cp_298_15_k: '82.9'
+          derivation:
+            relation: The authors report the theoretical standard heat capacity at 298.15 K from their CASTEP/quasi-harmonic calculation.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 13, section: 5.2 Results, figure: '5', table: '4'}
+            method:
+              state: {tag: value, value: CASTEP DFT calculations combined with a quasi-harmonic model.}
+              locator: {page: 13, section: 5.2 Results, equation: theoretical Cp regression}
+            references:
+              - '[25] J. L. Fleche, Thermodynamical functions for crystals with large unit cells such as zircon, coffinite, fluorapatite, and iodoapatite, Physical Review B 65 (2002) 245116.'
+              - '[26] S. J. Clark et al., First principles methods using CASTEP, Zeitschrift für Kristallographie 220(5-6) (2005) 567-570.'
+              - '[27] D. Vanderbilt, Soft self-consistent pseudopotentials in a generalized eigenvalue formalism, Physical Review B 41 (1990) 7892-7895.'
+              - '[28] J. P. Perdew, K. Burke, and M. Ernzerhof, Generalized gradient approximation made simple, Physical Review Letters 77 (1996) 3865-3868.'
+              - '[29] J. D. Pack and H. J. Monkhorst, Special points for Brillouin-zone integration – a reply, Physical Review B 16 (1977) 1748.'
+              - '[30] P. Vinet et al., Temperature effects on the universal equation of state of solid, Physical Review B 35 (1987) 1945-1953.'
+            input_reference_note: No separate structural-input citation is identified in the calculation description; reference [18] is cited as comparison data in Table 3.
           model_class_reason: >-
-            This is a reported model output; the E(V) input values are plotted only in Figure 5 and were not digitized, so quoted_attributed is used under d-110.
+            This is the authors' own CASTEP/quasi-harmonic model result; its unprinted model inputs are located in the calculation section.
       - observation_id: chatain_2021_absolute_standard_entropy_29815
         type: heat_capacity_and_heat_content_series
         locator:
@@ -639,14 +690,30 @@ species:
               section: 5.2 Results
         values:
           quantity: S
-          method_class: quoted_attributed
+          method_class: model_derived
           attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
           calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
           entropy_basis: absolute standard entropy, not S-S298
           T_K: '298.15'
           entropy: '94.5'
+          derivation:
+            relation: The authors obtained the theoretical entropy from the printed quasi-harmonic statistical-model expression.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 13, section: 5.2 Results, figure: '5', table: '4'}
+            method:
+              state: {tag: value, value: CASTEP DFT calculations combined with a quasi-harmonic model.}
+              locator: {page: 13, section: 5.2 Results, equation: theoretical entropy expression}
+            references:
+              - '[25] J. L. Fleche, Thermodynamical functions for crystals with large unit cells such as zircon, coffinite, fluorapatite, and iodoapatite, Physical Review B 65 (2002) 245116.'
+              - '[26] S. J. Clark et al., First principles methods using CASTEP, Zeitschrift für Kristallographie 220(5-6) (2005) 567-570.'
+              - '[27] D. Vanderbilt, Soft self-consistent pseudopotentials in a generalized eigenvalue formalism, Physical Review B 41 (1990) 7892-7895.'
+              - '[28] J. P. Perdew, K. Burke, and M. Ernzerhof, Generalized gradient approximation made simple, Physical Review Letters 77 (1996) 3865-3868.'
+              - '[29] J. D. Pack and H. J. Monkhorst, Special points for Brillouin-zone integration – a reply, Physical Review B 16 (1977) 1748.'
+              - '[30] P. Vinet et al., Temperature effects on the universal equation of state of solid, Physical Review B 35 (1987) 1945-1953.'
+            input_reference_note: No separate structural-input citation is identified in the calculation description; reference [18] is cited as comparison data in Table 3.
           model_class_reason: >-
-            This is the theoretical entropy value reported at 298.15 K; its inputs are not fully stored, so quoted_attributed is used under d-110.
+            This is the authors' own CASTEP/quasi-harmonic model result; its unprinted model inputs are located in the calculation section.
       - observation_id: chatain_2021_absolute_standard_entropy_298
         type: heat_capacity_and_heat_content_series
         locator:
@@ -663,7 +730,7 @@ species:
               section: 6.1 Heat capacity measurements
         values:
           quantity: S
-          method_class: quoted_attributed
+          method_class: model_derived
           attribution: Chatain et al. (2021), authors' ab initio/quasi-harmonic entropy output.
           calculation_method_as_printed: ab initio calculations with a quasi-harmonic model
           entropy_basis: absolute standard entropy, not S-S298
@@ -671,8 +738,24 @@ species:
           entropy: '94.53'
           temperature_discrepancy_note: >-
             Page 13 prints S=94.5 at 298.15 K; page 15 prints S°298K=94.53. Both printed temperatures are retained without conversion.
+          derivation:
+            relation: The authors obtained the theoretical entropy from the printed quasi-harmonic statistical-model expression, then use S°298K in the formation Gibbs-energy calculation.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 13, section: 5.2 Results, figure: '5', table: '4'}
+            method:
+              state: {tag: value, value: CASTEP DFT calculations combined with a quasi-harmonic model.}
+              locator: {page: 13, section: 5.2 Results, equation: theoretical entropy expression}
+            references:
+              - '[25] J. L. Fleche, Thermodynamical functions for crystals with large unit cells such as zircon, coffinite, fluorapatite, and iodoapatite, Physical Review B 65 (2002) 245116.'
+              - '[26] S. J. Clark et al., First principles methods using CASTEP, Zeitschrift für Kristallographie 220(5-6) (2005) 567-570.'
+              - '[27] D. Vanderbilt, Soft self-consistent pseudopotentials in a generalized eigenvalue formalism, Physical Review B 41 (1990) 7892-7895.'
+              - '[28] J. P. Perdew, K. Burke, and M. Ernzerhof, Generalized gradient approximation made simple, Physical Review Letters 77 (1996) 3865-3868.'
+              - '[29] J. D. Pack and H. J. Monkhorst, Special points for Brillouin-zone integration – a reply, Physical Review B 16 (1977) 1748.'
+              - '[30] P. Vinet et al., Temperature effects on the universal equation of state of solid, Physical Review B 35 (1987) 1945-1953.'
+            input_reference_note: No separate structural-input citation is identified in the calculation description; reference [18] is cited as comparison data in Table 3.
           model_class_reason: >-
-            This is a reported model output; the E(V) input values are plotted only in Figure 5 and were not digitized, so quoted_attributed is used under d-110.
+            This is the authors' own CASTEP/quasi-harmonic model result; its unprinted model inputs are located in the calculation section.
       - observation_id: chatain_2021_dta_transition_temperature
         type: transition_point
         locator:
@@ -681,7 +764,7 @@ species:
         phase: cr
         units: deg C
         values:
-          method_class: quoted_attributed
+          method_class: measured_reduced
           quantity: transition_temperature
           attribution: Chatain et al. (2021), authors' DTA result.
           T_C: '819'
@@ -693,8 +776,16 @@ species:
           atmosphere_as_printed: pure argon, 1 L h-1
           uncertainty_as_printed: ±4 °C
           confidence_level: not_stated
+          derivation:
+            relation: Equilibrium transition temperature extrapolated to rate zero from onset temperatures at three heating rates, with the onset reduced to the blank line.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 10, section: 4.3 Differential Thermal Analysis}
+            method:
+              state: {tag: value, value: 'DTA onset temperatures measured at heating rates of 5, 7, and 10 °C/min and extrapolated to rate zero.'}
+              locator: {page: 10, section: 4.3 Differential Thermal Analysis}
           method_class_reason: >-
-            The reported transition temperature is extrapolated to heating rate zero, but the three measured onset temperatures are not printed; quoted_attributed is retained under d-110.
+            This is the authors' reduction of their DTA measurements; the three onset-temperature inputs are not tabulated.
         uncertainty: ±4 °C
     context:
       - observation_id: chatain_2021_sample_synthesis_and_phase_identity
