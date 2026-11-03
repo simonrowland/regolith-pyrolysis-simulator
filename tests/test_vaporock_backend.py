@@ -950,9 +950,10 @@ def test_vaporock_shadow_parity_with_builtin_antoine_for_basalt():
         if not vaporock_pressures:
             pytest.skip(f"VapoRock returned no pressures at {basis_name}")
 
-        # SiO only: Na's pure-component Antoine certification range is
-        # [924, 1118] K, below this 1873 K fixture; the IW literature band
-        # above remains the load-bearing Na check.
+        # SiO only. Na's runtime saturation is the Browning-Potter equation
+        # (Fink & Leibowitz ANL/RE-95/2), certified 864-2499 K, with a solid
+        # branch below 370.98 K. This fixture does not parity-check that
+        # curve; the IW literature band above remains the load-bearing Na check.
         for species in ("SiO",):
             builtin_pressure = builtin.vapor_pressures_Pa.get(species, 0.0)
             vaporock_pressure = vaporock_pressures.get(species, 0.0)

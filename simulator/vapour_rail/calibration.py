@@ -250,9 +250,16 @@ DEFAULT_INDEPENDENT_ANCHORS: Final[tuple[IndependentAnchor, ...]] = (
         anchor_id="na_nist_webbook_pure",
         species="Na",
         kind="pure_component",
-        citation="NIST Chemistry WebBook SRD 69 Rodebush & Walters 1930 sodium",
+        citation=(
+            "Fink and Leibowitz ANL/RE-95/2 Browning-Potter liquid sodium, "
+            "certified 864-2499 K"
+        ),
         temperature_K=None,
-        notes="Pure-component Antoine; activity path is separate",
+        notes=(
+            "Solid branch corrects the liquid pressure by the handbook fusion "
+            "enthalpy below 370.98 K. Retired Rodebush Antoine is not the "
+            "runtime source. Activity path is separate."
+        ),
     ),
     IndependentAnchor(
         anchor_id="fe_kems_regime",
