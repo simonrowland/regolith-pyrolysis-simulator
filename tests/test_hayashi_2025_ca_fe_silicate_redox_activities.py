@@ -130,24 +130,32 @@ def test_hayashi_isolated_migration_binds_conditions_and_only_declared_schema_ga
     assert migrated_ids == _EXPECTED_OBSERVATION_IDS
     for row in source_rows.values():
         conditions = row["point_conditions"]
+        composition_state = conditions["composition"]["state"]
+        published = row["values"]["composition_as_published"]["components"]
         assert conditions["temperature_K"]["state"]["tag"] == "value"
         assert conditions["fO2_Pa"]["state"]["tag"] == "value"
-        assert conditions["composition"]["state"]["tag"] == "value"
+        assert composition_state["tag"] == "unknown"
+        assert "FeO1.5" in composition_state["reason"]
+        assert "Fe2O3" not in published
+        assert published["FeO1.5"]
         assert conditions["total_pressure_Pa"]["state"]["tag"] == "unknown"
 
     migrated_by_id = {
         row.observation_id.split("::", 1)[1]: row for row in observations
     }
-    for observation_id in (_obs_id(4, 3), _obs_id(7, 12), _obs_id(17, 15)):
-        row = migrated_by_id[observation_id]
+    assert set(migrated_by_id) == set(source_rows)
+    for row in migrated_by_id.values():
         conditions = row.point_conditions
         assert conditions["temperature_K"].state.value == Decimal("1573")
         assert conditions["fO2_Pa"].state.is_value
-        assert conditions["composition"].state.is_value
+        assert conditions["composition"].state.is_unknown
+        assert "FeO1.5" in conditions["composition"].state.reason
         assert row.identity.temperature_K.value == Decimal("1573")
         assert row.identity.fO2_Pa.is_value
-        assert row.identity.composition.is_value
-        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.composition.is_unknown
+        assert "FeO1.5" in row.identity.composition.reason
+    for observation_id in (_obs_id(4, 3), _obs_id(7, 12), _obs_id(17, 15)):
+        assert migrated_by_id[observation_id].identity.total_pressure_Pa.is_unknown
 
     fe2 = migrated_by_id[_obs_id(4, 3)]
     a_feo = migrated_by_id[_obs_id(7, 12)]
