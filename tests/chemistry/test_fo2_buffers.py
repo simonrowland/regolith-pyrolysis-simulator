@@ -297,17 +297,118 @@ def test_extended_curves_match_the_survey_table() -> None:
             assert _q4(evaluation.log10_fO2_bar) == Decimal(printed)
 
 
-def test_mo_region2_endpoints_count_each_edge_offset_once() -> None:
+def test_region2_bands_equal_the_edge_disagreement_at_each_edge() -> None:
     # At T = edge, d(T) = d(edge), so |d(T) - d(edge)| + |d(edge)|
-    # reduces to the edge offset itself. These values are the hand-rounded
-    # survey offsets at the open O'Neill endpoints.
-    for temperature, expected_band in (
-        (Decimal(1000), Decimal("0.1739")),
-        (Decimal(1450), Decimal("0.1150")),
-    ):
-        evaluation = evaluate_buffer("Mo-MoO2", temperature)
-        assert evaluation.region == 2
+    # reduces to the edge offset itself. The Mo endpoint literals are the
+    # hand-rounded survey offsets at the open O'Neill endpoints.
+    cases = (
+        ("Mo-MoO2", Decimal(1000), Decimal("0.1739")),
+        ("Mo-MoO2", Decimal(1450), Decimal("0.1150")),
+        ("MH", Decimal(1073), Decimal("0.4907")),
+        ("MW", Decimal(1270), Decimal("0.5191")),
+    )
+    for buffer, temperature, expected_band in cases:
+        evaluation = evaluate_buffer(buffer, temperature)
+        assert evaluation.band_dex is not None
         assert evaluation.band_dex == expected_band
+        assert evaluation.region == 2
+        assert evaluation.band_dex == max(
+            abs(edge.signed_dex)
+            for edge in evaluation.edge_offsets
+            if edge.edge_temperature_K == temperature
+        )
+
+
+def test_region2_bands_are_continuous_just_above_each_edge() -> None:
+    cases = (
+        ("Mo-MoO2", Decimal("1450.1"), Decimal("0.1150")),
+        ("MH", Decimal("1073.1"), Decimal("0.4907")),
+        ("MW", Decimal("1270.1"), Decimal("0.5191")),
+    )
+    tolerance = Decimal("0.001")
+    for buffer, temperature, edge_disagreement in cases:
+        band = evaluate_buffer(buffer, temperature).band_dex
+        assert band is not None
+        assert abs(band - edge_disagreement) <= tolerance
+
+
+def test_region2_interior_bands_match_pins_and_bound_raw_disagreement() -> None:
+    cases = (
+        (
+            "Mo-MoO2",
+            "janaf_mo_moo2",
+            ("oneill1986_via_oneill1987",),
+            1473,
+            "0.1171",
+        ),
+        (
+            "Mo-MoO2",
+            "janaf_mo_moo2",
+            ("oneill1986_via_oneill1987",),
+            1673,
+            "0.1378",
+        ),
+        (
+            "Mo-MoO2",
+            "janaf_mo_moo2",
+            ("oneill1986_via_oneill1987",),
+            1873,
+            "0.1599",
+        ),
+        (
+            "MH",
+            "haas1992_table_10_9",
+            ("chou1978_eq12", "janaf_mh_fe3o4_fe2o3"),
+            1473,
+            "0.7410",
+        ),
+        (
+            "MH",
+            "haas1992_table_10_9",
+            ("chou1978_eq12", "janaf_mh_fe3o4_fe2o3"),
+            1673,
+            "0.8274",
+        ),
+        (
+            "MW",
+            "haas1992_table_10_7",
+            ("oneill1988_eq16", "janaf_mw_fe0_947o_fe3o4"),
+            "1274.15",
+            "0.5214",
+        ),
+        (
+            "MW",
+            "haas1992_table_10_7",
+            ("oneill1988_eq16", "janaf_mw_fe0_947o_fe3o4"),
+            "1281.15",
+            "0.5255",
+        ),
+        (
+            "MW",
+            "haas1992_table_10_7",
+            ("oneill1988_eq16", "janaf_mw_fe0_947o_fe3o4"),
+            1473,
+            "0.6671",
+        ),
+        (
+            "MW",
+            "haas1992_table_10_7",
+            ("oneill1988_eq16", "janaf_mw_fe0_947o_fe3o4"),
+            1673,
+            "0.8920",
+        ),
+    )
+    for buffer, central_id, route_ids, temperature, expected_band in cases:
+        temp = Decimal(temperature)
+        band = evaluate_buffer(buffer, temp).band_dex
+        assert band is not None
+        assert band == Decimal(expected_band)
+        for route_id in route_ids:
+            raw_gap = abs(
+                _q4(_member(buffer, central_id, temp))
+                - _q4(_member(buffer, route_id, temp))
+            )
+            assert band >= raw_gap
 
 
 def test_mo_regions_authority_and_edge_offsets() -> None:
@@ -394,7 +495,9 @@ def test_mh_is_the_haas_table_until_1800_then_unsized() -> None:
         _member("MH", "chou1978_eq12", Decimal(1000))
     )
     assert selected.authority == "extrapolated"
-    assert selected.region == 2
+    assert selected.region == 3
+    assert selected.band_dex is None
+    assert selected.unsized_notice == UNSIZED_BAND_NOTICE
 
 
 def test_mw_regions_carry_the_wustite_warning_above_the_emf_window() -> None:
@@ -478,10 +581,37 @@ def test_explicit_janaf_authority_uses_its_table_window() -> None:
         "Mo-MoO2", Decimal(1673), calibration_id="janaf_mo_moo2"
     )
     assert janaf_inside.authority == "tabulated_thermochemistry"
+    assert janaf_inside.region == 2
+    assert janaf_inside.band_dex == Decimal("0.1378")
+    assert janaf_inside.unsized_notice is None
+    # JANAF's own table covers 1200 K even though the canonical centre is
+    # the O'Neill EMF route there.
+    janaf_inside_emf_region = evaluate_buffer(
+        "Mo-MoO2", Decimal(1200), calibration_id="janaf_mo_moo2"
+    )
+    assert janaf_inside_emf_region.authority == "tabulated_thermochemistry"
+    assert janaf_inside_emf_region.region == 2
+    assert janaf_inside_emf_region.band_dex is not None
+    assert janaf_inside_emf_region.band_dex > 0
     janaf_outside = evaluate_buffer(
         "Mo-MoO2", Decimal(2900), calibration_id="janaf_mo_moo2"
     )
     assert janaf_outside.authority == "extrapolated"
+    assert janaf_outside.region == 3
+    assert janaf_outside.band_dex is None
+    assert janaf_outside.unsized_notice == UNSIZED_BAND_NOTICE
+
+    for buffer, calibration_id in (
+        ("MH", "janaf_mh_fe3o4_fe2o3"),
+        ("MW", "janaf_mw_fe0_947o_fe3o4"),
+    ):
+        janaf_inside = evaluate_buffer(
+            buffer, Decimal(1873), calibration_id=calibration_id
+        )
+        assert janaf_inside.authority == "tabulated_thermochemistry"
+        assert janaf_inside.region == 2
+        assert janaf_inside.band_dex is not None
+        assert janaf_inside.unsized_notice is None
 
 
 def test_explicit_haas_authority_uses_its_table_window() -> None:
@@ -489,10 +619,16 @@ def test_explicit_haas_authority_uses_its_table_window() -> None:
         "MH", Decimal(1473), calibration_id="haas1992_table_10_9"
     )
     assert haas_inside.authority == "tabulated_thermochemistry"
+    assert haas_inside.region == 2
+    assert haas_inside.band_dex is not None
+    assert haas_inside.unsized_notice is None
     haas_outside = evaluate_buffer(
         "MH", Decimal(1873), calibration_id="haas1992_table_10_9"
     )
     assert haas_outside.authority == "extrapolated"
+    assert haas_outside.region == 3
+    assert haas_outside.band_dex is None
+    assert haas_outside.unsized_notice == UNSIZED_BAND_NOTICE
 
 
 def test_janaf_moo2_route_matches_the_printed_log_kf_column() -> None:
