@@ -25,14 +25,18 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    Authority,
     EvidenceClass,
     IdentityEqualKind,
+    NoticeKind,
     Quantity,
     ValueKind,
 )
 from simulator.battery.identity import identity_equal
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
+    _band_text,
+    _log_fO2_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     fe3_fe2_ratio_reduction,
@@ -40,6 +44,7 @@ from simulator.battery.migrate import (
     oxide_molar_mass,
     select_declared_source,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.battery.records import Evidence, Locator, State
 from tests.battery.factories import migrate_one_extract
 
@@ -547,9 +552,30 @@ def test_valence_rows_stamp_printed_po2_and_absolute_log(tmp_path: Path) -> None
     outcome = identity_equal(first.identity, second.identity)
     assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert "fO2_Pa" in outcome.fields
-    assert delta_iw.identity.fO2_Pa.is_unknown
-    assert "buffer-relative fO2" in delta_iw.identity.fO2_Pa.reason
-    assert "delta-IW" in delta_iw.identity.fO2_Pa.reason
+    assert delta_iw.identity.fO2_Pa.is_value
+    pressure = delta_iw.identity.total_pressure_Pa
+    pressure_bar = (
+        pressure.value / Decimal("100000")
+        if pressure is not None and pressure.is_value and pressure.value > 0
+        else None
+    )
+    evaluation = evaluate_buffer("IW", Decimal("1523.15"), pressure_bar=pressure_bar)
+    assert delta_iw.identity.fO2_Pa.value == _log_fO2_to_pa(
+        evaluation.log10_fO2_bar + Decimal("-1")
+    )
+    converted = [
+        notice
+        for notice in delta_iw.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    ]
+    assert len(converted) == 1
+    assert converted[0].authority is Authority.EXTRAPOLATED
+    assert converted[0].band == _band_text(evaluation.band_dex)
+    assert "buffer=IW" in converted[0].reason
+    assert "offset=-1" in converted[0].reason
+    assert "calibration=wolf2023_quote_oneill_pownceby1993" in converted[0].reason
+    assert "T_K=1523.15" in converted[0].reason
+    assert "authority=extrapolated" in converted[0].reason
     assert delta_iw.point_conditions["fO2_control"].state.value == "delta-IW"
 
 
@@ -768,39 +794,45 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
 
 
 @pytest.mark.parametrize(
-    "row_fields",
+    ("row_fields", "stays_unknown"),
     [
-        {
-            "point_conditions": {
-                "fO2_log": {
-                    "state": {
-                        "tag": "value",
-                        "value": {
-                            "kind": "bound",
-                            "bound_operator": "<",
-                            "bound_value": "-8",
+        (
+            {
+                "point_conditions": {
+                    "fO2_log": {
+                        "state": {
+                            "tag": "value",
+                            "value": {
+                                "kind": "bound",
+                                "bound_operator": "<",
+                                "bound_value": "-8",
+                            },
                         },
-                    },
-                    "locator": {"published_page": 1},
-                }
-            }
-        },
-        {
-            "point_conditions": {
-                "fO2_log": {
-                    "state": {"tag": "value", "value": "-8"},
-                    "locator": {"published_page": 1},
+                        "locator": {"published_page": 1},
+                    }
                 }
             },
-            "oxygen_buffer_as_published": "IW",
-        },
-        {"log_fO2": {"value": -2, "units": "log10(IW)"}},
-        {"log_fO2": {"value": -8, "units": "log10(Pa)"}},
-        {"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"},
+            True,
+        ),
+        (
+            {
+                "point_conditions": {
+                    "fO2_log": {
+                        "state": {"tag": "value", "value": "-8"},
+                        "locator": {"published_page": 1},
+                    }
+                },
+                "oxygen_buffer_as_published": "IW",
+            },
+            False,
+        ),
+        ({"log_fO2": {"value": -2, "units": "log10(IW)"}}, False),
+        ({"log_fO2": {"value": -8, "units": "log10(Pa)"}}, True),
+        ({"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"}, False),
     ],
 )
 def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
-    tmp_path: Path, row_fields: dict
+    tmp_path: Path, row_fields: dict, stays_unknown: bool
 ) -> None:
     path = _fixture_extract(tmp_path, [{
         "observation_id": "fixture_bounded_row",
@@ -823,7 +855,14 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
         if "fixture_bounded_row::" in obs.observation_id
     ]
     assert len(rows) == 1
-    assert rows[0].identity.fO2_Pa.is_unknown
+    oxygen = rows[0].identity.fO2_Pa
+    # The series point is 1e-7 bar = 0.01 Pa. A bound stays unknown. A printed
+    # log or a buffer offset keeps its own oxygen and does not inherit that point.
+    if stays_unknown:
+        assert oxygen.is_unknown
+    else:
+        assert oxygen.is_value
+        assert oxygen.value != Decimal("0.01")
 
 
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:

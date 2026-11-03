@@ -50,7 +50,7 @@ import re
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, fields, is_dataclass, replace
-from decimal import Decimal, InvalidOperation, localcontext
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation, localcontext
 from enum import Enum
 from fractions import Fraction
 from pathlib import Path
@@ -206,6 +206,7 @@ from simulator.battery.validate import (
     _unavailable_missing_input_work_items,
     validate_corpus,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer, match_printed_calibration
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 from simulator.battery.phase_field import (
     OUTSIDE_SINGLE_LIQUID_FIELD,
@@ -1095,6 +1096,51 @@ def _bare_log_notice(
         reason=decision.notice_reason,
         origin=origin,
     )
+
+
+def _buffer_conversion_notices(
+    decision: PrintedOxygenDecision | None,
+    landed: object,
+    quantity: object,
+    origin: str,
+    existing: Sequence[Notice],
+    *,
+    from_fallback: bool,
+) -> tuple[Notice, ...]:
+    """Notices for a buffer conversion, including one the profile cannot store.
+
+    A not-applicable fO2 axis still records the conversion. An inherited
+    conversion that did not land does not: the parent row carries it.
+    """
+
+    if decision is None or not decision.notices or not isinstance(quantity, Quantity):
+        return ()
+    landed_value = (
+        isinstance(landed, State)
+        and landed.is_value
+        and decision.state.is_value
+        and landed.value == decision.state.value
+    )
+    if from_fallback and not landed_value:
+        return ()
+    seen = {(notice.kind, notice.reason) for notice in existing}
+    out: list[Notice] = []
+    for spec in decision.notices:
+        key = (spec.kind, spec.reason)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(
+            Notice(
+                kind=spec.kind,
+                affected_quantities=(quantity,),
+                reason=spec.reason,
+                origin=origin,
+                band=spec.band,
+                authority=spec.authority,
+            )
+        )
+    return tuple(out)
 
 
 # ---------------------------------------------------------------------------
@@ -15608,15 +15654,28 @@ class PrintedOxygenFacts:
     bare_log: bool = False
 
 
-# A named buffer (IW, FMQ, QFM, NNO), with or without an offset, is not an
-# absolute pressure. No temperature-dependent buffer curve is applied.
+# IW, FMQ, QFM, and NNO name a buffer curve in fo2_buffers. Any other
+# non-empty oxygen_buffer_as_published string stays a typed missing-input
+# refusal. The curve is not applied to a bounded or approximate print.
 _BUFFER_NAME_TOKENS = ("iw", "fmq", "qfm", "nno")
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
 )
 _BUFFER_RELATIVE_FO2_REASON = (
-    "buffer-relative fO2 ({buffer}) requires a "
-    "temperature-dependent buffer model; no fO2_Pa assigned"
+    "buffer-relative fO2 ({buffer}) has no calibration in the buffer owner; "
+    "missing input; no fO2_Pa assigned"
+)
+_BUFFER_RELATIVE_NOT_A_POINT = (
+    "buffer-relative fO2 ({buffer}) is not a point offset; "
+    "missing input; no fO2_Pa assigned"
+)
+_BUFFER_RELATIVE_NO_TEMPERATURE = (
+    "buffer-relative fO2 ({buffer}) has no temperature; "
+    "missing input; no fO2_Pa assigned"
+)
+_BUFFER_RELATIVE_CONFLICT = (
+    "buffer-relative fO2 ({buffer}) conflicting offsets; "
+    "missing input; no fO2_Pa assigned"
 )
 
 
@@ -15685,18 +15744,48 @@ def _bare_log_convention(
 
 
 @dataclass(frozen=True)
+class PrintedOxygenNotice:
+    """One notice the oxygen decision wants attached to the observation."""
+
+    kind: NoticeKind
+    reason: str
+    band: str | None = None
+    authority: Authority | None = None
+
+
+@dataclass(frozen=True)
+class _BufferRequest:
+    """A point offset the buffer owner can evaluate. Temperature is required."""
+
+    buffer: str
+    offset: Decimal
+    offset_as_printed: str
+    buffer_as_printed: str
+    calibration_id: str | None
+    unmatched_calibration: str | None
+    ideal_ratio: bool
+    temperature_K: Decimal
+
+
+@dataclass(frozen=True)
 class PrintedOxygenDecision:
     """Identity outcome for one printed oxygen fact.
 
-    ``log`` and ``pressure`` carry the converted pascal state. ``refusal``
-    is unknown, with the buffer or bounded reason. Whether that state
-    overwrites an inherited value is decided by ``_printed_oxygen_state_for``.
+    ``log`` and ``pressure`` carry the converted pascal state. ``buffer``
+    is the same kind of value, from log fO2 = log fO2_buffer(T[, P]) + offset.
+    ``refusal`` is unknown, with the buffer or bounded reason. Whether that
+    state overwrites an inherited value is decided by ``_printed_oxygen_state_for``.
     ``notice_reason`` is set only when the unitless 1 bar convention was applied.
+    ``notices`` carries the buffer conversion. ``buffer_request`` lets a later
+    pressure fill recompute a conversion that had no pressure yet.
     """
 
     kind: str
     state: State
     notice_reason: str | None = None
+    notices: tuple[PrintedOxygenNotice, ...] = ()
+    buffer_request: _BufferRequest | None = None
+    pressure_pa_used: Decimal | None = None
 
 
 def _oxygen_pressure_point(located: object) -> Decimal | None:
@@ -15771,6 +15860,512 @@ def _printed_oxygen_buffer_text(
     return None
 
 
+_BUFFER_TOKEN_RE = re.compile(
+    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])",
+    re.IGNORECASE,
+)
+_BUFFER_OFFSET_RE = re.compile(
+    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])"
+    r"\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
+    re.IGNORECASE,
+)
+_LOG_UNITS_PHRASE_RE = re.compile(
+    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+log\s+units?\s+(?P<dir>below|above)\s+"
+    r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])",
+    re.IGNORECASE,
+)
+_APPROX_BUFFER_RE = re.compile(
+    r"[~≈≃≅]|(?:^|[\s(])(?:about|approximately|near|around|close\s+to)\b",
+    re.IGNORECASE,
+)
+_IDEAL_FEO_FE_RE = re.compile(
+    r"ideal.{0,80}(?:x_?\s*feo|feo).{0,40}(?:x_?\s*fe\b|metal\s+fe)|"
+    r"delta_iw_from_ideal_feo_fe_ratio",
+    re.IGNORECASE | re.DOTALL,
+)
+_BUFFER_FAMILY = {"iw": "IW", "qfm": "QFM", "fmq": "QFM", "nno": "NNO"}
+_DELTA_FIELD_FAMILY = {
+    "fO2_delta_IW": "IW",
+    "delta_IW": "IW",
+    "fO2_delta_QFM": "QFM",
+    "delta_QFM": "QFM",
+    "fO2_delta_FMQ": "QFM",
+    "delta_FMQ": "QFM",
+    "fO2_delta_NNO": "NNO",
+    "delta_NNO": "NNO",
+}
+_CALIBRATION_TEXT_FIELDS = (
+    "buffer_calibration",
+    "buffer_calibration_as_published",
+    "buffer_reference_as_published",
+    "fo2_calibration",
+)
+_BUFFER_NAME_WORDS = (
+    "iron-wüstite",
+    "iron-wustite",
+    "iron wüstite",
+    "iron wustite",
+    "fayalite-magnetite-quartz",
+    "fayalite magnetite quartz",
+    "nickel-nickel oxide",
+    "ni-nio",
+)
+
+
+def _units_name_buffer(units: str) -> bool:
+    folded = units.casefold()
+    return any(token in folded for token in _BUFFER_NAME_TOKENS)
+
+
+def _buffer_named_in_mapping(mapping: Mapping[str, Any]) -> bool:
+    """True when this mapping prints an IW, QFM, FMQ, or NNO token."""
+
+    for key in ("fO2_control", "oxygen_buffer_as_published", *_CALIBRATION_TEXT_FIELDS):
+        raw_value = mapping.get(key)
+        pieces = _text_pieces(raw_value)
+        if not pieces and isinstance(raw_value, str):
+            pieces = (raw_value,)
+        if any(_BUFFER_TOKEN_RE.search(piece) for piece in pieces):
+            return True
+    return False
+
+
+def _condition_payload(value: object) -> object:
+    if isinstance(value, Located):
+        if not value.state.is_value:
+            return None
+        return value.state.value
+    if isinstance(value, Mapping) and "state" in value:
+        state = value.get("state")
+        if isinstance(state, Mapping):
+            tag = state.get("tag")
+            if tag not in (None, "value"):
+                return None
+            return state.get("value", value)
+    return value
+
+
+def _offset_number(raw: object) -> tuple[Decimal, str] | None:
+    if isinstance(raw, bool) or raw is None or isinstance(raw, Mapping):
+        return None
+    if isinstance(raw, Decimal):
+        if not raw.is_finite():
+            return None
+        return raw, _dec_str(raw)
+    printed = str(raw).strip()
+    if not printed:
+        return None
+    normalized = (
+        printed.replace("−", "-").replace("–", "-").replace("—", "-").replace(" ", "")
+    )
+    if normalized.endswith("."):
+        normalized = normalized[:-1]
+    try:
+        number = Decimal(normalized)
+    except (InvalidOperation, ValueError):
+        return None
+    if not number.is_finite():
+        return None
+    return number, printed
+
+
+def _positive_pressure_pa(state: object) -> Decimal | None:
+    if isinstance(state, Located):
+        state = state.state
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    raw = state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    if isinstance(raw, Decimal) and raw.is_finite() and raw > 0:
+        return raw
+    return None
+
+
+def _point_total_pressure_pa(
+    point_conditions: Mapping[str, Any] | None,
+) -> Decimal | None:
+    """Pascal total already stored on the point. A kbar node is not pascals."""
+
+    located = (point_conditions or {}).get("total_pressure_Pa")
+    if isinstance(located, Mapping):
+        units = str(located.get("units") or located.get("unit") or "").strip().casefold()
+        if units and units not in {"pa", "pascal", "pascals"}:
+            return None
+        nested = located.get("state")
+        if isinstance(nested, Mapping):
+            units = str(nested.get("units") or nested.get("unit") or units).strip().casefold()
+            if units and units not in {"pa", "pascal", "pascals"}:
+                return None
+    return _positive_pressure_pa(located)
+
+
+def _buffer_mappings(
+    raw_item: object, point_conditions: Mapping[str, Any] | None
+) -> tuple[Mapping[str, Any], ...]:
+    found: list[Mapping[str, Any]] = []
+    if isinstance(point_conditions, Mapping):
+        found.append(point_conditions)
+    if isinstance(raw_item, Mapping):
+        found.append(raw_item)
+        nested = raw_item.get("point_conditions")
+        if isinstance(nested, Mapping):
+            found.append(nested)
+    return tuple(found)
+
+
+def _text_pieces(value: object) -> tuple[str, ...]:
+    payload = _condition_payload(value)
+    if isinstance(payload, str) and payload.strip():
+        return (payload.strip(),)
+    if isinstance(payload, Mapping):
+        pieces: list[str] = []
+        for key in (
+            "delta_as_published",
+            "reference_buffer",
+            "method_as_published",
+            "column_as_published",
+            *_CALIBRATION_TEXT_FIELDS,
+        ):
+            item = payload.get(key)
+            if isinstance(item, str) and item.strip():
+                pieces.append(item.strip())
+        return tuple(pieces)
+    return ()
+
+
+def _leftover_buffer_words(text: str) -> str:
+    folded = text.casefold().replace("−", "-").replace("–", "-").replace("—", "-")
+    for word in _BUFFER_NAME_WORDS:
+        folded = folded.replace(word.casefold(), " ")
+    folded = _BUFFER_OFFSET_RE.sub(" ", folded)
+    return re.sub(r"[^a-z]+", " ", folded).strip()
+
+
+def _classify_buffer_phrase(
+    text: str,
+) -> tuple[str, Decimal | None, str | None, bool]:
+    """Return family, offset, offset-as-printed, and whether the phrase is prose.
+
+    A bare IW/QFM/FMQ/NNO is offset 0. ``delta-IW`` with no number is prose.
+    """
+
+    if _APPROX_BUFFER_RE.search(text):
+        family = None
+        match = _BUFFER_TOKEN_RE.search(text.casefold())
+        if match is not None:
+            family = _BUFFER_FAMILY[match.group("buf").casefold()]
+        return family or "", None, None, True
+    phrase = _LOG_UNITS_PHRASE_RE.search(text)
+    if phrase is not None:
+        number, _printed = _offset_number(phrase.group("n")) or (None, None)
+        if number is None:
+            return "", None, None, True
+        if phrase.group("dir").casefold() == "below":
+            number = -abs(number)
+        else:
+            number = abs(number)
+        return (
+            _BUFFER_FAMILY[phrase.group("buf").casefold()],
+            number,
+            phrase.group("n"),
+            False,
+        )
+    matches = list(_BUFFER_OFFSET_RE.finditer(text))
+    if not matches:
+        return "", None, None, False
+    families = {_BUFFER_FAMILY[item.group("buf").casefold()] for item in matches}
+    if len(families) != 1:
+        return "", None, None, True
+    family = next(iter(families))
+    offsets = [item.group("off") for item in matches if item.group("off")]
+    if _leftover_buffer_words(text):
+        return family, None, None, True
+    if len(offsets) > 1 and len({item.replace(" ", "") for item in offsets}) > 1:
+        return family, None, None, True
+    if not offsets:
+        return family, Decimal(0), "0", False
+    number, printed = _offset_number(offsets[0]) or (None, None)
+    if number is None:
+        return family, None, None, True
+    return family, number, printed, False
+
+
+def _push_point(
+    points: list[tuple[str, Decimal, str, str, bool]],
+    family: str,
+    offset: Decimal,
+    offset_as_printed: str,
+    source: str,
+    *,
+    bare_name: bool,
+) -> None:
+    # bare_name marks a buffer word with no printed number (IW, iron-wüstite).
+    # It is offset 0 only when nothing else on the row supplies the offset.
+    points.append((family, offset, offset_as_printed, source, bare_name))
+
+
+def _buffer_request_from_row(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+    temperature_K: Decimal | None,
+) -> _BufferRequest | str | None:
+    """A buffer point, a refusal sentence, or None when the row names no buffer."""
+
+    points: list[tuple[str, Decimal, str, str, bool]] = []
+    prose: list[tuple[str, str]] = []
+    unknown: list[str] = []
+    oxygen_text: list[str] = []
+    calibration_bits: list[str] = []
+    for mapping in _buffer_mappings(raw_item, point_conditions):
+        for key in _CALIBRATION_TEXT_FIELDS:
+            raw_bit = mapping.get(key)
+            if isinstance(raw_bit, str) and raw_bit.strip():
+                calibration_bits.append(raw_bit.strip())
+                oxygen_text.append(raw_bit.strip())
+        control = mapping.get("fO2_control")
+        for piece in _text_pieces(control):
+            oxygen_text.append(piece)
+            family, offset, printed, is_prose = _classify_buffer_phrase(piece)
+            if is_prose:
+                prose.append((family, piece))
+            elif offset is not None and family:
+                _push_point(
+                    points,
+                    family,
+                    offset,
+                    printed or "0",
+                    piece,
+                    bare_name=printed == "0",
+                )
+        raw_buffer = mapping.get("oxygen_buffer_as_published")
+        if isinstance(raw_buffer, str) and raw_buffer.strip():
+            oxygen_text.append(raw_buffer.strip())
+            family, offset, printed, is_prose = _classify_buffer_phrase(raw_buffer.strip())
+            if not family and not is_prose and offset is None and not _BUFFER_TOKEN_RE.search(raw_buffer):
+                unknown.append(raw_buffer.strip())
+            elif is_prose:
+                prose.append((family, raw_buffer.strip()))
+            elif offset is not None and family:
+                _push_point(
+                    points,
+                    family,
+                    offset,
+                    printed or "0",
+                    raw_buffer.strip(),
+                    bare_name=printed == "0",
+                )
+        for key in _PRINTED_LOG_FO2_KEYS:
+            node = mapping.get(key)
+            if not isinstance(node, Mapping):
+                continue
+            units = str(node.get("units") or node.get("unit") or "")
+            if not _units_name_buffer(units):
+                continue
+            oxygen_text.append(units)
+            match = _BUFFER_TOKEN_RE.search(units.casefold())
+            parsed = _offset_number(node.get("value"))
+            if match is None or parsed is None:
+                prose.append(("", units))
+                continue
+            number, printed = parsed
+            _push_point(
+                points,
+                _BUFFER_FAMILY[match.group("buf").casefold()],
+                number,
+                printed,
+                units,
+                bare_name=False,
+            )
+        for key, family in _DELTA_FIELD_FAMILY.items():
+            if key not in mapping:
+                continue
+            payload = _condition_payload(mapping.get(key))
+            oxygen_text.extend(_text_pieces(mapping.get(key)))
+            raw_delta: object = payload
+            if isinstance(payload, Mapping):
+                raw_delta = payload.get("delta_as_published", payload.get("delta"))
+                reference = payload.get("reference_buffer")
+                if isinstance(reference, str) and reference.strip():
+                    ref_family, _, _, ref_prose = _classify_buffer_phrase(reference)
+                    if ref_family and ref_family != family and not ref_prose:
+                        prose.append((ref_family, reference.strip()))
+            parsed = _offset_number(raw_delta)
+            if parsed is None:
+                prose.append((family, key))
+                continue
+            number, printed = parsed
+            source = key
+            if isinstance(payload, Mapping) and isinstance(payload.get("reference_buffer"), str):
+                source = payload["reference_buffer"].strip() or key
+            _push_point(points, family, number, printed, source, bare_name=False)
+    if not points and not prose and not unknown:
+        return None
+    joined = "\n".join(oxygen_text)
+    ideal = _IDEAL_FEO_FE_RE.search(joined) is not None
+    if points:
+        # "IW" next to "IW+2" names the family. The printed number is the offset.
+        numbered = [item for item in points if not item[4]]
+        if numbered:
+            points = numbered
+        families = {item[0] for item in points}
+        offsets = {item[1] for item in points}
+        if len(families) != 1 or len(offsets) != 1:
+            return _BUFFER_RELATIVE_CONFLICT.format(
+                buffer=" / ".join(item[3] for item in points)
+            )
+        family, offset, offset_printed, source, _bare = points[0]
+        for prose_family, prose_text in prose:
+            if prose_family and prose_family != family:
+                return _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=f"{source} / {prose_text}"
+                )
+        if unknown:
+            return _BUFFER_RELATIVE_CONFLICT.format(
+                buffer=f"{source} / {unknown[0]}"
+            )
+        if (
+            temperature_K is None
+            or not isinstance(temperature_K, Decimal)
+            or not temperature_K.is_finite()
+            or temperature_K <= 0
+        ):
+            return _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+        matched = match_printed_calibration(family, joined)
+        unmatched = None
+        if matched is None and calibration_bits:
+            unmatched = calibration_bits[0][:120]
+        return _BufferRequest(
+            buffer=family,
+            offset=offset,
+            offset_as_printed=offset_printed,
+            buffer_as_printed=source,
+            calibration_id=matched,
+            unmatched_calibration=unmatched,
+            ideal_ratio=ideal and family == "IW",
+            temperature_K=temperature_K,
+        )
+    if unknown:
+        return _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+    label = next((text for _family, text in prose if text), "buffer")
+    return _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+
+
+def _band_text(width: Decimal) -> str:
+    return _dec_str(width.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP))
+
+
+def _decision_for_buffer(
+    request: _BufferRequest, total_pressure_pa: Decimal | None
+) -> PrintedOxygenDecision:
+    pressure_bar = None if total_pressure_pa is None else total_pressure_pa / _BAR_PA
+    evaluation = evaluate_buffer(
+        request.buffer,
+        request.temperature_K,
+        pressure_bar=pressure_bar,
+        calibration_id=request.calibration_id,
+    )
+    log_value = evaluation.log10_fO2_bar + request.offset
+    parts = [
+        f"buffer={evaluation.buffer}",
+        f"offset={request.offset_as_printed}",
+        f"calibration={evaluation.calibration_id}",
+        f"T_K={_dec_str(evaluation.temperature_K)}",
+    ]
+    if evaluation.pressure_bar is not None:
+        parts.append(f"P_bar={_dec_str(evaluation.pressure_bar)}")
+    band = _band_text(evaluation.band_dex)
+    parts.extend(
+        (
+            f"authority={evaluation.authority}",
+            f"band_dex={band}",
+            f"log10_fO2_bar={_dec_str(log_value)}",
+            f"provenance={evaluation.provenance}",
+        )
+    )
+    if evaluation.pressure_coefficient_spread:
+        parts.append("pressure_coefficient_spread=yes")
+    if request.unmatched_calibration:
+        parts.append(f"unmatched_calibration={request.unmatched_calibration}")
+    parts.append(f"buffer_as_printed={request.buffer_as_printed}")
+    reason = "buffer-relative fO2 converted: " + " ".join(parts)
+    authority = (
+        Authority.CERTIFIED
+        if evaluation.authority == "certified"
+        else Authority.EXTRAPOLATED
+    )
+    kind = (
+        NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED
+        if request.calibration_id is not None
+        else NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+    notices = [
+        PrintedOxygenNotice(kind=kind, reason=reason, band=band, authority=authority)
+    ]
+    if request.ideal_ratio:
+        notices.append(
+            PrintedOxygenNotice(
+                kind=NoticeKind.DELTA_IW_FROM_IDEAL_FEO_FE_RATIO,
+                reason=reason,
+                band=band,
+                authority=authority,
+            )
+        )
+    if authority is Authority.EXTRAPOLATED:
+        notices.append(
+            PrintedOxygenNotice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                reason=reason,
+                band=band,
+                authority=authority,
+            )
+        )
+    return PrintedOxygenDecision(
+        "buffer",
+        State.of(_log_fO2_to_pa(log_value, _BAR_PA)),
+        notices=tuple(notices),
+        buffer_request=request,
+        pressure_pa_used=total_pressure_pa,
+    )
+
+
+def _buffer_relative_decision(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+    *,
+    run_temperature_K: Decimal | None,
+    total_pressure_pa: Decimal | None,
+) -> PrintedOxygenDecision | None:
+    outcome = _buffer_request_from_row(raw_item, point_conditions, run_temperature_K)
+    if outcome is None:
+        return None
+    if isinstance(outcome, str):
+        return PrintedOxygenDecision("refusal", State.unknown(outcome))
+    resolved = _point_total_pressure_pa(point_conditions)
+    if resolved is None:
+        resolved = total_pressure_pa
+    return _decision_for_buffer(outcome, resolved)
+
+
+def _refresh_buffer_decision(
+    decision: PrintedOxygenDecision | None,
+    total_pressure_pa: Decimal | None,
+) -> PrintedOxygenDecision | None:
+    """Recompute a conversion once a pressure arrives after the first pass."""
+
+    if (
+        decision is None
+        or decision.buffer_request is None
+        or decision.pressure_pa_used is not None
+        or total_pressure_pa is None
+        or not decision.state.is_value
+    ):
+        return decision
+    return _decision_for_buffer(decision.buffer_request, total_pressure_pa)
+
+
 def printed_oxygen_decision(
     facts: PrintedOxygenFacts,
     *,
@@ -15778,11 +16373,12 @@ def printed_oxygen_decision(
     point_conditions: Mapping[str, Any] | None,
     scope: str,
     run_temperature_K: Decimal | None = None,
+    total_pressure_pa: Decimal | None = None,
 ) -> PrintedOxygenDecision | None:
     """Turn one oxygen scope into one identity state, for every quantity.
 
     ``scope="row"`` is oxygen printed on this row: a log, a typed pressure,
-    or a buffer refusal. ``scope="inherited"`` is a parent or experiment
+    or a buffer offset. ``scope="inherited"`` is a parent or experiment
     fallback. An inherited log is not a row absolute, so that scope does not
     read a row buffer or a row pressure. Callers resolve the row first.
 
@@ -15814,7 +16410,24 @@ def printed_oxygen_decision(
         # same reference the walk uses for that key. A derived log keeps its
         # inference and is not stamped as printed.
         located_log = (point_conditions or {}).get("fO2_log")
-        if isinstance(located_log, Located) and located_log.inference is None:
+        log_units = ""
+        raw_conditions = (
+            raw_item.get("point_conditions") if isinstance(raw_item, Mapping) else None
+        )
+        for container in (raw_conditions, point_conditions):
+            if not isinstance(container, Mapping):
+                continue
+            raw_log = container.get("fO2_log")
+            if isinstance(raw_log, Mapping):
+                log_units = str(raw_log.get("units") or raw_log.get("unit") or "")
+                if log_units:
+                    break
+        # log10(IW) is an offset. It must not become the absolute log.
+        if (
+            isinstance(located_log, Located)
+            and located_log.inference is None
+            and not _units_name_buffer(log_units)
+        ):
             point_log = _oxygen_pressure_point(located_log)
             if point_log is not None:
                 has_log = True
@@ -15822,18 +16435,26 @@ def printed_oxygen_decision(
                 log_reference_pa = _BAR_PA
     facts_pa = _oxygen_pressure_point(facts.oxygen_partial_pressure_Pa)
     point_pa = _oxygen_pressure_point((point_conditions or {}).get("fO2_Pa"))
+    absolute = has_log or facts_pa is not None or point_pa is not None
     # A typed unknown or bound is present oxygen. None here means absent,
     # which is the only result a parent fallback may replace.
     non_point_reason = (
         _present_non_point_oxygen_reason(raw_item, point_conditions)
-        if not has_log and facts_pa is None and point_pa is None
+        if not absolute
         else None
     )
+    if not absolute and not facts.rejected_log_fO2 and non_point_reason is None:
+        buffer_decision = _buffer_relative_decision(
+            raw_item,
+            point_conditions,
+            run_temperature_K=run_temperature_K,
+            total_pressure_pa=total_pressure_pa,
+        )
+        if buffer_decision is not None:
+            return buffer_decision
     if facts.rejected_log_fO2 or non_point_reason is not None or (
         buffer_text is not None
-        and not has_log
-        and facts_pa is None
-        and point_pa is None
+        and not absolute
     ):
         if non_point_reason is not None:
             reason = non_point_reason
@@ -15930,15 +16551,21 @@ def _scoped_oxygen_decision(
     raw_item: object,
     row_point_conditions: Mapping[str, Any] | None,
     run_temperature_K: Decimal | None = None,
+    total_pressure_pa: Decimal | None = None,
 ) -> tuple[PrintedOxygenDecision | None, bool]:
     """Row oxygen first. Inherited facts fill only when the row has none."""
 
+    point_pressure = _point_total_pressure_pa(row_point_conditions)
+    resolved_pressure = (
+        point_pressure if point_pressure is not None else total_pressure_pa
+    )
     row_decision = printed_oxygen_decision(
         PrintedOxygenFacts() if from_fallback else facts,
         raw_item=raw_item,
         point_conditions=row_point_conditions,
         scope="row",
         run_temperature_K=run_temperature_K,
+        total_pressure_pa=resolved_pressure,
     )
     if row_decision is not None or not from_fallback:
         return row_decision, False
@@ -15949,6 +16576,7 @@ def _scoped_oxygen_decision(
             point_conditions=None,
             scope="inherited",
             run_temperature_K=run_temperature_K,
+            total_pressure_pa=resolved_pressure,
         ),
         True,
     )
@@ -16254,7 +16882,6 @@ def _walk_printed_oxygen(
     if not isinstance(obj, Mapping):
         return
     local = locator_from_mapping(obj.get("locator")) or fallback
-    buffer_relative = obj.get("oxygen_buffer_as_published") not in (None, "")
     for key, value in obj.items():
         name = str(key)
         if skip_tables and name in _OXYGEN_TABLE_KEYS:
@@ -16305,9 +16932,20 @@ def _walk_printed_oxygen(
                     reference_pressure_pa = conventional_reference_pa
                 else:
                     reference_pressure_pa = units_reference_pa
-                if (
-                    buffer_relative
-                    or located_condition is None
+                # A buffer-unit log is an offset, not an absolute, and not a
+                # bounded refusal. A bar or atm log is kept even when the row
+                # also names a buffer: the printed absolute wins. An unknown
+                # log on that same row is a blank cell, not a competing point,
+                # so it must not veto the buffer offset.
+                blank_buffer_log = (
+                    located_condition is not None
+                    and located_condition.state.is_unknown
+                    and _buffer_named_in_mapping(value)
+                )
+                if _units_name_buffer(units) or blank_buffer_log:
+                    pass
+                elif (
+                    located_condition is None
                     or not isinstance(condition_value, Decimal)
                     or not condition_value.is_finite()
                     or reference_pressure_pa is None
@@ -16329,10 +16967,30 @@ def _walk_printed_oxygen(
                         False,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
-            if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
-                rejected_logs.append(True)
-                continue
             node = value if isinstance(value, Mapping) else {}
+            # A buffer row may repeat its log as a point-condition state map
+            # (`{state: {value}}`) beside fO2_log. That shape is the printed
+            # number, not a second unreadable log. Unwrap it only when this
+            # mapping also names a buffer, so other rows keep today's refusal.
+            state_wrapped_log = False
+            if (
+                name in _PRINTED_LOG_FO2_KEYS
+                and isinstance(node, Mapping)
+                and "value" not in node
+                and isinstance(node.get("state"), Mapping)
+                and _buffer_named_in_mapping(obj)
+            ):
+                state = node["state"]
+                # tag unknown is a blank cell. It is not an absolute log.
+                if state.get("tag") not in (None, "value"):
+                    continue
+                node = {**node, "value": state.get("value")}
+                value = node
+                state_wrapped_log = True
+            if name in _PRINTED_LOG_FO2_KEYS:
+                log_units = str(node.get("units") or node.get("unit") or "")
+                if _units_name_buffer(log_units):
+                    continue
             raw = value.get("value") if isinstance(value, Mapping) else value
             if isinstance(value, Mapping) and _oxygen_node_rejected(value, raw):
                 if name in _PRINTED_LOG_FO2_KEYS:
@@ -16374,7 +17032,7 @@ def _walk_printed_oxygen(
                         inference=None,
                     ),
                     reference_pressure_pa,
-                    units == "",
+                    units == "" and not state_wrapped_log,
                 ))
             else:
                 units = str(node.get("units") or node.get("unit") or "").strip()
@@ -20797,6 +21455,9 @@ class Migrator:
             raw_item=values if isinstance(values, Mapping) else None,
             row_point_conditions=row_point_conditions,
             run_temperature_K=_run_temperature_K(ident_kwargs.get("temperature_K")),
+            total_pressure_pa=_positive_pressure_pa(
+                ident_kwargs.get("total_pressure_Pa")
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -20810,6 +21471,7 @@ class Migrator:
         # Residue fO2 is the printed-only promotion above. The generic
         # decision covers every other quantity, including a derived ratio
         # copied from the row point.
+        oxygen_applied = False
         if (
             q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -20818,6 +21480,7 @@ class Migrator:
             )
         ):
             ident_kwargs["fO2_Pa"] = oxygen_state
+            oxygen_applied = True
         starting_bulk_notices: list[Notice] = []
         if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
             experiment = self.result.experiments.get(experiment_id)
@@ -20911,6 +21574,15 @@ class Migrator:
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
         )
+        refreshed_oxygen = _refresh_buffer_decision(
+            oxygen_decision,
+            _positive_pressure_pa(ident_kwargs.get("total_pressure_Pa")),
+        )
+        if refreshed_oxygen is not oxygen_decision and refreshed_oxygen is not None:
+            oxygen_decision = refreshed_oxygen
+            if oxygen_applied and refreshed_oxygen.state.is_value:
+                ident_kwargs["fO2_Pa"] = refreshed_oxygen.state
+                oxygen_state = refreshed_oxygen.state
         if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             fO2_condition = (point_conditions or {}).get("fO2_log")
             raw_fO2_condition = (
@@ -21756,6 +22428,16 @@ class Migrator:
         )
         if bare_log_notice is not None:
             observation_notices.append(bare_log_notice)
+        observation_notices.extend(
+            _buffer_conversion_notices(
+                oxygen_decision,
+                ident_kwargs.get("fO2_Pa"),
+                q_token,
+                obs_id,
+                observation_notices,
+                from_fallback=oxygen_decision_fallback,
+            )
+        )
         derivation_identity_provenance = _identity_provenance_for_value_derivation(
             identity_provenance, value_derivation
         )
@@ -23204,12 +23886,16 @@ class Migrator:
             run_temperature_K=_run_temperature_K(
                 getattr(identity, "temperature_K", None)
             ),
+            total_pressure_pa=_positive_pressure_pa(
+                getattr(identity, "total_pressure_Pa", None)
+            ),
         )
         oxygen_state = _printed_oxygen_state_for(
             identity,
             oxygen_decision,
             from_fallback=oxygen_decision_fallback,
         )
+        oxygen_applied = False
         if (
             q_token_point is not Quantity.RESIDUE_COMPONENT_COMPOSITION
             and oxygen_state is not None
@@ -23217,6 +23903,7 @@ class Migrator:
                 admission, row_point_conditions
             )
         ):
+            oxygen_applied = True
             identity = replace(identity, fO2_Pa=oxygen_state)
         experiment = self.result.experiments.get(experiment_id)
         if (
@@ -23385,6 +24072,14 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=State.of(pressure)
                     )
+        refreshed_oxygen = _refresh_buffer_decision(
+            oxygen_decision,
+            _positive_pressure_pa(getattr(identity, "total_pressure_Pa", None)),
+        )
+        if refreshed_oxygen is not oxygen_decision and refreshed_oxygen is not None:
+            oxygen_decision = refreshed_oxygen
+            if oxygen_applied and refreshed_oxygen.state.is_value:
+                identity = replace(identity, fO2_Pa=refreshed_oxygen.state)
         child_notices = list(notices)
         if gas_volume_bases and isinstance(q_token_point, Quantity):
             child_notices.append(
@@ -23520,6 +24215,16 @@ class Migrator:
         )
         if bare_log_notice is not None:
             child_notices.append(bare_log_notice)
+        child_notices.extend(
+            _buffer_conversion_notices(
+                oxygen_decision,
+                identity.fO2_Pa,
+                q_token_point,
+                point_id,
+                child_notices,
+                from_fallback=oxygen_decision_fallback,
+            )
+        )
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,

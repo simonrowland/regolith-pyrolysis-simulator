@@ -37,7 +37,9 @@ from simulator.battery.identity import (
 )
 from simulator.battery.migrate import (
     Migrator,
+    _band_text,
     _identity_from_plain,
+    _log_fO2_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
     map_quantity,
     observation_from_plain,
@@ -45,6 +47,7 @@ from simulator.battery.migrate import (
     to_plain,
     wt_pct_to_mole_fraction,
 )
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.battery.records import (
     Composition,
     Execution,
@@ -249,6 +252,17 @@ def test_sulfur_valence_forms_are_recognized_and_migrated_as_printed(tmp_path: P
     )
 
 
+def _jugo_qfm_pa(control: str) -> Decimal:
+    # Table 4 prints FMQ+2.7 through FMQ-1.4. 200 MPa is 2000 bar.
+    offset = Decimal(str(control).replace("FMQ", ""))
+    evaluation = evaluate_buffer(
+        "QFM",
+        Decimal("1323.15"),
+        pressure_bar=Decimal(2000),
+    )
+    return _log_fO2_to_pa(evaluation.log10_fO2_bar + offset)
+
+
 def test_jugo_2010_table4_values_and_conditions_match_render():
     extract = yaml.safe_load(JUGO_S.read_text(encoding="utf-8"))
     table4 = next(
@@ -331,8 +345,10 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         and row.identity.total_pressure_Pa.is_value
         and row.identity.total_pressure_Pa.value == Decimal("200000000")
         and row.identity.fO2_Pa is not None
-        and row.identity.fO2_Pa.is_unknown
-        and row.identity.fO2_Pa.reason.startswith("buffer-relative fO2 (")
+        and row.identity.fO2_Pa.is_value
+        and row.identity.fO2_Pa.value == _jugo_qfm_pa(
+            row.point_conditions["fO2_control"].state.value
+        )
         and row.point_conditions["temperature_K"].state.value == Decimal("1323.15")
         and row.point_conditions["temperature_K"].locator.pdf_page_index == 7
         and row.point_conditions["pressure_MPa"].state.value == Decimal("200")
@@ -340,6 +356,27 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         and row.point_conditions["composition"].locator.published_page == 5928
         for row in rows
     )
+    qfm = evaluate_buffer(
+        "QFM", Decimal("1323.15"), pressure_bar=Decimal(2000)
+    )
+    for row in rows:
+        converted = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ]
+        assert len(converted) == 1
+        assert converted[0].authority is Authority.CERTIFIED
+        assert converted[0].band == _band_text(qfm.band_dex)
+        assert "calibration=oneill1987_mu" in converted[0].reason
+        assert "P_bar=2000" in converted[0].reason
+        assert "pressure_coefficient_spread=yes" in converted[0].reason
+        assert "authority=certified" in converted[0].reason
+        assert not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.reason == converted[0].reason
+            for notice in row.notices
+        )
     fit = migrator.result.observations[
         "jugo-2010-sulfur-xanes::jugo_2010_eq10_sulfate_fraction_vs_delta_fmq_fit"
     ]
