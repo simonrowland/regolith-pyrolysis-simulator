@@ -3924,9 +3924,22 @@ species:
       units: atm as published
       values:
         quantity: p_sat
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Ohara et al. (1987), JANAF Thermochemical Tables NSRDS-NBS (1971), Supplement (1974), extrapolated P4O10(s) free energy from 1500 K to 1643 K
+        method_class: model_derived
+        evidence_class: model_derived
+        derivation:
+          relation: >-
+            The authors used JANAF standard free energies and extrapolated the
+            P4O10(s) formation free energy from 1500 K to 1643 K, obtaining the
+            P4O10(g) saturation pressure from the printed equilibrium relations
+            (7) and (8).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator: {page: 3, published_page: 1338, pdf_page_index: 2, section: '2.2'}
+          method:
+            state: {tag: value, value: JANAF standard free energies with the authors' 1500-to-1643 K P4O10(s) extrapolation and equilibrium calculation.}
+            locator: {page: 3, published_page: 1338, pdf_page_index: 2, section: '2.3', equation: '7-8'}
+          references:
+            - 'Reference [8]: JANAF Thermochemical Tables, NSRDS-NBS (1971), Supplement (1974).'
         T_K: 1643.0
         p_atm: 700
       uncertainty:
