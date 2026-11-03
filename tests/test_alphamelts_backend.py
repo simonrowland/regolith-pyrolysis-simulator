@@ -10247,6 +10247,26 @@ def test_alphamelts_transport_config_pin_before_shared_validation(
         assert expected is None
 
 
+def test_thermoengine_public_config_subfloor_oxygen_is_predicted_and_flagged(
+    monkeypatch,
+):
+    # Successor to the removed ThermoEngine public-config 1e-10 refusal case:
+    # below the vacuum floor the value is kept and carries an extrapolated flag.
+    from simulator.environment import vacuum_floor_bar_for_environment
+
+    gas_bar = 1e-10
+    floor = vacuum_floor_bar_for_environment()
+    assert gas_bar < floor
+    backend = ThermoEngineBackend()
+    assert _initialize_melts_transport_for_oxygen_test(
+        backend, monkeypatch, {'vapor_transport_pO2_bar': gas_bar},
+    )
+    expected = _expected_transport_oxygen_notice(gas_bar, floor)
+    assert backend._vapor_transport_pO2_bar == gas_bar
+    assert backend._transport_pO2_extrapolation_notice == expected
+    assert 'authority_level=extrapolated' in expected
+
+
 @pytest.mark.parametrize('gas_bar', [0.0, float('nan'), float('inf')])
 def test_alphamelts_transport_config_refusal_pin_before_shared_validation(
     monkeypatch, gas_bar,
