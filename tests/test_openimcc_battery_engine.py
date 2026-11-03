@@ -1420,6 +1420,42 @@ def test_vapor_engine_uses_family_reason_for_untyped_start_grid_refusals(
     )
 
 
+def test_vapor_engine_keeps_mixed_noncrash_start_refusals_in_family() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        reason, engine_reason = (
+            ("gate_refused_in_adapter", "silicate_window")
+            if logp == -6
+            else ("out_of_basis", "temperature_range")
+        )
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason=reason,
+            engine_reason=engine_reason,
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert str(exc_info.value) == (
+        "oxygen_balance_no_admitted_bracket: no admitted starting cell in "
+        "log10(pO2/bar) range [-30, 0]; last_admitted_pO2_bar=none; "
+        "starting-cell guard refusals: gate_refused_in_adapter: silicate_window: "
+        "1, out_of_basis: temperature_range: 30"
+    )
+
+
 def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _OxygenBalanceRefusal,
