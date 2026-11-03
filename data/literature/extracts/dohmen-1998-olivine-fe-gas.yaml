@@ -29,8 +29,10 @@ source_caveats:
   note: >-
     This is the printed iron-wustite buffer pressure, not a KMS O2 measurement;
     the paper says O2 was not detected in V892, V914, or V929. It is attached
-    only to the Fe+wustite runs at 1400 C, V929 and V932. V892 and V914 are
-    stated to be below the buffer value, without a printed absolute point.
+    only to V929, the named iron+wustite run. Table 1 also lists Fe + wustite
+    for V932, but the prose does not name V932 for this absolute buffer value.
+    V892 and V914 are stated to be below the buffer value, without a printed
+    absolute point.
 - locator:
     page: 6
     pdf_page_index: 5
@@ -38,9 +40,9 @@ source_caveats:
     section: Results, Olivine composition
   quote: 'V937 (Fa = 70 mol%)'
   note: >-
-    Table 1 gives the V937 product as Fa74Fo26. Both printed forms are retained
-    in the table audit; the prose value is treated as a rounded statement, not
-    as a replacement for the table cell.
+    Results prose gives Fa = 70 mol%, while Table 1 gives Fa74Fo26. The two
+    printed forms differ; both are retained, and neither is treated as a
+    correction or replacement for the other.
 - locator:
     page: 4
     pdf_page_index: 3
@@ -68,6 +70,95 @@ source_caveats:
     electron microprobe analysis. The paper does not describe the V937 assay as
     bulk wet chemistry or a defocused-beam average, so its measured phase
     remains unknown.
+- locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 973
+    section: Experiments
+  quote: >-
+    Oriented single crystals of olivines (forsterite, Fo100, or San Carlos
+    olivine, Fo92), polished on one side, were used to study the exact mechanism
+    of the reaction.
+  note: >-
+    This page-level statement identifies San Carlos olivine as Fo92. Table 1
+    remains transcribed as printed; the later Fo90-92 and run-specific
+    statements are preserved separately without choosing a composition.
+- locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 976
+    section: Single-crystal experiments
+  quote: >-
+    The crystals used were either pieces of synthetic forsterite (white in
+    color, Fo100) or San Carlos olivine (pale green, Fo90-92).
+  note: >-
+    This prose gives the San Carlos starting crystal as Fo90-92. Table 1 is
+    retained as printed; the differing composition statements are not
+    reconciled by this extract.
+- locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 976
+    section: Single-crystal experiments
+  quote: >-
+    In one case (V932), two single crystals of both compositions were placed
+    next to, but not touching, each other.
+  note: >-
+    The prose reports two V932 olivine crystals. Table 1 is preserved verbatim
+    and no V932 table position is rewritten from this sentence.
+- locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 976
+    figure: '7'
+  quote: >-
+    BSE of forsterite (a) and San Carlos olivine (both experiment V933) (c)
+    with thick film of overgrown Fe-rich olivine; (b) and (d): enlargement of
+    fayalite-rich regions in (a) and (c), respectively.
+  note: >-
+    Figure 7 assigns both crystal images to V933. Table 1's starting-material
+    rows remain unchanged; this conflicting run assignment is retained without
+    choosing which account is correct.
+- locator:
+    page: 10
+    pdf_page_index: 9
+    published_page: 979
+  quote: >-
+    This is seen clearly in experiment V932 where two single crystals of
+    olivine (Fo100 and Fo92) were used simultaneously.
+  note: >-
+    This Results statement also names Fo100 and Fo92 for V932. It is kept
+    separately from the Table 1 grid and the page-7 description; no account is
+    selected over the others.
+- locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 976
+    figure: '7'
+  quote: >-
+    The extreme iron enrichment, leading to the formation of molten olivine
+    (dark glass) near the top of the overgrown film is seen clearly in the
+    photographs with crossed polarizers.
+  note: >-
+    Figure 7 identifies the pictured San Carlos olivine crystal as experiment
+    V933. This glass description belongs to V933 and does not identify the
+    measured phase of the separate V937 product.
+- locator:
+    page: 8
+    pdf_page_index: 7
+    published_page: 977
+    section: Single-crystal experiments
+  quote: >-
+    sections from experiment V933 show that the films are made up of olivine
+    that is optically continuous with the substrate and grades into a glassy
+    region near the top of the layer (Figs. 7e–7h). This glass is seen to
+    penetrate and flow through cracks in the film and the substrate. It shows
+    that small volumes of fayalitic glass can be quenched even with cooling
+    rates as slow as 20 °C/min, as in our experiments.
+  note: >-
+    These sentences describe glass in V933 films and state that small volumes
+    of fayalitic glass can be quenched at the reported slow cooling rate. They
+    do not identify the measured phase of V937, whose phase remains unknown.
 - locator:
     page: 2
     pdf_page_index: 1
@@ -249,7 +340,7 @@ experiments:
     pdf_page_index: 2
     published_page: 972
     section: Interpretations
-    note: The 1 ATM EXPERIMENTS section covers this run; the gas composition and duration are not stated for this run.
+    note: The section heading is on page 2; this page-3 powder-test paragraph does not state a total pressure.
   conditions:
     temperature_K:
       state:
@@ -276,19 +367,9 @@ experiments:
         section: Interpretations
         note: Printed fO2 is 10^-11 bar.
   pressure_environment:
-    total_pressure_as_printed: 1 atm
     total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '101325'
-      locator:
-        page: 3
-        pdf_page_index: 2
-        published_page: 972
-        section: Interpretations
-        note: The section heading is 1 ATM EXPERIMENTS.
+      state: {tag: unknown, reason: no total pressure is printed for the 1600 C powder test}
+      locator: {page: 3, pdf_page_index: 2, published_page: 972, section: Interpretations}
     sweep_gas:
       state: {tag: unknown, reason: gas composition and flow not published for this run}
       locator:
@@ -495,8 +576,8 @@ experiments:
       state: {tag: value, value: {kind: point, point: '1673.15'}}
       locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V932, note: Anneal at 1400 C.}
     fO2_Pa:
-      state: {tag: value, value: {kind: point, point: '0.00002', approximate: true}}
-      locator: {page: 6, pdf_page_index: 5, published_page: 975, section: 'Results, Gas phase composition', note: Printed IW buffer pressure is approximately 2.0 x 10^-10 bar at 1400 C; Table 1 gives Fe + wustite.}
+      state: {tag: unknown, reason: 'Table 1 gives Fe + wustite for V932, but the text does not assign it the absolute IW buffer pressure'}
+      locator: {page: 4, pdf_page_index: 3, published_page: 973, table: '1', row: V932}
   pressure_environment:
     total_pressure_as_printed: 10^-8-10^-10 bar chamber vacuum
     total_pressure_Pa:
@@ -837,12 +918,12 @@ species:
           position_A: 'Fe + wustite (synthetic, polycrystalline)'
           position_B: 'Fo100 (synthetic, polycrystalline)'
           thermal_history: '(a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 22 h; (c) heat to 1400 C (5 C/min)'
-          product: 'Fa26Fo74; individual grains unzoned'
+          product: 'Fa26Fo74; individual grains unzoned†'
         - run: V932
           position_A: 'Fe + wustite (synthetic, polycrystalline)'
           position_B: 'San Carlos olivine (single crystal)'
           thermal_history: '(a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 20 h'
-          product: 'Fayalitic films'
+          product: 'Fayalitic films†'
         - run: V933
           position_A: 'Fe (synthetic, polycrystalline)'
           position_B: 'Fo90 + Fo100 (synthetic single crystals)'
@@ -852,14 +933,15 @@ species:
           position_A: 'Fe + magnetite (synthetic, polycrystalline)'
           position_B: 'Fo100 (synthetic, polycrystalline)'
           thermal_history: '(a) heat to 1400 C (5 C/min); (b) anneal at 1400 C for 20 h'
-          product: 'Molten sample: Fa74Fo26'
+          product: 'Molten sample: Fa74Fo26†'
         footnotes:
         - '* Always cooled at 20 C/min.'
         - '† Spinel formation on alumina crucible cell.'
         reconciliation_note: >-
           The rendered Table 1 confirms seven body rows. The product column is
           read cell-by-cell from the render; in particular the rendered V937
-          table cell is Fa74Fo26, while the Results prose rounds it to Fa70.
+          Table 1 reads Fa74Fo26†, while Results prose states Fa = 70 mol%; both
+          printed forms are retained without reconciling them.
     - observation_id: dohmen_1998_text_kems_gas_detection
       type: measured_numeric_context
       locator:
@@ -924,3 +1006,21 @@ species:
         - {figure: '10', page: 10, pdf_page_index: 9, published_page: 979, subject: 'Mg partial pressures for single-crystal and polycrystalline samples.'}
         - {figure: '11', page: 11, pdf_page_index: 10, published_page: 980, subject: 'reaction and gas-transport mechanism schematic.'}
         - {figure: '12', page: 12, pdf_page_index: 11, published_page: 981, subject: 'model simulations of reaction progress and gas partial pressures.'}
+  Ni:
+    observations: []
+    context:
+    - observation_id: dohmen_1998_text_v932_nickel_content
+      type: measured_numeric_context
+      locator:
+        page: 8
+        pdf_page_index: 7
+        published_page: 977
+        section: Single-crystal experiments
+      units: mass ppm
+      values:
+        quantity_as_printed: Ni content across the V932 crystal-film boundary
+        method_class: measured_direct
+        basis: ppm_mass
+        experiment: V932
+        original_crystal_as_published: 'approximately 3000 ppm'
+        film_as_published: '<100 ppm'

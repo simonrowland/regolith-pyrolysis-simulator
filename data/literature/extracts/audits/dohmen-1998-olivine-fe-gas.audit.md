@@ -4,8 +4,9 @@
 
 This is a new extract for the olivine–Fe vapor-transport study. It adds no
 measurements from Dohmen et al. (2003); that extract covers the distinct SC1–SC6
-series. The 1998 paper reports three 1-atm experiments and seven Knudsen-cell
-runs. Table 1 has seven printed rows: V892, V893, V914, V929, V932, V933, V937.
+series. The paper describes the diffusion-couple experiment under the “1 atm
+experiments” heading and a thin-foil repeat, plus seven Knudsen-cell runs.
+Table 1 has seven printed rows: V892, V893, V914, V929, V932, V933, V937.
 
 The machine inputs were the corpus MinerU table/markdown and the full
 `pdftotext-layout.txt`. The source PDF SHA-256 is
@@ -50,6 +51,8 @@ that the Fa74Fo26 assay was post-run. The source does not identify the
 post-cooling phase or describe the analysis as bulk wet chemistry or a
 defocused-beam average. Since the sample was cooled at 20 °C/min, the measured
 phase is stored as typed unknown; neither glass nor in-situ liquid is inferred.
+The product-cell daggers are retained for V929, V932, and V937, binding the
+“Spinel formation on alumina crucible cell” footnote to those three rows.
 
 The starting materials are recorded per run in Table 1 positions A and B.
 These are separate solids in a diffusion couple, not a printed bulk melt
@@ -68,13 +71,35 @@ V929, and one each for V893, V932, V933, and V937.
 |---|---|---|
 | 1-atm diffusion couple: 1300 °C, fO2 = 10^-12 bar, 115 h; CO+CO2 flowing gas; pressure stated as 1 atm | 2, section “1 atm experiments” | (b), page 2 render; the temperature, exponent, duration, and pressure were checked together |
 | Thin-Fe-foil repeat uses the conditions above and gives the same result | 3, Interpretations | (b), page 3 render; this is a repeated run, not another independent composition point |
-| Fe metal + forsterite powder test: 1600 °C, fO2 = 10^-11 bar; duration and gas ratio are not stated | 3, Interpretations under “1 ATM EXPERIMENTS” | (b), page 3 render; no duration or gas ratio was invented |
+| Fe metal + forsterite powder test: 1600 °C, fO2 = 10^-11 bar; pressure, duration, and gas ratio are not stated | 3, Interpretations | (b), page 3 render; total pressure stays unknown; the section heading is on page 2 and is not assigned as a run pressure |
 | KEMS cell and heater were in 10^-8–10^-10 bar chamber vacuum | 3, Knudsen-cell experiments / Setup | (b), page 3 render; this is chamber background, not a measured in-cell sample total pressure |
 | Gas species become detectable above about 1100 °C; Mg signal is observable at 1100–1400 °C | 5, Results / Gas phase composition | (b), page 5 render |
 | Dominant gases are SiO, O2, O, Mg; SiO is identified by isotope peaks during later 1400 °C annealing after CO2 degassing | 5, Results / Gas phase composition | (b), page 5 render; no plotted partial-pressure point was digitized |
-| At 1400 °C the iron–wüstite buffer pO2 is approximately 2.0×10^-10 bar; KMS O2 sensitivity is about 10^-10 bar; O2 was not detected for V892, V914, or V929 | 6, Results / Gas phase composition | (b), page 6 render checks the exponents and run names; the buffer value is not an O2 KMS measurement |
+| At 1400 °C the iron–wüstite buffer pO2 is approximately 2.0×10^-10 bar; KMS O2 sensitivity is about 10^-10 bar; O2 was not detected for V892, V914, or V929 | 6, Results / Gas phase composition | (b), page 6 render checks the exponents and run names; the approximate buffer pressure is attached to V929 only, not V932 |
 | Single-crystal Fe-rich olivine films reach up to 300 μm | 7, Single-crystal experiments | (b), page 7 render; retained as measured numeric context because no exact thickness quantity/type exists |
-| V937 is Fa = 70 mol% in prose; Table 1 prints Fa74Fo26 | 6 and 4, respectively | (b), pages 6 and 4 renders; both forms are kept, not reconciled by replacing the table cell |
+| V932 Ni content: original crystal approximately 3000 ppm; film <100 ppm | 8, V932 | (a)+(b), MinerU and `pdftotext` agree, and page 8 render confirms both values; stored as mass ppm with `ppm_mass` basis (`simulator/battery/enums.py::PHASE_BASIS_TOKENS`) |
+| V937 is Fa = 70 mol% in prose; Table 1 prints Fa74Fo26 | 6 and 4, respectively | (b), pages 6 and 4 renders; both differing forms are retained without treating either as a correction |
+
+### Conflicting starting-crystal descriptions
+
+Table 1 remains transcribed as printed. The paper separately gives these
+starting-crystal descriptions and assignments, which conflict with or add detail
+to the grid; each is preserved as a located source caveat without choosing a
+winner.
+
+| Printed statement | PDF page | Verification |
+|---|---:|---|
+| San Carlos olivine is Fo92 | 4 | MinerU and `pdftotext` agree; page 4 render confirms the statement |
+| San Carlos olivine is Fo90-92 | 7 | MinerU and `pdftotext` agree; page 7 render confirms the statement |
+| V932 used two single crystals of both compositions, placed next to but not touching | 7 | MinerU and `pdftotext` agree; page 7 render confirms the statement |
+| Figure 7 identifies forsterite and San Carlos olivine images as experiment V933 | 7 | MinerU caption and page 7 render agree |
+| V932 used Fo100 and Fo92 simultaneously | 10 | MinerU and `pdftotext` agree; page 10 render confirms the statement |
+
+The paper also identifies glass specifically on V933. Figure 7 calls the
+overgrown material “molten olivine (dark glass)” and assigns the pictured San
+Carlos crystal to V933 (page 7). The text says V933 films grade into a glassy
+region and that small volumes of fayalitic glass can be quenched at 20 °C/min
+(page 8). These statements apply to V933; V937 remains typed-unknown phase.
 
 The reported 60 μm diffusion profile is explicitly attributed to Chakraborty
 (1997), not to this paper's experiment, so it is not attributed to Dohmen et al.
@@ -94,16 +119,19 @@ quantity is non-equilibrium crystalline olivine endmember composition:
 `tools/validate_literature_extracts.py::OBSERVATION_TYPES`, but it has no
 mapping in `simulator/battery/migrate.py::TYPE_QUANTITY`, and no exact alias in
 `simulator/battery/migrate.py::QUANTITY_ALIASES`. The closest candidate,
-`Quantity.EQUILIBRIUM_PHASE_COMPOSITION`, describes equilibrium phase data;
+`simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION`, describes equilibrium phase data;
 these products are not asserted to have reached equilibrium. Its phase-row
-reader also uses the closed `PhaseRole` set, which has no olivine role. The
-`PHASE_BASIS_TOKENS` set is a basis vocabulary, not a quantity token. The
+reader also uses the closed `simulator/battery/enums.py::PhaseRole` set, which
+has no olivine role. `simulator/battery/enums.py::PHASE_BASIS_TOKENS` is a basis
+vocabulary, not a quantity token. The
 `park-2021-vanadium-thermodynamics-thesis.yaml` precedent is explicitly
 equilibrated Pt–V metal and does not type these post-run olivine products.
 
 The measured “up to 300 μm” film thickness is retained as context with a
-schema-gap note: the closed observation types and quantity tokens do not
-provide a thickness measurement. It is not relabelled as concentration or
+schema-gap note: `tools/validate_literature_extracts.py::OBSERVATION_TYPES`,
+`simulator/battery/migrate.py::TYPE_QUANTITY`, and
+`simulator/battery/migrate.py::QUANTITY_ALIASES` provide no exact thickness
+measurement type or quantity token. It is not relabelled as concentration or
 pressure. V937 is also retained as a typed observation with its measured phase
 unknown; its run state “Molten sample” and after-run characterization remain
 separately located.
@@ -130,7 +158,7 @@ duration on the 1600 °C test remain unknown.
 
 Table 1's V937 Fa74Fo26 cell is both in the full seven-row context record and a
 typed-unknown-phase observation. The expected store delta is one work record,
-ten experiment records, four context records, and five typed-refused
+ten experiment records, five context records, and five typed-refused
 observations; no generated store files are committed.
 
 The isolated migration printed the identity axes for the first three migrated
@@ -151,26 +179,28 @@ is mapped from Table 1.
 These `composition_series` rows have no quantity profile because the quantity
 is typed-refused, so the identity axes other than temperature are unavailable
 to the profile. The run-linked experiment records retain the reported
-conditions: V929 and V932 have the printed Fe–FeO buffer pressure of
-approximately 2.0×10^-10 bar; V892 and V914 retain the below-buffer statement;
-the remaining runs have no absolute fO2 point. All seven Table 1 positions A
-and B remain tied to their run IDs in the full grid. The only reported total
-pressure for the KEMS work is the chamber background interval; the extract
-does not promote it to an in-cell sample pressure.
+conditions: V929 alone has the printed Fe–FeO buffer pressure of approximately
+2.0×10^-10 bar; V932 retains its Table 1 Fe + wüstite buffer channel but has
+unknown absolute fO2. V892 and V914 retain the below-buffer statement; the
+remaining runs have no absolute fO2 point. All seven Table 1 positions A and B
+remain tied to their run IDs in the full grid. The only reported total pressure
+for the KEMS work is the chamber background interval; the extract does not
+promote it to an in-cell sample pressure. The separate 1600 °C powder test has
+unknown total pressure because page 3 does not print one.
 
 The table draft compare command completed with `matched=0`, `mismatch=0`, and
 `total=0`: its seven Table 1 records are prose cells which the numeric compare
 tool does not match. The render transcription and row count are therefore
-verified independently in the focused test. The comma-scalar YAML guard passed
-all 17 tests.
+verified independently in the focused test.
 
-The focused migration test passed all three cases, including its deliberate
-Table 1 product mutation check. The extract-specific literature validator
-passed. The repo-wide fidelity-sample parameterization has 637 extract cases;
-its `-k dohmen` rerun passed both Dohmen cases, including this extract after
-the V937 addition.
-The full `tests/test_literature_extracts.py`
-run and the all-extract validator case exceeded their 300-second local caps;
-the repository suite is **UNVERIFIED-local** beyond the passing filtered
-cases. A filtered general slice recorded 157 passing cases before it was
-interrupted; the remaining selected cases are unverified.
+The focused extract tests passed all three cases (2.94 s). They pin the rendered
+Table 1 transcription and include a deliberate changed-product check that must
+fail; they also pin the V932 Ni values after migration and the unknown
+powder-test pressure. The reviewer's pre-fix on-disk mutations independently
+showed that changing the Table 1 product or V937 phase makes the focused tests
+fail. The YAML comma-scalar guard passed all 17 cases (81.58 s), and the
+extract-specific validator reported one valid file. The repo-wide fidelity
+filter for the 1998 and 2003 Dohmen extracts passed both cases (891 deselected,
+43.02 s). The full `tests/test_literature_extracts.py` run reached 128 passing
+tests before it was stopped at its 300-second cap; the remaining suite is
+**UNVERIFIED-local**.
