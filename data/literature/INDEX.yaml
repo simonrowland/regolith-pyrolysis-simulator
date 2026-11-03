@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 745
-  extracts: 743
+  sources: 746
+  extracts: 744
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 743
+  extracts_without_pdf: 744
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -429,6 +429,7 @@ gaps:
   - naess-2014-liquid-silicon-oxidation-fume-flux
   - nagabayashi-hino-banya-1989-phosphorus
   - nagahara-2000-metsoc63-5166
+  - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
   - nagahara-ozawa-1999-forsterite-surface-microstructures
   - nagata-1989-emf-calcium-aluminates
   - nakamura-2022-science-ryugu-thermal
@@ -25312,6 +25313,64 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+  aliases: []
+  citation: Nagahara, H. and Ozawa, K. (1996), ‘Evaporation of forsterite in H2 gas’, Geochimica et Cosmochimica
+    Acta 60, 1445–1458.
+  doi: 10.1016/0016-7037(96)00014-2
+  report_number: null
+  identifier: 10.1016/0016-7037(96)00014-2
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
+    review_status: draft
+    rows: 191
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.pdf
+      present: true
+      sha256: 20e076cded33e4b4beede5019e4d3780ed14a0363a01a5b6991f1347ef80b709
+      matches_simulator: null
+    sidecar:
+      path: raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      exists: true
+      file_count: 12
+    tables:
+      path: tables/nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
   aliases: []
   citation: Nagahara, Hiroko and Ozawa, Kazuhito (1999), "Mechanism of forsterite evaporation as inferred

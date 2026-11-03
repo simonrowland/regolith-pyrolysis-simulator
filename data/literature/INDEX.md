@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 745
-- Extracts (`literature_extract.v1`): 743
+- Sources: 746
+- Extracts (`literature_extract.v1`): 744
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 743
+- Extracts with no PDF: 744
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -437,6 +437,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `naess-2014-liquid-silicon-oxidation-fume-flux` | M. K. Næss, J. E. Olsen, S. Andersson, G. Tranell (2014), "Parameters Affecting the Rate and Product of Liquid Silicon Oxidation", Oxidation of Metals 82:395–413. | 10.1007/s11085-014-9498-z | ABSENT, `` | `raw/naess-2014-liquid-silicon-oxidation-fume-flux/naess-2014-liquid-silicon-oxidation-fume-flux.pdf` (present, d3b93bc2); `text/naess-2014-liquid-silicon-oxidation-fume-flux/` (1 files, exists); `tables/naess-2014-liquid-silicon-oxidation-fume-flux/` (0 files, ABSENT) | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` (0 rows, draft) | `ledger/naess-2014-liquid-silicon-oxidation-fume-flux.yaml`: — (—) |
 | `nagabayashi-hino-banya-1989-phosphorus` | Nagabayashi, R., Hino, M. & Ban-ya, S. (1989), "Mathematical Expression of Phosphorus Distribution in Steelmaking Process by Quadratic Formalism", ISIJ International 29(2):140-147. |  | ABSENT, `` | `raw/nagabayashi-hino-banya-1989-phosphorus/nagabayashi-hino-banya-1989-phosphorus.pdf` (present, 5662bae5); `text/nagabayashi-hino-banya-1989-phosphorus/` (55 files, exists); `tables/nagabayashi-hino-banya-1989-phosphorus/` (0 files, ABSENT) | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` (10 rows, draft, private_path) | `ledger/nagabayashi-hino-banya-1989-phosphorus.yaml`: acquired (2026-09-06) |
 | `nagahara-2000-metsoc63-5166` | Nagahara, H. (2000). Chemical fractionation in the presence of ambient gas. 63rd Annual Meteoritical Society Meeting, abstract 5166. |  | ABSENT, `` | `raw/nagahara-2000-metsoc63-5166/nagahara-2000-metsoc63-5166.pdf` (present, e6d107da); `text/nagahara-2000-metsoc63-5166/` (3 files, exists); `tables/nagahara-2000-metsoc63-5166/` (0 files, ABSENT) | `data/literature/extracts/nagahara-2000-metsoc63-5166.yaml` (0 rows, draft) | `ledger/nagahara-2000-metsoc63-5166.yaml`: extracted (2026-10-05) |
+| `nagahara-ozawa-1996-forsterite-hydrogen-evaporation` | Nagahara, H. and Ozawa, K. (1996), ‘Evaporation of forsterite in H2 gas’, Geochimica et Cosmochimica Acta 60, 1445–1458. | 10.1016/0016-7037(96)00014-2 | ABSENT, `` | `raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.pdf` (present, 20e076cd); `text/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/` (12 files, exists); `tables/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/` (0 files, ABSENT) | `data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml` (191 rows, draft) | `ledger/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml`: — (—) |
 | `nagahara-ozawa-1999-forsterite-surface-microstructures` | Nagahara, Hiroko and Ozawa, Kazuhito (1999), "Mechanism of forsterite evaporation as inferred from surface microstructures", Proceedings of the Japan Academy, Series B 75:29-34. | 10.2183/pjab.75.29 | ABSENT, `` | `raw/nagahara-ozawa-1999-forsterite-surface-microstructures/nagahara-ozawa-1999-forsterite-surface-microstructures.pdf` (present, 463f1680); `text/nagahara-ozawa-1999-forsterite-surface-microstructures/` (25 files, exists); `tables/nagahara-ozawa-1999-forsterite-surface-microstructures/` (0 files, ABSENT) | `data/literature/extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml` (5 rows, draft) | `ledger/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml`: decoded (2026-09-06) |
 | `nagata-1989-emf-calcium-aluminates` | K. Nagata, J. Tanabe, K. S. Goto, "Standard Free Energies of Formation of CaO-Al2O3 Intermediate Compounds by Means of EMF Measurement of Galvanic Cells", Tetsu-to-Hagane 75 (1989) No. 11, 2023–2030. | 10.2355/tetsutohagane1955.75.11_2023 | ABSENT, `` | `raw/nagata-1989-emf-calcium-aluminates/nagata-1989-emf-calcium-aluminates.pdf` (present, 22250de4); `text/nagata-1989-emf-calcium-aluminates/` (45 files, exists); `tables/nagata-1989-emf-calcium-aluminates/` (0 files, ABSENT) | `data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml` (1 rows, draft) | `ledger/nagata-1989-emf-calcium-aluminates.yaml`: acquired (2026-10-04) |
 | `nakamura-2022-science-ryugu-thermal` | Nakamura, T. et al. (2023), "Formation and evolution of carbonaceous asteroid Ryugu: Direct evidence from returned samples", Science 379, eabn8671. | 10.1126/science.abn8671 | ABSENT, `` | `raw/nakamura-2022-science-ryugu-thermal/nakamura-2022-science-ryugu-thermal.pdf` (present, 777f0aa4); `text/nakamura-2022-science-ryugu-thermal/` (45 files, exists); `tables/nakamura-2022-science-ryugu-thermal/` (0 files, ABSENT) | `data/literature/extracts/nakamura-2022-science-ryugu-thermal.yaml` (3 rows, draft) | `ledger/nakamura-2022-science-ryugu-thermal.yaml`: decoded (2026-09-06) |
@@ -1189,6 +1190,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `naess-2014-liquid-silicon-oxidation-fume-flux`
 - `nagabayashi-hino-banya-1989-phosphorus`
 - `nagahara-2000-metsoc63-5166`
+- `nagahara-ozawa-1996-forsterite-hydrogen-evaporation`
 - `nagahara-ozawa-1999-forsterite-surface-microstructures`
 - `nagata-1989-emf-calcium-aluminates`
 - `nakamura-2022-science-ryugu-thermal`

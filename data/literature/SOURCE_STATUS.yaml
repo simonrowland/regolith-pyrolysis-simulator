@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2289
+  sources: 2290
   by_stage:
     located: 209
     inbox: 1268
-    in_progress: 222
+    in_progress: 223
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -40,7 +40,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 320
+      count: 321
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -226,6 +226,7 @@ anti_loss:
       - mueller-2004-alkali-oxide-activity-coal-ash
       - myers-jacobson-2015-volatile-metal-hydroxides-presentation
       - naess-2014-liquid-silicon-oxidation-fume-flux
+      - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
       - nagata-1989-emf-calcium-aluminates
       - nam-2025-cmas-vanadium-thesis
       - nazarov-2015-dhofar-silicides
@@ -24741,6 +24742,16 @@ sources:
     decided_by: in_progress
     artefacts:
     - data/literature/extracts/nagahara-2000-metsoc63-5166.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
