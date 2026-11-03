@@ -1202,6 +1202,51 @@ def test_cell_oxygen_balance_keeps_above_knudsen_reason_code() -> None:
     )
 
 
+def test_vapor_engine_records_outer_above_one_bar_same_sign_evidence() -> None:
+    _require_oxygen_balance()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        if logp < -3:
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="engine_crash",
+                engine_reason="subprocess_died",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={
+                "K": 1e-6 * po2_bar**-0.25 * 1e5,
+            },
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert (
+        exc_info.value.reason_code
+        == "oxygen_balance_no_admitted_bracket:same_sign_residual"
+    )
+    detail = str(exc_info.value)
+    assert "root lies above pO2 = 1 bar" in detail
+    assert "F(high)=-7.996336597883851e-08" in detail
+    assert "log10(pO2/bar)=(-3, 0)" in detail
+    assert "F(low)=" in detail
+    assert "Kn << 1 at the orifice" in detail
+    assert "It is not a solver miss" in detail
+
+
 def test_oxygen_bracket_reason_suffixes_share_refusal_census_family() -> None:
     from simulator.battery.score import refusal_census_payloads
 
