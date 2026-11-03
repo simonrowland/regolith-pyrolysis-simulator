@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 748
-  extracts: 746
+  sources: 749
+  extracts: 747
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 746
+  extracts_without_pdf: 747
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -189,6 +189,7 @@ gaps:
   - he-2017-karrooite-ordering-heat-capacity
   - henao-2001-ni-cr-mn-co-cu-slag-distribution
   - hendrix-2024-reactivity-reduced-simulants
+  - hertl-1967-solid-sio-disproportionation-vaporization
   - hino-1997-secondary-slag-activities
   - hirashima-1974-cr-redox-phosphate-glass
   - holappa-xiao-2004-ferroalloy-slag-review
@@ -11357,6 +11358,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  aliases: []
+  citation: Hertl, W., and Pultz, W. W. (1967). Disproportionation and vaporization of solid silicon monoxide.
+    Journal of the American Ceramic Society, 50(7), 378–381.
+  doi: 10.1111/j.1151-2916.1967.tb15135.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1967.tb15135.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/hertl-1967-solid-sio-disproportionation-vaporization/hertl-1967-solid-sio-disproportionation-vaporization.pdf
+      present: true
+      sha256: 892e01af79bb17d1eeceef91c5038a934b4906e4ee5e2748464aa08f7972703c
+      matches_simulator: null
+    sidecar:
+      path: raw/hertl-1967-solid-sio-disproportionation-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/hertl-1967-solid-sio-disproportionation-vaporization
+      exists: true
+      file_count: 19
+    tables:
+      path: tables/hertl-1967-solid-sio-disproportionation-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: hino-1997-secondary-slag-activities
   aliases: []
   citation: Hino, M., Kinoshita, S., Ehara, Y., Itoh, H. and Ban-Ya, S. (1997), ‘Activity Measurement

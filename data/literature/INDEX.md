@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 748
-- Extracts (`literature_extract.v1`): 746
+- Sources: 749
+- Extracts (`literature_extract.v1`): 747
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 746
+- Extracts with no PDF: 747
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -197,6 +197,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `he-2017-karrooite-ordering-heat-capacity` | He, M., Winkler, B., Bauer, J. D., Bayarjargal, L., Ruiz-Fuertes, J., Alencar, I., Morgenroth, W., Refson, K., and Milman, V. (2017). Lattice dynamics and Mg/Ti order in orthorhombic pseudobrookite-type MgTi2O5. Journal of Alloys and Compounds, 699, 16–24. | 10.1016/j.jallcom.2016.12.217 | ABSENT, `` | `raw/he-2017-karrooite-ordering-heat-capacity/he-2017-karrooite-ordering-heat-capacity.pdf` (present, 9d60b405); `text/he-2017-karrooite-ordering-heat-capacity/` (1 files, exists); `tables/he-2017-karrooite-ordering-heat-capacity/` (2 files, exists) | `data/literature/extracts/he-2017-karrooite-ordering-heat-capacity.yaml` (2 rows, draft) | `ledger/he-2017-karrooite-ordering-heat-capacity.yaml`: — (—) |
 | `henao-2001-ni-cr-mn-co-cu-slag-distribution` | Henao, H. M., Hino, M. and Itagaki, K. (2001), “Distribution of Ni, Cr, Mn, Co and Cu between Fe–Ni Alloy and FeOx–MgO–SiO2 Base Slags,” Materials Transactions 42(9), 1959–1966. DOI 10.2320/matertrans.42.1959. | 10.2320/matertrans.42.1959 | ABSENT, `` | `raw/henao-2001-ni-cr-mn-co-cu-slag-distribution/henao-2001-ni-cr-mn-co-cu-slag-distribution.pdf` (present, eeff91c3); `text/henao-2001-ni-cr-mn-co-cu-slag-distribution/` (27 files, exists); `tables/henao-2001-ni-cr-mn-co-cu-slag-distribution/` (0 files, ABSENT) | `data/literature/extracts/henao-2001-ni-cr-mn-co-cu-slag-distribution.yaml` (431 rows, draft) | `ledger/henao-2001-ni-cr-mn-co-cu-slag-distribution.yaml`: — (—) |
 | `hendrix-2024-reactivity-reduced-simulants` | Hendrix, D. A., Catalano, T., Nekvasil, H., Glotch, T. D., Legett, C. IV, and Hurowitz, J. A. (2024), "The reactivity of experimentally reduced lunar regolith simulants: Health implications for future crewed missions to the lunar surface", Meteoritics & Planetary Science 59:2487-2504, DOI 10.1111/maps.14228 | 10.1111/maps.14228 | ABSENT, `` | `raw/hendrix-2024-reactivity-reduced-simulants/hendrix-2024-reactivity-reduced-simulants.pdf` (present, efe79576); `text/hendrix-2024-reactivity-reduced-simulants/` (41 files, exists); `tables/hendrix-2024-reactivity-reduced-simulants/` (0 files, ABSENT) | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` (8 rows, draft) | `ledger/hendrix-2024-reactivity-reduced-simulants.yaml`: decoded (2026-09-06) |
+| `hertl-1967-solid-sio-disproportionation-vaporization` | Hertl, W., and Pultz, W. W. (1967). Disproportionation and vaporization of solid silicon monoxide. Journal of the American Ceramic Society, 50(7), 378–381. | 10.1111/j.1151-2916.1967.tb15135.x | ABSENT, `` | `raw/hertl-1967-solid-sio-disproportionation-vaporization/hertl-1967-solid-sio-disproportionation-vaporization.pdf` (present, 892e01af); `text/hertl-1967-solid-sio-disproportionation-vaporization/` (19 files, exists); `tables/hertl-1967-solid-sio-disproportionation-vaporization/` (0 files, ABSENT) | `data/literature/extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml` (5 rows, draft) | `ledger/hertl-1967-solid-sio-disproportionation-vaporization.yaml`: — (—) |
 | `hino-1997-secondary-slag-activities` | Hino, M., Kinoshita, S., Ehara, Y., Itoh, H. and Ban-Ya, S. (1997), ‘Activity Measurement of the Constituents in Secondary Steelmaking Slag’, Molten Slags, Fluxes and Salts '97, pp. 53–57. |  | ABSENT, `` | `raw/hino-1997-secondary-slag-activities/hino-1997-secondary-slag-activities.pdf` (present, 3e040e21); `text/hino-1997-secondary-slag-activities/` (42 files, exists); `tables/hino-1997-secondary-slag-activities/` (0 files, ABSENT) | `data/literature/extracts/hino-1997-secondary-slag-activities.yaml` (0 rows, draft) | `ledger/hino-1997-secondary-slag-activities.yaml`: — (—) |
 | `hirashima-1974-cr-redox-phosphate-glass` | Hirashima, H., Toyoda, H., & Yoshida, T. (1974). Redox Equilibria of Chromium Ions in Glass Melts, RP2O6 (R; Mg, Ca, Ba), with Gas Phase. Journal of the Ceramic Association, Japan, 82(946), 309–317. |  | ABSENT, `` | `raw/hirashima-1974-cr-redox-phosphate-glass/hirashima-1974-cr-redox-phosphate-glass.pdf` (present, a846a66b); `text/hirashima-1974-cr-redox-phosphate-glass/` (41 files, exists); `tables/hirashima-1974-cr-redox-phosphate-glass/` (0 files, ABSENT) | `data/literature/extracts/hirashima-1974-cr-redox-phosphate-glass.yaml` (0 rows, draft) | `ledger/hirashima-1974-cr-redox-phosphate-glass.yaml`: — (—) |
 | `holappa-xiao-2004-ferroalloy-slag-review` | Holappa, L. & Xiao, Y. (2004), Slags in ferroalloys production—review of present knowledge, Journal of the South African Institute of Mining and Metallurgy, August 2004, pp. 429-438. |  | ABSENT, `` | `raw/holappa-xiao-2004-ferroalloy-slag-review/holappa-xiao-2004-ferroalloy-slag-review.pdf` (present, 825f3c48); `text/holappa-xiao-2004-ferroalloy-slag-review/` (20 files, exists); `tables/holappa-xiao-2004-ferroalloy-slag-review/` (0 files, ABSENT) | `data/literature/extracts/holappa-xiao-2004-ferroalloy-slag-review.yaml` (0 rows, draft) | `ledger/holappa-xiao-2004-ferroalloy-slag-review.yaml`: — (—) |
@@ -952,6 +953,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `he-2017-karrooite-ordering-heat-capacity`
 - `henao-2001-ni-cr-mn-co-cu-slag-distribution`
 - `hendrix-2024-reactivity-reduced-simulants`
+- `hertl-1967-solid-sio-disproportionation-vaporization`
 - `hino-1997-secondary-slag-activities`
 - `hirashima-1974-cr-redox-phosphate-glass`
 - `holappa-xiao-2004-ferroalloy-slag-review`
