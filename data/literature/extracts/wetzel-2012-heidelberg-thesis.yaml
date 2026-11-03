@@ -293,13 +293,37 @@ experiments:
     published_page: 24
     section: '2.3.2'
     figure: '2.11'
-  sample:
+  sample: &wetzel_sio_sample
     material: amorphous SiO powder
+    form:
+      state:
+        tag: value
+        value: condensed_solid
+      locator:
+        page: 34
+        published_page: 24
+        section: '2.3.2'
+        note: Amorphous SiO powder is retained as a solid, with no crystalline polymorph assigned.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: nominal_pure_substance
+          amount_basis: mole_fraction
+          components:
+          - - SiO
+            - '1'
+      locator:
+        page: 34
+        published_page: 24
+        section: '2.3.2'
+        note: Nominal SiO endmember for the P_SAT reservoir under the controller ruling; the printed purity is 99.99% and the remaining 0.01% is unspecified and not modelled.
     particle_size_as_printed: 325 mesh
     purity:
       value: 99.99
       printed_form: '99,99% mass purity'
       unit: '%'
+      note: The remaining 0.01% impurity is unspecified and not modelled.
   apparatus:
     geometry:
       orifice_diameter:
@@ -315,13 +339,7 @@ experiments:
     published_page: 24
     section: '2.3.2'
     figure: '2.11'
-  sample:
-    material: amorphous SiO powder
-    particle_size_as_printed: 325 mesh
-    purity:
-      value: 99.99
-      printed_form: '99,99% mass purity'
-      unit: '%'
+  sample: *wetzel_sio_sample
   apparatus:
     geometry:
       orifice_diameter:
@@ -329,11 +347,22 @@ experiments:
         uncertainty: 0.04
         printed_form: '0,5 ± 0,04 mm'
         unit: mm
+- experiment_id: wetzel_sio_measurement_series
+  bench_id: wetzel_sio_knudsen_qcm
+  method: knudsen_effusion
+  locator:
+    page: 34
+    published_page: 24
+    section: '2.3.2'
+    figure: '2.11'
+    note: Series-level identity for fits using both printed orifice experiments.
+  sample: *wetzel_sio_sample
 species:
   SiO:
     observations:
     - observation_id: wetzel_2012_sio_evaporation_coefficient_fit_eq_2_25
       type: alpha
+      experiment: wetzel_sio_measurement_series
       locator:
         page: 34
         published_page: 24
@@ -376,6 +405,20 @@ species:
       uncertainty:
         note: No coefficient uncertainty is printed; point-level alpha deviation is reported separately.
       point_conditions:
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal_pure_substance
+              amount_basis: mole_fraction
+              components:
+              - - SiO
+                - '1'
+          locator:
+            page: 34
+            published_page: 24
+            section: '2.3.2'
+            note: Nominal SiO endmember for the two alpha-fit experiments; printed sample purity is 99.99%, and the unspecified 0.01% impurity is not modelled.
         temperature_K:
           state:
             tag: unknown
@@ -402,6 +445,7 @@ species:
             section: '2.3.2'
     - observation_id: wetzel_2012_sio_equilibrium_pressure_fit_eq_2_26
       type: psat_series
+      experiment: wetzel_sio_measurement_series
       locator:
         page: 36
         published_page: 26
@@ -418,11 +462,6 @@ species:
       values:
         quantity: pure_Psat
         gas_species: SiO
-        reservoir:
-          formula: SiO
-          phase:
-            tag: value
-            value: cr
         method_class: measured_reduced
         experiment_ids:
         - wetzel_sio_orifice_0_79_mm
