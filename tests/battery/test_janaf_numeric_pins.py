@@ -4,6 +4,7 @@ from simulator.battery.generators.janaf import (
     _interpolate_formation_gibbs,
     janaf_fusion_enthalpy,
     janaf_fusion_entropy,
+    janaf_fusion_energy,
 )
 
 
@@ -26,3 +27,14 @@ def test_mgo_janaf_fusion_entropy_uses_printed_3000_k_values() -> None:
     # Mg-008/Mg-009 print S=142.489/167.293 J/(mol K) at 3000 K.
     entropy, _crossing = janaf_fusion_entropy("MgO", Decimal("3000"))
     assert entropy == Decimal("24.804")
+
+
+def test_d144_janaf_fusion_gibbs_temperature_chord_numeric_pins() -> None:
+    expected_kJ_per_mol = {
+        ("CaO", Decimal("1873")): Decimal("32.59870"),
+        ("CaO", Decimal("1973")): Decimal("30.18797"),
+        ("MgO", Decimal("1873")): Decimal("28.47061"),
+        ("MgO", Decimal("1973")): Decimal("26.32615"),
+    }
+    for (oxide, temperature_K), expected in expected_kJ_per_mol.items():
+        assert janaf_fusion_energy(oxide, temperature_K).delta_g_fus_kJ_per_mol == expected
