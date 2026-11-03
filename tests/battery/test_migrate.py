@@ -2314,7 +2314,6 @@ def test_shornikov_2015_extract_migrates_model_derived_provenance(
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04",
-        "shornikov_2015_feo_cr_prose",
     }
 
     for observation in model_rows.values():

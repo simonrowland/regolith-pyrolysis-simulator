@@ -16,6 +16,7 @@ METHOD_QUOTE = (
     "vaporization coefficients are suggested for crystalline oxides contained "
     "in Ca–Al–inclusions in chondrites:"
 )
+TABLE5_METHOD = "Table 5 reports the crystalline evaporation coefficient under αvap (cr)."
 RECOMMENDATION_IDS = (
     "shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08",
     "shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08",
@@ -41,9 +42,19 @@ def _assert_recommendations_are_assessed(document: dict) -> None:
         row = rows[observation_id]
         assert row["values"]["method_class"] == "compilation_assessed"
         method = row["derivation"]["method"]
-        assert method["state"]["value"] == METHOD_QUOTE
-        assert method["locator"]["published_page"] == 1080
-        assert method["locator"]["section"] == "Abstract"
+        if observation_id in {
+            "shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08",
+            "shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08",
+        }:
+            assert method["state"]["value"] == TABLE5_METHOD
+            assert method["locator"]["published_page"] == 1086
+            assert method["locator"]["table"] == "5"
+        else:
+            assert method["state"]["value"] == METHOD_QUOTE
+            assert method["locator"]["published_page"] == 1080
+            assert method["locator"]["section"] == "Abstract"
+
+    assert rows["shornikov_2015_feo_cr_prose"]["values"]["method_class"] == "compilation_assessed"
 
 
 def test_sc456_recommendations_pin_compilation_assessed_class() -> None:
