@@ -1,0 +1,70 @@
+source_id: allendorf-2005-sand1196-refractory-corrosion
+source: ../regolith-corpus/raw/allendorf-2005-sand1196-refractory-corrosion/allendorf-2005-sand1196-refractory-corrosion.pdf
+extraction_mode: MinerU_and_pdftotext_with_render_audit
+mappings:
+  - table: '5-1'
+    page: 99
+    table_draft_key: p099-t10
+    columns:
+      - Extraction Sample Na concentration (ppm) -> total sodium concentration, independent of speciation
+      - NaOH concentration ELIF (ppm) -> ELIF-calibrated NaOH gas concentration
+    printed_rows: 6
+    numeric_cells_transcribed: 10
+    unavailable_cells:
+      - row: 4
+        column: Extraction Sample Na concentration (ppm)
+        printed: n.a.
+        reason: extraction probe unavailable due to access constraints
+      - row: 6
+        column: NaOH concentration ELIF (ppm)
+        printed: n.a.
+        reason: ELIF data unavailable due to access constraints
+    row_column_audit: >-
+      MinerU and pdftotext rows agree, with row 5 extraction Na as the exception; pdftotext reads
+      22 1 while the render and MinerU read 221. The render confirms all six port labels and both
+      numeric columns. See the companion cell audit.
+    disposition: all ten printed numeric cells transcribed; two n.a. cells preserved as unavailable metadata
+  - table: '2-1'
+    page: 16
+    disposition: inventory_only
+    reason: typical inputs for thermodynamic equilibrium calculations, not measured observations
+  - table: '2-2'
+    page: 17
+    disposition: inventory_only
+    reason: gas, liquid, and solid species roster for calculations, not measured observations
+  - table: '2-3'
+    page: 18
+    disposition: inventory_only
+    reason: model excess-free-energy equations and parameters
+  - table: '2-4'
+    pages: [21, 22]
+    disposition: inventory_only
+    reason: thermodynamic model parameters
+  - table: '3-1'
+    page: 38
+    disposition: inventory_only
+    reason: typical inputs for thermodynamic equilibrium calculations, not furnace measurements
+  - table: '3-2'
+    page: 38
+    disposition: inventory_only
+    reason: species roster for calculations
+  - table: '3-3'
+    pages: [39, 40]
+    disposition: inventory_only
+    reason: thermodynamic parameter data
+  - table: 'A-1'
+    page: 111
+    disposition: inventory_only
+    reason: fitted absorptivity parameters unrelated to alkali vapour or refractory recession
+schema_gap:
+  observation_types: tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  quantity_types: simulator/battery/migrate.py::TYPE_QUANTITY
+  quantity_aliases: simulator/battery/migrate.py::QUANTITY_ALIASES
+  quantity_enum: simulator/battery/enums.py::Quantity
+  explanation: >-
+    concentration_series and rate_series are available observation types, but no exact quantity
+    token represents concentration in ppm or refractory surface-recession distance/rate in mm or
+    mm/year. p_partial is not equivalent to concentration without a printed total pressure; mass_loss_rate
+    is not equivalent to dimensional surface recession. Therefore these printed rows keep their
+    descriptive non-token quantity labels, migrate as quantity-unknown typed refusals, and preserve
+    the printed values, conditions, units, attribution, and source locators in the extract.

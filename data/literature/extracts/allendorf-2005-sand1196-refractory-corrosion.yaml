@@ -1,0 +1,433 @@
+schema_version: literature_extract.v1
+source_id: allendorf-2005-sand1196-refractory-corrosion
+source:
+  citation: >-
+    Allendorf, M. D. et al. (2005). Development of Models and Online Diagnostic Monitors of the
+    High-Temperature Corrosion of Refractory Oxides. Sandia Report SAND2005-1196.
+  year: 2005
+  doi: 10.2172/922757
+review_status: draft
+extraction:
+  method: >-
+    Machine-text transcription from the report's MinerU table blocks and pdftotext-layout text.
+    Table 5-1 row and column placement, the 221 cell, plusminus marks, and cited prose observations
+    were checked against page renders. Measurements and their printed units are preserved. Where
+    the closed quantity vocabulary has no concentration or refractory-recession token, the printed
+    measurements are retained in typed-refused observations and are unavailable after migration.
+  date: '2026-11-02'
+  worker: w1103cw1-al05
+  note: >-
+    This extract contains 20 printed measured points: ten available numerical cells in the six-row
+    Table 5-1, three Faber and Beerkens NaOH concentration ranges, the Walsh-reported NaOH value,
+    one Monofrax test concentration, two reported refractory recession distances, two reported
+    recession rates, and a later Buckley-reported NaOH concentration. Table 5-1's two n.a. cells
+    are retained in printed_table_rows below, never as zero. No condition is supplied unless printed
+    for that observation. Measured activity curves and figure-only corrosion series are listed in
+    the companion audit and are not digitized.
+  printed_table_row_count: 6
+  printed_table_rows:
+    - row: 1
+      port: Right side midtank port
+      extraction_sample_na_ppm: '185'
+      naoh_elif_ppm: '125'
+    - row: 2
+      port: Right side exhaust port
+      extraction_sample_na_ppm: '202'
+      naoh_elif_ppm: '117'
+    - row: 3
+      port: Right side uptank port
+      extraction_sample_na_ppm: '158'
+      naoh_elif_ppm: '143'
+    - row: 4
+      port: Fill end
+      extraction_sample_na_ppm: n.a.
+      naoh_elif_ppm: '90'
+    - row: 5
+      port: Left side downtank port
+      extraction_sample_na_ppm: '221'
+      naoh_elif_ppm: '31'
+    - row: 6
+      port: Left side refiner-entrance
+      extraction_sample_na_ppm: '17'
+      naoh_elif_ppm: n.a.
+fidelity_samples:
+  - path: species.Na.observations[allendorf_2005_table5_1_extractive_total_sodium].values.series[3].value
+    value: '221'
+    note: >-
+      Page-99 render confirms 221 in Table 5-1 row 5, extraction-sample Na column;
+      pdftotext separates the final digit as 22 1.
+    locator: {page: 99, table: '5-1', row: 5}
+species:
+  Na:
+    observations:
+      - observation_id: allendorf_2005_table5_1_extractive_total_sodium
+        type: concentration_series
+        locator:
+          page: 99
+          table: '5-1'
+          note: >-
+            Table 5-1 extraction sample column; total sodium concentration is reported independent
+            of speciation.
+        phase: g
+        units: ppm
+        values:
+          quantity: total_sodium_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No closed quantity token represents total gas-phase sodium concentration independent
+            of speciation; the total sodium sample amounts and withdrawn gas volumes are not
+            tabulated as lineage inputs.
+          attribution: >-
+            Allendorf et al., Table 5-1. The report says concentration was determined from withdrawn
+            gas volume and collected sodium amount; those per-sample inputs are not tabulated.
+          species_as_printed: total sodium, independent of speciation
+          series:
+            - value: '185'
+              port_as_printed: Right side midtank port
+              locator: {page: 99, table: '5-1', row: 1}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side midtank port}, locator: {page: 99, table: '5-1', row: 1}}
+            - value: '202'
+              port_as_printed: Right side exhaust port
+              locator: {page: 99, table: '5-1', row: 2}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side exhaust port}, locator: {page: 99, table: '5-1', row: 2}}
+            - value: '158'
+              port_as_printed: Right side uptank port
+              locator: {page: 99, table: '5-1', row: 3}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side uptank port}, locator: {page: 99, table: '5-1', row: 3}}
+            - value: '221'
+              port_as_printed: Left side downtank port
+              locator: {page: 99, table: '5-1', row: 5}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Left side downtank port}, locator: {page: 99, table: '5-1', row: 5}}
+            - value: '17'
+              port_as_printed: Left side refiner-entrance
+              locator: {page: 99, table: '5-1', row: 6}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Left side refiner-entrance}, locator: {page: 99, table: '5-1', row: 6}}
+  NaOH:
+    observations:
+      - observation_id: allendorf_2005_table5_1_elif_naoh
+        type: concentration_series
+        locator:
+          page: 99
+          table: '5-1'
+          note: Table 5-1 time-averaged ELIF NaOH concentration column.
+        phase: g
+        units: ppm
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No closed quantity token represents gas concentration in ppm; the underlying ELIF
+            signals and the Figure 5-3 calibration values are not tabulated as lineage inputs.
+          attribution: Allendorf et al., Table 5-1; values use the Figure 5-3 ELIF calibration.
+          series:
+            - value: '125'
+              port_as_printed: Right side midtank port
+              locator: {page: 99, table: '5-1', row: 1}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side midtank port}, locator: {page: 99, table: '5-1', row: 1}}
+            - value: '117'
+              port_as_printed: Right side exhaust port
+              locator: {page: 99, table: '5-1', row: 2}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side exhaust port}, locator: {page: 99, table: '5-1', row: 2}}
+            - value: '143'
+              port_as_printed: Right side uptank port
+              locator: {page: 99, table: '5-1', row: 3}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Right side uptank port}, locator: {page: 99, table: '5-1', row: 3}}
+            - value: '90'
+              port_as_printed: Fill end
+              locator: {page: 99, table: '5-1', row: 4}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Fill end}, locator: {page: 99, table: '5-1', row: 4}}
+            - value: '31'
+              port_as_printed: Left side downtank port
+              locator: {page: 99, table: '5-1', row: 5}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                fO2_Pa: {state: {tag: unknown, reason: numerical_fO2_not_printed}, locator: {page: 99, table: '5-1'}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 99, table: '5-1'}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                composition: {state: {tag: unknown, reason: melt_composition_not_printed}, locator: {page: 99, table: '5-1'}}
+                furnace_port: {state: {tag: value, value: Left side downtank port}, locator: {page: 99, table: '5-1', row: 5}}
+      - observation_id: allendorf_2005_faber_beerkens_naoh_concentrations
+        type: concentration_series
+        locator: {page: 56, section: Quantitative measurements of furnace conditions}
+        phase: g
+        units: ppm
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents gas concentration in ppm.
+          attribution: Faber and Beerkens, as cited by Allendorf et al. (reference 17).
+          series:
+            - value: {kind: interval, interval_low: '50', interval_high: '60'}
+              as_published: 50–60 ppm
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 56}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                atmosphere: {state: {tag: value, value: air-fired furnace}, locator: {page: 56}}
+                composition: {state: {tag: unknown, reason: incomplete_glass_composition}, locator: {page: 56}}
+                reported_soda_content: {state: {tag: value, value: '13 wt.% soda in the glass'}, locator: {page: 56}}
+            - value: {kind: interval, interval_low: '140', interval_high: '200'}
+              as_published: 140–200 ppm
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 56}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                atmosphere: {state: {tag: value, value: oxy-fired furnace}, locator: {page: 56}}
+                composition: {state: {tag: unknown, reason: incomplete_glass_composition}, locator: {page: 56}}
+                reported_glass_type: {state: {tag: value, value: comparable soda-lime glass}, locator: {page: 56}}
+            - value: {kind: interval, interval_low: '220', interval_high: '260'}
+              as_published: 220–260 ppm
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 56}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 56}}
+                atmosphere: {state: {tag: value, value: oxy-fired furnace}, locator: {page: 56}}
+                composition: {state: {tag: unknown, reason: incomplete_glass_composition}, locator: {page: 56}}
+                reported_soda_content: {state: {tag: value, value: '16 wt.% soda'}, locator: {page: 56}}
+      - observation_id: allendorf_2005_walsh_naoh_concentration
+        type: concentration_series
+        locator: {page: 66, section: Comparison of measured and predicted corrosion-product composition}
+        phase: g
+        units: ppm
+        uncertainty:
+          kind: printed
+          value: '25'
+          basis: ppm
+          note: Printed as 125 ± 25 ppm; confidence level not stated.
+          locator: {page: 66}
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents gas concentration in ppm.
+          attribution: Walsh et al. measurements, as attributed in Allendorf et al. (reference 20).
+          value: '125'
+          approximate: false
+          value_as_published: 125 ± 25 ppm
+          series:
+            - value: '125'
+              locator: {page: 66}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: Walsh_measurement_temperature_not_reported_here}, locator: {page: 66}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported_for_Walsh_value}, locator: {page: 66}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported_for_Walsh_value}, locator: {page: 66}}
+                atmosphere: {state: {tag: unknown, reason: measurement_specific_gas_mix_not_reported}, locator: {page: 66}}
+                composition: {state: {tag: unknown, reason: measurement_specific_melt_composition_not_reported}, locator: {page: 66}}
+      - observation_id: allendorf_2005_monofrax_naoh_concentration
+        type: concentration_series
+        locator: {page: 68, section: Comparison of measured and predicted corrosion-product composition}
+        phase: g
+        units: ppm
+        uncertainty:
+          kind: printed
+          value: '65'
+          basis: ppm
+          note: Printed as 640 ± 65 ppm; confidence level not stated.
+          locator: {page: 68}
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: measured_direct
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents gas concentration in ppm.
+          value: '640'
+          approximate: false
+          value_as_published: 640 ± 65 ppm
+          method_note: NaOH concentration determined using extractive sampling.
+          composition_wt_pct:
+            SiO2: '72.7'
+            Na2O: '13.92'
+            K2O: '0.5'
+            CaO: '8.6'
+            MgO: '4.21'
+          series:
+            - value: '640'
+              T_K: '1883'
+              locator: {page: 68}
+              point_conditions:
+                temperature_K: {state: {tag: value, value: '1883'}, locator: {page: 68}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_or_gas_ratio_reported}, locator: {page: 67}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 67}}
+                atmosphere: {state: {tag: value, value: stoichiometric natural gas/oxygen combustion products}, locator: {page: 67}}
+                gas_flow_slpm: {state: {tag: value, value: '4.25'}, locator: {page: 67}}
+                composition:
+                  state:
+                    tag: value
+                    value:
+                      basis: wt_percent
+                      components:
+                        - [SiO2, '72.7']
+                        - [Na2O, '13.92']
+                        - [K2O, '0.5']
+                        - [CaO, '8.6']
+                        - [MgO, '4.21']
+                  locator: {page: 67}
+                duration_h: {state: {tag: value, value: '75'}, locator: {page: 68}}
+      - observation_id: allendorf_2005_buckley_later_naoh_concentration
+        type: concentration_series
+        locator: {page: 82, section: Computational Fluid Dynamic Modeling of Corrosion}
+        phase: g
+        units: ppm
+        values:
+          quantity: naoh_vapour_concentration_ppm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents gas concentration in ppm.
+          attribution: Later measurements reported from the same furnace, cited as reference 64.
+          approximate: true
+          value: '125'
+          value_as_published: approximately 125 ppm at 1.0 m
+          note: Burner design had changed since the cited measurements discussed immediately above.
+          series:
+            - value: '125'
+              locator: {page: 82}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: not_reported}, locator: {page: 82}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 82}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 82}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_at_measurement_not_reported}, locator: {page: 82}}
+                composition: {state: {tag: unknown, reason: melt_composition_at_measurement_not_reported}, locator: {page: 82}}
+                axial_position_m: {state: {tag: value, value: '1.0'}, locator: {page: 82}}
+  SiO2:
+    observations:
+      - observation_id: allendorf_2005_werezczak_recession_distances
+        type: rate_series
+        locator: {page: 62, section: Comparison of computed and observed surface recession rates}
+        phase: cr
+        units: mm of recession
+        values:
+          quantity: refractory_surface_recession_distance_mm
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: >-
+            No closed quantity token represents refractory surface-recession distance; the printed
+            distances and exposure durations are retained and no annual rate is calculated.
+          attribution: Wereszczak et al., as cited by Allendorf et al. (reference 25).
+          series:
+            - value: '6'
+              as_published: 6 mm in 10 years
+              T_C: '1600'
+              exposure_time_years: '10'
+              furnace_product: soda-lime-silica float glass
+              locator: {page: 62}
+              point_conditions:
+                temperature_C: {state: {tag: value, value: '1600'}, locator: {page: 62}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 62}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 62}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_reported}, locator: {page: 62}}
+                composition: {state: {tag: unknown, reason: full_melt_composition_not_reported}, locator: {page: 62}}
+                exposure_time_years: {state: {tag: value, value: '10'}, locator: {page: 62}}
+                furnace_product: {state: {tag: value, value: soda-lime-silica float glass}, locator: {page: 62}}
+            - value: '13'
+              as_published: 13 mm in 6.5 years
+              T_C: '1600'
+              exposure_time_years: '6.5'
+              furnace_product: TV-panel glass
+              locator: {page: 62}
+              point_conditions:
+                temperature_C: {state: {tag: value, value: '1600'}, locator: {page: 62}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 62}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 62}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_reported}, locator: {page: 62}}
+                composition: {state: {tag: unknown, reason: full_melt_composition_not_reported}, locator: {page: 62}}
+                exposure_time_years: {state: {tag: value, value: '6.5'}, locator: {page: 62}}
+                furnace_product: {state: {tag: value, value: TV-panel glass}, locator: {page: 62}}
+      - observation_id: allendorf_2005_faber_verheijen_recession_rates
+        type: rate_series
+        locator: {page: 62, section: Comparison of computed and observed surface recession rates}
+        phase: cr
+        units: mm/year
+        values:
+          quantity: refractory_surface_recession_rate_mm_per_year
+          method_class: quoted_attributed
+          admission_status: typed_refusal
+          status: typed_refusal
+          reason: No closed quantity token represents refractory surface-recession rate in mm/year.
+          attribution: Faber and Verheijen, as cited by Allendorf et al. (reference 10).
+          series:
+            - value: '100'
+              as_published: 100 mm/year
+              note: The report calls the observation presumably atypical.
+              locator: {page: 61}
+              point_conditions:
+                temperature_K: {state: {tag: unknown, reason: source_says_low_temperature_but_gives_no_numeric_temperature}, locator: {page: 61}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 61}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 61}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_reported}, locator: {page: 61}}
+                composition: {state: {tag: unknown, reason: full_melt_composition_not_reported}, locator: {page: 61}}
+                location: {state: {tag: value, value: low-temperature area above the batching area}, locator: {page: 61}}
+            - value: {kind: interval, interval_low: '5', interval_high: '10'}
+              as_published: 5–10 mm/year
+              T_range_C: ['1530', '1580']
+              location: over the batch area for the larger value
+              locator: {page: 62}
+              point_conditions:
+                temperature_C: {state: {tag: value, value: {kind: interval, interval_low: '1530', interval_high: '1580'}}, locator: {page: 62}}
+                fO2_Pa: {state: {tag: unknown, reason: no_numeric_fO2_reported}, locator: {page: 62}}
+                total_pressure_Pa: {state: {tag: unknown, reason: not_reported}, locator: {page: 62}}
+                atmosphere: {state: {tag: unknown, reason: gas_composition_not_reported}, locator: {page: 62}}
+                composition: {state: {tag: unknown, reason: full_melt_composition_not_reported}, locator: {page: 62}}
+                location: {state: {tag: value, value: over the batch area for the larger value}, locator: {page: 62}}
