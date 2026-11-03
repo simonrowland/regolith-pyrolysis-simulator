@@ -680,11 +680,13 @@ class MeltState:
                 f"pO2_mbar={pO2:.12g} p_total_mbar={p_total:.12g}"
             )
         if partial_pressure_exceeds_total(pO2, p_total):
-            raise MalformedRecipeError(
+            error = MalformedRecipeError(
                 "melt_pressure_partial_exceeds_total: "
                 f"pO2_mbar={pO2:.12g} > p_total_mbar={p_total:.12g}; "
                 "oxygen partial pressure cannot exceed total pressure"
             )
+            error.reason_code = "melt_pressure_partial_exceeds_total"
+            raise error
 
     def composition_wt_pct(self) -> Dict[str, float]:
         """Current composition as weight percent."""
