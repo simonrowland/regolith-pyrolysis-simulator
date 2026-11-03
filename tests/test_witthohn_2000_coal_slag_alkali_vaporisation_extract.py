@@ -160,17 +160,7 @@ def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
     issues = migrator.result.validation.hard_issues
-    fig6_issues = [
-        (issue.path, issue.detail)
-        for issue in issues
-        if "witthohn_2000_k2o_fig6_model_figure_only" in issue.path
-    ]
-    assert len(issues) == len(fig6_issues) == 3
-    assert {detail for _, detail in fig6_issues} == {
-        "raw_inputs declaration is invalid for model_derived without a located not_printed declaration, method, and named references",
-        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-        "derived observation requires derived_from",
-    }
+    assert not issues
 
     rows = {
         row.observation_id.split("::", 1)[-1]: row
