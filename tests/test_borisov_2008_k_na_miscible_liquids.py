@@ -11,6 +11,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import EvidenceClass, MethodToken
 from simulator.battery.migrate import _log_fO2_to_pa, wt_pct_to_mole_fraction
 from tests.battery.test_migrate import _migrate_real_extract
 
@@ -276,6 +277,13 @@ def test_independent_render_grids_match_primary_text_when_corpus_is_present():
     assert _source_table4(text) == table4
     assert "Table 1. Compositions of starting glasses, wt %" in text
     assert "Table 2. Experimental conditions and the compositions of melts" in text
+    normalized = " ".join(text.split())
+    assert "held under desired T– f O2 parameters for several hours" in normalized
+    assert "become simultaneously saturated with alkalis" in normalized
+    assert "held at the desired temperature and oxygen fugacity, the" in normalized
+    assert "samples were quenched in the upper cold zone of the" in normalized
+    assert "Quenched glasses were analyzed using a JEOL" in normalized
+    assert "Superprobe electron microprobe at the Institut" in normalized
 
 
 def test_isolated_migration_preserves_species_conditions_quench_and_activity_basis(tmp_path):
@@ -352,6 +360,33 @@ def test_isolated_migration_preserves_species_conditions_quench_and_activity_bas
     assert len(gammas) == 33
     assert all("standard_state_as_published" in row["values"] for row in gammas)
     assert all(row["derived_from"] for row in gammas)
+    experiment_declarations = {
+        row["experiment_id"]: row for row in document["experiments"]
+    }
+    migrated_gammas = [
+        migrated[observation_id]
+        for observation_id, (_container, row) in raw.items()
+        if row["type"] == "activity_coefficient"
+    ]
+    assert len(migrated_gammas) == 33
+    for observation in migrated_gammas:
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
+        source_row = raw[observation.observation_id.split("::", 1)[1]][1]
+        declaration = experiment_declarations[source_row["experiment"]]
+        assert declaration["method_detail_as_printed"] == (
+            "crucible-supported loop; alkali vapor saturation"
+        )
+        assert declaration["locator"] == {
+            "page": 2,
+            "pdf_page_index": 1,
+            "published_page": 553,
+            "section": "Experimental Methods",
+        }
+        assert source_row["values"]["method_class"] == "measured_reduced"
+        assert observation.evidence.class_.is_value
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     assert len([row for row in document["species"]["SiO2"]["context"] if row["type"] == "figure_record"]) == 10
     assert all(row["values"]["numeric_points"] == "none" for row in document["species"]["SiO2"]["context"] if row["type"] == "figure_record")
 
