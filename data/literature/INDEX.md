@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 743
-- Extracts (`literature_extract.v1`): 741
+- Sources: 744
+- Extracts (`literature_extract.v1`): 742
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 741
+- Extracts with no PDF: 742
 - Alias groups needing owner/controller resolution: 80
 - Extracts with private/non-public row locators: 78
 
@@ -139,6 +139,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `decapitani-kirschen-1998-excess-function` | DeCapitani, C. and Kirschen, M. (1998), “A generalized multicomponent excess function with application to immiscible liquids in the system CaO-SiO2-TiO2”, Geochimica et Cosmochimica Acta, 62(23/24), 3753–3763. | 10.1016/S0016-7037(98)00319-6 | ABSENT, `` | `raw/decapitani-kirschen-1998-excess-function/decapitani-kirschen-1998-excess-function.pdf` (present, 9a3ece38); `text/decapitani-kirschen-1998-excess-function/` (23 files, exists); `tables/decapitani-kirschen-1998-excess-function/` (0 files, ABSENT) | `data/literature/extracts/decapitani-kirschen-1998-excess-function.yaml` (90 rows, draft) | `ledger/decapitani-kirschen-1998-excess-function.yaml`: — (—) |
 | `deffrennes-2020-ca-o-calphad` | G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad, 69 (2020), 101764. | 10.1016/j.calphad.2020.101764 | ABSENT, `` | `raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf` (present, 8b5c40c4); `text/deffrennes-2020-ca-o-calphad/` (3 files, exists); `tables/deffrennes-2020-ca-o-calphad/` (8 files, exists) | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` (3 rows, draft) | `ledger/deffrennes-2020-ca-o-calphad.yaml`: extracted (2026-10-04) |
 | `deguzman-2026-simulant-physicochemical` | De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou, Kyriaki & Gacesa, Marko (2026), "Physicochemical properties of lunar regolith simulant for in situ oxygen production", arXiv:2601.14719. |  | ABSENT, `` | `raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf` (present, ebfc9d3f); `text/deguzman-2026-simulant-physicochemical/` (32 files, exists); `tables/deguzman-2026-simulant-physicochemical/` (0 files, ABSENT) | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` (10 rows, draft) | `ledger/deguzman-2026-simulant-physicochemical.yaml`: decoded (2026-09-06) |
+| `delgado-2015-mg-thermite-regolith` | Delgado, A., Cordova, S. & Shafirovich, E. (2015), "Thermite Reactions in the Mixtures of Magnesium with Lunar and Martian Regolith Simulants", AIAA SciTech Forum, 8th Symposium on Space Resource Utilization, AIAA 2015-1179. | 10.2514/6.2015-1179 | ABSENT, `` | `raw/delgado-2015-mg-thermite-regolith/delgado-2015-mg-thermite-regolith.pdf` (present, 1b9f4b9d); `text/delgado-2015-mg-thermite-regolith/` (1 files, exists); `tables/delgado-2015-mg-thermite-regolith/` (0 files, ABSENT) | `data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml` (22 rows, draft) | `ledger/delgado-2015-mg-thermite-regolith.yaml`: — (—) |
 | `di-donato-granati-2000` | Di Donato, A. and Granati, P. (2000), “Experimental Determination of Activity of FeO, MnO and Cr2O3 in Slags”, Centro Sviluppo Materiali research manuscript. |  | ABSENT, `` | `raw/di-donato-granati-2000/di-donato-granati-2000.pdf` (present, 78dd1d4d); `text/di-donato-granati-2000/` (8 files, exists); `tables/di-donato-granati-2000/` (10 files, exists) | `data/literature/extracts/di-donato-granati-2000.yaml` (95 rows, draft) | `ledger/di-donato-granati-2000.yaml`: extracted (2026-10-05) |
 | `distin-1971-ferrous-silicate-melts` | Distin, P. A., Whiteway, S. G. & Masson, C. R. (1971), "Thermodynamics and constitution of ferrous silicate melts", Canadian Metallurgical Quarterly 10(2):73-78. | 10.1179/cmq.1971.10.2.73 | ABSENT, `` | `raw/distin-1971-ferrous-silicate-melts/distin-1971-ferrous-silicate-melts.pdf` (present, 3049d522); `text/distin-1971-ferrous-silicate-melts/` (27 files, exists); `tables/distin-1971-ferrous-silicate-melts/` (0 files, ABSENT) | `data/literature/extracts/distin-1971-ferrous-silicate-melts.yaml` (24 rows, draft) | `ledger/distin-1971-ferrous-silicate-melts.yaml`: — (—) |
 | `dohmen-2003-coupled-kinetics` | Dohmen, R., Chakraborty, S., Palme, H., and Rammensee, W. (2003), "Role of element solubility on the kinetics of element partitioning: In situ observations and a thermodynamic kinetic model," Journal of Geophysical Research: Solid Earth, 108(B3), 2157. | 10.1029/2001JB000587 | ABSENT, `` | `raw/dohmen-2003-coupled-kinetics/dohmen-2003-coupled-kinetics.pdf` (present, 8a559094); `text/dohmen-2003-coupled-kinetics/` (62 files, exists); `tables/dohmen-2003-coupled-kinetics/` (0 files, ABSENT) | `data/literature/extracts/dohmen-2003-coupled-kinetics.yaml` (2 rows, draft) | `ledger/dohmen-2003-coupled-kinetics.yaml`: — (—) |
@@ -889,6 +890,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `decapitani-kirschen-1998-excess-function`
 - `deffrennes-2020-ca-o-calphad`
 - `deguzman-2026-simulant-physicochemical`
+- `delgado-2015-mg-thermite-regolith`
 - `di-donato-granati-2000`
 - `distin-1971-ferrous-silicate-melts`
 - `dohmen-2003-coupled-kinetics`

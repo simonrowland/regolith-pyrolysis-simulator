@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 743
-  extracts: 741
+  sources: 744
+  extracts: 742
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 741
+  extracts_without_pdf: 742
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -131,6 +131,7 @@ gaps:
   - decapitani-kirschen-1998-excess-function
   - deffrennes-2020-ca-o-calphad
   - deguzman-2026-simulant-physicochemical
+  - delgado-2015-mg-thermite-regolith
   - di-donato-granati-2000
   - distin-1971-ferrous-silicate-melts
   - dohmen-2003-coupled-kinetics
@@ -7963,6 +7964,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: delgado-2015-mg-thermite-regolith
+  aliases: []
+  citation: Delgado, A., Cordova, S. & Shafirovich, E. (2015), "Thermite Reactions in the Mixtures of
+    Magnesium with Lunar and Martian Regolith Simulants", AIAA SciTech Forum, 8th Symposium on Space Resource
+    Utilization, AIAA 2015-1179.
+  doi: 10.2514/6.2015-1179
+  report_number: null
+  identifier: 10.2514/6.2015-1179
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml
+    review_status: draft
+    rows: 22
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/delgado-2015-mg-thermite-regolith/delgado-2015-mg-thermite-regolith.pdf
+      present: true
+      sha256: 1b9f4b9de2f0597de6097a465d56458b24e73adce87261fbafe721e6c98eb941
+      matches_simulator: null
+    sidecar:
+      path: raw/delgado-2015-mg-thermite-regolith/sidecar.yaml
+      present: true
+    text:
+      path: text/delgado-2015-mg-thermite-regolith
+      exists: true
+      file_count: 1
+    tables:
+      path: tables/delgado-2015-mg-thermite-regolith
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/delgado-2015-mg-thermite-regolith.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/delgado-2015-mg-thermite-regolith.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: di-donato-granati-2000
   aliases: []
   citation: Di Donato, A. and Granati, P. (2000), “Experimental Determination of Activity of FeO, MnO
