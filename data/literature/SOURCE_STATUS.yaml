@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2289
+  sources: 2287
   by_stage:
     located: 209
     inbox: 1268
-    in_progress: 222
+    in_progress: 220
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -7720,16 +7720,6 @@ sources:
     artefacts:
     - raw/eliasova-1978-akermanite-diopside-gibbs-part2/eliasova-1978-akermanite-diopside-gibbs-part2.pdf
     reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
-  inbox_exclusion_reason: null
-- source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
-  stage: in_progress
-  evidence:
-    decided_by: in_progress
-    artefacts:
-    - data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml
-    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -33101,16 +33091,6 @@ sources:
     artefacts:
     - raw/snyder-1997-apollo12-parental-basalt-chemistry/snyder-1997-apollo12-parental-basalt-chemistry.pdf
     reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
-  inbox_exclusion_reason: null
-- source_id: snyder-carmichael-1992-olivine-liquid-feo-activity
-  stage: in_progress
-  evidence:
-    decided_by: in_progress
-    artefacts:
-    - data/literature/extracts/snyder-carmichael-1992-olivine-liquid-feo-activity.yaml
-    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null

@@ -666,7 +666,7 @@ species:
       - observation_id: ohare72_sample_and_calorimetry_conditions
         type: sample_composition_and_calorimetry_context
         locator: {page: 2, published_page: 4513, pdf_page_index: 1, section: 'Purification and characterization'}
-        units: kJ mole−1
+        units: 'g; °C; h; %; ppm; J °K−1'
         values:
           starting_Na2O_sample_mass: approximately 10 g
           heat_treatment_temperature: '520±10 °C'
@@ -696,7 +696,7 @@ species:
       - observation_id: ohare72_prior_sample_compositions
         type: cited_sample_composition_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, section: 'Discussion'}
-        units: kcal mole−1
+        units: '%'
         values:
           matsui_et_al_Na2O_content: '79%–98%'
           matsui_et_al_sample_phase_as_printed: Na2O, phase not specified for each Table II row
@@ -707,7 +707,7 @@ species:
       - observation_id: ohare72_hildenbrand_murad_hydroxide_removal_context
         type: cited_sample_treatment_context
         locator: {page: 2, published_page: 4513, pdf_page_index: 1, section: 'Purification and characterization'}
-        units: kcal mole−1
+        units: 'days; °C'
         values:
           treatment: Na2O containing small amounts of NaOH heated under vacuum
           treatment_duration: 2 days
