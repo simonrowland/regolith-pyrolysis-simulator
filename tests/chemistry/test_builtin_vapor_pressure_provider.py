@@ -22,6 +22,7 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -53,6 +54,7 @@ from simulator.chemistry.ellingham_thermo import (
 )
 from simulator.chemistry import ellingham_graph
 from simulator.chemistry import melt_activity
+from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
@@ -1503,12 +1505,22 @@ def test_k_table_gamma_is_temperature_independent_but_domain_labeled():
 def test_melt_activity_endmember_shell_is_local_only():
     """Continuity shell must not move lunar mid-range; pure endmember stays continuous."""
 
+    temperature_K = 1873.15
+    delta_g_fus = float(
+        janaf_fusion_energy("CaO", Decimal(str(temperature_K))).delta_g_fus_kJ_per_mol
+    )
+    liquid_gamma = 0.012 * math.exp(
+        -delta_g_fus / (8.31446261815324e-3 * temperature_K)
+    )
     lunar_ca = melt_oxide_activity(
-        "CaO", {}, cation_mol_fraction={"CaO": 0.1156}
+        "CaO",
+        {},
+        cation_mol_fraction={"CaO": 0.1156},
+        temperature_K=temperature_K,
     )
     assert lunar_ca is not None
-    assert lunar_ca.effective_gamma == pytest.approx(0.012)
-    assert lunar_ca.activity == pytest.approx(0.012 * 0.1156)
+    assert lunar_ca.effective_gamma == pytest.approx(liquid_gamma)
+    assert lunar_ca.activity == pytest.approx(liquid_gamma * 0.1156)
 
     # Just inside the shell floor (X=0.99): still exact table gamma.
     at_floor = melt_oxide_activity(
