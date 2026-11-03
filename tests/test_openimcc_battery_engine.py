@@ -1247,7 +1247,7 @@ def test_vapor_engine_records_outer_above_one_bar_same_sign_evidence() -> None:
     assert "It is not a solver miss" in detail
 
 
-def test_oxygen_bracket_reason_suffixes_share_refusal_census_family() -> None:
+def test_oxygen_bracket_refusal_census_keeps_typed_causes_distinct() -> None:
     from simulator.battery.score import refusal_census_payloads
 
     family = "oxygen_balance_no_admitted_bracket"
@@ -1269,7 +1269,10 @@ def test_oxygen_bracket_reason_suffixes_share_refusal_census_family() -> None:
     ]
 
     assert refusal_census_payloads(rows) == {
-        "unsupported:oxygen_balance_no_admitted_bracket": 4
+        "unsupported:oxygen_balance_no_admitted_bracket": 1,
+        "unsupported:oxygen_balance_no_admitted_bracket:engine_domain_crash": 1,
+        "unsupported:oxygen_balance_no_admitted_bracket:silicate_window_refusal": 1,
+        "unsupported:oxygen_balance_no_admitted_bracket:same_sign_residual": 1,
     }
 
 
@@ -1369,15 +1372,20 @@ def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> N
             cell_material=None,
         )
 
-    detail = str(exc_info.value)
-    assert (
-        exc_info.value.reason_code
-        == "oxygen_balance_no_admitted_bracket:engine_domain_crash"
+    expected = (
+        "oxygen_balance_no_admitted_bracket:engine_domain_crash: no admitted "
+        "starting cell in log10(pO2/bar) range [-30, 0]; "
+        "last_admitted_pO2_bar=none; starting-cell guard refusals: "
+        "engine_crash: subprocess_died: 15, "
+        "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10, "
+        "out_of_basis: temperature_range: 6"
     )
+    assert exc_info.value.reason_code == (
+        "oxygen_balance_no_admitted_bracket:engine_domain_crash"
+    )
+    assert str(exc_info.value) == expected
+    assert exc_info.value.backend_status_reason == expected
     assert sorted(trials) == list(range(-30, 1))
-    assert "engine_crash: subprocess_died: 15" in detail
-    assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
-    assert "out_of_basis: temperature_range: 6" in detail
 
 
 @pytest.mark.parametrize(
@@ -1481,12 +1489,18 @@ def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
             cell_material=None,
         )
 
-    assert (
-        exc_info.value.reason_code
-        == "oxygen_balance_no_admitted_bracket:silicate_window_refusal"
+    expected = (
+        "oxygen_balance_no_admitted_bracket:silicate_window_refusal: no admitted "
+        "starting cell in log10(pO2/bar) range [-30, 0]; "
+        "last_admitted_pO2_bar=none; starting-cell guard refusals: "
+        "gate_refused_in_adapter: silicate_window: 31"
     )
+    assert exc_info.value.reason_code == (
+        "oxygen_balance_no_admitted_bracket:silicate_window_refusal"
+    )
+    assert str(exc_info.value) == expected
+    assert exc_info.value.backend_status_reason == expected
     assert sorted(trials) == list(range(-30, 1))
-    assert "gate_refused_in_adapter: silicate_window: 31" in str(exc_info.value)
 
 
 def test_feo_association_channel_uses_catalog_parent_for_oxygen_balance() -> None:
