@@ -66,6 +66,20 @@ from simulator.battery.polymorph_dictionary import (
     polymorph_matches_formula,
     resolve_formula_polymorph,
 )
+from simulator.battery.input_provenance import (
+    ANALYSED_MELT_MINUS_SCORED,
+    NAMED_MATERIAL_MIXTURE,
+    PRINTED_STARTING_BULK,
+    SAME_RUN_INITIAL_ANALYSED_MELT,
+    SCORED_PHASE_ANALYSIS,
+    analysed_melt_decision,
+    collect_run_texts,
+    composition_with_provenance,
+    is_d323_candidate,
+    label_marks_final,
+    label_marks_initial,
+    phase_map_provenance,
+)
 from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
     ElementMassFractionRedox,
@@ -1732,6 +1746,11 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                     if payload.get("analysis_selection_rule") in (None, "")
                     else str(payload.get("analysis_selection_rule"))
                 ),
+                input_provenance=(
+                    None
+                    if payload.get("input_provenance") in (None, "")
+                    else str(payload.get("input_provenance"))
+                ),
             )
         return Located(
             State.of(composition),
@@ -1973,6 +1992,11 @@ def _composition_from_plain(payload: object) -> Composition:
             None
             if payload.get("analysis_selection_rule") in (None, "")
             else str(payload.get("analysis_selection_rule"))
+        ),
+        "input_provenance": (
+            None
+            if payload.get("input_provenance") in (None, "")
+            else str(payload.get("input_provenance"))
         ),
     }
     if amount_basis is AmountBasis.MASS_PERCENT:
@@ -5046,6 +5070,7 @@ _COMPOSITION_MOL_META_KEYS = frozenset(
         "proxy_flag",
         "proxy_source",
         "analysis_selection_rule",
+        "input_provenance",
     }
 )
 _DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
@@ -5527,6 +5552,285 @@ def _row_printed_composition_unknown(
     return False
 
 
+_INPUT_PROVENANCE_QUANTITIES = PHASE_ROW_QUANTITIES | {
+    Quantity.FE3_FE2_RATIO,
+    Quantity.VALENCE_RATIO,
+}
+_PHASE_ANALYSIS_QUANTITY_NAMES = frozenset(
+    {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value,
+        Quantity.DISTRIBUTION_RATIO.value,
+        Quantity.SULFIDE_CAPACITY.value,
+        Quantity.CHLORIDE_CAPACITY.value,
+        Quantity.FE3_FE2_RATIO.value,
+        Quantity.VALENCE_RATIO.value,
+    }
+)
+
+
+def _printed_oxide_map_locator(values: object) -> Locator | None:
+    """Locator anchored on the composition map itself, not the row."""
+
+    if not isinstance(values, Mapping):
+        return None
+    for key in _PRINTED_COMPOSITION_MAP_KEYS:
+        raw = values.get(key)
+        if isinstance(raw, Mapping) and raw.get("locator") not in (None, ""):
+            return locator_from_mapping(raw.get("locator"))
+    return None
+
+
+def _row_phase_label(row: Mapping[str, Any]) -> str:
+    parts = [str(row.get("observation_id") or "")]
+    locator = row.get("locator")
+    if isinstance(locator, Mapping):
+        for key in ("row", "row_label", "note"):
+            raw = locator.get(key)
+            if raw not in (None, ""):
+                parts.append(str(raw))
+    return " ".join(parts)
+
+
+def _row_is_phase_analysis(row: Mapping[str, Any]) -> bool:
+    values = row.get("values")
+    quantity = ""
+    if isinstance(values, Mapping):
+        quantity = str(values.get("quantity") or "")
+    if not quantity:
+        quantity = str(row.get("type") or "")
+    return quantity in _PHASE_ANALYSIS_QUANTITY_NAMES
+
+
+def _same_run_initial_melts(
+    rows: Sequence[tuple[str, Mapping[str, Any]]],
+) -> dict[tuple[str, str], dict[str, Decimal]]:
+    """Initial-labelled equilibrium phase rows, keyed by experiment and table.
+
+    The label is the observation id or the locator row text. Amounts are not
+    compared with the final row. A repeated oxide with two amounts drops the
+    whole map.
+    """
+
+    grouped: dict[tuple[str, str], dict[str, Decimal]] = {}
+    conflict: set[tuple[str, str]] = set()
+    for formula, row in rows:
+        if not isinstance(row, Mapping) or not _row_is_phase_analysis(row):
+            continue
+        if not label_marks_initial(_row_phase_label(row)):
+            continue
+        values = row.get("values")
+        if not isinstance(values, Mapping):
+            continue
+        units = " ".join(
+            str(part or "")
+            for part in (
+                row.get("units"),
+                values.get("basis_as_published"),
+                values.get("basis"),
+            )
+        ).casefold()
+        if not any(token in units for token in ("wt", "weight", "mass")):
+            continue
+        experiment = str(row.get("experiment") or "")
+        locator = row.get("locator")
+        table = ""
+        if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
+            table = str(locator.get("table"))
+        if not experiment or not table:
+            continue
+        oxide = _canonical_printed_oxide_name(str(formula).strip())
+        if oxide not in _COMPOSITION_COMPONENTS:
+            continue
+        amount = _as_dec_or_none(values.get("value"))
+        if amount is None or amount < 0:
+            continue
+        key = (experiment, table)
+        if key in conflict:
+            continue
+        bucket = grouped.setdefault(key, {})
+        previous = bucket.get(oxide)
+        if previous is not None and previous != amount:
+            conflict.add(key)
+            grouped.pop(key, None)
+            continue
+        bucket[oxide] = amount
+    return grouped
+
+
+def _bind_same_run_initial_composition(
+    obs: Mapping[str, Any],
+    context: Mapping[str, Any],
+) -> Composition | None:
+    """KC91 Table 3: the initial analysed melt is the final row's run composition."""
+
+    if not label_marks_final(_row_phase_label(obs)):
+        return None
+    experiment = str(obs.get("experiment") or "")
+    locator = obs.get("locator")
+    table = ""
+    if isinstance(locator, Mapping) and locator.get("table") not in (None, ""):
+        table = str(locator.get("table"))
+    if not experiment or not table:
+        return None
+    melts = context.get("same_run_initial_melts")
+    if not isinstance(melts, Mapping):
+        return None
+    weights = melts.get((experiment, table))
+    if not isinstance(weights, Mapping) or len(weights) < 2:
+        return None
+    try:
+        composition = wt_pct_to_mole_fraction(weights)
+    except (ArithmeticError, ValueError):
+        return None
+    return composition_with_provenance(composition, SAME_RUN_INITIAL_ANALYSED_MELT)
+
+
+def _identity_phase_role(ident_kwargs: Mapping[str, Any]) -> PhaseRole | None:
+    state = ident_kwargs.get("phase_role")
+    if isinstance(state, State) and state.is_value and isinstance(state.value, PhaseRole):
+        return state.value
+    return None
+
+
+def _finalize_input_provenance(
+    ident_kwargs: dict[str, Any],
+    *,
+    quantity: Quantity | None,
+    formula: str,
+    experiment: Experiment | None,
+    row_locator: Locator | None,
+    map_locator: Locator | None,
+    point_conditions: Mapping[str, Any] | None,
+    derivation_relation: str | None = None,
+) -> None:
+    """Stamp a token when the writer has not, then upgrade a d-323 candidate.
+
+    Catalogue proxies stay unset. initial_charge_only is a printed start.
+    Anything else with no token takes the map-locator class, and that class
+    is scored_phase_analysis when the locator does not say. The stored
+    component amounts are the printed vector; the scorer removes scored
+    components when the token is analysed_melt_minus_scored.
+    """
+
+    if quantity not in _INPUT_PROVENANCE_QUANTITIES:
+        return
+    state = ident_kwargs.get("composition")
+    if not isinstance(state, State) or not state.is_value:
+        return
+    composition = state.value
+    if not isinstance(composition, Composition):
+        return
+    if composition.proxy_flag == "composition_from_sample_catalog":
+        return
+    if composition.basis in {
+        ELEMENT_WT_PERCENT_BASIS,
+        ELEMENT_WT_PERCENT_FEO_T_BASIS,
+    }:
+        return
+    subtype = ident_kwargs.get("subtype")
+    if (
+        isinstance(subtype, State)
+        and subtype.is_value
+        and subtype.value == ELEMENT_WT_PERCENT_BASIS
+    ):
+        return
+    if composition.input_provenance is None:
+        if composition.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            token = PRINTED_STARTING_BULK
+        else:
+            token = phase_map_provenance(map_locator, row_locator)
+        composition = composition_with_provenance(composition, token)
+        ident_kwargs["composition"] = State.of(composition)
+    if composition.input_provenance != SCORED_PHASE_ANALYSIS:
+        if (
+            composition.input_provenance == ANALYSED_MELT_MINUS_SCORED
+            and not _d323_row(quantity, formula, _identity_phase_role(ident_kwargs))
+        ):
+            ident_kwargs["composition"] = State.of(
+                composition_with_provenance(composition, SCORED_PHASE_ANALYSIS)
+            )
+        return
+    texts = collect_run_texts(
+        experiment,
+        locator=row_locator,
+        point_conditions=point_conditions,
+        derivation_relation=derivation_relation,
+    )
+    temperature_K = None
+    temperature_state = ident_kwargs.get("temperature_K")
+    if (
+        isinstance(temperature_state, State)
+        and temperature_state.is_value
+        and temperature_state.value is not None
+    ):
+        temperature_K = _as_dec_or_none(temperature_state.value)
+    decision = analysed_melt_decision(
+        provenance=SCORED_PHASE_ANALYSIS,
+        quantity=quantity,
+        formula=formula,
+        phase_role=_identity_phase_role(ident_kwargs),
+        texts=texts,
+        point_conditions=point_conditions,
+        temperature_K=temperature_K,
+    )
+    if decision.action == "rewrite":
+        ident_kwargs["composition"] = State.of(
+            composition_with_provenance(composition, ANALYSED_MELT_MINUS_SCORED)
+        )
+
+
+def _d323_row(
+    quantity: Quantity | None,
+    formula: str,
+    phase_role: PhaseRole | None,
+) -> bool:
+    return is_d323_candidate(quantity, formula, phase_role)
+
+
+def _mixture_input_provenance(
+    parents: Sequence[str],
+    phase_analysis_parent_ids: object,
+) -> str:
+    """A t-1593 mixture of printed starts, unless a parent is a phase analysis.
+
+    An unresolved parent is already an unknown state and is not stamped.
+    A feedstock id is not a phase analysis. When a parent observation's
+    quantity is a phase-analysis quantity, the mixture is the analysis.
+    """
+
+    ids = (
+        phase_analysis_parent_ids
+        if isinstance(phase_analysis_parent_ids, (set, frozenset))
+        else frozenset()
+    )
+    if any(parent in ids for parent in parents):
+        return SCORED_PHASE_ANALYSIS
+    return NAMED_MATERIAL_MIXTURE
+
+
+def _stamp_mixture_provenance(
+    ident_kwargs: dict[str, Any],
+    point_conditions: Mapping[str, Located[Any]] | None,
+    binding: _NamedMaterialMixtureBinding,
+    phase_analysis_parent_ids: object,
+) -> Mapping[str, Located[Any]] | None:
+    state = binding.located.state
+    if not isinstance(state, State) or not state.is_value:
+        return point_conditions
+    composition = state.value
+    if not isinstance(composition, Composition):
+        return point_conditions
+    stamped = State.of(
+        composition_with_provenance(
+            composition,
+            _mixture_input_provenance(binding.parents, phase_analysis_parent_ids),
+        )
+    )
+    ident_kwargs["composition"] = stamped
+    located = replace(binding.located, state=stamped)
+    return {**(point_conditions or {}), "composition": located}
+
+
 def _apply_equilibrium_starting_bulk(
     experiment: Experiment | None,
     ident_kwargs: dict[str, Any],
@@ -5569,8 +5873,13 @@ def _apply_equilibrium_starting_bulk(
         return point_conditions, []
     if _keeps_existing_composition(ident_kwargs.get("composition")):
         return point_conditions, []
+    composition_for_row = composition
+    if composition.proxy_flag != "composition_from_sample_catalog":
+        composition_for_row = composition_with_provenance(
+            composition, PRINTED_STARTING_BULK
+        )
     located = Located(
-        initial.state,
+        State.of(composition_for_row),
         locator=initial.locator,
         inference=initial.inference,
     )
@@ -18844,6 +19153,7 @@ class Migrator:
         named_material_composition_records: dict[
             str, tuple[dict[str, Decimal], Locator | None]
         ] = {}
+        phase_analysis_parent_ids: set[str] = set()
         for _formula, row in rows:
             record_id = row.get("observation_id")
             if not isinstance(record_id, str) or not record_id:
@@ -18853,12 +19163,18 @@ class Migrator:
             record = _named_material_record_from_row(row)
             if record is not None:
                 named_material_composition_records[record_id] = record
+                if _row_is_phase_analysis(row):
+                    phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["sample_compositions"] = sample_compositions
         source_context["named_material_composition_records"] = (
             named_material_composition_records
         )
+        source_context["phase_analysis_parent_ids"] = frozenset(
+            phase_analysis_parent_ids
+        )
+        source_context["same_run_initial_melts"] = _same_run_initial_melts(rows)
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -20126,6 +20442,14 @@ class Migrator:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(composition_refusal)
             )
+        current_composition = ident_kwargs.get("composition")
+        if (
+            q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            and current_composition is None
+        ):
+            same_run = _bind_same_run_initial_composition(obs, context)
+            if same_run is not None:
+                ident_kwargs["composition"] = State.of(same_run)
         derived_oxygen = collect_author_ratio_oxygen((values,), locator)
         if (
             raw_adm == AdmissionStatus.ADMITTED.value
@@ -20352,6 +20676,25 @@ class Migrator:
                     ident_kwargs["subtype"] = State.unknown(
                         "source does not state equilibrium composition basis"
                     )
+        same_run_state = ident_kwargs.get("composition")
+        if (
+            isinstance(same_run_state, State)
+            and same_run_state.is_value
+            and isinstance(same_run_state.value, Composition)
+            and same_run_state.value.input_provenance == SAME_RUN_INITIAL_ANALYSED_MELT
+        ):
+            # "oxide wt%" is a prose weight percent. The phase profile keeps a
+            # composition only on a closed basis token, and the scorer reads
+            # the token only once phase_role is present. The printed phase
+            # field is that role. Amounts stay the initial analysed vector.
+            ident_kwargs["subtype"] = State.of("wt_percent")
+            existing_role = ident_kwargs.get("phase_role")
+            if not (
+                isinstance(existing_role, State) and existing_role.is_value
+            ):
+                role = _phase_role_token(phase_raw)
+                if role is not None:
+                    ident_kwargs["phase_role"] = State.of(role)
         if q_token in FUSION_QUANTITIES:
             ident_kwargs["subtype"] = State.of("solid_to_liquid")
         if q_token is Quantity.TRANSITION_TEMPERATURE and (
@@ -20847,6 +21190,9 @@ class Migrator:
                         basis="printed_phase_composition",
                         components=components,
                         amount_basis=AmountBasis.MASS_PERCENT,
+                        input_provenance=phase_map_provenance(
+                            printed.locator, locator
+                        ),
                     )
                     located_composition = Located(
                         State.of(composition), locator=printed.locator
@@ -20982,6 +21328,26 @@ class Migrator:
                     mixture_binding.lot_reason,
                     mixture_binding.lot_source or "",
                 )
+            point_conditions = _stamp_mixture_provenance(
+                ident_kwargs,
+                point_conditions,
+                mixture_binding,
+                context.get("phase_analysis_parent_ids"),
+            )
+        _finalize_input_provenance(
+            ident_kwargs,
+            quantity=q_token if isinstance(q_token, Quantity) else None,
+            formula=species.formula if species is not None else "",
+            experiment=self.result.experiments.get(experiment_id),
+            row_locator=locator,
+            map_locator=_printed_oxide_map_locator(
+                values if isinstance(values, Mapping) else None
+            ),
+            point_conditions=point_conditions,
+            derivation_relation=(
+                value_derivation.relation if value_derivation is not None else None
+            ),
+        )
         identity = fill_identity(
             quantity,
             None if q_token is Quantity.LOG10_K_REACTION else species,
@@ -22631,6 +22997,22 @@ class Migrator:
                 ),
                 charge=species.charge,
             )
+        child_map_locator = _printed_oxide_map_locator(
+            raw_item if isinstance(raw_item, Mapping) else None
+        )
+        if child_map_locator is None:
+            child_map_locator = _printed_oxide_map_locator(
+                parent_values if isinstance(parent_values, Mapping) else None
+            )
+        _finalize_input_provenance(
+            ident_kwargs,
+            quantity=q_token_point if isinstance(q_token_point, Quantity) else None,
+            formula=species.formula if species is not None else "",
+            experiment=self.result.experiments.get(experiment_id),
+            row_locator=point_locator,
+            map_locator=child_map_locator,
+            point_conditions=parent_point_conditions,
+        )
         identity = fill_identity(quantity, species, **ident_kwargs)
         converted: Derivation | None = None
         if value_sel is not None and value_sel.available:

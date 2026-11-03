@@ -391,6 +391,24 @@ class Composition:
     proxy_flag: str | None = None
     proxy_source: str | None = None
     analysis_selection_rule: str | None = None
+    # How this vector was chosen as an engine input. Closed tokens, set by
+    # migrate.py from locators, notes, and table identity. Absent means a
+    # writer that has not been classified. The phase scorer does not compare
+    # component amounts to the scored point.
+    #   scored_phase_analysis
+    #     own-row analysis, a sibling of that phase, a printed-phase stamp of
+    #     a product or analysed phase, or a table of averages of analyses.
+    #   printed_starting_bulk
+    #     starting, batched, or nominal charge on a different table from the
+    #     scored row, or a note that says so.
+    #   named_material_mixture_of_printed_starts
+    #     t-1593 mixture whose parents are printed starting materials.
+    #   analysed_melt_minus_scored
+    #     d-323 analysed single-melt majors. The stored amounts stay the
+    #     printed analysis; the scorer removes the scored components.
+    #   same_run_initial_analysed_melt
+    #     KC91 Table 3 initial analysis bound onto the final row.
+    input_provenance: str | None = None
 
     def __post_init__(self) -> None:
         if not self.basis:
@@ -407,7 +425,12 @@ class Composition:
                     f"Composition component {key!r} must be a nonnegative finite amount"
                 )
         object.__setattr__(self, "components", canonical)
-        for name in ("proxy_flag", "proxy_source", "analysis_selection_rule"):
+        for name in (
+            "proxy_flag",
+            "proxy_source",
+            "analysis_selection_rule",
+            "input_provenance",
+        ):
             value = getattr(self, name)
             if value is not None:
                 value = str(value).strip()
