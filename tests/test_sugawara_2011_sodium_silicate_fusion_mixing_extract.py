@@ -219,7 +219,26 @@ def test_printed_rows_and_render_pins():
         ]
         assert "[47] standard state value" in row["values"]["derivation"]["relation"]
         assert "[40] heat capacity" in row["values"]["derivation"]["relation"]
-    assert rows["sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing"]["values"]["method_class"] == "author_derived"
+    weighted_parents = [
+        "sugawara_2011_t1_na2sio3_enthalpy_of_mixing",
+        "sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference",
+        "sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference",
+        "sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference",
+    ]
+    weighted = rows["sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing"]["values"]
+    assert weighted["method_class"] == "author_derived"
+    assert weighted["derived_from"] == weighted_parents
+    assert weighted["derivation"]["inputs"] == weighted_parents
+    references = {
+        row["observation_id"]: row["values"]["reference_as_printed"]
+        for row in document["species"]["Na2O"]["context"]
+        if row["observation_id"] in {item.rsplit("::", 1)[-1] for item in weighted_parents[1:]}
+    }
+    assert references == {
+        "sugawara_2011_p4_weighted_mean_fan_reference": "Fan [10]",
+        "sugawara_2011_p4_weighted_mean_naylor_reference": "Naylor [37]",
+        "sugawara_2011_p4_weighted_mean_richet_reference": "Richet et al. [38]",
+    }
 
 
 def test_compositions_keep_printed_basis_and_migration_conditions():
@@ -270,6 +289,14 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
     assert source_rows["sugawara_2011_t2_na6si8o19_fusion_enthalpy"]["values"]["value"] == "7.79"
     assert source_rows["sugawara_2011_t1_na2sio3_heat_of_fusion"]["values"]["formula_basis_as_printed"].startswith("1/2 Na2SiO3")
     assert source_rows["sugawara_2011_t2_na6si8o19_fusion_enthalpy"]["values"]["formula_basis_as_printed"].startswith("Na6Si8O19–SiO2")
+    per_gfw_cpg = (
+        "sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation",
+        "sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation",
+        "sugawara_2011_t2_na2sio3_solid_heat_capacity_equation",
+    )
+    for observation_id in per_gfw_cpg:
+        assert migrated[observation_id].value.kind is ValueKind.UNAVAILABLE
+        assert not migrated[observation_id].identity.quantity.is_value
     assert migrated["sugawara_2011_t2_sio2_liquid_heat_capacity"].value.point == Decimal("81.37")
     for observation_id, expected in (
         ("sugawara_2011_t1_na2si2o5_heat_of_fusion", Decimal("0.7")),
@@ -277,6 +304,14 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
     ):
         assert migrated[observation_id].uncertainty.kind is UncertaintyKind.PRINTED
         assert migrated[observation_id].uncertainty.verbatim["value"] == str(expected)
+    assert migrated["sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing"].uncertainty.kind is UncertaintyKind.PRINTED
+    assert migrated["sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing"].uncertainty.verbatim["value"] == "1.3"
+    for observation_id, printed_width in (
+        ("sugawara_2011_t1_na2si2o5_enthalpy_of_mixing", "1.2"),
+        ("sugawara_2011_t1_na2sio3_enthalpy_of_mixing", "1.5"),
+    ):
+        assert migrated[observation_id].uncertainty.kind is UncertaintyKind.PRINTED
+        assert migrated[observation_id].uncertainty.verbatim["value"] == printed_width
     for observation_id in (
         "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
         "sugawara_2011_t1_na2si2o5_heat_of_fusion",
@@ -288,6 +323,39 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
         experiment = result.experiments[observation.experiment_id]
         assert experiment.method.value is MethodToken.DTA_DSC
         assert observation.evidence.class_.value.value == "measured_tabulated"
+    assert len(result.experiments) == 2
+    dsc_experiment_ids = {
+        migrated[observation_id].experiment_id
+        for observation_id in (
+            "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+            "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+            "sugawara_2011_t1_na2sio3_heat_of_fusion",
+            "sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy",
+            "sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy",
+        )
+    }
+    assert len(dsc_experiment_ids) == 1
+    dsc_experiment_id = next(iter(dsc_experiment_ids))
+    quoted = migrated["sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37"]
+    quoted_experiment = result.experiments[quoted.experiment_id]
+    assert quoted.experiment_id != dsc_experiment_id
+    assert not quoted_experiment.method.is_value
+    assert all(
+        result.experiments[experiment_id].method.value is MethodToken.DTA_DSC
+        for experiment_id in dsc_experiment_ids
+    )
+    other_experiments = {
+        row.experiment_id for observation_id, row in migrated.items()
+        if observation_id not in {
+            "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
+            "sugawara_2011_t1_na2si2o5_heat_of_fusion",
+            "sugawara_2011_t1_na2sio3_heat_of_fusion",
+            "sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy",
+            "sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy",
+        }
+    }
+    assert other_experiments == {quoted.experiment_id}
+    assert not result.experiments[quoted.experiment_id].method.is_value
     for observation_id, page, table in (
         ("sugawara_2011_t1_na2sio3_heat_of_fusion", 2, "1"),
         ("sugawara_2011_t2_sio2_liquid_heat_capacity", 3, "2"),
@@ -310,6 +378,9 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
         "sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm",
         "sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm",
         "sugawara_2011_t2_na2o_solid_enthalpy_at_tm",
+        "sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation",
+        "sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation",
+        "sugawara_2011_t2_na2sio3_solid_heat_capacity_equation",
         "sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion",
         "sugawara_2011_t1_na2si2o5_heat_of_fusion",
         "sugawara_2011_t1_na2sio3_heat_of_fusion",

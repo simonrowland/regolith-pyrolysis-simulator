@@ -63,6 +63,7 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
+          composition_id: sugawara_2011_present_study_dsc
           method_class: measured_tabulated
           quantity: heat_of_fusion_per_gram_formula_as_printed
           admission_status: typed_refusal
@@ -194,6 +195,12 @@ species:
             - sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.3'
+          verbatim: ± 1.3
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_na6_conditions_mixing
           temperature_K:
             state:
@@ -367,7 +374,15 @@ species:
         units: J/mol K
         standard_state_as_printed: Solid heat capacity function at the printed eutectic composition.
         values:
-          quantity: cp
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: Na6Si8O19–SiO2 eutectic composition; gram formula weight 60.566 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
           method_class: quoted_attributed
           equation_as_printed: Cp = 112.78 − 1.3334 × 10⁻³ T + 2.2919 × 10⁵ T⁻² − 1089.1 T⁻⁰·⁵
           formula_variable_as_printed: T in K
@@ -489,6 +504,7 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
+          composition_id: sugawara_2011_present_study_dsc
           method_class: measured_tabulated
           quantity: heat_of_fusion_per_gram_formula_as_printed
           admission_status: typed_refusal
@@ -563,6 +579,7 @@ species:
         standard_state_as_printed: Enthalpy of fusion from crystalline Na2Si2O5 to liquid.
         values:
           quantity: heat_of_fusion
+          composition_id: sugawara_2011_present_study_dsc
           method_class: measured_tabulated
           value: '29.0'
           uncertainty_kJ_mol-1: '1.4'
@@ -765,6 +782,12 @@ species:
             - sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.2'
+          verbatim: ± 1.2
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_n2s_mixing_conditions
           temperature_K:
             state:
@@ -938,7 +961,15 @@ species:
         units: J/mol K
         standard_state_as_printed: Solid heat capacity function at the printed one-third formula composition.
         values:
-          quantity: cp
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: 1/3 Na2Si2O5; gram formula weight 60.712 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
           method_class: quoted_attributed
           equation_as_printed: Cp = 108.43 + 1.5187 × 10⁻³ T + 1.6813 × 10⁵ T⁻² − 975.92 T⁻⁰·⁵
           formula_variable_as_printed: T in K
@@ -1046,6 +1077,7 @@ species:
         units: kJ/mol
         standard_state_as_printed: Enthalpy of fusion at Tm, from crystalline solid to liquid.
         values:
+          composition_id: sugawara_2011_present_study_dsc
           method_class: measured_tabulated
           quantity: heat_of_fusion_per_gram_formula_as_printed
           admission_status: typed_refusal
@@ -1120,6 +1152,7 @@ species:
         standard_state_as_printed: Enthalpy of fusion from crystalline Na2SiO3 to liquid.
         values:
           quantity: heat_of_fusion
+          composition_id: sugawara_2011_present_study_dsc
           method_class: measured_tabulated
           value: '53.2'
           uncertainty_kJ_mol-1: '2.0'
@@ -1322,6 +1355,12 @@ species:
             - sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
             - sugawara_2011_t2_sio2_solid_enthalpy_at_tm
             - sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+        uncertainty:
+          kind: printed
+          value: '1.5'
+          verbatim: ± 1.5
+          confidence_level: not_stated
+          basis: Printed uncertainty width; confidence level not stated.
         point_conditions: &t1_ns_mixing_conditions
           temperature_K:
             state:
@@ -1366,14 +1405,18 @@ species:
           method_class: author_derived
           admission_status: typed_refusal
           derived_from:
-            - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
-            - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
             - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
-            - sugawara_2011_t2_na6si8o19_fusion_enthalpy
-            - sugawara_2011_t2_na2si2o5_fusion_enthalpy
-            - sugawara_2011_t2_na2sio3_fusion_enthalpy
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+            - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
           derivation:
-            relation: Authors report the weighted average from the present-study and Table 2 rows plus comparison data from Fan [10], Naylor [37], and Richet et al. [38].
+            relation: Authors report the weighted average from the present-study NS row and the Fan [10], Naylor [37], and Richet et al. [38] references; Table 2 data are also cited in the text.
+            inputs:
+              - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+              - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+
           schema_gap: >-
             The exact printed observable is integral liquid enthalpy of mixing, H_Mix^L. OBSERVATION_TYPES admits
             heat_capacity_and_heat_content_series and PHASE_MAP maps l to a liquid phase, but no exact Quantity token
@@ -1582,7 +1625,15 @@ species:
         units: J/mol K
         standard_state_as_printed: Solid heat capacity function at the printed one-half formula composition.
         values:
-          quantity: cp
+          quantity: heat_capacity_equation_per_gram_formula_as_printed
+          admission_status: typed_refusal
+          formula_basis_as_printed: 1/2 Na2SiO3; gram formula weight 61.029 g/mol
+          schema_gap: >-
+            This Cp^G equation is printed on a per gram-formula basis; Quantity.CP has no gram-formula multiplier in Identity. Preserve the equation without binding it to the full formula.
+          schema_gap_symbols:
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/enums.py::Quantity.CP
+            - simulator/battery/records.py::Identity
           method_class: quoted_attributed
           equation_as_printed: Cp = 99.042 + 7.6665 × 10⁻³ T + 0.3655 × 10⁵ T⁻² − 731.95 T⁻⁰·⁵
           formula_variable_as_printed: T in K
@@ -2058,6 +2109,36 @@ species:
               reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
             locator: *t2_na2o_hsolid_locator
     context:
+      - observation_id: sugawara_2011_p4_weighted_mean_fan_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Fan [10]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+      - observation_id: sugawara_2011_p4_weighted_mean_naylor_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Naylor [37]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+      - observation_id: sugawara_2011_p4_weighted_mean_richet_reference
+        type: literature_reference
+        units: citation only; no input values tabulated in this extract
+        locator:
+          page: 4
+          published_page: 1393
+          paragraph: Weighted average of liquid mixing enthalpy at NS composition
+        values:
+          reference_as_printed: Richet et al. [38]
+          role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
       - observation_id: sugawara_2011_t3_gibbs_mixing_coefficients
         type: thermodynamic_model_parameters
         locator:
