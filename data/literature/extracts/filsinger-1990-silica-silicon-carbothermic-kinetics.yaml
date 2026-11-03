@@ -1140,7 +1140,7 @@ species:
         initial_weight_loss_temperature_C: '1450'
         intermediate_material_as_printed: ''
         intermediate_temperature_C: ''
-        final_residue_xrd_as_printed: 75% SiC; β:α = 3:1; 2% C
+        final_residue_xrd_as_printed: '75% SiC; β:α/3:1; 2% C'
         T_C: '2000'
         heating_rate_as_printed: 20°C/min
         average_helium_flow_as_printed: 3 mm/s
@@ -1232,7 +1232,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 106;
+        likely 10^6 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1248,7 +1249,7 @@ species:
         A: '-4.18'
         B: '17.55'
         activation_energy_kJ_per_mol: '348'
-        preexponential_factor_as_printed: 10^6
+        preexponential_factor_as_printed: '106'
         reaction_as_printed: 2SiO2 + SiC → 3SiO + CO
         crucible_vent_as_printed: Open
         temperature_range_as_printed: 1833–2033
@@ -1366,7 +1367,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 106;
+        likely 10^6 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1382,7 +1384,7 @@ species:
         A: '-4.06'
         B: '13.79'
         activation_energy_kJ_per_mol: '340'
-        preexponential_factor_as_printed: 10^6
+        preexponential_factor_as_printed: '106'
         reaction_as_printed: SiO(s) → SiO(g)
         crucible_vent_as_printed: 0.4 mm
         temperature_range_as_printed: 1833–2033
@@ -1498,7 +1500,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 106;
+        likely 10^6 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1514,7 +1517,7 @@ species:
         A: '-3.68'
         B: '14.34'
         activation_energy_kJ_per_mol: '305'
-        preexponential_factor_as_printed: 10^6
+        preexponential_factor_as_printed: '106'
         reaction_as_printed: SiO(s) → SiO(g)
         crucible_vent_as_printed: Open
         temperature_range_as_printed: 1683–1833
@@ -1630,7 +1633,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 107;
+        likely 10^7 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1646,7 +1650,7 @@ species:
         A: '-4.18'
         B: '16.95'
         activation_energy_kJ_per_mol: '348'
-        preexponential_factor_as_printed: 10^7
+        preexponential_factor_as_printed: '107'
         reaction_as_printed: SiO2 + Si → 2SiO
         crucible_vent_as_printed: Open
         temperature_range_as_printed: 1683–1883
@@ -1791,7 +1795,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 108;
+        likely 10^8 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1807,7 +1812,7 @@ species:
         A: '-4.68'
         B: '18.82'
         activation_energy_kJ_per_mol: '390'
-        preexponential_factor_as_printed: 10^8
+        preexponential_factor_as_printed: '108'
         reaction_as_printed: SiO2 + 3C → SiC + 2CO
         crucible_vent_as_printed: Open
         temperature_range_as_printed: 1733–1933
@@ -1925,7 +1930,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 1010;
+        likely 10^10 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -1941,7 +1947,7 @@ species:
         A: '-5.69'
         B: '23.76'
         activation_energy_kJ_per_mol: '472'
-        preexponential_factor_as_printed: 10^10
+        preexponential_factor_as_printed: '1010'
         reaction_as_printed: SiO + 2C → SiC + CO
         crucible_vent_as_printed: 0.4 mm
         temperature_range_as_printed: 1733–1933
@@ -2059,7 +2065,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 1010;
+        likely 10^10 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -2075,7 +2082,7 @@ species:
         A: '-6.10'
         B: '24.42'
         activation_energy_kJ_per_mol: '505'
-        preexponential_factor_as_printed: 10^10
+        preexponential_factor_as_printed: '1010'
         reaction_as_printed: (2.8)SiO + SiC → 2Si + CO
         crucible_vent_as_printed: 0.4 mm
         temperature_range_as_printed: 1963–2073
@@ -2194,7 +2201,8 @@ species:
       phase: gas
       units: A and B dimensionless; E_s kJ/mol; Z s^-1
       note: One Table III row reports a fitted reaction-kinetics parameter set; the rate constant and its Arrhenius
-        parameters have no exact quantity token, so the row is typed-refused.
+        parameters have no exact quantity token, so the row is typed-refused. The Z cell prints baseline digits 1011;
+        likely 10^11 with the exponent set on the baseline; not certain.
       values:
         quantity: arrhenius_kinetic_fit_parameters_as_published
         schema_gap: 'No exact kinetic rate-constant or Arrhenius-parameter quantity token exists: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
@@ -2210,7 +2218,7 @@ species:
         A: '-6.99'
         B: '25.10'
         activation_energy_kJ_per_mol: '505'
-        preexponential_factor_as_printed: 10^11
+        preexponential_factor_as_printed: '1011'
         reaction_as_printed: (2.8)SiO + SiC → 2Si + CO
         crucible_vent_as_printed: Loose lid
         temperature_range_as_printed: 1998–2073
