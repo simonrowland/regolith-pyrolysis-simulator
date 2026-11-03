@@ -88,6 +88,63 @@ def _observations(document):
     ]
 
 
+SC456_MODEL_DERIVED_IDS = {
+    "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p002_t01_r10_c05",
+    "shornikov_2020_tm_cao_r10",
+    "shornikov_2020_tm_mgo_r10",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c04",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r04_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c02",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c04",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r05_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r06_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r07_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r08_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r09_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r10_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r11_c06",
+    "shornikov_2020_cao_mgo_thermodynamics_p003_t02_r12_c06",
+    "shornikov_2020_fig2a_line1_CaO_not_sampled",
+    "shornikov_2020_fig2a_line2_CaO_not_sampled",
+    "shornikov_2020_fig2a_line4_MgO_not_sampled",
+    "shornikov_2020_fig2a_line5_MgO_not_sampled",
+}
+
+
+def _assert_sc456_evidence_classes(document):
+    rows = {row["observation_id"]: row for _formula, row in _observations(document)}
+    for observation_id in SC456_MODEL_DERIVED_IDS:
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "model_derived"
+        assert row["derivation"]["method"]["locator"]["published_page"] == 79
+        assert row["derivation"]["references"]
+
+    for observation_id in (
+        "shornikov_2020_fig2a_line3_CaO_not_sampled",
+        "shornikov_2020_fig2a_line6_MgO_not_sampled",
+    ):
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert "Wu et al. (1993)" in row["values"]["reason"]
+
+
+def test_sc456_model_derived_rows_are_pinned_against_quoted_class_mutation():
+    document = _load()
+    _assert_sc456_evidence_classes(document)
+
+    mutated = _load()
+    rows = {row["observation_id"]: row for _formula, row in _observations(mutated)}
+    rows["shornikov_2020_cao_mgo_thermodynamics_p003_t02_r03_c02"]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_evidence_classes(mutated)
+
+
 def _figure_markers(document):
     return [
         row
