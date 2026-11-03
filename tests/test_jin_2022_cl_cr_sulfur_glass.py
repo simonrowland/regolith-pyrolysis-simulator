@@ -152,8 +152,30 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
     assert all(row.identity.temperature_K.value == Decimal("1423.15") for row in typed_rows)
     assert all(row.point_conditions["T_C"].state.value == Decimal("1150") for row in typed_rows)
     assert all(row.point_conditions["atmosphere"].state.value == "air" for row in typed_rows)
-    assert all(row.point_conditions["quench"].state.value == "water quench" for row in typed_rows)
     assert all(row.locator.page == 15 and row.locator.published_page == "not_printed" for row in typed_rows)
+
+    baseline_rows = [
+        row for row in typed_rows
+        if row.point_conditions["composition"].locator.table == "1"
+    ]
+    salted_rows = [
+        row for row in typed_rows
+        if row.point_conditions["composition"].state.is_unknown
+    ]
+    assert len(baseline_rows) == 10
+    assert len(salted_rows) == 184
+    assert all(
+        row.point_conditions["quench"].state.value == "poured onto a steel plate"
+        and row.point_conditions["quench"].locator.page == 4
+        and row.point_conditions["quench"].locator.section == "2.2 Preparation of Baseline Glass"
+        for row in baseline_rows
+    )
+    assert all(
+        row.point_conditions["quench"].state.value == "water quench"
+        and row.point_conditions["quench"].locator.page == 4
+        and row.point_conditions["quench"].locator.section == "2.3 Preparation of Salt-Saturated Glass"
+        for row in salted_rows
+    )
 
     baseline_products = (
         "The baseline (BL) glass was prepared without sulfur, chromium, or chlorine, "
@@ -163,27 +185,48 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         "The resulting glass and surface salt were all extracted from the crucible, crushed in a "
         "tungsten carbide mill, and sieved through a #120 mesh sieve (< 125 μm)."
     )
+    xrd_assemblage = (
+        "For all samples, no crystal peaks were observed from the XRD patterns (not shown), "
+        "suggesting that the washing process removed the remnant salt phase(s), including the "
+        "potential salt inclusions, i.e., the potential salt remaining with the washed glass powder "
+        "is below the XRD detection limit (≈ 0.2 mass% for sulfate). Following salt saturation and "
+        "wash processing, every glass sample was homogenous and transparent."
+    )
     assert sum(
-        row.point_conditions["phase_assemblage"].state.value == baseline_products
+        row.point_conditions["run_products_as_printed"].state.value == baseline_products
         for row in typed_rows
     ) == 10
     assert sum(
-        row.point_conditions["phase_assemblage"].state.value == salted_products
+        row.point_conditions["run_products_as_printed"].state.value == salted_products
         for row in typed_rows
     ) == 184
     assert all(
         (
-            row.point_conditions["phase_assemblage"].state.value == baseline_products
-            and row.point_conditions["phase_assemblage"].locator.section
+            row.point_conditions["run_products_as_printed"].state.value == baseline_products
+            and row.point_conditions["run_products_as_printed"].locator.page == 4
+            and row.point_conditions["run_products_as_printed"].locator.pdf_page_index == 3
+            and row.point_conditions["run_products_as_printed"].locator.section
             == "2.2 Preparation of Baseline Glass"
         )
         or (
-            row.point_conditions["phase_assemblage"].state.value == salted_products
-            and row.point_conditions["phase_assemblage"].locator.section
+            row.point_conditions["run_products_as_printed"].state.value == salted_products
+            and row.point_conditions["run_products_as_printed"].locator.page == 4
+            and row.point_conditions["run_products_as_printed"].locator.pdf_page_index == 3
+            and row.point_conditions["run_products_as_printed"].locator.section
             == "2.3 Preparation of Salt-Saturated Glass"
         )
         for row in typed_rows
     )
+    assert all(
+        row.point_conditions["phase_assemblage"].state.value == xrd_assemblage
+        and row.point_conditions["phase_assemblage"].locator.page == 7
+        and row.point_conditions["phase_assemblage"].locator.pdf_page_index == 6
+        and row.point_conditions["phase_assemblage"].locator.section
+        == "3.1. Solubility of Sulfur, Chlorine and Chromium in Glass Melt"
+        for row in typed_rows
+    )
+    assert all("glass-only run" in row.point_conditions["run_products_as_printed"].locator.note for row in baseline_rows)
+    assert all("saturating phase" in row.point_conditions["run_products_as_printed"].locator.note for row in salted_rows)
     assert all(
         row.point_conditions["sulfide_phase"].state.is_unknown
         and row.point_conditions["sulfide_phase"].state.reason == "sulfide_phase_not_printed"
@@ -199,17 +242,6 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
     assert table2["values"]["basis"] == "wt_percent"
     assert all(row.identity.phase_role.is_value for row in typed_rows)
     assert all(row.identity.phase_role.value is PhaseRole.GLASS for row in typed_rows)
-
-    baseline_rows = [
-        row for row in typed_rows
-        if row.point_conditions["composition"].locator.table == "1"
-    ]
-    salted_rows = [
-        row for row in typed_rows
-        if row.point_conditions["composition"].state.is_unknown
-    ]
-    assert len(baseline_rows) == 10
-    assert len(salted_rows) == 184
     baseline_start = {
         "Al2O3": Decimal("10.47"),
         "B2O3": Decimal("14.09"),
@@ -258,11 +290,13 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         fugacity = row.point_conditions["fO2_Pa"]
         assert fugacity.state.is_unknown
         assert fugacity.state.reason == "fo2_set_by_air_not_printed_numerically"
-        assert fugacity.locator.page == 12
+        assert fugacity.locator.page == 13
+        assert fugacity.locator.pdf_page_index == 12
         assert not (row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value)
         detail = row.point_conditions["method_detail_as_printed"]
         assert detail.state.value == method_detail
-        assert detail.locator.page == 12
+        assert detail.locator.page == 13
+        assert detail.locator.pdf_page_index == 12
         temperature = row.point_conditions["T_C"]
         assert temperature.locator.page == 4
         assert temperature.locator.section in {
