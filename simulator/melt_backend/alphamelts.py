@@ -27,6 +27,7 @@ PetThermoTools 0.4.5 schema verified from installed source:
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import importlib.metadata
 import logging
@@ -680,6 +681,62 @@ def _crash_stderr_tail(stderr: str | None) -> str:
 def _regolith_diagnostics_root() -> Path:
     """Temp directory that already holds the engine diagnostic logs."""
     return Path(tempfile.gettempdir(), 'regolith-pyrolysis-simulator')
+
+
+_ALPHAMELTS_CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
+
+
+def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
+    """Copy the .melts input into the crash-input directory.
+
+    The file name is the sha256, so a repeated crash of the same input
+    keeps one copy. Raises on failure; the caller leaves the refusal
+    unchanged.
+    """
+    payload = Path(melts_path).read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
+    directory = _regolith_diagnostics_root() / _ALPHAMELTS_CRASH_INPUT_DIR_NAME
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / f'{digest}.melts'
+    if not destination.is_file() or destination.read_bytes() != payload:
+        temporary = directory / f'.{digest}.{os.getpid()}.tmp'
+        try:
+            temporary.write_bytes(payload)
+            os.replace(temporary, destination)
+        finally:
+            temporary.unlink(missing_ok=True)
+    return digest, str(destination)
+
+
+def _subprocess_died_diagnostics(
+    melts_path: Path,
+    stderr: str | None,
+) -> dict[str, object]:
+    """Bounded stderr tail and retained .melts identity. Never raises."""
+    extra: dict[str, object] = {}
+    try:
+        tail = _crash_stderr_tail(
+            stderr if isinstance(stderr, str) else ''
+        )
+    except Exception:
+        logger.warning(
+            'AlphaMELTS crash stderr tail failed',
+            exc_info=True,
+        )
+        tail = ''
+    if tail:
+        extra['stderr_tail'] = tail
+    try:
+        digest, retained = _retain_crash_melts_input(melts_path)
+    except Exception:
+        logger.warning(
+            'AlphaMELTS crash input retention failed',
+            exc_info=True,
+        )
+        return extra
+    extra['melts_sha256'] = digest
+    extra['melts_path'] = retained
+    return extra
 
 
 def _alphamelts_backend_failure_detail(reason_code: str,
@@ -3759,6 +3816,16 @@ class _MELTSBackendSupport(MeltBackend):
 
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
+                failure = {
+                    'stage': 'alphamelts_subprocess_execute',
+                    'command': [str(binary), '1'],
+                    'returncode': result.returncode,
+                    'signal': signal_name,
+                }
+                failure.update(_subprocess_died_diagnostics(
+                    melts_path,
+                    result.stderr,
+                ))
                 return self._subprocess_operational_failure_result(
                     temperature_C=requested_temperature_C,
                     pressure_bar=requested_pressure_bar,
@@ -3766,12 +3833,7 @@ class _MELTSBackendSupport(MeltBackend):
                     warnings=result_warnings,
                     diagnostics=diagnostics,
                     reason_code=ALPHAMELTS_REASON_SUBPROCESS_DIED,
-                    failure={
-                        'stage': 'alphamelts_subprocess_execute',
-                        'command': [str(binary), '1'],
-                        'returncode': result.returncode,
-                        'signal': signal_name,
-                    },
+                    failure=failure,
                     detail=f'{signal_name} (returncode {result.returncode})',
                 )
             if result.returncode > 0:

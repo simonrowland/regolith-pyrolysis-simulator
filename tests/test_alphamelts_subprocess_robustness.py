@@ -122,18 +122,31 @@ def test_sigsegv_alphamelts_returns_composition_and_crash_point(tmp_path):
         ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
     assert result.diagnostics['backend_failure_category'] == 'engine_crash'
-    assert result.diagnostics['subprocess_failure'] == {
-        'stage': 'alphamelts_subprocess_execute',
-        'command': [str(stub), '1'],
-        'returncode': -11,
-        'signal': 'SIGSEGV',
+    failure = result.diagnostics['subprocess_failure']
+    assert failure['stage'] == 'alphamelts_subprocess_execute'
+    assert failure['command'] == [str(stub), '1']
+    assert failure['returncode'] == -11
+    assert failure['signal'] == 'SIGSEGV'
+    assert set(failure) <= {
+        'stage',
+        'command',
+        'returncode',
+        'signal',
+        'stderr_tail',
+        'melts_sha256',
+        'melts_path',
     }
-    crash_point = result.diagnostics['out_of_domain_crash_point']
-    assert crash_point['stage'] == 'alphamelts_subprocess_execute'
-    assert crash_point['composition_mol_by_account'] == (
-        _composition_mol_by_account()
-    )
-    assert any('SIGSEGV' in warning for warning in result.warnings)
+    try:
+        crash_point = result.diagnostics['out_of_domain_crash_point']
+        assert crash_point['stage'] == 'alphamelts_subprocess_execute'
+        assert crash_point['composition_mol_by_account'] == (
+            _composition_mol_by_account()
+        )
+        assert any('SIGSEGV' in warning for warning in result.warnings)
+    finally:
+        retained = failure.get('melts_path')
+        if isinstance(retained, str):
+            Path(retained).unlink(missing_ok=True)
 
 
 def test_known_crashing_alkali_silica_binary_launches_without_fo2_path(tmp_path):
