@@ -75,10 +75,10 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert len(result.works) == 1
-    assert len(result.observations) == 4
+    assert len(result.observations) == 5
     assert len(result.experiments) == 10
     assert sum(len(rows) for rows in result.context_by_work.values()) == 4
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 4
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 5
 
     unknown_quantity_ids = {
         local_id
@@ -91,7 +91,15 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
         "dohmen_1998_table1_v893_product",
         "dohmen_1998_table1_v914_product",
         "dohmen_1998_table1_v929_product",
+        "dohmen_1998_table1_v937_product",
     }
+    unknown_phase_ids = {
+        local_id
+        for full_id, row in result.observations.items()
+        if row.identity.species.phase.is_unknown
+        for local_id in (full_id.split("::", 1)[1],)
+    }
+    assert unknown_phase_ids == {"dohmen_1998_table1_v937_product"}
     source_rows = {
         row["observation_id"]: row
         for row in _document()["species"]["Fe"]["observations"]
@@ -102,11 +110,15 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
         "dohmen_1998_table1_v893_product": Decimal("1773.15"),
         "dohmen_1998_table1_v914_product": Decimal("1673.15"),
         "dohmen_1998_table1_v929_product": Decimal("1673.15"),
+        "dohmen_1998_table1_v937_product": Decimal("1673.15"),
     }
     for full_id, row in result.observations.items():
         local_id = full_id.split("::", 1)[1]
-        assert row.identity.species.phase.is_value
-        assert row.identity.species.phase.value is Phase.CR
+        if local_id == "dohmen_1998_table1_v937_product":
+            assert row.identity.species.phase.is_unknown
+        else:
+            assert row.identity.species.phase.is_value
+            assert row.identity.species.phase.value is Phase.CR
         assert row.identity.composition is None or row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa is None or row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
@@ -133,8 +145,16 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
             assert reported_oxygen["state"]["value"]["approximate"] is True
         else:
             assert reported_oxygen["state"]["tag"] == "unknown"
-
         experiment = result.experiments[row.experiment_id]
+        if local_id == "dohmen_1998_table1_v937_product":
+            assert experiment.sample.form is not None
+            assert experiment.sample.form.state.is_value
+            assert experiment.sample.form.state.value == "Molten sample"
+            assert experiment.sample.form.locator is not None
+            assert experiment.sample.form.locator.page == 4
+            assert experiment.sample.form.locator.table == "1"
+        else:
+            assert experiment.sample.form is None
         pressure = experiment.pressure_environment.total_pressure_Pa
         assert pressure.state.is_value
         assert pressure.state.value.kind is ValueKind.INTERVAL
@@ -214,6 +234,24 @@ def test_figure_values_are_deferred_and_table_v937_is_preserved_verbatim() -> No
     document = _document()
     grid = _table1_grid(document)
     assert grid[-1] == TABLE1_RENDER_TRANSCRIPTION[-1]
+    observation = next(
+        item
+        for item in document["species"]["Fe"]["observations"]
+        if item["observation_id"] == "dohmen_1998_table1_v937_product"
+    )
+    assert observation["phase"] == "unknown"
+    assert observation["values"]["composition_as_published"] == "Fa74Fo26"
+    experiment = next(
+        item for item in document["experiments"]
+        if item["experiment_id"] == "dohmen-1998-kems-v937"
+    )
+    assert experiment["sample"]["form"]["state"]["value"] == "Molten sample"
+    prose = next(
+        item
+        for item in document["source_caveats"]
+        if item.get("quote") == "V937 (Fa = 70 mol%)"
+    )
+    assert prose["locator"]["page"] == 6
     film = next(
         item
         for item in document["species"]["Fe"]["context"]
