@@ -142,7 +142,12 @@ def _assert_render_pins(document: dict) -> None:
     assert all("digitisation" in row["values"] for row in figures)
     figure_13 = _context(document, "shornikov_2022_figure_13")["values"]
     assert figure_13["series_as_printed"][-2:] == ["8: CAI FUN1", "9: CAI FUN2"]
-    assert "40% weight loss" in figure_13["qualitative_trend_as_printed"]
+    trend = figure_13["qualitative_trend_as_printed"]
+    assert "40% weight loss" in trend
+    assert "increased" in trend
+    assert "ration" in trend
+    assert "decreases" not in trend
+    assert "CAI FUN" not in trend
 
     neutral_endpoints = _context(document, "shornikov_2022_perovskite_neutral_model_endpoints")
     reducing_endpoints = _context(document, "shornikov_2022_perovskite_reducing_model_endpoints")
@@ -267,6 +272,14 @@ def test_render_cells_conditions_and_migration_are_pinned_and_mutation_sensitive
     mutated = deepcopy(document)
     mutated_table1 = _context(mutated, "shornikov_2022_table1_conditions")["values"]["rows"]
     mutated_table1[8]["composition_mol_percent"]["CaO"] = "6.52"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated)
+
+    mutated = deepcopy(document)
+    mutated_trend = _context(mutated, "shornikov_2022_figure_13")["values"]
+    mutated_trend["qualitative_trend_as_printed"] = mutated_trend[
+        "qualitative_trend_as_printed"
+    ].replace("increased", "decreases")
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
 

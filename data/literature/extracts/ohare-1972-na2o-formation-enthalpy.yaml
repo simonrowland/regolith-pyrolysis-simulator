@@ -540,6 +540,7 @@ species:
       - observation_id: ohare72_reaction_scheme_1_2
         type: thermochemical_reaction_scheme_context
         locator: {page: 3, published_page: 4514, pdf_page_index: 2, section: 'The standard enthalpy of formation of sodium oxide'}
+        units: kJ mole−1
         values:
           reaction_equations_as_printed:
             - {number: '1', equation: 'Na2O(c) + 5.263[NaOH·555.27 H2O(aq)] → 7.263[NaOH·402.23 H2O(aq)]'}
@@ -548,6 +549,7 @@ species:
       - observation_id: ohare72_reaction_scheme_3_7
         type: thermochemical_reaction_scheme_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, section: 'The standard enthalpy of formation of sodium oxide and Discussion'}
+        units: kJ mole−1
         values:
           reaction_equations_as_printed:
             - {number: '3', equation: '2[NaOH·555.27 H2O(aq)] → 2Na(c) + O2(g) + H2(g) + 1110.53 H2O(l)'}
@@ -559,18 +561,21 @@ species:
       - observation_id: ohare72_atomization_equation_8
         type: thermochemical_equation_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, equation: '8'}
+        units: kcal mole−1
         values:
           equation_as_printed: 'ΔHa°(Na2O) = 2ΔHf°(Na,g) + ΔHf°(O,g) − ΔHf°(Na2O,g)'
           numeric_result_locator: {page: 5, published_page: 4516, pdf_page_index: 4}
       - observation_id: ohare72_molecular_mass_na2o
         type: printed_molecular_mass_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, paragraph: 'Reaction (1)'}
+        units: g mol−1
         values:
           formula: Na2O
           molecular_mass_g_mol: '61.979'
       - observation_id: ohare72_parker_dilution_input
         type: attributed_enthalpy_input_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, equation: '2'}
+        units: J mol−1
         values:
           quantity_as_printed: enthalpy of dilution
           dilution_input_J_mol: '-38'
@@ -642,6 +647,7 @@ species:
       - observation_id: ohare72_discussion_uncertainty_assignment
         type: author_uncertainty_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, paragraph: 'Discussion'}
+        units: kcal mole−1
         values:
           assigned_uncertainty_as_printed: '±1 kcal mole−1'
           assigned_to: [Matsui et al., Roth, Rengade]
@@ -660,6 +666,7 @@ species:
       - observation_id: ohare72_sample_and_calorimetry_conditions
         type: sample_composition_and_calorimetry_context
         locator: {page: 2, published_page: 4513, pdf_page_index: 1, section: 'Purification and characterization'}
+        units: kJ mole−1
         values:
           starting_Na2O_sample_mass: approximately 10 g
           heat_treatment_temperature: '520±10 °C'
@@ -689,6 +696,7 @@ species:
       - observation_id: ohare72_prior_sample_compositions
         type: cited_sample_composition_context
         locator: {page: 4, published_page: 4515, pdf_page_index: 3, section: 'Discussion'}
+        units: kcal mole−1
         values:
           matsui_et_al_Na2O_content: '79%–98%'
           matsui_et_al_sample_phase_as_printed: Na2O, phase not specified for each Table II row
@@ -699,6 +707,7 @@ species:
       - observation_id: ohare72_hildenbrand_murad_hydroxide_removal_context
         type: cited_sample_treatment_context
         locator: {page: 2, published_page: 4513, pdf_page_index: 1, section: 'Purification and characterization'}
+        units: kcal mole−1
         values:
           treatment: Na2O containing small amounts of NaOH heated under vacuum
           treatment_duration: 2 days

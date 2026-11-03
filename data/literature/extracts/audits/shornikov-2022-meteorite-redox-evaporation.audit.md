@@ -100,7 +100,7 @@ the extract. Since the table reports linear reaction constants and
 | 6 | Reducing perovskite residual TiO2 values 55.18 and 68.30 mol. %; residual melt weight loss exceeding 80 wt. %; [WO3] condensate 0.06–0.6 wt. %; forsterite melting point 2171 ± 11 K. | (b), rendered paragraph, species labels, and uncertainty glyph |
 | 7 | Forsterite component vapor pressures MgO 5.831 × 10⁻⁵ and SiO2 2.771 × 10⁻⁴ atm at 2173 K; residual MgO values 65.56 and 67.20 mol. %. | (b), rendered paragraph and source locator |
 | 8 | Forsterite initial-to-final composition difference does not exceed 0.6 mol. % at 2173 K. | (b), rendered paragraph and source locator |
-| 10 | Figure 13 describes a constant O/O2 ratio through 40% residual-melt weight loss, followed by a sharp decrease; figure temperature is 2173 K. | (b), rendered prose, caption, and series labels |
+| 10 | Figure 13 describes a constant O/O2 ratio through 40% residual-melt weight loss; the printed sentence says this ration is sharply increased, indicating evaporation of refractory calcium aluminates. Figure temperature is 2173 K. | (b), rendered prose, caption, and series labels |
 
 The figure captions and numbered series for Figures 1–14 were checked against
 the corresponding rendered pages. Figure-only curves for volatility,

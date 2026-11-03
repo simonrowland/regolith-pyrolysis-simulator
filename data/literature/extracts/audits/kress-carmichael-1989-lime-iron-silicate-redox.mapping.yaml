@@ -63,9 +63,9 @@ tables:
       Every Table 1 numeric cell was reconciled against the 600 dpi page render;
       both OCR reads are retained in the consolidated cell audit. Printed run
       identifiers and the 205AF3 suffix were checked against the render. No
-      uncertainty column is printed. The bare log(fO2) reference is unstated;
-      the allowed bar convention is recorded as log10(bar) with that note. No
-      total pressure or per-run gas-mixture assignment is printed.
+      uncertainty column is printed. The column header is a bare log(fO2); the
+      paper does not print a pressure reference. No total pressure or per-run
+      gas-mixture assignment is printed.
     cell_counts:
       numeric: 312
       row_identifiers: 52
@@ -163,10 +163,10 @@ method_and_condition_decisions:
     samples quenched completely to glass are considered; rows use phase glass
     and quench_state asserted_preserved, located on PDF page 4.
   oxygen_reference: >-
-    Table 1 gives log(fO2) values with at most two decimal places and no bar/atm
-    reference. Store the printed logarithm with the extraction-wave bar default
-    (log10(bar)); note that the paper leaves the reference unstated. This is
-    separate from total experimental pressure, which remains unknown.
+    Table 1 gives log(fO2) values with at most two decimal places and does not
+    print a pressure reference. The printed logarithm is stored with an empty
+    unit so the migrator bare-log convention owns the frame. This is separate
+    from total experimental pressure, which remains unknown.
   total_pressure: >-
     The paper prints no total experimental pressure for Table 1. No pressure is
     inferred from the air or CO-CO2 atmosphere, and no 1 bar total-pressure

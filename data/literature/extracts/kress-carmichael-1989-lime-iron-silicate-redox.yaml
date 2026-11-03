@@ -19,8 +19,7 @@ extraction:
     completely glass-quenched results are considered. Per-run assignment of liquid-Hg versus distilled-water quench
     is not printed.
   pressure_note: The paper does not report total experimental pressure for Table 1. No total-pressure value is inferred.
-    Bare log(fO2) uses the required bar convention because the column values have at most two decimal places; the
-    printed reference is unstated.
+    Table 1 prints a bare log(fO2) and does not print a pressure reference.
 review_status: draft
 fidelity_samples:
 - path: species.Fe2O3.observations[kc89_table1_1A_Fe2O3].values.component_amount
@@ -582,8 +581,7 @@ species:
             row: 1A
             note: Table 1 sample 1A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id055
           state:
             tag: unknown
@@ -663,8 +661,7 @@ species:
             row: 8B
             note: Table 1 sample 8B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id059
           state:
             tag: unknown
@@ -738,8 +735,7 @@ species:
             row: 11A
             note: Table 1 sample 11A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id063
           state:
             tag: unknown
@@ -813,8 +809,7 @@ species:
             row: 23A
             note: Table 1 sample 23A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id067
           state:
             tag: unknown
@@ -888,8 +883,7 @@ species:
             row: 24B
             note: Table 1 sample 24B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id071
           state:
             tag: unknown
@@ -963,8 +957,7 @@ species:
             row: 38D
             note: Table 1 sample 38D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id075
           state:
             tag: unknown
@@ -1038,8 +1031,7 @@ species:
             row: 45A
             note: Table 1 sample 45A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id079
           state:
             tag: unknown
@@ -1113,8 +1105,7 @@ species:
             row: 47C
             note: Table 1 sample 47C.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id083
           state:
             tag: unknown
@@ -1188,8 +1179,7 @@ species:
             row: 48D
             note: Table 1 sample 48D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id087
           state:
             tag: unknown
@@ -1263,8 +1253,7 @@ species:
             row: 55D
             note: Table 1 sample 55D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id091
           state:
             tag: unknown
@@ -1338,8 +1327,7 @@ species:
             row: 57C
             note: Table 1 sample 57C.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id095
           state:
             tag: unknown
@@ -1413,8 +1401,7 @@ species:
             row: 93A
             note: Table 1 sample 93A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id099
           state:
             tag: unknown
@@ -1488,8 +1475,7 @@ species:
             row: 98B
             note: Table 1 sample 98B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id103
           state:
             tag: unknown
@@ -1563,8 +1549,7 @@ species:
             row: 99A
             note: Table 1 sample 99A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id107
           state:
             tag: unknown
@@ -1638,8 +1623,7 @@ species:
             row: 101A
             note: Table 1 sample 101A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id111
           state:
             tag: unknown
@@ -1713,8 +1697,7 @@ species:
             row: 123A
             note: Table 1 sample 123A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id115
           state:
             tag: unknown
@@ -1788,8 +1771,7 @@ species:
             row: 124B
             note: Table 1 sample 124B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id119
           state:
             tag: unknown
@@ -1863,8 +1845,7 @@ species:
             row: 126B
             note: Table 1 sample 126B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id123
           state:
             tag: unknown
@@ -1938,8 +1919,7 @@ species:
             row: 127A
             note: Table 1 sample 127A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id127
           state:
             tag: unknown
@@ -2013,8 +1993,7 @@ species:
             row: 129A
             note: Table 1 sample 129A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id131
           state:
             tag: unknown
@@ -2088,8 +2067,7 @@ species:
             row: 130B
             note: Table 1 sample 130B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id135
           state:
             tag: unknown
@@ -2163,8 +2141,7 @@ species:
             row: 134B
             note: Table 1 sample 134B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id139
           state:
             tag: unknown
@@ -2238,8 +2215,7 @@ species:
             row: 135A
             note: Table 1 sample 135A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id143
           state:
             tag: unknown
@@ -2313,8 +2289,7 @@ species:
             row: 138B
             note: Table 1 sample 138B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id147
           state:
             tag: unknown
@@ -2388,8 +2363,7 @@ species:
             row: 149A
             note: Table 1 sample 149A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id151
           state:
             tag: unknown
@@ -2463,8 +2437,7 @@ species:
             row: 150B
             note: Table 1 sample 150B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id155
           state:
             tag: unknown
@@ -2538,8 +2511,7 @@ species:
             row: 154B
             note: Table 1 sample 154B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id159
           state:
             tag: unknown
@@ -2613,8 +2585,7 @@ species:
             row: 155A
             note: Table 1 sample 155A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id163
           state:
             tag: unknown
@@ -2688,8 +2659,7 @@ species:
             row: 157A
             note: Table 1 sample 157A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id167
           state:
             tag: unknown
@@ -2763,8 +2733,7 @@ species:
             row: 161A
             note: Table 1 sample 161A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id171
           state:
             tag: unknown
@@ -2838,8 +2807,7 @@ species:
             row: 162B
             note: Table 1 sample 162B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id175
           state:
             tag: unknown
@@ -2913,8 +2881,7 @@ species:
             row: 166D
             note: Table 1 sample 166D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id179
           state:
             tag: unknown
@@ -2988,8 +2955,7 @@ species:
             row: 169B
             note: Table 1 sample 169B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id183
           state:
             tag: unknown
@@ -3063,8 +3029,7 @@ species:
             row: 173A
             note: Table 1 sample 173A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id187
           state:
             tag: unknown
@@ -3138,8 +3103,7 @@ species:
             row: 175C
             note: Table 1 sample 175C.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id191
           state:
             tag: unknown
@@ -3213,8 +3177,7 @@ species:
             row: 180D
             note: Table 1 sample 180D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id195
           state:
             tag: unknown
@@ -3288,8 +3251,7 @@ species:
             row: 183A
             note: Table 1 sample 183A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id199
           state:
             tag: unknown
@@ -3363,8 +3325,7 @@ species:
             row: 185C
             note: Table 1 sample 185C.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id203
           state:
             tag: unknown
@@ -3438,8 +3399,7 @@ species:
             row: 193A
             note: Table 1 sample 193A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id207
           state:
             tag: unknown
@@ -3513,8 +3473,7 @@ species:
             row: 194B
             note: Table 1 sample 194B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id211
           state:
             tag: unknown
@@ -3588,8 +3547,7 @@ species:
             row: 196D
             note: Table 1 sample 196D.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id215
           state:
             tag: unknown
@@ -3663,8 +3621,7 @@ species:
             row: 199C
             note: Table 1 sample 199C.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id219
           state:
             tag: unknown
@@ -3738,8 +3695,7 @@ species:
             row: 203A
             note: Table 1 sample 203A.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id223
           state:
             tag: unknown
@@ -3813,8 +3769,7 @@ species:
             row: 204B
             note: Table 1 sample 204B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id227
           state:
             tag: unknown
@@ -3888,8 +3843,7 @@ species:
             row: 205AF3
             note: Table 1 sample 205AF3.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id231
           state:
             tag: unknown
@@ -3963,8 +3917,7 @@ species:
             row: 206AF
             note: Table 1 sample 206AF.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id235
           state:
             tag: unknown
@@ -4038,8 +3991,7 @@ species:
             row: 229G
             note: Table 1 sample 229G.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id239
           state:
             tag: unknown
@@ -4113,8 +4065,7 @@ species:
             row: 230H
             note: Table 1 sample 230H.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id243
           state:
             tag: unknown
@@ -4188,8 +4139,7 @@ species:
             row: 231G
             note: Table 1 sample 231G.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id247
           state:
             tag: unknown
@@ -4263,8 +4213,7 @@ species:
             row: 232H
             note: Table 1 sample 232H.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id251
           state:
             tag: unknown
@@ -4338,8 +4287,7 @@ species:
             row: 245B
             note: Table 1 sample 245B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id255
           state:
             tag: unknown
@@ -4413,8 +4361,7 @@ species:
             row: 246B
             note: Table 1 sample 246B.
             column: log(fO2)
-          units: log10(bar)
-          note: The paper omits a pressure reference; bar is used by the extraction-wave default.
+          units: ''
         total_pressure_Pa: &id259
           state:
             tag: unknown

@@ -11,6 +11,8 @@ import yaml
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import (
     Migrator,
+    _BARE_LOG_BAR_NOTICE,
+    _BARE_LOG_SCALE_UNKNOWN,
     mass_fraction_pair_to_valence_ratio,
     wt_pct_to_mole_fraction,
 )
@@ -23,6 +25,17 @@ EXTRACT = ROOT / (
     "kress-carmichael-1989-lime-iron-silicate-redox.yaml"
 )
 OXIDES = ("SiO2", "Fe2O3", "FeO", "CaO")
+IN_BAND_LOGS = {
+    "93A": "-7.32",
+    "98B": "-8.98",
+    "99A": "-8.98",
+    "101A": "-10.46",
+}
+_SCALE_UNKNOWN = "fO2 reference scale not printed (absolute vs buffer-relative)"
+_BAR_NOTICE = (
+    "fO2 reference state not printed; 1 bar convention assumed "
+    "(1 atm alternative: +0.0057 dex)"
+)
 
 # Independent 600 dpi render transcription of Table 1, PDF page 3 (published
 # page 2885), in printed column order after the run identifier.
@@ -120,7 +133,8 @@ def _assert_table1_matches_render(document):
             assert observation["locator"]["table"] == "1"
             assert observation["locator"]["row"] == sample
             assert observation["point_conditions"]["fO2_log"]["state"]["value"] == log_fo2
-            assert observation["point_conditions"]["fO2_log"]["units"] == "log10(bar)"
+            assert observation["point_conditions"]["fO2_log"]["units"] == ""
+            assert "note" not in observation["point_conditions"]["fO2_log"]
             pressure = observation["point_conditions"]["total_pressure_Pa"]
             assert pressure["state"]["tag"] == "unknown"
             assert "does not report total experimental pressure" in pressure["state"]["reason"]
@@ -184,7 +198,27 @@ def test_interior_render_cell_mutation_is_rejected():
         _assert_table1_matches_render(document)
 
 
+def _assert_bare_log_identity(observation, sample: str, log_fo2: str) -> None:
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None
+    if sample in IN_BAND_LOGS:
+        assert log_fo2 == IN_BAND_LOGS[sample]
+        assert oxygen.is_value
+        assert oxygen.value == log10_fo2_to_pa(Decimal(log_fo2), Decimal("100000"))
+        assert any(notice.reason == _BAR_NOTICE for notice in observation.notices)
+    else:
+        assert log_fo2 == "-0.68"
+        assert oxygen.is_unknown
+        assert oxygen.reason == _SCALE_UNKNOWN
+        assert all(notice.reason != _BAR_NOTICE for notice in observation.notices)
+
+
 def test_isolated_migration_binds_every_value_condition_and_render_locator():
+    assert _BARE_LOG_SCALE_UNKNOWN == _SCALE_UNKNOWN
+    assert _BARE_LOG_BAR_NOTICE == _BAR_NOTICE
+    rows = rendered_rows()
+    assert sum(row[2] == "-0.68" for row in rows) == 48
+    assert {row[0]: row[2] for row in rows if row[0] in IN_BAND_LOGS} == IN_BAND_LOGS
     document = load_extract()
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
@@ -212,7 +246,6 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
         expected_composition = wt_pct_to_mole_fraction(
             {oxide: Decimal(amount) for oxide, amount in composition.items()}
         )
-        expected_fugacity = log10_fo2_to_pa(Decimal(log_fo2), Decimal("100000"))
         expected_temperature = Decimal(temp_c) + Decimal("273.15")
         for oxide in OXIDES:
             local_id = f"kc89_table1_{sample}_{oxide}"
@@ -220,7 +253,7 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
             assert observation.value.kind is ValueKind.POINT
             assert observation.value.point == Decimal(composition[oxide])
             assert observation.identity.temperature_K.value == expected_temperature
-            assert observation.identity.fO2_Pa.value == expected_fugacity
+            _assert_bare_log_identity(observation, sample, log_fo2)
             assert observation.identity.composition.value == expected_composition
             assert observation.identity.total_pressure_Pa.is_unknown
             assert observation.point_conditions["temperature_K"].state.value == expected_temperature
@@ -242,7 +275,7 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
             mass_fraction_basis=("Fe2O3", "FeO"),
         )
         assert ratio.identity.temperature_K.value == expected_temperature
-        assert ratio.identity.fO2_Pa.value == expected_fugacity
+        _assert_bare_log_identity(ratio, sample, log_fo2)
         assert ratio.identity.composition.value == expected_composition
         assert ratio.identity.total_pressure_Pa.is_unknown
         assert ratio.point_conditions["temperature_K"].state.value == expected_temperature
