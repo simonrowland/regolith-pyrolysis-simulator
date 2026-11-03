@@ -61,8 +61,19 @@ experiments:
 - &murchison_degassing_base
   experiment_id: murchison-isothermal-series
   bench_id: quartz-helium-degassing-rig
-  method: vacuum_pyrolysis_furnace
-  locator: {published_page: 574, table: '1', note: Murchison isothermal degassing series}
+  method:
+    tag: unknown
+    reason: >-
+      unmapped published method: «экспериментов с изотермической выдержкой при
+      различных температурах, T: 200, 500 и 800°C» with volatile-component
+      analysis by «газовом хроматографе “Кристал-Люкс 4000М”»; no existing
+      MethodToken represents this thermal-degassing and gas-chromatography
+      method.
+  locator:
+    published_page: 574
+    pdf_page_index: 4
+    section: Eksperimentalnye issledovaniya degazatsii
+    note: The gas-chromatography method is described here; the isothermal and stepwise programs continue on pp. 575-576.
   sample:
     mass_kg: {state: {tag: unknown, reason: not_published}, locator: {published_page: 573, note: No aliquot mass printed}}
     printed_composition: {state: {tag: value, value: Ground and dried Murchison CM2 material}, locator: *degassing_apparatus}
@@ -75,7 +86,14 @@ experiments:
     regime: {regime_class: {tag: unknown, reason: not_published}}
 - <<: *murchison_degassing_base
   experiment_id: murchison-stepwise-series
-  locator: {published_page: 574, table: '2', note: Murchison stepped degassing series}
+  method:
+    tag: unknown
+    reason: >-
+      unmapped published method: «углистый хондрит Murchison подвергался
+      ступенчатому нагреву от 50 до 800°C, с шагом в 100°C» with
+      volatile-component analysis by «газовом хроматографе “Кристал-Люкс
+      4000М”»; no existing MethodToken represents this thermal-degassing and
+      gas-chromatography method.
 corrections: []
 fidelity_samples:
 - path: species.CO.observations[voropaev_2023_murchison_isothermal_co_table1].values.points[2].yield_ug_g
@@ -1097,6 +1115,24 @@ species:
         authors_text: At T > 700 C the reaction proceeds irreversibly toward CO (Kp > 1); at T < 600 C
           in the opposite direction (Kp < 1). Reversibility window 600-700 C.
         used_to_interpret: Table 2 CO rise at 700-800 C
+      derivation:
+        relation: The authors apply the van't Hoff isotherm to reaction (1) and report its Kp relation as equation (2).
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            published_page: 576
+            pdf_page_index: 6
+            equation: '2'
+            note: The Kp relation is printed, but the thermodynamic input data used to produce its coefficients are not identified in this article.
+        method:
+          state: {tag: value, value: Van't Hoff isotherm applied to the Boudouard reaction}
+          locator:
+            page: 7
+            published_page: 576
+            pdf_page_index: 6
+            equation: '2'
+        references:
+        - Boudouard reaction (1) and equilibrium relation (2) in this work, published page 576
   CO2:
     observations:
     - observation_id: voropaev_2023_murchison_isothermal_co2_table1
