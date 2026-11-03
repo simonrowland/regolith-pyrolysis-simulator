@@ -880,6 +880,7 @@ def test_vapor_engine_reports_same_sign_residual_when_no_bracket_exists(
     from simulator.melt_backend.vaporock import vaporock_sum_pressure_sane
 
     bracket_attempts: list[tuple[float, float]] = []
+    bracket_residuals: list[tuple[float, float]] = []
     solve_cell_balance = battery._solve_cell_oxygen_balance
 
     def record_bracket_attempt(*args, **kwargs):
@@ -887,18 +888,36 @@ def test_vapor_engine_reports_same_sign_residual_when_no_bracket_exists(
         try:
             return solve_cell_balance(*args, **kwargs)
         except _OxygenBalanceRefusal as exc:
-            assert "oxygen-balance root is not bracketed" in str(exc)
+            detail = str(exc)
+            assert "oxygen-balance root is not bracketed" in detail
+            residuals = detail.rsplit("F(low)=", 1)[1]
+            f_low, f_high = residuals.split(", F(high)=")
+            bracket_residuals.append((float(f_low), float(f_high)))
             raise
 
     monkeypatch.setattr(
         battery, "_solve_cell_oxygen_balance", record_bracket_attempt
     )
-    trials: list[tuple[float, bool]] = []
+    trials: list[tuple[float, str]] = []
 
     def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
-        pressures_pa = {"K": 1e-6 * po2_bar**-0.25 * 1e5}
+        logp = round(math.log10(po2_bar))
+        if logp < -3:
+            trials.append((logp, "engine_crash"))
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="engine_crash",
+                engine_reason="subprocess_died",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+
+        pressures_pa = {
+            "Mg": 1e-6 * po2_bar**-0.5 * 1e5,
+            "O2": 0.1 * po2_bar * 1e5,
+        }
         admitted, sum_bar = vaporock_sum_pressure_sane(pressures_pa)
-        trials.append((round(math.log10(po2_bar)), admitted))
+        trials.append((logp, "ok" if admitted else "sum_pressure_sanity"))
         return SimpleNamespace(
             status="ok" if admitted else "refusal",
             refusal_reason=None if admitted else "sum_pressure_sanity",
@@ -921,15 +940,43 @@ def test_vapor_engine_reports_same_sign_residual_when_no_bracket_exists(
     )
     assert "no sign-changing bracket was found in the admitted pO2 window" in detail
     assert "reachable from the chosen start" in detail
-    assert "start_pO2_bar=1e-06" in detail
-    assert "searched_window_pO2_bar=[1e-28, 1]" in detail
+    assert "start_pO2_bar=0.001" in detail
+    assert "searched_window_pO2_bar=[0.001, 1]" in detail
     assert "does not establish whether a root exists in another admitted window" in detail
     assert "lower_stop=" in detail and "lower_stop=None" not in detail
     assert "upper_stop=" in detail and "upper_stop=None" not in detail
-    assert "lower_stop=pO2=1e-29 bar; guard=sum_pressure_sanity" in detail
+    assert "lower_stop=pO2=0.0001 bar; guard=engine_crash: subprocess_died" in detail
     assert "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar" in detail
-    assert (-6, True) in trials
-    assert bracket_attempts
+    assert (-3, "ok") in trials
+    assert (-4, "engine_crash") in trials
+    assert bracket_attempts == [(-3.0, -2.0), (-3.0, -1.0), (-3.0, 0.0)]
+    assert all(
+        f_low > 0.0 and f_high > f_low
+        for f_low, f_high in bracket_residuals
+    )
+    assert bracket_residuals[-1][1] > 0.0  # F(0) stays positive at the Knudsen limit.
+
+
+def test_cell_oxygen_balance_keeps_above_knudsen_reason_code() -> None:
+    _require_oxygen_balance()
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_cell_oxygen_balance,
+        _vapor_engine_oxygen_balance_species_metadata,
+    )
+
+    species_metadata = _vapor_engine_oxygen_balance_species_metadata(("K",))
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_cell_oxygen_balance(
+            lambda po2_bar: {"K": 1e-6 * po2_bar**-0.25},
+            species_metadata,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert exc_info.value.reason_code == "imcc_gas_oxygen_balance_failed"
+    assert "root lies above pO2 = 1 bar" in str(exc_info.value)
 
 
 def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
