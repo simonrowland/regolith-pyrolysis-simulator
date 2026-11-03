@@ -528,12 +528,15 @@ def test_pool_membership_and_second_source_lifts_only_the_vacuum_hold(
     assert _reason(result, second_h2) == FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED
 
 
-def _sio_sample(components: list[list[str]]) -> dict:
+def _sio_sample(
+    components: list[list[str]],
+    material: str = "amorphous SiO powder",
+) -> dict:
     # Wetzel 2012 (review/x-w1103-wz12 @ 864b44277) prints amorphous SiO
     # powder as condensed_solid and a nominal pure SiO endmember. The
     # synthetic row keeps that sample shape; it is not the extract.
     return {
-        "material": "amorphous SiO powder",
+        "material": material,
         "form": {
             "state": {"tag": "value", "value": "condensed_solid"},
             "locator": {"page": 34, "section": "2.3.2"},
@@ -620,3 +623,55 @@ def test_pure_sio_alpha_takes_the_sample_reservoir(tmp_path: Path) -> None:
         langmuir.identity.reservoir is None
         or langmuir.identity.reservoir.is_unknown
     )
+
+
+def test_glassy_vitreous_stay_unknown_and_negations_stay_crystal(
+    tmp_path: Path,
+) -> None:
+    # b-1112. Hyphen is a non-word character, so a bare stem boundary matches
+    # non-amorphous and semi-amorphous. glassy and vitreous are the same
+    # printed class. None of the three becomes Phase.CR or an inferred
+    # Phase.GLASS. The negated wordings stay the printed condensed_solid.
+    wordings = (
+        ("glassy", "glassy SiO powder", True),
+        ("vitreous", "vitreous SiO powder", True),
+        ("non_amorphous", "non-amorphous SiO powder", False),
+        ("semi_amorphous", "semi-amorphous SiO powder", False),
+    )
+    experiments = []
+    observations = []
+    for key, material, _unknown in wordings:
+        experiment_id = f"sio_{key}"
+        experiments.append(
+            {
+                "experiment_id": experiment_id,
+                "method": "knudsen_effusion",
+                "sample": _sio_sample([["SiO", "1"]], material=material),
+            }
+        )
+        observations.append(
+            _sio_alpha_observation(f"pure_knudsen_{key}", experiment_id)
+        )
+    doc = _document("synthetic-wetzel-sio-wording", {"SiO": observations})
+    doc["experiments"] = experiments
+    result = migrate(_write_tree(tmp_path, [doc]), write=False)
+
+    for key, _material, unknown in wordings:
+        obs = _one(result, f"pure_knudsen_{key}")
+        assert obs.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        reservoir = obs.identity.reservoir
+        assert reservoir is not None
+        if unknown:
+            assert reservoir.is_unknown
+            assert reservoir.value is None
+            assert reservoir.reason is not None
+            assert "Phase.CR" in reservoir.reason
+            assert "crystal" in reservoir.reason
+            assert "Phase.GLASS" in reservoir.reason
+            assert "inferred" in reservoir.reason
+            continue
+        assert reservoir.is_value
+        species = reservoir.value
+        assert species.formula == "SiO"
+        assert species.phase.value is Phase.CR
+        assert species.phase.value is not Phase.GLASS

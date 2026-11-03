@@ -461,15 +461,22 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
 
 
 # A form token condensed_solid is Phase.CR. A sample the source prints as
-# amorphous is not that crystal, and Phase.GLASS is not a stand-in for it.
-_AMORPHOUS_SOLID_RE = re.compile(r"\bamorphous\b", re.IGNORECASE)
+# amorphous, glassy, or vitreous is not that crystal, and Phase.GLASS is
+# not a stand-in for it. Hyphen is a non-word character, so \b matches the
+# stem of non-amorphous and semi-amorphous; a hyphen immediately before
+# the stem is that negation, not the printed class. Bare "glass" is not.
+_AMORPHOUS_SOLID_RE = re.compile(
+    r"(?<![-])\b(?:amorphous|glassy|vitreous)\b",
+    re.IGNORECASE,
+)
 _AMORPHOUS_CRYSTAL_RESERVOIR_REASON = (
-    "source prints an amorphous solid; Phase.CR would assert a crystal"
+    "source prints an amorphous, glassy, or vitreous solid; "
+    "Phase.CR would assert a crystal and Phase.GLASS is not inferred"
 )
 
 
 def _sample_prints_amorphous_solid(sample: object) -> bool:
-    """True when the sample's material text says the solid is amorphous."""
+    """True when the material text says amorphous, glassy, or vitreous."""
 
     if not isinstance(sample, Mapping):
         return False
@@ -16815,7 +16822,8 @@ class Migrator:
         self._oxygen_pressure_conflict: set[str] = set()
         self._initial_composition_conflicts: set[str] = set()
         self._registry_printed_composition_experiments: set[str] = set()
-        # Experiment ids whose sample material prints an amorphous solid.
+        # Experiment ids whose sample material prints an amorphous, glassy,
+        # or vitreous solid. A hyphen before the stem is not that print.
         # Sample has no material field; the word is read here, while the
         # extract mapping is still intact, and consulted by the reservoir fill.
         self._amorphous_printed_sample_experiments: set[str] = set()
@@ -17495,8 +17503,9 @@ class Migrator:
                 in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
                 and pure_sample
             ):
-                # condensed_solid maps to Phase.CR. An amorphous print must
-                # not take that phase, and must not be rewritten as glass.
+                # condensed_solid maps to Phase.CR. An amorphous, glassy, or
+                # vitreous print must not take that phase, and must not be
+                # rewritten as glass. A hyphenated negation is not that print.
                 if (
                     sample_phase is Phase.CR
                     and experiment_id in self._amorphous_printed_sample_experiments
