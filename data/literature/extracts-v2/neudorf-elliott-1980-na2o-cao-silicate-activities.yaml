@@ -38,18 +38,33 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_partial_mole_fraction
+        basis: binary_complement_mole_fraction
         components:
         - - Na2O
           - '0.244'
+        - - SiO2
+          - '0.756'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: value
@@ -117,10 +132,12 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_partial_mole_fraction
+          basis: binary_complement_mole_fraction
           components:
           - - Na2O
             - '0.244'
+          - - SiO2
+            - '0.756'
           amount_basis: mole_fraction
       locator:
         page: 3
@@ -128,6 +145,23 @@ observations:
         pdf_page_index: 2
         section: Results and Discussion
         note: Results text maps 25 w/o Na2O to 24.4 m/o Na2O.
+      inference:
+        relation: binary per abstract, complement
+        inputs:
+        - printed partial mole fraction
+        parameters:
+        - - X_Na2O
+          - state:
+              tag: value
+              value: '0.244'
+            locator:
+              page: 3
+              published_page: 609
+              pdf_page_index: 2
+              section: Results and Discussion
+              note: Results text maps 25 w/o Na2O to 24.4 m/o Na2O.
+        output_unit: mole_fraction
+        references: []
     fO2_Pa:
       state:
         tag: value
@@ -215,18 +249,33 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_partial_mole_fraction
+        basis: binary_complement_mole_fraction
         components:
         - - Na2O
           - '0.393'
+        - - SiO2
+          - '0.607'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: value
@@ -294,10 +343,12 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_partial_mole_fraction
+          basis: binary_complement_mole_fraction
           components:
           - - Na2O
             - '0.393'
+          - - SiO2
+            - '0.607'
           amount_basis: mole_fraction
       locator:
         page: 5
@@ -305,6 +356,23 @@ observations:
         pdf_page_index: 4
         table: I
         note: Table I row at 40 w/o Na2O prints 39.3 m/o Na2O.
+      inference:
+        relation: binary per abstract, complement
+        inputs:
+        - printed partial mole fraction
+        parameters:
+        - - X_Na2O
+          - state:
+              tag: value
+              value: '0.393'
+            locator:
+              page: 5
+              published_page: 611
+              pdf_page_index: 4
+              table: I
+              note: Table I row at 40 w/o Na2O prints 39.3 m/o Na2O.
+        output_unit: mole_fraction
+        references: []
     fO2_Pa:
       state:
         tag: value
@@ -392,16 +460,31 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: unknown
-      reason: no reference_state mapped from source
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: SiO2
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: tridymite
+          charge:
+            tag: value
+            value: 0
+        component_basis: SiO2
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_partial_mole_fraction
+        basis: binary_complement_mole_fraction
         components:
+        - - Na2O
+          - '0.35'
         - - SiO2
           - '0.65'
         amount_basis: mole_fraction
@@ -471,8 +554,10 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_partial_mole_fraction
+          basis: binary_complement_mole_fraction
           components:
+          - - Na2O
+            - '0.35'
           - - SiO2
             - '0.65'
           amount_basis: mole_fraction
@@ -482,6 +567,23 @@ observations:
         pdf_page_index: 5
         section: Na2O-CaO-SiO2 System
         note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+      inference:
+        relation: binary per abstract, complement
+        inputs:
+        - printed partial mole fraction
+        parameters:
+        - - X_SiO2
+          - state:
+              tag: value
+              value: '0.65'
+            locator:
+              page: 6
+              published_page: 612
+              pdf_page_index: 5
+              section: Na2O-CaO-SiO2 System
+              note: The paper states aSiO2 is approximately 0.24 at 1070 °C and NSiO2 = 0.65.
+        output_unit: mole_fraction
+        references: []
     fO2_Pa:
       state:
         tag: value

@@ -1,0 +1,396 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  citation: Doyle, C.D. (1988). Prediction of the activity of FeO in multicomponent magma from known values in [SiO2-KAlO2-CaAl2Si2O8]-FeO
+    liquids. Geochimica et Cosmochimica Acta 52, 1827–1834.
+  source_ids:
+  - doyle-1988-feo-activity-multicomponent-magma
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:doyle-1988-feo-activity-multicomponent-magma
+      role: pdf
+      path: raw/doyle-1988-feo-activity-multicomponent-magma/doyle-1988-feo-activity-multicomponent-magma.pdf
+      sha256:
+        tag: value
+        value: 12de73961e3369564fba36b3edfd1b0f5a8ed5adee63f055dc4fb42793455ca2
+    - asset_id: pdftotext:doyle-1988-feo-activity-multicomponent-magma
+      role: pdftotext
+      path: text/doyle-1988-feo-activity-multicomponent-magma
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:doyle-1988-feo-activity-multicomponent-magma
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8::doyle-1988-feo-activity-multicomponent-magma
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  locator:
+    page: 2
+    published_page: 1828
+    pdf_page_index: 1
+    section: Control of the Activity of FeO
+    note: The quoted aFeO = 1.93 statement.
+- experiment_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8::experiment::doyle_1988_feo_activity_measurement
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'gas_metal_equilibration' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  locator:
+    page: 3
+    published_page: 1829
+    pdf_page_index: 2
+    section: Experimental and Analytical Methods
+context:
+- observation_id: doyle_1988_table1b_setpoint_0170
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.170 ± 0.008
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.170'
+    uncertainty_as_printed: '0.008'
+    minus_log10_fO2_as_printed: '12.06'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '---'
+      24.4 CO2: '15.6'
+      H2: '120.0'
+      N2: '135.6'
+    gas_flow_absences_as_printed:
+      75.6 CO:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.170 ± 0.008
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0170
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0227
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.227 ± 0.010
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.227'
+    uncertainty_as_printed: '0.010'
+    minus_log10_fO2_as_printed: '11.81'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '---'
+      24.4 CO2: '20.2'
+      H2: '120.0'
+      N2: '140.2'
+    gas_flow_absences_as_printed:
+      75.6 CO:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.227 ± 0.010
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0227
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0285
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.285 ± 0.012
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.285'
+    uncertainty_as_printed: '0.012'
+    minus_log10_fO2_as_printed: '11.61'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '---'
+      24.4 CO2: '24.7'
+      H2: '120.0'
+      N2: '144.7'
+    gas_flow_absences_as_printed:
+      75.6 CO:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.285 ± 0.012
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0285
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0339
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.339 ± 0.014
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.339'
+    uncertainty_as_printed: '0.014'
+    minus_log10_fO2_as_printed: '11.46'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '---'
+      24.4 CO2: '29.0'
+      H2: '120.0'
+      N2: '149.0'
+    gas_flow_absences_as_printed:
+      75.6 CO:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.339 ± 0.014
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0339
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0398
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.398 ± 0.016
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.398'
+    uncertainty_as_printed: '0.016'
+    minus_log10_fO2_as_printed: '11.32'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '50.0'
+      24.4 CO2: '---'
+      H2: '29.1'
+      N2: '130.0'
+    gas_flow_absences_as_printed:
+      24.4 CO2:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.398 ± 0.016
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0398
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0452
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.452 ± 0.018
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.452'
+    uncertainty_as_printed: '0.018'
+    minus_log10_fO2_as_printed: '11.21'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '50.0'
+      24.4 CO2: '---'
+      H2: '24.0'
+      N2: '130.0'
+    gas_flow_absences_as_printed:
+      24.4 CO2:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.452 ± 0.018
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0452
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0507
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.507 ± 0.020
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.507'
+    uncertainty_as_printed: '0.020'
+    minus_log10_fO2_as_printed: '11.11'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '50.0'
+      24.4 CO2: '---'
+      H2: '20.3'
+      N2: '130.0'
+    gas_flow_absences_as_printed:
+      24.4 CO2:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.507 ± 0.020
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0507
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
+- observation_id: doyle_1988_table1b_setpoint_0569
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 1831
+    pdf_page_index: 4
+    table: 1B
+    row_label: aFeO 0.569 ± 0.022
+    note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.569'
+    uncertainty_as_printed: '0.022'
+    minus_log10_fO2_as_printed: '11.01'
+    minus_log10_fO2_uncertainty: '0.02'
+    minus_log10_fO2_uncertainty_as_printed: '+0.02'
+    gas_flows_cc_min_as_printed:
+      75.6 CO: '50.0'
+      24.4 CO2: '---'
+      H2: '16.7'
+      N2: '130.0'
+    gas_flow_absences_as_printed:
+      24.4 CO2:
+        state:
+          tag: not_applicable
+          reason: Table 1B prints a dash in this gas flow cell.
+        locator:
+          page: 5
+          published_page: 1831
+          pdf_page_index: 4
+          table: 1B
+          row_label: aFeO 0.569 ± 0.022
+          note: Table 1B printed aFeO, -log10 fO2 and gas flow row; 600 dpi render checked.
+  context_id: doyle-1988-feo-activity-multicomponent-magma::context::doyle_1988_table1b_setpoint_0569
+  work_id: 5edbf47614caa9a7afd46cd876293a9389bbac59d408e50e37c4b3825de3b3e8
+  source_id: doyle-1988-feo-activity-multicomponent-magma
+  species: FeO
