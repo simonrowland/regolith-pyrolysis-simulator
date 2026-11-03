@@ -210,7 +210,7 @@ def _assert_bare_log_identity(observation, sample: str, log_fo2: str) -> None:
         assert log_fo2 == "-0.68"
         assert oxygen.is_value
         assert oxygen.value == log10_fo2_to_pa(
-            Decimal(log_fo2), Decimal("100000")
+            Decimal(log_fo2), Decimal("101325")
         )
         assert any(
             notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE

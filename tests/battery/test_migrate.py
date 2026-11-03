@@ -17923,15 +17923,39 @@ def test_bare_log_convention_pins_existing_iw_window() -> None:
 def test_bare_log_accepts_printed_air_atmosphere() -> None:
     from simulator.battery.enums import NoticeKind
     from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
 
     decision = _bare_log_frame_decision(
         Decimal("-0.68"), Decimal("1600"), printed_atmospheres=("air",)
     )
     assert decision.state.is_value
-    assert decision.state.value == Decimal("20892.96130854039483122233736")
+    assert decision.state.value == log10_fo2_to_pa(
+        Decimal("-0.68"), Decimal("101325")
+    )
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert "expected log10(fO2/bar)=-0.6731" in decision.notice_reason
     assert "matched atm frame" in decision.notice_reason
+
+
+def test_bare_log_air_at_one_bar_uses_the_bar_frame() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"),
+        Decimal("1600"),
+        printed_atmospheres=("air",),
+        total_pressure_pa=Decimal("100000"),
+    )
+
+    assert decision.state.is_value
+    assert decision.state.value == log10_fo2_to_pa(
+        Decimal("-0.68"), Decimal("100000")
+    )
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "matched bar frame" in decision.notice_reason
 
 
 def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
@@ -17941,14 +17965,118 @@ def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
     decision = _bare_log_frame_decision(
         Decimal("0.00"),
         Decimal("1600"),
-        printed_atmospheres=("pure O2 at 1 atm",),
-        total_pressure_pa=Decimal("101325"),
+        printed_atmospheres=("O2 100.0 × 200 SCCM",),
     )
     assert decision.state.is_value
-    assert decision.state.value == Decimal("100000")
+    assert decision.state.value == Decimal("101325")
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
     assert "expected log10(fO2/bar)=+0.0057" in decision.notice_reason
     assert "matched atm frame" in decision.notice_reason
+
+
+@pytest.mark.parametrize(
+    ("gas_as_printed", "log_fO2"),
+    [
+        ("CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM", "-0.68"),
+        ("H2O 275.400 × 100.00 SCCM + H2 1.000 × 1.00 SCCM", "-0.68"),
+    ],
+)
+def test_bare_log_accepts_direct_printed_gas_couple_with_combined_band(
+    gas_as_printed: str, log_fO2: str
+) -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal(log_fO2),
+        Decimal("1682.15"),
+        printed_atmospheres=(gas_as_printed,),
+    )
+
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.CERTIFIED
+    assert "combined_band=" in decision.notice_band
+    assert "expected CEA log10(fO2/bar)=" in decision.notice_reason
+
+
+def test_bare_log_direct_couple_mismatch_is_refused_as_possible_misprint() -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"),
+        Decimal("1682.15"),
+        printed_atmospheres=("CO2 51.0 × 200 SCCM + CO 5.1 × 10 SCCM",),
+    )
+
+    assert decision.state.is_unknown
+    assert decision.notices[0].kind is NoticeKind.PROBABLE_SOURCE_MISPRINT
+    assert "possible source misprint" in decision.notices[0].reason
+
+
+def test_bare_log_direct_couple_outside_cea_domain_carries_extrapolated_authority() -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+    from simulator.battery.migrate import _bare_log_frame_decision
+    from simulator.chemistry.offgas_fo2 import _direct_gas_couple_fo2
+
+    expected = _direct_gas_couple_fo2(
+        {"CO2": 1.0, "CO": 1.0},
+        {"CO2": 0.011, "CO": 0.011},
+        199.0,
+    ).log10_fO2
+    decision = _bare_log_frame_decision(
+        Decimal(str(expected)),
+        Decimal("199"),
+        printed_atmospheres=(
+            "CO2 1.000 × 1.00 SCCM + CO 1.000 × 1.00 SCCM",
+        ),
+    )
+
+    assert decision.state.is_value
+    assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+    assert decision.notice_authority is Authority.EXTRAPOLATED
+
+
+def test_bare_log_wgs_dependent_mix_remains_typed_refusal() -> None:
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    decision = _bare_log_frame_decision(
+        Decimal("-0.30"),
+        Decimal("1682.15"),
+        printed_atmospheres=(
+            "CO2 20.0 × 10 SCCM + H2 50.0 × 200 SCCM",
+        ),
+    )
+
+    assert decision.state.is_unknown
+    assert "gas_mix_fo2_band_unavailable" in decision.state.reason
+    assert "WGS-dependent" in decision.state.reason
+
+
+def test_direct_gas_couple_without_janaf_uses_mix_band_and_notices(monkeypatch) -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.generators import janaf
+    from simulator.battery.migrate import _bare_log_frame_decision
+
+    def missing_table(_formula, _temperature):
+        raise ValueError("no JANAF gas table")
+
+    monkeypatch.setattr(janaf, "_janaf_gas_formation_gibbs_J_per_mol", missing_table)
+    decision = _bare_log_frame_decision(
+        Decimal("-0.68"),
+        Decimal("1682.15"),
+        printed_atmospheres=(
+            "CO2 82.200 × 100.00 SCCM + CO 1.000 × 1.00 SCCM",
+        ),
+    )
+
+    assert decision.state.is_value
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "gas_couple_thermo_spread_unsized" in notice.reason
+        for notice in decision.notices
+    )
 
 
 def test_bare_log_mismatch_is_refused_and_noticed() -> None:
