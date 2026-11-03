@@ -6,6 +6,7 @@ from simulator.battery.generators.janaf import (
     janaf_fusion_entropy,
     janaf_fusion_energy,
 )
+from simulator.reference_data.janaf_fusion import d144_fusion_delta_g_kJ_per_mol
 
 
 def test_mgo_janaf_fusion_gibbs_interpolation_numeric_pin() -> None:
@@ -38,3 +39,4 @@ def test_d144_janaf_fusion_gibbs_temperature_chord_numeric_pins() -> None:
     }
     for (oxide, temperature_K), expected in expected_kJ_per_mol.items():
         assert janaf_fusion_energy(oxide, temperature_K).delta_g_fus_kJ_per_mol == expected
+        assert d144_fusion_delta_g_kJ_per_mol(oxide, temperature_K) == expected

@@ -1157,7 +1157,9 @@ def test_refused_calls_use_bracketed_same_composition_temperature_neighbors(
             assert min(abs(offset - step) for step in (25.0, 50.0, 75.0)) < 1e-6
         assert activity.activity_model == notice["method"]
         assert activity.activity != melt_oxide_activity(
-            oxide, refused_62["composition"],
+            oxide,
+            refused_62["composition"],
+            temperature_K=refused_62["T_K"],
         ).activity
         if notice["method"] == "nearest_converged_temperature_neighbor":
             anchor_T = notice["anchor_temperature_K"]

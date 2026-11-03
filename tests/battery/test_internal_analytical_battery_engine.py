@@ -256,21 +256,30 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
 
 
 @pytest.mark.parametrize(
-    ("formula", "notice_reason"),
+    ("formula", "notice_reason", "temperature_K"),
     [
-        ("MnO", "gamma_reference_state_solid_unconverted"),
-        ("K2O", "gamma_reference_state_unprinted"),
-        ("Al2O3", "gamma_reference_state_unverified"),
-        ("Cr2O3", None),
+        ("MnO", "gamma_reference_state_solid_unconverted", Decimal("1473.15")),
+        ("K2O", "gamma_reference_state_unprinted", Decimal("1500")),
+        ("Al2O3", "gamma_reference_state_unverified", Decimal("1473.15")),
+        ("Cr2O3", None, Decimal("1473.15")),
+        ("P2O5", "gamma_reference_state_unverified", Decimal("1873")),
     ],
 )
 def test_internal_analytical_row_uses_gamma_reference_notice(
     formula: str,
     notice_reason: str | None,
+    temperature_K: Decimal,
 ) -> None:
     experiment, bench, observation = _case(
         composition=_composition(("SiO2", "0.5"), (formula, "0.5")),
         formula=formula,
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.of(temperature_K),
+        ),
     )
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
