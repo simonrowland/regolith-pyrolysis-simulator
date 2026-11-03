@@ -6,7 +6,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as battery_migrate
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Authority, NoticeKind
 from tests.helpers.literature_extract import find_context_row
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -231,10 +231,22 @@ def test_isolated_migration_scores_numeric_glass_components_and_preserves_condit
         assert "fO2_log" not in row.point_conditions
         # t-1619 / d-324: the printed FMQ-relative input uses the canonical
         # buffer curve and discloses that its calibration was not named.
-        assert any(
-            notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        assert len(row.notices) == 2
+        assert {
+            (notice.kind, notice.authority, notice.band)
             for notice in row.notices
-        )
+        } == {
+            (
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+            (
+                NoticeKind.OUT_OF_CERTIFIED_BAND,
+                Authority.EXTRAPOLATED,
+                "0.2544",
+            ),
+        }
         if cell == "D.L.":
             assert row.value.kind.value == "unavailable"
             assert values["component_amount"]["tag"] == "unknown"
