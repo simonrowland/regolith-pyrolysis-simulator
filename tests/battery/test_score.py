@@ -16513,7 +16513,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert len(fresh_stolyarova_1996_pressures) == 55
     assert all(
         observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         for observation in fresh_stolyarova_1996_pressures.values()
     )
     stolyarova_atomic_oxygen_pressures = {
@@ -16609,14 +16609,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # 4e0819f6d and 3de591b81 type the calculated oxygen columns MEASURED_REDUCED.
-    # These are the authors' reductions of their own KEMS measurements; the WO2
-    # and WO3 input pressures are not printed.
-    # b162's 1995 model_derived count of 26 describes the pre-car extract,
-    # which this car retyped. The 1996 count of 55 is the quoted population.
+    # The reviewed source edits type these 1995 and 1996 calculated oxygen
+    # pressure columns MEASURED_REDUCED. They are author reductions of KEMS
+    # measurements; the raw ion-current inputs are not printed.
     assert len(stolyarova_1995_derived_pressures) == 0
     assert len(stolyarova_1996_derived_pressures) == 0
-    stolyarova_1995_quoted_pressures = {
+    stolyarova_1995_measured_pressures = {
         key
         for key, obs in observations.items()
         if obs.source_id == "stolyarova-1995-cao-alumina-kems"
@@ -16624,9 +16622,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     }
-    stolyarova_1996_quoted_pressures = {
+    stolyarova_1996_measured_pressures = {
         key
         for key, obs in observations.items()
         if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
@@ -16634,15 +16632,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     }
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
-    assert len(stolyarova_1995_quoted_pressures) == 26
+    assert len(stolyarova_1995_measured_pressures) == 26
     # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
-    assert len(stolyarova_1996_quoted_pressures) == 55
+    assert len(stolyarova_1996_measured_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_quoted_pressures
+        for key in stolyarova_1996_measured_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -16651,7 +16649,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_quoted_pressures
+            for key in stolyarova_1996_measured_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -16932,7 +16930,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             row
             for row in residuals
             if row.reference
-            in stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
+            in stolyarova_1996_derived_pressures | stolyarova_1996_measured_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
         unavailable_stolyarova_refs = {
@@ -16956,8 +16954,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             observation.observation_id
             for observation in score_module.comparison_candidates(filtered)
             if observation.source_id
-            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
-        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
+            in {
+                "kems-053-stolyarova-1991",
+                "stolyarova-1995-cao-alumina-kems",
+            }
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_measured_pressures
         assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
         assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
@@ -16985,32 +16986,30 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             if row.reference in stolyarova_1996_derived_pressures
         ]
         assert len(stolyarova_1996_rows) == 0
-        stolyarova_1996_quoted_rows = [
+        stolyarova_1996_measured_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_1996_quoted_pressures
+            if row.reference in stolyarova_1996_measured_pressures
         ]
-        assert len(stolyarova_1996_quoted_rows) == 55
+        assert len(stolyarova_1996_measured_rows) == 55
         assert all(
-            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_quoted_rows
+            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_measured_rows
         )
-        assert all(not row.score_eligible for row in stolyarova_1996_quoted_rows)
+        assert all(not row.score_eligible for row in stolyarova_1996_measured_rows)
         assert all(
             observations[row.reference].evidence.class_.is_value
             and observations[row.reference].evidence.class_.value
-            is EvidenceClass.QUOTED_ATTRIBUTED
-            and any(
-                notice.kind is NoticeKind.FIGURE_ONLY
-                and notice.reason == "evidence_class:quoted_attributed"
-                for notice in row.notices
-            )
-            for row in stolyarova_1996_quoted_rows
+            is EvidenceClass.MEASURED_REDUCED
+            for row in stolyarova_1996_measured_rows
         )
         assert {
             row.refusal.reason
-            for row in stolyarova_1996_quoted_rows
+            for row in stolyarova_1996_measured_rows
             if row.refusal is not None
-        } == {RefusalReason.IDENTITY_INCOMPLETE}
+        } == {
+            RefusalReason.IDENTITY_INCOMPLETE,
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+        }
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as
