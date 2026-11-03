@@ -29,6 +29,8 @@ def _ambient_pressure_result(
     include_evidence: bool = True,
     point_pressure_Pa: str | None = None,
     exploded: bool = False,
+    pressure_basis: str | None = None,
+    residue_container: str | None = None,
 ):
     source_id = "ambient-pressure-fixture"
     extract_dir = tmp_path / "data" / "literature" / "extracts"
@@ -61,6 +63,23 @@ def _ambient_pressure_result(
             "values": partial_values,
         }
     elif quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        residue_values = {
+            "quantity": "residue_component_composition",
+            "method_class": "measured_direct",
+            "FeO_wt_pct": "12.59",
+            "T_C": "1199",
+        }
+        if residue_container is not None:
+            residue_values.pop("FeO_wt_pct")
+            residue_values.pop("T_C")
+            residue_values[residue_container] = [
+                {
+                    "FeO_wt_pct": "12.59",
+                    "T_C": "1199",
+                    "t_min": "48",
+                    "run_id": "open",
+                }
+            ]
         observation = {
             "observation_id": "residue",
             "experiment": "open",
@@ -68,12 +87,7 @@ def _ambient_pressure_result(
             "phase": "glass",
             "units": "wt%",
             "locator": {"page": 4, "table": "1"},
-            "values": {
-                "quantity": "residue_component_composition",
-                "method_class": "measured_direct",
-                "FeO_wt_pct": "12.59",
-                "T_C": "1199",
-            },
+            "values": residue_values,
         }
     elif quantity is Quantity.CONDENSATE_COMPOSITION:
         observation = {
@@ -104,6 +118,11 @@ def _ambient_pressure_result(
                 "method_class": "measured_direct",
                 "admission_status": "admitted",
                 "T_m_K": 1200,
+                **(
+                    {"pressure_basis": pressure_basis}
+                    if pressure_basis is not None
+                    else {}
+                ),
             },
         }
     if point_pressure_Pa is not None:
@@ -290,6 +309,49 @@ def test_open_furnace_evidence_fills_required_pressure_with_authority_and_notice
     )
 
 
+def test_ambient_fill_removes_non_numeric_pressure_basis_queue_entry(tmp_path) -> None:
+    migrator, observation = _ambient_pressure_result(
+        tmp_path, pressure_basis="atmospheric"
+    )
+
+    assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+    assert any(
+        notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+        for notice in observation.notices
+    )
+    assert not any(
+        entry.axes == ["total_pressure_Pa"]
+        and entry.why == "source pressure_basis 'atmospheric' is not a numeric pressure"
+        for entry in migrator.result.queue
+    )
+
+
+def test_ambient_notice_iff_identity_pressure_is_filled_101325(tmp_path) -> None:
+    cases = (
+        ("filled", {"include_evidence": True}, True),
+        ("no-evidence", {"include_evidence": False}, False),
+        ("printed", {"point_pressure_Pa": "250000"}, False),
+    )
+    for label, kwargs, expected_filled in cases:
+        migrator, _observation = _ambient_pressure_result(
+            tmp_path / label, **kwargs
+        )
+        observations = tuple(migrator.result.observations.values())
+        assert observations
+        for observation in observations:
+            has_ambient_notice = any(
+                notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+                for notice in observation.notices
+            )
+            is_filled_pressure = (
+                observation.identity.total_pressure_Pa.is_value
+                and observation.identity.total_pressure_Pa.value
+                == Decimal("101325")
+            )
+            assert has_ambient_notice is is_filled_pressure
+            assert has_ambient_notice is expected_filled
+
+
 def test_absent_open_furnace_evidence_keeps_typed_identity_refusal(tmp_path) -> None:
     _migrator, observation = _ambient_pressure_result(
         tmp_path, include_evidence=False
@@ -364,6 +426,49 @@ def test_ambient_partial_pressure_series_keeps_notice_without_point_copy(
             observation.derivation is None
             or "ambient_pressure_evidence" not in observation.derivation.relation
         )
+
+
+@pytest.mark.parametrize("container", ["points", "series"])
+def test_ambient_residue_exploded_rows_keep_identity_and_point_pressure(
+    tmp_path, container: str
+) -> None:
+    migrator, _observation = _ambient_pressure_result(
+        tmp_path,
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        residue_container=container,
+    )
+    observations = [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+
+    assert observations
+    for observation in observations:
+        has_ambient_notice = any(
+            notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+            for notice in observation.notices
+        )
+        assert has_ambient_notice is (
+            observation.identity.total_pressure_Pa.is_value
+            and observation.identity.total_pressure_Pa.value == Decimal("101325")
+        )
+        assert has_ambient_notice
+        assert observation.identity.total_pressure_Pa.value == Decimal("101325")
+        notice, = (
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+        )
+        assert notice.band == "-0.10/+0.01 dex"
+        total_pressure = (observation.point_conditions or {}).get(
+            "total_pressure_Pa"
+        )
+        assert total_pressure is not None
+        assert total_pressure.state.is_value
+        assert total_pressure.state.value == Decimal("101325")
 
 
 def test_unmapped_ambient_pressure_category_keeps_typed_identity_refusal(
