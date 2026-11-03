@@ -36,7 +36,8 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     context = document["species"]["SiO"]["context"]
     by_id = {row["observation_id"]: row for row in observations + context}
     assert len(observations) == 5
-    assert len(context) == 11
+    assert len(context) == 13
+    assert len(by_id) == 18
     assert all(
         row["locator"]["page"] == 3
         and row["locator"]["published_page"] == 380
@@ -58,7 +59,7 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
         "page": 1,
         "published_page": 378,
         "pdf_page_index": 0,
-        "section": "II. Experimental Procedure",
+        "section": "Abstract",
     }
     assert method_context["vaporization_temperature_range_C_as_published"] == [
         1005, 1475
@@ -66,6 +67,29 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     assert method_context["disproportionation_temperature_range_C_as_published"] == [
         1000, 1440
     ]
+    characterization = by_id["hertl_1967_starting_material_characterization"]
+    assert characterization["locator"] == {
+        "page": 1,
+        "published_page": 378,
+        "pdf_page_index": 0,
+        "section": "II. Experimental Procedure",
+    }
+    assert characterization["values"]["cation_impurity_levels_as_printed"] == {
+        "basis": "oxide",
+        "ranges": [
+            {"range": "0.01 to 0.1%", "oxides": ["Fe2O3", "Al2O3"]},
+            {"range": "0.005 to 0.05%", "oxides": ["MgO", "MnO2"]},
+            {
+                "range": "0.001 to 0.01%",
+                "oxides": ["B2O3", "SnO2", "NiO", "CuO", "ZrO2"],
+            },
+        ],
+    }
+    assert (
+        characterization["values"]["BET_particle_surface_area_m2_per_g_as_published"]
+        == 1.4
+    )
+    assert characterization["values"]["mean_particle_diameter_as_printed"] == "2.0μ"
     vaporization_setup = by_id[
         "hertl_1967_vaporization_measurement_and_atmosphere"
     ]
@@ -79,6 +103,51 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     assert "18 by 2 in." in disprop_setup["values"][
         "disproportionation_apparatus_as_printed"
     ]
+    assert disprop_setup["values"]["orifice_dimensions_as_printed"][
+        "orifice_as_printed"
+    ] == "a gasket-sealed orifice in the end cap"
+    assert disprop_setup["values"]["orifice_dimensions_as_printed"][
+        "diameter"]["state"]["tag"] == "unknown"
+    assert disprop_setup["values"]["clausing_factor_as_printed"]["state"][
+        "tag"
+    ] == "unknown"
+
+    numeric_results = by_id["hertl_1967_disproportionation_numeric_results"]
+    assert numeric_results["locator"] == {
+        "page": 3,
+        "published_page": 380,
+        "pdf_page_index": 2,
+        "section": "IV. Disproportionation Experiments, Results",
+    }
+    numeric_values = numeric_results["values"]
+    assert numeric_values["charge_weight_change_bound_mg_as_published"] == 1.5
+    assert (
+        numeric_values["reaction_temperature_attainment_time_as_printed"]
+        == "~1 min"
+    )
+    assert (
+        numeric_values[
+            "imperceptible_disproportionation_below_temperature_as_printed"
+        ]
+        == "about 1000°C"
+    )
+    assert numeric_values["parallel_experiment_temperature_C_as_published"] == 1010
+    assert [
+        [
+            (stage["temperature_C"], stage.get("duration_as_printed"))
+            for stage in sequence["stages"]
+        ]
+        for sequence in numeric_values["temperature_sequences_as_printed"]
+    ] == [
+        [
+            (1180, "long enough to reach its terminal disproportionation value"),
+            (1390, "1 min"),
+        ],
+        [(1380, "5 min"), (1195, "16 hr")],
+    ]
+    assert numeric_values["superficial_oxidation_temperature_C_as_published"] == 800
+    assert numeric_values["silicon_globule_temperature_C_as_published"] == 1440
+    assert numeric_values["silicon_melting_point_C_as_published"] == 1412
 
     fig1_legend = by_id["hertl_1967_fig1_marker_legend"]["values"][
         "marker_legend_as_printed"
@@ -107,7 +176,7 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     ] == 72.5
     assert pinned["hertl_1967_quoted_vaporization_enthalpy_range"][
         "value_range_as_published"
-    ] == {"kind": "interval", "low": 55, "high": 95}
+    ] == {"kind": "interval", "low": 58, "high": 95}
     assert pinned["hertl_1967_quoted_geld_kochnev_vaporization_heat"][
         "value_as_published"
     ] == 76
@@ -134,10 +203,10 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     assert pinned["hertl_1967_apparent_disproportionation_activation_energy"][
         "discussion_locator"]["page"] == 4
 
-    # The superscript references on 55 and 95 are not decimal digits.
+    # The superscript references on 58 and 95 are not decimal digits.
     assert by_id["hertl_1967_quoted_vaporization_enthalpy_range"]["values"][
         "value_range_text_as_published"
-    ] == "about 55⁵ to 95⁷ kcal/mole"
+    ] == "about 58⁵ to 95⁷ kcal/mole"
 
     figure3 = by_id["hertl_1967_fig3_sio_loss_vs_argon_flow_figure_only"]
     assert figure3["values"]["T_C"] == 1427
@@ -145,6 +214,10 @@ def test_hertl_values_figure_legends_and_row_counts_match_render() -> None:
     assert figure3["values"]["flow_rate_result_as_published"].startswith(
         "Rate increased with increasing flow up to about 1000 ml/min"
     )
+    fig5 = by_id["hertl_1967_fig5_disproportionation_vs_time_figure_only"]
+    assert fig5["locator"]["published_page"] == 380
+    assert fig5["values"]["charge_mass_g_as_printed"] == 0.250
+    assert fig5["values"]["percent_to_Si_mass_mg_as_printed"] == 79.5
     fig6_conditions = by_id[
         "hertl_1967_fig6_arrhenius_terminal_disproportionation_figure_only"
     ]["values"]["point_conditions"]
@@ -196,6 +269,9 @@ def test_hertl_isolated_migration_keeps_exact_schema_gaps_and_conditions(
         assert row.identity.species.phase.value is Phase.CR
         assert row.point_conditions is not None
         assert row.point_conditions["temperature"].state.is_unknown
+        assert row.point_conditions["temperature"].locator.page == source_rows[
+            observation_id
+        ]["point_conditions"]["temperature"]["locator"]["page"]
         assert source_rows[observation_id]["point_conditions"]["total_pressure_Pa"][
             "state"]["tag"] == "unknown"
         assert "total_pressure_Pa" not in row.point_conditions
@@ -234,8 +310,16 @@ def test_hertl_isolated_migration_keeps_exact_schema_gaps_and_conditions(
         for row in document["species"]["SiO"]["context"]
     }
     assert len(migrated_context) == len(document["species"]["SiO"]["context"])
+    assert len(migrated_context) == 13
     assert migrated_context["hertl_1967_fig1_marker_legend"]["values"][
         "marker_legend_as_printed"
     ] == source_context["hertl_1967_fig1_marker_legend"]["values"][
         "marker_legend_as_printed"
     ]
+    for context_id in (
+        "hertl_1967_starting_material_characterization",
+        "hertl_1967_disproportionation_numeric_results",
+    ):
+        assert migrated_context[context_id]["values"] == source_context[context_id][
+            "values"
+        ]

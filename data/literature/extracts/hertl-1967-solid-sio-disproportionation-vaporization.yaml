@@ -18,7 +18,7 @@ fidelity_samples:
   - species: SiO
     observation_id: hertl_1967_quoted_vaporization_enthalpy_range
     field: value_range_as_published
-    value: {kind: interval, low: 55, high: 95}
+    value: {kind: interval, low: 58, high: 95}
     locator: {page: 3, published_page: 380, pdf_page_index: 2, section: 'III. Vaporization Experiments, Discussion'}
   - species: SiO
     observation_id: hertl_1967_quoted_geld_kochnev_vaporization_heat
@@ -150,8 +150,8 @@ species:
           method_class: quoted_attributed
           evidence_class: quoted_attributed
           attribution: References 5 and 7 as cited by Hertl and Pultz (1967).
-          value_range_as_published: {kind: interval, low: 55, high: 95}
-          value_range_text_as_published: about 55⁵ to 95⁷ kcal/mole
+          value_range_as_published: {kind: interval, low: 58, high: 95}
+          value_range_text_as_published: about 58⁵ to 95⁷ kcal/mole
           endpoint_attributions_as_published:
             lower: Reference 5, N. C. Tombs and A. J. E. Welch (1952).
             upper: Reference 7, K. G. Günther (1958).
@@ -229,15 +229,35 @@ species:
     context:
       - observation_id: hertl_1967_vaporization_methods_and_apparatus
         type: laboratory_conditions
-        locator: {page: 1, published_page: 378, pdf_page_index: 0, section: 'II. Experimental Procedure'}
+        locator: {page: 1, published_page: 378, pdf_page_index: 0, section: 'Abstract'}
         units: as printed
         values:
           quantity: vaporization_and_disproportionation_method_context
           method_class: method_only
           vaporization_temperature_range_C_as_published: [1005, 1475]
           disproportionation_temperature_range_C_as_published: [1000, 1440]
+
+      - observation_id: hertl_1967_starting_material_characterization
+        type: laboratory_conditions
+        locator: {page: 1, published_page: 378, pdf_page_index: 0, section: 'II. Experimental Procedure'}
+        units: as printed
+        values:
+          quantity: starting_material_and_vaporization_apparatus_context
+          method_class: method_only
           sample_as_printed: Solid SiO powder, −325 mesh, select grade from the Linde Division of Union Carbide Company.
-          vaporization_apparatus_as_printed: 36 in. by 1½ or 2 in. ID sillimanite muffle inside a platinum-wound horizontal tube furnace.
+          cation_impurity_levels_as_printed:
+            basis: oxide
+            ranges:
+              - range: 0.01 to 0.1%
+                oxides: [Fe2O3, Al2O3]
+              - range: 0.005 to 0.05%
+                oxides: [MgO, MnO2]
+              - range: 0.001 to 0.01%
+                oxides: [B2O3, SnO2, NiO, CuO, ZrO2]
+          optical_particle_size_range_as_printed: several tenths of a micron up to several microns in diameter
+          BET_particle_surface_area_m2_per_g_as_published: 1.4
+          mean_particle_diameter_as_printed: 2.0μ
+          vaporization_apparatus_as_printed: 36 in. by 1½ or 2 in. ID sillimanite muffles inside a platinum-wound horizontal tube furnace.
 
       - observation_id: hertl_1967_vaporization_measurement_and_atmosphere
         type: laboratory_conditions
@@ -260,10 +280,46 @@ species:
           method_class: method_only
           disproportionation_apparatus_as_printed: 18 by 2 in. ID sillimanite muffle with water-cooled brass end caps; alumina boats holding SiO powder on a platinum holder.
           evacuation_as_printed: The muffle was evacuated to at least 10 to 75 μ with the charge in the cool end; after evacuation it was usually filled to 1 atm with argon.
-          charge_motion_as_printed: The charge was pushed to the reaction site and withdrawn by a wire through a gasket-sealed orifice in the end cap.
-          orifice_dimensions_as_printed: No orifice diameter is reported.
-          clausing_factor_as_printed: No Clausing factor is reported.
+          charge_motion_as_printed: The charge was pushed to the reaction site and withdrawn by a wire through the end-cap orifice.
+          orifice_dimensions_as_printed:
+            orifice_as_printed: a gasket-sealed orifice in the end cap
+            diameter:
+              state: {tag: unknown, reason: No diameter is printed for the gasket-sealed orifice.}
+              locator: {page: 2, published_page: 379, pdf_page_index: 1, section: 'II. Experimental Procedure'}
+          clausing_factor_as_printed:
+            state: {tag: unknown, reason: No Clausing factor is printed for the gasket-sealed orifice.}
+            locator: {page: 2, published_page: 379, pdf_page_index: 1, section: 'II. Experimental Procedure'}
           disproportionation_analysis_as_printed: Sample treated with hydrofluoric acid diluted with isopropyl alcohol; the residual elemental silicon was dried and weighed.
+
+      - observation_id: hertl_1967_disproportionation_numeric_results
+        type: laboratory_conditions
+        locator: {page: 3, published_page: 380, pdf_page_index: 2, section: 'IV. Disproportionation Experiments, Results'}
+        units: as printed
+        values:
+          quantity: disproportionation_results_conditions_context
+          method_class: method_only
+          charge_weight_change_bound_mg_as_published: 1.5
+          charge_weight_change_exception_as_printed: Except for several runs over very long periods.
+          reaction_temperature_attainment_time_as_printed: ~1 min
+          imperceptible_disproportionation_below_temperature_as_printed: about 1000°C
+          parallel_experiment_temperature_C_as_published: 1010
+          parallel_experiment_conditions_as_printed: Constant evacuation of the system and the added inert gas; no difference was noted in the extent of disproportionation.
+          temperature_sequences_as_printed:
+            - stages:
+                - temperature_C: 1180
+                  duration_as_printed: long enough to reach its terminal disproportionation value
+                - temperature_C: 1390
+                  duration_as_printed: 1 min
+              result_as_printed: The extent of disproportionation corresponded to that at the higher temperature.
+            - stages:
+                - temperature_C: 1380
+                  duration_as_printed: 5 min
+                - temperature_C: 1195
+                  duration_as_printed: 16 hr
+              result_as_printed: The extent of disproportionation corresponded to the higher temperature; there was no indication of reversibility.
+          superficial_oxidation_temperature_C_as_published: 800
+          silicon_globule_temperature_C_as_published: 1440
+          silicon_melting_point_C_as_published: 1412
 
       - observation_id: hertl_1967_fig1_sio_loss_vs_charge_weight_figure_only
         type: figure_record
