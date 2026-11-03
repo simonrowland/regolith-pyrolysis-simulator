@@ -2153,7 +2153,7 @@ species:
               - run_as_printed: B190906
                 locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B190906}
           sulfide_phase:
-            as_printed: "Values for the Ni-bearing glasses were meaningless, because the loss of the immiscible sulphide phase led to a drop in S content to below the CMAS value."
+            as_printed: 'and those for the Ni-bearing glasses were meaningless, because the loss of the immiscible sulphide phase led to a drop in S content to below the CMAS value.'
             locator:
               page: 19
               published_page: 6865
@@ -2177,6 +2177,37 @@ species:
                 locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B010806}
               - run_as_printed: B140906
                 locator: {page: 4, published_page: 6850, pdf_page_index: 3, table: '1', row: B140906}
+          sulfide_phase_run_results:
+            as_printed: 'B010806 samples contained black specks inferred to be exsolved NiS while B140906 did not.'
+            locator:
+              page: 9
+              published_page: 6855
+              pdf_page_index: 8
+              section: 3.2.2. Synthetic silicate glasses
+            results_by_run:
+              - run_as_printed: B010806
+                result_as_printed: 'samples contained black specks inferred to be exsolved NiS'
+              - run_as_printed: B140906
+                result_as_printed: 'did not'
+          series_phase_observations:
+            - as_printed: 'Most of the samples formed translucent clear or yellow-coloured glass beads up to 5 mm in diameter and 0.05–0.15 g in weight.'
+              locator:
+                page: 6
+                published_page: 6852
+                pdf_page_index: 5
+                section: 3.1. Characteristics of synthetic silicate glasses
+            - as_printed: 'A number of samples contained bubbles and/or black specks. In most cases the black specks occurred on the margins of the sample, or showed dendritic form in fractures but appeared to be a surface feature, probably produced on quench, and of insufficient size for analysis. However, in some Ni-bearing samples specks were distributed through the glass and appeared to define flow patterns; probe analysis (Evans et al., 2008a, not shown here) revealed that this apparently exsolved material contained Ni and S with minor Fe.'
+              locator:
+                page: 6
+                published_page: 6852
+                pdf_page_index: 5
+                section: 3.1. Characteristics of synthetic silicate glasses
+            - as_printed: 'This is consistent with equilibration of the melt with a Ni sulphide phase, which was observed to have exsolved from the melt in many of the samples (Evans et al., 2008a).'
+              locator:
+                page: 6
+                published_page: 6852
+                pdf_page_index: 5
+                section: 3.1. Characteristics of synthetic silicate glasses
     - observation_id: evans_2009_table_2a_mn_glass_compositions
       type: measured_table_context
       locator: {page: 7, published_page: 6853, pdf_page_index: 6, table: '2a'}
