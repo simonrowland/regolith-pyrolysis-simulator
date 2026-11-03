@@ -2976,6 +2976,28 @@ species:
       - 1600.0
       - 2100.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04
+      derivation:
+        relation: "Table 1 reports the authors’ calculations from the cited thermochemical literature using method IX, defined as calculations from literature data."
+        method:
+          state: {tag: value, value: "Calculations from literature data (method IX)"}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: Method IX is defined as calculations from literature data.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: Thermochemical input values are not printed in this table.
+        references:
+        - "Refs. 14, 17, 22, 25, 28, and 33, as listed in the Table 1 caption."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -2995,7 +3017,7 @@ species:
       experiment: shornikov_2003_table1_this_work_row30
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: model_derived
         T_K: '1790'
         value_as_printed: 11.05 ± 0.08
         method_as_printed: IX
@@ -3027,6 +3049,28 @@ species:
       - 1400.0
       - 2180.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r31_c05
+      derivation:
+        relation: "Table 1 reports the authors’ calculations from the cited thermochemical literature using method IX, defined as calculations from literature data."
+        method:
+          state: {tag: value, value: "Calculations from literature data (method IX)"}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: Method IX is defined as calculations from literature data.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: Thermochemical input values are not printed in this table.
+        references:
+        - "Refs. 14, 17, 22, 25, 28, and 33, as listed in the Table 1 caption."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3046,7 +3090,7 @@ species:
       experiment: shornikov_2003_table1_this_work_row30
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: model_derived
         T_K: '1790'
         value_as_printed: 10.05 ± 0.04*
         method_as_printed: IX
@@ -3083,6 +3127,17 @@ species:
       - 1400.0
       - 2180.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r32_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: "Numerical KEMS input pressures for the Table 1 KEMS result are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3102,7 +3157,7 @@ species:
       experiment: shornikov_2003_kems_thermodynamic_series
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '1950'
         value_as_printed: 12.9 ± 0.8
         method_as_printed: IV
@@ -3134,6 +3189,17 @@ species:
       - 1720.0
       - 2180.0
     - observation_id: shornikov_2003_mullite_thermodynamics_p002_t01_r32_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 1045
+            pdf_page_index: 1
+            table: "1"
+            section: "Table 1 method legend"
+            note: "Numerical KEMS input pressures for the Table 1 KEMS result are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3153,7 +3219,7 @@ species:
       experiment: shornikov_2003_kems_thermodynamic_series
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '1950'
         value_as_printed: 11.6 ± 0.4
         method_as_printed: IV
@@ -3189,6 +3255,17 @@ species:
       - 2180.0
 
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3208,7 +3285,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 13.4 ± 2.6
         attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
@@ -3236,6 +3313,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3255,7 +3343,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 10.9 ± 1.1
         attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
@@ -3286,6 +3374,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r02_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3305,7 +3404,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 10.3 ± 0.8
         attribution: Table 2, this work; equation set (4), (11), concentration interval Silica–mullite.
@@ -3336,6 +3435,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3355,7 +3465,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.3 ± 1.9
         attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
@@ -3383,6 +3493,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3402,7 +3523,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.3 ± 0.9
         attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
@@ -3433,6 +3554,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r03_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3452,7 +3584,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 14.5 ± 1.2
         attribution: Table 2, this work; equation set (6), (11), concentration interval Silica–mullite.
@@ -3483,6 +3615,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3502,7 +3645,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.7 ± 2.1
         attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
@@ -3530,6 +3673,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3549,7 +3703,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.8 ± 1.0
         attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
@@ -3580,6 +3734,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r04_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3599,7 +3764,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 13.1 ± 1.0
         attribution: Table 2, this work; equation set (9), (11), concentration interval Silica–mullite.
@@ -3630,6 +3795,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3649,7 +3825,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 13.1 ± 1.0
         attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
@@ -3677,6 +3853,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3696,7 +3883,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.5 ± 0.7
         attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
@@ -3727,6 +3914,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r05_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3746,7 +3944,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.0 ± 1.3
         attribution: Table 2, this work; equation set (4), (11), concentration interval Mullite–alumina.
@@ -3777,6 +3975,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3796,7 +4005,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.8 ± 2.2
         attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
@@ -3824,6 +4033,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3843,7 +4063,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.7 ± 1.1
         attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
@@ -3874,6 +4094,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r06_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3893,7 +4124,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.8 ± 1.0
         attribution: Table 2, this work; equation set (6), (11), concentration interval Mullite–alumina.
@@ -3924,6 +4155,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3943,7 +4185,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 13.0 ± 1.4
         attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
@@ -3971,6 +4213,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -3990,7 +4243,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.4 ± 0.8
         attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
@@ -4021,6 +4274,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r07_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -4040,7 +4304,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.8 ± 1.2
         attribution: Table 2, this work; equation set (10), (11), concentration interval Mullite–alumina.
@@ -4071,6 +4335,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c03
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -4090,7 +4365,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fH
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.9 ± 0.8
         attribution: Table 2, recommended value, this work.
@@ -4117,6 +4392,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c04
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -4136,7 +4422,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fS
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 11.6 ± 0.4
         attribution: Table 2, recommended value, this work.
@@ -4166,6 +4452,17 @@ species:
             column: 5
             note: Printed −ΔfG column specifies 2180 K.
     - observation_id: shornikov_2003_mullite_thermodynamics_p004_t02_r08_c05
+      derivation:
+        relation: "The reported thermodynamic value is reduced from the authors’ KEMS pressure data using the printed thermodynamic relations; numerical input pressures are not tabulated."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            published_page: 1047
+            pdf_page_index: 3
+            table: "2"
+            section: "Results and Discussion"
+            note: "Numerical KEMS input pressures for the Table 2 thermodynamic reductions are not printed."
       type: gibbs_table
       regime: tabulation
       locator:
@@ -4185,7 +4482,7 @@ species:
       experiment: shornikov_2003_kems_table2
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: measured_reduced
         T_K: '2180'
         value_as_printed: 12.4 ± 0.5
         attribution: Table 2, recommended value, this work.
