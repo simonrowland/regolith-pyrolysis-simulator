@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping, Sequence
 from decimal import Decimal
 
 from simulator.battery.records import Composition
@@ -90,3 +91,31 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
     if total <= 0.0:
         return None
     return {key: 100.0 * value / total for key, value in masses.items() if value > 0.0}
+
+
+def mass_weighted_mixture_wt_pct(
+    parts: Sequence[tuple[Mapping[str, Decimal], Decimal]],
+) -> dict[str, Decimal]:
+    """Mass-weighted sum of printed wt% vectors. Does not renormalize.
+
+    Premise: each part is (component wt% map w_k, mass fraction f_k) of one
+    mixture. The fractions sum to 1. A named material contributes its printed
+    oxide wt% scaled by f_material. A metallic element is its own component
+    at 100 wt% of f_element (Mg0). It is never folded into its oxide: the
+    metal is the reductant charge, and the oxide already in the material
+    stays that oxide.
+    Algebra: w_mix,j = sum_k f_k * w_k,j.
+    Unit check: f is dimensionless; w is wt% (g per 100 g of that part);
+    the product is wt% of the mixture.
+    Sanity: 50 wt% pure Mg plus 50 wt% of a material that is 50 SiO2 / 50 MgO
+    gives w_Mg = 50, w_SiO2 = 25, w_MgO = 25. MgO is not 75.
+    """
+
+    mixed: dict[str, Decimal] = {}
+    for weights, fraction in parts:
+        for name, weight in weights.items():
+            contribution = fraction * weight
+            if contribution == 0:
+                continue
+            mixed[name] = mixed.get(name, Decimal("0")) + contribution
+    return mixed

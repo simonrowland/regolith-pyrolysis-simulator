@@ -68,6 +68,7 @@ from simulator.battery.polymorph_dictionary import (
 from simulator.battery.composition import (
     ideal_gas_volume_amount_to_mole_fraction,
     ideal_gas_volume_scale,
+    mass_weighted_mixture_wt_pct,
     parse_species_formula,
 )
 from simulator.battery.extract_context import iter_extract_context_containers
@@ -4209,6 +4210,383 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         basis="printed_oxides",
         components=tuple((oxide, n / total) for oxide, n in moles.items()),
         amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
+# t-1593. A printed mixture cites its named material with
+# ``named_material_records`` on the mass-percent composition body. Without
+# that key the row is not this spec: oxide rows and previously unsupported
+# component lists keep their existing path (store delta 0).
+#
+# The cited record is, in order:
+# 1. Another observation in the same extract, by observation id. That is the
+#    composition the paper prints (Delgado 2015 Table 1 puts JSC-1A oxides on
+#    point_conditions). The id is explicit so "JSC-1A" is not matched against
+#    a label like "JSC-1A [9]".
+# 2. ``feedstock_id`` into data/feedstocks.yaml ``composition_wt_pct``, and
+#    only when every key is an allowlisted oxide and the map is non-empty.
+#    ``lunar_mare_jsc_1a_legacy`` is empty and is not a record. The paper's
+#    own table wins because the ruling says to use the composition the paper
+#    prints or cites before a published bulk analysis stored as a feedstock.
+_NAMED_MATERIAL_WITHOUT_RECORD = (
+    "typed-refusal:named_material_without_cited_composition"
+)
+_NAMED_MATERIAL_FRACTIONS_OPEN = (
+    "typed-refusal:named_material_mixture_mass_fractions_do_not_sum_to_1"
+)
+_FEEDSTOCK_OXIDE_WT_PCT: dict[str, dict[str, Decimal]] | None = None
+
+
+@dataclass(frozen=True)
+class _NamedMaterialMixtureBinding:
+    located: Located[Composition]
+    parents: tuple[str, ...]
+    lot_reason: str | None
+    lot_source: str | None
+
+
+def _composition_payload_body(payload: object) -> Mapping[str, Any] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    if "state" not in payload:
+        return payload
+    state = payload.get("state")
+    if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+        return None
+    body = state.get("value")
+    return body if isinstance(body, Mapping) else None
+
+
+def _metallic_element_symbol(name: str) -> str | None:
+    """Element symbol printed as the metal itself, not an allowlisted oxide.
+
+    Mg is metallic Mg0. It stays out of ``_COMPOSITION_COMPONENTS`` so an
+    ordinary unsupported list is unchanged, and it is not rewritten as MgO.
+    """
+
+    if name in _COMPOSITION_COMPONENTS:
+        return None
+    parsed = parse_species_formula(name)
+    if parsed is None or len(parsed) != 1:
+        return None
+    element, count = parsed[0]
+    if count != 1 or element != name:
+        return None
+    return element
+
+
+def _cited_allowlisted_oxide_wt_pct(payload: object) -> dict[str, Decimal] | None:
+    """Oxide wt% map usable as a named-material composition record.
+
+    Every component must already be an allowlisted composition key. A map
+    that itself names a material or a metal is not a record. The printed
+    sum is kept; Delgado Table 1 closes at 98.1 wt% and the remainder stays
+    out.
+    """
+
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names):
+        return None
+    if any(name not in _COMPOSITION_COMPONENTS for name in names):
+        return None
+    if any(not amount.is_finite() or amount < 0 for _name, amount in pairs):
+        return None
+    if sum((amount for _name, amount in pairs), Decimal("0")) <= 0:
+        return None
+    return dict(pairs)
+
+
+def _named_material_record_from_row(
+    row: Mapping[str, Any],
+) -> tuple[dict[str, Decimal], Locator | None] | None:
+    raw_conditions = row.get("point_conditions")
+    payload = (
+        raw_conditions.get("composition")
+        if isinstance(raw_conditions, Mapping)
+        else None
+    )
+    oxides = _cited_allowlisted_oxide_wt_pct(payload)
+    locator = None
+    if isinstance(payload, Mapping):
+        locator = _locator_from_plain(payload.get("locator"))
+    if oxides is None and not (
+        isinstance(raw_conditions, Mapping) and "composition" in raw_conditions
+    ):
+        oxides = _oxide_map_from_mapping(row.get("values"))
+        if oxides is not None and any(
+            name not in _COMPOSITION_COMPONENTS for name in oxides
+        ):
+            oxides = None
+        if locator is None:
+            locator = locator_from_mapping(row.get("locator"))
+    if oxides is None:
+        return None
+    return oxides, locator
+
+
+def _feedstock_oxide_wt_pct_table() -> Mapping[str, Mapping[str, Decimal]]:
+    """Loadable feedstock oxide maps. An empty or mixed map is omitted."""
+
+    global _FEEDSTOCK_OXIDE_WT_PCT
+    if _FEEDSTOCK_OXIDE_WT_PCT is not None:
+        return _FEEDSTOCK_OXIDE_WT_PCT
+    loaded: dict[str, dict[str, Decimal]] = {}
+    document = load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
+    if isinstance(document, Mapping):
+        for feedstock_id, record in document.items():
+            if not isinstance(record, Mapping):
+                continue
+            raw = record.get("composition_wt_pct")
+            if not isinstance(raw, Mapping) or not raw:
+                continue
+            parsed: dict[str, Decimal] = {}
+            usable = True
+            for name, value in raw.items():
+                key = str(name).strip()
+                amount = _as_dec_or_none(value)
+                if (
+                    key not in _COMPOSITION_COMPONENTS
+                    or amount is None
+                    or not amount.is_finite()
+                    or amount < 0
+                ):
+                    usable = False
+                    break
+                parsed[key] = amount
+            if usable and parsed and sum(parsed.values(), Decimal("0")) > 0:
+                loaded[str(feedstock_id)] = parsed
+    _FEEDSTOCK_OXIDE_WT_PCT = loaded
+    return loaded
+
+
+def _mixture_component_kind(name: str) -> str:
+    if name in _COMPOSITION_COMPONENTS:
+        return "component"
+    if _metallic_element_symbol(name) is not None:
+        return "element"
+    return "named"
+
+
+def _named_material_mixture_parts(
+    payload: object,
+) -> list[tuple[str, Decimal, str]] | None:
+    """Parts of a t-1593 mixture, or None when this is not that spec.
+
+    The body must carry ``named_material_records`` and at least one named
+    material plus one element or allowlisted component.
+    """
+
+    body = _composition_payload_body(payload)
+    if body is None or "named_material_records" not in body:
+        return None
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names):
+        return None
+    if any(not amount.is_finite() or amount < 0 for _name, amount in pairs):
+        return None
+    kinds = [_mixture_component_kind(name) for name in names]
+    if "named" not in kinds or not any(kind in {"element", "component"} for kind in kinds):
+        return None
+    return [
+        (name, amount, kind)
+        for (name, amount), kind in zip(pairs, kinds, strict=True)
+    ]
+
+
+def _mixture_mass_percent_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
+    """Mole fraction of a mixture wt% map, with metallic elements kept.
+
+    ``wt_pct_to_mole_fraction`` refuses names outside ``_COMPOSITION_COMPONENTS``.
+    Mg is not added to that map: doing so would convert previously unsupported
+    extracts. This converter is only used after the mixture spec has matched.
+    n_j = w_j / M_j and x_j = n_j / sum n. wt% is not renormalized.
+    """
+
+    names = {str(name).strip() for name in wt}
+    if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
+        overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
+        raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
+    moles: dict[str, Decimal] = {}
+    total = Decimal("0")
+    for name, weight in wt.items():
+        amount = as_decimal(weight)
+        if amount < 0:
+            raise ValueError(f"component {name!r} wt% is negative")
+        if amount == 0:
+            continue
+        element = _metallic_element_symbol(str(name))
+        if element is not None:
+            canonical = element
+            mass = oxide_molar_mass(element)
+        else:
+            component = _COMPOSITION_COMPONENTS.get(str(name))
+            if component is None:
+                raise ValueError(
+                    "mixture wt% has a component that is neither an allowlisted "
+                    f"oxide nor a metallic element: {name}"
+                )
+            canonical = component[1]
+            mass = oxide_molar_mass(str(name))
+        moles[canonical] = moles.get(canonical, Decimal("0")) + amount / mass
+        total += amount / mass
+    if total <= 0:
+        raise ValueError("mixture wt% map has no positive mass")
+    return Composition(
+        basis="derived_composition",
+        components=tuple((name, n / total) for name, n in moles.items()),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
+def _lot_variability_reason(materials: Sequence[str]) -> str:
+    names = ", ".join(materials)
+    if any("JSC-1" in material for material in materials):
+        return (
+            "named-material bulk composition is a cited analysis and varies by lot "
+            f"(JSC-1 vs JSC-1A lots differ). material={names}."
+        )
+    return (
+        "named-material bulk composition is a cited analysis and varies by lot. "
+        f"material={names}."
+    )
+
+
+def _resolve_named_material_citation(
+    citation: object,
+    *,
+    records: Mapping[str, tuple[dict[str, Decimal], Locator | None]],
+    source_id: str,
+) -> tuple[dict[str, Decimal], str] | None:
+    if isinstance(citation, str) and citation.strip():
+        record_id = citation.strip()
+        found = records.get(record_id)
+        if found is None:
+            return None
+        return found[0], f"{source_id}::{record_id}"
+    if isinstance(citation, Mapping):
+        feedstock_id = citation.get("feedstock_id")
+        if not isinstance(feedstock_id, str) or not feedstock_id.strip():
+            return None
+        feedstock_id = feedstock_id.strip()
+        oxides = _feedstock_oxide_wt_pct_table().get(feedstock_id)
+        if oxides is None:
+            return None
+        # Not an observation id. Corpus validation flags derived_from parents
+        # that do not resolve; a same-extract observation id does resolve.
+        # The feedstock token is the composition record the ruling asks for
+        # when the paper does not print the oxides itself.
+        return dict(oxides), f"feedstock:{feedstock_id}"
+    return None
+
+
+def _named_material_mixture_binding(
+    payload: object,
+    *,
+    records: Mapping[str, tuple[dict[str, Decimal], Locator | None]],
+    source_id: str,
+) -> _NamedMaterialMixtureBinding | None:
+    """Bind a named-material mixture, or refuse when its citation does not resolve."""
+
+    parts = _named_material_mixture_parts(payload)
+    if parts is None:
+        return None
+    locator = (
+        _locator_from_plain(payload.get("locator"))
+        if isinstance(payload, Mapping)
+        else None
+    )
+
+    def refused(reason: str) -> _NamedMaterialMixtureBinding:
+        return _NamedMaterialMixtureBinding(
+            Located(State.unknown(reason), locator=locator),
+            (),
+            None,
+            None,
+        )
+
+    closure = _mole_percent_closure_error(
+        {f"component_{index}": amount for index, (_name, amount, _kind) in enumerate(parts)}
+    )
+    if closure is not None:
+        return refused(_NAMED_MATERIAL_FRACTIONS_OPEN)
+    body = _composition_payload_body(payload)
+    citations = body.get("named_material_records") if isinstance(body, Mapping) else None
+    if not isinstance(citations, Mapping):
+        missing = [name for name, _amount, kind in parts if kind == "named"]
+        return refused(f"{_NAMED_MATERIAL_WITHOUT_RECORD}:{','.join(missing)}")
+    resolved: list[tuple[str, dict[str, Decimal], str]] = []
+    missing: list[str] = []
+    for name, _amount, kind in parts:
+        if kind != "named":
+            continue
+        hit = _resolve_named_material_citation(
+            citations.get(name),
+            records=records,
+            source_id=source_id,
+        )
+        if hit is None:
+            missing.append(name)
+        else:
+            oxides, parent = hit
+            resolved.append((name, oxides, parent))
+    if missing:
+        return refused(f"{_NAMED_MATERIAL_WITHOUT_RECORD}:{','.join(missing)}")
+    mix_parts: list[tuple[Mapping[str, Decimal], Decimal]] = []
+    parents: list[str] = []
+    for name, amount, kind in parts:
+        fraction = amount / Decimal("100")
+        if kind == "named":
+            oxides = next(item[1] for item in resolved if item[0] == name)
+            parent = next(item[2] for item in resolved if item[0] == name)
+            mix_parts.append((oxides, fraction))
+            if parent not in parents:
+                parents.append(parent)
+        elif kind == "element":
+            element = _metallic_element_symbol(name)
+            assert element is not None
+            mix_parts.append(({element: Decimal("100")}, fraction))
+        else:
+            mix_parts.append(({name: Decimal("100")}, fraction))
+    mixed = mass_weighted_mixture_wt_pct(mix_parts)
+    try:
+        composition = _mixture_mass_percent_to_mole_fraction(mixed)
+    except (ArithmeticError, ValueError) as exc:
+        return refused(f"mass-percent composition is not usable: {exc}")
+    parameters: list[tuple[str, Located[Decimal]]] = []
+    for name, amount, _kind in parts:
+        parameters.append(
+            (f"f_{name}", Located(State.of(amount / Decimal("100")), locator=locator))
+        )
+    for name, weight in mixed.items():
+        parameters.append(
+            (
+                f"w_mix_{name}_wt_pct",
+                Located(State.of(weight), locator=locator),
+            )
+        )
+    materials = [name for name, _amount, kind in parts if kind == "named"]
+    derivation = Derivation(
+        relation="w_mix,j = sum_k f_k * w_k,j",
+        inputs=(
+            "metallic element stays elemental (Mg is Mg0 and is not folded into MgO)",
+            "composition_records=" + ",".join(parents),
+        ),
+        parameters=tuple(parameters),
+        output_unit="mole_fraction",
+        method=Located(State.of("derived_composition"), locator=locator),
+        references=tuple(parents),
+    )
+    return _NamedMaterialMixtureBinding(
+        Located(State.of(composition), locator=locator, inference=derivation),
+        tuple(parents),
+        _lot_variability_reason(materials),
+        ",".join(parents),
     )
 
 
@@ -17661,9 +18039,24 @@ class Migrator:
                 sample_compositions.pop(sample_id)
             elif sample_id not in ambiguous_sample_compositions:
                 sample_compositions[sample_id] = candidate
+        named_material_composition_records: dict[
+            str, tuple[dict[str, Decimal], Locator | None]
+        ] = {}
+        for _formula, row in rows:
+            record_id = row.get("observation_id")
+            if not isinstance(record_id, str) or not record_id:
+                continue
+            if not isinstance(row, Mapping):
+                continue
+            record = _named_material_record_from_row(row)
+            if record is not None:
+                named_material_composition_records[record_id] = record
         source_context = dict(pressure_identity_context or {})
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["sample_compositions"] = sample_compositions
+        source_context["named_material_composition_records"] = (
+            named_material_composition_records
+        )
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -19740,6 +20133,36 @@ class Migrator:
                 ident_kwargs["fO2_Pa"] = State.of(
                     _log_fO2_to_pa(fO2_condition.state.value, fO2_reference_pa)
                 )
+        # t-1593 runs after every other composition write. An unknown
+        # unsupported-component state is not an explicit composition, so a
+        # later branch would otherwise leave identity.composition unset.
+        named_material_lot: tuple[str, str] | None = None
+        raw_mixture = (
+            raw_point_conditions.get("composition")
+            if isinstance(raw_point_conditions, Mapping)
+            else None
+        )
+        mixture_records = context.get("named_material_composition_records")
+        mixture_binding = _named_material_mixture_binding(
+            raw_mixture,
+            records=mixture_records if isinstance(mixture_records, Mapping) else {},
+            source_id=source_id,
+        )
+        if mixture_binding is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": mixture_binding.located,
+            }
+            ident_kwargs["composition"] = mixture_binding.located.state
+            if mixture_binding.parents:
+                derived_from = tuple(
+                    dict.fromkeys((*(derived_from or ()), *mixture_binding.parents))
+                )
+            if mixture_binding.lot_reason is not None:
+                named_material_lot = (
+                    mixture_binding.lot_reason,
+                    mixture_binding.lot_source or "",
+                )
         identity = fill_identity(
             quantity,
             None if q_token is Quantity.LOG10_K_REACTION else species,
@@ -20455,6 +20878,17 @@ class Migrator:
                     ),
                     origin=obs_id,
                     source=composition.proxy_source,
+                )
+            )
+        if named_material_lot is not None and isinstance(q_token, Quantity):
+            lot_reason, lot_source = named_material_lot
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.LOT_VARIABILITY,
+                    affected_quantities=(q_token,),
+                    reason=lot_reason,
+                    origin=obs_id,
+                    source=lot_source or None,
                 )
             )
         hold_reason_notice = _hold_reason_notice(
