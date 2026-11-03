@@ -125,6 +125,11 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
         },
     ]
     assert "temperature" in equations["values"]["note"]
+    table2 = _table_rows(document, "2")
+    assert table2[0] == ["Mn", "Cr", "C", "Ni", "Si", "N", "Al"]
+    assert table2[1] == ["11.8", "17.5", "0.15", "0.5", "0.3", "0.26", "0.008"]
+    assert "Fe" not in table2[0]
+
     table3 = _table_rows(document, "3")
     assert len(table3) == 20
     assert table3[1] == ["1-1", "10", "1600", "10", "10", "10", "42.0", "28.0", "1.5"]
