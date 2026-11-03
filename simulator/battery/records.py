@@ -498,6 +498,10 @@ class Derivation:
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
         ) or (isinstance(page, str) and bool(page.strip()))
+        has_section_or_equation = locator is not None and any(
+            isinstance(location, str) and bool(location.strip())
+            for location in (locator.section, locator.equation)
+        )
         return (
             self.method is not None
             and self.method.state.is_value
@@ -505,14 +509,14 @@ class Derivation:
             and bool(self.method.state.value.strip())
             and locator is not None
             and has_physical_page
-            and isinstance(locator.equation, str)
-            and bool(locator.equation.strip())
+            and has_section_or_equation
         )
 
     @property
     def has_named_references(self) -> bool:
         return bool(self.references) and all(
             isinstance(reference, str) and bool(reference.strip())
+            and reference != "none_printed"
             for reference in self.references
         )
 

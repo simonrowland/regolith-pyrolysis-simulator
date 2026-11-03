@@ -202,6 +202,14 @@ def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
     return ValidationIssue(path, reason, detail)
 
 
+def _has_model_derived_notice(observation: Observation, reason_prefix: str) -> bool:
+    return any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason.startswith(reason_prefix)
+        for notice in observation.notices
+    )
+
+
 def _check_located(
     path: str,
     located: Located[Any],
@@ -1235,6 +1243,20 @@ def _validate_observation(
     ev = observation.evidence.class_
     derivation = observation.derivation
     raw_inputs = derivation.raw_inputs if derivation is not None else None
+    method_located = derivation is not None and derivation.has_located_method
+    method_unknown_notice = _has_model_derived_notice(
+        observation, "method_unknown:"
+    )
+    references_are_none_printed = (
+        derivation is not None and derivation.references == ("none_printed",)
+    )
+    none_printed_references_notice = _has_model_derived_notice(
+        observation, "input_references_none_printed:"
+    )
+    model_references_declared = derivation is not None and (
+        derivation.has_named_references
+        or (references_are_none_printed and none_printed_references_notice)
+    )
     declares_printed_unresolved = (
         derivation is not None and derivation.declares_unresolved_printed_inputs
     )
@@ -1271,6 +1293,18 @@ def _validate_observation(
             )
         )
     if (
+        ev.is_value
+        and ev.value is EvidenceClass.MODEL_DERIVED
+        and raw_inputs is None
+    ):
+        issues.append(
+            _issue(
+                f"{path}.derivation.raw_inputs",
+                RefusalReason.CONDITIONAL_FIELD,
+                "model_derived requires raw_inputs not_printed",
+            )
+        )
+    if (
         raw_inputs is not None
         and ev.is_value
         and ev.value is EvidenceClass.MODEL_DERIVED
@@ -1278,8 +1312,8 @@ def _validate_observation(
             derivation is not None
             and derivation.has_located_unprinted_raw_inputs
             and not derivation.inputs
-            and derivation.has_located_method
-            and derivation.has_named_references
+            and (method_located or method_unknown_notice)
+            and model_references_declared
         )
     ):
         issues.append(
@@ -1369,36 +1403,20 @@ def _validate_observation(
             ev.value is EvidenceClass.MODEL_DERIVED
             and declares_unprinted_raw_inputs
         ):
-            if derivation is None or derivation.method is None:
+            if not method_located and not method_unknown_notice:
                 issues.append(
                     _issue(
                         f"{path}.derivation.method",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs not_printed declaration requires a method",
+                        "model_derived without a located method requires a method_unknown notice",
                     )
                 )
-            elif derivation.method.locator is None:
-                issues.append(
-                    _issue(
-                        f"{path}.derivation.method",
-                        RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a locator",
-                    )
-                )
-            elif not derivation.has_located_method:
-                issues.append(
-                    _issue(
-                        f"{path}.derivation.method",
-                        RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires a nonempty value and an equation and physical page locator",
-                    )
-                )
-            if derivation is not None and not derivation.has_named_references:
+            if not model_references_declared:
                 issues.append(
                     _issue(
                         f"{path}.derivation.references",
                         RefusalReason.CONDITIONAL_FIELD,
-                        "model_derived raw_inputs method requires named compiled references",
+                        "model_derived requires named references or none_printed with a notice",
                     )
                 )
         has_resolved_lineage = any(
@@ -1412,16 +1430,16 @@ def _validate_observation(
                 ev.value is EvidenceClass.MEASURED_REDUCED
                 or (
                     ev.value is EvidenceClass.MODEL_DERIVED
-                    and derivation.has_located_method
-                    and derivation.has_named_references
+                    and (method_located or method_unknown_notice)
+                    and model_references_declared
                 )
             )
         )
         if not figure_only_without_value:
             # printed_unresolved is not complete lineage. A located
             # not_printed declaration excuses a missing derived_from for
-            # measured_reduced, and for model_derived only with a located
-            # method and named references.
+            # measured_reduced, and for model_derived with either a located
+            # method or its method_unknown notice plus a references declaration.
             if not has_resolved_lineage and not (
                 raw_inputs_supply_lineage
             ):
