@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.composition import mass_weighted_mixture_wt_pct
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import AdmissionStatus, NoticeKind, RefusalReason
 from simulator.battery.identity import celsius_to_kelvin
 from simulator.battery.migrate import (
     migrate,
@@ -22,6 +22,12 @@ from simulator.battery.migrate import (
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import Composition
+from simulator.battery.score import (
+    ScoreContext,
+    comparison_candidates,
+    selected_lineage_level,
+)
+from simulator.battery.validate import validate_observation
 from simulator.state_types import State
 
 # Delgado 2015 Table 1, JSC-1A [9]. Sum is 98.1 wt%; the remainder stays out.
@@ -299,7 +305,9 @@ def test_named_material_mixture_binds_and_refuses(tmp_path: Path) -> None:
     assert condition.inference.relation == "w_mix,j = sum_k f_k * w_k,j"
     assert condition.inference.method is not None
     assert condition.inference.method.state.value == "derived_composition"
-    assert mixture.derived_from == ("fixture-source::jsc1a_table1",)
+    assert condition.inference.references == ("fixture-source::jsc1a_table1",)
+    assert "composition_records=fixture-source::jsc1a_table1" in condition.inference.inputs
+    assert mixture.derived_from in (None, ())
     lot = [notice for notice in mixture.notices if notice.kind is NoticeKind.LOT_VARIABILITY]
     assert len(lot) == 1
     assert "JSC-1 vs JSC-1A" in lot[0].reason
@@ -359,8 +367,69 @@ def test_named_material_mixture_binds_and_refuses(tmp_path: Path) -> None:
     _assert_printed_wt(mls_recovered["MgO"], printed_mls_mgo)
     folded_mls = printed_mls_mgo + Decimal("50") * Decimal("40.30") / Decimal("24.31")
     assert abs(mls_recovered["MgO"] - folded_mls) > Decimal("1")
-    assert feedstock.derived_from == ("feedstock:lunar_mls_1a",)
+    feed_condition = feedstock.point_conditions["composition"]
+    assert feed_condition.inference.references == ("feedstock:lunar_mls_1a",)
+    assert "composition_records=feedstock:lunar_mls_1a" in feed_condition.inference.inputs
+    assert feedstock.derived_from in (None, ())
+    feedstock_issues = validate_observation(feedstock, {}, rows)
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and "derived_from" in issue.path
+        for issue in feedstock_issues
+    )
     assert any(notice.kind is NoticeKind.LOT_VARIABILITY for notice in feedstock.notices)
+
+
+def test_admitted_cited_record_stays_an_independent_lineage(tmp_path: Path) -> None:
+    """A cited composition row is not value ancestry.
+
+    Table 1 is an admitted mass_loss_fraction. Fig. 3 is an admitted
+    activity. selected_lineage_level stays true because the citation is
+    not Observation.derived_from.
+    """
+
+    document = _document()
+    kept = []
+    for obs in document["species"]["Mg"]["observations"]:
+        if obs["observation_id"] == "jsc1a_table1":
+            obs["units"] = "1"
+            obs["values"] = {
+                "quantity": "mass_loss_fraction",
+                "method_class": "measured_direct",
+                "mass_loss_fraction": "0.10",
+            }
+            kept.append(obs)
+        elif obs["observation_id"] == "fig3_mg_jsc1a":
+            obs["values"] = {
+                "quantity": "activity",
+                "method_class": "measured_direct",
+                "activity": "0.20",
+            }
+            kept.append(obs)
+    document["species"]["Mg"]["observations"] = kept
+    result = migrate(_write_tree(tmp_path, document), write=False)
+    table = result.observations["fixture-source::jsc1a_table1"]
+    mixture = result.observations["fixture-source::fig3_mg_jsc1a"]
+    assert table.admission.status is AdmissionStatus.ADMITTED
+    assert mixture.admission.status is AdmissionStatus.ADMITTED
+    candidate_ids = {
+        obs.observation_id
+        for obs in comparison_candidates(
+            ScoreContext(result.works, result.experiments, result.observations)
+        )
+    }
+    assert table.observation_id in candidate_ids
+    assert selected_lineage_level(mixture, candidate_ids)
+    assert mixture.derived_from in (None, ())
+    bound = mixture.identity.composition.value
+    assert "Mg" in bound.as_map()
+    recovered = _recovered_wt(bound, "Mg", Decimal("26"))
+    printed_mgo = Decimal("74") / Decimal("100") * JSC_1A_WT_PCT["MgO"]
+    _assert_printed_wt(recovered["MgO"], printed_mgo)
+    assert abs(recovered["MgO"] - (printed_mgo + _FOLDED_MG_INTO_MGO)) > Decimal("1")
+    assert mixture.point_conditions["composition"].inference.references == (
+        "fixture-source::jsc1a_table1",
+    )
 
 
 def test_cited_record_mutation_changes_the_mixture(tmp_path: Path) -> None:
