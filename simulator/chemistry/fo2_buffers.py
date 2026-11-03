@@ -408,8 +408,9 @@ def _log_nno_charette(temperature_K: Decimal, pressure_bar: Decimal | None) -> D
 #   JANAF solid. νw = 6/(1−4y), νm = (2−2y)/(1−4y), the printed
 #   magnetite–wüstite coefficients. ΔrG = νm ΔfG(Fe3O4) − νw ΔfG(Fe0.947O).
 #   JANAF Fe-001 and Fe-032.
-# Haas equation (7.57) does not reproduce Table 10.7 (about +0.17 to
-# +0.24 dex). It is not a calibration.
+# Haas equation (7.57) misses Table 10.7 by +166 to +244 in log10. At
+# 1450 K, Table 10.7 is −9.535 and the polynomial is +175.7, a +185.2
+# difference. It is not a calibration.
 # Sanity at 1473 K, 1 bar, survey-rounded: JANAF Mo −11.5363 against
 # O'Neill 1986 −11.6492; JANAF MH −2.5237 against Haas Table 10.9
 # −2.7641; JANAF MW −9.8320 against Haas Table 10.7 −9.1649.
@@ -431,6 +432,11 @@ _JANAF_TABLES = Path(__file__).resolve().parents[2] / (
     "data/literature/compilations/janaf/tables"
 )
 _JANAF_ROWS: dict[str, tuple[tuple[Decimal, Decimal], ...]] = {}
+_JANAF_TABLES_BY_CALIBRATION = {
+    "janaf_mo_moo2": ("Mo-002", "Mo-009"),
+    "janaf_mh_fe3o4_fe2o3": ("Fe-030", "Fe-032"),
+    "janaf_mw_fe0_947o_fe3o4": ("Fe-001", "Fe-032"),
+}
 
 # Haas & Hemingway 1992, one bar. log f(O2) is linear in 1/T between
 # printed nodes and exact on a node. Duplicate transition nodes in
@@ -677,6 +683,15 @@ def _janaf_log(
 
 def _janaf_covers(table_ids: tuple[str, ...], temperature_K: Decimal) -> bool:
     return all(_table_covers(_janaf_dg_rows(table_id), temperature_K) for table_id in table_ids)
+
+
+def _calibration_covers_own_window(
+    item: Calibration, temperature_K: Decimal
+) -> bool:
+    table_ids = _JANAF_TABLES_BY_CALIBRATION.get(item.calibration_id)
+    if table_ids is not None:
+        return _janaf_covers(table_ids, temperature_K)
+    return _in_window(item, temperature_K)
 
 
 def _log_mo_oneill1986(temperature_K: Decimal, pressure_bar: Decimal | None) -> Decimal:
@@ -1272,14 +1287,22 @@ def _pair_width(
     edge_central: Decimal,
     edge_route: Decimal,
 ) -> Decimal:
-    """|central − route| at T plus the same absolute offset at the edge.
+    """Count the edge offset once, plus any additional separation at T.
 
     Each log is rounded to 0.0001 first, which is the survey table's place.
     One comparison route is the ruling's band. Two routes take the wider
     pair, so a crossing cannot drop a named curve.
+
+    The open O'Neill window puts Mo in region 2 at its 1000 K and 1450 K
+    endpoints. Let d(T) = log10(fO2/bar)_central − log10(fO2/bar)_route;
+    the band is |d(T) − d(edge)| + |d(edge)| dex. At 1000 K, d(T) and
+    d(edge) are both +0.1739 dex, giving |0| + 0.1739 = 0.1739 dex.
+    At 1450 K both are +0.1150 dex, giving |0| + 0.1150 = 0.1150 dex.
     """
 
-    return abs(_signed_edge(central, route)) + abs(_signed_edge(edge_central, edge_route))
+    at_temperature = _signed_edge(central, route)
+    at_edge = _signed_edge(edge_central, edge_route)
+    return abs(at_temperature - at_edge) + abs(at_edge)
 
 
 def _edge(route_id: str, temperature_K: Decimal, central: Decimal, route: Decimal) -> EdgeOffset:
@@ -1361,7 +1384,13 @@ def _evaluate_extended(
     item = calibration(calibration_id)
     if item.buffer != name:
         raise KeyError(f"{calibration_id} is not a {name} calibration")
-    authority = "certified" if _in_window(item, temperature_K) else "extrapolated"
+    in_own_window = _calibration_covers_own_window(item, temperature_K)
+    if not in_own_window:
+        authority = "extrapolated"
+    elif item.provenance in {"assessed_table", "tabulated_thermochemistry"}:
+        authority = "tabulated_thermochemistry"
+    else:
+        authority = "certified"
     return replace(
         canonical,
         calibration_id=item.calibration_id,
@@ -1417,7 +1446,9 @@ def _canonical_mo(
             unsized=False,
             divergence=None,
         )
-    covered = _janaf_covers(("Mo-002", "Mo-009"), temperature_K)
+    covered = _calibration_covers_own_window(
+        calibration("janaf_mo_moo2"), temperature_K
+    )
     janaf_log = _member("janaf_mo_moo2", temperature_K)
     if covered:
         edge_t = _MO_EDGES[1] if temperature_K >= _MO_EDGES[1] else _MO_EDGES[0]
