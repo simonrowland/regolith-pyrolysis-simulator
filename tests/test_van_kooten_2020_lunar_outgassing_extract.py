@@ -23,12 +23,12 @@ def _assert_quoted_rows_have_attributions(document: dict) -> None:
     values = observation["values"]
     assert values["evidence_class"] == "quoted_attributed"
     assert observation["attribution"] == (
-        "Day et al. (2020b) and Kato & Moynier (2017), as named by Table 1 reference keys Day20 and Kato17."
+        "Day et al. (2020b) and Kato et al. (2015), as named by Table 1 reference keys Day20 and Kato17."
     )
     for row in values["rows"]:
         expected = {
             "Day20": "Day et al. (2020b)",
-            "Kato17": "Kato & Moynier (2017)",
+            "Kato17": "Kato et al. (2015)",
         }[row["reference"]]
         assert row["evidence_class"] == "quoted_attributed"
         assert row["attribution"] == expected
