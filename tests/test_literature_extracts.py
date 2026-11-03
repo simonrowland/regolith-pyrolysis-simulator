@@ -7181,3 +7181,36 @@ def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
                     assert migrated_condition.state.tag.value == condition["state"]["tag"]
     assert not migrator.result.registry_issues
     assert not migrator.result.validation.hard_issues
+def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
+    from simulator.battery.enums import MethodToken
+
+    source = EXTRACTS / "kroger-fingas-1935-alkali-silicate-equilibria.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+
+    method_experiment_ids = {
+        "kroger_fingas_1935_manometric_reaction_pressures",
+        "kroger_fingas_1935_k2co3_vacuum_pressure",
+    }
+    pressure_rows = tuple(
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id.rsplit("::", 1)[-1] in method_experiment_ids
+    )
+    assert len(pressure_rows) == 189
+    assert result.validation.hard_issues == ()
+
+    for observation in pressure_rows:
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+
+        assert observation.identity.temperature_K.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        for key in ("T_C", "temperature_K"):
+            condition = conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table is not None
