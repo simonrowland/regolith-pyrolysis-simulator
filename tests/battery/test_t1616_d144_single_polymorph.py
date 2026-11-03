@@ -463,3 +463,47 @@ def test_magemin_mgo_activity_refuses_uncertified_native_standard_state(
     assert "engines/magemin/domain.py:28-30" in refusal_notice.band
     assert "simulator/melt_backend/magemin.py:3502-3516" in refusal_notice.band
     assert "b-1123" in refusal_notice.band
+
+
+def test_magemin_mgo_missing_temperature_keeps_fusion_input_refusal(
+    tmp_path: Path,
+) -> None:
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    migrated = _migrate_real_extract(tmp_path, "kume-2000-cao-activities.yaml")
+    mgo = next(
+        observation
+        for observation in migrated.observations.values()
+        if observation.observation_id.endswith(
+            "::kume_2000_table4_sample_305_mgo_activity"
+        )
+    )
+    missing_temperature = replace(
+        mgo,
+        identity=replace(
+            mgo.identity,
+            temperature_K=State.unknown("test temperature omitted"),
+        ),
+    )
+    observations = dict(migrated.observations)
+    observations[missing_temperature.observation_id] = missing_temperature
+    context = ScoreContext(
+        works=migrated.works,
+        experiments=migrated.experiments,
+        observations=observations,
+        benches=migrated.benches,
+    )
+
+    residual, _candidate = compile_residual(
+        missing_temperature, Engine.MAGEMIN, context=context
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
+    assert residual.refusal.detail["missing_input"] == (
+        "activity observation temperature_K"
+    )
