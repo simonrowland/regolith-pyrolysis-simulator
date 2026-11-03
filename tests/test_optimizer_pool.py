@@ -179,6 +179,42 @@ def test_read_pid_log_drops_recycled_and_dead_pids(tmp_path: Path) -> None:
         proc.wait()
 
 
+def test_tracked_popen_remains_subscriptable_and_logs_child_pid(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Runtime ``subprocess.Popen[bytes]`` must succeed while pid tracking is installed.
+
+    Studio IPython 9.14 evaluates that subscript at import (no
+    ``from __future__ import annotations``). The optimizer worker installs
+    tracking before an analytical hour reaches alphamelts initialize, which
+    imports VapoRock, which imports IPython. A function stand-in raises
+    ``TypeError: 'function' object is not subscriptable`` and the pool reports
+    ``BackendUnavailableAbort``. Laptop IPython 9.17 defers the annotation, so
+    the study file stays green there without this forced subscript.
+    """
+    original = subprocess.Popen
+    log_path = tmp_path / "children.pid"
+    monkeypatch.setenv(pool_module._CHILD_PID_LOG_ENV, str(log_path))
+    restore = pool_module._install_child_pid_tracking()
+    proc: subprocess.Popen[str] | None = None
+    try:
+        assert subprocess.Popen[bytes] == original[bytes]
+        proc = subprocess.Popen(
+            [sys.executable, "-c", "pass"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        assert isinstance(proc, original)
+        recorded = log_path.read_text(encoding="utf-8").splitlines()[0].split("\t", 1)[0]
+        assert recorded == str(proc.pid)
+    finally:
+        restore()
+        if proc is not None:
+            proc.wait(timeout=10)
+    assert subprocess.Popen is original
+
+
 def _process_pool_unavailable_reason() -> str | None:
     executor: ProcessPoolExecutor | None = None
     try:

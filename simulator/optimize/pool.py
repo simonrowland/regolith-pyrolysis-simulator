@@ -1683,17 +1683,27 @@ def _append_child_pid(path: str, pid: int) -> None:
 def _install_child_pid_tracking() -> Callable[[], None]:
     previous_popen = subprocess.Popen
 
-    def _tracked_popen(*args: Any, **kwargs: Any) -> Any:
-        process = previous_popen(*args, **kwargs)
-        log_path = os.environ.get(_CHILD_PID_LOG_ENV)
-        if log_path:
-            _append_child_pid(log_path, int(process.pid))
-        return process
+    class _TrackedPopen:
+        # Studio IPython 9.14 evaluates ``subprocess.Popen[bytes]`` at import
+        # (VapoRock → IPython, no ``from __future__ import annotations``). A
+        # function stand-in raises TypeError there and the analytical
+        # melt-redox gate aborts the worker. Forward the subscript to the real
+        # class so the annotation is the same GenericAlias. ``__new__`` returns
+        # that class's instance, so Python does not run ``__init__`` again.
+        def __new__(cls, *args: Any, **kwargs: Any) -> Any:
+            process = previous_popen(*args, **kwargs)
+            log_path = os.environ.get(_CHILD_PID_LOG_ENV)
+            if log_path:
+                _append_child_pid(log_path, int(process.pid))
+            return process
+
+        def __class_getitem__(cls, item: Any) -> Any:
+            return previous_popen[item]
 
     # subprocess is shared process-wide, and in-process executor doubles can
     # invoke this worker path. Restore the class after each evaluation instead
-    # of leaking this callable into unrelated consumers of subprocess.Popen.
-    subprocess.Popen = _tracked_popen  # type: ignore[assignment]
+    # of leaking this stand-in into unrelated consumers of subprocess.Popen.
+    subprocess.Popen = _TrackedPopen  # type: ignore[assignment]
 
     def _restore() -> None:
         subprocess.Popen = previous_popen
