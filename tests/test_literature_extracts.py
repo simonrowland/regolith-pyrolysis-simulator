@@ -7073,7 +7073,10 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
         assert_migration(mutated)
 
 
-_SC456_SOURCE_IDS = ("banya-hino-takezoe-1985-na-fe-silicate-redox",)
+_SC456_SOURCE_IDS = (
+    "banya-hino-takezoe-1985-na-fe-silicate-redox",
+    "gca-366-210-berry-2024",
+)
 
 
 @pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
