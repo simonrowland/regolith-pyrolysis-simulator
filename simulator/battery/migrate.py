@@ -1518,6 +1518,15 @@ def _ideal_gas_volume_printed_bases(payload: object) -> tuple[str, ...] | None:
     return tuple(seen)
 
 
+def _printed_gas_phase_marker(payload: Mapping[str, Any]) -> bool:
+    """True only for an explicit gas-phase token ``gas`` or ``g``."""
+
+    phase = payload.get("phase")
+    if not isinstance(phase, str):
+        return False
+    return phase.strip().casefold() in {"gas", "g"}
+
+
 def _composition_from_ideal_gas_volume(
     payload: Mapping[str, Any], metadata: Mapping[str, str | None]
 ) -> Composition | None:
@@ -1526,6 +1535,14 @@ def _composition_from_ideal_gas_volume(
     rows = _ideal_gas_volume_rows(payload)
     if rows is None:
         return None
+    # Amagat applies to a gas. A condensed vol% map (SiO2, Al2O3) is not a
+    # mole fraction and must not carry the ideal-gas notice. The marker is
+    # the payload phase token, not the species name: SO2 is on the oxide
+    # allowlist and still a gas when the extract says so.
+    if not _printed_gas_phase_marker(payload):
+        raise ValueError(
+            "condensed-phase volume fraction is not an ideal-gas mole fraction"
+        )
     percent = {
         name: amount
         for name, amount, verbatim in rows

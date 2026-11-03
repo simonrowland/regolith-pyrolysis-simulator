@@ -14,12 +14,15 @@ from simulator.battery.enums import (
     AmountBasis,
     Engine,
     EvidenceClass,
+    ExecutionState,
+    MetricOperation,
     NoticeKind,
     PerBasis,
     Phase,
     Quantity,
+    ResidualStatus,
 )
-from simulator.battery.identity import Identity
+from simulator.battery.identity import Identity, SweepIdentity, WallIdentity
 from simulator.battery.migrate import (
     PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     _composition_located_from_plain,
@@ -31,6 +34,7 @@ from simulator.battery.migrate import (
 from simulator.battery.records import Composition, Located, Species, State
 from simulator.battery.score import (
     ScoreContext,
+    compile_residual,
     predict_with_engine,
     refusal_census,
     score_store,
@@ -94,6 +98,7 @@ def test_ideal_gas_volume_scale_is_not_a_new_amount_basis() -> None:
 def _gas_i() -> dict[str, object]:
     return {
         "amount_basis": "mole_percent",
+        "phase": "gas",
         "components": [
             ["O2", "4.5", "vol-%"],
             ["N2", "72.7", "vol-%"],
@@ -125,6 +130,36 @@ def test_gas_i_volume_map_becomes_mole_fraction_with_notice() -> None:
     assert located.inference is not None
     assert located.inference.relation == _NOTICE.value
     assert located.inference.inputs == ("vol-%", "volume-ppm")
+
+
+def test_condensed_volume_fraction_stays_unknown() -> None:
+    """SiO2/Al2O3 vol% is not an ideal-gas mole fraction without a gas marker."""
+
+    payload = {
+        "amount_basis": "mole_percent",
+        "components": [["SiO2", "60", "vol-%"], ["Al2O3", "40", "vol-%"]],
+    }
+    for marked in (payload, {**payload, "phase": "cr"}):
+        located = _composition_located_from_plain(marked)
+        assert located.state.is_unknown
+        assert located.state.reason == (
+            "condensed-phase volume fraction is not an ideal-gas mole fraction"
+        )
+        assert (
+            located.inference is None
+            or located.inference.relation != _NOTICE.value
+        )
+    gas = _composition_located_from_plain(
+        {
+            "amount_basis": "mole_percent",
+            "phase": "G",
+            "components": [["O2", "100", "vol-%"]],
+        }
+    )
+    assert gas.state.is_value
+    assert gas.state.value.components == (("O2", Decimal("1")),)
+    assert gas.inference is not None
+    assert gas.inference.relation == _NOTICE.value
 
 
 def test_plain_mole_percent_gases_have_no_volume_notice() -> None:
@@ -378,94 +413,329 @@ def test_predictor_refusals_are_counted_not_dropped(tmp_path) -> None:
     assert dew_residual.refusal.detail["species"] == ("Na2SO4", "NaOH")
 
 
-def test_areal_rate_calls_the_existing_wall_flux(monkeypatch) -> None:
-    calls: list[str] = []
-
-    def _admitted(species: str, **_kwargs: object) -> None:
-        return None
-
-    def _flux(species: str, *_args: object, **_kwargs: object) -> float:
-        calls.append(species)
-        return 2.0
-
-    monkeypatch.setattr(
-        "simulator.condensation._condensation_admission_refusal", _admitted
-    )
-    monkeypatch.setattr(
-        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
-        _flux,
-    )
+def _areal_observation(
+    *,
+    formula: str = "Na2SO4",
+    gas_temperature_K: str = "1373",
+    wall_temperature_K: str = "900",
+    pressure_Pa: str = "101325",
+    fraction: str = "0.0001",
+    carrier: str = "Ar",
+    diameter: str | None = "0.05",
+    alpha: str | None = "0.2",
+    observation_id: str = "flux",
+):
+    rest = Decimal("1") - Decimal(fraction)
     composition = Composition(
-        basis="vol-%",
-        components=(
-            ("Na2SO4", Decimal("0.0001")),
-            ("N2", Decimal("0.9999")),
-        ),
+        basis="mole_fraction",
+        components=((formula, Decimal(fraction)), (carrier, rest)),
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     identity = Identity(
         quantity=Quantity.WALL_DEPOSIT_AREAL_RATE,
-        species=Species("Na2SO4", Phase.CR),
-        temperature_K=State.of(Decimal("1373")),
+        species=Species(formula, Phase.CR),
+        temperature_K=State.of(Decimal(gas_temperature_K)),
         per=State.of(PerBasis.AREA_TIME),
         composition=State.of(composition),
-        total_pressure_Pa=State.of(Decimal("101325")),
+        total_pressure_Pa=State.of(Decimal(pressure_Pa)),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species=carrier,
+                flow_sccm=State.not_applicable("unprinted flow"),
+                partial_pressure_Pa=State.not_applicable("unprinted partial pressure"),
+            )
+        ),
+        wall=State.of(
+            WallIdentity(
+                temperature_K=State.of(Decimal(wall_temperature_K)),
+                material=State.of("alumina"),
+            )
+        ),
     )
     built = observation(
-        "flux",
+        observation_id,
         "run",
         identity,
         "1",
         evidence=EvidenceClass.MEASURED_DIRECT,
     )
-    built = replace(
-        built,
+    conditions = dict(built.point_conditions or {})
+    if diameter is not None:
+        conditions["pipe_diameter_m"] = Located(State.of(Decimal(diameter)))
+    if alpha is not None:
+        conditions["sticking_coefficient"] = Located(State.of(Decimal(alpha)))
+    return replace(built, point_conditions=conditions)
+
+
+def _admit_all(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "simulator.condensation._condensation_admission_refusal",
+        lambda _species, **_kwargs: None,
+    )
+
+
+def test_areal_rate_calls_the_existing_wall_flux(monkeypatch) -> None:
+    """The flux call carries the wall-model contract, not the helper defaults."""
+
+    from simulator.condensation import (
+        _knudsen_number,
+        _knudsen_regime_factor,
+        _reactive_product_backstop_authorized,
+        _species_condensation_temperature_C,
+        reactive_product_backstop_enabled,
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    seen: dict[str, object] = {}
+
+    def _flux(species, p_local, t_surface, alpha, **kwargs):
+        seen["species"] = species
+        seen["p_local"] = p_local
+        seen["t_surface"] = t_surface
+        seen["alpha"] = alpha
+        seen["kwargs"] = kwargs
+        return 2.0
+
+    _admit_all(monkeypatch)
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _flux,
+    )
+    gas_T = Decimal("1373")
+    wall_T = Decimal("900")
+    pressure = Decimal("101325")
+    fraction = Decimal("0.0001")
+    diameter = Decimal("0.05")
+    carrier = "Ar"
+    built = _areal_observation(
+        gas_temperature_K=str(gas_T),
+        wall_temperature_K=str(wall_T),
+        pressure_Pa=str(pressure),
+        fraction=str(fraction),
+        carrier=carrier,
+        diameter=str(diameter),
+    )
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
+    kwargs = seen["kwargs"]
+    assert isinstance(kwargs, dict)
+    expected_regime = _knudsen_regime_factor(
+        _knudsen_number(
+            float(pressure),
+            float(gas_T),
+            float(diameter),
+            carrier_gas=carrier,
+        )
+    )
+    if _reactive_product_backstop_authorized("Na2SO4"):
+        expected_backstop = reactive_product_backstop_enabled(
+            "Na2SO4",
+            float(wall_T) - float(CELSIUS_TO_KELVIN_OFFSET),
+            _species_condensation_temperature_C("Na2SO4"),
+        )
+    else:
+        expected_backstop = False
+    molar_mass = resolve_species_formula("Na2SO4").molar_mass_kg_per_mol()
+    assert seen["species"] == "Na2SO4"
+    assert seen["p_local"] == float(fraction * pressure)
+    assert seen["t_surface"] == float(wall_T)
+    assert seen["t_surface"] != float(gas_T)
+    assert kwargs["T_gas_K"] == float(gas_T)
+    assert kwargs["overhead_pressure_pa"] == float(pressure)
+    assert kwargs["carrier_gas"] == carrier
+    assert kwargs["regime_factor"] == expected_regime
+    assert kwargs["reactive_product_backstop"] is expected_backstop
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("2.0") * Decimal(str(molar_mass))
+    assert prediction.refusal_reason is None
+    assert prediction.notices == ()
+
+
+def test_undersaturated_wall_is_zero_not_a_negative_deposit(monkeypatch) -> None:
+    """p_bulk < p_sat predicts 0 with the evaporation notice. Equality does not."""
+
+    def _flux(*_args, diagnostic_out=None, **_kwargs):
+        if isinstance(diagnostic_out, dict):
+            diagnostic_out["wall_saturation_pressure_pa"] = 2000.0
+        return -3.0
+
+    _admit_all(monkeypatch)
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _flux,
+    )
+    fraction = Decimal("0.01")
+    pressure = Decimal("100000")
+    built = _areal_observation(
+        pressure_Pa=str(pressure),
+        fraction=str(fraction),
+        observation_id="undersaturated",
+    )
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
+    p_bulk = fraction * pressure
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal(0)
+    assert prediction.value >= 0
+    assert len(prediction.notices) == 1
+    notice = prediction.notices[0]
+    assert notice.kind is NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION
+    assert notice.reason == f"p_bulk_Pa={p_bulk}; p_sat_T_wall_Pa={Decimal('2000.0')}"
+
+    def _equilibrium(*_args, diagnostic_out=None, **_kwargs):
+        if isinstance(diagnostic_out, dict):
+            diagnostic_out["wall_saturation_pressure_pa"] = float(p_bulk)
+        return 0.0
+
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _equilibrium,
+    )
+    equilibrium = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
+    assert equilibrium.value == Decimal(0)
+    assert equilibrium.notices == ()
+    assert equilibrium.refusal_reason is None
+
+
+def test_undersaturated_zero_is_scored(tmp_path, monkeypatch) -> None:
+    """The zero reaches the residual metric and is not a typed refusal."""
+
+    result = migrate(_write_min_tree(tmp_path, _extract()), write=False)
+    context = ScoreContext(
+        works=result.works,
+        experiments=result.experiments,
+        observations=result.observations,
+    )
+    row = next(
+        item
+        for item in result.observations.values()
+        if item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.WALL_DEPOSIT_AREAL_RATE
+        and item.identity.species is not None
+        and item.identity.species.formula == "Na2SO4"
+        and item.value.point == Decimal("0.38") / Decimal(360000)
+    )
+    fraction = Decimal("0.01")
+    pressure = Decimal("100000")
+    identity = replace(
+        row.identity,
+        # A crystal with no printed polymorph is identity-unknown before any
+        # metric. The gas-phase species keeps this row on the numeric path.
+        species=Species("Na2SO4", Phase.G),
+        temperature_K=State.of(Decimal("1373")),
+        total_pressure_Pa=State.of(pressure),
+        composition=State.of(
+            Composition(
+                basis="mole_fraction",
+                components=(("Na2SO4", fraction), ("Ar", Decimal("0.99"))),
+                amount_basis=AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        sweep_gas=State.of(
+            SweepIdentity(
+                species="Ar",
+                flow_sccm=State.of(Decimal("10")),
+                partial_pressure_Pa=State.of(pressure),
+            )
+        ),
+        wall=State.of(
+            WallIdentity(
+                temperature_K=State.of(Decimal("900")),
+                material=State.of("alumina"),
+                area_m2=State.of(Decimal("0.02")),
+                location=State.of("duct"),
+            )
+        ),
+    )
+    row = replace(
+        row,
+        identity=identity,
         point_conditions={
-            **(built.point_conditions or {}),
+            **(row.point_conditions or {}),
             "pipe_diameter_m": Located(State.of(Decimal("0.05"))),
             "sticking_coefficient": Located(State.of(Decimal("0.2"))),
         },
     )
-    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
-    molar_mass = resolve_species_formula("Na2SO4").molar_mass_kg_per_mol()
-    assert calls == ["Na2SO4"]
-    assert prediction.value == Decimal("2.0") * Decimal(str(molar_mass))
-    assert prediction.refusal_reason is None
 
+    def _flux(*_args, diagnostic_out=None, **_kwargs):
+        if isinstance(diagnostic_out, dict):
+            diagnostic_out["wall_saturation_pressure_pa"] = 2000.0
+        return -3.0
 
-def test_missing_pipe_diameter_refuses_before_the_flux(monkeypatch) -> None:
-    def _admitted(species: str, **_kwargs: object) -> None:
-        return None
-
-    def _flux(*_args: object, **_kwargs: object) -> float:
-        raise AssertionError("flux called without a printed pipe diameter")
-
-    monkeypatch.setattr(
-        "simulator.condensation._condensation_admission_refusal", _admitted
-    )
+    _admit_all(monkeypatch)
     monkeypatch.setattr(
         "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
         _flux,
     )
-    composition = Composition(
-        basis="vol-%",
-        components=(("NaCl", Decimal("0.01")), ("N2", Decimal("0.99"))),
-        amount_basis=AmountBasis.MOLE_FRACTION,
+    residual, _candidate = compile_residual(
+        row, Engine.INTERNAL_ANALYTICAL, context=context
     )
-    identity = Identity(
-        quantity=Quantity.WALL_DEPOSIT_AREAL_RATE,
-        species=Species("NaCl", Phase.CR),
-        temperature_K=State.of(Decimal("1100")),
-        per=State.of(PerBasis.AREA_TIME),
-        composition=State.of(composition),
-        total_pressure_Pa=State.of(Decimal("100000")),
+    assert residual.refusal is None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.numeric.operation is MetricOperation.RELATIVE
+    assert residual.numeric.value == Decimal(-1)
+    assert "not_flagged_stratum" not in residual.exclusions
+    notices = [
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION
+    ]
+    assert len(notices) == 1
+    assert notices[0].reason == (
+        f"p_bulk_Pa={fraction * pressure}; p_sat_T_wall_Pa={Decimal('2000.0')}"
     )
-    built = observation(
-        "bare",
-        "run",
-        identity,
-        "1",
-        evidence=EvidenceClass.MEASURED_DIRECT,
+
+
+def test_deposition_input_refusal_is_separate_from_saturation(monkeypatch) -> None:
+    from simulator.condensation import (
+        DepositionInputRefusal,
+        WallSaturationPressureRefusal,
+    )
+
+    def _bad_input(*_args, **_kwargs):
+        raise DepositionInputRefusal("pipe_diameter_m", 0.0, "must be > 0")
+
+    _admit_all(monkeypatch)
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _bad_input,
+    )
+    built = _areal_observation(observation_id="bad-diameter")
+    prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
+    assert prediction.refusal_detail["reason"] == "deposition_input_refused"
+    assert prediction.refusal_detail["parameter"] == "pipe_diameter_m"
+    assert prediction.refusal_detail["reason"] != "wall_saturation_pressure_refused"
+
+    def _unsaturated(*_args, **_kwargs):
+        raise WallSaturationPressureRefusal("Na2SO4", 900.0, "antoine_data_unavailable")
+
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _unsaturated,
+    )
+    saturation = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
+    assert saturation.refusal_detail["reason"] == "antoine_data_unavailable"
+    assert saturation.refusal_detail["reason"] != "deposition_input_refused"
+
+
+def test_missing_pipe_diameter_refuses_before_the_flux(monkeypatch) -> None:
+    def _flux(*_args: object, **_kwargs: object) -> float:
+        raise AssertionError("flux called without a printed pipe diameter")
+
+    _admit_all(monkeypatch)
+    monkeypatch.setattr(
+        "simulator.condensation._series_resistance_deposition_flux_mol_m2_s",
+        _flux,
+    )
+    built = _areal_observation(
+        formula="NaCl",
+        gas_temperature_K="1100",
+        pressure_Pa="100000",
+        fraction="0.01",
+        carrier="N2",
+        diameter=None,
+        alpha=None,
+        observation_id="bare",
     )
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, built)
     assert prediction.value is None

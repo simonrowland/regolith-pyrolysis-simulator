@@ -296,6 +296,10 @@ class NoticeKind(StrEnum):
     IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION = (
         "ideal_gas_volume_fraction_as_mole_fraction"
     )
+    # t-1597: p_bulk < p_sat(T_wall). The model predicts zero net deposition
+    # (net evaporation). The miss against a measured deposit stays scored.
+    # Not a flagged stratum.
+    UNDERSATURATED_WALL_NET_EVAPORATION = "undersaturated_wall_net_evaporation"
 
 
 class ReferenceStateConvention(StrEnum):

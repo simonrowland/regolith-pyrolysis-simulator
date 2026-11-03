@@ -924,6 +924,27 @@ def _reactive_product_backstop_authorized(species: str) -> bool:
     return _sticking_reactivity_class(species) == 'reactive'
 
 
+def reactive_product_backstop_enabled(
+    species: str,
+    wall_temperature_C: float,
+    condensation_temperature_C: float,
+) -> bool:
+    """Whether a reactive product may materialize on this wall.
+
+    Premise: SiO disproportionation is the reactive class, and the wall
+    model materializes that product only at or below the declared
+    condensation temperature. A hotter wall stays on reversible p_sat.
+    Algebra: authorized and wall_C <= T_cond_C. Unit check: both
+    temperatures are Celsius. Sanity: a reactive species above T_cond
+    returns False, and a non-reactive species returns False at any T.
+    """
+
+    return (
+        _reactive_product_backstop_authorized(species)
+        and float(wall_temperature_C) <= float(condensation_temperature_C)
+    )
+
+
 def _stable_condensation_product_backstop_authorized(species: str) -> bool:
     return _sticking_wall_product_class(species) == 'stable_condensation_product'
 
@@ -4694,9 +4715,8 @@ class CondensationModel:
                 # reaction term is rejected as a wall pressure.  The
                 # temperature gate preserves colder downstream carryover
                 # without admitting hotter upstream stages.
-                reactive_product_backstop=(
-                    _reactive_product_backstop_authorized(species)
-                    and T_surface_C <= T_cond_C
+                reactive_product_backstop=reactive_product_backstop_enabled(
+                    species, T_surface_C, T_cond_C
                 ),
                 # Stable product class (CrO2 today) materializes the declared
                 # irreversible oxide route instead of reversible pure-species Psat.
