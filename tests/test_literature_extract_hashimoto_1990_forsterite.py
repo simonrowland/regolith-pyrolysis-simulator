@@ -85,6 +85,22 @@ def _assert_render_pins(document: dict) -> None:
         assert values["quantity"] == "evaporation_coefficient_alpha"
         assert values["coefficient_definition_as_printed"] == "alpha_v = J_v/J_e"
 
+    alpha_12 = observations[OUT_OF_DOMAIN_ID][1]
+    assert alpha_12["values"]["status"] == "typed_refusal"
+    assert alpha_12["values"]["admission_status"] == "typed_refusal"
+    assert (
+        "impossible, according to the definition of alpha_v"
+        in alpha_12["values"]["reason"]
+    )
+    assert (
+        "underestimation of the experimental surface area"
+        in alpha_12["values"]["reason"]
+    )
+    assert alpha_12["locator"]["page"] == 3
+    assert alpha_12["T_range_K"] == ["2173.15", "2373.15"]
+    assert alpha_12["values"]["T_range_C_as_printed"] == ["1900", "2100"]
+    assert alpha_12["T_range_locator"]["page"] == 2
+
     residue = observations["hashimoto_1990_forsterite_residue_glass_sio2"][1]
     assert residue["values"]["points"][0]["SiO2_wt_pct"] == "65"
     assert residue["units"] == "wt%"
@@ -139,25 +155,44 @@ def test_residue_glass_sio2_wt_percent_migrates_without_manual_division(tmp_path
     assert row.value.point == Decimal("65")
 
 
-def test_isolated_migration_keeps_printed_axes_and_only_declared_quantity_gap(tmp_path: Path) -> None:
+def test_isolated_migration_keeps_printed_axes_and_ruled_quantity_refusals(
+    tmp_path: Path,
+) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     result = migrate(isolated_root(tmp_path, document), write=False)
     assert result.validation is not None
     assert not result.validation.hard_issues
 
     rows = {
-        row.observation_id.rsplit("::", 1)[-1]: row
+        row.observation_id.split("::", 2)[1]: row
         for row in result.observations.values()
         if row.source_id == SID
     }
     assert len(rows) == 16
-    assert {key for key, row in rows.items() if row.identity.quantity.is_unknown} == {SCHEMA_GAP_ID}
+    assert sum(row.value.kind.value == "unavailable" for row in rows.values()) == 2
+    for observation_id, page in {
+        "hashimoto_1990_mgo_solid_alpha": 1,
+        "hashimoto_1990_sio2_solid_alpha": 2,
+        OUT_OF_DOMAIN_ID: 3,
+    }.items():
+        assert rows[observation_id].locator is not None
+        assert rows[observation_id].locator.page == page
+    assert {key for key, row in rows.items() if row.identity.quantity.is_unknown} == {
+        SCHEMA_GAP_ID,
+        OUT_OF_DOMAIN_ID,
+    }
     assert all(row.identity.species.phase.is_value for row in rows.values())
 
     for observation_id, (_, observation) in _observations(document).items():
         migrated = rows[observation_id]
         assert migrated.identity.species.formula == _observations(document)[observation_id][0]
         assert migrated.identity.species.phase.value in {Phase.CR, Phase.L, Phase.GLASS}
+        if migrated.identity.quantity.is_value and (
+            migrated.identity.quantity.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        ):
+            composition = migrated.identity.composition
+            assert composition is not None and composition.is_unknown
+            assert "no composition mapped from source" in composition.reason
         assert "total_pressure_Pa" not in (observation.get("point_conditions") or {})
         assert "fO2_Pa" not in (observation.get("point_conditions") or {})
         assert not (
@@ -166,6 +201,11 @@ def test_isolated_migration_keeps_printed_axes_and_only_declared_quantity_gap(tm
         )
         assert not (migrated.identity.fO2_Pa and migrated.identity.fO2_Pa.is_value)
         temperature = migrated.identity.temperature_K
+        if observation_id == OUT_OF_DOMAIN_ID:
+            assert observation["T_range_K"] == ["2173.15", "2373.15"]
+            assert observation["T_range_locator"]["page"] == 2
+            assert temperature is None or not temperature.is_value
+            continue
         if observation.get("T_range_K") is not None:
             assert "temperature_K" in profile_for(migrated.identity).required
             assert temperature is not None and temperature.is_unknown

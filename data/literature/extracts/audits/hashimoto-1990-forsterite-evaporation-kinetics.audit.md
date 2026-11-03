@@ -35,22 +35,22 @@ they contain no numeric composition to store.
 
 The source prints the liquid-SiO2 alternate-species alpha as 1.2 while explicitly
 stating that alpha above one is impossible by its definition and may result from
-underestimating experimental surface area. The existing migrator's alpha-domain
-guard (`simulator/battery/migrate.py::_quantity_contradiction`) therefore produces an unknown
-quantity and unavailable value for that source row. This is a domain refusal,
-not a schema gap or a changed evidence class. The task's requirement to preserve
-the printed value conflicts with its acceptance requirement for no
-quantity-unknown observations. Because its quantity becomes unknown, the
-migrator also does not bind this row's printed temperature range to identity.
-This row is held for a controller ruling; the migrator and schema were not
-changed.
+underestimating experimental surface area. The row remains an observation with
+the printed value `1.2`, its temperature range, and typed-refusal status. Its
+reason includes the source's caveat: “impossible, according to the definition
+of alpha_v”; Hashimoto says the value may reflect underestimation of the
+experimental surface area. The existing migrator alpha-domain guard
+(`simulator/battery/migrate.py::_quantity_contradiction`) leaves its quantity
+unknown and value unavailable. The controller ruled this refusal acceptable for
+this extraction; a clearer “printed alpha > 1, author-flagged” reason is a
+migrator follow-up, and no migrator or schema changes were made.
 
-The alpha quantity profile also requires an identity composition. The source
-prints the pure-material formulas MgO, SiO2, and Mg2SiO4, but no analyzed oxide
-percent maps. The current migrator leaves `Identity.composition` unknown for
-these alpha rows because its existing composition paths consume structured
-oxide maps. Whether the printed formula itself should be mapped to a formula
-stoichiometry composition is unresolved; no derived percentages were invented.
+The alpha quantity profile requires an identity composition. The paper names
+the MgO, SiO2, and Mg2SiO4 materials but does not state that the experimental
+samples were pure synthetic or reagent compounds, nor give their origin. Under
+the controller ruling, formula-derived composition is permitted only with such
+a printed purity/origin statement. The existing migrator therefore leaves
+`Identity.composition` unknown; no derived percentages were invented.
 
 ## Conditions and phase
 
@@ -96,23 +96,41 @@ the migrator as printed temperature ranges; identity temperature is unknown
 because the profile does not accept a range midpoint. The two author
 extrapolations reach identity as 1973.15 K and 1673.15 K. Total pressure and
 fO2 stay unknown because the source does not print their run values. The
-identity-composition issue and the alpha 1.2 gate conflict are recorded in the
-isolated migration report.
+source-origin basis for unknown composition and the alpha 1.2 domain refusal
+are recorded in the isolated migration report.
 
 Three alpha-profile identity checks (the profile requires composition,
 total_pressure_Pa, fO2_Pa, and temperature_K):
 
 | Observation | Composition | Total pressure | fO2 | Temperature |
 | --- | --- | --- | --- | --- |
-| MgO solid alpha | Unknown: formula not mapped | Unknown: not printed | Unknown: not printed | Unknown: printed range 1873.15–2173.15 K; no midpoint |
-| SiO2 solid alpha | Unknown: formula not mapped | Unknown: not printed | Unknown: not printed | Unknown: printed range 1833.15–1958.15 K; no midpoint |
-| Forsterite extrapolation at 1700 °C | Unknown: formula not mapped | Unknown: not printed | Unknown: not printed | 1973.15 K |
+| MgO solid alpha | Unknown: origin/purity not printed | Unknown: not printed | Unknown: not printed | Unknown: printed range 1873.15–2173.15 K; no midpoint |
+| SiO2 solid alpha | Unknown: origin/purity not printed | Unknown: not printed | Unknown: not printed | Unknown: printed range 1833.15–1958.15 K; no midpoint |
+| Forsterite extrapolation at 1700 °C | Unknown: origin/purity not printed | Unknown: not printed | Unknown: not printed | 1973.15 K |
 
 The generated observation/battery store was not regenerated or committed. The
 expected addition is 16 source rows: 14 alpha statements (one unavailable by
 the existing alpha-domain guard), one glass-residue composition row, and one
 typed-refused glass volume-fraction row. Figure and qualitative context records
 do not add observation rows.
+
+## Verification
+
+- Isolated migration: 16 observations, 0 hard issues, 2 unavailable values,
+  2 quantity-unknown rows, and 0 phase-unknown rows. The quantity-unknown IDs
+  are the volume-fraction schema gap and the author-flagged alpha 1.2 refusal.
+- Focused extraction test: 3 passed. It pins the rendered coefficients and
+  residue composition, verifies a deliberate coefficient mutation fails, and
+  pins the migrated 65 wt% value as 65 without manual division.
+- `tests/test_yaml_flow_scalar_commas.py`: 17 passed.
+- `test_repo_extracts_validate_green`: 1 passed after correcting the residue
+  composition fidelity path. The focused Hashimoto fidelity matcher selected
+  4 cases and passed all 4.
+- The complete `tests/test_literature_extracts.py` file remains
+  `UNVERIFIED-local`: two full-file attempts exceeded the 300-second cap and
+  were interrupted (128 passed at 329.50 seconds; 158 passed, one excluded, at
+  328.78 seconds). The extract-tree validator and Hashimoto fidelity cases were
+  then run separately and passed.
 
 ## Figure-read candidate
 
