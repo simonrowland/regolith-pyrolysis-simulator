@@ -1,0 +1,493 @@
+schema_version: literature_extract.v1
+source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
+source:
+  citation: >-
+    Kassis, N., and Frischat, G. H. (1981), Dampfdrucke von Glasschmelzen des
+    Mischalkalisystems Na2O-Rb2O-SiO2, Glastechnische Berichte, 54(4), 89-98.
+  year: 1981
+  doi: 10.34657/17394
+  corpus_asset: raw/kassis-frischat-1981-mixed-alkali-vapor-pressures/kassis-frischat-1981-mixed-alkali-vapor-pressures.pdf
+extraction:
+  method: >-
+    Transcribed the printed pressure-ratio row from the MinerU draft and
+    pdftotext, then verified the comma decimals and table layout against the
+    page render. Absolute Na and Rb partial-pressure curves in Figures 8 and 9
+    are figure-read candidates and were not digitized. This is a different source from
+    kassis-frischat-1981-silicate-glass-vapour; no rows are duplicated.
+  date: '2026-11-03'
+  worker: w1103cw4-kf81
+review_status: draft
+benches:
+  - id: knudsen-effusion-apparatus
+    identity:
+      basis: described_in_this_work
+    locator:
+      page: 2
+      published_page: 90
+      section: 1.2.2
+    apparatus_family:
+      state:
+        tag: value
+        value: >-
+          Knudsen cell, thermobalance, and high-temperature high-vacuum furnace
+      locator:
+        page: 2
+        published_page: 90
+        section: 1.2.2
+experiments:
+  - experiment_id: mixed_alkali_pressure_ratio_series
+    bench_id: knudsen-effusion-apparatus
+    method: knudsen_effusion
+    locator:
+      page: 2
+      published_page: 90
+      section: 1.2.2
+      note: Shared chamber condition for the compared melt series.
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: value
+          value: {kind: point, point: '0.00066'}
+        locator:
+          page: 2
+          published_page: 90
+          section: 1.2.2
+          note: >-
+            Printed chamber operating vacuum 6,6 · 10^-4 Pa; this is the
+            outside-cell background, not an in-cell vapor total pressure.
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: No sweep-gas composition is reported.
+        locator:
+          page: 2
+          published_page: 90
+          section: 1.2.2
+      regime:
+        regime_class:
+          tag: unknown
+          reason: The source does not report a flow-regime classification.
+fidelity_samples:
+  - path: species.Rb.observations[kassis_frischat_1981_table3_rb_pressure_ratio_1150c].values.value
+    value: '0,44'
+    locator:
+      page: 7
+      published_page: 95
+      table: '3'
+      row_label: pγRb(0.3) / pγRb(0.5)
+      column_header: '1150 °C'
+    note: Table 3 pressure-ratio cell checked against the page render.
+  - path: species.Rb.observations[kassis_frischat_1981_table3_rb_pressure_ratio_1200c].values.value
+    value: '0,46'
+    locator:
+      page: 7
+      published_page: 95
+      table: '3'
+      row_label: pγRb(0.3) / pγRb(0.5)
+      column_header: '1200 °C'
+    note: Table 3 pressure-ratio cell checked against the page render.
+  - path: species.Rb.observations[kassis_frischat_1981_table3_rb_pressure_ratio_1250c].values.value
+    value: '0,48'
+    locator:
+      page: 7
+      published_page: 95
+      table: '3'
+      row_label: pγRb(0.3) / pγRb(0.5)
+      column_header: '1250 °C'
+    note: Table 3 pressure-ratio cell checked against the page render.
+  - path: species.Rb.observations[kassis_frischat_1981_table3_rb_pressure_ratio_1300c].values.value
+    value: '0,56'
+    locator:
+      page: 7
+      published_page: 95
+      table: '3'
+      row_label: pγRb(0.3) / pγRb(0.5)
+      column_header: '1300 °C'
+    note: Table 3 pressure-ratio cell checked against the page render.
+species:
+  Rb:
+    observations:
+      - observation_id: kassis_frischat_1981_table3_rb_pressure_ratio_1150c
+        experiment: mixed_alkali_pressure_ratio_series
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 95
+          table: '3'
+          row_label: pγRb(0.3) / pγRb(0.5)
+          column_header: '1150 °C'
+          table_row_number: 2
+          table_column_number: 2
+        phase: gas
+        units: dimensionless
+        values:
+          quantity: Rb partial-pressure ratio between two melt compositions
+          method_class: quoted_attributed
+          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class_reason: >-
+            The authors calculate this ratio from their partial-pressure
+            series using the printed pressure relations. Those individual
+            numeric points occur only in Figures 8 and 9 and are not stored;
+            under d-110 this row is quoted_attributed, not direct measurement.
+          admission_status: unavailable
+          unavailable_reason: no exact quantity token for a partial-pressure ratio
+          schema_gap: >-
+            No exact token represents a ratio of two partial pressures;
+            simulator/battery/enums.py::Quantity.P_PARTIAL is scalar.
+            See the source audit for the closed-set comparison.
+          quantity_as_printed: pγRb(0.3) / pγRb(0.5)
+          value: '0,44'
+          T_C: '1150'
+          temperature_setting_accuracy_as_printed: '± 5 K'
+          compared_melts_as_published:
+            numerator:
+              melt_number: '11'
+              gamma_Rb_as_printed: '0,3'
+              composition_mol_percent:
+                Na2O: '17,5'
+                Rb2O: '7,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 11'
+            denominator:
+              melt_number: '3'
+              gamma_Rb_as_printed: '0,5'
+              composition_mol_percent:
+                Na2O: '12,5'
+                Rb2O: '12,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 3'
+          composition_units_as_printed: '% Stoffmengengehalt'
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1150'}
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              row_label: 'ϑ in °C'
+              column_header: '1150 °C'
+          composition:
+            state:
+              tag: unknown
+              reason: >-
+                Table 3 is a ratio between two melt compositions; no single
+                composition identifies this row. Both printed compositions
+                are retained in values.compared_melts_as_published.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity or gas mixture is reported for this measurement.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: >-
+                The in-cell vapor total pressure is calculated, not a printed
+                condition; the printed chamber vacuum is stored on the experiment.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+      - observation_id: kassis_frischat_1981_table3_rb_pressure_ratio_1200c
+        experiment: mixed_alkali_pressure_ratio_series
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 95
+          table: '3'
+          row_label: pγRb(0.3) / pγRb(0.5)
+          column_header: '1200 °C'
+          table_row_number: 2
+          table_column_number: 3
+        phase: gas
+        units: dimensionless
+        values:
+          quantity: Rb partial-pressure ratio between two melt compositions
+          method_class: quoted_attributed
+          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class_reason: >-
+            The authors calculate this ratio from their partial-pressure
+            series using the printed pressure relations. Those individual
+            numeric points occur only in Figures 8 and 9 and are not stored;
+            under d-110 this row is quoted_attributed, not direct measurement.
+          admission_status: unavailable
+          unavailable_reason: no exact quantity token for a partial-pressure ratio
+          schema_gap: >-
+            No exact token represents a ratio of two partial pressures;
+            simulator/battery/enums.py::Quantity.P_PARTIAL is scalar.
+            See the source audit for the closed-set comparison.
+          quantity_as_printed: pγRb(0.3) / pγRb(0.5)
+          value: '0,46'
+          T_C: '1200'
+          temperature_setting_accuracy_as_printed: '± 5 K'
+          compared_melts_as_published:
+            numerator:
+              melt_number: '11'
+              gamma_Rb_as_printed: '0,3'
+              composition_mol_percent:
+                Na2O: '17,5'
+                Rb2O: '7,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 11'
+            denominator:
+              melt_number: '3'
+              gamma_Rb_as_printed: '0,5'
+              composition_mol_percent:
+                Na2O: '12,5'
+                Rb2O: '12,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 3'
+          composition_units_as_printed: '% Stoffmengengehalt'
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1200'}
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              row_label: 'ϑ in °C'
+              column_header: '1200 °C'
+          composition:
+            state:
+              tag: unknown
+              reason: >-
+                Table 3 is a ratio between two melt compositions; no single
+                composition identifies this row. Both printed compositions
+                are retained in values.compared_melts_as_published.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity or gas mixture is reported for this measurement.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: >-
+                The in-cell vapor total pressure is calculated, not a printed
+                condition; the printed chamber vacuum is stored on the experiment.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+      - observation_id: kassis_frischat_1981_table3_rb_pressure_ratio_1250c
+        experiment: mixed_alkali_pressure_ratio_series
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 95
+          table: '3'
+          row_label: pγRb(0.3) / pγRb(0.5)
+          column_header: '1250 °C'
+          table_row_number: 2
+          table_column_number: 4
+        phase: gas
+        units: dimensionless
+        values:
+          quantity: Rb partial-pressure ratio between two melt compositions
+          method_class: quoted_attributed
+          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class_reason: >-
+            The authors calculate this ratio from their partial-pressure
+            series using the printed pressure relations. Those individual
+            numeric points occur only in Figures 8 and 9 and are not stored;
+            under d-110 this row is quoted_attributed, not direct measurement.
+          admission_status: unavailable
+          unavailable_reason: no exact quantity token for a partial-pressure ratio
+          schema_gap: >-
+            No exact token represents a ratio of two partial pressures;
+            simulator/battery/enums.py::Quantity.P_PARTIAL is scalar.
+            See the source audit for the closed-set comparison.
+          quantity_as_printed: pγRb(0.3) / pγRb(0.5)
+          value: '0,48'
+          T_C: '1250'
+          temperature_setting_accuracy_as_printed: '± 5 K'
+          compared_melts_as_published:
+            numerator:
+              melt_number: '11'
+              gamma_Rb_as_printed: '0,3'
+              composition_mol_percent:
+                Na2O: '17,5'
+                Rb2O: '7,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 11'
+            denominator:
+              melt_number: '3'
+              gamma_Rb_as_printed: '0,5'
+              composition_mol_percent:
+                Na2O: '12,5'
+                Rb2O: '12,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 3'
+          composition_units_as_printed: '% Stoffmengengehalt'
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1250'}
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              row_label: 'ϑ in °C'
+              column_header: '1250 °C'
+          composition:
+            state:
+              tag: unknown
+              reason: >-
+                Table 3 is a ratio between two melt compositions; no single
+                composition identifies this row. Both printed compositions
+                are retained in values.compared_melts_as_published.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity or gas mixture is reported for this measurement.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: >-
+                The in-cell vapor total pressure is calculated, not a printed
+                condition; the printed chamber vacuum is stored on the experiment.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+      - observation_id: kassis_frischat_1981_table3_rb_pressure_ratio_1300c
+        experiment: mixed_alkali_pressure_ratio_series
+        type: partial_pressure
+        locator:
+          page: 7
+          published_page: 95
+          table: '3'
+          row_label: pγRb(0.3) / pγRb(0.5)
+          column_header: '1300 °C'
+          table_row_number: 2
+          table_column_number: 5
+        phase: gas
+        units: dimensionless
+        values:
+          quantity: Rb partial-pressure ratio between two melt compositions
+          method_class: quoted_attributed
+          attribution: 'Kassis and Frischat (1981), Table 3.'
+          method_class_reason: >-
+            The authors calculate this ratio from their partial-pressure
+            series using the printed pressure relations. Those individual
+            numeric points occur only in Figures 8 and 9 and are not stored;
+            under d-110 this row is quoted_attributed, not direct measurement.
+          admission_status: unavailable
+          unavailable_reason: no exact quantity token for a partial-pressure ratio
+          schema_gap: >-
+            No exact token represents a ratio of two partial pressures;
+            simulator/battery/enums.py::Quantity.P_PARTIAL is scalar.
+            See the source audit for the closed-set comparison.
+          quantity_as_printed: pγRb(0.3) / pγRb(0.5)
+          value: '0,56'
+          T_C: '1300'
+          temperature_setting_accuracy_as_printed: '± 5 K'
+          compared_melts_as_published:
+            numerator:
+              melt_number: '11'
+              gamma_Rb_as_printed: '0,3'
+              composition_mol_percent:
+                Na2O: '17,5'
+                Rb2O: '7,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 11'
+            denominator:
+              melt_number: '3'
+              gamma_Rb_as_printed: '0,5'
+              composition_mol_percent:
+                Na2O: '12,5'
+                Rb2O: '12,5'
+                SiO2: '75'
+              locator:
+                page: 2
+                published_page: 90
+                table: '1'
+                row_label: 'Schmelze Nr. 3'
+          composition_units_as_printed: '% Stoffmengengehalt'
+        point_conditions:
+          temperature_C:
+            state: {tag: value, value: '1300'}
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+              row_label: 'ϑ in °C'
+              column_header: '1300 °C'
+          composition:
+            state:
+              tag: unknown
+              reason: >-
+                Table 3 is a ratio between two melt compositions; no single
+                composition identifies this row. Both printed compositions
+                are retained in values.compared_melts_as_published.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No oxygen fugacity or gas mixture is reported for this measurement.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: >-
+                The in-cell vapor total pressure is calculated, not a printed
+                condition; the printed chamber vacuum is stored on the experiment.
+            locator:
+              page: 7
+              published_page: 95
+              table: '3'
