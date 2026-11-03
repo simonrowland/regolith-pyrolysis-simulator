@@ -11,22 +11,25 @@ uses its own lines and must not import this module:
 * ``simulator/battery/waypoints.py`` still looks up Frost
   ``PUBLISHED_BUFFERS``. Repointing it would change experiment-buffer numbers.
 
-Equations are the ones transcribed in
-``docs-private/research/2026-11-03-buffer-survey`` (fo2_table.py / REPORT.md).
 R for a μ fit is O'Neill 1987's 8.31441 J K^-1 mol^-1. An atmosphere equation
 becomes log10(fO2/bar) by adding log10(1.01325). The brief's +0.00570 is that
-shift rounded; the value used is the exact logarithm.
+shift rounded; the value used is the exact logarithm. Each function below
+records premise, algebra, the unit check, and one survey-table value.
 
-Band rule (d-324). A calibration is valid at T only inside the authors'
-stated window. An unstated range does not certify, so it is not in the valid
-set. The band is the max-min of log10(fO2/bar) among valid calibrations, each
-evaluated at the requested pressure with its own published pressure
-coefficient (zero when none was published). One valid calibration has band 0.
-If none are valid, the band is the full distinct-source spread and the
-authority of a calibration used there is extrapolated. The recorded
-0.007-0.009 dex is |Wolf minus O'Neill 1988| at the survey temperatures, not
-this T-dependent band. Myers & Gunter stay in the spread only while
-1073.15-1573.15 K.
+Band rule (d-324). For QFM and NNO a calibration is valid at T only inside
+the authors' stated window. An unstated range does not certify, so it is not
+in the valid set. The band is the max-min of log10(fO2/bar) among valid
+calibrations, each evaluated at the requested pressure with its own published
+pressure coefficient (zero when none was published). One valid calibration
+has band 0. If none are valid, the band is the full distinct-source spread
+and the authority of a calibration used there is extrapolated.
+
+IW is the band d-324 names as ~0.01 dex. It is |Wolf minus O'Neill 1988
+equation (11)| after each log is rounded to the survey's printed 0.0001.
+That printed residual is 0.0067, 0.0077, and 0.0085 at 1473, 1673, and
+1873 K. Myers & Gunter is not in the pair: inside 1073.15-1573.15 K it must
+not collapse the adopted curve's band to 0, and outside that window it must
+not re-enter through the empty-valid fallback.
 
 QFM pressure. O'Neill 1987 publishes no volume term. At P other than 1 bar
 the value uses Chou's published C = 0.092 (bar), and the band widens by
@@ -38,7 +41,7 @@ Frost's coefficient is not used.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Callable
 
 # 1 atm = 1.01325 bar. log10(fO2/bar) = log10(fO2/atm) + log10(1.01325).
@@ -680,6 +683,20 @@ def _member_log(
     return _LOG[item.calibration_id](temperature_K, pressure_bar)
 
 
+# d-324: the IW band is this pair, not the distinct-source spread.
+_IW_BAND_PAIR = (
+    "wolf2023_quote_oneill_pownceby1993",
+    "oneill1988_eq11",
+)
+_SURVEY_LOG_QUANTUM = Decimal("0.0001")
+
+
+def _survey_log(value: Decimal) -> Decimal:
+    """The survey table prints log10(fO2/bar) to 0.0001."""
+
+    return value.quantize(_SURVEY_LOG_QUANTUM, rounding=ROUND_HALF_UP)
+
+
 def _band(
     buffer: str, temperature_K: Decimal, pressure_bar: Decimal | None
 ) -> tuple[Decimal, tuple[str, ...]]:
@@ -687,10 +704,19 @@ def _band(
         item for item in calibrations_for(buffer) if item.in_distinct_spread
     )
     valid = tuple(item for item in members if _in_window(item, temperature_K))
+    valid_ids = tuple(item.calibration_id for item in valid)
+    if buffer == "IW":
+        # Printed 4 d.p. residual. The unrounded subtraction at 1673 K is
+        # 0.00775 and would display as 0.0078; the table difference is 0.0077.
+        logs = tuple(
+            _survey_log(_member_log(calibration(item), temperature_K, pressure_bar))
+            for item in _IW_BAND_PAIR
+        )
+        return abs(logs[0] - logs[1]), valid_ids
     chosen = valid if valid else members
     logs = tuple(_member_log(item, temperature_K, pressure_bar) for item in chosen)
     width = max(logs) - min(logs) if logs else Decimal(0)
-    return width, tuple(item.calibration_id for item in valid)
+    return width, valid_ids
 
 
 def evaluate_buffer(

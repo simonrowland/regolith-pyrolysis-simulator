@@ -11,7 +11,7 @@ absolute log still wins. A row with no printed oxygen stays unknown.
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
@@ -448,7 +448,82 @@ def test_activity_buffer_offset_uses_canonical_qfm(tmp_path: Path) -> None:
     assert "offset=+2.7" in observation.notices[0].reason or any(
         "offset=+2.7" in notice.reason for notice in observation.notices
     )
+    # Survey table, O'Neill 1987 QFM at 1673 K, 1 bar: -6.3051. The
+    # printed control adds +2.7. This is the table, not evaluate_buffer.
+    assert _used_pressure_bar(observation) in (None, Decimal(1))
+    recovered = (observation.identity.fO2_Pa.value / Decimal("100000")).log10()
+    assert recovered.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP) == (
+        Decimal("-6.3051") + Decimal("2.7")
+    )
     assert observation.point_conditions["fO2_control"].state.value == "FMQ+2.7"
+
+
+def _activity_iw(tmp_path: Path, control: str):
+    result = _migrate_fixture(
+        tmp_path,
+        quantity="activity",
+        point={
+            "T_K": 1473,
+            "activity": "0.2",
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": control},
+                    "locator": {"published_page": 1},
+                }
+            },
+            "locator": {"published_page": 1, "table": "1", "row": "1"},
+        },
+    )
+    return _activity_control(result, control)
+
+
+def _bar_log(observation) -> Decimal:
+    oxygen = observation.identity.fO2_Pa
+    assert oxygen is not None and oxygen.is_value
+    return (oxygen.value / Decimal("100000")).log10()
+
+
+def test_unicode_minus_offset_matches_ascii_and_the_survey_table(tmp_path: Path) -> None:
+    # Survey Wolf IW at 1473 K is -11.9375. Offset -1 is the printed sign,
+    # including U+2212, U+2013, and U+2014. U+002D is the ASCII control.
+    expected = Decimal("-11.9375") + Decimal("-1")
+    controls = ("IW-1", "IW − 1", "IW – 1", "IW — 1", "IW = -2")
+    expected_by_control = {
+        "IW-1": expected,
+        "IW − 1": expected,
+        "IW – 1": expected,
+        "IW — 1": expected,
+        "IW = -2": Decimal("-11.9375") + Decimal("-2"),
+    }
+    logs = {}
+    for index, control in enumerate(controls):
+        observation = _activity_iw(tmp_path / str(index), control)
+        recovered = _bar_log(observation)
+        assert recovered.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP) == (
+            expected_by_control[control]
+        )
+        token = "offset=-2" if control == "IW = -2" else "offset=-1"
+        assert any(token in (notice.reason or "") for notice in observation.notices)
+        logs[control] = observation.identity.fO2_Pa.value
+    assert logs["IW − 1"] == logs["IW-1"]
+    assert logs["IW – 1"] == logs["IW-1"]
+    assert logs["IW — 1"] == logs["IW-1"]
+
+
+def test_dangling_printed_sign_is_not_offset_zero(tmp_path: Path) -> None:
+    for control in ("IW +", "IW =", "IW −"):
+        observation = _activity_iw(tmp_path / str(ord(control[-1])), control)
+        oxygen = observation.identity.fO2_Pa
+        assert oxygen is not None and oxygen.is_unknown
+        assert "not a point" in (oxygen.reason or "")
+        assert not any(
+            notice.kind
+            in (
+                NoticeKind.BUFFER_RELATIVE_FO2_CONVERTED,
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+            )
+            for notice in observation.notices
+        )
 
 
 def test_child_buffer_beats_parent_log(tmp_path: Path) -> None:
