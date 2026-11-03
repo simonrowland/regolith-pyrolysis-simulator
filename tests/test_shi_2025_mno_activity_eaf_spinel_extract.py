@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import EvidenceClass, Phase, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -163,6 +163,65 @@ def test_isolated_migration_maps_conditions_values_and_schema_refusal():
     assert unknown_quantity_ids == {"shi2025_prose_mn_spinel_precipitation_ratio_80_32"}
     assert all(not row.identity.species.phase.is_unknown for row in result.observations.values())
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in result.observations.values()) == 1
+
+    table3_ids = [f"shi2025_table3_row_{row}_al2o3_activity" for row in range(1, 6)]
+    table3_source_rows = [
+        next(
+            row for row in document["species"]["Al2O3"]["observations"]
+            if row["observation_id"] == local_id
+        )
+        for local_id in table3_ids
+    ]
+    assert all(
+        row["values"]["method_class"] == "model_derived"
+        and row["values"]["evidence_class"] == "model_derived"
+        and "derived_from" not in row
+        for row in table3_source_rows
+    )
+    assert all(
+        row["derivation"]["method"]["locator"]["page"] == 3
+        and row["derivation"]["method"]["locator"]["section"]
+        == "3.1. Thermodynamic Equilibrium Calculation"
+        and row["derivation"]["method"]["locator"]["equation"] == "6"
+        and row["derivation"]["references"]
+        == ["FToxid database 8.3", "FactPS database 8.3"]
+        and row["derivation"]["raw_inputs"]["state"]["value"]
+        == "not_printed"
+        and row["derivation"]["raw_inputs"]["locator"]["page"] == 3
+        for row in table3_source_rows
+    )
+    assert all(
+        _record(migrator, local_id).evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        for local_id in table3_ids
+    )
+
+    precipitation_id = "shi2025_prose_mn_spinel_precipitation_ratio_80_32"
+    precipitation_source = next(
+        row for row in document["species"]["Mn"]["observations"]
+        if row["observation_id"] == precipitation_id
+    )
+    assert precipitation_source["values"]["method_class"] == "measured_reduced"
+    assert precipitation_source["values"]["evidence_class"] == "measured_reduced"
+    assert precipitation_source["values"]["admission_status"] == "typed_refusal"
+    assert precipitation_source["values"]["value_as_published"] == "80.32"
+    assert precipitation_source["locator"]["section"] == "3.2. Effect of Al2O3 Content on the Precipitation of Spinel"
+    assert precipitation_source["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert precipitation_source["derivation"]["raw_inputs"]["locator"]["page"] == 4
+    assert _record(migrator, precipitation_id).evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+
+    x_mn_ids = [f"shi2025_table6_row_{row}_x_mn_measurement" for row in range(1, 5)]
+    x_mn_source_rows = [
+        next(
+            row for row in document["species"]["Mn"]["observations"]
+            if row["observation_id"] == local_id
+        )
+        for local_id in x_mn_ids
+    ]
+    assert all(row["phase"] == "l" and row["locator"]["phase"] == "liquid" for row in x_mn_source_rows)
+    assert all(
+        _record(migrator, local_id).identity.species.phase.value is Phase.L
+        for local_id in x_mn_ids
+    )
 
     # Render pins from Table 3 (page 3), Table 4 (page 4), and Table 6 (page 6).
     assert _record(migrator, "shi2025_table3_row_1_al2o3_activity").value.point == Decimal("0.3691")

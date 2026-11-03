@@ -1554,7 +1554,7 @@ species:
         table_row_number: 2
         table_column_number: 3
         phase: liquid
-      phase: cr
+      phase: l
       units: mole_fraction
       quench_statement:
         text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
@@ -1596,7 +1596,7 @@ species:
         table_row_number: 3
         table_column_number: 3
         phase: liquid
-      phase: cr
+      phase: l
       units: mole_fraction
       quench_statement:
         text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
@@ -1638,7 +1638,7 @@ species:
         table_row_number: 4
         table_column_number: 3
         phase: liquid
-      phase: cr
+      phase: l
       units: mole_fraction
       quench_statement:
         text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
@@ -1680,7 +1680,7 @@ species:
         table_row_number: 5
         table_column_number: 3
         phase: liquid
-      phase: cr
+      phase: l
       units: mole_fraction
       quench_statement:
         text: After equilibration, samples were retrieved from the furnace and water-quenched immediately; the Mn
@@ -1713,7 +1713,7 @@ species:
         page: 4
         pdf_page_index: 3
         published_page: 2272
-        section: 3.3. Effect of Al2O3 Content on the Precipitation of Spinel
+        section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
         note: The text states a maximum MnAl2O4 precipitation ratio of 80.32% at 33.64 mol% Al2O3.
         equation: 7–9
       phase: cr
@@ -1777,13 +1777,23 @@ species:
             table: '1'
             row: '4'
             note: Initial slag recipe in Table 1; only a starting-charge composition.
+      derivation:
+        relation: The authors calculate the fraction of total Mn incorporated into MnAl2O4 from EDS elemental balances using Eqs. (7)–(9).
+        output_unit: '%'
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 4
+            pdf_page_index: 3
+            published_page: 2272
+            section: 3.2. Effect of Al2O3 Content on the Precipitation of Spinel
+            equation: '7–9'
+            note: The paper does not publish the intermediate elemental-balance inputs used for the reported maximum.
       values:
         quantity: manganese_spinel_precipitation_ratio_as_printed
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
-        attribution: Authors' calculated MnAl2O4 precipitation ratio from EDS elemental balances, as printed in the
-          Results and Discussion.
         schema_gap: The paper's precipitation ratio is the percentage of total bulk Mn incorporated into spinel, computed
           from elemental balances in Eqs. (7)–(9). It is not an exact equilibrium phase composition or phase-to-phase
           distribution ratio. simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO represents a concentration ratio
@@ -1877,13 +1887,34 @@ species:
             table: '1'
             row: '1'
             note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      derivation:
+        relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the precipitation equilibrium relation in Eq. (6).
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: FactSage 8.3 equilibrium calculation for Al2O3 activity.}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            equation: '6'
+        references:
+        - FToxid database 8.3
+        - FactPS database 8.3
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The thermochemical input values used by the calculation are not tabulated.
       values:
         quantity: activity
         formula: Al2O3
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
-        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
         method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
         activity_standard_state_as_printed: not stated
         points:
@@ -1958,13 +1989,34 @@ species:
             table: '1'
             row: '2'
             note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      derivation:
+        relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the precipitation equilibrium relation in Eq. (6).
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: FactSage 8.3 equilibrium calculation for Al2O3 activity.}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            equation: '6'
+        references:
+        - FToxid database 8.3
+        - FactPS database 8.3
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The thermochemical input values used by the calculation are not tabulated.
       values:
         quantity: activity
         formula: Al2O3
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
-        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
         method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
         activity_standard_state_as_printed: not stated
         points:
@@ -2039,13 +2091,34 @@ species:
             table: '1'
             row: '3'
             note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      derivation:
+        relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the precipitation equilibrium relation in Eq. (6).
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: FactSage 8.3 equilibrium calculation for Al2O3 activity.}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            equation: '6'
+        references:
+        - FToxid database 8.3
+        - FactPS database 8.3
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The thermochemical input values used by the calculation are not tabulated.
       values:
         quantity: activity
         formula: Al2O3
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
-        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
         method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
         activity_standard_state_as_printed: not stated
         points:
@@ -2120,13 +2193,34 @@ species:
             table: '1'
             row: '4'
             note: Table 1 initial slag composition used for the corresponding FactSage composition series.
+      derivation:
+        relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the precipitation equilibrium relation in Eq. (6).
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: FactSage 8.3 equilibrium calculation for Al2O3 activity.}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            equation: '6'
+        references:
+        - FToxid database 8.3
+        - FactPS database 8.3
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The thermochemical input values used by the calculation are not tabulated.
       values:
         quantity: activity
         formula: Al2O3
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
-        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
         method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
         activity_standard_state_as_printed: not stated
         points:
@@ -2181,13 +2275,34 @@ species:
             reason: For the 36.56 mol% Al2O3 calculation the paper states only the CaO/SiO2 ratio 0.82, not separate
               CaO and SiO2 amounts.
           locator: *id014
+      derivation:
+        relation: FactSage 8.3 thermodynamic equilibrium calculation for the Al2O3 activity reported in Table 3, framed by the precipitation equilibrium relation in Eq. (6).
+        output_unit: dimensionless
+        method:
+          state: {tag: value, value: FactSage 8.3 equilibrium calculation for Al2O3 activity.}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            equation: '6'
+        references:
+        - FToxid database 8.3
+        - FactPS database 8.3
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 2271
+            section: 3.1. Thermodynamic Equilibrium Calculation
+            note: The thermochemical input values used by the calculation are not tabulated.
       values:
         quantity: activity
         formula: Al2O3
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
-        attribution: Authors' FactSage 8.3 calculation, as printed in Table 3.
         method_as_printed: FactSage 8.3 using FToxid 8.3 and FactPS 8.3 databases.
         activity_standard_state_as_printed: not stated
         points:
