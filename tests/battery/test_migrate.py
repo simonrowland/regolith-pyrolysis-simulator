@@ -12982,9 +12982,10 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     assert table3.derivation is not None
     assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
     assert table3.derivation.inputs == table3.derived_from
-    assert table4.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-    assert table4.derived_from is None
-    assert table4.derivation is None
+    assert table4.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table4.derivation is not None
+    assert "exchange relation (Eqs. 1-6" in table4.derivation.relation
+    assert table4.derivation.inputs == table4.derived_from
 
     source = REPO_ROOT / "data" / "literature" / "extracts" / name
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
@@ -12996,8 +12997,7 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     }
     rows[table3_id].pop("derivation")
     mutated_table4 = rows[table4_id]
-    mutated_table4["values"]["method_class"] = "measured_reduced"
-    mutated_table4["values"]["evidence_class"] = "measured_reduced"
+    mutated_table4.pop("derivation")
     mutated_table4["derived_from"] = ["missing-parent"]
     mutated = migrate(_write_min_tree(tmp_path / "mutated", extract), write=False)
     issues = {
@@ -19332,7 +19332,7 @@ def test_stolyarova_1995_oxygen_routes_keep_typed_reactions_without_invented_par
     for rows in (eqn1_rows, eqn2_rows, o2_rows):
         assert all(
             obs.evidence.class_.is_value
-            and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+            and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
             for obs in rows
         )
 
