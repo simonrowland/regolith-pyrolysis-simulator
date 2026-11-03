@@ -1,0 +1,1342 @@
+schema_version: literature_extract.v1
+source_id: oeltjen-1999-coal-slag-thermochemistry
+source:
+  citation: Oeltjen, Lars (1999). Vorhersage thermodynamischer Eigenschaften von Kohlenschlacken mittels Modellrechnungen.
+    Berichte des Forschungszentrums Jülich, Jül-3688 (August 1999), RWTH Aachen dissertation D82. ISSN 0944-2952.
+  year: 1999
+  url: https://juser.fz-juelich.de/record/136170
+  version: Jül-3688, August 1999
+  corpus_asset: raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf
+  corpus_sha256: c253ab795342c9397bbde04bb0df89dfcc9b98fa54fecd3dd7a114e936759d4d
+  source_note: Six own KEMS sample series; numeric pressure/activity results are plotted in Figures 6.21-6.22, with
+    no numeric run table or per-point uncertainties. The source review records an unresolved sample 6 SiO2 composition
+    discrepancy (0.725/0.735); Table 5.1 is retained as printed and figure labels are kept separate.
+extraction:
+  method: Machine-text-first transcription from MinerU table blocks and pdftotext-layout; Table 4.1 and Table 5.1
+    cell values and row-column assignments checked against the page renders. Figure plots catalogued without digitization.
+  date: '2026-11-02'
+  worker: w1103oe-oe99
+  provenance_path: data/literature/extracts/audits/oeltjen-1999-coal-slag-thermochemistry.audit.md
+  source_note: Own K and Na partial pressures are described as derived from unprinted detector signals by equation
+    5.1; alkali-oxide activities are reduced from pressures using equations 5.2-5.6 and the stoichiometric-evaporation
+    assumption. The thesis does not tabulate numeric own pressure or activity series, so no numeric observations
+    are emitted. The model predictions are figure-only and remain separate from measured figure records.
+review_status: draft
+fidelity_samples:
+- species: K2O
+  observation_id: oeltjen_1999_table4_1_sk1
+  field: printed_values
+  value:
+    SiO2: '75.2'
+    Al2O3: '22.6'
+    CaO: '-'
+    FeO: '-'
+    Na2O: '-'
+    K2O: '2.2'
+  locator:
+    page: 29
+    published_page: 15
+    pdf_page_index: 28
+    table: '4.1'
+    row_label: SK1
+- species: K2O
+  observation_id: oeltjen_1999_table4_1_sk3
+  field: printed_values
+  value:
+    SiO2: '64.8'
+    Al2O3: '19.5'
+    CaO: '-'
+    FeO: '13.7'
+    Na2O: '-'
+    K2O: '1.9'
+  locator:
+    page: 29
+    published_page: 15
+    pdf_page_index: 28
+    table: '4.1'
+    row_label: SK3
+- species: Na2O
+  observation_id: oeltjen_1999_table4_1_bk2
+  field: printed_values
+  value:
+    SiO2: '61.3'
+    Al2O3: '9.0'
+    CaO: '28.2'
+    FeO: '-'
+    Na2O: '1.5'
+    K2O: '-'
+  locator:
+    page: 29
+    published_page: 15
+    pdf_page_index: 28
+    table: '4.1'
+    row_label: BK2
+benches:
+- id: oeltjen_1999_kems_bench
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Knudsen cell coupled to a quadrupole mass spectrometer, Balzers QMG 421
+    locator:
+      page: 44
+      published_page: 30
+      pdf_page_index: 43
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  method:
+    state:
+      tag: value
+      value: Knudsen-Effusionsmassenspektrometrie
+    locator:
+      page: 42
+      published_page: 28
+      pdf_page_index: 41
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Cylindrical inner cell of iridium; cylindrical outer cell of tungsten.
+    locator:
+      page: 42
+      published_page: 28
+      pdf_page_index: 41
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0003'
+      locator:
+        page: 42
+        published_page: 28
+        pdf_page_index: 41
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 0.3 mm; converted to metres.
+    cell_internal_dimensions:
+      height_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0085'
+        locator:
+          page: 42
+          published_page: 28
+          pdf_page_index: 41
+          section: 5.2 Knudsen-Effusionsmassenspektrometrie
+          note: Printed 8.5 mm; converted to metres.
+      diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0075'
+        locator:
+          page: 42
+          published_page: 28
+          pdf_page_index: 41
+          section: 5.2 Knudsen-Effusionsmassenspektrometrie
+          note: Printed 7.5 mm; converted to metres.
+  detector:
+    state:
+      tag: value
+      value: Faraday collector and secondary-electron multiplier
+    locator:
+      page: 43
+      published_page: 29
+      pdf_page_index: 42
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  ionization:
+    method:
+      state:
+        tag: value
+        value: Electron-impact ionization
+      locator:
+        page: 42
+        published_page: 28
+        pdf_page_index: 41
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+    energy_eV:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '70'
+      locator:
+        page: 42
+        published_page: 28
+        pdf_page_index: 41
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  temperature_measurement:
+    sensors:
+      state:
+        tag: value
+        value: Pyrometer and thermocouple
+      locator:
+        page: 42
+        published_page: 28
+        pdf_page_index: 41
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  heating_method:
+    state:
+      tag: value
+      value: Tungsten-wire cathode; electron bombardment used above approximately 1200 K.
+    locator:
+      page: 44
+      published_page: 30
+      pdf_page_index: 43
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  pumping_type:
+    state:
+      tag: value
+      value: Two turbomolecular pumps, each backed by a diaphragm pump.
+    locator:
+      page: 43
+      published_page: 29
+      pdf_page_index: 42
+      section: 5.2 Knudsen-Effusionsmassenspektrometrie
+  other_facts:
+  - name: sample_room_background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 1e-5
+          approximate: true
+      locator:
+        page: 43
+        published_page: 29
+        pdf_page_index: 42
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Approximately 10^-5 Pa in the sample room; apparatus background, not an assigned sample total-pressure
+          condition.
+  - name: analyzer_room_background_pressure
+    unit: Pa
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 1e-6
+          approximate: true
+      locator:
+        page: 43
+        published_page: 29
+        pdf_page_index: 42
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Approximately 10^-6 Pa in the analyzer room; apparatus background, not an assigned sample total-pressure
+          condition.
+  - name: silver_calibration_after_each_sample
+    unit: as printed
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: A calibration measurement with pure silver was performed after each sample measurement.
+      locator:
+        page: 45
+        published_page: 31
+        pdf_page_index: 44
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+experiments:
+- experiment_id: oeltjen_1999_kems_sample_1
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (1); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 100 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (1) is 1790 to 1890 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '72.9'
+          Al2O3: '17.4'
+          CaO: '-'
+          FeO: '-'
+          Na2O: '-'
+          K2O: '9.7'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '1'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1790'
+          interval_high: '1890'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (1) is 1790 to 1890 K.
+- experiment_id: oeltjen_1999_kems_sample_2
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (2); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 5e-05
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 50 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (2) is 1700 to 1840 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '69.6'
+          Al2O3: '18.6'
+          CaO: '6.3'
+          FeO: '-'
+          Na2O: '-'
+          K2O: '5.5'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '2'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1700'
+          interval_high: '1840'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (2) is 1700 to 1840 K.
+- experiment_id: oeltjen_1999_kems_sample_3
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (3); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 100 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (3) is 1760 to 2050 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '62.9'
+          Al2O3: '19.7'
+          CaO: '-'
+          FeO: '14.2'
+          Na2O: '-'
+          K2O: '3.2'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '3'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1760'
+          interval_high: '2050'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (3) is 1760 to 2050 K.
+- experiment_id: oeltjen_1999_kems_sample_4
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (4); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 100 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (4) is 1720 to 1890 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '73.5'
+          Al2O3: '18.0'
+          CaO: '-'
+          FeO: '-'
+          Na2O: '8.5'
+          K2O: '-'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '4'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1720'
+          interval_high: '1890'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (4) is 1720 to 1890 K.
+- experiment_id: oeltjen_1999_kems_sample_5
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (5); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: 5e-05
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 50 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (5) is 1530 to 1640 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '59.6'
+          Al2O3: '11.6'
+          CaO: '24.3'
+          FeO: '-'
+          Na2O: '4.5'
+          K2O: '-'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '5'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1530'
+          interval_high: '1640'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (5) is 1530 to 1640 K.
+- experiment_id: oeltjen_1999_kems_sample_6
+  bench_id: oeltjen_1999_kems_bench
+  method: knudsen_effusion
+  locator:
+    page: 71
+    published_page: 57
+    pdf_page_index: 70
+    section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+    note: Own KEMS activity series for synthetic sample (6); numerical values are plotted, not tabulated.
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0001'
+      locator:
+        page: 44
+        published_page: 30
+        pdf_page_index: 43
+        section: 5.2 Knudsen-Effusionsmassenspektrometrie
+        note: Printed 100 mg for the activity measurement; converted to kg.
+    form:
+      state:
+        tag: value
+        value: Synthetic slag sample measured in the liquid range.
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (6) is 1620 to 1810 K.
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: '72.5'
+          Al2O3: '12.7'
+          CaO: '-'
+          FeO: '9.8'
+          Na2O: '5.0'
+          K2O: '-'
+      locator:
+        page: 41
+        published_page: 27
+        pdf_page_index: 40
+        table: '5.1'
+        row_label: '6'
+        note: All six oxide entries retained as printed; the table unit line reads Stoffmengenanteil in Mol %. A
+          dash remains a printed dash.
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '1620'
+          interval_high: '1810'
+      locator:
+        page: 71
+        published_page: 57
+        pdf_page_index: 70
+        section: 6.2 Vergleich berechneter Aktivitäten mit eigenen experimentellen Daten
+        note: The printed activity-point interval for sample (6) is 1620 to 1810 K.
+species:
+  K2O:
+    observations: []
+    context:
+    - observation_id: oeltjen_1999_table4_1_sk1
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: SK1
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: SK1
+        printed_values:
+          SiO2: '75.2'
+          Al2O3: '22.6'
+          CaO: '-'
+          FeO: '-'
+          Na2O: '-'
+          K2O: '2.2'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_table4_1_sk2
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: SK2
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: SK2
+        printed_values:
+          SiO2: '69.6'
+          Al2O3: '21.0'
+          CaO: '7.3'
+          FeO: '-'
+          Na2O: '-'
+          K2O: '2.1'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_table4_1_sk3
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: SK3
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: SK3
+        printed_values:
+          SiO2: '64.8'
+          Al2O3: '19.5'
+          CaO: '-'
+          FeO: '13.7'
+          Na2O: '-'
+          K2O: '1.9'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_figure_6_1
+      type: figure_record
+      locator:
+        page: 50
+        published_page: 36
+        pdf_page_index: 49
+        figure: '6.1'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_1
+        printed_caption: Activity of K2O in the K2O-SiO2 system; experimental data and model calculations.
+        topic_translation: K2O activity in K2O-SiO2; literature measurements compared with QUAS and IMGG calculations
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+        audit_note: Legend includes Plante, Chastel, Ravaine, Azandegbe, Frohberg, and Steller datasets.
+    - observation_id: oeltjen_1999_figure_6_8
+      type: figure_record
+      locator:
+        page: 57
+        published_page: 43
+        pdf_page_index: 56
+        figure: '6.8'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_8
+        printed_caption: K2O and Na2O activities in the K2O-Na2O-SiO2 system.
+        topic_translation: K2O and Na2O activities in K2O-Na2O-SiO2; Rudnyi et al. mass-spectrometric data compared
+          with models
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+        related_species:
+        - K2O
+        - Na2O
+    - observation_id: oeltjen_1999_figure_6_18
+      type: figure_record
+      locator:
+        page: 68
+        published_page: 54
+        pdf_page_index: 67
+        figure: '6.18'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_18
+        printed_caption: K2O activity in the K-(alpha+beta)-Al2O3 system.
+        topic_translation: K2O activity in K-(alpha+beta)-Al2O3; literature EMF data compared with FACT
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+        audit_note: The source review flags a temperature-bound conflict for this figure; no point values were read
+          or corrected.
+    - observation_id: oeltjen_1999_figure_6_21
+      type: figure_record
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_21
+        printed_caption: K2O activity for synthetic samples (1), (2), and (3); model calculations and experimental
+          data.
+        topic_translation: Own measured K2O activities for synthetic samples 1-3 versus modified quasichemical model
+          predictions
+        content_kind: own_kems_measured_activity
+        numeric_values_digitized: false
+        printed_sample_labels:
+        - 0.097K2O-0.729SiO2-0.174Al2O3 (1)
+        - 0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)
+        - 0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)
+        evidence_class_if_digitized: measured_reduced
+        audit_note: Own activity values are reduced from measured K partial pressures using the printed equations
+          and stoichiometric-evaporation assumption. No numeric run table or point uncertainties are printed; figure
+          points are not digitized.
+    - observation_id: oeltjen_1999_figure_6_23
+      type: figure_record
+      locator:
+        page: 74
+        published_page: 60
+        pdf_page_index: 73
+        figure: '6.23'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_23
+        printed_caption: Modified-quasichemical-model K2O activity in the K2O-SiO2-Al2O3 system at fixed K2O mole
+          fraction 0.02.
+        topic_translation: Model-predicted K2O activity in K2O-SiO2-Al2O3 at fixed K2O mole fraction 0.02
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_24
+      type: figure_record
+      locator:
+        page: 75
+        published_page: 61
+        pdf_page_index: 74
+        figure: '6.24'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_24
+        printed_caption: Modified-quasichemical-model K2O activity in the K2O-SiO2-Al2O3 system at fixed K2O mole
+          fraction 0.05.
+        topic_translation: Model-predicted K2O activity in K2O-SiO2-Al2O3 at fixed K2O mole fraction 0.05
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_25
+      type: figure_record
+      locator:
+        page: 76
+        published_page: 62
+        pdf_page_index: 75
+        figure: '6.25'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_25
+        printed_caption: Modified-quasichemical-model K2O activity in the K2O-SiO2-Al2O3 system at fixed K2O mole
+          fraction 0.10.
+        topic_translation: Model-predicted K2O activity in K2O-SiO2-Al2O3 at fixed K2O mole fraction 0.10
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_29
+      type: figure_record
+      locator:
+        page: 80
+        published_page: 66
+        pdf_page_index: 79
+        figure: '6.29'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_29
+        printed_caption: K2O-SiO2-Al2O3 liquid-only model at K2O mole fraction 0.02.
+        topic_translation: K2O-SiO2-Al2O3 liquid-only model at K2O mole fraction 0.02
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model K2O activity; liquid phases only.
+    - observation_id: oeltjen_1999_figure_6_30
+      type: figure_record
+      locator:
+        page: 81
+        published_page: 67
+        pdf_page_index: 80
+        figure: '6.30'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_30
+        printed_caption: K2O additive effects in a 0.02K2O-0.75SiO2-0.23Al2O3 liquid model system.
+        topic_translation: K2O additive effects in a 0.02K2O-0.75SiO2-0.23Al2O3 liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model K2O activity; liquid phases only.
+    - observation_id: oeltjen_1999_figure_6_33
+      type: figure_record
+      locator:
+        page: 84
+        published_page: 70
+        pdf_page_index: 83
+        figure: '6.33'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_33
+        printed_caption: K2O-SiO2-Al2O3-FeO liquid-only model in equilibrium with metallic iron.
+        topic_translation: K2O-SiO2-Al2O3-FeO liquid-only model in equilibrium with metallic iron
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: K2O and FeO mole fractions held at 0.02 and 0.14; modified quasichemical model.
+    - observation_id: oeltjen_1999_figure_6_34
+      type: figure_record
+      locator:
+        page: 85
+        published_page: 71
+        pdf_page_index: 84
+        figure: '6.34'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_34
+        printed_caption: K2O additive effects in a 0.02K2O-0.65SiO2-0.19Al2O3-0.14FeO liquid model system.
+        topic_translation: K2O additive effects in a 0.02K2O-0.65SiO2-0.19Al2O3-0.14FeO liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model K2O activity; liquid phases only.
+    - observation_id: oeltjen_1999_figure_6_35
+      type: figure_record
+      locator:
+        page: 86
+        published_page: 72
+        pdf_page_index: 85
+        figure: '6.35'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_35
+        printed_caption: K2O-SiO2-Al2O3-CaO liquid-only model.
+        topic_translation: K2O-SiO2-Al2O3-CaO liquid-only model
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: K2O and CaO mole fractions held at 0.02 and 0.07; modified quasichemical model.
+    - observation_id: oeltjen_1999_figure_6_36
+      type: figure_record
+      locator:
+        page: 87
+        published_page: 73
+        pdf_page_index: 86
+        figure: '6.36'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_36
+        printed_caption: K2O additive effects in a 0.02K2O-0.70SiO2-0.21Al2O3-0.07CaO liquid model system.
+        topic_translation: K2O additive effects in a 0.02K2O-0.70SiO2-0.21Al2O3-0.07CaO liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model K2O activity; liquid phases only.
+  Na2O:
+    observations: []
+    context:
+    - observation_id: oeltjen_1999_table4_1_bk1
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: BK1
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: BK1
+        printed_values:
+          SiO2: '85.4'
+          Al2O3: '12.5'
+          CaO: '-'
+          FeO: '-'
+          Na2O: '2.1'
+          K2O: '-'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_table4_1_bk2
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: BK2
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: BK2
+        printed_values:
+          SiO2: '61.3'
+          Al2O3: '9.0'
+          CaO: '28.2'
+          FeO: '-'
+          Na2O: '1.5'
+          K2O: '-'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_table4_1_bk3
+      type: printed_model_system_composition
+      locator:
+        page: 29
+        published_page: 15
+        pdf_page_index: 28
+        table: '4.1'
+        row_label: BK3
+        note: Column is a model system; each listed component is a printed mole percent. Dashes retained verbatim.
+      units: Mol %
+      values:
+        quantity: printed_model_system_composition
+        model_system: BK3
+        printed_values:
+          SiO2: '74.9'
+          Al2O3: '10.9'
+          CaO: '-'
+          FeO: '12.4'
+          Na2O: '1.8'
+          K2O: '-'
+        unit_heading_as_printed: Stoffmengenanteil in Mol %
+        table_title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+        role: model input; not an activity result
+    - observation_id: oeltjen_1999_figure_6_2
+      type: figure_record
+      locator:
+        page: 51
+        published_page: 37
+        pdf_page_index: 50
+        figure: '6.2'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_2
+        printed_caption: Activity of Na2O in the Na2O-SiO2 system; experimental data and model calculations.
+        topic_translation: Na2O activity in Na2O-SiO2; literature measurements compared with QUAS and IMGG calculations
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_3
+      type: figure_record
+      locator:
+        page: 52
+        published_page: 38
+        pdf_page_index: 51
+        figure: '6.3'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_3
+        printed_caption: Activity of Na2O in the Na2O-SiO2 system; experimental data and model calculations.
+        topic_translation: Na2O activity in Na2O-SiO2; literature measurements compared with QUAS and IMGG calculations
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_4
+      type: figure_record
+      locator:
+        page: 53
+        published_page: 39
+        pdf_page_index: 52
+        figure: '6.4'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_4
+        printed_caption: Na2O activity in the Na2O-SiO2-Al2O3 system at 1300 K.
+        topic_translation: Na2O activity in Na2O-SiO2-Al2O3 at 1300 K; Itoh and Yokokawa EMF data compared with
+          models
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_6
+      type: figure_record
+      locator:
+        page: 55
+        published_page: 41
+        pdf_page_index: 54
+        figure: '6.6'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_6
+        printed_caption: Na2O activity in the Na2O-SiO2-CaO system at 1343 K.
+        topic_translation: Na2O activity in Na2O-SiO2-CaO at 1343 K; Neudorf and Elliott EMF data compared with
+          models
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_7
+      type: figure_record
+      locator:
+        page: 56
+        published_page: 42
+        pdf_page_index: 55
+        figure: '6.7'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_7
+        printed_caption: Na2O activity in the Na2O-SiO2-CaO system at 1623 K.
+        topic_translation: Na2O activity in Na2O-SiO2-CaO at 1623 K; Argent et al. mass-spectrometric data compared
+          with models
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_19
+      type: figure_record
+      locator:
+        page: 69
+        published_page: 55
+        pdf_page_index: 68
+        figure: '6.19'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_19
+        printed_caption: Na2O activity in the Na2O-Al2O3 system.
+        topic_translation: Na2O activity in a Na-alumina phase system; literature data compared with FACT
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_20
+      type: figure_record
+      locator:
+        page: 70
+        published_page: 56
+        pdf_page_index: 69
+        figure: '6.20'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_20
+        printed_caption: Na2O activity in the Na2O-Al2O3 system.
+        topic_translation: Na2O activity in a Na-alumina phase system; literature data compared with FACT
+        content_kind: literature_comparison
+        numeric_values_digitized: false
+    - observation_id: oeltjen_1999_figure_6_22
+      type: figure_record
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_22
+        printed_caption: Na2O activity for synthetic samples (4), (5), and (6); model calculations and experimental
+          data.
+        topic_translation: Own measured Na2O activities for synthetic samples 4-6 versus modified quasichemical
+          model predictions
+        content_kind: own_kems_measured_activity
+        numeric_values_digitized: false
+        printed_sample_labels:
+        - 0.085Na2O-0.735SiO2-0.18Al2O3 (4)
+        - 0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)
+        - 0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)
+        evidence_class_if_digitized: measured_reduced
+        audit_note: Own activity values are reduced from measured Na partial pressures using the printed equations
+          and stoichiometric-evaporation assumption. No numeric run table or point uncertainties are printed; figure
+          points are not digitized. The source review flags an unresolved sample 6 SiO2 composition discrepancy;
+          the figure label is retained as printed.
+    - observation_id: oeltjen_1999_figure_6_26
+      type: figure_record
+      locator:
+        page: 77
+        published_page: 63
+        pdf_page_index: 76
+        figure: '6.26'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_26
+        printed_caption: Modified-quasichemical-model Na2O activity in the Na2O-SiO2-Al2O3 system at fixed Na2O
+          mole fraction 0.02.
+        topic_translation: Model-predicted Na2O activity in Na2O-SiO2-Al2O3 at fixed Na2O mole fraction 0.02
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_27
+      type: figure_record
+      locator:
+        page: 78
+        published_page: 64
+        pdf_page_index: 77
+        figure: '6.27'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_27
+        printed_caption: Modified-quasichemical-model Na2O activity in the Na2O-SiO2-Al2O3 system at fixed Na2O
+          mole fraction 0.05.
+        topic_translation: Model-predicted Na2O activity in Na2O-SiO2-Al2O3 at fixed Na2O mole fraction 0.05
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_28
+      type: figure_record
+      locator:
+        page: 79
+        published_page: 65
+        pdf_page_index: 78
+        figure: '6.28'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_28
+        printed_caption: Modified-quasichemical-model Na2O activity in the Na2O-SiO2-Al2O3 system at fixed Na2O
+          mole fraction 0.10.
+        topic_translation: Model-predicted Na2O activity in Na2O-SiO2-Al2O3 at fixed Na2O mole fraction 0.10
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Calculated curves only; not tabulated and not digitized.
+    - observation_id: oeltjen_1999_figure_6_31
+      type: figure_record
+      locator:
+        page: 82
+        published_page: 68
+        pdf_page_index: 81
+        figure: '6.31'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_31
+        printed_caption: Na2O-SiO2-Al2O3 liquid-only model at Na2O mole fraction 0.02.
+        topic_translation: Na2O-SiO2-Al2O3 liquid-only model at Na2O mole fraction 0.02
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model Na2O activity; liquid phases only.
+    - observation_id: oeltjen_1999_figure_6_32
+      type: figure_record
+      locator:
+        page: 83
+        published_page: 69
+        pdf_page_index: 82
+        figure: '6.32'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_32
+        printed_caption: Na2O additive effects in the captioned 0.02Na2O-0.85SiO2-0.13Al2O3 liquid model system.
+        topic_translation: Na2O additive effects in the captioned 0.02Na2O-0.85SiO2-0.13Al2O3 liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model Na2O activity; liquid phases only. The source review flags a K2O/Na2O
+          label conflict in this Na2O study; the caption is preserved and no plotted value is interpreted.
+    - observation_id: oeltjen_1999_figure_6_37
+      type: figure_record
+      locator:
+        page: 88
+        published_page: 74
+        pdf_page_index: 87
+        figure: '6.37'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_37
+        printed_caption: Na2O-SiO2-Al2O3-FeO liquid-only model in equilibrium with metallic iron.
+        topic_translation: Na2O-SiO2-Al2O3-FeO liquid-only model in equilibrium with metallic iron
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Na2O and FeO mole fractions held at 0.02 and 0.12; modified quasichemical model.
+    - observation_id: oeltjen_1999_figure_6_38
+      type: figure_record
+      locator:
+        page: 89
+        published_page: 75
+        pdf_page_index: 88
+        figure: '6.38'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_38
+        printed_caption: Na2O additive effects in a 0.02Na2O-0.75SiO2-0.11Al2O3-0.12FeO liquid model system.
+        topic_translation: Na2O additive effects in a 0.02Na2O-0.75SiO2-0.11Al2O3-0.12FeO liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model Na2O activity; liquid phases only.
+    - observation_id: oeltjen_1999_figure_6_39
+      type: figure_record
+      locator:
+        page: 90
+        published_page: 76
+        pdf_page_index: 89
+        figure: '6.39'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_39
+        printed_caption: Na2O-SiO2-Al2O3-CaO liquid-only model.
+        topic_translation: Na2O-SiO2-Al2O3-CaO liquid-only model
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Na2O and CaO mole fractions held at 0.02 and 0.28; modified quasichemical model.
+    - observation_id: oeltjen_1999_figure_6_40
+      type: figure_record
+      locator:
+        page: 91
+        published_page: 77
+        pdf_page_index: 90
+        figure: '6.40'
+        note: Figure inventory only; numeric plotted values are not transcribed.
+      units: as plotted; numeric values not transcribed
+      values:
+        quantity: figure_records
+        method_class: figure_only
+        figure_id: oeltjen_1999_figure_6_40
+        printed_caption: Na2O additive effects in a 0.02Na2O-0.61SiO2-0.09Al2O3-0.28CaO liquid model system.
+        topic_translation: Na2O additive effects in a 0.02Na2O-0.61SiO2-0.09Al2O3-0.28CaO liquid model system
+        content_kind: author_model_prediction
+        numeric_values_digitized: false
+        audit_note: Modified-quasichemical-model Na2O activity; liquid phases only.
