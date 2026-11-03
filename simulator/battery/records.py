@@ -443,6 +443,81 @@ class Composition:
         return dict(self.components)
 
 
+_CITED_SATURATION_METHOD = "cited_standard"
+_DERIVED_SATURATION_METHOD = "derived_from_source_analyses"
+_SATURATION_METHODS = frozenset(
+    {_CITED_SATURATION_METHOD, _DERIVED_SATURATION_METHOD}
+)
+
+
+@dataclass(frozen=True)
+class IronSaturationComposition:
+    """Recorded saturation composition an extract can carry into the one owner.
+
+    ``cited_standard`` is precedence (1): the thermo chain names the oxide
+    (quote, locator, composition as printed, for example Fe0.947O). No band.
+    ``derived_from_source_analyses`` is precedence (1.5): N_Fe2+ is a recorded
+    reduction of the source's own printed analyses, with method provenance and
+    the method-spread band in dex. The number is never a constant in the scorer.
+    """
+
+    method: str
+    composition_as_printed: str
+    quote: str
+    locator: Locator
+    n_fe2_plus: Decimal | None = None
+    provenance: str | None = None
+    band_dex: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        method = str(self.method or "").strip()
+        if method not in _SATURATION_METHODS:
+            raise ValueError(
+                "IronSaturationComposition.method must be cited_standard "
+                "or derived_from_source_analyses"
+            )
+        object.__setattr__(self, "method", method)
+        for name in ("composition_as_printed", "quote"):
+            value = str(getattr(self, name) or "").strip()
+            if not value:
+                raise ValueError(f"IronSaturationComposition.{name} is required")
+            object.__setattr__(self, name, value)
+        if not isinstance(self.locator, Locator):
+            raise TypeError("IronSaturationComposition.locator is required")
+        if method == _CITED_SATURATION_METHOD:
+            if (
+                self.n_fe2_plus is not None
+                or self.provenance is not None
+                or self.band_dex is not None
+            ):
+                raise ValueError(
+                    "cited_standard carries the printed formula only"
+                )
+            return
+        if self.n_fe2_plus is None:
+            raise ValueError(
+                "derived_from_source_analyses requires n_fe2_plus"
+            )
+        n_fe2_plus = as_decimal(self.n_fe2_plus)
+        if n_fe2_plus <= 0 or n_fe2_plus > 1:
+            raise ValueError("n_fe2_plus must lie in (0, 1]")
+        object.__setattr__(self, "n_fe2_plus", n_fe2_plus)
+        provenance = str(self.provenance or "").strip()
+        if not provenance:
+            raise ValueError(
+                "derived_from_source_analyses requires provenance"
+            )
+        object.__setattr__(self, "provenance", provenance)
+        if self.band_dex is None:
+            raise ValueError(
+                "derived_from_source_analyses requires band_dex"
+            )
+        band_dex = as_decimal(self.band_dex)
+        if band_dex <= 0:
+            raise ValueError("band_dex must be positive")
+        object.__setattr__(self, "band_dex", band_dex)
+
+
 @dataclass(frozen=True)
 class StandardState:
     convention: ReferenceStateConvention
@@ -450,6 +525,8 @@ class StandardState:
     component_basis: str
     # Absent when the source does not print a number. Never a default of 1 bar.
     reference_pressure_bar: Decimal | None = None
+    # Absent unless the extract records a cited or derived saturation composition.
+    iron_saturation_composition: IronSaturationComposition | None = None
 
     def __post_init__(self) -> None:
         if not self.component_basis:
@@ -462,6 +539,12 @@ class StandardState:
         if self.reference_pressure_bar is not None:
             object.__setattr__(
                 self, "reference_pressure_bar", as_decimal(self.reference_pressure_bar)
+            )
+        recorded = self.iron_saturation_composition
+        if recorded is not None and not isinstance(recorded, IronSaturationComposition):
+            raise TypeError(
+                "StandardState.iron_saturation_composition must be "
+                "IronSaturationComposition or absent"
             )
 
 

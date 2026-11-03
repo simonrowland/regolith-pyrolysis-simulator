@@ -1829,6 +1829,8 @@ def _values_compare(
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
             return _mismatch(name)
+        if left.iron_saturation_composition != right.iron_saturation_composition:
+            return _mismatch(name)
         nested = _species_equal(
             left.endmember,
             right.endmember,

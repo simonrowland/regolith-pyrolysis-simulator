@@ -193,6 +193,7 @@ from simulator.battery.records import (
     FlowRegime,
     FO2Control,
     GasRatio,
+    IronSaturationComposition,
     Located,
     Locator,
     Notice,
@@ -2150,6 +2151,29 @@ def _reaction_from_plain(payload: object) -> Reaction:
     return Reaction(terms=tuple(terms))
 
 
+def _iron_saturation_composition_from_plain(
+    payload: object,
+) -> IronSaturationComposition | None:
+    if payload is None:
+        return None
+    if not isinstance(payload, Mapping):
+        raise TypeError("iron_saturation_composition must be a mapping")
+    locator = _locator_from_plain(payload.get("locator"))
+    if locator is None:
+        raise ValueError("iron_saturation_composition requires a locator")
+    band = payload.get("band_dex")
+    n_fe2_plus = payload.get("n_fe2_plus")
+    return IronSaturationComposition(
+        method=str(payload.get("method") or ""),
+        composition_as_printed=str(payload.get("composition_as_printed") or ""),
+        quote=str(payload.get("quote") or ""),
+        locator=locator,
+        n_fe2_plus=None if n_fe2_plus in (None, "") else n_fe2_plus,
+        provenance=payload.get("provenance"),
+        band_dex=None if band in (None, "") else band,
+    )
+
+
 def _standard_state_from_plain(payload: object) -> StandardState:
     assert isinstance(payload, Mapping)
     return StandardState(
@@ -2160,6 +2184,9 @@ def _standard_state_from_plain(payload: object) -> StandardState:
             None
             if payload.get("reference_pressure_bar") in (None, "")
             else as_decimal(payload.get("reference_pressure_bar"))
+        ),
+        iron_saturation_composition=_iron_saturation_composition_from_plain(
+            payload.get("iron_saturation_composition")
         ),
     )
 
