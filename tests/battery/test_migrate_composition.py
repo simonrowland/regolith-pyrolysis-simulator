@@ -1909,6 +1909,23 @@ def test_phase_component_wt_percent_keeps_mass_basis_scale() -> None:
     assert selection.unit_trail == "identity:wt_percent"
 
 
+def test_phase_component_bare_percent_uses_declared_wt_percent_basis() -> None:
+    payload = {
+        "basis": "wt_percent",
+        "component_amount": "32.80",
+        "component_amount_as_published": "32.80 (0.67)",
+    }
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "%",
+        payload,
+    )
+
+    assert selection.amount == Decimal("32.80")
+    assert selection.unit_trail == "identity:wt_percent"
+    assert payload["component_amount_as_published"] == "32.80 (0.67)"
+
+
 def test_phase_component_at_percent_refuses_missing_atom_fraction_basis() -> None:
     selection = migrate_module.select_declared_source(
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
