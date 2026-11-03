@@ -387,7 +387,7 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
         )
         # A/B: the same point with the assessment stubbed to no-notice must
         # give byte-identical predicted values and identical diagnostics
-        # modulo the three notice keys.
+        # modulo the notice fields.
         monkeypatch.setattr(
             vaporock_module,
             'assess_engine_commissioning',
@@ -733,6 +733,14 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
 
 
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
+    from engines.builtin import vapor_pressure as builtin_vapor_pressure
+
+    monkeypatch.setattr(
+        builtin_vapor_pressure,
+        "openimcc_binding_selected_by_inputs",
+        lambda **_kwargs: False,
+    )
+
     class FakeSystem:
         def set_melt_comp(self, composition):
             self.composition = dict(composition)
@@ -1815,16 +1823,15 @@ def test_out_of_band_liquid_fraction_gate_still_refuses(monkeypatch):
     assert result.diagnostics["backend_status_reason"] == (
         OutOfDomainReason.LIQUID_STATE.value
     )
-    assert fake_system.instances[0].eval_calls == []
+    assert fake_system.instances == []
 
 
 def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     """Defense-in-depth: even in-domain T, absurd totals are refused.
 
     Fixture source: docs-private/research/2026-07-31-vaporock-probe/findings.md
-    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). The T gate would catch 10000 K
-    first; this test injects the probe-scale total at an admitted T to pin
-    the sum-pressure gate itself.
+    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). Inject it at an admitted T to
+    isolate the sum-pressure guard from the new finite-temperature notice.
     """
     from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
 
