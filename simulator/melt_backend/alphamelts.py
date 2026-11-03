@@ -27,6 +27,7 @@ PetThermoTools 0.4.5 schema verified from installed source:
 
 from __future__ import annotations
 
+import fcntl
 import hashlib
 import importlib
 import importlib.metadata
@@ -685,6 +686,7 @@ def _regolith_diagnostics_root() -> Path:
 
 _ALPHAMELTS_CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
 _ALPHAMELTS_CRASH_INPUT_MAX_FILES = 256
+_ALPHAMELTS_CRASH_INPUT_LOCK_NAME = '.retention.lock'
 
 
 def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
@@ -699,17 +701,18 @@ def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
     directory = _regolith_diagnostics_root() / _ALPHAMELTS_CRASH_INPUT_DIR_NAME
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / f'{digest}.melts'
-    if not destination.is_file() or destination.read_bytes() != payload:
-        temporary = directory / f'.{digest}.{os.getpid()}.tmp'
-        try:
-            temporary.write_bytes(payload)
-            os.replace(temporary, destination)
-        finally:
-            temporary.unlink(missing_ok=True)
-    try:
+    lock_path = directory / _ALPHAMELTS_CRASH_INPUT_LOCK_NAME
+    with lock_path.open('a+b') as lock_file:
+        # Closing the file releases the kernel lock even if publish/prune fails.
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        if not destination.is_file() or destination.read_bytes() != payload:
+            temporary = directory / f'.{digest}.{os.getpid()}.tmp'
+            try:
+                temporary.write_bytes(payload)
+                os.replace(temporary, destination)
+            finally:
+                temporary.unlink(missing_ok=True)
         _prune_crash_melt_inputs(directory, destination)
-    except OSError:
-        pass
     return digest, str(destination)
 
 
