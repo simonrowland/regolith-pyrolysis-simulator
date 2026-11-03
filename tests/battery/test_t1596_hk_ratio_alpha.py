@@ -326,6 +326,25 @@ def test_hk_ratio_maps_and_bare_condensation_stays_refused() -> None:
     assert not state.is_value
     assert reason and "condensation" in reason
 
+    # The section title above already says condensation. This locator does not,
+    # so the refusal has to come from source_term_as_printed.
+    table = {"phase": "cr", "locator": {"section": "Table 1"}}
+    state, reason = map_quantity("alpha", bare, units="dimensionless", row=table)
+    assert not state.is_value
+    assert reason and "condensation" in reason
+
+    film_in_definition = {
+        "quantity": "alpha",
+        "alpha": "0.06",
+        "definition_as_printed": "Growth/condensation coefficient. " + _DEFINITION,
+        "ratio_as_printed": _RATIO,
+    }
+    state, reason = map_quantity(
+        "alpha", film_in_definition, units="dimensionless", row=table
+    )
+    assert not state.is_value
+    assert reason and "condensation" in reason
+
     no_maximum = _hk_values(
         definition_as_printed=(
             "The condensation coefficient is obtained by dividing the "
@@ -587,10 +606,14 @@ def test_pure_sio_alpha_takes_the_sample_reservoir(tmp_path: Path) -> None:
     assert pure.identity.species is not None
     assert pure.identity.species.formula == "SiO"
     assert pure.identity.species.phase.value is Phase.G
+    # Amorphous SiO powder is not a crystal. Phase.GLASS is not a substitute.
     reservoir = pure.identity.reservoir
-    assert reservoir is not None and reservoir.is_value
-    assert reservoir.value.formula == "SiO"
-    assert reservoir.value.phase.value is Phase.CR
+    assert reservoir is not None and reservoir.is_unknown
+    assert reservoir.value is None
+    assert reservoir.reason is not None
+    assert "amorphous" in reservoir.reason
+    assert "Phase.CR" in reservoir.reason
+    assert "crystal" in reservoir.reason
 
     assert mixed.identity.reservoir is None or mixed.identity.reservoir.is_unknown
     assert (
