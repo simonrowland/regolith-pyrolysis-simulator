@@ -266,6 +266,39 @@ def test_charge_reaches_every_observation_with_temperature_and_conditions(
         assert "MnO" in dict(composition.value.components)
 
 
+def test_open_system_notice_names_the_distribution_ratio_row(tmp_path) -> None:
+    document = _extract(_charge_body())
+    document["experiments"][0]["sample"]["container"] = {
+        "state": {"tag": "value", "value": "open crucible"},
+        "locator": {"page": 2},
+    }
+    result = migrate(
+        _write_min_tree(tmp_path, extract=document), write=False
+    )
+    rows = {
+        observation.observation_id: observation
+        for observation in result.observations.values()
+        if observation.source_id == "fixture-source"
+    }
+    expected = {
+        "fixture-source::l-s": Quantity.DISTRIBUTION_RATIO,
+        "fixture-source::metal-mn": Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    }
+    assert set(rows) == set(expected)
+    for observation_id, quantity in expected.items():
+        observation = rows[observation_id]
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        notices = [
+            notice
+            for notice in observation.notices
+            if notice.reason == "open_system_starting_bulk: open crucible"
+        ]
+        assert len(notices) == 1
+        assert notices[0].affected_quantities == (quantity,)
+        assert notices[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+
+
 def test_oxide_metal_does_not_migrate_as_a_charge(tmp_path) -> None:
     charge = _charge_body()
     charge["metal_element_wt_pct"] = {"MnO": "11.8", "Cr": "17.5"}
