@@ -28,8 +28,14 @@ def _assert_sc456_evidence(document: dict) -> None:
 
     factsage = rows["jacobson_2024_t1_factsage_2500k_predicted_psat"]
     assert factsage["values"]["method_class"] == "model_derived"
+    assert len(factsage["values"]["points"]) == 21
+    assert factsage["values"]["table_csv"] == "tables/kems-139-jacobson-2024/t1.csv"
+    assert factsage["values"]["quote"].startswith(
+        "Predicted vapor species of a lunar basalt at 2500 K"
+    )
     assert factsage["derivation"]["method"]["locator"]["section"] == (
-        "2.5 Assignment of ion peaks in the mass spectra"
+        "2.4.2 Ion current and ion counting measurements in the mass spectrum of a vapor; "
+        "item 6: Comparison to calculated/estimated vapor pressures for the condensed phase in the Knudsen cell"
     )
     assert factsage["derivation"]["references"] == [
         "Bale et al. [115]",
