@@ -8,6 +8,7 @@ import yaml
 from simulator.battery.enums import (
     AmountBasis,
     EvidenceClass,
+    PhaseRole,
     Quantity,
     ValueKind,
     ValenceValueForm,
@@ -153,6 +154,122 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
     assert all(row.point_conditions["atmosphere"].state.value == "air" for row in typed_rows)
     assert all(row.point_conditions["quench"].state.value == "water quench" for row in typed_rows)
     assert all(row.locator.page == 15 and row.locator.published_page == "not_printed" for row in typed_rows)
+
+    baseline_products = (
+        "The baseline (BL) glass was prepared without sulfur, chromium, or chlorine, "
+        "which were added by salt saturation method later (see Section 2.3)."
+    )
+    salted_products = (
+        "The resulting glass and surface salt were all extracted from the crucible, crushed in a "
+        "tungsten carbide mill, and sieved through a #120 mesh sieve (< 125 μm)."
+    )
+    assert sum(
+        row.point_conditions["phase_assemblage"].state.value == baseline_products
+        for row in typed_rows
+    ) == 10
+    assert sum(
+        row.point_conditions["phase_assemblage"].state.value == salted_products
+        for row in typed_rows
+    ) == 184
+    assert all(
+        (
+            row.point_conditions["phase_assemblage"].state.value == baseline_products
+            and row.point_conditions["phase_assemblage"].locator.section
+            == "2.2 Preparation of Baseline Glass"
+        )
+        or (
+            row.point_conditions["phase_assemblage"].state.value == salted_products
+            and row.point_conditions["phase_assemblage"].locator.section
+            == "2.3 Preparation of Salt-Saturated Glass"
+        )
+        for row in typed_rows
+    )
+    assert all(
+        row.point_conditions["sulfide_phase"].state.is_unknown
+        and row.point_conditions["sulfide_phase"].state.reason == "sulfide_phase_not_printed"
+        and row.point_conditions["sulfide_phase"].locator.page == 4
+        and row.point_conditions["sulfide_phase"].locator.section
+        == row.point_conditions["T_C"].locator.section
+        for row in typed_rows
+    )
+
+    table2 = document["species"]["Al2O3"]["observations"][0]
+    assert table2["phase"] == "glass"
+    assert table2["values"]["phase_label"] == "glass"
+    assert table2["values"]["basis"] == "wt_percent"
+    assert all(row.identity.phase_role.is_value for row in typed_rows)
+    assert all(row.identity.phase_role.value is PhaseRole.GLASS for row in typed_rows)
+
+    baseline_rows = [
+        row for row in typed_rows
+        if row.point_conditions["composition"].locator.table == "1"
+    ]
+    salted_rows = [
+        row for row in typed_rows
+        if row.point_conditions["composition"].state.is_unknown
+    ]
+    assert len(baseline_rows) == 10
+    assert len(salted_rows) == 184
+    baseline_start = {
+        "Al2O3": Decimal("10.47"),
+        "B2O3": Decimal("14.09"),
+        "CaO": Decimal("8.23"),
+        "Fe2O3": Decimal("1.03"),
+        "MgO": Decimal("1.03"),
+        "Na2O": Decimal("21.29"),
+        "SiO2": Decimal("37.70"),
+        "ZnO": Decimal("3.08"),
+        "ZrO2": Decimal("3.08"),
+    }
+    expected_baseline_start = wt_pct_to_mole_fraction(baseline_start)
+    for row in baseline_rows:
+        condition = row.point_conditions["composition"]
+        assert condition.state.is_value
+        assert condition.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert condition.state.value.as_map() == expected_baseline_start.as_map()
+        assert condition.locator.page == 14
+        assert condition.locator.table == "1"
+        assert "nominal_as_printed" in condition.locator.note
+
+    salt_point = next(
+        point for point in table2["values"]["points"]
+        if point["sample"] == "S-R1"
+    )
+    salt_composition = salt_point["point_conditions"]["composition"]
+    assert salt_composition["state"]["tag"] == "unknown"
+    assert salt_composition["state"]["reason"] == "run_starting_composition_not_printed_as_component_vector"
+    assert salt_composition["locator"]["page"] == 4
+    assert salt_composition["locator"]["section"] == "2.3 Preparation of Salt-Saturated Glass"
+    assert all(row.point_conditions["composition"].state.is_unknown for row in salted_rows)
+    assert all(
+        row.point_conditions["T_C"].locator.section == "2.2 Preparation of Baseline Glass"
+        for row in baseline_rows
+    )
+    assert all(
+        row.point_conditions["T_C"].locator.section == "2.3 Preparation of Salt-Saturated Glass"
+        for row in salted_rows
+    )
+
+    method_detail = (
+        "A simplified LAW glass was prepared and used to measure the saturation "
+        "solubility of sulfur, chromium, and chlorine at 1150 °C in an air atmosphere."
+    )
+    for row in typed_rows:
+        fugacity = row.point_conditions["fO2_Pa"]
+        assert fugacity.state.is_unknown
+        assert fugacity.state.reason == "fo2_set_by_air_not_printed_numerically"
+        assert fugacity.locator.page == 12
+        assert not (row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value)
+        detail = row.point_conditions["method_detail_as_printed"]
+        assert detail.state.value == method_detail
+        assert detail.locator.page == 12
+        temperature = row.point_conditions["T_C"]
+        assert temperature.locator.page == 4
+        assert temperature.locator.section in {
+            "2.2 Preparation of Baseline Glass",
+            "2.3 Preparation of Salt-Saturated Glass",
+        }
+
     context = document["species"]["Cr"]["context"]
     mckeown = next(
         row for row in context
