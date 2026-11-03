@@ -428,6 +428,7 @@ def test_shilov_1998_migrates_printed_po_pressures() -> None:
     # 9 activity cells; 112 was the count with blank-cell suppression off.
     # Each head value equals the parent column it was split from.
     assert len(result.observations) == 92
+    assert result.validation.hard_issues == ()
     migrated_po_rows = [
         observation
         for observation in result.observations.values()
@@ -446,6 +447,46 @@ def test_shilov_1998_migrates_printed_po_pressures() -> None:
     )
     source_points = source_po["values"]["points"]
     assert len(migrated_po_rows) == len(source_points)
+    zinc_phosphate_attribution = (
+        "Shornikov, Shilov, and Shultz (1996), A Mass Spectrometric Investigation "
+        "on the Thermodynamic Properties of Melts in the ZnO–P2O5 System, reference [4]."
+    )
+    tin_pyrophosphate_attribution = (
+        "Lopatin and Semenov (1996), A Mass Spectrometric Investigation on the "
+        "Vaporization of Sn2P2O7, reference [7]."
+    )
+    assert source_points[0]["method_class"] == "quoted_attributed"
+    assert source_points[0]["attribution"] == zinc_phosphate_attribution
+    context_rows = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in species.get("context") or []
+    }
+    spectrum_context = context_rows[
+        "shilov_1998_table1_spectrum_conditions_and_normalization"
+    ]["values"]["spectra"]
+    assert spectrum_context[0]["method_class"] == "quoted_attributed"
+    assert spectrum_context[2]["method_class"] == "quoted_attributed"
+    for observation_id, point_index, attribution in (
+        ("shilov_1998_table2_P2_partial_pressures", 0, zinc_phosphate_attribution),
+        ("shilov_1998_table2_PO2_partial_pressures", 0, zinc_phosphate_attribution),
+        ("shilov_1998_table2_PO2_partial_pressures", 5, tin_pyrophosphate_attribution),
+        ("shilov_1998_table2_Zn_partial_pressures", 0, zinc_phosphate_attribution),
+        ("shilov_1998_table2_SnO_partial_pressures", 4, tin_pyrophosphate_attribution),
+        ("shilov_1998_table2_SnPO3_partial_pressures", 4, tin_pyrophosphate_attribution),
+        ("shilov_1998_table5_P2O5_activities", 0, zinc_phosphate_attribution),
+        ("shilov_1998_table5_SnO_activities", 4, tin_pyrophosphate_attribution),
+        ("shilov_1998_table5_ZnO_activities", 0, zinc_phosphate_attribution),
+    ):
+        source_observation = next(
+            row
+            for species in document["species"].values()
+            for row in species.get("observations") or []
+            if row["observation_id"] == observation_id
+        )
+        point = source_observation["values"]["points"][point_index]
+        assert point["method_class"] == "quoted_attributed"
+        assert point["attribution"] == attribution
     po_by_x_sno = {
         Decimal(str(source_point["xSnO_mol_pct"])): migrated.value.point
         for source_point, migrated in zip(source_points, migrated_po_rows)
