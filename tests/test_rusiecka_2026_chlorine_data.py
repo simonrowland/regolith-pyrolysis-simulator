@@ -139,7 +139,10 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert row.identity.temperature_K.value == Decimal(str(ws.cell(row_number, 20).value)) + Decimal("273.15")
         assert row.value.kind is ValueKind.POINT
         assert row.value.point == displayed_component
-        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == (
+            _displayed_decimal(ws.cell(row_number, 21)) * Decimal("1000000000")
+        )
         assert row.identity.fO2_Pa.is_unknown
         assert row.experiment_id.endswith(f"::experiment::worksheet-row-{row_number}")
         assert row.point_conditions["total_pressure_Pa"].state.value == (
@@ -155,6 +158,39 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         )
         assert row.point_conditions["fCl2_bar"].locator is not None
         assert not row.notices
+
+    bound_compositions = [
+        observation
+        for _, observation in compositions
+        if "composition_wt_pct" in observation["values"]
+    ]
+    assert len(bound_compositions) == 1241
+    bound_rows = set()
+    for observation in bound_compositions:
+        row_number = int(re.search(r"row(\d+)_", observation["observation_id"]).group(1))
+        expected_composition = {
+            str(ws.cell(2, column).value).removesuffix("*"): str(
+                _displayed_decimal(ws.cell(row_number, column))
+            )
+            for column in range(2, 19)
+        }
+        assert observation["values"]["composition_wt_pct"] == expected_composition
+        assert observation["values"]["composition_locator"] == {
+            "source_path": (
+                "corpus/raw/rusiecka-2026-chlorine-data/"
+                "rusiecka-2026-chlorine-data.xlsx"
+            ),
+            "record": f"sheet data, cells B{row_number}:R{row_number}",
+        }
+        row = migrated[observation["observation_id"]]
+        printed = row.point_conditions["printed_composition"]
+        assert printed.state.is_value
+        assert printed.state.value == expected_composition
+        assert printed.locator is not None
+        assert row.identity.composition.is_unknown
+        assert "unsupported numeric component(s)" in (row.identity.composition.reason or "")
+        bound_rows.add(row_number)
+    assert len(bound_rows) == 73
 
     # Independent cell pins: Lunar-1 is a named legacy composition row, while AND-1 is this study.
     assert ws["AC22"].value == "Lunar-1"
