@@ -32,18 +32,21 @@ The layout text mangles the model equations in the theory section. The PDF p. 2 
 
 ### Scoring-gap review (2026-11-03)
 
-The paper does print the method for the 167 Table 1A activities: samples are
-equilibrated with reagent-grade metallic iron under controlled oxygen fugacity
-at 1600 K, and the activity is calculated from the resulting oxygen fugacity
-using Equation (8) (PDF p. 3 / printed p. 2633, “Control of the activity of
-FeO”). This is gas equilibration with an iron buffer, not Knudsen effusion.
+The paper does print the method for the 167 Table 1A activities. The controlled
+oxygen-fugacity equilibration and metallic-iron activity statements are on PDF
+p. 2 / printed p. 2632, under “Control of the activity of FeO.” Equation (8)
+and the molten Fe0.947O standard state are on PDF p. 3 / printed p. 2633.
+“Furnace arrangement” on that page prints the Fe-wire loop, CO2-H2-N2 gas,
+quench furnace, and that hot-zone fugacities are calculated by Brinkley’s
+method. The Table 1B caption on PDF p. 6 / printed p. 2636 reads “Compositions
+of the input gases (c.c./min).” Each clause is stored with its own page or
+table locator in the experiment and every row’s derivation. This is gas
+equilibration with an iron buffer, not Knudsen effusion.
 Controller ruling seq. 2 directs `experiment.method: quench_equilibration`;
 no schema change is needed. The shared experiment and all 167 rows carry the
-located method detail. It retains the printed CO2-H2-N2 input-gas mixture
-(Table 1B), the calculation of hot-zone fugacities by Brinkley’s method with
-ideal gases, reagent-grade Fe wire and the statement that metallic iron is
-almost pure (`a_Fe=1`), and the printed molten Fe0.947O standard state. The
-standard-state values remain verbatim and are not rebased. Doyle 1988 stores
+located method detail, including the printed metal superscript in
+`a_Fe^{metal} = 1`. The standard-state values remain verbatim and are not
+rebased. Doyle 1988 stores
 `gas_metal_equilibration` as free text; that sibling extract is outside this
 task and the controller will queue it separately.
 

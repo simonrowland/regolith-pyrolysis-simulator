@@ -402,20 +402,57 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
 
     source_experiment = document["experiments"][0]
     assert source_experiment["method"] == "quench_equilibration"
+    method_text = source_experiment["method_as_printed"]
     method_detail = source_experiment["method_detail_as_printed"]
-    assert "controlled oxygen fugacity" in method_detail
-    assert "CO2-H2-N2 gas" in method_detail
-    assert "almost pure (a_Fe=1)" in method_detail
-    assert "molten Fe0.947O" in method_detail
     assert source_experiment["locator"]["published_page"] == 2633
+    assert source_experiment["locator"]["section"] == "Furnace arrangement"
+    control = method_detail["controlled_oxygen_fugacity"]
+    assert control["state"]["value"] == (
+        "In this investigation, aluminosilicate liquids are equilibrated with "
+        "reagent-grade metallic iron under controlled oxygen fugacity at 1600 K."
+    )
+    assert control["locator"]["page"] == 2
+    assert control["locator"]["pdf_page_index"] == 1
+    assert control["locator"]["published_page"] == 2632
+    iron_activity = method_detail["metallic_iron_activity"]
+    assert iron_activity["state"]["value"] == (
+        "Because the metallic iron is almost pure (a_Fe^{metal} = 1)"
+    )
+    assert iron_activity["locator"] == control["locator"]
+    equation = method_detail["activity_equation"]
+    assert equation["state"]["value"] == (
+        "a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837), where T is the absolute temperature."
+    )
+    assert equation["locator"]["published_page"] == 2633
+    standard_state = method_detail["FeO_standard_state"]
+    assert standard_state["state"]["value"] == (
+        "The standard state is molten Fe_{0.947}O."
+    )
+    assert standard_state["locator"]["published_page"] == 2633
+    furnace = method_detail["furnace_equilibration"]
+    assert furnace["state"]["value"] == method_text
+    assert furnace["locator"]["published_page"] == 2633
+    assert "CO2-H2-N2 gas" in method_text
+    fugacity = method_detail["fugacity_calculation"]
+    assert fugacity["state"]["value"] == (
+        "Fugacities of the gaseous species in the hot zone are calculated by "
+        "BRINKLEY's (1946) method using the algorithm of VAN ZEGGEREN and "
+        "STOREY (1970). All species are considered to be ideal gases."
+    )
+    assert fugacity["locator"]["published_page"] == 2633
+    input_gases = method_detail["input_gas_caption"]
+    assert input_gases["state"]["value"] == "Compositions of the input gases (c.c./min)"
+    assert input_gases["locator"]["published_page"] == 2636
+    assert input_gases["locator"]["table"] == "1B"
     source_rows = {
         row["observation_id"]: row for row in document["species"]["FeO"]["observations"]
     }
     assert len(source_rows) == 167
     assert all(
         row["experiment"] == source_experiment["experiment_id"]
-        and row["derivation"]["method"]["state"]["value"] == method_detail
+        and row["derivation"]["method"]["state"]["value"] == method_text
         and row["derivation"]["method"]["locator"]["published_page"] == 2633
+        and row["derivation"]["method_detail_as_printed"] == method_detail
         for row in source_rows.values()
     )
     experiment_ids = {row.experiment_id for row in observations.values()}
@@ -427,7 +464,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         row.derivation is not None
         and row.derivation.method is not None
         and row.derivation.method.state.is_value
-        and row.derivation.method.state.value == method_detail
+        and row.derivation.method.state.value == method_text
         and row.derivation.method.locator.published_page == 2633
         for row in observations.values()
     )
