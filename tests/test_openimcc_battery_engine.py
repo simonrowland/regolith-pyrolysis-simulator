@@ -1202,6 +1202,32 @@ def test_cell_oxygen_balance_keeps_above_knudsen_reason_code() -> None:
     )
 
 
+def test_oxygen_bracket_reason_suffixes_share_refusal_census_family() -> None:
+    from simulator.battery.score import refusal_census_payloads
+
+    family = "oxygen_balance_no_admitted_bracket"
+    reasons = (
+        family,
+        f"{family}:engine_domain_crash",
+        f"{family}:silicate_window_refusal",
+        f"{family}:same_sign_residual",
+    )
+    rows = [
+        {
+            "status": ResidualStatus.REFUSED.value,
+            "refusal": {
+                "reason": "unsupported",
+                "detail": {"reason": reason},
+            },
+        }
+        for reason in reasons
+    ]
+
+    assert refusal_census_payloads(rows) == {
+        "unsupported:oxygen_balance_no_admitted_bracket": 4
+    }
+
+
 def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _solve_vapor_engine_cell_oxygen_balance,
