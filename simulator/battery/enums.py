@@ -271,6 +271,9 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
+    # t-1593: a named material's cited bulk analysis varies by lot
+    # (JSC-1 vs JSC-1A). Advisory. Not a flagged stratum.
+    LOT_VARIABILITY = "lot_variability"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
