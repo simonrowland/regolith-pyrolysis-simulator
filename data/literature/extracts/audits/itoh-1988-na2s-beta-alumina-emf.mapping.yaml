@@ -1,0 +1,35 @@
+source_id: itoh-1988-na2s-beta-alumina-emf
+source:
+  citation: 'Itoh, M., Yamamoto, T. and Kozuka, Z. (1988), Journal of Materials Science 23(4), 1395–1398.'
+  doi: 10.1007/BF01154606
+extraction:
+  method: Compare-only table mapping; values were transcribed from the MinerU table drafts, independently checked against pdftotext, and row/column layout checked against page renders.
+tables:
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: mixed_quantities_as_mapped_below
+    unit: mixed_as_printed
+    evidence_class: mixed_as_mapped_below
+    temperature: {column: 2, unit: K}
+    values:
+      - {column: 3, species: Na2S, quantity: electromotive_force_as_published, unit: V, evidence_class: measured_direct}
+      - {column: 4, species: Na2S, quantity: exchange_reaction_gibbs_energy, unit: J/mol, evidence_class: author_derived}
+      - {column: 5, species: Na2S, quantity: delta_fG, unit: J/mol, evidence_class: author_derived}
+    render_verified: []
+  - page: 2
+    table_index: 2
+    type: gibbs_table
+    quantity: mixed_quantities_as_mapped_below
+    unit: J/mol
+    evidence_class: quoted_attributed
+    temperature: {column: 1, unit: K}
+    values:
+      - {column: 2, species: S2, quantity: standard_gibbs_energy_as_published, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 3, species: Na, quantity: standard_gibbs_energy_as_published, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 4, species: Ag, quantity: standard_gibbs_energy_as_published, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 5, species: Na2S, quantity: standard_gibbs_energy_as_published, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 6, species: Ag2S, quantity: standard_gibbs_energy_as_published, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 7, species: Na2S, quantity: delta_fG, unit: J/mol, evidence_class: quoted_attributed}
+      - {column: 8, species: Ag2S, quantity: delta_fG, unit: J/mol, evidence_class: quoted_attributed}
+    render_verified: []

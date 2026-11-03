@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 744
-  extracts: 742
+  sources: 745
+  extracts: 743
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 78
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 742
+  extracts_without_pdf: 743
   alias_groups_needing_resolution: 80
 gaps:
   pdfs_without_extract: []
@@ -201,6 +201,7 @@ gaps:
   - inoue-suito-1982-na-silicate-sulfur-partitions
   - inoue-suito-1982-vanadium-mgo-saturated-slag
   - itoh-1985-beta-alumina-na2o-emf
+  - itoh-1988-na2s-beta-alumina-emf
   - itoh-1989-zno-solid-zinc-silicate
   - itoh-hino-banya-1997-mg-deoxidation
   - itoh-hino-banya-1998-spinel
@@ -12055,6 +12056,64 @@ sources:
       last_stage: null
       date: null
     commit: 499a0fd386c3dd006f98398a85ae897c53586288
+- source_id: itoh-1988-na2s-beta-alumina-emf
+  aliases: []
+  citation: Itoh, M., Yamamoto, T. and Kozuka, Z. (1988), "The determination of Gibbs energy of the exchange
+    reaction of sulphides using beta-alumina solid electrolyte", Journal of Materials Science 23(4), 1395–1398.
+  doi: 10.1007/BF01154606
+  report_number: null
+  identifier: 10.1007/BF01154606
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/itoh-1988-na2s-beta-alumina-emf.yaml
+    review_status: draft
+    rows: 169
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/itoh-1988-na2s-beta-alumina-emf/itoh-1988-na2s-beta-alumina-emf.pdf
+      present: true
+      sha256: 1405c1fb2ad1545d1530468912f75a24e0e9e39bef620273d3cb3ad792c92bba
+      matches_simulator: null
+    sidecar:
+      path: raw/itoh-1988-na2s-beta-alumina-emf/sidecar.yaml
+      present: true
+    text:
+      path: text/itoh-1988-na2s-beta-alumina-emf
+      exists: true
+      file_count: 33
+    tables:
+      path: tables/itoh-1988-na2s-beta-alumina-emf
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/itoh-1988-na2s-beta-alumina-emf.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/itoh-1988-na2s-beta-alumina-emf.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: a6871422ff04f6033afef12c4593f2df76704e17
 - source_id: itoh-1989-zno-solid-zinc-silicate
   aliases: []
   citation: Itoh, S. and Azakami, T. (1989), Thermodynamic Studies of ZnO in Solid Zinc Silicate, Shigen-to-Sozai
