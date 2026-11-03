@@ -18,6 +18,18 @@ def _obs_id(row: int, column: int) -> str:
     return f"{SLUG}_p003_t01_r{row:02d}_c{column:02d}"
 
 
+_TABLE1A_ROWS = (4, 5, 6, 7, 8, 11, 16)
+_TABLE1DE_ROWS = range(7, 18)
+_TABLE1_SAMPLE_LABELS = {
+    "A1", "A2", "A3", "A4", "A5", "B1", "B2", "C1", "C2", "C3",
+    "D1", "D2", "E1", "E2",
+}
+_EXPECTED_OBSERVATION_IDS = (
+    {_obs_id(row, column) for row in _TABLE1A_ROWS for column in (3, 4, 5)}
+    | {_obs_id(row, column) for row in _TABLE1DE_ROWS for column in (12, 14, 13, 15)}
+)
+
+
 def _load_and_migrate() -> tuple[dict, Migrator, list]:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     migrator = Migrator(ROOT, index={}, aliases={})
@@ -31,7 +43,7 @@ def _load_and_migrate() -> tuple[dict, Migrator, list]:
     return document, migrator, observations
 
 
-def test_hayashi_table_1_row_count_and_render_pins() -> None:
+def test_hayashi_table_1_rows_and_render_pins() -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     species = document["species"]
     observations = {
@@ -39,11 +51,13 @@ def test_hayashi_table_1_row_count_and_render_pins() -> None:
         for formula, block in species.items()
         for row in block.get("observations", [])
     }
-    sample_count = len({
+    assert {
         row["values"]["sample_as_published"]
         for row in observations.values()
-    })
-    assert sample_count == 14
+    } == _TABLE1_SAMPLE_LABELS
+    assert {observation_id for _, observation_id in observations} == (
+        _EXPECTED_OBSERVATION_IDS
+    )
 
     render_pins = (
         ("Fe", _obs_id(4, 3), "78.3", "1(a)"),
@@ -70,7 +84,6 @@ def test_hayashi_table_1_row_count_and_render_pins() -> None:
 
 def test_hayashi_isolated_migration_binds_conditions_and_only_declared_schema_gaps() -> None:
     document, migrator, observations = _load_and_migrate()
-    assert len(observations) == 65
     assert migrator.result.validation.hard_issues == ()
 
     unknown_quantity_ids = {
@@ -97,6 +110,11 @@ def test_hayashi_isolated_migration_binds_conditions_and_only_declared_schema_ga
         for block in document["species"].values()
         for row in block.get("observations", [])
     }
+    migrated_ids = {
+        row.observation_id.split("::", 1)[1]
+        for row in observations
+    }
+    assert migrated_ids == _EXPECTED_OBSERVATION_IDS
     for row in source_rows.values():
         conditions = row["point_conditions"]
         assert conditions["temperature_K"]["state"]["tag"] == "value"
@@ -147,7 +165,16 @@ def test_hayashi_reviewed_evidence_classes_and_experiment_locator() -> None:
     assert document["review_status"] == "draft"
 
     fe_observations = document["species"]["Fe"]["observations"]
-    assert len(fe_observations) == 21
+    assert {row["observation_id"] for row in fe_observations} == {
+        _obs_id(table_row, column)
+        for table_row in _TABLE1A_ROWS
+        for column in (3, 4, 5)
+    }
+    assert all(
+        row["values"]["method_class"] == "measured_reduced"
+        and row["values"]["evidence_class"] == "measured_reduced"
+        for row in fe_observations
+    )
     a1_fe2 = next(row for row in fe_observations if row["observation_id"] == _obs_id(4, 3))
     assert a1_fe2["values"]["method_class"] == "measured_reduced"
     assert a1_fe2["values"]["evidence_class"] == "measured_reduced"
@@ -166,7 +193,11 @@ def test_hayashi_reviewed_evidence_classes_and_experiment_locator() -> None:
         for row in block.get("context", [])
     ]
     cfe_rows = [row for row in all_contexts if "table1c_" in row["observation_id"]]
-    assert len(cfe_rows) == 11
+    expected_cfe_ids = {
+        f"{SLUG}_table1c_{sample}_cfe_pt"
+        for sample in ("A4", "A5", "B1", "B2", "C1", "C2", "C3", "D1", "D2", "E1", "E2")
+    }
+    assert {row["observation_id"] for row in cfe_rows} == expected_cfe_ids
     assert {row["values"]["method_class"] for row in cfe_rows} == {"measured_reduced"}
 
     compositions = {

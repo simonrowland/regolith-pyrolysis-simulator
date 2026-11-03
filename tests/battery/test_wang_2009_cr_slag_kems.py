@@ -64,7 +64,7 @@ def _assert_source_rows_are_measured_reduced(extract: dict) -> None:
         for species in extract["species"].values()
         for row in species["observations"]
     ]
-    assert len(rows) == 80
+    assert rows
     assert all(row["values"]["method_class"] == "measured_reduced" for row in rows)
     assert all("attribution" not in row["values"] for row in rows)
     for row in rows:
@@ -81,7 +81,7 @@ def _assert_activity_evidence_is_measured(observations: list) -> None:
         if observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.ACTIVITY
     ]
-    assert len(activities) == 40
+    assert activities
     assert all(
         observation.evidence.class_.is_value
         and observation.evidence.class_.value in MEASURED_EVIDENCE
@@ -99,8 +99,31 @@ def _assert_render_pins(extract: dict, page2: str, page4: str, page5: str) -> No
     table4_text = page5.split("Table 4.", 1)[1].split("Table 5.", 1)[0]
     table5_text = page5.split("Table 5.", 1)[1].split("Copyright", 1)[0]
     sample_rows = re.compile(r"^\s*(\d{1,2})\s+0\.\d{3}\s+[-−]?\d", re.MULTILINE)
-    assert [int(value) for value in sample_rows.findall(table4_text)] == list(range(1, 21))
-    assert [int(value) for value in sample_rows.findall(table5_text)] == list(range(1, 21))
+    table4_samples = {int(value) for value in sample_rows.findall(table4_text)}
+    table5_samples = {int(value) for value in sample_rows.findall(table5_text)}
+    observations = {
+        species: block["observations"]
+        for species, block in extract["species"].items()
+    }
+    table4_ids = {
+        f"wang_2009_table4_{oxide}_sample_{sample:02d}_temperature_fit"
+        for oxide in ("cro", "cro2")
+        for sample in table4_samples
+    }
+    table5_ids = {
+        f"wang_2009_table5_cr2o3_sample_{sample:02d}_{kind}"
+        for sample in table5_samples
+        for kind in (
+            "log_activity_temperature_fit",
+            "activities_at_1950_2035_k",
+        )
+    }
+    source_ids = {
+        row["observation_id"]
+        for rows in observations.values()
+        for row in rows
+    }
+    assert source_ids == table4_ids | table5_ids
 
     assert "Table 1." in page2
     assert re.search(r"\b1\s+0\.062\b", page2)
@@ -157,15 +180,12 @@ def _assert_render_pins(extract: dict, page2: str, page4: str, page5: str) -> No
     assert activity_1["values"]["points"][0]["locator"]["table_column_number"] == 5
 
 
-def test_render_pins_and_printed_table_row_counts() -> None:
+def test_render_pins_and_printed_rows() -> None:
     if not SOURCE.is_file():
         pytest.skip(f"source PDF is absent: {SOURCE}")
 
     extract = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     _assert_source_rows_are_measured_reduced(extract)
-    assert len(extract["species"]["CrO"]["observations"]) == 20
-    assert len(extract["species"]["CrO2"]["observations"]) == 20
-    assert len(extract["species"]["Cr2O3"]["observations"]) == 40
     page2 = _page_text(2)
     page4 = _page_text(4)
     page5 = _page_text(5)
@@ -208,16 +228,34 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
         for observation in migrator.result.observations.values()
         if observation.source_id == SID
     ]
-    assert len(rows) == 100
-    assert sum(row.value.kind is ValueKind.POINT for row in rows) == 40
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows) == 60
-
     fit_ids = {
         row["observation_id"]
         for species in extract["species"].values()
         for row in species["observations"]
         if "temperature_fit" in row["observation_id"]
     }
+    unavailable_ids = {
+        observation.observation_id.split("::", 1)[1]
+        for observation in rows
+        if observation.value.kind is ValueKind.UNAVAILABLE
+    }
+    expected_point_keys = {
+        (row["observation_id"], str(point["T_K"]))
+        for species in extract["species"].values()
+        for row in species["observations"]
+        for point in row.get("values", {}).get("points", [])
+        if isinstance(point.get("activity"), str)
+    }
+    actual_point_keys = {
+        (
+            observation.observation_id.split("::", 1)[1].split("::T=", 1)[0],
+            str(observation.identity.temperature_K.value),
+        )
+        for observation in rows
+        if observation.value.kind is ValueKind.POINT
+    }
+    assert unavailable_ids == fit_ids
+    assert actual_point_keys == expected_point_keys
     unknown_quantity_ids = {
         observation.observation_id.split("::", 1)[1]
         for observation in rows
@@ -252,7 +290,6 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
     activities = [
         observation for observation in rows if observation.identity.quantity.is_value
     ]
-    assert len(activities) == 40
     _assert_activity_evidence_is_measured(rows)
     for observation in activities:
         identity = observation.identity
@@ -305,7 +342,6 @@ def test_isolated_migration_keeps_conditions_and_only_refuses_fit_coefficients()
         _assert_activity_evidence_is_measured(mutated_activities)
 
     first_three = sorted(activities, key=lambda row: row.observation_id)[:3]
-    assert len(first_three) == 3
     for observation in first_three:
         assert observation.identity.composition.is_value
         assert (

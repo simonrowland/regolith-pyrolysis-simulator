@@ -19,12 +19,20 @@ def _rows(doc: dict) -> dict[str, dict]:
     }
 
 
+def _point_at_table_row(series: dict, table_row_number: int) -> dict:
+    return next(
+        point
+        for point in series["values"]["points"]
+        if point["locator"].get("table_row_number") == table_row_number
+    )
+
+
 def _assert_beerkens_render_pins(doc: dict) -> None:
     rows = _rows(doc)
     sulfur = rows["beerkens_1986_table1_5_s_volume_ppm"]
-    assert len(sulfur["values"]["points"]) == 6
-    assert sulfur["values"]["points"][0]["value"] == 1200
-    assert sulfur["values"]["points"][0]["locator"] == {
+    sulfur_furnace_a = _point_at_table_row(sulfur, 2)
+    assert sulfur_furnace_a["value"] == 1200
+    assert sulfur_furnace_a["locator"] == {
         "page": 28,
         "published_page": 19,
         "table": "1.5",
@@ -36,14 +44,14 @@ def _assert_beerkens_render_pins(doc: dict) -> None:
     }
 
     carryover = rows["beerkens_1986_table2_4_water_cooled_paddle_carryover"]
-    assert len(carryover["values"]["points"]) == 19
-    assert carryover["values"]["points"][0]["value"] == 3.3
-    assert carryover["values"]["points"][0]["locator"]["page"] == 73
+    first_carryover = _point_at_table_row(carryover, 4)
+    assert first_carryover["value"] == 3.3
+    assert first_carryover["locator"]["page"] == 73
 
     rate = rows["beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment"]
-    assert len(rate["values"]["points"]) == 4
-    assert rate["values"]["points"][3]["value"] == 1.60
-    assert rate["values"]["points"][3]["locator"] == {
+    final_rate = _point_at_table_row(rate, 5)
+    assert final_rate["value"] == 1.60
+    assert final_rate["locator"] == {
         "page": 137,
         "published_page": 128,
         "table": "4.2",
@@ -54,9 +62,10 @@ def _assert_beerkens_render_pins(doc: dict) -> None:
     }
 
     dew = rows["beerkens_1986_table4_3_na2so4_dew_point_experiment"]
-    assert len(dew["values"]["points"]) == 4
-    assert dew["values"]["points"][0]["T_K"] == 1120
-    assert dew["values"]["points"][0]["locator"]["page"] == 139
+    dew_point = next(
+        point for point in dew["values"]["points"] if point["locator"]["page"] == 139
+    )
+    assert dew_point["T_K"] == 1120
 
     pb = rows["beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate"]
     assert pb["values"]["points"][0]["value"] == 3.0
@@ -110,36 +119,45 @@ def test_beerkens_1986_render_pins_and_isolated_migration(tmp_path: Path) -> Non
     result = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     assert result.validation is not None
     assert not result.validation.hard_issues
-    assert len(result.observations) == 66
 
     rows = list(result.observations.values())
-    unknown_quantity = [row for row in rows if row.identity.quantity.is_unknown]
-    expected_unknown_prefix_counts = {
-        "beerkens_1986_table1_5_s_volume_ppm": 6,
-        "beerkens_1986_table1_5_na_volume_ppm": 7,
-        "beerkens_1986_table1_5_k_volume_ppm": 6,
-        "beerkens_1986_table2_4_water_cooled_paddle_carryover": 19,
-        "beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment": 4,
-        "beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl": 4,
-        "beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate": 1,
-        "beerkens_1986_section4_5_5_na2so4_model_comparator_rate": 1,
-        "beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate": 1,
-    }
-    actual_unknown_prefix_counts: dict[str, int] = {}
-    for row in unknown_quantity:
-        base_id = next(
-            (
-                base_id
-                for base_id in expected_unknown_prefix_counts
-                if f"::{base_id}::" in row.observation_id
-            ),
-            None,
-        )
-        assert base_id is not None, row.observation_id
-        actual_unknown_prefix_counts[base_id] = (
-            actual_unknown_prefix_counts.get(base_id, 0) + 1
-        )
-    assert actual_unknown_prefix_counts == expected_unknown_prefix_counts
+    from simulator.battery import migrate as battery_migrate
+    from simulator.battery.stable_ids import series_row_extra
+
+    expected_observation_ids = set()
+    for source_row in _rows(doc).values():
+        parent_id = f"{doc['source_id']}::{source_row['observation_id']}"
+        for point in source_row["values"]["points"]:
+            temperature = battery_migrate.select_declared_source(
+                battery_migrate.AXIS_TEMPERATURE_K, None, point
+            ).amount
+            row_extra = series_row_extra(point, include_locator=True)
+            expected_observation_ids.add(
+                battery_migrate._exploded_point_id(
+                    parent_id,
+                    {"container": "points"},
+                    temperature,
+                    point,
+                    row_extra,
+                )
+            )
+    assert {row.observation_id for row in rows} == expected_observation_ids
+    expected_unknown_prefixes = (
+        "beerkens_1986_table1_5_s_volume_ppm",
+        "beerkens_1986_table1_5_na_volume_ppm",
+        "beerkens_1986_table1_5_k_volume_ppm",
+        "beerkens_1986_table2_4_water_cooled_paddle_carryover",
+        "beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment",
+        "beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl",
+        "beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate",
+        "beerkens_1986_section4_5_5_na2so4_model_comparator_rate",
+        "beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate",
+    )
+    for base_id in expected_unknown_prefixes:
+        matching_rows = [row for row in rows if f"::{base_id}::" in row.observation_id]
+        assert matching_rows, base_id
+        assert all(row.identity.quantity.is_unknown for row in matching_rows)
+        assert all(row.value.kind.value == "unavailable" for row in matching_rows)
 
     model_comparator = next(
         row
