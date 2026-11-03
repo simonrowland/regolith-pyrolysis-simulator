@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Quantity
+from simulator.battery.enums import EvidenceClass, Phase, PhaseRole, Quantity
 from simulator.battery.migrate import (
     Migrator,
     fe3_fe2_ratio_from_oxide_wt_pct,
@@ -222,6 +222,152 @@ def _migrated() -> tuple[dict, Migrator]:
     return document, migrator
 
 
+def _assert_phase_scoring_inputs(document: dict, records: dict) -> None:
+    target = {
+        observation["observation_id"]: (formula, observation)
+        for formula, body in document["species"].items()
+        for observation in body.get("observations", [])
+        if observation.get("values", {}).get("quantity")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+        and observation["observation_id"].startswith(("kc91_t3_", "kc91_t4_", "kc91_t5_"))
+    }
+    assert len(target) == 835
+
+    composition_count = 0
+    fo2_count = 0
+    migrated_composition_count = 0
+    migrated_fo2_count = 0
+    migrated_temperature_count = 0
+    for observation_id, (_formula, observation) in target.items():
+        values = observation["values"]
+        assert values["phase_label"] == "melt"
+        assert values["basis"] == "wt_percent"
+        temperature = values["T_C"]
+        if isinstance(temperature, dict):
+            assert temperature.get("value") not in (None, "")
+            assert temperature.get("units") == "°C"
+            assert temperature.get("locator", {}).get("table") == "2"
+        else:
+            assert temperature not in (None, "")
+
+        conditions = observation["point_conditions"]
+        assert "composition" in conditions
+        assert "state" in conditions["composition"]
+        assert conditions["composition"].get("locator")
+        assert "fO2_log" in conditions
+        assert "state" in conditions["fO2_log"]
+        assert conditions["fO2_log"].get("locator")
+        composition_count += conditions["composition"]["state"]["tag"] == "value"
+        fo2_count += conditions["fO2_log"]["state"]["tag"] == "value"
+
+        record = records[f"{SOURCE_ID}::{observation_id}"]
+        assert record.identity.phase_role.is_value
+        assert record.identity.phase_role.value is PhaseRole.MELT
+        assert record.identity.species.phase.is_value
+        assert record.identity.species.phase.value is Phase.L
+        assert record.identity.temperature_K.is_value
+        migrated_temperature_count += record.identity.temperature_K.is_value
+        assert record.point_conditions is not None
+        assert all(condition.locator is not None for condition in record.point_conditions.values())
+        assert record.point_conditions["temperature_K"].state.is_value
+        assert record.point_conditions["composition"].state.is_value or record.point_conditions["composition"].state.is_unknown
+        assert record.point_conditions["fO2_log"].state.is_value or record.point_conditions["fO2_log"].state.is_unknown
+        migrated_composition_count += bool(
+            record.identity.composition and record.identity.composition.is_value
+        )
+        fo2_state = record.point_conditions["fO2_log"].state
+        assert fo2_state.is_value or fo2_state.is_unknown
+        migrated_fo2_count += fo2_state.is_value
+
+    assert composition_count == 144
+    assert fo2_count == 130
+    assert migrated_composition_count == 144
+    assert migrated_fo2_count == 130
+    assert migrated_temperature_count == 835
+
+    observations = {
+        observation["observation_id"]: observation
+        for _formula, body in document["species"].items()
+        for observation in body.get("observations", [])
+    }
+    initial = observations["kc91_t3_0011_0014_initial_SiO2"]
+    final = observations["kc91_t3_0011_0014_final_SiO2"]
+    assert initial["phase_as_published"] == "glass"
+    assert final["phase_as_published"] == "glass"
+    assert initial["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+    assert "not reused as run composition" in initial["point_conditions"]["composition"]["state"]["reason"]
+    assert initial["point_conditions"]["fO2_log"]["state"]["reason"] == (
+        "fo2_set_by_in_air_not_printed_numerically"
+    )
+    assert initial["point_conditions"]["method_detail_as_printed"]["state"]["value"] == (
+        "Measurements were performed in air, between 945 and 1530 °C, "
+        "at frequencies between 2 and 10 mHz."
+    )
+    assert initial["values"]["T_C"]["value"] == "1260"
+    assert initial["values"]["T_C"]["locator"]["row"] == "0012"
+    assert final["values"]["T_C"]["value"] == "1260"
+    assert final["values"]["T_C"]["locator"]["row"] == "0014"
+
+    expected_table3 = _expected_table3()
+    initial_bulk = final["point_conditions"]["composition"]
+    assert initial_bulk["state"]["tag"] == "value"
+    assert initial_bulk["state"]["value"]["basis"] == "oxide wt% as printed in Table 3"
+    assert initial_bulk["state"]["value"]["amount_basis"] == "mass_percent"
+    assert initial_bulk["state"]["value"]["components"] == [
+        [oxide, expected_table3[("0011-0014 initial", oxide)]]
+        for oxide in TABLE3_OXIDES
+    ]
+    assert initial_bulk["locator"]["table"] == "3"
+    assert initial_bulk["locator"]["row"] == "0011-0014 initial"
+    final_record = records[f"{SOURCE_ID}::kc91_t3_0011_0014_final_SiO2"]
+    assert final_record.identity.composition.is_value
+    expected_mole_fractions = wt_pct_to_mole_fraction(
+        {
+            oxide: Decimal(expected_table3[("0011-0014 initial", oxide)])
+            for oxide in TABLE3_OXIDES
+        }
+    )
+    assert final_record.identity.composition.value.as_map() == expected_mole_fractions.as_map()
+
+    na_final = observations["kc91_t3_171_174_final_MnO"]
+    assert na_final["point_conditions"]["composition"]["state"]["tag"] == "unknown"
+    assert "MnO as N.A." in na_final["point_conditions"]["composition"]["state"]["reason"]
+
+    table4 = observations["kc91_t4_Q01_SiO2"]["point_conditions"]
+    assert table4["composition"]["state"]["tag"] == "unknown"
+    assert "no starting/bulk composition" in table4["composition"]["state"]["reason"]
+    assert table4["fO2_log"]["state"]["tag"] == "unknown"
+    assert "neither a numeric fO2 nor a method" in table4["fO2_log"]["state"]["reason"]
+    assert "air" not in table4["fO2_log"]["state"]["reason"].casefold()
+
+    table5 = observations["kc91_t5_B27_SiO2"]["point_conditions"]
+    assert table5["composition"]["state"]["tag"] == "unknown"
+    assert table5["fO2_log"]["state"]["tag"] == "value"
+    assert table5["fO2_log"]["state"]["value"] == "-0.68"
+    assert table5["fO2_log"]["locator"]["table"] == "5"
+    assert table5["fO2_log"]["locator"]["row"] == "B27"
+    assert records[f"{SOURCE_ID}::kc91_t5_B27_SiO2"].identity.fO2_Pa.is_value
+
+
+def test_phase_scoring_input_deletions_fail_the_focused_pins() -> None:
+    document = _document()
+    _, migrator = _migrated()
+    records = migrator.result.observations
+    _assert_phase_scoring_inputs(document, records)
+
+    mutations = (
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["values"].pop("phase_label"),
+        lambda doc: doc["species"]["SiO2"]["observations"][1]["point_conditions"].pop("composition"),
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["point_conditions"]["fO2_log"]["state"].pop("reason"),
+        lambda doc: doc["species"]["SiO2"]["observations"][0]["values"]["T_C"].pop("value"),
+    )
+    for mutate in mutations:
+        changed = deepcopy(document)
+        mutate(changed)
+        with pytest.raises((AssertionError, KeyError)):
+            _assert_phase_scoring_inputs(changed, records)
+
+
 def test_extract_validates_and_table3_matches_independent_render_grid() -> None:
     document = _document()
     assert validate_extract_document(
@@ -360,13 +506,18 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         if not migrated:
             continue
         if "T_C" in values:
-            expected_temperature = Decimal(values["T_C"]) + Decimal("273.15")
+            raw_temperature = values["T_C"]
+            if isinstance(raw_temperature, dict):
+                expected_temperature = Decimal(raw_temperature["value"]) + Decimal("273.15")
+                assert raw_temperature["locator"]["table"] == "2"
+            else:
+                expected_temperature = Decimal(raw_temperature) + Decimal("273.15")
             assert all(record.identity.temperature_K.value == expected_temperature for record in migrated)
         elif observation.get("locator", {}).get("table") == "3":
-            assert all(record.identity.temperature_K.is_unknown for record in migrated)
+            assert all(record.identity.temperature_K.is_value for record in migrated)
             assert all(
-                record.point_conditions["temperature_K"].state.is_unknown
-                and record.point_conditions["temperature_K"].locator.page == 4
+                record.point_conditions["temperature_K"].state.is_value
+                and record.point_conditions["temperature_K"].locator.page == 3
                 for record in migrated
             )
             assert all(record.identity.total_pressure_Pa.is_not_applicable for record in migrated)
@@ -381,6 +532,7 @@ def test_isolated_migration_preserves_species_conditions_and_reduced_ratios() ->
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION: 835,
         Quantity.FE3_FE2_RATIO: 46,
     }
+    _assert_phase_scoring_inputs(document, records)
     reduced = [
         record
         for key, record in records.items()
