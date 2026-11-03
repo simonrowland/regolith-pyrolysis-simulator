@@ -313,7 +313,7 @@ campaigns:
       Na2O_solubility_cap_wt_pct: 10
       JANAF_4th_multiphase_margin_kJ_per_mol_O2:   # 2026-07-09 re-ground; recomputed from ellingham_thermo multiphase fits
         Na_FeO_1150C: 11.1     # was 9.6 under the earlier linear fit
-        Na_FeO_crossover_C: 1181.5     # was 1173.4
+        Na_FeO_crossover_C: 1183.6715578613794  # BuiltinMetallothermicStepProvider._crossover_temperature_C("Na", "Fe"); tests/test_physics_ground_truth.py window is 1184 +/- 1 C. Was 1181.5, before that 1173.4.
         K_FeO_1150C: -127.4    # was -125.7
         K_FeO_crossover_C: 836.25    # was 832.0
       reactions:
@@ -325,7 +325,7 @@ campaigns:
         The JANAF-4th multiphase refit (2026-07-09 re-ground) removes K/FeO from
         practical melt temperatures (K/Fe crossover 836 C). The staged cleanup is
         now Na-only at 1150 C, inside a narrow Na/FeO window with about +11.1 kJ/mol O2
-        margin and a 1181.5 C crossover. Do not retune upward without new thermodynamic evidence.
+        margin and a 1183.6715578613794 C crossover. Do not retune upward without new thermodynamic evidence.
     downstream_impact: >
       Adds an operator-selectable Path A staged route without changing
       C2A_continuous. The cool Na cleanup uses additive/recycled Na for

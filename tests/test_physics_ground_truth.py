@@ -935,6 +935,20 @@ def test_janaf_alkali_fe_ellingham_crossovers_match_literature_window(
     ) == pytest.approx(expected_c, abs=abs_tol_c)
 
 
+def test_na_feo_crossover_annotation_matches_computed_root() -> None:
+    # The recipe note is not a control. It must stay on the root the shuttle
+    # gate actually computes, inside the 1184 +/- 1 C JANAF window above.
+    computed = BuiltinMetallothermicStepProvider._crossover_temperature_C(
+        "Na", "Fe",
+    )
+    assert computed == pytest.approx(1184.0, abs=1.0)
+    setpoints = yaml.safe_load((DATA_DIR / "setpoints.yaml").read_text())
+    annotated = setpoints["campaigns"]["C2A_staged"]["na_shuttle_stage"][
+        "JANAF_4th_multiphase_margin_kJ_per_mol_O2"
+    ]["Na_FeO_crossover_C"]
+    assert annotated == computed
+
+
 def test_janaf_alkali_fe_reduction_margin_changes_sign_at_crossover() -> None:
     # NIST-JANAF high-T refit: below Na/Fe crossover Na2O is more stable than
     # FeO; above it, Na->FeO reduction must be thermodynamically refused.
