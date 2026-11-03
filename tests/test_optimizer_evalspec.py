@@ -2384,6 +2384,26 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[-1] == pytest.approx(1600.0)
 
 
+def test_c2a_thermal_window_seed_pressure_reaches_configure_campaign() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 5.0
+
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(5.0)
+
+
 def test_c2a_window_schedules_148_hours_under_carrier_seed_cap() -> None:
     profile = _c2a_window_profile(1050.0, 1600.0, 146)
     profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
