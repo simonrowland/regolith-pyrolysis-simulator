@@ -17,7 +17,7 @@ Reductions (derivation in simulator/battery/migrate.py, b-686 block):
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 from typing import Any
 
@@ -794,7 +794,7 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
 
 
 @pytest.mark.parametrize(
-    ("row_fields", "stays_unknown"),
+    ("row_fields", "expected_log10"),
     [
         (
             {
@@ -812,7 +812,7 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
                     }
                 }
             },
-            True,
+            None,
         ),
         (
             {
@@ -824,15 +824,16 @@ def test_absolute_typed_row_log_overrides_series_oxygen(
                 },
                 "oxygen_buffer_as_published": "IW",
             },
-            False,
+            "-8",
         ),
-        ({"log_fO2": {"value": -2, "units": "log10(IW)"}}, False),
-        ({"log_fO2": {"value": -8, "units": "log10(Pa)"}}, True),
-        ({"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"}, False),
+        # Survey Wolf IW at 1473 K is -11.9375. log10(IW) = -2 adds that offset.
+        ({"log_fO2": {"value": -2, "units": "log10(IW)"}}, "-13.9375"),
+        ({"log_fO2": {"value": -8, "units": "log10(Pa)"}}, None),
+        ({"log_fO2": -10.5, "oxygen_buffer_as_published": "IW"}, "-10.5"),
     ],
 )
 def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
-    tmp_path: Path, row_fields: dict, stays_unknown: bool
+    tmp_path: Path, row_fields: dict, expected_log10: str | None
 ) -> None:
     path = _fixture_extract(tmp_path, [{
         "observation_id": "fixture_bounded_row",
@@ -844,7 +845,7 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
             "admission_status": "admitted",
             "oxygen_partial_pressure": {"value": "1e-7", "units": "bar"},
             "series": [{
-                "T_C": 1250,
+                "T_K": 1473,
                 "Fe3_over_FeT": 0.5,
                 **row_fields,
             }],
@@ -858,11 +859,15 @@ def test_bounded_or_buffer_relative_redox_row_does_not_inherit_series_fO2_point(
     oxygen = rows[0].identity.fO2_Pa
     # The series point is 1e-7 bar = 0.01 Pa. A bound stays unknown. A printed
     # log or a buffer offset keeps its own oxygen and does not inherit that point.
-    if stays_unknown:
+    if expected_log10 is None:
         assert oxygen.is_unknown
-    else:
-        assert oxygen.is_value
-        assert oxygen.value != Decimal("0.01")
+        return
+    assert oxygen.is_value
+    assert oxygen.value != Decimal("0.01")
+    recovered = (oxygen.value / Decimal("100000")).log10()
+    assert recovered.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP) == Decimal(
+        expected_log10
+    )
 
 
 def test_declared_ratio_from_ferric_fraction_is_r_over_one_minus_r() -> None:

@@ -16201,7 +16201,13 @@ _BUFFER_TOKEN_RE = re.compile(
 )
 _BUFFER_OFFSET_RE = re.compile(
     r"(?<![a-z0-9])(?P<buf>nno|qfm|fmq|iw)(?![a-z0-9])"
-    r"\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
+    r"(?:\s*=)?\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
+    re.IGNORECASE,
+)
+# A sign or equals with no number is an offset that failed to parse.
+# It must not fall through to the bare-name offset of 0.
+_BUFFER_OFFSET_INTRO_RE = re.compile(
+    r"(?<![a-z0-9])(?:nno|qfm|fmq|iw)(?![a-z0-9])\s*(?:=|[+-])",
     re.IGNORECASE,
 )
 _LOG_UNITS_PHRASE_RE = re.compile(
@@ -16371,8 +16377,19 @@ def _text_pieces(value: object) -> tuple[str, ...]:
     return ()
 
 
+def _normalize_offset_dashes(text: str) -> str:
+    """Map the printed minus signs onto ASCII '-' before the offset regex.
+
+    U+2212 MINUS, U+2013 EN DASH, and U+2014 EM DASH are the signs papers
+    print. The offset class is ASCII ``[+-]``. Folding only after a capture
+    misses them and the missing group becomes offset 0.
+    """
+
+    return text.replace("−", "-").replace("–", "-").replace("—", "-")
+
+
 def _leftover_buffer_words(text: str) -> str:
-    folded = text.casefold().replace("−", "-").replace("–", "-").replace("—", "-")
+    folded = _normalize_offset_dashes(text).casefold()
     for word in _BUFFER_NAME_WORDS:
         folded = folded.replace(word.casefold(), " ")
     folded = _BUFFER_OFFSET_RE.sub(" ", folded)
@@ -16385,8 +16402,11 @@ def _classify_buffer_phrase(
     """Return family, offset, offset-as-printed, and whether the phrase is prose.
 
     A bare IW/QFM/FMQ/NNO is offset 0. ``delta-IW`` with no number is prose.
+    A printed sign or ``=`` whose number does not parse is prose, not offset 0.
+    ``IW = -2`` is offset -2. Unicode minus, en dash, and em dash are minus.
     """
 
+    text = _normalize_offset_dashes(text)
     if _APPROX_BUFFER_RE.search(text):
         family = None
         match = _BUFFER_TOKEN_RE.search(text.casefold())
@@ -16421,11 +16441,13 @@ def _classify_buffer_phrase(
     if len(offsets) > 1 and len({item.replace(" ", "") for item in offsets}) > 1:
         return family, None, None, True
     if not offsets:
+        if _BUFFER_OFFSET_INTRO_RE.search(text):
+            return family, None, None, True
         return family, Decimal(0), "0", False
-    number, printed = _offset_number(offsets[0]) or (None, None)
+    number, _printed = _offset_number(offsets[0]) or (None, None)
     if number is None:
         return family, None, None, True
-    return family, number, printed, False
+    return family, number, offsets[0].replace(" ", ""), False
 
 
 def _push_point(

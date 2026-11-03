@@ -129,20 +129,9 @@ def test_nno_volume_term_is_in_atmospheres() -> None:
 
 
 def test_band_rule_in_range_versus_extrapolated() -> None:
-    # 1473 K: only Myers & Gunter IW is inside a stated window, so the
-    # valid-set spread is 0. Wolf has no printed window, so using it is
-    # extrapolated. 1673 and 1873 K: nobody is in range, so the band is the
-    # full solid spread, which the survey prints as 0.145 and 0.198.
-    at_1473 = evaluate_buffer("IW", Decimal(1473))
-    assert at_1473.valid_calibration_ids == ("myers_gunter1979_iw",)
-    assert at_1473.band_dex == 0
-    assert at_1473.authority == "extrapolated"
-    assert valid_calibration_ids("IW", Decimal(1673)) == ()
-    assert valid_calibration_ids("IW", Decimal(1873)) == ()
-    assert _q3(evaluate_buffer("IW", Decimal(1673)).band_dex) == Decimal("0.145")
-    assert _q3(evaluate_buffer("IW", Decimal(1873)).band_dex) == Decimal("0.198")
-    # The recorded 0.007-0.009 dex is the rounded Wolf minus O'Neill 1988
-    # table residual, not the T-dependent band.
+    # d-324: the IW band is the printed Wolf minus O'Neill 1988 table
+    # residual, about 0.01 dex. Myers inside 1073.15-1573.15 K must not
+    # zero it. Myers outside that window must not re-enter.
     wolf = [Decimal(item) for item in _TABLE["wolf2023_quote_oneill_pownceby1993"]]
     oneill = [Decimal(item) for item in _TABLE["oneill1988_eq11"]]
     residuals = [left - right for left, right in zip(wolf, oneill, strict=True)]
@@ -151,7 +140,25 @@ def test_band_rule_in_range_versus_extrapolated() -> None:
         Decimal("-0.0077"),
         Decimal("-0.0085"),
     ]
-    assert all(Decimal("0.006") <= abs(item) <= Decimal("0.009") for item in residuals)
+    at_1473 = evaluate_buffer("IW", Decimal(1473))
+    assert at_1473.valid_calibration_ids == ("myers_gunter1979_iw",)
+    assert at_1473.authority == "extrapolated"
+    assert at_1473.band_dex == abs(residuals[0])
+    assert at_1473.band_dex != 0
+    at_1523 = evaluate_buffer("IW", Decimal("1523.15"))
+    assert at_1523.valid_calibration_ids == ("myers_gunter1979_iw",)
+    assert at_1523.band_dex != 0
+    assert Decimal("0.006") <= at_1523.band_dex <= Decimal("0.009")
+    assert valid_calibration_ids("IW", Decimal(1673)) == ()
+    assert valid_calibration_ids("IW", Decimal(1873)) == ()
+    assert evaluate_buffer("IW", Decimal(1673)).band_dex == abs(residuals[1])
+    assert evaluate_buffer("IW", Decimal(1873)).band_dex == abs(residuals[2])
+    myers_gap = abs(
+        Decimal(_TABLE["wolf2023_quote_oneill_pownceby1993"][0])
+        - Decimal(_TABLE["myers_gunter1979_iw"][0])
+    )
+    assert myers_gap == Decimal("0.0912")
+    assert at_1473.band_dex < myers_gap
 
     # 1200 K QFM: O'Neill and Wones are in range. Chou eq. 24 and Hewitt are not.
     qfm = evaluate_buffer("QFM", Decimal(1200))
