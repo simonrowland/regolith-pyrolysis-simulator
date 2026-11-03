@@ -103,8 +103,11 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
 
     assert execution.status == "ok"
     assert len(execution.snapshots) == 2
+    # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
+    # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
+    # the laptop and studio-3, so this digest is not a laptop re-run.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "a2dad0d9cfe5e49393505a143855f5de6fb2e00b7c1da7337c7f4a2119515176"
+        "8e53b0f97a3dc81209cf91835192fe1723caf5111c0e1360fbbec0b6a9d2fecb"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

@@ -653,8 +653,11 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
     # excess-inventory balance; the production resolver now reports the pins
     # below without relaxing the independent atom-ledger closure bound.
+    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
+    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
+    # and studio-3, so this value is not a laptop re-run.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333470503708e-7,
+        "lunar_mare_low_ti": 6.164333585288513e-7,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
