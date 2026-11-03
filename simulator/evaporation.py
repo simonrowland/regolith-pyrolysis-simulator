@@ -89,6 +89,25 @@ class EvaporationFluxRefusal(ProviderUnavailableError):
         super().__init__(self.reason)
 
 
+def _headspace_reuse_or_load(sim: Any, key: str, loader):
+    """Return a catalog load cached for the current headspace solve.
+
+    Alpha, its envelope, and the HKL transport set are pure functions of
+    the vapor-pressure payload. A solve evaluates that payload once per
+    partial probe. The cache is the dict installed by
+    ``_calculate_evaporation_with_headspace_feedback`` and is absent
+    outside that solve, so a later mutation of the payload is visible.
+    """
+
+    reuse = getattr(sim, "_headspace_probe_reuse", None)
+    if isinstance(reuse, dict) and key in reuse:
+        return reuse[key]
+    loaded = loader(sim.vapor_pressures)
+    if isinstance(reuse, dict):
+        reuse[key] = loaded
+    return loaded
+
+
 def evaporation_flux_refusal_from_configuration_error(
     exc: BaseException,
 ) -> EvaporationFluxRefusal:
@@ -3997,24 +4016,6 @@ class EvaporationMixin:
             return None
         return parsed
 
-    def _headspace_reuse_or_load(self, key: str, loader):
-        """Return a catalog load cached for the current headspace solve.
-
-        Alpha, its envelope, and the HKL transport set are pure functions of
-        the vapor-pressure payload. A solve evaluates that payload once per
-        partial probe. The cache is the dict installed by
-        ``_calculate_evaporation_with_headspace_feedback`` and is absent
-        outside that solve, so a later mutation of the payload is visible.
-        """
-
-        reuse = getattr(self, "_headspace_probe_reuse", None)
-        if isinstance(reuse, dict) and key in reuse:
-            return reuse[key]
-        loaded = loader(self.vapor_pressures)
-        if isinstance(reuse, dict):
-            reuse[key] = loaded
-        return loaded
-
     def _build_evaporation_aux_maps(
         self, vapor_pressures: dict,
     ) -> tuple[dict, dict, dict]:
@@ -4498,17 +4499,20 @@ class EvaporationMixin:
                 kernel_config.get('evaporation_series_resistance', {}) or {}
             ),
             'alpha': _measured_alpha_control_view(
-                self._headspace_reuse_or_load(
+                _headspace_reuse_or_load(
+                    self,
                     "alpha_loaded",
                     _load_evaporation_alpha_by_species,
                 )
             ),
-            'alpha_envelope': self._headspace_reuse_or_load(
+            'alpha_envelope': _headspace_reuse_or_load(
+                self,
                 "alpha_envelope",
                 _load_evaporation_alpha_envelope_by_species,
             ),
             'hkl_upper_bound_transport_species': (
-                self._headspace_reuse_or_load(
+                _headspace_reuse_or_load(
+                    self,
                     "hkl_upper_bound",
                     _load_hkl_upper_bound_transport_species,
                 )
