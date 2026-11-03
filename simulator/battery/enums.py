@@ -331,6 +331,18 @@ class NoticeKind(StrEnum):
     # (net evaporation). The miss against a measured deposit stays scored.
     # Not a flagged stratum.
     UNDERSATURATED_WALL_NET_EVAPORATION = "undersaturated_wall_net_evaporation"
+    # t-1619 / d-324. A printed buffer offset was converted with the
+    # calibration the paper names. Advisory. Not a flagged stratum.
+    BUFFER_RELATIVE_FO2_CONVERTED = "buffer_relative_fo2_converted"
+    # The extract did not name a calibration the buffer owner has, so the
+    # canonical curve was used. Advisory. Not a flagged stratum.
+    BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED = (
+        "buffer_calibration_not_printed_canonical_used"
+    )
+    # The paper says this ΔIW is ideal FeO and metal Fe (or x_FeO/x_Fe).
+    # Advisory. Not a flagged stratum. Extrapolation still uses
+    # out_of_certified_band, which is the flagged stratum.
+    DELTA_IW_FROM_IDEAL_FEO_FE_RATIO = "delta_iw_from_ideal_feo_fe_ratio"
 
 
 class ReferenceStateConvention(StrEnum):
