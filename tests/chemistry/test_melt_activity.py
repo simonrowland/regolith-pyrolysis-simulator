@@ -113,12 +113,15 @@ def test_liquid_reference_oxide_gammas_are_unchanged(parent: str) -> None:
 
 
 @pytest.mark.parametrize(
-    ("parent", "temperature_K", "expected_warning"),
+    ("parent", "temperature_K", "expected_notice"),
     [
         (
             "MnO",
             1873.0,
-            "gamma_reference_state_solid_unconverted",
+            "gamma_reference_state_solid_unconverted (reason: JANAF manifest "
+            "lists only elemental Mn-001 through Mn-006; no MnO(cr)/MnO(l) "
+            "fusion chord (data/literature/compilations/janaf/manifest.yaml:"
+            "28177-28444))",
         ),
         ("Al2O3", 1873.0, "gamma_reference_state_unverified"),
         ("SiO2", 1873.0, "gamma_reference_state_unverified"),
@@ -132,7 +135,7 @@ def test_liquid_reference_oxide_gammas_are_unchanged(parent: str) -> None:
 def test_reference_state_notice_comes_from_primary_evidence(
     parent: str,
     temperature_K: float,
-    expected_warning: str | None,
+    expected_notice: str | None,
 ) -> None:
     gamma = (
         P2O5_ACTIVITY_COEFFICIENT.gamma
@@ -149,14 +152,14 @@ def test_reference_state_notice_comes_from_primary_evidence(
     assert activity.provenance()["melt_oxide_activity_reference_state"] == (
         MELT_OXIDE_ACTIVITY_REFERENCE_STATE
     )
-    if expected_warning is None:
-        assert activity.warning is None
-        assert "melt_oxide_activity_warning" not in activity.provenance()
+    provenance = activity.provenance()
+    assert activity.warning is None
+    assert "melt_oxide_activity_warning" not in provenance
+    if expected_notice is None:
+        assert "melt_oxide_activity_reference_state_notice" not in provenance
     else:
-        assert activity.warning is not None
-        assert expected_warning in activity.warning
-        assert activity.provenance()["melt_oxide_activity_warning"] == (
-            activity.warning
+        assert provenance["melt_oxide_activity_reference_state_notice"] == (
+            expected_notice
         )
 
 
