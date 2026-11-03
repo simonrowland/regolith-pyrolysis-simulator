@@ -552,6 +552,10 @@ def test_scoring_gap_compositions_and_temperatures_reach_migration(tmp_path):
     )
     assert changed.identity.composition is not None
     assert changed.identity.composition.is_value
-    assert changed.identity.composition.value == wt_pct_to_mole_fraction(
+    expected = wt_pct_to_mole_fraction(
         {"SiO2": Decimal("99.99"), "Al2O3": Decimal("0.01")}
     )
+    # t-1617 / SC-458: a located phase analysis is stamped before it can be
+    # reused as its own scoring input.
+    assert changed.identity.composition.value.components == expected.components
+    assert changed.identity.composition.value.input_provenance == "scored_phase_analysis"
