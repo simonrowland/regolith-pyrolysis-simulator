@@ -51,8 +51,9 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
-    PHASE_BASIS_TOKENS,
     PHASE_COMPOSITION_QUANTITIES,
+    PROSE_MOLE_PERCENT_PHASE_COMPONENT,
+    effective_phase_basis,
     PRINTED_CAPACITY_QUANTITIES,
     PerBasis,
     Phase,
@@ -166,7 +167,11 @@ from simulator.battery.oxygen_balance import (
     _cell_oxygen_class,
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.composition import composition_wt_pct
+from simulator.battery.composition import (
+    composition_wt_pct,
+    phase_ppm_mass_as_wt_percent,
+    phase_printed_mole_amounts_to_wt_percent,
+)
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
@@ -1366,7 +1371,9 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
             if identity.subtype is not None and identity.subtype.is_value
             else None
         )
-        if subtype in PHASE_BASIS_TOKENS:
+        # Prose wt% and mole-percent synonyms are the same dex observable
+        # as a token phase row. The stored subtype is not rewritten.
+        if effective_phase_basis(subtype) is not None:
             return MetricOperation.DEX
         return MetricOperation.ABSOLUTE
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -8284,6 +8291,223 @@ def _component_wt(
     return matched[1], repair_notices
 
 
+def _subtype_text(identity: Identity) -> str | None:
+    subtype = identity.subtype
+    if subtype is None or not subtype.is_value:
+        return None
+    return subtype.value
+
+
+def _printed_phase_component(identity: Identity) -> tuple[str | None, str | None]:
+    """Oxide key of a phase row, or a typed refusal.
+
+    Prose mole percent names the measured oxide in the subtype. The
+    species formula on those rows is not that oxide (Cheng prints Fe3O4
+    on a CaO mol% row). Scoring the number against the formula would
+    rename the evidence, so a disagreement stays refused. A subtype that
+    does not name an oxide uses the formula.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    subtype = _subtype_text(identity)
+    if (
+        effective_phase_basis(subtype) == "mole_percent"
+        and subtype in PROSE_MOLE_PERCENT_PHASE_COMPONENT
+    ):
+        named = PROSE_MOLE_PERCENT_PHASE_COMPONENT[subtype]
+        if named is not None and named != formula:
+            return None, "phase_species_disagrees_with_basis_component"
+        return (named or formula), None
+    return formula, None
+
+
+def _fe_valence_named_form(identity: Identity) -> str:
+    """``ratio``, ``fraction``, ``other_fe``, or ``non_fe``.
+
+    The ratio form is species Fe, numerator Fe3+, value_form ratio,
+    denominator oxidation state 2 (Fe3+/Fe2+). The fraction form is
+    species Fe, numerator Fe3+, value_form fraction, denominator the
+    total element (Fe3+/sumFe). Any other iron printing, and every
+    non-iron element, stays refused. The species string must be ``Fe``.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    if formula != "Fe":
+        return "non_fe"
+    basis_state = identity.valence_basis
+    if basis_state is None or not basis_state.is_value:
+        return "other_fe"
+    basis = basis_state.value
+    numerator = basis.numerator_oxidation_states
+    if (
+        numerator == (3,)
+        and basis.value_form is ValenceValueForm.RATIO
+        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+        and basis.denominator_oxidation_state == 2
+    ):
+        return "ratio"
+    if (
+        numerator == (3,)
+        and basis.value_form is ValenceValueForm.FRACTION
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    ):
+        return "fraction"
+    return "other_fe"
+
+
+def _coefficient_basis_detail(
+    subtype: str | None,
+    typed_reason: str,
+    detail: str,
+) -> dict[str, object]:
+    return {
+        "reason": typed_reason,
+        "basis": subtype,
+        "engine_basis": "wt_percent",
+        "detail": detail,
+    }
+
+
+def _phase_mole_sibling_amounts(
+    observations: Iterable[Observation],
+    reference: Observation,
+) -> tuple[Mapping[str, Decimal] | None, str | None]:
+    """Printed sibling amounts for one phase point, or a typed refusal.
+
+    The group is experiment_id + phase_role + temperature_K + mole scale.
+    experiment_id alone mixes phases: one Cheng run has liquid and spinel.
+    The pool is this scoring context. A file scorer's context is that
+    file's batch, so a phase split across files is not shown to be closed
+    and stays refused. Duplicate component keys are refused rather than
+    summed twice. Mole-fraction tokens and prose mole percent are different
+    scales and do not share a group. Returns (None, None) when this row
+    is not a mole row.
+    """
+
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return None, None
+    scale = effective_phase_basis(_subtype_text(identity))
+    if scale not in {"mole_fraction", "mole_percent"}:
+        return None, None
+    role = _phase_role_value(identity, "phase_role")
+    if role is None:
+        return None, None
+    temperature = temperature_of(identity)
+    rows = list(observations)
+    if all(row.observation_id != reference.observation_id for row in rows):
+        rows.append(reference)
+    amounts: dict[str, Decimal] = {}
+    for row in rows:
+        row_identity = row.identity
+        if not isinstance(row_identity, Identity):
+            continue
+        if quantity_token(row_identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            continue
+        if row.experiment_id != reference.experiment_id:
+            continue
+        if _phase_role_value(row_identity, "phase_role") is not role:
+            continue
+        if temperature_of(row_identity) != temperature:
+            continue
+        if effective_phase_basis(_subtype_text(row_identity)) != scale:
+            continue
+        component, refusal = _printed_phase_component(row_identity)
+        if refusal is not None:
+            return None, refusal
+        if not component:
+            return None, "phase_mole_fraction_component_absent"
+        point = point_magnitude(row.value)
+        if point is None:
+            return None, "phase_mole_fraction_non_finite"
+        if component in amounts:
+            return None, "phase_mole_fraction_duplicate_component"
+        amounts[component] = point
+    return amounts, None
+
+
+def _engine_scale_reference(
+    identity: Identity,
+    reference: Decimal,
+    phase_siblings: Mapping[str, Decimal] | None,
+    phase_sibling_refusal: str | None,
+) -> tuple[Decimal | None, RefusalReason | None, dict[str, object] | None]:
+    """Measured point on the engine scale, or a typed refusal.
+
+    Token and prose wt% are already weight percent. element_ppm_by_mass
+    keeps the existing /10000 path. ppm_mass uses ppm_mass_to_wt_percent
+    only for an engine-map oxide key. Mole fraction and prose mole percent
+    use the closed-phase wt% conversion. An Fe3+/sumFe fraction becomes
+    Fe3+/Fe2+ by the existing ferric-fraction function; the stored point
+    of a ratio form is already that ratio.
+    """
+
+    if (
+        quantity_token(identity) is Quantity.VALENCE_RATIO
+        and _fe_valence_named_form(identity) == "fraction"
+    ):
+        # Premise: r = Fe3+/sumFe as printed, and Fe2+ with Fe3+ are all
+        # the iron. Algebra: R = r / (1 - r), owned by
+        # fe3_fe2_ratio_from_ferric_fraction. Unit check: mol/mol.
+        # Worked example: r = 0.25 → R = 1/3. r outside (0, 1) stays refused.
+        converted = fe3_fe2_ratio_from_ferric_fraction(reference)
+        if converted is None:
+            return None, RefusalReason.UNSUPPORTED, {
+                "reason": "fe3_sumfe_ratio_undefined",
+                "detail": (
+                    "Fe3+/sumFe fraction r converts by R = r/(1-r) only when 0 < r < 1"
+                ),
+            }
+        return converted, None, None
+
+    subtype = _subtype_text(identity)
+    basis = effective_phase_basis(subtype)
+    if basis in {"mole_fraction", "mole_percent"}:
+        if phase_sibling_refusal is not None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                phase_sibling_refusal,
+                f"phase mole set refused: {phase_sibling_refusal}",
+            )
+        component, component_refusal = _printed_phase_component(identity)
+        if component_refusal is not None or not component:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                component_refusal or "phase_mole_fraction_component_absent",
+                "printed species formula disagrees with the oxide named by the basis",
+            )
+        if phase_siblings is None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                "phase_mole_fraction_siblings_unavailable",
+                "sibling mole fractions are required to show the phase closes",
+            )
+        wt_percent, reason = phase_printed_mole_amounts_to_wt_percent(
+            component,
+            phase_siblings,
+            mole_percent=basis == "mole_percent",
+        )
+        if reason is not None or wt_percent is None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                reason or "phase_mole_fraction_set_unclosed",
+                "mole fraction is converted to wt% only for a closed engine-map oxide set",
+            )
+        return wt_percent, None, None
+    if basis == "ppm_mass":
+        formula = identity.species.formula if identity.species is not None else ""
+        wt_percent, reason = phase_ppm_mass_as_wt_percent(formula, reference)
+        if reason is not None or wt_percent is None:
+            # The element-ppm sentence is the existing refusal text.
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                reason or "element_ppm_not_oxide_wt_percent",
+                "engine phase maps are wt%; ppm_mass is not converted to wt%",
+            )
+        return wt_percent, None, None
+    return _phase_component_reference_wt_percent(identity, reference), None, None
+
+
 def _predict_phase_row(
     engine: Engine,
     observation: Observation,
@@ -8292,6 +8516,8 @@ def _predict_phase_row(
     sources: tuple[str, ...],
     *,
     handles: Mapping[str, object] | None = None,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -8356,34 +8582,46 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "counter_phase_role"},
             execution=ExecutionState.NOT_PROBED,
         )
-    subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
+    subtype = _subtype_text(identity)
     if solute is None:
-        # Engine phase maps are wt%. mole_fraction and ppm_mass are closed
-        # bases on another scale. ppm_mass_to_wt_percent is the ppm scale
-        # rule and is not applied here: the stored point stays as printed.
-        # element_ppm_by_mass stays scoreable; it is not ppm_mass.
-        if subtype in PHASE_BASIS_TOKENS and subtype not in {
+        # Engine phase maps are wt%. A closed mole set and an oxide-key
+        # ppm_mass convert onto that scale; the stored point stays printed.
+        # element_ppm_by_mass stays on its own /10000 path. A precondition
+        # failure stays refused and does not call the assemblage.
+        basis = effective_phase_basis(subtype)
+        if basis is None or basis not in {
             "wt_percent",
             "element_ppm_by_mass",
+            "mole_fraction",
+            "mole_percent",
+            "ppm_mass",
         }:
-            return refused(
-                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
-                {
-                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
-                    "basis": subtype,
-                    "engine_basis": "wt_percent",
-                    "detail": (
-                        "engine phase maps are wt%; "
-                        f"{subtype} is not converted to wt%"
-                    ),
-                },
-            )
-        if subtype not in {"wt_percent", "element_ppm_by_mass"}:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "basis"},
                 execution=ExecutionState.NOT_PROBED,
             )
+        if basis not in {"wt_percent", "element_ppm_by_mass"}:
+            point = point_magnitude(observation.value)
+            if point is None:
+                return refused(
+                    RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                    _coefficient_basis_detail(
+                        subtype,
+                        "phase_ppm_mass_non_finite"
+                        if basis == "ppm_mass"
+                        else "phase_mole_fraction_non_finite",
+                        "the printed phase amount is not a finite point",
+                    ),
+                )
+            _converted, scale_reason, scale_detail = _engine_scale_reference(
+                identity,
+                point,
+                phase_siblings,
+                phase_sibling_refusal,
+            )
+            if scale_reason is not None:
+                return refused(scale_reason, scale_detail or {"reason": scale_reason.value})
     temperature = temperature_of(identity)
     if temperature is None or not temperature.is_finite() or temperature <= 0:
         return refused(
@@ -8784,6 +9022,71 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _predict_named_fe_valence(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    *,
+    handles: Mapping[str, object] | None,
+    isolated: bool | None,
+) -> EnginePrediction:
+    """Route a named iron valence into ``_predict_fe_redox``.
+
+    Fe3+/Fe2+ (ratio form) is already R. Fe3+/sumFe (fraction form) is
+    scored as R = r/(1-r) after the engine returns R; r outside (0, 1)
+    is refused here, before the engine. Cr, V, Ti, Eu, Ce and every other
+    non-Fe valence stay refused. Other iron printings (average oxidation
+    state, log10, Fe2+/sumFe) stay refused. None of those are mapped onto
+    fe3_fe2_ratio.
+    """
+
+    form = _fe_valence_named_form(identity)
+    formula = identity.species.formula if identity.species is not None else ""
+
+    def unsupported(typed_reason: str, detail: str) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": typed_reason,
+                "species": formula,
+                "detail": detail,
+            },
+            identity=identity,
+        )
+
+    if form == "non_fe":
+        return unsupported(
+            "non_fe_valence_not_fe3_fe2",
+            f"{formula} valence is not Fe3+/Fe2+ and is not scored as that ratio",
+        )
+    if form == "fraction":
+        point = point_magnitude(observation.value)
+        if point is None or fe3_fe2_ratio_from_ferric_fraction(point) is None:
+            return unsupported(
+                "fe3_sumfe_ratio_undefined",
+                "Fe3+/sumFe fraction r converts by R = r/(1-r) only when 0 < r < 1",
+            )
+    elif form != "ratio":
+        return unsupported(
+            "fe_valence_form_not_fe3_fe2",
+            "only printed Fe3+/Fe2+ and Fe3+/sumFe are scored; this iron form stays refused",
+        )
+    return _predict_fe_redox(
+        engine,
+        observation,
+        identity,
+        channel,
+        handles=handles,
+        isolated=isolated,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8793,6 +9096,8 @@ def predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
@@ -8805,6 +9110,8 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
         )
 
     provided_handles = handles or {}
@@ -8818,6 +9125,8 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -8840,6 +9149,8 @@ def _predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -8929,23 +9240,36 @@ def _predict_with_engine(
             handles=handles,
             isolated=isolated,
         )
-    phase_basis = (
-        identity.subtype.value
-        if identity.subtype is not None and identity.subtype.is_value
-        else None
-    )
+    phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
-    # phase rows. They stay on the not-predicted path.
+    # phase rows. They stay on the not-predicted path. A closed prose
+    # weight-percent or mole-percent subtype is the same phase row.
     if (
         quantity in PRINTED_CAPACITY_QUANTITIES
         or quantity is Quantity.DISTRIBUTION_RATIO
         or (
             quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-            and phase_basis in PHASE_BASIS_TOKENS
+            and effective_phase_basis(phase_basis) is not None
         )
     ):
         return _predict_phase_row(
-            engine, observation, identity, channel, sources, handles=handles
+            engine,
+            observation,
+            identity,
+            channel,
+            sources,
+            handles=handles,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
+        )
+    if quantity is Quantity.VALENCE_RATIO:
+        return _predict_named_fe_valence(
+            engine,
+            observation,
+            identity,
+            channel,
+            handles=handles,
+            isolated=isolated,
         )
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
@@ -11880,6 +12204,12 @@ def compile_residual(
             exclusions=("reference_state_conversion_inputs_present",),
         )
 
+    # Sibling mole amounts are this context's phase point. A precomputed
+    # prediction still converts the reference with the same map, so a raw
+    # mole fraction is not compared with an engine wt%.
+    phase_siblings, phase_sibling_refusal = _phase_mole_sibling_amounts(
+        context.observations.values(), reference
+    )
     if (
         prediction is None and predict in (None, predict_with_engine)
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -11976,6 +12306,9 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
+        if predictor is predict_with_engine:
+            predictor_kwargs["phase_siblings"] = phase_siblings
+            predictor_kwargs["phase_sibling_refusal"] = phase_sibling_refusal
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
@@ -12318,6 +12651,9 @@ def compile_residual(
         and isinstance(identity, Identity)
         and identity.valence_basis is not None
         and identity.valence_basis.is_value
+        # Fe3+/sumFe is compared as R = r/(1-r). The fraction range [0, 1]
+        # does not apply to R (r = 0.25 → R = 1/3; r = 0.8 → R = 4).
+        and _fe_valence_named_form(identity) != "fraction"
     ):
         basis = identity.valence_basis.value
         range_excess = basis._physical_range_excess(prediction.value)
@@ -12341,7 +12677,22 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
-    ref_point = _phase_component_reference_wt_percent(identity, ref_point)
+    if isinstance(identity, Identity):
+        scaled, scale_reason, scale_detail = _engine_scale_reference(
+            identity, ref_point, phase_siblings, phase_sibling_refusal
+        )
+        if scale_reason is not None:
+            return _refused(
+                scale_reason,
+                scale_detail or {"reason": scale_reason.value},
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+            )
+        assert scaled is not None
+        ref_point = scaled
+    else:
+        ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:

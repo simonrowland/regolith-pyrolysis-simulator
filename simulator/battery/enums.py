@@ -697,6 +697,55 @@ PHASE_BASIS_TOKENS = frozenset({
     "ppm_mass",
 })
 
+# Hero-chart funnel 1a. Exact printed subtypes from the funnelrule top
+# groups, plus nothing else. A free-text basis outside this set stays
+# quantity_not_predicted. These strings are weight percent already; they
+# are not a pattern and they do not rename a different observable.
+# The funnelrule table cuts three labels before the clause the extract
+# stores. Each cut count (381, 194, 59) is one stored sentence, so that
+# sentence is a member. The shorter table text stays a member too.
+# "X mass percent in Y phase", "X wt% in silicate glass", and "oxide wt.%"
+# are different wordings and are not members.
+PROSE_WT_PERCENT_PHASE_SUBTYPES = frozenset({
+    "oxide wt%",
+    "oxide mass percent in liquid phase",
+    "Electron-microprobe wt.% as printed",
+    "Electron-microprobe wt.% as printed; elemental component in quenched silicate glass.",
+    "Analyzed glass composition, mass%",
+    "Analyzed glass composition, mass%; each glass composition is normalized to 100%.",
+    "S content in silicate melt (Gl), wt.%",
+    "Cu2O mass percent in Metal phase",
+    "Cu2O mass percent in Slag phase",
+    "ICP-OES measured oxide wt.% as printed",
+    "ICP-OES measured oxide wt.% as printed.",
+})
+
+# Hero-chart funnel 1b. Exact mole-percent subtypes. The value is mol% on
+# a 0–100 scale. The mapped oxide is the component the prose names. None
+# means the subtype does not name an oxide, so the species formula is the
+# component. A formula that disagrees with a named oxide is not this map.
+PROSE_MOLE_PERCENT_PHASE_COMPONENT = {
+    "SiO2 mol pct in the phase, Table 5": "SiO2",
+    "CaO mol pct in the phase, Table 5": "CaO",
+    "FeO1.5 mol pct in the phase, Table 5": "FeO1.5",
+    "oxide mole percent in solid phase": None,
+}
+
+
+def effective_phase_basis(subtype: str | None) -> str | None:
+    """Closed phase-basis token, or the wt% / mole-percent prose it names.
+
+    Anything else is None. Callers do not pattern-match free text.
+    """
+
+    if subtype in PHASE_BASIS_TOKENS:
+        return subtype
+    if subtype in PROSE_WT_PERCENT_PHASE_SUBTYPES:
+        return "wt_percent"
+    if subtype in PROSE_MOLE_PERCENT_PHASE_COMPONENT:
+        return "mole_percent"
+    return None
+
 # 1 wt% = 1 mass part per 100. 1 ppm by mass = 1 mass part per 1_000_000.
 # 1e6 / 1e2 = 1e4, so 1 wt% = 10_000 ppm and wt% = ppm / 1e4.
 # Unit check: ppm_mass / 1e4 = (mass fraction × 1e6) / 1e4
