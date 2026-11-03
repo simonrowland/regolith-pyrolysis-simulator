@@ -54,6 +54,40 @@ def _context_by_id(document: dict) -> dict[str, dict]:
     }
 
 
+def _observations_by_id(document: dict) -> dict[str, dict]:
+    return {
+        row["observation_id"]: row
+        for payload in document["species"].values()
+        for row in payload.get("observations", [])
+    }
+
+
+def _assert_cr_measurement_render_pins(document: dict) -> None:
+    rows = _observations_by_id(document)
+    expected = {
+        "seetharaman2013_table4_spinel_cr": ("0.03", 5, "IV", "Spinel"),
+        "seetharaman2013_table4_matrix_cr": ("0.00", 5, "IV", "Matrix"),
+        "seetharaman2013_prose_cr_loss_2h_oxygen": (
+            "0.27",
+            6,
+            None,
+            None,
+        ),
+    }
+    assert set(rows) == set(expected)
+    for observation_id, (printed, page, table, row) in expected.items():
+        observation = rows[observation_id]
+        assert observation["values"]["component_amount_as_published"] == printed
+        assert observation["values"]["value_units_as_published"] == "at.%"
+        assert observation["units"] == "at.%"
+        assert observation["locator"]["page"] == page
+        assert observation["locator"].get("table") == table
+        if row is not None:
+            assert observation["locator"]["row"] == row
+            assert observation["locator"]["column"] == "Cr"
+        assert observation["values"]["component_amount"] is None
+
+
 def _assert_table_rows_match_render(document: dict) -> None:
     rows = _context_by_id(document)
     table1 = rows["seetharaman2013_table1_reagent_purity"]["values"]["rows"]
@@ -100,6 +134,7 @@ def test_tables_match_independent_600_dpi_transcription_and_row_counts() -> None
 def test_independent_table_and_figure_pins_reject_mutations() -> None:
     document = _document()
     _assert_table_rows_match_render(document)
+    _assert_cr_measurement_render_pins(document)
     assert check_all_fidelity_samples_match(document, label=SID) == []
 
     changed_table = deepcopy(document)
@@ -110,6 +145,13 @@ def test_independent_table_and_figure_pins_reject_mutations() -> None:
     with pytest.raises(AssertionError):
         _assert_table_rows_match_render(changed_table)
     assert check_all_fidelity_samples_match(changed_table, label=f"{SID}-mutated")
+
+    changed_measurement = deepcopy(document)
+    changed_measurement["species"]["Cr"]["observations"][0]["values"][
+        "component_amount_as_published"
+    ] = "0.04"
+    with pytest.raises(AssertionError):
+        _assert_cr_measurement_render_pins(changed_measurement)
 
     changed_figure = deepcopy(document)
     figure2 = _context_by_id(changed_figure)["seetharaman2013_figure2_mass_loss"]
@@ -178,7 +220,7 @@ def test_figure_legends_conditions_and_undigitized_points_match_renders() -> Non
             assert values["total_pressure"] == "not stated"
 
 
-def test_extract_validates_and_real_isolated_migration_has_no_unknown_rows() -> None:
+def test_extract_validates_and_isolated_migration_refuses_atomic_percent() -> None:
     document = _document()
     assert validate_extract_document(
         document,
@@ -193,18 +235,72 @@ def test_extract_validates_and_real_isolated_migration_has_no_unknown_rows() -> 
     result = migrator.result
     assert not result.validation.hard_issues
     assert not result.registry_issues
-    assert result.observations == {}
-    assert len(result.queue) == 1
-    assert result.queue[0].observation_id == f"{SID}::typed_absence"
-    assert result.queue[0].axes == ["document"]
-    assert result.queue[0].why == "extract yielded no observations"
+    assert len(result.observations) == 3
+    _assert_cr_measurement_render_pins(document)
+    source_observations = _observations_by_id(document)
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in result.observations.values()
+    }
+    assert set(migrated) == set(source_observations)
+    expected_phase_roles = {
+        "seetharaman2013_table4_spinel_cr": "slag",
+        "seetharaman2013_table4_matrix_cr": "glass",
+        "seetharaman2013_prose_cr_loss_2h_oxygen": "slag",
+    }
+    for observation_id, row in migrated.items():
+        source = source_observations[observation_id]
+        assert row.identity.quantity.is_value
+        assert row.identity.quantity.value.value == "equilibrium_phase_composition"
+        assert row.identity.species.phase.is_value
+        assert row.identity.phase_role.is_value
+        assert (
+            row.identity.phase_role.value.value
+            == expected_phase_roles[observation_id]
+        )
+        assert row.value.kind.value == "unavailable"
+        assert "component_amount is null" in row.value.unavailable_reason
+        assert row.admission.status.value == "rejected"
+        assert row.admission.reason == source["values"]["reason"]
+        assert row.identity.temperature_K.is_value
+        assert str(row.identity.temperature_K.value) == "1873"
+        assert row.identity.composition.is_value
+        assert row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.fO2_Pa.is_unknown
+        assert row.point_conditions is not None
+        assert row.point_conditions["temperature_K"].state.is_value
+        assert (
+            row.point_conditions["temperature_K"].locator.page
+            == source["locator"]["page"]
+        )
+        assert row.point_conditions["atmosphere"].state.value == source["values"][
+            "atmosphere_as_published"
+        ]
+        assert row.point_conditions["atmosphere"].locator.page == source["locator"][
+            "page"
+        ]
+        assert row.point_conditions["composition"].locator.page == 3
+        assert row.point_conditions["composition"].locator.table == "II"
+        assert row.point_conditions["composition"].state.is_value
+        assert row.point_conditions["fO2_Pa"].state.is_unknown
+        assert row.point_conditions["total_pressure_Pa"].state.is_unknown
+
+    matrix = migrated["seetharaman2013_table4_matrix_cr"]
+    assert matrix.identity.species.phase.value.value == "glass"
+    matrix_source = source_observations["seetharaman2013_table4_matrix_cr"]["values"]
+    assert matrix_source["quench_preservation_status"] == "not_stated"
+    assert matrix_source["quench_statement_locator"]["page"] == 3
+
     context_ids = {
         row["observation_id"]
         for rows in result.context_by_work.values()
         for row in rows
     }
+    assert len(context_ids) == 19
     assert context_ids == set(_context_by_id(document))
-
-    # All measurable Cr at.% and Cr-specific loss rows are typed-refused context;
-    # no observation exists whose quantity or phase could be unknown or inferred.
-    assert not document["species"]["Cr"]["observations"]
+    assert all(
+        not row.identity.quantity.is_unknown for row in result.observations.values()
+    )
+    assert all(
+        row.identity.species.phase.is_value for row in result.observations.values()
+    )

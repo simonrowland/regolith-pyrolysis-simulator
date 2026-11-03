@@ -10,7 +10,7 @@ extraction:
   date: '2026-11-03'
   worker: Codex
   schema_gap: >-
-    Measured elemental Cr concentrations and full elemental analyses are printed in atomic percent. Their exact candidate quantity is simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series. data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml stores at.% Cr with basis mole_fraction, but its component_amount has already been divided by 100 and its unit is mole_fraction. Under the current percent rule, the printed number must remain unchanged with canonical units '%'. simulator/battery/migrate.py::_convert_compilation_amount passes component_amount through unchanged for this quantity; the percent_to_fraction selector in simulator/battery/migrate.py::select_declared_source does not include Quantity.EQUILIBRIUM_PHASE_COMPOSITION. The required migration to a mole fraction is therefore unavailable without changing simulator/battery/migrate.py, which this extraction may not touch. simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token. Table IV's Spinel row also lacks a role in simulator/battery/enums.py::PhaseRole and is rejected by simulator/battery/migrate.py::_phase_row_rejection. Do not store an unconverted value or hand-divide it; preserve these measurements as typed-refused context and report migrator-change-needed. Cr-specific loss and relative mass-loss-rate forms have no exact quantity token: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE describe total-sample mass loss, simulator/battery/enums.py::Quantity.YIELD_FRACTION is not Cr loss, and simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO compares phase contents. The same Table IV WDS result is reproduced in Albertsson (2013), Table 20, and is not independent replication.
+    Measured elemental Cr concentrations are printed in atomic percent. The exact candidate quantity is simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series. The controller ruled that these at.% values stay exactly as printed, with units at.%, and remain typed-refused until the migrator can scale this quantity. simulator/battery/migrate.py::_convert_compilation_amount passes component_amount through unchanged for this quantity; the percent_to_fraction selector in simulator/battery/migrate.py::select_declared_source does not include Quantity.EQUILIBRIUM_PHASE_COMPOSITION. Therefore each row retains the printed number in component_amount_as_published, sets component_amount to null, and gives a refusal reason; no divided value or converted twin is stored. simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token. Table IV's Spinel label is retained separately from the supported slag phase role. Cr-specific loss and relative mass-loss-rate forms have no exact quantity token: simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION and simulator/battery/enums.py::Quantity.MASS_LOSS_RATE describe total-sample mass loss, simulator/battery/enums.py::Quantity.YIELD_FRACTION is not Cr loss, and simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO compares phase contents. The same Table IV WDS result is reproduced in Albertsson (2013), Table 20, and is not independent replication.
 review_status: draft
 fidelity_samples:
   - path: species.Cr.context[seetharaman2013_table2_initial_slag_composition].values.rows[0].mass_percent[0]
@@ -35,7 +35,173 @@ fidelity_samples:
       figure: '2'
 species:
   Cr:
-    observations: []
+    observations:
+      - observation_id: seetharaman2013_table4_spinel_cr
+        type: concentration_series
+        locator:
+          page: 5
+          table: IV
+          row: Spinel
+          column: Cr
+        phase: condensed_solid
+        units: at.%
+        note: The analyzed phase is printed as Spinel; slag is its parent phase role.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          measured_phase_as_published: Spinel
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.03'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            The source prints 0.03 at.% Cr. The current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.03 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: oxygen
+          sample_thickness: not stated for this treatment
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 5, table: IV, row: treatment conditions}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: oxygen}
+            locator: {page: 5, table: IV}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+
+      - observation_id: seetharaman2013_table4_matrix_cr
+        type: concentration_series
+        locator:
+          page: 5
+          table: IV
+          row: Matrix
+          column: Cr
+        phase: glass
+        units: at.%
+        note: The adjacent prose identifies the Matrix as a glassy phase.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: glass
+          measured_phase_as_published: Matrix (glassy phase)
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.00'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            The source prints 0.00 at.% Cr. The current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.00 mole fraction.
+          T_K: '1873'
+          treatment_duration_h: '24'
+          atmosphere_as_published: oxygen
+          sample_thickness: not stated for this treatment
+          quench_preservation_status: not_stated
+          quench_statement_as_printed: The samples were cooled at the rate of 40 K/min after the experiment and then subjected to SEM/WDS analysis.
+          quench_statement_locator: {page: 3, section: Experimental}
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 5, table: IV, row: treatment conditions}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: oxygen}
+            locator: {page: 5, table: IV}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 5, table: IV}
+
+      - observation_id: seetharaman2013_prose_cr_loss_2h_oxygen
+        type: concentration_series
+        locator:
+          page: 6
+          section: Discussion
+        phase: condensed_solid
+        units: at.%
+        note: The post-experiment WDS result is an average for the slag film, not a phase-specific value.
+        values:
+          quantity: equilibrium_phase_composition
+          formula: Cr
+          phase_label: slag
+          basis: mole_fraction
+          component_amount: null
+          component_amount_as_published: '0.27'
+          value_units_as_published: at.%
+          method_class: measured_direct
+          admission_status: typed_refusal
+          reason: >-
+            The source prints 0.27 at.% Cr after the 2 h treatment. The current migrator cannot scale at.% for this quantity, so the migrated value remains unavailable and must not be read as 0.27 mole fraction.
+          initial_Cr_content_as_published: '2'
+          initial_Cr_content_units_as_published: at.%
+          T_K: '1873'
+          treatment_duration_h: '2'
+          atmosphere_as_published: pure oxygen
+          sample_thickness: not stated for this prose result
+          pO2_as_printed: not stated numerically
+          total_pressure: not stated
+          statement_as_published: Cr content drops from 2 at. pct to 0.27 at. pct in 2 hours at 1873 K in pure oxygen.
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1873'}
+            locator: {page: 6, section: Discussion}
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mass_percent
+                amount_basis: mass_percent
+                components:
+                  - [Al2O3, '45.0']
+                  - [CaO, '20.0']
+                  - [SiO2, '20.0']
+                  - [MgO, '8.0']
+                  - [Cr2O3, '7.0']
+            locator: {page: 3, table: II}
+          atmosphere:
+            state: {tag: value, value: pure oxygen}
+            locator: {page: 6, section: Discussion}
+          fO2_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, section: Discussion}
+          total_pressure_Pa:
+            state: {tag: unknown, reason: not_published}
+            locator: {page: 6, section: Discussion}
     context:
       - observation_id: seetharaman2013_table1_reagent_purity
         type: table_context
@@ -197,7 +363,7 @@ species:
         locator:
           page: 4
           section: Results
-        units: '%'
+        units: at.% Cr; mm3 for volumes
         printed_units_as_published: atomic percent for Cr; mm3 for volumes
         values:
           quantity: Cr_dissolved_in_alumina_ring_and_approximate_mass_balance
@@ -213,14 +379,14 @@ species:
           oxygen_partial_pressure: not stated numerically
           total_pressure: not stated
           schema_gap: >-
-            Cr dissolved in the alumina ring is reported as atomic percent. simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION is mass-based and has no ring phase role; simulator/battery/enums.py::PHASE_BASIS_TOKENS has no atomic_percent basis. The candidate equilibrium_phase_composition form would still need the unavailable percent_to_fraction migration described in extraction.schema_gap.
+            The reported maximum dissolved ring Cr is atomic percent but is not assigned to one experiment. simulator/battery/enums.py::Quantity.RESIDUE_COMPONENT_COMPOSITION is mass-based and simulator/battery/enums.py::PHASE_BASIS_TOKENS has no atomic_percent basis; retain it as context with the printed unit and do not divide it.
 
       - observation_id: seetharaman2013_table4_wds_phase_compositions
         type: table_context
         locator:
           page: 5
           table: IV
-        units: '%'
+        units: at.%
         printed_units_as_published: atomic percent
         values:
           quantity: WDS_elemental_phase_composition_at_percent
@@ -240,8 +406,8 @@ species:
               values: ['66.59', '3.07', '17.84', '8.03', '4.47', '0.00']
           detection_note: Separately, the discussion says the result after 6 h in oxygen was near WDS noise; no detection limit is given, and that statement is not assigned to the 24 h Table IV cells.
           schema_gap: >-
-            The Matrix row is an exact glass-phase elemental-composition candidate under simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION with basis mole_fraction, but the required printed-percent migration for component_amount is unavailable; see extraction.schema_gap. The Spinel row additionally has no matching simulator/battery/enums.py::PhaseRole and is refused by simulator/battery/migrate.py::_phase_row_rejection. Both rows remain typed-refused context. The same two rows appear in Albertsson (2013), Table 20; that is overlapping data from the same study, not an independent replication.
-          disposition: Measured post-treatment elemental compositions retained as typed-refused context; no percent values are divided by 100.
+            The Cr cells have the exact elemental-composition candidate under simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION, but the migrator cannot scale the printed at.% value for component_amount. Their structured rows retain each printed number and unit with component_amount null and a typed refusal. The Spinel sample phase label is preserved while the supported slag phase role identifies its host. The same two rows appear in Albertsson (2013), Table 20; that is overlapping data from the same study, not an independent replication.
+          disposition: All twelve elemental cells are retained in table context; the Cr cells also have structured typed-refused records, with no values divided by 100.
 
       - observation_id: seetharaman2013_figure2_mass_loss
         type: figure_record
@@ -415,29 +581,6 @@ species:
           mass_loss_normalisation_as_printed: σ (dimensionless weight loss)
           PtOx_mass_loss_compensation: applied
           note: This is whole-sample weight loss, not element-specific Cr volatilization.
-
-      - observation_id: seetharaman2013_prose_cr_loss_2h_oxygen
-        type: measured_context
-        locator:
-          page: 6
-          section: Discussion
-        units: '%'
-        printed_units_as_published: atomic percent
-        values:
-          quantity: chromium_content_at_percent_after_oxidative_soak
-          method_class: measured_direct
-          method: WDS analysis of post-experiment sample films
-          initial_Cr_content_at_percent: '2'
-          remaining_Cr_content_at_percent: '0.27'
-          treatment_temperature_K: '1873'
-          treatment_duration_h: '2'
-          atmosphere_as_published: pure oxygen
-          sample_thickness: not stated for this prose result
-          pO2_as_printed: not stated numerically
-          total_pressure: not stated
-          statement_as_published: Cr content drops from 2 at. pct to 0.27 at. pct in 2 hours at 1873 K in pure oxygen.
-          schema_gap: >-
-            The Cr component amount is printed in atomic percent. Its exact candidate is simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION with basis mole_fraction, but current migration cannot convert the required canonical units '%' for component_amount. Do not store the unchanged percent as a mole fraction or hand-divide it; see extraction.schema_gap.
 
       - observation_id: seetharaman2013_prose_cr_loss_temperature_summary
         type: measured_context

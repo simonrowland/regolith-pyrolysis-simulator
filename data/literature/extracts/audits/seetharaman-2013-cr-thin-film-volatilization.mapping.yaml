@@ -39,11 +39,15 @@ table_audit:
     caption: WDS analysis after 24 h at 1873 K in oxygen, atomic percent
     printed_body_rows: 2
     stored_body_rows: 2
-    disposition: Measured elemental phase compositions retained as typed-refused context because at.% component amounts cannot be migrated from canonical percent units; the Spinel row also has no supported phase role.
+    disposition: All printed cells retained in the table transcription. The two Cr cells also have structured typed-refused observations with at.% unchanged and component_amount unavailable.
     machine_reads: MinerU and pdftotext agree on all twelve elemental cells.
     qa: Digit agreement 1.000.
     render_check: 600 dpi render confirms the Spinel and Matrix row assignments and the O, Mg, Al, Si, Ca, Cr column order.
     overlap: The exact WDS rows also appear in Albertsson (2013), Table 20; this is the same study, not independent replication.
+draft_comparison:
+  result_rows: 0
+  disposition: >-
+    The compare tool emits no point comparisons because all three structured at.% Cr observations have component_amount null under the controller's typed-refusal ruling. All printed Table I-IV cells remain in the extract context and are covered by the cell audit and independent table pins.
 figure_audit:
   - figure: '1'
     page: 2
@@ -88,10 +92,9 @@ condition_audit:
   - Table IV's Matrix is described as a glassy phase. The table itself labels the row Matrix; the adjacent prose provides the glass identification.
   - A prose sentence says the argon rate for the “0.5 m” sample exceeds the air rate for a 1 mm sample while referring to Figure 2. Rendered Figure 2 labels 0.5 mm O2, 1.0 mm Air, and 0.5 mm Air. Preserve both sources and do not resolve the mismatch.
 schema_audit:
-  - Candidate at.% quantity: simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION is exact for a measured elemental component amount; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series. data/literature/extracts/khedim-2008-chromia-solubility-thesis.yaml uses this path for at.% Cr but hand-divides the printed percentage before storage, which the current percent rule forbids.
-  - BLOCKED: migrator-change-needed. simulator/battery/migrate.py::select_declared_source applies percent_to_fraction only to mass-loss, yield, oxygen-yield, and valence-ratio quantities; simulator/battery/migrate.py::_convert_compilation_amount returns a component_amount unchanged for equilibrium_phase_composition. With canonical units '%', this would migrate 0.27 at.% as 0.27 mole fraction rather than 0.0027. Adding the conversion would require a forbidden migrator edit, so no observation is emitted.
-  - simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token; simulator/battery/migrate.py::_phase_row_rejection enforces those closed bases and roles.
-  - Crystalline spinel is not a phase role in simulator/battery/enums.py::PhaseRole; simulator/battery/migrate.py::_phase_row_rejection uses the closed roles melt, slag, glass, metal, and matte.
+  - Candidate at.% quantity: simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION is exact for a measured elemental component amount; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series.
+  - Controller ruling: retain each Cr number exactly as printed with units at.%, and make the migration unavailable with component_amount null and admission_status typed_refusal plus a reason. simulator/battery/migrate.py::_convert_compilation_amount passes component_amount unchanged for equilibrium_phase_composition, and simulator/battery/migrate.py::select_declared_source does not apply percent_to_fraction to this quantity; sending the raw number as component_amount would therefore migrate 0.27 at.% as a 0.27 mole fraction. No division or converted twin is stored.
+  - simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token. The printed phase name Spinel is retained separately; phase_label slag represents its host slag role, while Matrix is identified as glass from adjacent prose.
   - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION is whole-sample mass loss, simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is absolute mass/time, simulator/battery/enums.py::Quantity.YIELD_FRACTION is a yield fraction, and simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO is a phase ratio; none means Cr-specific loss or a ratio of mass-loss rates.
   - Existing overlapping at.% source: data/literature/extracts/albertsson-2013-cr-slag-thesis.yaml, context row albertsson2013_table20_wds_phase_compositions.
 evidence_audit:
@@ -103,8 +106,10 @@ evidence_audit:
   - The 0.27 at.% post-treatment result is an explicit textual WDS result. No Cr-loss percentage was calculated from the initial and remaining concentrations.
   - Related Cr-specific volatilization precedent: Khedim and Abdelouhab (2011) retains a calculated Cr2O3 loss in context because its supporting measured inputs cannot be stored; it does not supply an exact quantity token for this paper's at.% Cr result.
 migration_expectation:
-  scored_observations: 0
+  scored_observations: 3
   hard_issues: 0
-  unavailable_values: 0
-  typed_absence_queue: >-
-    One document-level typed_absence queue item is expected: the extract preserves all evidence as context or figure_record because Cr at.% and Cr-specific loss have no exact supported quantity and figure-only points remain undigitized.
+  unavailable_values: 3
+  typed_refusal_admissions: 3
+  context_records: 19
+  identity_axes: >-
+    All three Cr observations bind temperature and the Table II starting composition. Total pressure and numeric fO2 are unknown because the source prints neither; the oxygen atmosphere label is retained as printed.
