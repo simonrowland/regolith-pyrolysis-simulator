@@ -791,6 +791,356 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+class _HeadspaceSeriesReplay:
+    """Replay one hour's headspace probes through the shared series law.
+
+    Premise: at fixed temperature, composition, alpha, area, and pipe
+    geometry, each species flux is
+    J = max(0, P_eq - P_bulk) / (R_interface + R_gas(P_overhead)).
+    R_interface does not depend on the probe partials. R_gas depends on
+    overhead total pressure through D_AB and the Knudsen switch. Calling
+    ``_series_resistance_evaporation_flux_kg_m2_s`` at the probe partials
+    and overhead pressure repeats that evaluation without rebuilding the
+    control map or the diagnostic. The solver's first two bracket probes
+    are compared with exact float equality before the shortcut is used.
+    The winning probe is re-evaluated through the full provider so its
+    diagnostic is the one the hour records.
+
+    Unit check: J is kg/(m^2 s); J * area_m2 * 3600 is kg/h, the same
+    product the provider stores. Limiting case: equality failure, melt
+    resistance on, or Kn at or above the viscous maximum falls back to
+    the full provider. A zero pipe diameter, zero area, or a frozen melt
+    is an empty rate map on both paths.
+    """
+
+    __slots__ = (
+        '_host',
+        '_rows',
+        '_series',
+        '_knudsen',
+        '_viscous_max',
+        '_nontrivial',
+        '_config_error',
+        '_area',
+        '_factor',
+        '_frozen',
+        '_t_k',
+        '_pipe_m',
+        '_axial',
+        '_radial',
+        '_cold_skull',
+        '_carrier',
+        '_t_gas_k',
+        '_renewal',
+        '_renewal_source',
+        '_gas_on',
+        '_fe_molar',
+    )
+
+    def __init__(self, host: Any, **kwargs: Any) -> None:
+        self._host = host
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    @classmethod
+    def try_build(
+        cls,
+        host: Any,
+        *,
+        equilibrium: Any,
+        gate_authority: Any,
+        vapor_pressures: Mapping[str, float],
+    ) -> '_HeadspaceSeriesReplay | None':
+        from engines.builtin.evaporation_flux import (
+            DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+            DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+            EvaporationFluxConfigurationError,
+            _DEFAULT_EVAPORATION_ALPHA,
+            _NONTRIVIAL_FLUX_KG_HR,
+            _alpha_is_unmeasured,
+            _coerce_alpha_by_species,
+            _evaluate_alpha_control,
+            _finite_float,
+            _series_resistance_evaporation_flux_kg_m2_s,
+            _unmeasured_alpha_fallback_permitted,
+        )
+        from simulator.condensation import _knudsen_number
+        from simulator.config_flags import bool_feature_flag
+        from simulator.transport_constants import VISCOUS_KNUDSEN_MAX
+
+        diagnostic = (
+            getattr(host, '_last_evaporation_flux_diagnostic', None) or {}
+        )
+        reported_t = diagnostic.get('temperature_C')
+        temperature_c = (
+            float(host.melt.temperature_C)
+            if reported_t is None
+            else float(reported_t)
+        )
+        t_k = temperature_c + 273.15
+        controls, molar_masses = host._evaporation_flux_control_inputs(
+            equilibrium,
+            overhead_partials_Pa={},
+            vapour_batch_flux_pressures_Pa=vapor_pressures,
+        )
+        series_config = controls.get('evaporation_series_resistance') or {}
+        if not isinstance(series_config, Mapping):
+            series_config = {}
+        melt_on = bool(
+            series_config.get(
+                'melt_resistance_enabled',
+                controls.get('melt_resistance_enabled', False),
+            )
+        )
+        if melt_on:
+            return None
+        try:
+            area = float(controls.get('melt_surface_area_m2', 0.0))
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(area) or area < 0.0:
+            return None
+        stir = controls.get('stir_factor', 0.0)
+        if isinstance(stir, Mapping):
+            axial = stir.get('axial', 0.0)
+            radial = stir.get('radial', 1.0)
+        else:
+            axial = stir
+            radial = 1.0
+        gas_on = bool_feature_flag(
+            series_config,
+            'gas_resistance_enabled',
+            bool_feature_flag(controls, 'gas_resistance_enabled', True),
+        )
+        hkl = frozenset(
+            str(species)
+            for species in (
+                controls.get('hkl_upper_bound_transport_species', ()) or ()
+            )
+        )
+        alpha_by_species = _coerce_alpha_by_species(controls.get('alpha'))
+        allow_fallback = bool(
+            controls.get('allow_unmeasured_alpha_fallback', False)
+        )
+        fallback_raw = controls.get('unmeasured_alpha_fallback_species')
+        if fallback_raw is None:
+            allowlist = None
+        elif isinstance(fallback_raw, (str, bytes)):
+            allowlist = {str(fallback_raw)}
+        else:
+            allowlist = {str(species) for species in fallback_raw}
+        stoich_by_species = controls.get('stoich_by_species') or {}
+        available_oxide = controls.get('available_oxide_kg') or {}
+        rows = []
+        for species, raw_pressure in vapor_pressures.items():
+            p_eq = float(raw_pressure)
+            if p_eq <= 0.0:
+                continue
+            molar = molar_masses.get(species)
+            if molar is None or molar <= 0.0:
+                grams = MOLAR_MASS.get(species)
+                if grams is None or grams <= 0.0:
+                    continue
+                molar = grams / 1000.0
+            stoich = stoich_by_species.get(species) or {}
+            if float(stoich.get('oxide_per_product_kg') or 0.0) <= 0.0:
+                continue
+            uses_gas = gas_on and species not in hkl
+            unmeasured = _alpha_is_unmeasured(species, alpha_by_species)
+            permitted = _unmeasured_alpha_fallback_permitted(
+                species,
+                allow_unmeasured_alpha_fallback=allow_fallback,
+                unmeasured_alpha_fallback_species_allowlist=allowlist,
+            )
+            alpha_spec = alpha_by_species.get(
+                species,
+                alpha_by_species.get('*', _DEFAULT_EVAPORATION_ALPHA),
+            )
+            alpha, _evaluation = _evaluate_alpha_control(
+                species, t_k, alpha_spec,
+            )
+            if alpha <= 0.0:
+                continue
+            available = float(available_oxide.get(species, 0.0) or 0.0)
+            rows.append((
+                species,
+                p_eq,
+                float(molar),
+                float(alpha),
+                uses_gas,
+                bool(unmeasured and not permitted),
+                available,
+            ))
+        renewal_raw = series_config.get(
+            'melt_surface_renewal_base_kg_s_m2_pa',
+            controls.get('melt_surface_renewal_base_kg_s_m2_pa'),
+        )
+        if renewal_raw is None:
+            renewal = DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA
+        else:
+            renewal = _finite_float(renewal_raw, math.nan)
+        renewal_source = str(
+            series_config.get(
+                'melt_surface_renewal_source',
+                controls.get(
+                    'melt_surface_renewal_source',
+                    DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
+                ),
+            )
+        )
+        factor = 1.0
+        frozen = False
+        if host._freeze_gate_enabled():
+            cached = getattr(host, '_last_freeze_gate_diagnostic', None) or {}
+            if 'liquid_fraction' in cached:
+                factor = float(cached['liquid_fraction'])
+            elif gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
+                factor = host._freeze_gate_liquid_fraction_factor()
+            else:
+                factor = host._freeze_gate_liquid_fraction_factor(
+                    gate_authority=gate_authority,
+                )
+            frozen = (
+                melt_regime(liquid_fraction=factor) == MeltRegime.FROZEN
+            )
+        return cls(
+            host,
+            _rows=tuple(rows),
+            _series=_series_resistance_evaporation_flux_kg_m2_s,
+            _knudsen=_knudsen_number,
+            _viscous_max=VISCOUS_KNUDSEN_MAX,
+            _nontrivial=_NONTRIVIAL_FLUX_KG_HR,
+            _config_error=EvaporationFluxConfigurationError,
+            _area=area,
+            _factor=float(factor),
+            _frozen=frozen,
+            _t_k=t_k,
+            _pipe_m=_finite_float(controls.get('pipe_diameter_m'), 0.12),
+            _axial=axial,
+            _radial=radial,
+            _cold_skull=controls.get('cold_skull_envelope'),
+            _carrier=str(controls.get('carrier_gas') or 'N2'),
+            _t_gas_k=_finite_float(controls.get('gas_temperature_K'), t_k),
+            _renewal=renewal,
+            _renewal_source=renewal_source,
+            _gas_on=gas_on,
+            _fe_molar=float(molar_masses.get('Fe', 0.0) or 0.0),
+        )
+
+    def species_kg_hr(
+        self,
+        source_partials: Mapping[str, float],
+        total_pressure_Pa: float,
+        *,
+        capacity_set: bool,
+    ) -> dict[str, float] | None:
+        if self._frozen or self._area == 0.0 or self._pipe_m <= 0.0:
+            return {}
+        if capacity_set:
+            overhead_pa = max(0.0, float(total_pressure_Pa))
+        else:
+            overhead_pa = self._host._evaporation_overhead_total_pressure_Pa(
+                source_partials
+            )
+        knudsen = None
+        if self._gas_on and overhead_pa > 0.0:
+            knudsen = self._knudsen(
+                overhead_pa,
+                max(self._t_gas_k, 1.0),
+                self._pipe_m,
+                carrier_gas=self._carrier,
+            )
+            if not knudsen < self._viscous_max:
+                return None
+        residual = getattr(
+            self._host,
+            '_native_fe_vapor_residual_capacity_mol_this_hr',
+            None,
+        )
+        fe_cap = None
+        if residual is not None:
+            fe_cap = max(0.0, float(residual)) * self._fe_molar
+        series = self._series
+        area = self._area
+        factor = self._factor
+        config_error = self._config_error
+        rates: dict[str, float] = {}
+        for (
+            species,
+            p_eq,
+            molar,
+            alpha,
+            uses_gas,
+            gate_unmeasured,
+            available,
+        ) in self._rows:
+            if uses_gas:
+                raw_bulk = source_partials.get(species, 0.0)
+                try:
+                    p_bulk = max(0.0, float(raw_bulk))
+                except (TypeError, ValueError):
+                    return None
+            else:
+                p_bulk = 0.0
+            if p_eq <= p_bulk:
+                continue
+            if gate_unmeasured:
+                baseline = series(
+                    species=species,
+                    P_eq_pa=p_eq,
+                    P_bulk_pa=p_bulk,
+                    T_surface_K=self._t_k,
+                    molar_mass_kg_mol=molar,
+                    alpha_i=1.0,
+                    knudsen_number=math.inf,
+                    pipe_diameter_m=self._pipe_m,
+                    overhead_pressure_pa=overhead_pa,
+                    axial_stir_factor=self._axial,
+                    radial_stir_factor=self._radial,
+                    cold_skull_envelope=self._cold_skull,
+                    carrier_gas=self._carrier,
+                    T_gas_K=self._t_gas_k,
+                    gas_resistance_enabled=False,
+                    melt_resistance_enabled=False,
+                )
+                baseline_rate = (baseline.flux_kg_s_m2 * area) * 3600.0
+                if available > 1.0e-12 and baseline_rate > self._nontrivial:
+                    continue
+            try:
+                solved = series(
+                    species=species,
+                    P_eq_pa=p_eq,
+                    P_bulk_pa=p_bulk,
+                    T_surface_K=self._t_k,
+                    molar_mass_kg_mol=molar,
+                    alpha_i=alpha,
+                    knudsen_number=knudsen,
+                    pipe_diameter_m=self._pipe_m,
+                    overhead_pressure_pa=overhead_pa,
+                    axial_stir_factor=self._axial,
+                    radial_stir_factor=self._radial,
+                    cold_skull_envelope=self._cold_skull,
+                    carrier_gas=self._carrier,
+                    T_gas_K=self._t_gas_k,
+                    melt_resistance_enabled=False,
+                    gas_resistance_enabled=uses_gas,
+                    extrapolate_continuum=False,
+                    melt_surface_renewal_base_kg_s_m2_pa=self._renewal,
+                    melt_surface_renewal_source=self._renewal_source,
+                )
+            except config_error:
+                continue
+            rate = (solved.flux_kg_s_m2 * area) * 3600.0
+            if rate <= 0.0:
+                continue
+            gated = float(rate) * factor
+            if species == 'Fe' and fe_cap is not None:
+                gated = min(gated, fe_cap)
+            if gated > 0.0:
+                rates[species] = gated
+        return rates
+
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -920,6 +1270,9 @@ class EvaporationMixin:
         participants: dict[str, float] = {}
         current_effective_capacity = None
         probe_diagnostics: dict[int, dict[str, Any]] = {}
+        # idle -> pending after one exact rate match, then armed. off is
+        # the hour's typed fallback to the full provider.
+        replay_box: dict[str, Any] = {'phase': 'idle'}
 
         def project_inventory_limited_flux(
             raw_flux: EvaporationFlux,
@@ -934,6 +1287,9 @@ class EvaporationMixin:
         def evaluate_flux(
             partials_Pa: Mapping[str, float],
             total_pressure_Pa: float,
+            *,
+            force_real: bool = False,
+            record_host_notes: bool = True,
         ) -> EvaporationFlux:
             source_partials_Pa = dict(base_partials_Pa)
             for species in eligible_participants:
@@ -942,6 +1298,32 @@ class EvaporationMixin:
                 source_partials_Pa[species] = max(
                     0.0, float(partials_Pa.get(species, 0.0))
                 )
+            capacity_set = current_effective_capacity is not None
+            replay = replay_box.get('replay')
+            if (
+                not force_real
+                and replay_box['phase'] == 'armed'
+                and replay is not None
+                and replay_box.get('capacity_set') == capacity_set
+                and participants
+            ):
+                try:
+                    predicted = replay.species_kg_hr(
+                        source_partials_Pa,
+                        total_pressure_Pa,
+                        capacity_set=capacity_set,
+                    )
+                except Exception:
+                    predicted = None
+                if predicted is not None:
+                    self._partial_channel_refusal_notes(
+                        flux_overlay_report,
+                        vapor_pressures,
+                        record=True,
+                    )
+                    replayed = EvaporationFlux(species_kg_hr=predicted)
+                    replayed.update_totals()
+                    return replayed
             flux = self._calculate_evaporation(
                 equilibrium,
                 gate_authority=gate_authority,
@@ -949,14 +1331,67 @@ class EvaporationMixin:
                 overhead_partials_override_Pa=source_partials_Pa,
                 overhead_pressure_override_Pa=(
                     total_pressure_Pa
-                    if current_effective_capacity is not None
+                    if capacity_set
                     else None
                 ),
                 _resolved_batch_flux_state=resolved_batch_flux_state,
+                _record_host_partial_channel_notes=record_host_notes,
             )
             probe_diagnostics[id(flux)] = dict(
                 getattr(self, '_last_evaporation_flux_diagnostic', {}) or {}
             )
+            if (
+                force_real
+                or not participants
+                or replay_box['phase'] in ('off', 'armed')
+            ):
+                return flux
+            if replay_box.get('capacity_set') not in (None, capacity_set):
+                replay_box['phase'] = 'idle'
+                replay_box['replay'] = None
+            if replay_box['phase'] == 'idle':
+                try:
+                    built = _HeadspaceSeriesReplay.try_build(
+                        self,
+                        equilibrium=equilibrium,
+                        gate_authority=gate_authority,
+                        vapor_pressures=vapor_pressures,
+                    )
+                    predicted = (
+                        None
+                        if built is None
+                        else built.species_kg_hr(
+                            source_partials_Pa,
+                            total_pressure_Pa,
+                            capacity_set=capacity_set,
+                        )
+                    )
+                except Exception:
+                    built = None
+                    predicted = None
+                if (
+                    built is None
+                    or predicted is None
+                    or predicted != flux.species_kg_hr
+                ):
+                    replay_box['phase'] = 'off'
+                    return flux
+                replay_box['phase'] = 'pending'
+                replay_box['replay'] = built
+                replay_box['capacity_set'] = capacity_set
+                return flux
+            try:
+                predicted = replay_box['replay'].species_kg_hr(
+                    source_partials_Pa,
+                    total_pressure_Pa,
+                    capacity_set=capacity_set,
+                )
+            except Exception:
+                predicted = None
+            if predicted is None or predicted != flux.species_kg_hr:
+                replay_box['phase'] = 'off'
+                return flux
+            replay_box['phase'] = 'armed'
             return flux
 
         def select_probe_diagnostic(flux: EvaporationFlux) -> None:
@@ -1236,6 +1671,18 @@ class EvaporationMixin:
                 break
 
         assert solved is not None
+        if id(solved.flux) not in probe_diagnostics:
+            from dataclasses import replace
+
+            solved = replace(
+                solved,
+                flux=evaluate_flux(
+                    solved.partials_Pa,
+                    solved.total_pressure_Pa,
+                    force_real=True,
+                    record_host_notes=False,
+                ),
+            )
         select_probe_diagnostic(solved.flux)
         selected_flux = EvaporationFlux() if source_below_threshold else solved.flux
         self._solved_headspace_partials_Pa_this_tick = dict(solved.partials_Pa)
@@ -1363,6 +1810,65 @@ class EvaporationMixin:
             effective_pressure_source,
         )
 
+    def _partial_channel_refusal_notes(
+        self,
+        flux_overlay_report: Mapping[str, Any],
+        vapor_pressures: Mapping[str, float],
+        *,
+        record: bool,
+    ) -> list:
+        """Record peer-channel refusals that the flux map drops.
+
+        The headspace replay calls this once per probe so the host note
+        count matches a full provider probe. The winning probe's diagnostic
+        still receives the same notes through ``_calculate_evaporation``.
+        """
+
+        channel_states = dict(
+            flux_overlay_report.get('batch_channel_states', {}) or {}
+        )
+        notes: list = []
+        if not channel_states:
+            return notes
+        from simulator.silent_zero import (
+            CATEGORY_REFUSE,
+            ZeroBecause,
+            note_dict,
+            record_on_host,
+        )
+
+        detail = (
+            'channel state=refusal while peer channels still '
+            'debit; species omitted from flux (silent zero residual '
+            'of b-126 F3). Counted as category-1 missing input; '
+            'hard raise deferred pending blast-radius rebaseline.'
+        )
+        for species, state in sorted(channel_states.items()):
+            if str(state) != 'refusal':
+                continue
+            if species in vapor_pressures:
+                continue
+            note = note_dict(
+                ZeroBecause.REFUSED_UPSTREAM,
+                site='evaporation.partial_channel_refusal',
+                species=str(species),
+                field='batch_channel_state',
+                detail=detail,
+                doctrine_category=CATEGORY_REFUSE,
+            )
+            notes.append(note)
+            if record:
+                record_on_host(
+                    self,
+                    ZeroBecause.REFUSED_UPSTREAM,
+                    site='evaporation.partial_channel_refusal',
+                    species=str(species),
+                    field='batch_channel_state',
+                    detail=note['detail'],
+                    doctrine_category=CATEGORY_REFUSE,
+                )
+        return notes
+
     def _calculate_evaporation(
         self,
         equilibrium,
@@ -1372,6 +1878,7 @@ class EvaporationMixin:
         overhead_pressure_override_Pa: float | None = None,
         solve_headspace_feedback: bool = False,
         record_degraded_path_engagement: bool = True,
+        _record_host_partial_channel_notes: bool = True,
         _resolved_batch_flux_state: tuple[
             dict[str, float],
             dict[str, Any],
@@ -1735,46 +2242,11 @@ class EvaporationMixin:
         # vapor_pressures and surface as flux 0 with no raise (all-non-debit
         # already refuses above). Record each refused species so incomplete
         # extraction is visible while the catalog can still subtract.
-        _channel_states_partial = dict(
-            flux_overlay_report.get('batch_channel_states', {}) or {}
+        _partial_sz_notes = self._partial_channel_refusal_notes(
+            flux_overlay_report,
+            vapor_pressures,
+            record=_record_host_partial_channel_notes,
         )
-        _partial_sz_notes: list = []
-        if _channel_states_partial:
-            from simulator.silent_zero import (
-                CATEGORY_REFUSE,
-                ZeroBecause,
-                note_dict,
-                record_on_host,
-            )
-
-            for _sp, _state in sorted(_channel_states_partial.items()):
-                if str(_state) != 'refusal':
-                    continue
-                if _sp in vapor_pressures:
-                    continue
-                _n = note_dict(
-                    ZeroBecause.REFUSED_UPSTREAM,
-                    site='evaporation.partial_channel_refusal',
-                    species=str(_sp),
-                    field='batch_channel_state',
-                    detail=(
-                        f'channel state=refusal while peer channels still '
-                        f'debit; species omitted from flux (silent zero residual '
-                        f'of b-126 F3). Counted as category-1 missing input; '
-                        f'hard raise deferred pending blast-radius rebaseline.'
-                    ),
-                    doctrine_category=CATEGORY_REFUSE,
-                )
-                _partial_sz_notes.append(_n)
-                record_on_host(
-                    self,
-                    ZeroBecause.REFUSED_UPSTREAM,
-                    site='evaporation.partial_channel_refusal',
-                    species=str(_sp),
-                    field='batch_channel_state',
-                    detail=_n['detail'],
-                    doctrine_category=CATEGORY_REFUSE,
-                )
         self._last_partial_melt_offgassing_diagnostic = (
             self._build_partial_melt_offgassing_diagnostic(
                 equilibrium,
