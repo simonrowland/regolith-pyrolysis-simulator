@@ -1,0 +1,4177 @@
+schema_version: literature_extract.v1
+source_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+source:
+  citation: Dai, W., Seetharaman, S. & Staffansson, L.-I. (1984). A thermodynamic
+    study of the system Fe-Na-O. Scandinavian Journal of Metallurgy 13(1), 32-38.
+  year: 1984
+  corpus_asset: raw/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.pdf
+extraction:
+  method: MinerU tables and markdown plus independent Tesseract OCR; table layouts
+    checked against rendered pages, with rendered cells used to resolve OCR disagreements
+    and source inconsistencies.
+  date: '2026-11-03'
+  worker: w1103cw4-ds84
+  provenance_path: text/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry/tesseract-layout.txt
+  source_note: The scanned PDF has no text layer. Figure-only EMF points and phase-diagram
+    reads were not digitized. All printed table values are retained; render-confirmed
+    disagreements between equations and tables are recorded in the audit.
+review_status: draft
+fidelity_samples:
+- path: species.Na2O.observations[dai_1984_table1_r3_na2o].values.equation_as_printed
+  value: -559460 + 264.14T
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 34
+    table: I
+    row: '3'
+- path: species.Na2FeO2.observations[dai_1984_table2_na2feo2_heat_evolution_2].values.value
+  value: '345600'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 35
+    table: II
+    row: '8'
+- path: species.Na2Fe2O4.observations[dai_1984_table3_na2fe2o4_gibbs_from_oxides].values.table_cell_as_printed
+  value: -86000 - 61.89T
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 36
+    table: III
+    row: '1'
+- path: species.Na2Fe2O4.observations[dai_1984_table3_na2fe2o4_gibbs_from_oxides].values.equation_16_as_printed
+  value: -86002 - 61.89T
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 35
+    equation: '16'
+- path: species.Na4FeO3.observations[dai_1984_table3_na4feo3_gibbs_from_oxides].values.table_cell_as_printed
+  value: -147988 + 164.80T
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 36
+    table: III
+    row: '3'
+- path: species.Na4FeO3.observations[dai_1984_table3_na4feo3_gibbs_from_oxides].values.equation_34_as_printed
+  value: -147998 + 164.8T
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 36
+    equation: '34'
+- path: species.Na4FeO3.observations[dai_1984_table3_na4feo3_gibbs_from_oxides].values.melt_Na_fraction_as_printed
+  value: '0.85'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 36
+    equation: '33'
+- path: species.Na4FeO3.observations[dai_1984_table3_na4feo3_gibbs_from_oxides].values.activity_Na2O_as_printed
+  value: '0.74'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 36
+    equation: '33'
+- path: species.O2.observations[dai_1984_table7_r1_873_o2_log_pressure].values.value
+  value: '-25.27'
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 37
+    table: VII
+    row: '1'
+scope_assessment:
+  document_type: primary experimental thermodynamic and phase-equilibrium study of
+    Fe-Na-O
+  measured_direct_observations: 12
+  measured_reduced_observations: 9
+  model_derived_observations: 35
+  quoted_attributed_observations: 11
+  note: The 67 observations are the 11 rows in Table I, 18 numeric cells in Table
+    II, 3 rows each in Tables III and IV, 9 rows in Table V, 11 rows in Table VI,
+    and 12 populated pressure cells in Table VII. The fitted EMF relation is an unscored
+    context record because EMF has no quantity token.
+  absent_from_source:
+  - numeric oxygen partial pressure or fO2 condition for the calorimetry
+  - total pressure for the calorimetry and phase-equilibrium pressure calculations
+  - pressure reference/unit for the log(P_Na) and log(P_O2) tables
+  - bounded temperature interval for the Gibbs and pressure functions in Tables III-VI
+species:
+  Fe2O3:
+    observations:
+    - observation_id: dai_1984_table1_r1_fe2o3
+      type: gibbs_table
+      locator: &id001
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '1'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Fe(s) + 3/2O2(g) = Fe2O3(s)
+          locator: *id001
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id001
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id001
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id001
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: 2Fe(s) + 3/2O2(g) = Fe2O3(s)
+        equation_as_printed: -810200 + 247.93T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: The exact quantity token is delta_fG, but this coefficient-only
+          function has no evaluated point series.
+      T_range_K:
+      - '600'
+      - '1300'
+  FeO:
+    observations:
+    - observation_id: dai_1984_table1_r2_feo
+      type: gibbs_table
+      locator: &id002
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '2'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s) + 1/2O2(g) = FeO(s)
+          locator: *id002
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id002
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id002
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id002
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: Fe(s) + 1/2O2(g) = FeO(s)
+        equation_as_printed: -269200 + 62.24T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: The exact quantity token is delta_fG, but this coefficient-only
+          function has no evaluated point series.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r7_feo
+      type: gibbs_table
+      locator: &id003
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '7'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s) + 1/2O2(g) = FeO(l)
+          locator: *id003
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id003
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id003
+      values:
+        quantity: delta_fG
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: Fe(s) + 1/2O2(g) = FeO(l)
+        equation_as_printed: -247470 + 49.197T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: The exact quantity token is delta_fG, but this coefficient-only
+          function has no evaluated point series.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r9_feo
+      type: gibbs_table
+      locator: &id004
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '9'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: FeO(s) = FeO(l)
+          locator: *id004
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id004
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id004
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id004
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: FeO(s) = FeO(l)
+        equation_as_printed: 21577 - 12.91T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table2_feo_heat_evolution_1
+      type: heat_capacity_and_heat_content_series
+      locator: &id005
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '1'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+          locator: *id005
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id005
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id005
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id005
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '79772'
+        value_as_printed: '79772'
+        substance_as_printed: FeO
+        reaction_as_printed: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_feo_heat_evolution_2
+      type: heat_capacity_and_heat_content_series
+      locator: &id006
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '2'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+          locator: *id006
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id006
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id006
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id006
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '79383'
+        value_as_printed: '79383'
+        substance_as_printed: FeO
+        reaction_as_printed: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_feo_heat_evolution_3
+      type: heat_capacity_and_heat_content_series
+      locator: &id007
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '3'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+          locator: *id007
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id007
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id007
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id007
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '79760'
+        value_as_printed: '79760'
+        substance_as_printed: FeO
+        reaction_as_printed: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_feo_heat_evolution_average
+      type: heat_capacity_and_heat_content_series
+      locator: &id008
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '3'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+          locator: *id008
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id008
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id008
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id008
+      values:
+        quantity: average_heat_of_solution_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: The reported average remains a heat-of-solution quantity, for
+          which no exact quantity token exists; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '79638'
+        value_as_printed: '79638'
+        substance_as_printed: FeO
+        reported_average_as_printed: '79638'
+        uncertainty_as_printed: ±210 J/mol
+        confidence_level: not_stated
+        reaction_as_printed: FeO(s) + 2HCl(6M,aq) = FeCl2(aq) + H2O(l)
+        T_C: '40'
+      uncertainty: ±210 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_feo_heat_evolution_1
+      - dai_1984_table2_feo_heat_evolution_2
+      - dai_1984_table2_feo_heat_evolution_3
+      derivation:
+        relation: The authors' reported Average Value for the printed heat-evolution
+          readings.
+        inputs:
+        - dai_1984_table2_feo_heat_evolution_1
+        - dai_1984_table2_feo_heat_evolution_2
+        - dai_1984_table2_feo_heat_evolution_3
+        output_unit: J/mol
+  Na2O:
+    observations:
+    - observation_id: dai_1984_table1_r3_na2o
+      type: gibbs_table
+      locator: &id009
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '3'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(g) + 1/2O2(g) = Na2O(l)
+          locator: *id009
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id009
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id009
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id009
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: 2Na(g) + 1/2O2(g) = Na2O(l)
+        equation_as_printed: -559460 + 264.14T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r4_na2o
+      type: gibbs_table
+      locator: &id010
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '4'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(g) + 1/2O2(g) = Na2O(s)
+          locator: *id010
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id010
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id010
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id010
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: 2Na(g) + 1/2O2(g) = Na2O(s)
+        equation_as_printed: -616240 + 305.27T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r5_na2o
+      type: gibbs_table
+      locator: &id011
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '5'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(l) + 1/2O2(g) = Na2O(l)
+          locator: *id011
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id011
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id011
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id011
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: 2Na(l) + 1/2O2(g) = Na2O(l)
+        equation_as_printed: -360230 + 94.73T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r6_na2o
+      type: gibbs_table
+      locator: &id012
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '6'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(l) + 1/2O2(g) = Na2O(s)
+          locator: *id012
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id012
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id012
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id012
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: 2Na(l) + 1/2O2(g) = Na2O(s)
+        equation_as_printed: -417010 + 135.86T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table1_r8_na2o
+      type: gibbs_table
+      locator: &id013
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '8'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) = Na2O(l)
+          locator: *id013
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id013
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id013
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id013
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: Na2O(s) = Na2O(l)
+        equation_as_printed: 57248 - 41.56T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table2_na2o_heat_evolution_1
+      type: heat_capacity_and_heat_content_series
+      locator: &id014
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '4'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+          locator: *id014
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id014
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id014
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id014
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '347916'
+        value_as_printed: '347916'
+        substance_as_printed: Na2O
+        reaction_as_printed: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2o_heat_evolution_2
+      type: heat_capacity_and_heat_content_series
+      locator: &id015
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '5'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+          locator: *id015
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id015
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id015
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id015
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '346900'
+        value_as_printed: '346900'
+        substance_as_printed: Na2O
+        reaction_as_printed: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2o_heat_evolution_3
+      type: heat_capacity_and_heat_content_series
+      locator: &id016
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '6'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+          locator: *id016
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id016
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id016
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id016
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '346670'
+        value_as_printed: '346670'
+        substance_as_printed: Na2O
+        reaction_as_printed: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2o_heat_evolution_average
+      type: heat_capacity_and_heat_content_series
+      locator: &id017
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '6'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+          locator: *id017
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id017
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id017
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id017
+      values:
+        quantity: average_heat_of_solution_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: The reported average remains a heat-of-solution quantity, for
+          which no exact quantity token exists; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '347159'
+        value_as_printed: '347159'
+        substance_as_printed: Na2O
+        reported_average_as_printed: '347159'
+        uncertainty_as_printed: ±670 J/mol
+        confidence_level: not_stated
+        reaction_as_printed: Na2O(s) + 2HCl(6M,aq) = 2NaCl(aq) + H2O(l)
+        T_C: '40'
+      uncertainty: ±670 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_na2o_heat_evolution_1
+      - dai_1984_table2_na2o_heat_evolution_2
+      - dai_1984_table2_na2o_heat_evolution_3
+      derivation:
+        relation: The authors' reported Average Value for the printed heat-evolution
+          readings.
+        inputs:
+        - dai_1984_table2_na2o_heat_evolution_1
+        - dai_1984_table2_na2o_heat_evolution_2
+        - dai_1984_table2_na2o_heat_evolution_3
+        output_unit: J/mol
+  Na:
+    observations:
+    - observation_id: dai_1984_table1_r10_na
+      type: gibbs_table
+      locator: &id018
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '10'
+      phase: g
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na(l) = Na(g)
+          locator: *id018
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id018
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id018
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id018
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: Na(l) = Na(g)
+        equation_as_printed: 99114 - 84.24T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+    - observation_id: dai_1984_table6_r1_log_pressure_relation
+      type: partial_pressure
+      locator: &id019
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '1'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Fe(s), Na2Fe2O4(s)
+          locator: *id019
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id019
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id019
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id019
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: 2log(P_Na) + 2log(P_O2) = -78990/T + 25.66
+        phase_assemblage_as_printed: Gas, Fe(s), Na2Fe2O4(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r1_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r1_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '1'
+    - observation_id: dai_1984_table6_r2_log_pressure_relation
+      type: partial_pressure
+      locator: &id020
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '2'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Fe(s), Na2FeO2(s)
+          locator: *id020
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id020
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id020
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id020
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: 2log(P_Na) + log(P_O2) = -52465/T + 25.13
+        phase_assemblage_as_printed: Gas, Fe(s), Na2FeO2(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r2_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r2_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '2'
+    - observation_id: dai_1984_table6_r3_log_pressure_relation
+      type: partial_pressure
+      locator: &id021
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '3'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Fe(s), Na4FeO3(s)
+          locator: *id021
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id021
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id021
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id021
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: 4log(P_Na) + 3/2log(P_O2) = -86157/T + 43.74
+        phase_assemblage_as_printed: Gas, Fe(s), Na4FeO3(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r3_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r3_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '3'
+    - observation_id: dai_1984_table6_r5_log_pressure_relation
+      type: partial_pressure
+      locator: &id022
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '5'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na2Fe2O4(s), Na2FeO2(s)
+          locator: *id022
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id022
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id022
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id022
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_Na) = -12969/T + 12.3
+        phase_assemblage_as_printed: Gas, Na2Fe2O4(s), Na2FeO2(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r5_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r5_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '5'
+    - observation_id: dai_1984_table6_r7_log_pressure_relation
+      type: partial_pressure
+      locator: &id023
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '7'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na2FeO2(s), Na4FeO3(s)
+          locator: *id023
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id023
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id023
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id023
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: 2log(P_Na) + 1/2log(P_O2) = -33693/T + 18.61
+        phase_assemblage_as_printed: Gas, Na2FeO2(s), Na4FeO3(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r7_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r7_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '7'
+    - observation_id: dai_1984_table6_r8_log_pressure_relation
+      type: partial_pressure
+      locator: &id024
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '8'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na2Fe2O4(s), Na4FeO3(s)
+          locator: *id024
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id024
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id024
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id024
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_O2) + 6log(P_Na) = -93324/T + 61.83
+        phase_assemblage_as_printed: Gas, Na2Fe2O4(s), Na4FeO3(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r8_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r8_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '8'
+    - observation_id: dai_1984_table6_r9_log_pressure_relation
+      type: partial_pressure
+      locator: &id025
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '9'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na2Fe2O4(s), Na4FeO3(s), Na2FeO2(s)
+          locator: *id025
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id025
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id025
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id025
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: 4log(P_Na) + 1/2log(P_O2) = -59632/T + 43.22
+        phase_assemblage_as_printed: Gas, Na2Fe2O4(s), Na4FeO3(s), Na2FeO2(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r9_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r9_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '9'
+    - observation_id: dai_1984_table6_r11_log_pressure_relation
+      type: partial_pressure
+      locator: &id026
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '11'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na(l)
+          locator: *id026
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id026
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id026
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id026
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_Na) = -5176/T + 4.4
+        phase_assemblage_as_printed: Gas, Na(l)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table1_r10_na
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '11'
+    - observation_id: dai_1984_table7_r1_873_na_log_pressure
+      type: partial_pressure
+      locator: &id027
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '1'
+        note: Na_873K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), wüstite(s), Na2Fe2O4(s)
+          locator: *id027
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id027
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id027
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id027
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-7.14'
+        value_as_printed: '-7.14'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r1_log_pressure_relation
+      - dai_1984_table6_r10_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: &id029
+        - dai_1984_table6_r1_log_pressure_relation
+        - dai_1984_table6_r10_log_pressure_relation
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '1'
+    - observation_id: dai_1984_table7_r1_1173_na_log_pressure
+      type: partial_pressure
+      locator: &id028
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '1'
+        note: Na_1173K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), wüstite(s), Na2Fe2O4(s)
+          locator: *id028
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id028
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id028
+        temperature_K:
+          state:
+            tag: value
+            value: '1173'
+          locator: *id028
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-1.24'
+        value_as_printed: '-1.24'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '1173'
+      derived_from:
+      - dai_1984_table6_r1_log_pressure_relation
+      - dai_1984_table6_r10_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id029
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '1'
+    - observation_id: dai_1984_table7_r2_873_na_log_pressure
+      type: partial_pressure
+      locator: &id030
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '2'
+        note: Na_873K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na2Fe2O4(s), Na2FeO2(s)
+          locator: *id030
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id030
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id030
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id030
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-2.56'
+        value_as_printed: '-2.56'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r4_log_pressure_relation
+      - dai_1984_table6_r5_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: &id068
+        - dai_1984_table6_r4_log_pressure_relation
+        - dai_1984_table6_r5_log_pressure_relation
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '2'
+    - observation_id: dai_1984_table7_r3_873_na_log_pressure
+      type: partial_pressure
+      locator: &id031
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '3'
+        note: Na_873K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na2FeO2(s), Na4FeO3(s)
+          locator: *id031
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id031
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id031
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id031
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-2.50'
+        value_as_printed: '-2.50'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r6_log_pressure_relation
+      - dai_1984_table6_r7_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: &id070
+        - dai_1984_table6_r6_log_pressure_relation
+        - dai_1984_table6_r7_log_pressure_relation
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '3'
+    - observation_id: dai_1984_table7_r4_873_na_log_pressure
+      type: partial_pressure
+      locator: &id032
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '4'
+        note: Na_873K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s), Na4FeO3(s), Na2FeO2(s)
+          locator: *id032
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id032
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id032
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id032
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-2.56'
+        value_as_printed: '-2.56'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r8_log_pressure_relation
+      - dai_1984_table6_r9_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: &id072
+        - dai_1984_table6_r8_log_pressure_relation
+        - dai_1984_table6_r9_log_pressure_relation
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '4'
+    - observation_id: dai_1984_table7_r5_873_na_log_pressure
+      type: partial_pressure
+      locator: &id033
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '5'
+        note: Na_873K; log(P_Na)
+      phase: g
+      units: log(P_Na); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na(l), Na4FeO3(s)
+          locator: *id033
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id033
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id033
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id033
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-1.53'
+        value_as_printed: '-1.53'
+        printed_form_as_printed: log(P_Na)
+        species_as_printed: Na
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r3_log_pressure_relation
+      - dai_1984_table6_r11_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: &id074
+        - dai_1984_table6_r3_log_pressure_relation
+        - dai_1984_table6_r11_log_pressure_relation
+        output_unit: log(P_Na); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '5'
+  Fe:
+    observations:
+    - observation_id: dai_1984_table1_r11_fe
+      type: gibbs_table
+      locator: &id034
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        table: I
+        row: '11'
+      phase: l
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s) = Fe(l)
+          locator: *id034
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id034
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id034
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature range, not a single point temperature.
+          locator: *id034
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: quoted_attributed
+        attribution: Thermochemical Inorganic Databank System Stockholm (THISS), reference
+          [15], as printed.
+        reaction_as_printed: Fe(s) = Fe(l)
+        equation_as_printed: 21730 - 6.77T
+        temperature_range_as_printed: 600-1300 K
+        temperature_variable_as_printed: T in K
+        status: typed_refused_schema_gap
+        schema_gap: No exact reaction-Gibbs quantity token represents this reaction
+          or phase-transition function; the closed quantity set is simulator/battery/enums.py::Quantity.
+      T_range_K:
+      - '600'
+      - '1300'
+  Na2FeO2:
+    observations:
+    - observation_id: dai_1984_table2_na2feo2_heat_evolution_1
+      type: heat_capacity_and_heat_content_series
+      locator: &id035
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '7'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id035
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id035
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id035
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id035
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '311940'
+        value_as_printed: '311940'
+        substance_as_printed: Na2FeO2
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2feo2_heat_evolution_2
+      type: heat_capacity_and_heat_content_series
+      locator: &id036
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '8'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id036
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id036
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id036
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id036
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '345600'
+        value_as_printed: '345600'
+        substance_as_printed: Na2FeO2
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2feo2_heat_evolution_3
+      type: heat_capacity_and_heat_content_series
+      locator: &id037
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '9'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id037
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id037
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id037
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id037
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '306830'
+        value_as_printed: '306830'
+        substance_as_printed: Na2FeO2
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2feo2_heat_evolution_4
+      type: heat_capacity_and_heat_content_series
+      locator: &id038
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '10'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id038
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id038
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id038
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id038
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '306386'
+        value_as_printed: '306386'
+        substance_as_printed: Na2FeO2
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na2feo2_heat_evolution_average
+      type: heat_capacity_and_heat_content_series
+      locator: &id039
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '10'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id039
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id039
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id039
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id039
+      values:
+        quantity: average_heat_of_solution_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: The reported average remains a heat-of-solution quantity, for
+          which no exact quantity token exists; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '307691'
+        value_as_printed: '307691'
+        substance_as_printed: Na2FeO2
+        reported_average_as_printed: '307691'
+        uncertainty_as_printed: ±2850 J/mol
+        confidence_level: not_stated
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+        T_C: '40'
+        source_consistency_note: The rendered fourth-cell series includes 345600;
+          the arithmetic mean of all four printed cells does not equal the printed
+          average 307691. Both are preserved as printed; no averaging correction is
+          inferred.
+      uncertainty: ±2850 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_na2feo2_heat_evolution_1
+      - dai_1984_table2_na2feo2_heat_evolution_2
+      - dai_1984_table2_na2feo2_heat_evolution_3
+      - dai_1984_table2_na2feo2_heat_evolution_4
+      derivation:
+        relation: The authors' reported Average Value for the printed heat-evolution
+          readings.
+        inputs:
+        - dai_1984_table2_na2feo2_heat_evolution_1
+        - dai_1984_table2_na2feo2_heat_evolution_2
+        - dai_1984_table2_na2feo2_heat_evolution_3
+        - dai_1984_table2_na2feo2_heat_evolution_4
+        output_unit: J/mol
+    - observation_id: dai_1984_table2_na2feo2_enthalpy_of_mixing
+      type: heat_capacity_and_heat_content_series
+      locator: &id040
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '10'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+          locator: *id040
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id040
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id040
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id040
+      values:
+        quantity: enthalpy_of_mixing_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: Reaction enthalpy of mixing is neither element-based formation
+          enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '-119106'
+        value_as_printed: '-119106'
+        uncertainty_as_printed: ±3730 J/mol
+        confidence_level: not_stated
+        T_C: '40'
+        reaction_as_printed: Na2FeO2(s) + 4HCl(6M,aq) = 2NaCl(aq) + FeCl2(aq) + 2H2O(l)
+      uncertainty: ±3730 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_na2feo2_heat_evolution_average
+      - dai_1984_table2_feo_heat_evolution_average
+      - dai_1984_table2_na2o_heat_evolution_average
+      derivation:
+        relation: Enthalpy of mixing calculated from the calorimetric solution reactions
+          (17)-(20), as reported in Table II.
+        inputs:
+        - dai_1984_table2_na2feo2_heat_evolution_average
+        - dai_1984_table2_feo_heat_evolution_average
+        - dai_1984_table2_na2o_heat_evolution_average
+        output_unit: J/mol
+    - observation_id: dai_1984_table3_na2feo2_gibbs_from_oxides
+      type: gibbs_table
+      locator: &id041
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: III
+        row: '2'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + FeO(s) = Na2FeO2(s)
+          locator: *id041
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id041
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id041
+        temperature_K:
+          state:
+            tag: value
+            value: '1075'
+          locator: &id042
+            page: 4
+            pdf_page_index: 3
+            published_page: 35
+            section: Discussion
+            equation: '30'
+      values:
+        quantity: gibbs_formation_from_component_oxides_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed formation reaction is from component oxides, not
+          the element-based delta_fG quantity; no exact reaction-Gibbs token exists.
+          Candidate considered: simulator/battery/enums.py::Quantity.DELTA_FG. No
+          evaluated point series is printed.'
+        equation_as_printed: -119106 + 113.74T
+        reaction_as_printed: Na2O(s) + FeO(s) = Na2FeO2(s)
+        table_cell_as_printed: -119106 + 113.74T
+        temperature_variable_as_printed: T in K
+        equation_form_as_printed: ΔG° = A + BT, J/mol
+        activity_Na2O_as_printed: '0.443'
+        activity_FeO_as_printed: '0.333'
+        activity_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 36
+          section: Discussion
+          equation: '31'
+        equilibrium_temperature_as_printed: 1075 K
+        T_K:
+          value: '1075'
+          locator: *id042
+      derived_from:
+      - dai_1984_table2_na2feo2_enthalpy_of_mixing
+      - dai_1984_table1_r8_na2o
+      - dai_1984_table1_r9_feo
+      derivation:
+        relation: The authors' Temkin-model Gibbs-energy estimate from calorimetric
+          enthalpy and the printed liquidus equilibrium/activity inputs.
+        inputs:
+        - dai_1984_table2_na2feo2_enthalpy_of_mixing
+        - dai_1984_table1_r8_na2o
+        - dai_1984_table1_r9_feo
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Temkin model, equations (23)-(34), with the printed equilibrium
+              conditions.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: III
+            row: '2'
+            section: Discussion
+        references:
+        - Temkin, reference [16], as printed
+    - observation_id: dai_1984_table4_na2feo2_gibbs_from_elements
+      type: gibbs_table
+      locator: &id043
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: IV
+        row: '2'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(l) + Fe(s) + O2(g) = Na2FeO2(s)
+          locator: *id043
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id043
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id043
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id043
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The exact delta_fG quantity is printed only as a coefficient function,
+          with no evaluated point series.
+        reaction_as_printed: 2Na(l) + Fe(s) + O2(g) = Na2FeO2(s)
+        equation_as_printed: -805316 + 311.84T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table3_na2feo2_gibbs_from_oxides
+      - dai_1984_table1_r6_na2o
+      - dai_1984_table1_r2_feo
+      derivation:
+        relation: Gibbs-energy function from elements assembled from the authors'
+          component-oxide Gibbs functions and the cited reference functions.
+        inputs:
+        - dai_1984_table3_na2feo2_gibbs_from_oxides
+        - dai_1984_table1_r6_na2o
+        - dai_1984_table1_r2_feo
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic combination of the printed component-oxide Gibbs functions.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: IV
+            row: '2'
+        references:
+        - Thermochemical Inorganic Databank System Stockholm, reference [15], as printed
+    - observation_id: dai_1984_table5_r2_reaction_gibbs
+      type: gibbs_table
+      locator: &id044
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '2'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(g) + Fe(s) + O2(g) = Na2FeO2(s)
+          locator: *id044
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id044
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id044
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id044
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: 2Na(g) + Fe(s) + O2(g) = Na2FeO2(s)
+        equation_as_printed: -1004546 + 481.25T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '2'
+    - observation_id: dai_1984_table5_r5_reaction_gibbs
+      type: gibbs_table
+      locator: &id045
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '5'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s) + 2Na(g) = 2Na2FeO2(s)
+          locator: *id045
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id045
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id045
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id045
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na2Fe2O4(s) + 2Na(g) = 2Na2FeO2(s)
+        equation_as_printed: -496650 + 471.19T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na2fe2o4_gibbs_from_elements
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na2fe2o4_gibbs_from_elements
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '5'
+    - observation_id: dai_1984_table5_r6_reaction_gibbs
+      type: gibbs_table
+      locator: &id046
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '6'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na4FeO3(s) + Fe(s) + 1/2O2(g) = 2Na2FeO2(s)
+          locator: *id046
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id046
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id046
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id046
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na4FeO3(s) + Fe(s) + 1/2O2(g) = 2Na2FeO2(s)
+        equation_as_printed: -359424 + 124.92T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na4feo3_gibbs_from_elements
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na4feo3_gibbs_from_elements
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '6'
+  Na4FeO3:
+    observations:
+    - observation_id: dai_1984_table2_na4feo3_heat_evolution_1
+      type: heat_capacity_and_heat_content_series
+      locator: &id047
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '11'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+          locator: *id047
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id047
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id047
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id047
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '632633'
+        value_as_printed: '632633'
+        substance_as_printed: Na4FeO3
+        reaction_as_printed: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na4feo3_heat_evolution_2
+      type: heat_capacity_and_heat_content_series
+      locator: &id048
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '12'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+          locator: *id048
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id048
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id048
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id048
+      values:
+        quantity: heat_of_solution_as_printed
+        method_class: measured_direct
+        status: typed_refused_schema_gap
+        schema_gap: Heat evolution from a calorimetric solution reaction is neither
+          element-based formation enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '619441'
+        value_as_printed: '619441'
+        substance_as_printed: Na4FeO3
+        reaction_as_printed: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+        T_C: '40'
+    - observation_id: dai_1984_table2_na4feo3_heat_evolution_average
+      type: heat_capacity_and_heat_content_series
+      locator: &id049
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '12'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+          locator: *id049
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id049
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id049
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id049
+      values:
+        quantity: average_heat_of_solution_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: The reported average remains a heat-of-solution quantity, for
+          which no exact quantity token exists; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '625968'
+        value_as_printed: '625968'
+        substance_as_printed: Na4FeO3
+        reported_average_as_printed: '625968'
+        uncertainty_as_printed: ±8210 J/mol
+        confidence_level: not_stated
+        reaction_as_printed: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+        T_C: '40'
+      uncertainty: ±8210 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_na4feo3_heat_evolution_1
+      - dai_1984_table2_na4feo3_heat_evolution_2
+      derivation:
+        relation: The authors' reported Average Value for the printed heat-evolution
+          readings.
+        inputs:
+        - dai_1984_table2_na4feo3_heat_evolution_1
+        - dai_1984_table2_na4feo3_heat_evolution_2
+        output_unit: J/mol
+    - observation_id: dai_1984_table2_na4feo3_enthalpy_of_mixing
+      type: heat_capacity_and_heat_content_series
+      locator: &id050
+        page: 4
+        pdf_page_index: 3
+        published_page: 35
+        table: II
+        row: '12'
+      phase: cr
+      units: J/mol
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+          locator: *id050
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id050
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id050
+        temperature_C:
+          state:
+            tag: value
+            value: '40'
+          locator: *id050
+      values:
+        quantity: enthalpy_of_mixing_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: Reaction enthalpy of mixing is neither element-based formation
+          enthalpy nor partial molar enthalpy; see simulator/battery/enums.py::Quantity.DELTA_FH
+          and simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY.
+        value: '-147988'
+        value_as_printed: '-147988'
+        uncertainty_as_printed: ±8210 J/mol
+        confidence_level: not_stated
+        T_C: '40'
+        reaction_as_printed: Na4FeO3(s) + 6HCl(6M,aq) = 4NaCl(aq) + FeCl2(aq) + 3H2O(l)
+      uncertainty: ±8210 J/mol; confidence level not stated
+      derived_from:
+      - dai_1984_table2_na4feo3_heat_evolution_average
+      - dai_1984_table2_feo_heat_evolution_average
+      - dai_1984_table2_na2o_heat_evolution_average
+      derivation:
+        relation: Enthalpy of mixing calculated from the calorimetric solution reactions
+          (17)-(20), as reported in Table II.
+        inputs:
+        - dai_1984_table2_na4feo3_heat_evolution_average
+        - dai_1984_table2_feo_heat_evolution_average
+        - dai_1984_table2_na2o_heat_evolution_average
+        output_unit: J/mol
+    - observation_id: dai_1984_table3_na4feo3_gibbs_from_oxides
+      type: gibbs_table
+      locator: &id051
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: III
+        row: '3'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na2O(s) + FeO(s) = Na4FeO3(s)
+          locator: *id051
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id051
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id051
+        temperature_K:
+          state:
+            tag: value
+            value: '904'
+          locator: &id052
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            section: Discussion
+            equation: '33'
+      values:
+        quantity: gibbs_formation_from_component_oxides_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed formation reaction is from component oxides, not
+          the element-based delta_fG quantity; no exact reaction-Gibbs token exists.
+          Candidate considered: simulator/battery/enums.py::Quantity.DELTA_FG. No
+          evaluated point series is printed.'
+        equation_as_printed: -147988 + 164.80T
+        reaction_as_printed: 2Na2O(s) + FeO(s) = Na4FeO3(s)
+        table_cell_as_printed: -147988 + 164.80T
+        temperature_variable_as_printed: T in K
+        equation_form_as_printed: ΔG° = A + BT, J/mol
+        equation_34_as_printed: -147998 + 164.8T
+        source_consistency_note: Equation (34) prints -147998 while Table III prints
+          -147988; both render-verified forms are retained. The text also pairs 0.85
+          Na-fraction with aNa2O=0.74 under Eq. (23); both are preserved without recalculation.
+        melt_Na_fraction_as_printed: '0.85'
+        activity_Na2O_as_printed: '0.74'
+        calibration_locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 36
+          section: Discussion
+          equation: '33'
+        equilibrium_temperature_as_printed: 904 K
+        T_K:
+          value: '904'
+          locator: *id052
+      derived_from:
+      - dai_1984_table2_na4feo3_enthalpy_of_mixing
+      - dai_1984_table3_na2feo2_gibbs_from_oxides
+      derivation:
+        relation: The authors' Temkin-model Gibbs-energy estimate from calorimetric
+          enthalpy and the printed liquidus equilibrium/activity inputs.
+        inputs:
+        - dai_1984_table2_na4feo3_enthalpy_of_mixing
+        - dai_1984_table3_na2feo2_gibbs_from_oxides
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Temkin model, equations (23)-(34), with the printed equilibrium
+              conditions.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: III
+            row: '3'
+            section: Discussion
+        references:
+        - Temkin, reference [16], as printed
+    - observation_id: dai_1984_table4_na4feo3_gibbs_from_elements
+      type: gibbs_table
+      locator: &id053
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: IV
+        row: '3'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 4Na(l) + Fe(s) + 3/2O2(g) = Na4FeO3(s)
+          locator: *id053
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id053
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id053
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id053
+      values:
+        quantity: delta_fG
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The exact delta_fG quantity is printed only as a coefficient function,
+          with no evaluated point series.
+        reaction_as_printed: 4Na(l) + Fe(s) + 3/2O2(g) = Na4FeO3(s)
+        equation_as_printed: -1251208 + 498.76T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table3_na4feo3_gibbs_from_oxides
+      - dai_1984_table1_r6_na2o
+      - dai_1984_table1_r2_feo
+      derivation:
+        relation: Gibbs-energy function from elements assembled from the authors'
+          component-oxide Gibbs functions and the cited reference functions.
+        inputs:
+        - dai_1984_table3_na4feo3_gibbs_from_oxides
+        - dai_1984_table1_r6_na2o
+        - dai_1984_table1_r2_feo
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic combination of the printed component-oxide Gibbs functions.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: IV
+            row: '3'
+        references:
+        - Thermochemical Inorganic Databank System Stockholm, reference [15], as printed
+    - observation_id: dai_1984_table5_r3_reaction_gibbs
+      type: gibbs_table
+      locator: &id054
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '3'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 4Na(g) + Fe(s) + 3/2O2(g) = Na4FeO3(s)
+          locator: *id054
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id054
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id054
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id054
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: 4Na(g) + Fe(s) + 3/2O2(g) = Na4FeO3(s)
+        equation_as_printed: -1649668 + 837.58T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na4feo3_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na4feo3_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '3'
+    - observation_id: dai_1984_table5_r7_reaction_gibbs
+      type: gibbs_table
+      locator: &id055
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '7'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + 2Na(g) + 1/2O2(g) = Na4FeO3(s)
+          locator: *id055
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id055
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id055
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id055
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na2FeO2(s) + 2Na(g) + 1/2O2(g) = Na4FeO3(s)
+        equation_as_printed: -645122 + 356.33T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na4feo3_gibbs_from_elements
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na4feo3_gibbs_from_elements
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '7'
+    - observation_id: dai_1984_table5_r8_reaction_gibbs
+      type: gibbs_table
+      locator: &id056
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '8'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s) + 6Na(g) + O2(g) = 2Na4FeO3(s)
+          locator: *id056
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id056
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id056
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id056
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na2Fe2O4(s) + 6Na(g) + O2(g) = 2Na4FeO3(s)
+        equation_as_printed: -1786896 + 1183.85T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na4feo3_gibbs_from_elements
+      - dai_1984_table4_na2fe2o4_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na4feo3_gibbs_from_elements
+        - dai_1984_table4_na2fe2o4_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '8'
+    - observation_id: dai_1984_table5_r9_reaction_gibbs
+      type: gibbs_table
+      locator: &id057
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '9'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s) + 4Na(g) + 1/2O2(g) = Na4FeO3(s) + Na2FeO2(s)
+          locator: *id057
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id057
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id057
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id057
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na2Fe2O4(s) + 4Na(g) + 1/2O2(g) = Na4FeO3(s) + Na2FeO2(s)
+        equation_as_printed: -1141774 + 827.52T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na4feo3_gibbs_from_elements
+      - dai_1984_table4_na2fe2o4_gibbs_from_elements
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na4feo3_gibbs_from_elements
+        - dai_1984_table4_na2fe2o4_gibbs_from_elements
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '9'
+  Na2Fe2O4:
+    observations:
+    - observation_id: dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      type: gibbs_table
+      locator: &id058
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: III
+        row: '1'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2O(s) + Fe2O3(s) = Na2Fe2O4(s)
+          locator: *id058
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id058
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id058
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id058
+        atmosphere:
+          state:
+            tag: value
+            value: Commercial-grade air circulated to maintain a constant oxygen partial
+              pressure; gas ratio not stated.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            section: EMF measurements
+            equation: '7'
+      values:
+        quantity: gibbs_formation_from_component_oxides_as_printed
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed formation reaction is from component oxides, not
+          the element-based delta_fG quantity; no exact reaction-Gibbs token exists.
+          Candidate considered: simulator/battery/enums.py::Quantity.DELTA_FG. No
+          evaluated point series is printed.'
+        equation_as_printed: -86000 - 61.89T
+        reaction_as_printed: Na2O(s) + Fe2O3(s) = Na2Fe2O4(s)
+        table_cell_as_printed: -86000 - 61.89T
+        temperature_variable_as_printed: T in K
+        equation_form_as_printed: ΔG° = A + BT, J/mol
+        equation_16_as_printed: -86002 - 61.89T
+        source_consistency_note: Equation (16) prints -86002 while Table III prints
+          -86000; both render-verified forms are retained.
+      derivation:
+        relation: The authors' Gibbs-energy reduction from the measured cell EMF and
+          the printed thermochemical reference functions.
+        output_unit: J/mol
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            equation: '7'
+            figure: '4'
+            note: The individual EMF readings are figure-only and not digitized; the
+              fitted EMF relation is retained in the context record.
+    - observation_id: dai_1984_table4_na2fe2o4_gibbs_from_elements
+      type: gibbs_table
+      locator: &id059
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: IV
+        row: '1'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(l) + 2Fe(s) + 2O2(g) = Na2Fe2O4(s)
+          locator: *id059
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id059
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id059
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id059
+      values:
+        quantity: delta_fG
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: The exact delta_fG quantity is printed only as a coefficient function,
+          with no evaluated point series.
+        reaction_as_printed: 2Na(l) + 2Fe(s) + 2O2(g) = Na2Fe2O4(s)
+        equation_as_printed: -1323130 + 321.90T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+      - dai_1984_table1_r1_fe2o3
+      - dai_1984_table1_r6_na2o
+      derivation:
+        relation: Gibbs-energy function from elements assembled from the authors'
+          component-oxide Gibbs functions and the cited reference functions.
+        inputs:
+        - dai_1984_table3_na2fe2o4_gibbs_from_oxides
+        - dai_1984_table1_r1_fe2o3
+        - dai_1984_table1_r6_na2o
+        output_unit: J/mol
+    - observation_id: dai_1984_table5_r1_reaction_gibbs
+      type: gibbs_table
+      locator: &id060
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '1'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: 2Na(g) + 2Fe(s) + 2O2(g) = Na2Fe2O4(s)
+          locator: *id060
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id060
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id060
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id060
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: measured_reduced
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: 2Na(g) + 2Fe(s) + 2O2(g) = Na2Fe2O4(s)
+        equation_as_printed: -1512440 + 491.31T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na2fe2o4_gibbs_from_elements
+      - dai_1984_table1_r10_na
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na2fe2o4_gibbs_from_elements
+        - dai_1984_table1_r10_na
+        output_unit: J/mol
+    - observation_id: dai_1984_table5_r4_reaction_gibbs
+      type: gibbs_table
+      locator: &id061
+        page: 5
+        pdf_page_index: 4
+        published_page: 36
+        table: V
+        row: '4'
+      phase: cr
+      units: J/mol; T in K as printed
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2FeO2(s) + Fe(s) + O2(g) = Na2Fe2O4(s)
+          locator: *id061
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id061
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id061
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id061
+      values:
+        quantity: reaction_gibbs_energy_function
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: 'The printed quantity is reaction Gibbs energy, not element-based
+          formation Gibbs energy, and no exact reaction-Gibbs token exists. Candidates
+          considered: simulator/battery/enums.py::Quantity.DELTA_FG and simulator/battery/enums.py::Quantity.LOG10_K_REACTION.'
+        reaction_as_printed: Na2FeO2(s) + Fe(s) + O2(g) = Na2Fe2O4(s)
+        equation_as_printed: -507896 + 10.06T
+        temperature_variable_as_printed: T in K
+      derived_from:
+      - dai_1984_table4_na2fe2o4_gibbs_from_elements
+      - dai_1984_table4_na2feo2_gibbs_from_elements
+      derivation:
+        relation: Author-calculated reaction Gibbs-energy function from stored Gibbs-energy
+          functions.
+        inputs:
+        - dai_1984_table4_na2fe2o4_gibbs_from_elements
+        - dai_1984_table4_na2feo2_gibbs_from_elements
+        output_unit: J/mol
+        method:
+          state:
+            tag: value
+            value: Algebraic reaction combination printed in Table V.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 36
+            table: V
+            row: '4'
+    context:
+    - observation_id: dai_1984_emf_measurement_fit_context
+      type: measurement_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 34
+        section: EMF measurements
+        equation: '7'
+        figure: '4'
+      units: mV; T in K as printed
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_reduced
+        schema_gap: There is no electrochemical measurement observation type or EMF
+          quantity token. MethodToken.EMF_CELL identifies the apparatus, not the measured
+          quantity; the fitted relation is retained as typed-refused context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/enums.py::MethodToken.EMF_CELL
+        admission_status: typed_refusal
+        equation_as_printed: E (mV) = 461.98 (±0.11) + 0.1264 (±0.00011)T; 923 < T,K
+          < 1023
+        uncertainty_as_printed: ±0.11 mV; ±0.00011 mV/K
+        confidence_level: not_stated
+        temperature_range_K_as_printed:
+        - '923'
+        - '1023'
+        cell_as_printed: Pt, Na2Fe2O4(s), Fe2O3(s), O2(air) || Na+ (Na beta-alumina)
+          || (0.45 Na2O-0.55 WO3), O2(air), Pt
+        oxygen_environment_as_printed: Commercial-grade air was circulated to maintain
+          a constant oxygen partial pressure; no numeric oxygen pressure or total
+          pressure is stated.
+        raw_data_note: Individual EMF data are figure-only in Figure 4 and were not
+          digitized.
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s), Fe2O3(s), O2(air); Na+ beta-alumina; Na2O-WO3 reference
+              melt
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            equation: '7'
+            figure: '4'
+        temperature_K:
+          state:
+            tag: unknown
+            reason: Multiple temperatures are plotted; the equation is reported over
+              923<T,K<1023.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            equation: '7'
+            figure: '4'
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: Air is stated but no numeric oxygen pressure/reference pressure
+              is stated.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            equation: '7'
+            figure: '4'
+        atmosphere:
+          state:
+            tag: value
+            value: Commercial-grade air circulated to maintain a constant oxygen partial
+              pressure; gas ratio not stated.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            section: EMF measurements
+            equation: '7'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 34
+            equation: '7'
+            figure: '4'
+        reference_melt_composition:
+          state:
+            tag: value
+            value:
+              Na2O: '0.45'
+              WO3: '0.55'
+              basis_as_printed: mole fraction
+          locator:
+            page: 1
+            pdf_page_index: 0
+            published_page: 32
+            section: Principle
+            note: Cell notation prints 0.45 Na2O-0.55 WO3.
+  O2:
+    observations:
+    - observation_id: dai_1984_table6_r4_log_pressure_relation
+      type: partial_pressure
+      locator: &id062
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '4'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Fe(s), Na2Fe2O4(s), Na2FeO2(s)
+          locator: *id062
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id062
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id062
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id062
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_O2) = -26526/T + 0.53
+        phase_assemblage_as_printed: Gas, Fe(s), Na2Fe2O4(s), Na2FeO2(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r4_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r4_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '4'
+    - observation_id: dai_1984_table6_r6_log_pressure_relation
+      type: partial_pressure
+      locator: &id063
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '6'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Fe(s), Na2FeO2(s), Na4FeO3(s)
+          locator: *id063
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id063
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id063
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id063
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_O2) = -37543/T + 13.05
+        phase_assemblage_as_printed: Gas, Fe(s), Na2FeO2(s), Na4FeO3(s)
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table5_r6_reaction_gibbs
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table5_r6_reaction_gibbs
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '6'
+    - observation_id: dai_1984_table6_r10_log_pressure_relation
+      type: partial_pressure
+      locator: &id064
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VI
+        row: '10'
+      phase: g
+      units: log(P) relation; pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Gas, Na2Fe2O4(s), wüstite
+          locator: *id064
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id064
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id064
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source prints a temperature-dependent function but no single
+              evaluation temperature.
+          locator: *id064
+      values:
+        quantity: combined_log_partial_pressure_relation
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: A combined logarithmic pressure relation is not a single-species
+          pressure in Pa; Quantity.P_PARTIAL is not a log-pressure form and TYPE_QUANTITY
+          inference is suppressed by the descriptive quantity label. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        relation_as_printed: log(P_O2) = -19385/T - 3.07
+        phase_assemblage_as_printed: Gas, Na2Fe2O4(s), wüstite
+        temperature_variable_as_printed: T; no bounded interval printed
+      derived_from:
+      - dai_1984_table1_r2_feo
+      derivation:
+        relation: Author-calculated partial-pressure function from the stored Gibbs-energy
+          reaction functions.
+        inputs:
+        - dai_1984_table1_r2_feo
+        output_unit: log(P) relation as printed
+        method:
+          state:
+            tag: value
+            value: Equilibrium Gibbs-energy relation printed in Table VI.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VI
+            row: '10'
+    - observation_id: dai_1984_table7_r1_873_o2_log_pressure
+      type: partial_pressure
+      locator: &id065
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '1'
+        note: O2_873K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), wüstite(s), Na2Fe2O4(s)
+          locator: *id065
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id065
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id065
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id065
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-25.27'
+        value_as_printed: '-25.27'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r1_log_pressure_relation
+      - dai_1984_table6_r10_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id029
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '1'
+    - observation_id: dai_1984_table7_r1_1173_o2_log_pressure
+      type: partial_pressure
+      locator: &id066
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '1'
+        note: O2_1173K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), wüstite(s), Na2Fe2O4(s)
+          locator: *id066
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id066
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id066
+        temperature_K:
+          state:
+            tag: value
+            value: '1173'
+          locator: *id066
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-19.6'
+        value_as_printed: '-19.6'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '1173'
+      derived_from:
+      - dai_1984_table6_r1_log_pressure_relation
+      - dai_1984_table6_r10_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id029
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '1'
+    - observation_id: dai_1984_table7_r2_873_o2_log_pressure
+      type: partial_pressure
+      locator: &id067
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '2'
+        note: O2_873K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na2Fe2O4(s), Na2FeO2(s)
+          locator: *id067
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id067
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id067
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id067
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-29.85'
+        value_as_printed: '-29.85'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r4_log_pressure_relation
+      - dai_1984_table6_r5_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id068
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '2'
+    - observation_id: dai_1984_table7_r3_873_o2_log_pressure
+      type: partial_pressure
+      locator: &id069
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '3'
+        note: O2_873K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na2FeO2(s), Na4FeO3(s)
+          locator: *id069
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id069
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id069
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id069
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-29.95'
+        value_as_printed: '-29.95'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r6_log_pressure_relation
+      - dai_1984_table6_r7_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id070
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '3'
+    - observation_id: dai_1984_table7_r4_873_o2_log_pressure
+      type: partial_pressure
+      locator: &id071
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '4'
+        note: O2_873K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Na2Fe2O4(s), Na4FeO3(s), Na2FeO2(s)
+          locator: *id071
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id071
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id071
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id071
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-29.69'
+        value_as_printed: '-29.69'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r8_log_pressure_relation
+      - dai_1984_table6_r9_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id072
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '4'
+    - observation_id: dai_1984_table7_r5_873_o2_log_pressure
+      type: partial_pressure
+      locator: &id073
+        page: 6
+        pdf_page_index: 5
+        published_page: 37
+        table: VII
+        row: '5'
+        note: O2_873K; log(P_O2)
+      phase: g
+      units: log(P_O2); pressure reference not stated
+      point_conditions:
+        phase_assemblage:
+          state:
+            tag: value
+            value: Fe(s), Na(l), Na4FeO3(s)
+          locator: *id073
+        fO2_Pa:
+          state:
+            tag: unknown
+            reason: No numeric oxygen fugacity or oxygen partial pressure is stated
+              as an experimental condition for this row.
+          locator: *id073
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for this experiment or equilibrium
+              result.
+          locator: *id073
+        temperature_K:
+          state:
+            tag: value
+            value: '873'
+          locator: *id073
+      values:
+        quantity: log_partial_pressure_as_printed
+        method_class: model_derived
+        status: typed_refused_schema_gap
+        schema_gap: The table prints log(P_species), but its pressure reference is
+          unstated and Quantity.P_PARTIAL stores pressure in Pa, not log pressure.
+          The descriptive quantity blocks TYPE_QUANTITY inference. See simulator/battery/enums.py::Quantity.P_PARTIAL
+          and simulator/battery/migrate.py::TYPE_QUANTITY.
+        value: '-32.55'
+        value_as_printed: '-32.55'
+        printed_form_as_printed: log(P_O2)
+        species_as_printed: O2
+        T_K: '873'
+      derived_from:
+      - dai_1984_table6_r3_log_pressure_relation
+      - dai_1984_table6_r11_log_pressure_relation
+      derivation:
+        relation: Calculated partial-pressure value from the Table VI equilibrium
+          relations, as reported in Table VII.
+        inputs: *id074
+        output_unit: log(P_O2); pressure reference not stated
+        method:
+          state:
+            tag: value
+            value: The authors report calculated phase-equilibrium pressures at 873
+              K and 1173 K.
+          locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 37
+            table: VII
+            row: '5'
