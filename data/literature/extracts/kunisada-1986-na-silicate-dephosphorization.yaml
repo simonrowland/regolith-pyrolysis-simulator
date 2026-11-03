@@ -5383,8 +5383,18 @@ species:
           maps rate_series to that different quantity when no explicit quantity is present. This row declares a
           descriptive non-token quantity and is retained typed-refused.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), prose discussion of Figure 7
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The initial dephosphorization rates are reductions of the authors' measured phosphorus changes during the first minute per slag-metal interface area; the plotted source curves are in Figure 7.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 5
+              published_page: 125
+              pdf_page_index: 4
+              figure: '7'
+              section: III.2 Effect of Na2CO3 in Flux
         value_range_as_published:
           lower: 3.3 × 10^-3
           upper: 7.2 × 10^-3
@@ -5461,8 +5471,18 @@ species:
           maps rate_series to that different quantity when no explicit quantity is present. This row declares a
           descriptive non-token quantity and is retained typed-refused.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), prose discussion of Figure 7
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The comparison rate is the authors' reduction of measured phosphorus change during the first minute per slag-metal interface area; the plotted source curve is in Figure 7.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 5
+              published_page: 125
+              pdf_page_index: 4
+              figure: '7'
+              section: III.2 Effect of Na2CO3 in Flux
         value: 2.1 × 10^-3
         value_as_published:
           value: 2.1 × 10^-3
@@ -11060,8 +11080,17 @@ species:
             section: III.1 Effect of Fe2O3 in Flux
       values:
         quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs are not separately itemized.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              published_page: 123
+              pdf_page_index: 2
+              section: III.1 Effect of Fe2O3 in Flux
         mass_loss_wt_pct_range:
         - '7'
         - '12'
@@ -11127,8 +11156,17 @@ species:
             section: III.1 Effect of Fe2O3 in Flux
       values:
         quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs are not separately itemized.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              published_page: 123
+              pdf_page_index: 2
+              section: III.1 Effect of Fe2O3 in Flux
         mass_loss_wt_pct_range:
         - '8'
         - '17'
@@ -11194,8 +11232,17 @@ species:
             section: III.1 Effect of Fe2O3 in Flux
       values:
         quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs are not separately itemized.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              published_page: 123
+              pdf_page_index: 2
+              section: III.1 Effect of Fe2O3 in Flux
         mass_loss_wt_pct_range:
         - '12'
         - '30'
@@ -11261,8 +11308,17 @@ species:
             section: III.1 Effect of Fe2O3 in Flux
       values:
         quantity: mass_loss_fraction
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), reported Na2O-loss calculation
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            Na2O loss is the authors' calculated difference for the reported flux run; its numerical calculation inputs are not separately itemized.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 3
+              published_page: 123
+              pdf_page_index: 2
+              section: III.1 Effect of Fe2O3 in Flux
         mass_loss_wt_pct_range:
         - '27'
         - '44'
@@ -22184,8 +22240,17 @@ species:
         basis: wt_percent
         component_amount: '2.9'
         component_amount_as_published: '2.9'
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), Table 2
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs are not all stored in the extract.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              table: '2'
         admission_status: admitted
         value: '2.9'
         value_as_published:
@@ -22279,8 +22344,17 @@ species:
         basis: wt_percent
         component_amount: '7.8'
         component_amount_as_published: '7.8'
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), Table 2
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs are not all stored in the extract.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              table: '2'
         admission_status: admitted
         value: '7.8'
         value_as_published:
@@ -22374,8 +22448,17 @@ species:
         basis: wt_percent
         component_amount: '12.4'
         component_amount_as_published: '12.4'
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), Table 2
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs are not all stored in the extract.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              table: '2'
         admission_status: admitted
         value: '12.4'
         value_as_published:
@@ -22469,8 +22552,17 @@ species:
         basis: wt_percent
         component_amount: '18.3'
         component_amount_as_published: '18.3'
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), Table 2
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs are not all stored in the extract.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              table: '2'
         admission_status: admitted
         value: '18.3'
         value_as_published:
@@ -22564,8 +22656,17 @@ species:
         basis: wt_percent
         component_amount: '26.8'
         component_amount_as_published: '26.8'
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), Table 2
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated this FeO content using Eqs. (1)–(5) and the stated slag mass balance; the numerical inputs are not all stored in the extract.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              table: '2'
         admission_status: admitted
         value: '26.8'
         value_as_published:
@@ -23270,8 +23371,17 @@ species:
           mapping. equilibrium_phase_composition would assert equilibrium that the source does not state for these
           values. The value is retained typed-refused.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), calculation from Eq. (1)
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors calculated carbon generated during the first 6 min for Flux E from reaction Eq. (1).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              section: III.2 Effect of Na2CO3 in Flux
         value: '0.085'
         value_as_published:
           value: '0.085'
@@ -23312,8 +23422,17 @@ species:
           mapping. equilibrium_phase_composition would assert equilibrium that the source does not state for these
           values. The value is retained typed-refused.
         admission_status: typed_refusal
-        method_class: quoted_attributed
-        attribution: Kunisada and Iwai (1986), calculation from Eq. (1)
+        method_class: measured_reduced
+        derivation:
+          relation: >-
+            The authors reduced the calculated generated-carbon amount to the expected concentration increment by assuming all generated carbon dissolved in the 250 g liquid-iron charge.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 126
+              pdf_page_index: 5
+              section: III.2 Effect of Na2CO3 in Flux
         value: '0.034'
         value_as_published:
           value: '0.034'
