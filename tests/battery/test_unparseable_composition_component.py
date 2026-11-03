@@ -170,6 +170,12 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     """
 
     from simulator.battery.composition import parse_species_formula as composition_parse
+    from simulator.battery.generators.usgs_b1259 import (
+        _parseable_formula as b1259_parseable,
+    )
+    from simulator.battery.generators.usgs_b1452 import (
+        _parseable_formula as b1452_parseable,
+    )
     from simulator.battery.score import parse_species_formula as score_parse
     from simulator.reference_data.janaf import formula_composition
 
@@ -204,6 +210,22 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
     assert _atoms("3Al2O3.2SiO2") == {"Al": 6.0, "O": 13.0, "Si": 2.0}
     assert _atoms("Na2O.SiO2") == {"Na": 2.0, "O": 3.0, "Si": 1.0}
     assert _atoms("K2O.2SiO2") == {"K": 2.0, "O": 5.0, "Si": 2.0}
+    # Kaolinite hand count: Al2O3 + 2 SiO2 + 2 H2O. A chain of digit-flanked
+    # adducts, not one decimal coefficient (that reading is Al 2, Si 1, O 6.4).
+    kaolinite = {"Al": 2.0, "Si": 2.0, "O": 9.0, "H": 4.0}
+    assert _atoms("Al2O3.2SiO2.2H2O") == kaolinite
+    assert _atoms("Al2O3·2SiO2·2H2O") == kaolinite
+    for parseable in (b1259_parseable, b1452_parseable):
+        candidate = parseable("Al2O3·2SiO2·2H2O")
+        assert candidate == "Al2O3.2SiO2.2H2O"
+        assert _atoms(candidate) == kaolinite
+    # Feldspar hand count. The fractional parts stay on one species.
+    assert _atoms("Na1.08Fe1.17Si3.13O8") == {
+        "Na": 1.08,
+        "Fe": 1.17,
+        "Si": 3.13,
+        "O": 8.0,
+    }
 
     for junk in ("foobar", "not-a-formula", "Fe_tO", "Fe(1-x)O", "unknown"):
         with pytest.raises(AccountingError):
