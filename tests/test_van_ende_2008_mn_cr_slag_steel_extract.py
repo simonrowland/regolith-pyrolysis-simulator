@@ -14,6 +14,20 @@ from simulator.battery.migrate import Migrator
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/van-ende-2008-mn-cr-slag-steel.yaml"
 
+# Section headings transcribed from the source's pdftotext-layout text.
+PRINTED_SECTION_HEADINGS = {
+    "1. Introduction",
+    "2. Thermodynamic Background",
+    "2.1. Manganese Equilibrium",
+    "2.2. Chromium Equilibrium",
+    "3. Experimental",
+    "4. Results and Discussion",
+    "4.1. Manganese Equilibrium",
+    "4.2. Chromium Equilibrium",
+    "4.3. Manganese–Chromium Exchange Reaction be-\ntween Slag and Steel",
+    "5. Summary and Conclusions",
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -31,6 +45,26 @@ def _table_rows(document: dict, table: str) -> list[list[str]]:
     contexts = document["species"]["SiO2"]["context"]
     record = next(row for row in contexts if row["locator"].get("table") == table)
     return list(csv.reader(StringIO(record["values"]["printed_rows_csv"])))
+
+
+def _section_strings(value: object):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "section":
+                yield child
+            else:
+                yield from _section_strings(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _section_strings(child)
+
+
+def test_every_locator_section_is_a_printed_source_heading() -> None:
+    sections = set(_section_strings(_document()))
+
+    assert sections
+    assert sections <= PRINTED_SECTION_HEADINGS
+    assert sections == {"3. Experimental"}
 
 
 def _assert_table4_pins(document: dict) -> None:
