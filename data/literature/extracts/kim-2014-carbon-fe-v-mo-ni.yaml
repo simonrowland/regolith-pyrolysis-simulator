@@ -78,12 +78,12 @@ experiments:
     sample_id: t1-r01
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r01
       V: '0'
       Mo: '0'
       Ni: '0'
       C: '5.41'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -117,12 +117,12 @@ experiments:
     sample_id: t1-r02
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r02
       V: '2.59'
       Mo: '0'
       Ni: '0'
       C: '5.86'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -156,12 +156,12 @@ experiments:
     sample_id: t1-r03
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r03
       V: '4.38'
       Mo: '0'
       Ni: '0'
       C: '6.10'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -195,12 +195,12 @@ experiments:
     sample_id: t1-r04
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r04
       V: '4.50'
       Mo: '0'
       Ni: '0'
       C: '5.99'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -234,12 +234,12 @@ experiments:
     sample_id: t1-r05
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r05
       V: '5.22'
       Mo: '0'
       Ni: '0'
       C: '6.08'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -273,12 +273,12 @@ experiments:
     sample_id: t1-r06
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r06
       V: '6.91'
       Mo: '0'
       Ni: '0'
       C: '6.30'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -312,12 +312,12 @@ experiments:
     sample_id: t1-r07
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r07
       V: '8.06'
       Mo: '0'
       Ni: '0'
       C: '6.42'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -351,12 +351,12 @@ experiments:
     sample_id: t1-r08
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r08
       V: '8.83'
       Mo: '0'
       Ni: '0'
       C: '6.43'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -390,12 +390,12 @@ experiments:
     sample_id: t1-r09
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r09
       V: '9.37'
       Mo: '0'
       Ni: '0'
       C: '6.61'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -429,12 +429,12 @@ experiments:
     sample_id: t1-r10
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r10
       V: '9.52'
       Mo: '0'
       Ni: '0'
       C: '6.69'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -468,12 +468,12 @@ experiments:
     sample_id: t1-r11
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r11
       V: '10.36'
       Mo: '0'
       Ni: '0'
       C: '6.79'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -507,12 +507,12 @@ experiments:
     sample_id: t1-r12
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r12
       V: '12.52'
       Mo: '0'
       Ni: '0'
       C: '7.04'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -546,12 +546,12 @@ experiments:
     sample_id: t1-r13
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r13
       V: '21.55'
       Mo: '0'
       Ni: '0'
       C: '8.14'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -585,12 +585,12 @@ experiments:
     sample_id: t1-r14
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r14
       V: '27.00'
       Mo: '0'
       Ni: '0'
       C: '9.19'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -624,12 +624,12 @@ experiments:
     sample_id: t1-r15
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r15
       V: '0'
       Mo: '0'
       Ni: '0'
       C: '5.41'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -663,12 +663,12 @@ experiments:
     sample_id: t1-r16
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r16
       V: '0'
       Mo: '5.38'
       Ni: '0'
       C: '5.50'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -702,12 +702,12 @@ experiments:
     sample_id: t1-r17
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r17
       V: '0'
       Mo: '10.74'
       Ni: '0'
       C: '5.55'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -741,12 +741,12 @@ experiments:
     sample_id: t1-r18
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r18
       V: '0'
       Mo: '14.92'
       Ni: '0'
       C: '5.68'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -780,12 +780,12 @@ experiments:
     sample_id: t1-r19
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r19
       V: '0'
       Mo: '19.42'
       Ni: '0'
       C: '5.76'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -819,12 +819,12 @@ experiments:
     sample_id: t1-r20
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r20
       V: '0'
       Mo: '21.27'
       Ni: '0'
       C: '5.69'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -858,12 +858,12 @@ experiments:
     sample_id: t1-r21
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r21
       V: '0'
       Mo: '27.27'
       Ni: '0'
       C: '5.85'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -897,12 +897,12 @@ experiments:
     sample_id: t1-r22
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r22
       V: '0'
       Mo: '0'
       Ni: '0.22'
       C: '5.42'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -936,12 +936,12 @@ experiments:
     sample_id: t1-r23
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r23
       V: '0'
       Mo: '0'
       Ni: '0.49'
       C: '5.40'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -975,12 +975,12 @@ experiments:
     sample_id: t1-r24
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r24
       V: '0'
       Mo: '0'
       Ni: '1.26'
       C: '5.37'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1014,12 +1014,12 @@ experiments:
     sample_id: t1-r25
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r25
       V: '0'
       Mo: '0'
       Ni: '3.37'
       C: '5.25'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1053,12 +1053,12 @@ experiments:
     sample_id: t1-r26
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r26
       V: '0'
       Mo: '0'
       Ni: '7.69'
       C: '5.03'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1092,12 +1092,12 @@ experiments:
     sample_id: t1-r27
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r27
       V: '0'
       Mo: '0'
       Ni: '14.47'
       C: '4.76'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1131,12 +1131,12 @@ experiments:
     sample_id: t1-r28
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r28
       V: '0'
       Mo: '0'
       Ni: '15.84'
       C: '4.68'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1170,12 +1170,12 @@ experiments:
     sample_id: t1-r29
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r29
       V: '0'
       Mo: '0'
       Ni: '16.02'
       C: '4.66'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1209,12 +1209,12 @@ experiments:
     sample_id: t1-r30
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r30
       V: '0'
       Mo: '0'
       Ni: '24.42'
       C: '4.25'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1248,12 +1248,12 @@ experiments:
     sample_id: t1-r31
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r31
       V: '1.01'
       Mo: '25.64'
       Ni: '0'
       C: '5.93'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1287,12 +1287,12 @@ experiments:
     sample_id: t1-r32
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r32
       V: '1.06'
       Mo: '26.65'
       Ni: '0'
       C: '5.90'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1326,12 +1326,12 @@ experiments:
     sample_id: t1-r33
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r33
       V: '3.23'
       Mo: '26.50'
       Ni: '0'
       C: '6.22'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1365,12 +1365,12 @@ experiments:
     sample_id: t1-r34
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r34
       V: '4.96'
       Mo: '23.92'
       Ni: '0'
       C: '6.40'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1404,12 +1404,12 @@ experiments:
     sample_id: t1-r35
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r35
       V: '9.25'
       Mo: '18.45'
       Ni: '0'
       C: '6.91'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1443,12 +1443,12 @@ experiments:
     sample_id: t1-r36
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r36
       V: '6.05'
       Mo: '0'
       Ni: '14.14'
       C: '5.50'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1482,12 +1482,12 @@ experiments:
     sample_id: t1-r37
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r37
       V: '10.38'
       Mo: '0'
       Ni: '13.32'
       C: '6.02'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1521,12 +1521,12 @@ experiments:
     sample_id: t1-r38
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r38
       V: '4.32'
       Mo: '0'
       Ni: '12.26'
       C: '5.34'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1560,12 +1560,12 @@ experiments:
     sample_id: t1-r39
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r39
       V: '10.26'
       Mo: '0'
       Ni: '12.58'
       C: '6.05'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1599,12 +1599,12 @@ experiments:
     sample_id: t1-r40
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r40
       V: '12.45'
       Mo: '0'
       Ni: '9.31'
       C: '6.51'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1638,12 +1638,12 @@ experiments:
     sample_id: t1-r41
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r41
       V: '16.40'
       Mo: '0'
       Ni: '10.17'
       C: '7.08'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1677,12 +1677,12 @@ experiments:
     sample_id: t1-r42
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r42
       V: '0'
       Mo: '10.19'
       Ni: '13.15'
       C: '4.90'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1716,12 +1716,12 @@ experiments:
     sample_id: t1-r43
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r43
       V: '0'
       Mo: '14.80'
       Ni: '11.76'
       C: '4.98'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1755,12 +1755,12 @@ experiments:
     sample_id: t1-r44
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r44
       V: '0'
       Mo: '5.33'
       Ni: '12.32'
       C: '4.86'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1794,12 +1794,12 @@ experiments:
     sample_id: t1-r45
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r45
       V: '0'
       Mo: '9.31'
       Ni: '11.53'
       C: '4.92'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1833,12 +1833,12 @@ experiments:
     sample_id: t1-r46
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r46
       V: '0'
       Mo: '14.11'
       Ni: '18.40'
       C: '4.76'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1872,12 +1872,12 @@ experiments:
     sample_id: t1-r47
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r47
       V: '0'
       Mo: '7.75'
       Ni: '19.79'
       C: '4.55'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1911,12 +1911,12 @@ experiments:
     sample_id: t1-r48
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r48
       V: '11.43'
       Mo: '6.12'
       Ni: '8.44'
       C: '6.67'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1950,12 +1950,12 @@ experiments:
     sample_id: t1-r49
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-Csat-V-Mo-Ni
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t1_r49
       V: '10.70'
       Mo: '12.09'
       Ni: '8.07'
       C: '6.62'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -1989,10 +1989,10 @@ experiments:
     sample_id: t2-r01
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r01
       V: '0'
       C: '5.28'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2026,10 +2026,10 @@ experiments:
     sample_id: t2-r02
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r02
       V: '0.38'
       C: '5.40'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2063,10 +2063,10 @@ experiments:
     sample_id: t2-r03
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r03
       V: '2.31'
       C: '5.61'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2100,10 +2100,10 @@ experiments:
     sample_id: t2-r04
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r04
       V: '3.94'
       C: '5.78'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2137,10 +2137,10 @@ experiments:
     sample_id: t2-r05
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r05
       V: '7.32'
       C: '6.25'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2174,10 +2174,10 @@ experiments:
     sample_id: t2-r06
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r06
       V: '9.04'
       C: '6.45'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2211,10 +2211,10 @@ experiments:
     sample_id: t2-r07
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r07
       V: '11.80'
       C: '6.84'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2248,10 +2248,10 @@ experiments:
     sample_id: t2-r08
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r08
       V: '13.57'
       C: '7.16'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2285,10 +2285,10 @@ experiments:
     sample_id: t2-r09
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r09
       V: '20.04'
       C: '8.06'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2322,10 +2322,10 @@ experiments:
     sample_id: t2-r10
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r10
       V: '0'
       C: '5.53'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2359,10 +2359,10 @@ experiments:
     sample_id: t2-r11
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r11
       V: '0.62'
       C: '5.69'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2396,10 +2396,10 @@ experiments:
     sample_id: t2-r12
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r12
       V: '1.23'
       C: '5.77'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2433,10 +2433,10 @@ experiments:
     sample_id: t2-r13
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r13
       V: '3.46'
       C: '6.05'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2470,10 +2470,10 @@ experiments:
     sample_id: t2-r14
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r14
       V: '5.55'
       C: '6.34'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2507,10 +2507,10 @@ experiments:
     sample_id: t2-r15
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r15
       V: '11.51'
       C: '7.14'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2544,10 +2544,10 @@ experiments:
     sample_id: t2-r16
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r16
       V: '13.61'
       C: '7.41'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2581,10 +2581,10 @@ experiments:
     sample_id: t2-r17
     sample_id_note: Local table-row key; the article does not print an individual charge identifier.
     system_as_printed: Fe-V melt
-    component_values_as_printed:
+    component_values_as_printed: &kim_components_t2_r17
       V: '18.03'
       C: '8.00'
-    component_basis: mass percent
+    component_basis: element_wt_percent
     unreported_component: Fe balance is not reported and was not calculated.
   note: Table row used as the local sample key. The paper reports the alloy system and component assays, not a unique
     sample identifier.
@@ -2618,6 +2618,23 @@ species:
         point_conditions:
           temperature_K: *id002
           gas_mix: *id003
+          composition: &kim_composition_unknown_t1_r01
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r01
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 01; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r01
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r01
+            locator: *kim_composition_locator_t1_r01
         note: t1-r01 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2650,6 +2667,8 @@ species:
         point_conditions:
           temperature_K: *id002
           gas_mix: *id003
+          composition: *kim_composition_unknown_t1_r01
+          printed_composition: *kim_printed_composition_t1_r01
         note: t1-r01 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2682,6 +2701,8 @@ species:
         point_conditions:
           temperature_K: *id002
           gas_mix: *id003
+          composition: *kim_composition_unknown_t1_r01
+          printed_composition: *kim_printed_composition_t1_r01
         note: t1-r01 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2714,6 +2735,8 @@ species:
         point_conditions:
           temperature_K: *id002
           gas_mix: *id003
+          composition: *kim_composition_unknown_t1_r01
+          printed_composition: *kim_printed_composition_t1_r01
         note: t1-r01 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2739,6 +2762,23 @@ species:
         point_conditions:
           temperature_K: *id005
           gas_mix: *id006
+          composition: &kim_composition_unknown_t1_r02
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r02
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 02; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r02
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r02
+            locator: *kim_composition_locator_t1_r02
         note: t1-r02 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2771,6 +2811,8 @@ species:
         point_conditions:
           temperature_K: *id005
           gas_mix: *id006
+          composition: *kim_composition_unknown_t1_r02
+          printed_composition: *kim_printed_composition_t1_r02
         note: t1-r02 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2803,6 +2845,8 @@ species:
         point_conditions:
           temperature_K: *id005
           gas_mix: *id006
+          composition: *kim_composition_unknown_t1_r02
+          printed_composition: *kim_printed_composition_t1_r02
         note: t1-r02 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2835,6 +2879,8 @@ species:
         point_conditions:
           temperature_K: *id005
           gas_mix: *id006
+          composition: *kim_composition_unknown_t1_r02
+          printed_composition: *kim_printed_composition_t1_r02
         note: t1-r02 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2867,6 +2913,23 @@ species:
         point_conditions:
           temperature_K: *id007
           gas_mix: *id008
+          composition: &kim_composition_unknown_t1_r03
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r03
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 03; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r03
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r03
+            locator: *kim_composition_locator_t1_r03
         note: t1-r03 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2899,6 +2962,8 @@ species:
         point_conditions:
           temperature_K: *id007
           gas_mix: *id008
+          composition: *kim_composition_unknown_t1_r03
+          printed_composition: *kim_printed_composition_t1_r03
         note: t1-r03 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2931,6 +2996,8 @@ species:
         point_conditions:
           temperature_K: *id007
           gas_mix: *id008
+          composition: *kim_composition_unknown_t1_r03
+          printed_composition: *kim_printed_composition_t1_r03
         note: t1-r03 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2963,6 +3030,8 @@ species:
         point_conditions:
           temperature_K: *id007
           gas_mix: *id008
+          composition: *kim_composition_unknown_t1_r03
+          printed_composition: *kim_printed_composition_t1_r03
         note: t1-r03 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -2995,6 +3064,23 @@ species:
         point_conditions:
           temperature_K: *id009
           gas_mix: *id010
+          composition: &kim_composition_unknown_t1_r04
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r04
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 04; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r04
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r04
+            locator: *kim_composition_locator_t1_r04
         note: t1-r04 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3027,6 +3113,8 @@ species:
         point_conditions:
           temperature_K: *id009
           gas_mix: *id010
+          composition: *kim_composition_unknown_t1_r04
+          printed_composition: *kim_printed_composition_t1_r04
         note: t1-r04 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3059,6 +3147,8 @@ species:
         point_conditions:
           temperature_K: *id009
           gas_mix: *id010
+          composition: *kim_composition_unknown_t1_r04
+          printed_composition: *kim_printed_composition_t1_r04
         note: t1-r04 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3091,6 +3181,8 @@ species:
         point_conditions:
           temperature_K: *id009
           gas_mix: *id010
+          composition: *kim_composition_unknown_t1_r04
+          printed_composition: *kim_printed_composition_t1_r04
         note: t1-r04 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3123,6 +3215,23 @@ species:
         point_conditions:
           temperature_K: *id011
           gas_mix: *id012
+          composition: &kim_composition_unknown_t1_r05
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r05
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 05; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r05
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r05
+            locator: *kim_composition_locator_t1_r05
         note: t1-r05 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3155,6 +3264,8 @@ species:
         point_conditions:
           temperature_K: *id011
           gas_mix: *id012
+          composition: *kim_composition_unknown_t1_r05
+          printed_composition: *kim_printed_composition_t1_r05
         note: t1-r05 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3187,6 +3298,8 @@ species:
         point_conditions:
           temperature_K: *id011
           gas_mix: *id012
+          composition: *kim_composition_unknown_t1_r05
+          printed_composition: *kim_printed_composition_t1_r05
         note: t1-r05 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3219,6 +3332,8 @@ species:
         point_conditions:
           temperature_K: *id011
           gas_mix: *id012
+          composition: *kim_composition_unknown_t1_r05
+          printed_composition: *kim_printed_composition_t1_r05
         note: t1-r05 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3251,6 +3366,23 @@ species:
         point_conditions:
           temperature_K: *id013
           gas_mix: *id014
+          composition: &kim_composition_unknown_t1_r06
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r06
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 06; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r06
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r06
+            locator: *kim_composition_locator_t1_r06
         note: t1-r06 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3283,6 +3415,8 @@ species:
         point_conditions:
           temperature_K: *id013
           gas_mix: *id014
+          composition: *kim_composition_unknown_t1_r06
+          printed_composition: *kim_printed_composition_t1_r06
         note: t1-r06 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3315,6 +3449,8 @@ species:
         point_conditions:
           temperature_K: *id013
           gas_mix: *id014
+          composition: *kim_composition_unknown_t1_r06
+          printed_composition: *kim_printed_composition_t1_r06
         note: t1-r06 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3347,6 +3483,8 @@ species:
         point_conditions:
           temperature_K: *id013
           gas_mix: *id014
+          composition: *kim_composition_unknown_t1_r06
+          printed_composition: *kim_printed_composition_t1_r06
         note: t1-r06 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3379,6 +3517,23 @@ species:
         point_conditions:
           temperature_K: *id015
           gas_mix: *id016
+          composition: &kim_composition_unknown_t1_r07
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r07
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 07; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r07
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r07
+            locator: *kim_composition_locator_t1_r07
         note: t1-r07 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3411,6 +3566,8 @@ species:
         point_conditions:
           temperature_K: *id015
           gas_mix: *id016
+          composition: *kim_composition_unknown_t1_r07
+          printed_composition: *kim_printed_composition_t1_r07
         note: t1-r07 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3443,6 +3600,8 @@ species:
         point_conditions:
           temperature_K: *id015
           gas_mix: *id016
+          composition: *kim_composition_unknown_t1_r07
+          printed_composition: *kim_printed_composition_t1_r07
         note: t1-r07 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3475,6 +3634,8 @@ species:
         point_conditions:
           temperature_K: *id015
           gas_mix: *id016
+          composition: *kim_composition_unknown_t1_r07
+          printed_composition: *kim_printed_composition_t1_r07
         note: t1-r07 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3507,6 +3668,23 @@ species:
         point_conditions:
           temperature_K: *id017
           gas_mix: *id018
+          composition: &kim_composition_unknown_t1_r08
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r08
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 08; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r08
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r08
+            locator: *kim_composition_locator_t1_r08
         note: t1-r08 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3539,6 +3717,8 @@ species:
         point_conditions:
           temperature_K: *id017
           gas_mix: *id018
+          composition: *kim_composition_unknown_t1_r08
+          printed_composition: *kim_printed_composition_t1_r08
         note: t1-r08 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3571,6 +3751,8 @@ species:
         point_conditions:
           temperature_K: *id017
           gas_mix: *id018
+          composition: *kim_composition_unknown_t1_r08
+          printed_composition: *kim_printed_composition_t1_r08
         note: t1-r08 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3603,6 +3785,8 @@ species:
         point_conditions:
           temperature_K: *id017
           gas_mix: *id018
+          composition: *kim_composition_unknown_t1_r08
+          printed_composition: *kim_printed_composition_t1_r08
         note: t1-r08 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3635,6 +3819,23 @@ species:
         point_conditions:
           temperature_K: *id019
           gas_mix: *id020
+          composition: &kim_composition_unknown_t1_r09
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r09
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 09; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r09
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r09
+            locator: *kim_composition_locator_t1_r09
         note: t1-r09 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3667,6 +3868,8 @@ species:
         point_conditions:
           temperature_K: *id019
           gas_mix: *id020
+          composition: *kim_composition_unknown_t1_r09
+          printed_composition: *kim_printed_composition_t1_r09
         note: t1-r09 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3699,6 +3902,8 @@ species:
         point_conditions:
           temperature_K: *id019
           gas_mix: *id020
+          composition: *kim_composition_unknown_t1_r09
+          printed_composition: *kim_printed_composition_t1_r09
         note: t1-r09 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3731,6 +3936,8 @@ species:
         point_conditions:
           temperature_K: *id019
           gas_mix: *id020
+          composition: *kim_composition_unknown_t1_r09
+          printed_composition: *kim_printed_composition_t1_r09
         note: t1-r09 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3763,6 +3970,23 @@ species:
         point_conditions:
           temperature_K: *id021
           gas_mix: *id022
+          composition: &kim_composition_unknown_t1_r10
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r10
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 10; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r10
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r10
+            locator: *kim_composition_locator_t1_r10
         note: t1-r10 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3795,6 +4019,8 @@ species:
         point_conditions:
           temperature_K: *id021
           gas_mix: *id022
+          composition: *kim_composition_unknown_t1_r10
+          printed_composition: *kim_printed_composition_t1_r10
         note: t1-r10 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3827,6 +4053,8 @@ species:
         point_conditions:
           temperature_K: *id021
           gas_mix: *id022
+          composition: *kim_composition_unknown_t1_r10
+          printed_composition: *kim_printed_composition_t1_r10
         note: t1-r10 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3859,6 +4087,8 @@ species:
         point_conditions:
           temperature_K: *id021
           gas_mix: *id022
+          composition: *kim_composition_unknown_t1_r10
+          printed_composition: *kim_printed_composition_t1_r10
         note: t1-r10 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3891,6 +4121,23 @@ species:
         point_conditions:
           temperature_K: *id023
           gas_mix: *id024
+          composition: &kim_composition_unknown_t1_r11
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r11
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 11; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r11
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r11
+            locator: *kim_composition_locator_t1_r11
         note: t1-r11 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3923,6 +4170,8 @@ species:
         point_conditions:
           temperature_K: *id023
           gas_mix: *id024
+          composition: *kim_composition_unknown_t1_r11
+          printed_composition: *kim_printed_composition_t1_r11
         note: t1-r11 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3955,6 +4204,8 @@ species:
         point_conditions:
           temperature_K: *id023
           gas_mix: *id024
+          composition: *kim_composition_unknown_t1_r11
+          printed_composition: *kim_printed_composition_t1_r11
         note: t1-r11 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -3987,6 +4238,8 @@ species:
         point_conditions:
           temperature_K: *id023
           gas_mix: *id024
+          composition: *kim_composition_unknown_t1_r11
+          printed_composition: *kim_printed_composition_t1_r11
         note: t1-r11 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4019,6 +4272,23 @@ species:
         point_conditions:
           temperature_K: *id025
           gas_mix: *id026
+          composition: &kim_composition_unknown_t1_r12
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r12
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 12; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r12
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r12
+            locator: *kim_composition_locator_t1_r12
         note: t1-r12 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4051,6 +4321,8 @@ species:
         point_conditions:
           temperature_K: *id025
           gas_mix: *id026
+          composition: *kim_composition_unknown_t1_r12
+          printed_composition: *kim_printed_composition_t1_r12
         note: t1-r12 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4083,6 +4355,8 @@ species:
         point_conditions:
           temperature_K: *id025
           gas_mix: *id026
+          composition: *kim_composition_unknown_t1_r12
+          printed_composition: *kim_printed_composition_t1_r12
         note: t1-r12 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4115,6 +4389,8 @@ species:
         point_conditions:
           temperature_K: *id025
           gas_mix: *id026
+          composition: *kim_composition_unknown_t1_r12
+          printed_composition: *kim_printed_composition_t1_r12
         note: t1-r12 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4147,6 +4423,23 @@ species:
         point_conditions:
           temperature_K: *id027
           gas_mix: *id028
+          composition: &kim_composition_unknown_t1_r13
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r13
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 13; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r13
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r13
+            locator: *kim_composition_locator_t1_r13
         note: t1-r13 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4179,6 +4472,8 @@ species:
         point_conditions:
           temperature_K: *id027
           gas_mix: *id028
+          composition: *kim_composition_unknown_t1_r13
+          printed_composition: *kim_printed_composition_t1_r13
         note: t1-r13 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4211,6 +4506,8 @@ species:
         point_conditions:
           temperature_K: *id027
           gas_mix: *id028
+          composition: *kim_composition_unknown_t1_r13
+          printed_composition: *kim_printed_composition_t1_r13
         note: t1-r13 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4243,6 +4540,8 @@ species:
         point_conditions:
           temperature_K: *id027
           gas_mix: *id028
+          composition: *kim_composition_unknown_t1_r13
+          printed_composition: *kim_printed_composition_t1_r13
         note: t1-r13 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4275,6 +4574,23 @@ species:
         point_conditions:
           temperature_K: *id029
           gas_mix: *id030
+          composition: &kim_composition_unknown_t1_r14
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r14
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 14; Fe-Csat-V'
+          printed_composition: &kim_printed_composition_t1_r14
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r14
+            locator: *kim_composition_locator_t1_r14
         note: t1-r14 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4307,6 +4623,8 @@ species:
         point_conditions:
           temperature_K: *id029
           gas_mix: *id030
+          composition: *kim_composition_unknown_t1_r14
+          printed_composition: *kim_printed_composition_t1_r14
         note: t1-r14 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4339,6 +4657,8 @@ species:
         point_conditions:
           temperature_K: *id029
           gas_mix: *id030
+          composition: *kim_composition_unknown_t1_r14
+          printed_composition: *kim_printed_composition_t1_r14
         note: t1-r14 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4364,6 +4684,8 @@ species:
         point_conditions:
           temperature_K: *id029
           gas_mix: *id030
+          composition: *kim_composition_unknown_t1_r14
+          printed_composition: *kim_printed_composition_t1_r14
         note: t1-r14 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4396,6 +4718,23 @@ species:
         point_conditions:
           temperature_K: *id032
           gas_mix: *id033
+          composition: &kim_composition_unknown_t1_r15
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r15
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 15; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r15
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r15
+            locator: *kim_composition_locator_t1_r15
         note: t1-r15 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4428,6 +4767,8 @@ species:
         point_conditions:
           temperature_K: *id032
           gas_mix: *id033
+          composition: *kim_composition_unknown_t1_r15
+          printed_composition: *kim_printed_composition_t1_r15
         note: t1-r15 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4460,6 +4801,8 @@ species:
         point_conditions:
           temperature_K: *id032
           gas_mix: *id033
+          composition: *kim_composition_unknown_t1_r15
+          printed_composition: *kim_printed_composition_t1_r15
         note: t1-r15 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4492,6 +4835,8 @@ species:
         point_conditions:
           temperature_K: *id032
           gas_mix: *id033
+          composition: *kim_composition_unknown_t1_r15
+          printed_composition: *kim_printed_composition_t1_r15
         note: t1-r15 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4524,6 +4869,23 @@ species:
         point_conditions:
           temperature_K: *id034
           gas_mix: *id035
+          composition: &kim_composition_unknown_t1_r16
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r16
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 16; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r16
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r16
+            locator: *kim_composition_locator_t1_r16
         note: t1-r16 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4556,6 +4918,8 @@ species:
         point_conditions:
           temperature_K: *id034
           gas_mix: *id035
+          composition: *kim_composition_unknown_t1_r16
+          printed_composition: *kim_printed_composition_t1_r16
         note: t1-r16 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4588,6 +4952,8 @@ species:
         point_conditions:
           temperature_K: *id034
           gas_mix: *id035
+          composition: *kim_composition_unknown_t1_r16
+          printed_composition: *kim_printed_composition_t1_r16
         note: t1-r16 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4620,6 +4986,8 @@ species:
         point_conditions:
           temperature_K: *id034
           gas_mix: *id035
+          composition: *kim_composition_unknown_t1_r16
+          printed_composition: *kim_printed_composition_t1_r16
         note: t1-r16 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4652,6 +5020,23 @@ species:
         point_conditions:
           temperature_K: *id036
           gas_mix: *id037
+          composition: &kim_composition_unknown_t1_r17
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r17
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 17; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r17
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r17
+            locator: *kim_composition_locator_t1_r17
         note: t1-r17 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4684,6 +5069,8 @@ species:
         point_conditions:
           temperature_K: *id036
           gas_mix: *id037
+          composition: *kim_composition_unknown_t1_r17
+          printed_composition: *kim_printed_composition_t1_r17
         note: t1-r17 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4716,6 +5103,8 @@ species:
         point_conditions:
           temperature_K: *id036
           gas_mix: *id037
+          composition: *kim_composition_unknown_t1_r17
+          printed_composition: *kim_printed_composition_t1_r17
         note: t1-r17 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4748,6 +5137,8 @@ species:
         point_conditions:
           temperature_K: *id036
           gas_mix: *id037
+          composition: *kim_composition_unknown_t1_r17
+          printed_composition: *kim_printed_composition_t1_r17
         note: t1-r17 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4780,6 +5171,23 @@ species:
         point_conditions:
           temperature_K: *id038
           gas_mix: *id039
+          composition: &kim_composition_unknown_t1_r18
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r18
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 18; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r18
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r18
+            locator: *kim_composition_locator_t1_r18
         note: t1-r18 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4812,6 +5220,8 @@ species:
         point_conditions:
           temperature_K: *id038
           gas_mix: *id039
+          composition: *kim_composition_unknown_t1_r18
+          printed_composition: *kim_printed_composition_t1_r18
         note: t1-r18 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4844,6 +5254,8 @@ species:
         point_conditions:
           temperature_K: *id038
           gas_mix: *id039
+          composition: *kim_composition_unknown_t1_r18
+          printed_composition: *kim_printed_composition_t1_r18
         note: t1-r18 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4876,6 +5288,8 @@ species:
         point_conditions:
           temperature_K: *id038
           gas_mix: *id039
+          composition: *kim_composition_unknown_t1_r18
+          printed_composition: *kim_printed_composition_t1_r18
         note: t1-r18 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4908,6 +5322,23 @@ species:
         point_conditions:
           temperature_K: *id040
           gas_mix: *id041
+          composition: &kim_composition_unknown_t1_r19
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r19
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 19; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r19
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r19
+            locator: *kim_composition_locator_t1_r19
         note: t1-r19 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4940,6 +5371,8 @@ species:
         point_conditions:
           temperature_K: *id040
           gas_mix: *id041
+          composition: *kim_composition_unknown_t1_r19
+          printed_composition: *kim_printed_composition_t1_r19
         note: t1-r19 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -4972,6 +5405,8 @@ species:
         point_conditions:
           temperature_K: *id040
           gas_mix: *id041
+          composition: *kim_composition_unknown_t1_r19
+          printed_composition: *kim_printed_composition_t1_r19
         note: t1-r19 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5004,6 +5439,8 @@ species:
         point_conditions:
           temperature_K: *id040
           gas_mix: *id041
+          composition: *kim_composition_unknown_t1_r19
+          printed_composition: *kim_printed_composition_t1_r19
         note: t1-r19 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5036,6 +5473,23 @@ species:
         point_conditions:
           temperature_K: *id042
           gas_mix: *id043
+          composition: &kim_composition_unknown_t1_r20
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r20
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 20; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r20
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r20
+            locator: *kim_composition_locator_t1_r20
         note: t1-r20 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5068,6 +5522,8 @@ species:
         point_conditions:
           temperature_K: *id042
           gas_mix: *id043
+          composition: *kim_composition_unknown_t1_r20
+          printed_composition: *kim_printed_composition_t1_r20
         note: t1-r20 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5100,6 +5556,8 @@ species:
         point_conditions:
           temperature_K: *id042
           gas_mix: *id043
+          composition: *kim_composition_unknown_t1_r20
+          printed_composition: *kim_printed_composition_t1_r20
         note: t1-r20 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5132,6 +5590,8 @@ species:
         point_conditions:
           temperature_K: *id042
           gas_mix: *id043
+          composition: *kim_composition_unknown_t1_r20
+          printed_composition: *kim_printed_composition_t1_r20
         note: t1-r20 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5164,6 +5624,23 @@ species:
         point_conditions:
           temperature_K: *id044
           gas_mix: *id045
+          composition: &kim_composition_unknown_t1_r21
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r21
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 21; Fe-Csat-Mo'
+          printed_composition: &kim_printed_composition_t1_r21
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r21
+            locator: *kim_composition_locator_t1_r21
         note: t1-r21 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5196,6 +5673,8 @@ species:
         point_conditions:
           temperature_K: *id044
           gas_mix: *id045
+          composition: *kim_composition_unknown_t1_r21
+          printed_composition: *kim_printed_composition_t1_r21
         note: t1-r21 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5228,6 +5707,8 @@ species:
         point_conditions:
           temperature_K: *id044
           gas_mix: *id045
+          composition: *kim_composition_unknown_t1_r21
+          printed_composition: *kim_printed_composition_t1_r21
         note: t1-r21 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5260,6 +5741,8 @@ species:
         point_conditions:
           temperature_K: *id044
           gas_mix: *id045
+          composition: *kim_composition_unknown_t1_r21
+          printed_composition: *kim_printed_composition_t1_r21
         note: t1-r21 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5292,6 +5775,23 @@ species:
         point_conditions:
           temperature_K: *id046
           gas_mix: *id047
+          composition: &kim_composition_unknown_t1_r22
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r22
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 22; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r22
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r22
+            locator: *kim_composition_locator_t1_r22
         note: t1-r22 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5324,6 +5824,8 @@ species:
         point_conditions:
           temperature_K: *id046
           gas_mix: *id047
+          composition: *kim_composition_unknown_t1_r22
+          printed_composition: *kim_printed_composition_t1_r22
         note: t1-r22 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5356,6 +5858,8 @@ species:
         point_conditions:
           temperature_K: *id046
           gas_mix: *id047
+          composition: *kim_composition_unknown_t1_r22
+          printed_composition: *kim_printed_composition_t1_r22
         note: t1-r22 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5388,6 +5892,8 @@ species:
         point_conditions:
           temperature_K: *id046
           gas_mix: *id047
+          composition: *kim_composition_unknown_t1_r22
+          printed_composition: *kim_printed_composition_t1_r22
         note: t1-r22 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5420,6 +5926,23 @@ species:
         point_conditions:
           temperature_K: *id048
           gas_mix: *id049
+          composition: &kim_composition_unknown_t1_r23
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r23
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 23; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r23
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r23
+            locator: *kim_composition_locator_t1_r23
         note: t1-r23 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5452,6 +5975,8 @@ species:
         point_conditions:
           temperature_K: *id048
           gas_mix: *id049
+          composition: *kim_composition_unknown_t1_r23
+          printed_composition: *kim_printed_composition_t1_r23
         note: t1-r23 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5484,6 +6009,8 @@ species:
         point_conditions:
           temperature_K: *id048
           gas_mix: *id049
+          composition: *kim_composition_unknown_t1_r23
+          printed_composition: *kim_printed_composition_t1_r23
         note: t1-r23 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5516,6 +6043,8 @@ species:
         point_conditions:
           temperature_K: *id048
           gas_mix: *id049
+          composition: *kim_composition_unknown_t1_r23
+          printed_composition: *kim_printed_composition_t1_r23
         note: t1-r23 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5548,6 +6077,23 @@ species:
         point_conditions:
           temperature_K: *id050
           gas_mix: *id051
+          composition: &kim_composition_unknown_t1_r24
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r24
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 24; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r24
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r24
+            locator: *kim_composition_locator_t1_r24
         note: t1-r24 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5580,6 +6126,8 @@ species:
         point_conditions:
           temperature_K: *id050
           gas_mix: *id051
+          composition: *kim_composition_unknown_t1_r24
+          printed_composition: *kim_printed_composition_t1_r24
         note: t1-r24 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5612,6 +6160,8 @@ species:
         point_conditions:
           temperature_K: *id050
           gas_mix: *id051
+          composition: *kim_composition_unknown_t1_r24
+          printed_composition: *kim_printed_composition_t1_r24
         note: t1-r24 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5644,6 +6194,8 @@ species:
         point_conditions:
           temperature_K: *id050
           gas_mix: *id051
+          composition: *kim_composition_unknown_t1_r24
+          printed_composition: *kim_printed_composition_t1_r24
         note: t1-r24 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5676,6 +6228,23 @@ species:
         point_conditions:
           temperature_K: *id052
           gas_mix: *id053
+          composition: &kim_composition_unknown_t1_r25
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r25
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 25; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r25
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r25
+            locator: *kim_composition_locator_t1_r25
         note: t1-r25 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5708,6 +6277,8 @@ species:
         point_conditions:
           temperature_K: *id052
           gas_mix: *id053
+          composition: *kim_composition_unknown_t1_r25
+          printed_composition: *kim_printed_composition_t1_r25
         note: t1-r25 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5740,6 +6311,8 @@ species:
         point_conditions:
           temperature_K: *id052
           gas_mix: *id053
+          composition: *kim_composition_unknown_t1_r25
+          printed_composition: *kim_printed_composition_t1_r25
         note: t1-r25 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5772,6 +6345,8 @@ species:
         point_conditions:
           temperature_K: *id052
           gas_mix: *id053
+          composition: *kim_composition_unknown_t1_r25
+          printed_composition: *kim_printed_composition_t1_r25
         note: t1-r25 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5804,6 +6379,23 @@ species:
         point_conditions:
           temperature_K: *id054
           gas_mix: *id055
+          composition: &kim_composition_unknown_t1_r26
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r26
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 26; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r26
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r26
+            locator: *kim_composition_locator_t1_r26
         note: t1-r26 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5836,6 +6428,8 @@ species:
         point_conditions:
           temperature_K: *id054
           gas_mix: *id055
+          composition: *kim_composition_unknown_t1_r26
+          printed_composition: *kim_printed_composition_t1_r26
         note: t1-r26 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5868,6 +6462,8 @@ species:
         point_conditions:
           temperature_K: *id054
           gas_mix: *id055
+          composition: *kim_composition_unknown_t1_r26
+          printed_composition: *kim_printed_composition_t1_r26
         note: t1-r26 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5900,6 +6496,8 @@ species:
         point_conditions:
           temperature_K: *id054
           gas_mix: *id055
+          composition: *kim_composition_unknown_t1_r26
+          printed_composition: *kim_printed_composition_t1_r26
         note: t1-r26 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5932,6 +6530,23 @@ species:
         point_conditions:
           temperature_K: *id056
           gas_mix: *id057
+          composition: &kim_composition_unknown_t1_r27
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r27
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 27; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r27
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r27
+            locator: *kim_composition_locator_t1_r27
         note: t1-r27 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5964,6 +6579,8 @@ species:
         point_conditions:
           temperature_K: *id056
           gas_mix: *id057
+          composition: *kim_composition_unknown_t1_r27
+          printed_composition: *kim_printed_composition_t1_r27
         note: t1-r27 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -5996,6 +6613,8 @@ species:
         point_conditions:
           temperature_K: *id056
           gas_mix: *id057
+          composition: *kim_composition_unknown_t1_r27
+          printed_composition: *kim_printed_composition_t1_r27
         note: t1-r27 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6028,6 +6647,8 @@ species:
         point_conditions:
           temperature_K: *id056
           gas_mix: *id057
+          composition: *kim_composition_unknown_t1_r27
+          printed_composition: *kim_printed_composition_t1_r27
         note: t1-r27 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6060,6 +6681,23 @@ species:
         point_conditions:
           temperature_K: *id058
           gas_mix: *id059
+          composition: &kim_composition_unknown_t1_r28
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r28
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 28; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r28
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r28
+            locator: *kim_composition_locator_t1_r28
         note: t1-r28 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6092,6 +6730,8 @@ species:
         point_conditions:
           temperature_K: *id058
           gas_mix: *id059
+          composition: *kim_composition_unknown_t1_r28
+          printed_composition: *kim_printed_composition_t1_r28
         note: t1-r28 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6124,6 +6764,8 @@ species:
         point_conditions:
           temperature_K: *id058
           gas_mix: *id059
+          composition: *kim_composition_unknown_t1_r28
+          printed_composition: *kim_printed_composition_t1_r28
         note: t1-r28 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6156,6 +6798,8 @@ species:
         point_conditions:
           temperature_K: *id058
           gas_mix: *id059
+          composition: *kim_composition_unknown_t1_r28
+          printed_composition: *kim_printed_composition_t1_r28
         note: t1-r28 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6188,6 +6832,23 @@ species:
         point_conditions:
           temperature_K: *id060
           gas_mix: *id061
+          composition: &kim_composition_unknown_t1_r29
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r29
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 29; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r29
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r29
+            locator: *kim_composition_locator_t1_r29
         note: t1-r29 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6220,6 +6881,8 @@ species:
         point_conditions:
           temperature_K: *id060
           gas_mix: *id061
+          composition: *kim_composition_unknown_t1_r29
+          printed_composition: *kim_printed_composition_t1_r29
         note: t1-r29 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6252,6 +6915,8 @@ species:
         point_conditions:
           temperature_K: *id060
           gas_mix: *id061
+          composition: *kim_composition_unknown_t1_r29
+          printed_composition: *kim_printed_composition_t1_r29
         note: t1-r29 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6284,6 +6949,8 @@ species:
         point_conditions:
           temperature_K: *id060
           gas_mix: *id061
+          composition: *kim_composition_unknown_t1_r29
+          printed_composition: *kim_printed_composition_t1_r29
         note: t1-r29 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6316,6 +6983,23 @@ species:
         point_conditions:
           temperature_K: *id062
           gas_mix: *id063
+          composition: &kim_composition_unknown_t1_r30
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r30
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 30; Fe-Csat-Ni'
+          printed_composition: &kim_printed_composition_t1_r30
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r30
+            locator: *kim_composition_locator_t1_r30
         note: t1-r30 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6348,6 +7032,8 @@ species:
         point_conditions:
           temperature_K: *id062
           gas_mix: *id063
+          composition: *kim_composition_unknown_t1_r30
+          printed_composition: *kim_printed_composition_t1_r30
         note: t1-r30 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6380,6 +7066,8 @@ species:
         point_conditions:
           temperature_K: *id062
           gas_mix: *id063
+          composition: *kim_composition_unknown_t1_r30
+          printed_composition: *kim_printed_composition_t1_r30
         note: t1-r30 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6412,6 +7100,8 @@ species:
         point_conditions:
           temperature_K: *id062
           gas_mix: *id063
+          composition: *kim_composition_unknown_t1_r30
+          printed_composition: *kim_printed_composition_t1_r30
         note: t1-r30 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6444,6 +7134,23 @@ species:
         point_conditions:
           temperature_K: *id064
           gas_mix: *id065
+          composition: &kim_composition_unknown_t1_r31
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r31
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 31; Fe-Csat-V-Mo'
+          printed_composition: &kim_printed_composition_t1_r31
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r31
+            locator: *kim_composition_locator_t1_r31
         note: t1-r31 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6476,6 +7183,8 @@ species:
         point_conditions:
           temperature_K: *id064
           gas_mix: *id065
+          composition: *kim_composition_unknown_t1_r31
+          printed_composition: *kim_printed_composition_t1_r31
         note: t1-r31 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6508,6 +7217,8 @@ species:
         point_conditions:
           temperature_K: *id064
           gas_mix: *id065
+          composition: *kim_composition_unknown_t1_r31
+          printed_composition: *kim_printed_composition_t1_r31
         note: t1-r31 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6540,6 +7251,8 @@ species:
         point_conditions:
           temperature_K: *id064
           gas_mix: *id065
+          composition: *kim_composition_unknown_t1_r31
+          printed_composition: *kim_printed_composition_t1_r31
         note: t1-r31 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6572,6 +7285,23 @@ species:
         point_conditions:
           temperature_K: *id066
           gas_mix: *id067
+          composition: &kim_composition_unknown_t1_r32
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r32
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 32; Fe-Csat-V-Mo'
+          printed_composition: &kim_printed_composition_t1_r32
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r32
+            locator: *kim_composition_locator_t1_r32
         note: t1-r32 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6604,6 +7334,8 @@ species:
         point_conditions:
           temperature_K: *id066
           gas_mix: *id067
+          composition: *kim_composition_unknown_t1_r32
+          printed_composition: *kim_printed_composition_t1_r32
         note: t1-r32 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6636,6 +7368,8 @@ species:
         point_conditions:
           temperature_K: *id066
           gas_mix: *id067
+          composition: *kim_composition_unknown_t1_r32
+          printed_composition: *kim_printed_composition_t1_r32
         note: t1-r32 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6668,6 +7402,8 @@ species:
         point_conditions:
           temperature_K: *id066
           gas_mix: *id067
+          composition: *kim_composition_unknown_t1_r32
+          printed_composition: *kim_printed_composition_t1_r32
         note: t1-r32 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6700,6 +7436,23 @@ species:
         point_conditions:
           temperature_K: *id068
           gas_mix: *id069
+          composition: &kim_composition_unknown_t1_r33
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r33
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 33; Fe-Csat-V-Mo'
+          printed_composition: &kim_printed_composition_t1_r33
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r33
+            locator: *kim_composition_locator_t1_r33
         note: t1-r33 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6732,6 +7485,8 @@ species:
         point_conditions:
           temperature_K: *id068
           gas_mix: *id069
+          composition: *kim_composition_unknown_t1_r33
+          printed_composition: *kim_printed_composition_t1_r33
         note: t1-r33 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6764,6 +7519,8 @@ species:
         point_conditions:
           temperature_K: *id068
           gas_mix: *id069
+          composition: *kim_composition_unknown_t1_r33
+          printed_composition: *kim_printed_composition_t1_r33
         note: t1-r33 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6796,6 +7553,8 @@ species:
         point_conditions:
           temperature_K: *id068
           gas_mix: *id069
+          composition: *kim_composition_unknown_t1_r33
+          printed_composition: *kim_printed_composition_t1_r33
         note: t1-r33 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6828,6 +7587,23 @@ species:
         point_conditions:
           temperature_K: *id070
           gas_mix: *id071
+          composition: &kim_composition_unknown_t1_r34
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r34
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 34; Fe-Csat-V-Mo'
+          printed_composition: &kim_printed_composition_t1_r34
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r34
+            locator: *kim_composition_locator_t1_r34
         note: t1-r34 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6860,6 +7636,8 @@ species:
         point_conditions:
           temperature_K: *id070
           gas_mix: *id071
+          composition: *kim_composition_unknown_t1_r34
+          printed_composition: *kim_printed_composition_t1_r34
         note: t1-r34 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6892,6 +7670,8 @@ species:
         point_conditions:
           temperature_K: *id070
           gas_mix: *id071
+          composition: *kim_composition_unknown_t1_r34
+          printed_composition: *kim_printed_composition_t1_r34
         note: t1-r34 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6924,6 +7704,8 @@ species:
         point_conditions:
           temperature_K: *id070
           gas_mix: *id071
+          composition: *kim_composition_unknown_t1_r34
+          printed_composition: *kim_printed_composition_t1_r34
         note: t1-r34 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6956,6 +7738,23 @@ species:
         point_conditions:
           temperature_K: *id072
           gas_mix: *id073
+          composition: &kim_composition_unknown_t1_r35
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r35
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 35; Fe-Csat-V-Mo'
+          printed_composition: &kim_printed_composition_t1_r35
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r35
+            locator: *kim_composition_locator_t1_r35
         note: t1-r35 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -6988,6 +7787,8 @@ species:
         point_conditions:
           temperature_K: *id072
           gas_mix: *id073
+          composition: *kim_composition_unknown_t1_r35
+          printed_composition: *kim_printed_composition_t1_r35
         note: t1-r35 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7020,6 +7821,8 @@ species:
         point_conditions:
           temperature_K: *id072
           gas_mix: *id073
+          composition: *kim_composition_unknown_t1_r35
+          printed_composition: *kim_printed_composition_t1_r35
         note: t1-r35 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7052,6 +7855,8 @@ species:
         point_conditions:
           temperature_K: *id072
           gas_mix: *id073
+          composition: *kim_composition_unknown_t1_r35
+          printed_composition: *kim_printed_composition_t1_r35
         note: t1-r35 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7084,6 +7889,23 @@ species:
         point_conditions:
           temperature_K: *id074
           gas_mix: *id075
+          composition: &kim_composition_unknown_t1_r36
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r36
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 36; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r36
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r36
+            locator: *kim_composition_locator_t1_r36
         note: t1-r36 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7116,6 +7938,8 @@ species:
         point_conditions:
           temperature_K: *id074
           gas_mix: *id075
+          composition: *kim_composition_unknown_t1_r36
+          printed_composition: *kim_printed_composition_t1_r36
         note: t1-r36 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7148,6 +7972,8 @@ species:
         point_conditions:
           temperature_K: *id074
           gas_mix: *id075
+          composition: *kim_composition_unknown_t1_r36
+          printed_composition: *kim_printed_composition_t1_r36
         note: t1-r36 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7180,6 +8006,8 @@ species:
         point_conditions:
           temperature_K: *id074
           gas_mix: *id075
+          composition: *kim_composition_unknown_t1_r36
+          printed_composition: *kim_printed_composition_t1_r36
         note: t1-r36 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7212,6 +8040,23 @@ species:
         point_conditions:
           temperature_K: *id076
           gas_mix: *id077
+          composition: &kim_composition_unknown_t1_r37
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r37
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 37; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r37
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r37
+            locator: *kim_composition_locator_t1_r37
         note: t1-r37 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7244,6 +8089,8 @@ species:
         point_conditions:
           temperature_K: *id076
           gas_mix: *id077
+          composition: *kim_composition_unknown_t1_r37
+          printed_composition: *kim_printed_composition_t1_r37
         note: t1-r37 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7276,6 +8123,8 @@ species:
         point_conditions:
           temperature_K: *id076
           gas_mix: *id077
+          composition: *kim_composition_unknown_t1_r37
+          printed_composition: *kim_printed_composition_t1_r37
         note: t1-r37 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7308,6 +8157,8 @@ species:
         point_conditions:
           temperature_K: *id076
           gas_mix: *id077
+          composition: *kim_composition_unknown_t1_r37
+          printed_composition: *kim_printed_composition_t1_r37
         note: t1-r37 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7340,6 +8191,23 @@ species:
         point_conditions:
           temperature_K: *id078
           gas_mix: *id079
+          composition: &kim_composition_unknown_t1_r38
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r38
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 38; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r38
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r38
+            locator: *kim_composition_locator_t1_r38
         note: t1-r38 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7372,6 +8240,8 @@ species:
         point_conditions:
           temperature_K: *id078
           gas_mix: *id079
+          composition: *kim_composition_unknown_t1_r38
+          printed_composition: *kim_printed_composition_t1_r38
         note: t1-r38 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7404,6 +8274,8 @@ species:
         point_conditions:
           temperature_K: *id078
           gas_mix: *id079
+          composition: *kim_composition_unknown_t1_r38
+          printed_composition: *kim_printed_composition_t1_r38
         note: t1-r38 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7436,6 +8308,8 @@ species:
         point_conditions:
           temperature_K: *id078
           gas_mix: *id079
+          composition: *kim_composition_unknown_t1_r38
+          printed_composition: *kim_printed_composition_t1_r38
         note: t1-r38 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7468,6 +8342,23 @@ species:
         point_conditions:
           temperature_K: *id080
           gas_mix: *id081
+          composition: &kim_composition_unknown_t1_r39
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r39
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 39; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r39
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r39
+            locator: *kim_composition_locator_t1_r39
         note: t1-r39 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7500,6 +8391,8 @@ species:
         point_conditions:
           temperature_K: *id080
           gas_mix: *id081
+          composition: *kim_composition_unknown_t1_r39
+          printed_composition: *kim_printed_composition_t1_r39
         note: t1-r39 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7532,6 +8425,8 @@ species:
         point_conditions:
           temperature_K: *id080
           gas_mix: *id081
+          composition: *kim_composition_unknown_t1_r39
+          printed_composition: *kim_printed_composition_t1_r39
         note: t1-r39 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7564,6 +8459,8 @@ species:
         point_conditions:
           temperature_K: *id080
           gas_mix: *id081
+          composition: *kim_composition_unknown_t1_r39
+          printed_composition: *kim_printed_composition_t1_r39
         note: t1-r39 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7596,6 +8493,23 @@ species:
         point_conditions:
           temperature_K: *id082
           gas_mix: *id083
+          composition: &kim_composition_unknown_t1_r40
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r40
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 40; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r40
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r40
+            locator: *kim_composition_locator_t1_r40
         note: t1-r40 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7628,6 +8542,8 @@ species:
         point_conditions:
           temperature_K: *id082
           gas_mix: *id083
+          composition: *kim_composition_unknown_t1_r40
+          printed_composition: *kim_printed_composition_t1_r40
         note: t1-r40 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7660,6 +8576,8 @@ species:
         point_conditions:
           temperature_K: *id082
           gas_mix: *id083
+          composition: *kim_composition_unknown_t1_r40
+          printed_composition: *kim_printed_composition_t1_r40
         note: t1-r40 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7692,6 +8610,8 @@ species:
         point_conditions:
           temperature_K: *id082
           gas_mix: *id083
+          composition: *kim_composition_unknown_t1_r40
+          printed_composition: *kim_printed_composition_t1_r40
         note: t1-r40 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7724,6 +8644,23 @@ species:
         point_conditions:
           temperature_K: *id084
           gas_mix: *id085
+          composition: &kim_composition_unknown_t1_r41
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r41
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 41; Fe-Csat-V-Ni'
+          printed_composition: &kim_printed_composition_t1_r41
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r41
+            locator: *kim_composition_locator_t1_r41
         note: t1-r41 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7756,6 +8693,8 @@ species:
         point_conditions:
           temperature_K: *id084
           gas_mix: *id085
+          composition: *kim_composition_unknown_t1_r41
+          printed_composition: *kim_printed_composition_t1_r41
         note: t1-r41 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7788,6 +8727,8 @@ species:
         point_conditions:
           temperature_K: *id084
           gas_mix: *id085
+          composition: *kim_composition_unknown_t1_r41
+          printed_composition: *kim_printed_composition_t1_r41
         note: t1-r41 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7820,6 +8761,8 @@ species:
         point_conditions:
           temperature_K: *id084
           gas_mix: *id085
+          composition: *kim_composition_unknown_t1_r41
+          printed_composition: *kim_printed_composition_t1_r41
         note: t1-r41 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7852,6 +8795,23 @@ species:
         point_conditions:
           temperature_K: *id086
           gas_mix: *id087
+          composition: &kim_composition_unknown_t1_r42
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r42
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 42; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r42
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r42
+            locator: *kim_composition_locator_t1_r42
         note: t1-r42 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7884,6 +8844,8 @@ species:
         point_conditions:
           temperature_K: *id086
           gas_mix: *id087
+          composition: *kim_composition_unknown_t1_r42
+          printed_composition: *kim_printed_composition_t1_r42
         note: t1-r42 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7916,6 +8878,8 @@ species:
         point_conditions:
           temperature_K: *id086
           gas_mix: *id087
+          composition: *kim_composition_unknown_t1_r42
+          printed_composition: *kim_printed_composition_t1_r42
         note: t1-r42 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7948,6 +8912,8 @@ species:
         point_conditions:
           temperature_K: *id086
           gas_mix: *id087
+          composition: *kim_composition_unknown_t1_r42
+          printed_composition: *kim_printed_composition_t1_r42
         note: t1-r42 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -7980,6 +8946,23 @@ species:
         point_conditions:
           temperature_K: *id088
           gas_mix: *id089
+          composition: &kim_composition_unknown_t1_r43
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r43
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 43; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r43
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r43
+            locator: *kim_composition_locator_t1_r43
         note: t1-r43 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8012,6 +8995,8 @@ species:
         point_conditions:
           temperature_K: *id088
           gas_mix: *id089
+          composition: *kim_composition_unknown_t1_r43
+          printed_composition: *kim_printed_composition_t1_r43
         note: t1-r43 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8044,6 +9029,8 @@ species:
         point_conditions:
           temperature_K: *id088
           gas_mix: *id089
+          composition: *kim_composition_unknown_t1_r43
+          printed_composition: *kim_printed_composition_t1_r43
         note: t1-r43 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8076,6 +9063,8 @@ species:
         point_conditions:
           temperature_K: *id088
           gas_mix: *id089
+          composition: *kim_composition_unknown_t1_r43
+          printed_composition: *kim_printed_composition_t1_r43
         note: t1-r43 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8108,6 +9097,23 @@ species:
         point_conditions:
           temperature_K: *id090
           gas_mix: *id091
+          composition: &kim_composition_unknown_t1_r44
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r44
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 44; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r44
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r44
+            locator: *kim_composition_locator_t1_r44
         note: t1-r44 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8140,6 +9146,8 @@ species:
         point_conditions:
           temperature_K: *id090
           gas_mix: *id091
+          composition: *kim_composition_unknown_t1_r44
+          printed_composition: *kim_printed_composition_t1_r44
         note: t1-r44 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8172,6 +9180,8 @@ species:
         point_conditions:
           temperature_K: *id090
           gas_mix: *id091
+          composition: *kim_composition_unknown_t1_r44
+          printed_composition: *kim_printed_composition_t1_r44
         note: t1-r44 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8204,6 +9214,8 @@ species:
         point_conditions:
           temperature_K: *id090
           gas_mix: *id091
+          composition: *kim_composition_unknown_t1_r44
+          printed_composition: *kim_printed_composition_t1_r44
         note: t1-r44 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8236,6 +9248,23 @@ species:
         point_conditions:
           temperature_K: *id092
           gas_mix: *id093
+          composition: &kim_composition_unknown_t1_r45
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r45
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 45; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r45
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r45
+            locator: *kim_composition_locator_t1_r45
         note: t1-r45 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8268,6 +9297,8 @@ species:
         point_conditions:
           temperature_K: *id092
           gas_mix: *id093
+          composition: *kim_composition_unknown_t1_r45
+          printed_composition: *kim_printed_composition_t1_r45
         note: t1-r45 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8300,6 +9331,8 @@ species:
         point_conditions:
           temperature_K: *id092
           gas_mix: *id093
+          composition: *kim_composition_unknown_t1_r45
+          printed_composition: *kim_printed_composition_t1_r45
         note: t1-r45 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8332,6 +9365,8 @@ species:
         point_conditions:
           temperature_K: *id092
           gas_mix: *id093
+          composition: *kim_composition_unknown_t1_r45
+          printed_composition: *kim_printed_composition_t1_r45
         note: t1-r45 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8364,6 +9399,23 @@ species:
         point_conditions:
           temperature_K: *id094
           gas_mix: *id095
+          composition: &kim_composition_unknown_t1_r46
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r46
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 46; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r46
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r46
+            locator: *kim_composition_locator_t1_r46
         note: t1-r46 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8396,6 +9448,8 @@ species:
         point_conditions:
           temperature_K: *id094
           gas_mix: *id095
+          composition: *kim_composition_unknown_t1_r46
+          printed_composition: *kim_printed_composition_t1_r46
         note: t1-r46 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8428,6 +9482,8 @@ species:
         point_conditions:
           temperature_K: *id094
           gas_mix: *id095
+          composition: *kim_composition_unknown_t1_r46
+          printed_composition: *kim_printed_composition_t1_r46
         note: t1-r46 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8460,6 +9516,8 @@ species:
         point_conditions:
           temperature_K: *id094
           gas_mix: *id095
+          composition: *kim_composition_unknown_t1_r46
+          printed_composition: *kim_printed_composition_t1_r46
         note: t1-r46 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8492,6 +9550,23 @@ species:
         point_conditions:
           temperature_K: *id096
           gas_mix: *id097
+          composition: &kim_composition_unknown_t1_r47
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r47
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 47; Fe-Csat-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r47
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r47
+            locator: *kim_composition_locator_t1_r47
         note: t1-r47 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8524,6 +9599,8 @@ species:
         point_conditions:
           temperature_K: *id096
           gas_mix: *id097
+          composition: *kim_composition_unknown_t1_r47
+          printed_composition: *kim_printed_composition_t1_r47
         note: t1-r47 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8556,6 +9633,8 @@ species:
         point_conditions:
           temperature_K: *id096
           gas_mix: *id097
+          composition: *kim_composition_unknown_t1_r47
+          printed_composition: *kim_printed_composition_t1_r47
         note: t1-r47 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8588,6 +9667,8 @@ species:
         point_conditions:
           temperature_K: *id096
           gas_mix: *id097
+          composition: *kim_composition_unknown_t1_r47
+          printed_composition: *kim_printed_composition_t1_r47
         note: t1-r47 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8620,6 +9701,23 @@ species:
         point_conditions:
           temperature_K: *id098
           gas_mix: *id099
+          composition: &kim_composition_unknown_t1_r48
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r48
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 48; Fe-Csat-V-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r48
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r48
+            locator: *kim_composition_locator_t1_r48
         note: t1-r48 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8652,6 +9750,8 @@ species:
         point_conditions:
           temperature_K: *id098
           gas_mix: *id099
+          composition: *kim_composition_unknown_t1_r48
+          printed_composition: *kim_printed_composition_t1_r48
         note: t1-r48 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8684,6 +9784,8 @@ species:
         point_conditions:
           temperature_K: *id098
           gas_mix: *id099
+          composition: *kim_composition_unknown_t1_r48
+          printed_composition: *kim_printed_composition_t1_r48
         note: t1-r48 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8716,6 +9818,8 @@ species:
         point_conditions:
           temperature_K: *id098
           gas_mix: *id099
+          composition: *kim_composition_unknown_t1_r48
+          printed_composition: *kim_printed_composition_t1_r48
         note: t1-r48 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8748,6 +9852,23 @@ species:
         point_conditions:
           temperature_K: *id100
           gas_mix: *id101
+          composition: &kim_composition_unknown_t1_r49
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t1_r49
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '1'
+              record: 'row 49; Fe-Csat-V-Mo-Ni'
+          printed_composition: &kim_printed_composition_t1_r49
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t1_r49
+            locator: *kim_composition_locator_t1_r49
         note: t1-r49 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8780,6 +9901,8 @@ species:
         point_conditions:
           temperature_K: *id100
           gas_mix: *id101
+          composition: *kim_composition_unknown_t1_r49
+          printed_composition: *kim_printed_composition_t1_r49
         note: t1-r49 binds this Mo row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8812,6 +9935,8 @@ species:
         point_conditions:
           temperature_K: *id100
           gas_mix: *id101
+          composition: *kim_composition_unknown_t1_r49
+          printed_composition: *kim_printed_composition_t1_r49
         note: t1-r49 binds this Ni row to the full printed alloy-component vector in its experiment record. The
           row key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8844,6 +9969,8 @@ species:
         point_conditions:
           temperature_K: *id100
           gas_mix: *id101
+          composition: *kim_composition_unknown_t1_r49
+          printed_composition: *kim_printed_composition_t1_r49
         note: t1-r49 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8876,6 +10003,23 @@ species:
         point_conditions:
           temperature_K: *id102
           gas_mix: *id103
+          composition: &kim_composition_unknown_t2_r01
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r01
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 01; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r01
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r01
+            locator: *kim_composition_locator_t2_r01
         note: t2-r01 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8908,6 +10052,8 @@ species:
         point_conditions:
           temperature_K: *id102
           gas_mix: *id103
+          composition: *kim_composition_unknown_t2_r01
+          printed_composition: *kim_printed_composition_t2_r01
         note: t2-r01 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8940,6 +10086,23 @@ species:
         point_conditions:
           temperature_K: *id104
           gas_mix: *id105
+          composition: &kim_composition_unknown_t2_r02
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r02
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 02; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r02
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r02
+            locator: *kim_composition_locator_t2_r02
         note: t2-r02 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -8972,6 +10135,8 @@ species:
         point_conditions:
           temperature_K: *id104
           gas_mix: *id105
+          composition: *kim_composition_unknown_t2_r02
+          printed_composition: *kim_printed_composition_t2_r02
         note: t2-r02 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9004,6 +10169,23 @@ species:
         point_conditions:
           temperature_K: *id106
           gas_mix: *id107
+          composition: &kim_composition_unknown_t2_r03
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r03
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 03; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r03
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r03
+            locator: *kim_composition_locator_t2_r03
         note: t2-r03 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9036,6 +10218,8 @@ species:
         point_conditions:
           temperature_K: *id106
           gas_mix: *id107
+          composition: *kim_composition_unknown_t2_r03
+          printed_composition: *kim_printed_composition_t2_r03
         note: t2-r03 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9068,6 +10252,23 @@ species:
         point_conditions:
           temperature_K: *id108
           gas_mix: *id109
+          composition: &kim_composition_unknown_t2_r04
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r04
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 04; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r04
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r04
+            locator: *kim_composition_locator_t2_r04
         note: t2-r04 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9100,6 +10301,8 @@ species:
         point_conditions:
           temperature_K: *id108
           gas_mix: *id109
+          composition: *kim_composition_unknown_t2_r04
+          printed_composition: *kim_printed_composition_t2_r04
         note: t2-r04 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9132,6 +10335,23 @@ species:
         point_conditions:
           temperature_K: *id110
           gas_mix: *id111
+          composition: &kim_composition_unknown_t2_r05
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r05
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 05; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r05
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r05
+            locator: *kim_composition_locator_t2_r05
         note: t2-r05 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9164,6 +10384,8 @@ species:
         point_conditions:
           temperature_K: *id110
           gas_mix: *id111
+          composition: *kim_composition_unknown_t2_r05
+          printed_composition: *kim_printed_composition_t2_r05
         note: t2-r05 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9196,6 +10418,23 @@ species:
         point_conditions:
           temperature_K: *id112
           gas_mix: *id113
+          composition: &kim_composition_unknown_t2_r06
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r06
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 06; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r06
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r06
+            locator: *kim_composition_locator_t2_r06
         note: t2-r06 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9228,6 +10467,8 @@ species:
         point_conditions:
           temperature_K: *id112
           gas_mix: *id113
+          composition: *kim_composition_unknown_t2_r06
+          printed_composition: *kim_printed_composition_t2_r06
         note: t2-r06 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9260,6 +10501,23 @@ species:
         point_conditions:
           temperature_K: *id114
           gas_mix: *id115
+          composition: &kim_composition_unknown_t2_r07
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r07
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 07; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r07
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r07
+            locator: *kim_composition_locator_t2_r07
         note: t2-r07 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9292,6 +10550,8 @@ species:
         point_conditions:
           temperature_K: *id114
           gas_mix: *id115
+          composition: *kim_composition_unknown_t2_r07
+          printed_composition: *kim_printed_composition_t2_r07
         note: t2-r07 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9324,6 +10584,23 @@ species:
         point_conditions:
           temperature_K: *id116
           gas_mix: *id117
+          composition: &kim_composition_unknown_t2_r08
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r08
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 08; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r08
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r08
+            locator: *kim_composition_locator_t2_r08
         note: t2-r08 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9356,6 +10633,8 @@ species:
         point_conditions:
           temperature_K: *id116
           gas_mix: *id117
+          composition: *kim_composition_unknown_t2_r08
+          printed_composition: *kim_printed_composition_t2_r08
         note: t2-r08 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9388,6 +10667,23 @@ species:
         point_conditions:
           temperature_K: *id118
           gas_mix: *id119
+          composition: &kim_composition_unknown_t2_r09
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r09
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 09; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r09
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r09
+            locator: *kim_composition_locator_t2_r09
         note: t2-r09 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9420,6 +10716,8 @@ species:
         point_conditions:
           temperature_K: *id118
           gas_mix: *id119
+          composition: *kim_composition_unknown_t2_r09
+          printed_composition: *kim_printed_composition_t2_r09
         note: t2-r09 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9452,6 +10750,23 @@ species:
         point_conditions:
           temperature_K: *id120
           gas_mix: *id121
+          composition: &kim_composition_unknown_t2_r10
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r10
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 10; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r10
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r10
+            locator: *kim_composition_locator_t2_r10
         note: t2-r10 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9484,6 +10799,8 @@ species:
         point_conditions:
           temperature_K: *id120
           gas_mix: *id121
+          composition: *kim_composition_unknown_t2_r10
+          printed_composition: *kim_printed_composition_t2_r10
         note: t2-r10 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9516,6 +10833,23 @@ species:
         point_conditions:
           temperature_K: *id122
           gas_mix: *id123
+          composition: &kim_composition_unknown_t2_r11
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r11
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 11; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r11
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r11
+            locator: *kim_composition_locator_t2_r11
         note: t2-r11 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9548,6 +10882,8 @@ species:
         point_conditions:
           temperature_K: *id122
           gas_mix: *id123
+          composition: *kim_composition_unknown_t2_r11
+          printed_composition: *kim_printed_composition_t2_r11
         note: t2-r11 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9580,6 +10916,23 @@ species:
         point_conditions:
           temperature_K: *id124
           gas_mix: *id125
+          composition: &kim_composition_unknown_t2_r12
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r12
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 12; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r12
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r12
+            locator: *kim_composition_locator_t2_r12
         note: t2-r12 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9612,6 +10965,8 @@ species:
         point_conditions:
           temperature_K: *id124
           gas_mix: *id125
+          composition: *kim_composition_unknown_t2_r12
+          printed_composition: *kim_printed_composition_t2_r12
         note: t2-r12 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9644,6 +10999,23 @@ species:
         point_conditions:
           temperature_K: *id126
           gas_mix: *id127
+          composition: &kim_composition_unknown_t2_r13
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r13
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 13; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r13
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r13
+            locator: *kim_composition_locator_t2_r13
         note: t2-r13 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9676,6 +11048,8 @@ species:
         point_conditions:
           temperature_K: *id126
           gas_mix: *id127
+          composition: *kim_composition_unknown_t2_r13
+          printed_composition: *kim_printed_composition_t2_r13
         note: t2-r13 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9708,6 +11082,23 @@ species:
         point_conditions:
           temperature_K: *id128
           gas_mix: *id129
+          composition: &kim_composition_unknown_t2_r14
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r14
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 14; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r14
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r14
+            locator: *kim_composition_locator_t2_r14
         note: t2-r14 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9740,6 +11131,8 @@ species:
         point_conditions:
           temperature_K: *id128
           gas_mix: *id129
+          composition: *kim_composition_unknown_t2_r14
+          printed_composition: *kim_printed_composition_t2_r14
         note: t2-r14 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9772,6 +11165,23 @@ species:
         point_conditions:
           temperature_K: *id130
           gas_mix: *id131
+          composition: &kim_composition_unknown_t2_r15
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r15
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 15; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r15
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r15
+            locator: *kim_composition_locator_t2_r15
         note: t2-r15 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9804,6 +11214,8 @@ species:
         point_conditions:
           temperature_K: *id130
           gas_mix: *id131
+          composition: *kim_composition_unknown_t2_r15
+          printed_composition: *kim_printed_composition_t2_r15
         note: t2-r15 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9836,6 +11248,23 @@ species:
         point_conditions:
           temperature_K: *id132
           gas_mix: *id133
+          composition: &kim_composition_unknown_t2_r16
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r16
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 16; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r16
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r16
+            locator: *kim_composition_locator_t2_r16
         note: t2-r16 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9868,6 +11297,8 @@ species:
         point_conditions:
           temperature_K: *id132
           gas_mix: *id133
+          composition: *kim_composition_unknown_t2_r16
+          printed_composition: *kim_printed_composition_t2_r16
         note: t2-r16 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9900,6 +11331,23 @@ species:
         point_conditions:
           temperature_K: *id134
           gas_mix: *id135
+          composition: &kim_composition_unknown_t2_r17
+            state:
+              tag: unknown
+              reason: Full alloy composition is not printed because the Fe balance is unreported and was not calculated.
+            locator: &kim_composition_locator_t2_r17
+              page: 3
+              published_page: 612
+              pdf_page_index: 2
+              table: '2'
+              record: 'row 17; Fe-V melt'
+          printed_composition: &kim_printed_composition_t2_r17
+            state:
+              tag: value
+              value:
+                basis: element_wt_percent
+                values: *kim_components_t2_r17
+            locator: *kim_composition_locator_t2_r17
         note: t2-r17 binds this V row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
@@ -9925,6 +11373,8 @@ species:
         point_conditions:
           temperature_K: *id134
           gas_mix: *id135
+          composition: *kim_composition_unknown_t2_r17
+          printed_composition: *kim_printed_composition_t2_r17
         note: t2-r17 binds this C row to the full printed alloy-component vector in its experiment record. The row
           key is local because the paper prints no sample ID; Fe balance is unreported.
       phase: l
