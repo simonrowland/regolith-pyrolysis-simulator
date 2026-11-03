@@ -2015,7 +2015,7 @@ def _source_polymorph_is_unspecified(source_polymorph: State | None) -> bool:
 
 
 def _rt_ln_10_j_per_mol_K(temperature_K: Decimal) -> Decimal:
-    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+    from simulator.reference_data.janaf_fusion import JANAF_R_J_PER_MOL_K
 
     return JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
 
@@ -2049,13 +2049,13 @@ def _fusion_energy_when_polymorph_absent(
 
     from simulator.battery.generators.janaf import (
         _JANAF_POLYMORPH_BY_TABLE,
-        JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _janaf_eligible_pure_crystal_tables,
         _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
+    from simulator.reference_data.janaf_fusion import JANAF_R_J_PER_MOL_K
 
     fusion = janaf_fusion_energy(formula, temperature_K)
     expected_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(fusion.crystal_table)
@@ -2626,7 +2626,7 @@ def _feo_reference_factor(
     intercept_J: Decimal | None = None,
     slope_J_per_mol_K: Decimal | None = None,
 ) -> Decimal:
-    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+    from simulator.reference_data.janaf_fusion import JANAF_R_J_PER_MOL_K
 
     intercept = calibration.intercept_J if intercept_J is None else intercept_J
     slope = (
@@ -2678,7 +2678,7 @@ def _feo_jackknife_factors(
 def _iron_saturated_feo_calibration() -> tuple[
     _IronSaturatedFeOCalibration, tuple[Decimal, ...]
 ]:
-    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+    from simulator.reference_data.janaf_fusion import JANAF_R_J_PER_MOL_K
 
     ratios = _darken_gurry_iron_boundary_ratios()
     temperatures = tuple(temperature for temperature, _ratio in ratios)
@@ -3051,7 +3051,6 @@ def fusion_comparison_reference(
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
         _d144_single_polymorph,
         _janaf_eligible_pure_crystal_tables,
@@ -3059,6 +3058,7 @@ def fusion_comparison_reference(
         _janaf_stable_crystal_set,
         janaf_fusion_energy,
     )
+    from simulator.reference_data.janaf_fusion import JANAF_R_J_PER_MOL_K
 
     # d-165: a source that records the solid but not its polymorph stays on the
     # printed number. polymorph is None is not that record — the melt-activity
@@ -9589,6 +9589,36 @@ def _predict_with_engine(
             tier_notice = _payload_fo2_notice(quantity, activity_payload)
             if tier_notice is not None:
                 notices.append(tier_notice)
+            warning_field = activity.provenance().get(
+                "melt_oxide_activity_warning"
+            )
+            warning_parts = tuple(
+                part.strip()
+                for part in str(warning_field or "").split(";")
+                if part.strip()
+            )
+            reference_state_warnings = tuple(
+                part
+                for part in warning_parts
+                if part.startswith("gamma_reference_state_")
+            )
+            other_activity_warning = "; ".join(
+                part
+                for part in warning_parts
+                if not part.startswith("gamma_reference_state_")
+            )
+            for reference_warning in reference_state_warnings:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=reference_warning,
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
             certified_band = None
             if activity.valid_range_K is not None:
                 low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
@@ -9611,13 +9641,13 @@ def _predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         )
                     )
-            elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
+            elif activity.evidence_tier == "UNCERTIFIED" or other_activity_warning:
                 notices.append(
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
                         reason=(
-                            activity.warning
+                            other_activity_warning
                             or "melt_oxide_activity has no certified evidence tier"
                         ),
                         origin=(

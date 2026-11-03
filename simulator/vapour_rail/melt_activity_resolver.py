@@ -2565,6 +2565,7 @@ def _imcc_shadow_rows(
     composition_mol: Mapping[str, float],
     *,
     imcc_activities: Mapping[str, float] | None,
+    temperature_K: float | None,
 ) -> dict[str, dict[str, Any]]:
     """Build the fixed eight-oxide comparison table on explicit bases."""
 
@@ -2578,7 +2579,7 @@ def _imcc_shadow_rows(
             resolved = melt_oxide_activity(
                 oxide,
                 composition_mol,
-                temperature_K=None,
+                temperature_K=temperature_K,
             )
         except (TypeError, ValueError) as exc:
             resolved = None
@@ -2687,6 +2688,7 @@ def build_imcc_activity_shadow(
         payload["activities_by_oxide"] = _imcc_shadow_rows(
             composition_mol,
             imcc_activities=None,
+            temperature_K=temperature,
         )
         return payload
 
@@ -2714,6 +2716,7 @@ def build_imcc_activity_shadow(
             payload["activities_by_oxide"] = _imcc_shadow_rows(
                 composition_mol,
                 imcc_activities=None,
+                temperature_K=temperature,
             )
             return payload
 
@@ -2740,6 +2743,7 @@ def build_imcc_activity_shadow(
         payload["activities_by_oxide"] = _imcc_shadow_rows(
             composition_mol,
             imcc_activities=None,
+            temperature_K=temperature,
         )
         return payload
 
@@ -2761,6 +2765,7 @@ def build_imcc_activity_shadow(
     payload["activities_by_oxide"] = _imcc_shadow_rows(
         composition_mol,
         imcc_activities=result.parent_oxide_activities,
+        temperature_K=temperature,
     )
     return payload
 
