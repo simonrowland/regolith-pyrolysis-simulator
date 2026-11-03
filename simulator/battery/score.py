@@ -77,6 +77,8 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    SweepIdentity,
+    WallIdentity,
     IdentityEqualKind,
     IdentityEqualOutcome,
     PA_PER_BAR_DEC,
@@ -110,6 +112,7 @@ from simulator.battery.migrate import (
     load_yaml,
     _convert_compilation_amount,
     _log_fO2_to_pa,
+    PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
@@ -121,6 +124,9 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    ALPHA_GAS_SYSTEM_H2,
+    HK_RATIO_ALPHA_DEFINITION,
+    evaporation_alpha_family_key,
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -362,6 +368,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
+    Quantity.WALL_DEPOSIT_AREAL_RATE: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
@@ -976,7 +983,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY
-    if quantity is Quantity.WALL_DEPOSIT_MASS:
+    if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
         return Rail.WALL_DEPOSITION
     if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
@@ -4841,6 +4848,16 @@ def _read_decision_band_ratchet(
     return entries, False, history
 
 
+# Same minimum the HK-ratio alpha family uses before a row can leave the
+# insufficient-sources hold. Two independent source_ids, not two rows.
+MINIMUM_INDEPENDENT_FAMILY_SOURCES = 2
+DERIVED_BAND_INSUFFICIENT_SOURCES = "derived_band_insufficient_sources"
+FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED = (
+    "forsterite_h2_equilibrium_gas_not_modelled"
+)
+_FORSTERITE_CRYSTAL_FORMULA = "Mg2SiO4"
+
+
 def _source_band_catalog(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
@@ -4902,8 +4919,8 @@ def _source_band_catalog(
     records: list[dict[str, object]] = []
     no_band_reasons: dict[str, str] = {}
     for key, by_source in sources.items():
-        if len(by_source) < 2:
-            no_band_reasons[key] = "derived_band_insufficient_sources"
+        if len(by_source) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+            no_band_reasons[key] = DERIVED_BAND_INSUFFICIENT_SOURCES
             continue
         if any(len(row["values"]) != 1 for row in by_source.values()):
             continue
@@ -8831,6 +8848,404 @@ def predict_with_engine(
         )
 
 
+def _identity_decimal(state: object) -> Decimal | None:
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    if isinstance(state.value, Decimal):
+        return state.value
+    return None
+
+
+def _condition_decimal(observation: Observation, key: str) -> Decimal | None:
+    located = (observation.point_conditions or {}).get(key)
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    value = located.state.value
+    if isinstance(value, bool) or not isinstance(value, (Decimal, int, float, str)):
+        return None
+    try:
+        return as_decimal(value)
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+
+def _component_mole_fraction(identity: Identity, formula: str) -> Decimal | None:
+    composition = identity.composition
+    if (
+        composition is None
+        or not composition.is_value
+        or not isinstance(composition.value, Composition)
+    ):
+        return None
+    for name, amount in composition.value.components:
+        if name == formula:
+            return amount
+    return None
+
+
+def _gas_thermo_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formulas: Sequence[str],
+) -> EnginePrediction | None:
+    """Typed refusal when a depositing or dew-point species has no gas thermo."""
+
+    from simulator.condensation import _condensation_admission_refusal
+
+    missing: list[str] = []
+    codes: list[str] = []
+    for formula in formulas:
+        code = _condensation_admission_refusal(formula)
+        if code:
+            missing.append(formula)
+            codes.append(code)
+    if not missing:
+        return None
+    reason = codes[0]
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={"reason": reason, "species": tuple(missing)},
+        identity=identity,
+    )
+
+
+def _wall_flux_input_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    missing: Sequence[str],
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        refusal_detail={
+            "reason": "wall_flux_inputs_unprinted",
+            "missing": tuple(missing),
+        },
+        identity=identity,
+    )
+
+
+def _wall_flux_unsupported(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    reason: str,
+    **detail: object,
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={"reason": reason, **detail},
+        identity=identity,
+    )
+
+
+def _printed_wall_temperature_K(identity: Identity) -> Decimal | None:
+    wall = identity.wall
+    if wall is None or not wall.is_value or not isinstance(wall.value, WallIdentity):
+        return None
+    return _identity_decimal(wall.value.temperature_K)
+
+
+def _printed_sweep_carrier(identity: Identity) -> str | None:
+    sweep = identity.sweep_gas
+    if (
+        sweep is None
+        or not sweep.is_value
+        or not isinstance(sweep.value, SweepIdentity)
+    ):
+        return None
+    carrier = sweep.value.species.strip()
+    return carrier or None
+
+
+def _finite_diagnostic_decimal(value: object) -> Decimal | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
+        return None
+    try:
+        number = Decimal(str(value))
+    except InvalidOperation:
+        return None
+    if not number.is_finite():
+        return None
+    return number
+
+
+def _wall_areal_rate_from_existing_flux(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formula: str,
+) -> EnginePrediction:
+    """Mass flux from the wall model's series-resistance molar flux.
+
+    The call uses that model's contract: T_wall for p_sat, T_gas for the
+    ideal-gas denominator, the printed total pressure as overhead pressure,
+    the printed sweep gas as the carrier, the Knudsen regime factor, and
+    the reactive-product backstop only when the wall is at or below the
+    species condensation temperature. A missing input refuses. Pressure is
+    never left unset, because the flux helper then uses its 0.01 m^2/s
+    diffusion fallback.
+
+    When p_bulk < p_sat(T_wall) the model predicts zero net deposition.
+    That zero is returned with undersaturated_wall_net_evaporation so the
+    miss against a measured deposit is scored. A negative flux is clamped
+    to zero and is never reported as a deposit.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.condensation import (
+        DepositionInputRefusal,
+        KnudsenRegimeRefusal,
+        WallSaturationPressureRefusal,
+        _knudsen_number,
+        _knudsen_regime_factor,
+        _reactive_product_backstop_authorized,
+        _series_resistance_deposition_flux_mol_m2_s,
+        _species_condensation_temperature_C,
+        reactive_product_backstop_enabled,
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    missing: list[str] = []
+    temperature = _identity_decimal(identity.temperature_K)
+    pressure = _identity_decimal(identity.total_pressure_Pa)
+    wall_temperature = _printed_wall_temperature_K(identity)
+    carrier = _printed_sweep_carrier(identity)
+    if temperature is None:
+        missing.append("temperature_K")
+    if pressure is None:
+        missing.append("total_pressure_Pa")
+    if wall_temperature is None:
+        missing.append("wall_temperature_K")
+    if carrier is None:
+        missing.append("sweep_gas")
+    fraction = _component_mole_fraction(identity, formula)
+    if fraction is None:
+        missing.append("partial_pressure_unprinted")
+    diameter = _condition_decimal(observation, "pipe_diameter_m")
+    if diameter is None:
+        missing.append("pipe_diameter_m")
+    alpha = _condition_decimal(observation, "sticking_coefficient")
+    if alpha is None:
+        alpha = _condition_decimal(observation, "alpha_s")
+    if alpha is None:
+        missing.append("sticking_coefficient")
+    if (
+        missing
+        or temperature is None
+        or pressure is None
+        or fraction is None
+        or diameter is None
+        or alpha is None
+        or wall_temperature is None
+        or carrier is None
+    ):
+        return _wall_flux_input_refusal(engine, identity, channel, sources, missing)
+    if _reactive_product_backstop_authorized(formula):
+        try:
+            condensation_C = _species_condensation_temperature_C(formula)
+        except ValueError:
+            return _wall_flux_unsupported(
+                engine,
+                identity,
+                channel,
+                sources,
+                "condensation_temperature_unprinted",
+                species=(formula,),
+            )
+        backstop = reactive_product_backstop_enabled(
+            formula,
+            float(wall_temperature) - float(CELSIUS_TO_KELVIN_OFFSET),
+            condensation_C,
+        )
+    else:
+        backstop = False
+    try:
+        regime_factor = _knudsen_regime_factor(
+            _knudsen_number(
+                float(pressure),
+                float(temperature),
+                float(diameter),
+                carrier_gas=carrier,
+            )
+        )
+    except (KnudsenRegimeRefusal, ValueError):
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            "wall_regime_factor_uncomputed",
+            species=(formula,),
+        )
+    diagnostic: dict[str, object] = {}
+    try:
+        molar_flux = _series_resistance_deposition_flux_mol_m2_s(
+            formula,
+            float(fraction * pressure),
+            float(wall_temperature),
+            float(alpha),
+            pipe_diameter_m=float(diameter),
+            regime_factor=regime_factor,
+            T_gas_K=float(temperature),
+            overhead_pressure_pa=float(pressure),
+            carrier_gas=carrier,
+            reactive_product_backstop=backstop,
+            diagnostic_out=diagnostic,
+        )
+    except WallSaturationPressureRefusal as exc:
+        printed = exc.reason
+        reason = (
+            printed
+            if _short_refusal_token(printed) is not None
+            else "wall_saturation_pressure_refused"
+        )
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            reason,
+            species=(formula,),
+        )
+    except DepositionInputRefusal as exc:
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            "deposition_input_refused",
+            species=(formula,),
+            parameter=exc.parameter,
+        )
+    if diagnostic.get("wall_saturation_pressure_refused"):
+        printed = diagnostic.get("wall_saturation_pressure_refusal_reason")
+        reason = (
+            printed
+            if isinstance(printed, str) and _short_refusal_token(printed) is not None
+            else "wall_saturation_pressure_refused"
+        )
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            reason,
+            species=(formula,),
+        )
+    try:
+        molar_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    except Exception:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+            refusal_detail={
+                "reason": "species_molar_mass_unresolved",
+                "formula": formula,
+            },
+            identity=identity,
+        )
+    mass_flux = Decimal(str(molar_flux)) * Decimal(str(molar_mass))
+    p_bulk = fraction * pressure
+    p_sat = _finite_diagnostic_decimal(diagnostic.get("wall_saturation_pressure_pa"))
+    notices: tuple[Notice, ...] = ()
+    # Strictly below saturation. Equality is equilibrium, and a zero from
+    # alpha_s == 0 never writes p_sat, so it does not take this notice.
+    if p_sat is not None and p_bulk < p_sat:
+        mass_flux = Decimal(0)
+        notices = (
+            Notice(
+                kind=NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION,
+                affected_quantities=(Quantity.WALL_DEPOSIT_AREAL_RATE,),
+                reason=f"p_bulk_Pa={p_bulk}; p_sat_T_wall_Pa={p_sat}",
+                origin=observation.observation_id,
+            ),
+        )
+    elif mass_flux < 0:
+        mass_flux = Decimal(0)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=mass_flux,
+        unit=QUANTITY_UNITS[Quantity.WALL_DEPOSIT_AREAL_RATE],
+        authority=Authority.BRIDGE,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
+def _wall_deposition_quantity_prediction(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction | None:
+    """Dew point and areal wall flux. Other quantities fall through.
+
+    Gas thermo is checked before any temperature or pipe diameter is read.
+    A Na2SO4 dew point also needs NaOH, its equilibrium partner. An areal
+    rate checks only the depositing species.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    if not formula:
+        return None
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        subtype = identity.subtype
+        if (
+            subtype is None
+            or not subtype.is_value
+            or subtype.value != "dew_point"
+        ):
+            return None
+        partners = [formula]
+        if formula == "Na2SO4":
+            partners.append("NaOH")
+        return _gas_thermo_refusal(engine, identity, channel, sources, partners)
+    if quantity is not Quantity.WALL_DEPOSIT_AREAL_RATE:
+        return None
+    refusal = _gas_thermo_refusal(engine, identity, channel, sources, (formula,))
+    if refusal is not None:
+        return refusal
+    return _wall_areal_rate_from_existing_flux(
+        engine, observation, identity, channel, sources, formula
+    )
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8947,6 +9362,11 @@ def _predict_with_engine(
         return _predict_phase_row(
             engine, observation, identity, channel, sources, handles=handles
         )
+    wall_prediction = _wall_deposition_quantity_prediction(
+        engine, observation, identity, quantity, channel, sources
+    )
+    if wall_prediction is not None:
+        return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -11388,6 +11808,60 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
+def hk_ratio_alpha_predictor_refusal(
+    reference: Observation,
+    observations: Iterable[Observation],
+) -> dict[str, object] | None:
+    """Typed H2 refusal, or the existing two-source hold, for an HK-ratio alpha.
+
+    Only rows the migrator marked ``j_exp_over_hk_maximum`` are considered.
+    Forsterite crystal measured against an H2-reactive maximum is refused
+    because that equilibrium gas is not modelled, even when the H2 family
+    already has two sources. Any other marked family with fewer than
+    ``MINIMUM_INDEPENDENT_FAMILY_SOURCES`` independent source_ids is held
+    with ``derived_band_insufficient_sources``. A large enough vacuum family
+    falls through to the ordinary kinetic rail.
+    """
+
+    provenance = reference.provenance
+    if not isinstance(provenance, Mapping):
+        return None
+    if provenance.get("alpha_definition") != HK_RATIO_ALPHA_DEFINITION:
+        return None
+    key = evaporation_alpha_family_key(reference)
+    if key is None:
+        return None
+    phase, formula, gas = key
+    if (
+        gas == ALPHA_GAS_SYSTEM_H2
+        and phase == Phase.CR.value
+        and formula == _FORSTERITE_CRYSTAL_FORMULA
+    ):
+        return {
+            "reason": FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED,
+            "gas_system": gas,
+            "phase": phase,
+            "formula": formula,
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    rows = list(observations)
+    if all(row.observation_id != reference.observation_id for row in rows):
+        rows.append(reference)
+    sources = {
+        row.source_id
+        for row in rows
+        if row.source_id and evaporation_alpha_family_key(row) == key
+    }
+    if len(sources) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+        return {
+            "reason": DERIVED_BAND_INSUFFICIENT_SOURCES,
+            "n_sources": len(sources),
+            "family": {"phase": phase, "formula": formula, "gas_system": gas},
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    return None
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -11623,6 +12097,20 @@ def compile_residual(
             )
 
     if quantity is None:
+        if (
+            isinstance(identity, Identity)
+            and identity.quantity.is_unknown
+            and identity.quantity.reason == PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE
+        ):
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                {"reason": PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE},
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                exclusions=(
+                    "status_match_or_mismatch",
+                    "finite_numeric_point_endpoints",
+                ),
+            )
         detail: dict[str, object] = {"reason": "quantity_unknown"}
         if reference.value.kind is ValueKind.CATEGORICAL:
             detail["value_kind"] = ValueKind.CATEGORICAL.value
@@ -11633,6 +12121,22 @@ def compile_residual(
             detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
+        )
+    hk_alpha_refusal = hk_ratio_alpha_predictor_refusal(
+        reference, context.observations.values()
+    )
+    if hk_alpha_refusal is not None:
+        hk_reason = hk_alpha_refusal.get("reason")
+        hk_execution = (
+            ExecutionState.UNSUPPORTED
+            if hk_reason == FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED
+            else ExecutionState.NOT_PROBED
+        )
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            hk_alpha_refusal,
+            execution=Execution(state=hk_execution),
+            exclusions=("status_match_or_mismatch",),
         )
     if rail is None:
         return _refused(

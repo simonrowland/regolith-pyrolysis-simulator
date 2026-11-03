@@ -99,6 +99,7 @@ class Quantity(StrEnum):
     EVAPORATION_RATE = "evaporation_rate"
     MASS_LOSS_RATE = "mass_loss_rate"
     WALL_DEPOSIT_MASS = "wall_deposit_mass"
+    WALL_DEPOSIT_AREAL_RATE = "wall_deposit_areal_rate"
     TRANSITION_TEMPERATURE = "transition_temperature"
     VISCOSITY = "viscosity"
     DENSITY = "density"
@@ -271,6 +272,9 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
+    # t-1593: a named material's cited bulk analysis varies by lot
+    # (JSC-1 vs JSC-1A). Advisory. Not a flagged stratum.
+    LOT_VARIABILITY = "lot_variability"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
@@ -291,6 +295,14 @@ class NoticeKind(StrEnum):
     # Advisory. The reason is the parser sentence (phase, field, raw token).
     # It is not a flagged stratum and does not void the decision band.
     UNREQUESTED_PHASE_NONFINITE = "unrequested_phase_nonfinite"
+    # t-1598: printed vol% or vol-ppm of an ideal gas, stored as a mole fraction.
+    IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION = (
+        "ideal_gas_volume_fraction_as_mole_fraction"
+    )
+    # t-1597: p_bulk < p_sat(T_wall). The model predicts zero net deposition
+    # (net evaporation). The miss against a measured deposit stays scored.
+    # Not a flagged stratum.
+    UNDERSATURATED_WALL_NET_EVAPORATION = "undersaturated_wall_net_evaporation"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -621,6 +633,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVAPORATION_RATE: "kg_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
+    Quantity.WALL_DEPOSIT_AREAL_RATE: "kg_per_m2_s",
     Quantity.TRANSITION_TEMPERATURE: "K",
     Quantity.VISCOSITY: "Pa_s",
     Quantity.DENSITY: "kg_per_m3",

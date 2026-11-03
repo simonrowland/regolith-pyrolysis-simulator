@@ -65,7 +65,12 @@ from simulator.battery.polymorph_dictionary import (
     polymorph_matches_formula,
     resolve_formula_polymorph,
 )
-from simulator.battery.composition import parse_species_formula
+from simulator.battery.composition import (
+    ideal_gas_volume_amount_to_mole_fraction,
+    ideal_gas_volume_scale,
+    mass_weighted_mixture_wt_pct,
+    parse_species_formula,
+)
 from simulator.battery.extract_context import iter_extract_context_containers
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
@@ -130,6 +135,7 @@ from simulator.battery.identity import (
     _uncompared_axes_for,
     identity_equal,
     profile_for,
+    quantity_token,
 )
 from simulator.battery.stable_ids import (
     cao_raw_pca_id,
@@ -181,6 +187,7 @@ from simulator.battery.records import (
     _is_source_internally_inconsistent,
     _value_has_numeric_value,
     as_decimal,
+    phase_token,
 )
 from simulator.battery.enums import BenchIdentityBasis, CellMaterial
 from simulator.battery.validate import (
@@ -453,6 +460,38 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     return PHASE_MAP.get(token)
 
 
+# A form token condensed_solid is Phase.CR. A sample the source prints as
+# amorphous, glassy, or vitreous is not that crystal, and Phase.GLASS is
+# not a stand-in for it. Hyphen is a non-word character, so \b matches the
+# stem of non-amorphous and semi-amorphous; a hyphen immediately before
+# the stem is that negation, not the printed class. Bare "glass" is not.
+_AMORPHOUS_SOLID_RE = re.compile(
+    r"(?<![-])\b(?:amorphous|glassy|vitreous)\b",
+    re.IGNORECASE,
+)
+_AMORPHOUS_CRYSTAL_RESERVOIR_REASON = (
+    "source prints an amorphous, glassy, or vitreous solid; "
+    "Phase.CR would assert a crystal and Phase.GLASS is not inferred"
+)
+
+
+def _sample_prints_amorphous_solid(sample: object) -> bool:
+    """True when the material text says amorphous, glassy, or vitreous."""
+
+    if not isinstance(sample, Mapping):
+        return False
+    raw = sample.get("material")
+    if isinstance(raw, Mapping):
+        state = raw.get("state")
+        if isinstance(state, Mapping) and isinstance(state.get("value"), str):
+            raw = state.get("value")
+        elif isinstance(raw.get("value"), str):
+            raw = raw.get("value")
+    if not isinstance(raw, str):
+        return False
+    return _AMORPHOUS_SOLID_RE.search(raw) is not None
+
+
 _SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
     # Reviewed KEMS sample descriptions and states. These are exact labels;
     # words embedded in mixed or temperature-dependent descriptions stay unknown.
@@ -610,7 +649,11 @@ QUANTITY_ALIASES = {
     "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
     "open_furnace_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
     "residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    "surface_deposition_areal_mass_rate": Quantity.WALL_DEPOSIT_AREAL_RATE,
 }
+
+# t-1597. Batch particulate entrainment is not a wall-deposition quantity.
+PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE = "particulate_carryover_out_of_model_scope"
 
 # guard_09_05: legacy rail names including underscored aliases.
 RAIL_MAP = {
@@ -1400,8 +1443,165 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MASS_PERCENT)
 
 
+def _printed_mole_component_name(name: str) -> bool:
+    """Oxide allowlist or a parsed formula. Arbitrary strings stay rejected."""
+
+    if name in _COMPOSITION_COMPONENTS:
+        return True
+    return parse_species_formula(name) is not None
+
+
 def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
-    return _percent_components(payload, AmountBasis.MOLE_PERCENT)
+    pairs = _percent_pairs(payload, AmountBasis.MOLE_PERCENT)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names) or any(
+        not _printed_mole_component_name(name) for name in names
+    ):
+        return None
+    return dict(pairs)
+
+
+def _component_entries(payload: Mapping[str, Any]) -> list[Any] | None:
+    components = payload.get("components")
+    if isinstance(components, Mapping):
+        return list(components.items())
+    if isinstance(components, (list, tuple)):
+        return list(components)
+    return None
+
+
+def _ideal_gas_volume_rows(
+    payload: Mapping[str, Any],
+) -> list[tuple[str, Decimal, str]] | None:
+    """Printed ``(name, amount, verbatim basis)`` for an ideal-gas volume map.
+
+    ``None`` means this payload is not a volume map. A volume token that
+    does not parse raises ``ValueError``; the component is not dropped.
+    Percent amounts stay on the printed 100-closure. Volume-ppm amounts
+    are extra and do not enter that closure.
+    """
+
+    entries = _component_entries(payload)
+    if not entries:
+        return None
+    payload_basis = payload.get("basis")
+    payload_scale = (
+        ideal_gas_volume_scale(payload_basis)
+        if isinstance(payload_basis, str)
+        else None
+    )
+    has_component_scale = any(
+        isinstance(item, (list, tuple))
+        and len(item) >= 3
+        and ideal_gas_volume_scale(item[2]) is not None
+        for item in entries
+    )
+    if payload_scale is None and not has_component_scale:
+        return None
+    rows: list[tuple[str, Decimal, str]] = []
+    for item in entries:
+        if not isinstance(item, (list, tuple)) or len(item) not in {2, 3}:
+            raise ValueError(
+                "ideal-gas volume composition component must be a pair or a printed-basis triple"
+            )
+        name = str(item[0])
+        amount = _as_dec_or_none(item[1])
+        if amount is None or not amount.is_finite() or amount < 0:
+            raise ValueError(
+                "mole-percent composition contains a negative or non-finite amount"
+            )
+        if len(item) == 3:
+            verbatim = str(item[2])
+            if ideal_gas_volume_scale(verbatim) is None:
+                raise ValueError(
+                    f"unrecognised ideal-gas volume basis {verbatim!r}"
+                )
+        elif payload_scale is None or not isinstance(payload_basis, str):
+            raise ValueError(
+                f"ideal-gas volume component {name!r} has no printed volume basis"
+            )
+        else:
+            verbatim = payload_basis
+        if not _printed_mole_component_name(name):
+            raise ValueError(
+                "mole-percent composition contains unsupported or ambiguous components: "
+                f"{name}"
+            )
+        rows.append((name, amount, verbatim))
+    names = [name for name, _amount, _basis in rows]
+    if len(set(names)) != len(names):
+        raise ValueError(
+            "mole-percent composition contains unsupported or ambiguous components"
+        )
+    return rows
+
+
+def _ideal_gas_volume_printed_bases(payload: object) -> tuple[str, ...] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    if _enum(AmountBasis, payload.get("amount_basis")) is not AmountBasis.MOLE_PERCENT:
+        return None
+    rows = _ideal_gas_volume_rows(payload)
+    if rows is None:
+        return None
+    seen: list[str] = []
+    for _name, _amount, verbatim in rows:
+        if verbatim not in seen:
+            seen.append(verbatim)
+    return tuple(seen)
+
+
+def _printed_gas_phase_marker(payload: Mapping[str, Any]) -> bool:
+    """True only for an explicit gas-phase token ``gas`` or ``g``."""
+
+    phase = payload.get("phase")
+    if not isinstance(phase, str):
+        return False
+    return phase.strip().casefold() in {"gas", "g"}
+
+
+def _composition_from_ideal_gas_volume(
+    payload: Mapping[str, Any], metadata: Mapping[str, str | None]
+) -> Composition | None:
+    if _enum(AmountBasis, payload.get("amount_basis")) is not AmountBasis.MOLE_PERCENT:
+        return None
+    rows = _ideal_gas_volume_rows(payload)
+    if rows is None:
+        return None
+    # Amagat applies to a gas. A condensed vol% map (SiO2, Al2O3) is not a
+    # mole fraction and must not carry the ideal-gas notice. The marker is
+    # the payload phase token, not the species name: SO2 is on the oxide
+    # allowlist and still a gas when the extract says so.
+    if not _printed_gas_phase_marker(payload):
+        raise ValueError(
+            "condensed-phase volume fraction is not an ideal-gas mole fraction"
+        )
+    percent = {
+        name: amount
+        for name, amount, verbatim in rows
+        if ideal_gas_volume_scale(verbatim) == "percent"
+    }
+    if percent:
+        closure_error = _mole_percent_closure_error(percent)
+        if closure_error is not None:
+            raise ValueError(closure_error)
+    payload_basis = payload.get("basis")
+    basis = (
+        str(payload_basis)
+        if isinstance(payload_basis, str) and ideal_gas_volume_scale(payload_basis)
+        else "ideal_gas_volume_fraction"
+    )
+    return Composition(
+        basis=basis,
+        components=tuple(
+            (name, ideal_gas_volume_amount_to_mole_fraction(amount, verbatim))
+            for name, amount, verbatim in rows
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        **metadata,
+    )
 
 
 def _mole_percent_closure_error(components: Mapping[str, Decimal]) -> str | None:
@@ -1470,10 +1670,19 @@ def _composition_located_from_plain(payload: object) -> Located[Composition]:
                 locator=source.locator,
                 inference=source.inference,
             )
+        inference = source.inference
+        printed_bases = _ideal_gas_volume_printed_bases(body)
+        if printed_bases is not None:
+            inference = Derivation(
+                relation=NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION.value,
+                inputs=printed_bases,
+                parameters=(),
+                output_unit="mole_fraction",
+            )
         return Located(
             State.of(composition),
             locator=source.locator,
-            inference=source.inference,
+            inference=inference,
         )
     wt = _mass_percent_components(payload)
     if wt is not None:
@@ -1755,6 +1964,9 @@ def _composition_from_plain(payload: object) -> Composition:
         if wt is not None:
             return replace(wt_pct_to_mole_fraction(wt), **metadata)
     elif amount_basis is AmountBasis.MOLE_PERCENT:
+        volume = _composition_from_ideal_gas_volume(payload, metadata)
+        if volume is not None:
+            return volume
         mole_percent = _mole_percent_components(payload)
         if mole_percent is None:
             raise ValueError(
@@ -3472,6 +3684,54 @@ def convert_areal_mass_to_kg_per_m2(
     return None, f"unmapped areal mass unit {units!r}"
 
 
+def _areal_rate_unit_key(units: str) -> str:
+    text = str(units).strip().lower()
+    suffix = " as printed"
+    if text.endswith(suffix):
+        text = text[: -len(suffix)].strip()
+    return (
+        text.replace("·", "/")
+        .replace("•", "/")
+        .replace("⋅", "/")
+        .replace(" ", "")
+        .replace("²", "2")
+        .replace("^", "")
+        .replace("−", "-")
+        .replace("⁻", "-")
+        .replace("/hr", "/h")
+        .replace("hr-1", "h-1")
+    )
+
+
+def convert_areal_rate_to_kg_per_m2_s(
+    value: object, units: str | None
+) -> tuple[Decimal | None, str | None]:
+    """Convert a printed wall-deposition flux to kg m^-2 s^-1.
+
+    Premise: 1 mg = 1e-6 kg, 1 cm^2 = 1e-4 m^2, 1 h = 3600 s (SI).
+    Algebra: 1 mg cm^-2 h^-1 = 1e-6 / (1e-4 * 3600) = 1/360000
+    kg m^-2 s^-1. 1 mg m^-2 s^-1 = 1e-6 kg m^-2 s^-1.
+    Unit check: kg / (m^2 * s) = kg m^-2 s^-1.
+    Sanity: 0.38 mg cm^-2 h^-1 = 0.38/360000 = 1.0555...e-6
+    kg m^-2 s^-1, which is 1.056e-6 at 4 significant figures.
+    1.60/360000 = 4.444...e-6. 2.9 mg m^-2 s^-1 = 2.9e-6.
+    """
+
+    amount = _as_dec_or_none(value)
+    if amount is None:
+        return None, "areal rate value is not numeric"
+    if units is None or not str(units).strip():
+        return None, "missing areal rate unit"
+    key = _areal_rate_unit_key(str(units))
+    if key in {"kg/m2/s", "kg/m2s-1", "kgm-2s-1", "kgperm2pers", "kg_per_m2_s"}:
+        return amount, "identity:kg_per_m2_s"
+    if key in {"mg/cm2/h", "mg/cm2h-1", "mgcm-2h-1", "mgpercm2perh", "mg_per_cm2_per_h"}:
+        return amount / Decimal(360000), "mg_per_cm2_h_to_kg_per_m2_s"
+    if key in {"mg/m2/s", "mg/m2s-1", "mgm-2s-1", "mgperm2pers", "mg_per_m2_per_s"}:
+        return amount * Decimal("1e-6"), "mg_per_m2_s_to_kg_per_m2_s"
+    return None, f"unmapped areal rate unit {units!r}"
+
+
 def convert_mass_to_kg(
     value: object, units: str | None
 ) -> tuple[Decimal | None, str | None]:
@@ -3673,6 +3933,18 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
         "rho_kg_per_m3 = rho_g_per_cm3 × 1000",
         "kg_per_m3",
         "g_per_cm3",
+    ),
+    "mg_per_cm2_h_to_kg_per_m2_s": (
+        Decimal(360000),
+        "J_kg_per_m2_s = J_mg_per_cm2_h / 360000",
+        "kg_per_m2_s",
+        "mg/cm2/h",
+    ),
+    "mg_per_m2_s_to_kg_per_m2_s": (
+        Decimal("1e-6"),
+        "J_kg_per_m2_s = J_mg_per_m2_s * 1e-6",
+        "kg_per_m2_s",
+        "mg/m2/s",
     ),
     "mg_per_cm2_to_kg_per_m2": (
         Decimal("100"),
@@ -3972,6 +4244,382 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         basis="printed_oxides",
         components=tuple((oxide, n / total) for oxide, n in moles.items()),
         amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
+# t-1593. A printed mixture cites its named material with
+# ``named_material_records`` on the mass-percent composition body. Without
+# that key the row is not this spec: oxide rows and previously unsupported
+# component lists keep their existing path (store delta 0).
+#
+# The cited record is, in order:
+# 1. Another observation in the same extract, by observation id. That is the
+#    composition the paper prints (Delgado 2015 Table 1 puts JSC-1A oxides on
+#    point_conditions). The id is explicit so "JSC-1A" is not matched against
+#    a label like "JSC-1A [9]".
+# 2. ``feedstock_id`` into data/feedstocks.yaml ``composition_wt_pct``, and
+#    only when every key is an allowlisted oxide and the map is non-empty.
+#    ``lunar_mare_jsc_1a_legacy`` is empty and is not a record. The paper's
+#    own table wins because the ruling says to use the composition the paper
+#    prints or cites before a published bulk analysis stored as a feedstock.
+_NAMED_MATERIAL_WITHOUT_RECORD = (
+    "typed-refusal:named_material_without_cited_composition"
+)
+_NAMED_MATERIAL_FRACTIONS_OPEN = (
+    "typed-refusal:named_material_mixture_mass_fractions_do_not_sum_to_1"
+)
+_FEEDSTOCK_OXIDE_WT_PCT: dict[str, dict[str, Decimal]] | None = None
+
+
+@dataclass(frozen=True)
+class _NamedMaterialMixtureBinding:
+    located: Located[Composition]
+    parents: tuple[str, ...]
+    lot_reason: str | None
+    lot_source: str | None
+
+
+def _composition_payload_body(payload: object) -> Mapping[str, Any] | None:
+    if not isinstance(payload, Mapping):
+        return None
+    if "state" not in payload:
+        return payload
+    state = payload.get("state")
+    if not isinstance(state, Mapping) or str(state.get("tag") or "value") != "value":
+        return None
+    body = state.get("value")
+    return body if isinstance(body, Mapping) else None
+
+
+def _metallic_element_symbol(name: str) -> str | None:
+    """Element symbol printed as the metal itself, not an allowlisted oxide.
+
+    Mg is metallic Mg0. It stays out of ``_COMPOSITION_COMPONENTS`` so an
+    ordinary unsupported list is unchanged, and it is not rewritten as MgO.
+    """
+
+    if name in _COMPOSITION_COMPONENTS:
+        return None
+    parsed = parse_species_formula(name)
+    if parsed is None or len(parsed) != 1:
+        return None
+    element, count = parsed[0]
+    if count != 1 or element != name:
+        return None
+    return element
+
+
+def _cited_allowlisted_oxide_wt_pct(payload: object) -> dict[str, Decimal] | None:
+    """Oxide wt% map usable as a named-material composition record.
+
+    Every component must already be an allowlisted composition key. A map
+    that itself names a material or a metal is not a record. The printed
+    sum is kept; Delgado Table 1 closes at 98.1 wt% and the remainder stays
+    out.
+    """
+
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names):
+        return None
+    if any(name not in _COMPOSITION_COMPONENTS for name in names):
+        return None
+    if any(not amount.is_finite() or amount < 0 for _name, amount in pairs):
+        return None
+    if sum((amount for _name, amount in pairs), Decimal("0")) <= 0:
+        return None
+    return dict(pairs)
+
+
+def _named_material_record_from_row(
+    row: Mapping[str, Any],
+) -> tuple[dict[str, Decimal], Locator | None] | None:
+    raw_conditions = row.get("point_conditions")
+    payload = (
+        raw_conditions.get("composition")
+        if isinstance(raw_conditions, Mapping)
+        else None
+    )
+    oxides = _cited_allowlisted_oxide_wt_pct(payload)
+    locator = None
+    if isinstance(payload, Mapping):
+        locator = _locator_from_plain(payload.get("locator"))
+    if oxides is None and not (
+        isinstance(raw_conditions, Mapping) and "composition" in raw_conditions
+    ):
+        oxides = _oxide_map_from_mapping(row.get("values"))
+        if oxides is not None and any(
+            name not in _COMPOSITION_COMPONENTS for name in oxides
+        ):
+            oxides = None
+        if locator is None:
+            locator = locator_from_mapping(row.get("locator"))
+    if oxides is None:
+        return None
+    return oxides, locator
+
+
+def _feedstock_oxide_wt_pct_table() -> Mapping[str, Mapping[str, Decimal]]:
+    """Loadable feedstock oxide maps. An empty or mixed map is omitted."""
+
+    global _FEEDSTOCK_OXIDE_WT_PCT
+    if _FEEDSTOCK_OXIDE_WT_PCT is not None:
+        return _FEEDSTOCK_OXIDE_WT_PCT
+    loaded: dict[str, dict[str, Decimal]] = {}
+    document = load_yaml(REPO_ROOT / "data" / "feedstocks.yaml")
+    if isinstance(document, Mapping):
+        for feedstock_id, record in document.items():
+            if not isinstance(record, Mapping):
+                continue
+            raw = record.get("composition_wt_pct")
+            if not isinstance(raw, Mapping) or not raw:
+                continue
+            parsed: dict[str, Decimal] = {}
+            usable = True
+            for name, value in raw.items():
+                key = str(name).strip()
+                amount = _as_dec_or_none(value)
+                if (
+                    key not in _COMPOSITION_COMPONENTS
+                    or amount is None
+                    or not amount.is_finite()
+                    or amount < 0
+                ):
+                    usable = False
+                    break
+                parsed[key] = amount
+            if usable and parsed and sum(parsed.values(), Decimal("0")) > 0:
+                loaded[str(feedstock_id)] = parsed
+    _FEEDSTOCK_OXIDE_WT_PCT = loaded
+    return loaded
+
+
+def _mixture_component_kind(name: str) -> str:
+    if name in _COMPOSITION_COMPONENTS:
+        return "component"
+    if _metallic_element_symbol(name) is not None:
+        return "element"
+    return "named"
+
+
+def _named_material_mixture_parts(
+    payload: object,
+) -> list[tuple[str, Decimal, str]] | None:
+    """Parts of a t-1593 mixture, or None when this is not that spec.
+
+    The body must carry ``named_material_records`` and at least one named
+    material plus one element or allowlisted component.
+    """
+
+    body = _composition_payload_body(payload)
+    if body is None or "named_material_records" not in body:
+        return None
+    pairs = _mass_percent_pairs(payload)
+    if pairs is None:
+        return None
+    names = [name for name, _amount in pairs]
+    if len(set(names)) != len(names):
+        return None
+    if any(not amount.is_finite() or amount < 0 for _name, amount in pairs):
+        return None
+    kinds = [_mixture_component_kind(name) for name in names]
+    if "named" not in kinds or not any(kind in {"element", "component"} for kind in kinds):
+        return None
+    return [
+        (name, amount, kind)
+        for (name, amount), kind in zip(pairs, kinds, strict=True)
+    ]
+
+
+def _mixture_mass_percent_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
+    """Mole fraction of a mixture wt% map, with metallic elements kept.
+
+    ``wt_pct_to_mole_fraction`` refuses names outside ``_COMPOSITION_COMPONENTS``.
+    Mg is not added to that map: doing so would convert previously unsupported
+    extracts. This converter is only used after the mixture spec has matched.
+    n_j = w_j / M_j and x_j = n_j / sum n. wt% is not renormalized.
+    """
+
+    names = {str(name).strip() for name in wt}
+    if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
+        overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
+        raise ValueError(f"ambiguous total iron components: FeOT with {overlap}")
+    moles: dict[str, Decimal] = {}
+    total = Decimal("0")
+    for name, weight in wt.items():
+        amount = as_decimal(weight)
+        if amount < 0:
+            raise ValueError(f"component {name!r} wt% is negative")
+        if amount == 0:
+            continue
+        element = _metallic_element_symbol(str(name))
+        if element is not None:
+            canonical = element
+            mass = oxide_molar_mass(element)
+        else:
+            component = _COMPOSITION_COMPONENTS.get(str(name))
+            if component is None:
+                raise ValueError(
+                    "mixture wt% has a component that is neither an allowlisted "
+                    f"oxide nor a metallic element: {name}"
+                )
+            canonical = component[1]
+            mass = oxide_molar_mass(str(name))
+        moles[canonical] = moles.get(canonical, Decimal("0")) + amount / mass
+        total += amount / mass
+    if total <= 0:
+        raise ValueError("mixture wt% map has no positive mass")
+    return Composition(
+        basis="derived_composition",
+        components=tuple((name, n / total) for name, n in moles.items()),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+
+
+def _lot_variability_reason(materials: Sequence[str]) -> str:
+    names = ", ".join(materials)
+    if any("JSC-1" in material for material in materials):
+        return (
+            "named-material bulk composition is a cited analysis and varies by lot "
+            f"(JSC-1 vs JSC-1A lots differ). material={names}."
+        )
+    return (
+        "named-material bulk composition is a cited analysis and varies by lot. "
+        f"material={names}."
+    )
+
+
+def _resolve_named_material_citation(
+    citation: object,
+    *,
+    records: Mapping[str, tuple[dict[str, Decimal], Locator | None]],
+    source_id: str,
+) -> tuple[dict[str, Decimal], str] | None:
+    if isinstance(citation, str) and citation.strip():
+        record_id = citation.strip()
+        found = records.get(record_id)
+        if found is None:
+            return None
+        return found[0], f"{source_id}::{record_id}"
+    if isinstance(citation, Mapping):
+        feedstock_id = citation.get("feedstock_id")
+        if not isinstance(feedstock_id, str) or not feedstock_id.strip():
+            return None
+        feedstock_id = feedstock_id.strip()
+        oxides = _feedstock_oxide_wt_pct_table().get(feedstock_id)
+        if oxides is None:
+            return None
+        # Composition-record token for Derivation.references. Not an
+        # Observation.derived_from parent: that field is value ancestry,
+        # and corpus validation rejects a feedstock id that does not resolve.
+        return dict(oxides), f"feedstock:{feedstock_id}"
+    return None
+
+
+def _named_material_mixture_binding(
+    payload: object,
+    *,
+    records: Mapping[str, tuple[dict[str, Decimal], Locator | None]],
+    source_id: str,
+) -> _NamedMaterialMixtureBinding | None:
+    """Bind a named-material mixture, or refuse when its citation does not resolve."""
+
+    parts = _named_material_mixture_parts(payload)
+    if parts is None:
+        return None
+    locator = (
+        _locator_from_plain(payload.get("locator"))
+        if isinstance(payload, Mapping)
+        else None
+    )
+
+    def refused(reason: str) -> _NamedMaterialMixtureBinding:
+        return _NamedMaterialMixtureBinding(
+            Located(State.unknown(reason), locator=locator),
+            (),
+            None,
+            None,
+        )
+
+    closure = _mole_percent_closure_error(
+        {f"component_{index}": amount for index, (_name, amount, _kind) in enumerate(parts)}
+    )
+    if closure is not None:
+        return refused(_NAMED_MATERIAL_FRACTIONS_OPEN)
+    body = _composition_payload_body(payload)
+    citations = body.get("named_material_records") if isinstance(body, Mapping) else None
+    if not isinstance(citations, Mapping):
+        missing = [name for name, _amount, kind in parts if kind == "named"]
+        return refused(f"{_NAMED_MATERIAL_WITHOUT_RECORD}:{','.join(missing)}")
+    resolved: list[tuple[str, dict[str, Decimal], str]] = []
+    missing: list[str] = []
+    for name, _amount, kind in parts:
+        if kind != "named":
+            continue
+        hit = _resolve_named_material_citation(
+            citations.get(name),
+            records=records,
+            source_id=source_id,
+        )
+        if hit is None:
+            missing.append(name)
+        else:
+            oxides, parent = hit
+            resolved.append((name, oxides, parent))
+    if missing:
+        return refused(f"{_NAMED_MATERIAL_WITHOUT_RECORD}:{','.join(missing)}")
+    mix_parts: list[tuple[Mapping[str, Decimal], Decimal]] = []
+    parents: list[str] = []
+    for name, amount, kind in parts:
+        fraction = amount / Decimal("100")
+        if kind == "named":
+            oxides = next(item[1] for item in resolved if item[0] == name)
+            parent = next(item[2] for item in resolved if item[0] == name)
+            mix_parts.append((oxides, fraction))
+            if parent not in parents:
+                parents.append(parent)
+        elif kind == "element":
+            element = _metallic_element_symbol(name)
+            assert element is not None
+            mix_parts.append(({element: Decimal("100")}, fraction))
+        else:
+            mix_parts.append(({name: Decimal("100")}, fraction))
+    mixed = mass_weighted_mixture_wt_pct(mix_parts)
+    try:
+        composition = _mixture_mass_percent_to_mole_fraction(mixed)
+    except (ArithmeticError, ValueError) as exc:
+        return refused(f"mass-percent composition is not usable: {exc}")
+    parameters: list[tuple[str, Located[Decimal]]] = []
+    for name, amount, _kind in parts:
+        parameters.append(
+            (f"f_{name}", Located(State.of(amount / Decimal("100")), locator=locator))
+        )
+    for name, weight in mixed.items():
+        parameters.append(
+            (
+                f"w_mix_{name}_wt_pct",
+                Located(State.of(weight), locator=locator),
+            )
+        )
+    materials = [name for name, _amount, kind in parts if kind == "named"]
+    derivation = Derivation(
+        relation="w_mix,j = sum_k f_k * w_k,j",
+        inputs=(
+            "metallic element stays elemental (Mg is Mg0 and is not folded into MgO)",
+            "composition_records=" + ",".join(parents),
+        ),
+        parameters=tuple(parameters),
+        output_unit="mole_fraction",
+        method=Located(State.of("derived_composition"), locator=locator),
+        references=tuple(parents),
+    )
+    return _NamedMaterialMixtureBinding(
+        Located(State.of(composition), locator=locator, inference=derivation),
+        tuple(parents),
+        _lot_variability_reason(materials),
+        ",".join(parents),
     )
 
 
@@ -6348,6 +6996,318 @@ def _pressure_evaluator(values: Mapping[str, Any], units: str | None) -> bool:
     return False
 
 
+# A printed J_exp/J_vac (or J_exp/J_max) whose denominator is the theoretical
+# maximum Hertz-Knudsen rate is evaporation_coefficient_alpha. The source may
+# still call that ratio a condensation coefficient; that word stays
+# source_term_as_printed and is not a contradiction. Film growth is not this ratio.
+HK_RATIO_ALPHA_DEFINITION = "j_exp_over_hk_maximum"
+ALPHA_GAS_SYSTEM_H2 = "H2"
+ALPHA_GAS_SYSTEM_VACUUM = "vacuum"
+_HK_RATIO_GAS_SYSTEMS = frozenset({ALPHA_GAS_SYSTEM_H2, ALPHA_GAS_SYSTEM_VACUUM})
+_CONDENSATION_NOT_EVAPORATION_ALPHA = (
+    "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
+)
+_FILM_GROWTH_RE = re.compile(
+    r"film growth|growth coefficient|growth/condensation",
+    re.IGNORECASE,
+)
+_CONDENSATION_WORD_RE = re.compile(
+    r"\bcondensation\b|alpha\(cond\)|α\(cond\)",
+    re.IGNORECASE,
+)
+_HK_NUMERATOR_RE = re.compile(r"j[\s_\-]*exp", re.IGNORECASE)
+_HK_DENOMINATOR_RE = re.compile(r"j[\s_\-]*(?:vac|max|hk)\b", re.IGNORECASE)
+_HK_MAXIMUM_RATE_RE = re.compile(
+    r"maximum evaporation rate|theoretical maximum|hertz[\s\-]*knudsen",
+    re.IGNORECASE,
+)
+_HK_DIVISION_RE = re.compile(r"divid\w+\s+.*\bby\b|/", re.IGNORECASE | re.DOTALL)
+_H2_RUN_GAS_RE = re.compile(r"(?<![a-z0-9])(?:h2|hydrogen)(?![a-z0-9])", re.IGNORECASE)
+_VACUUM_RUN_GAS_RE = re.compile(
+    r"(?<![a-z0-9])(?:vacuum|in vacuo)(?![a-z0-9])",
+    re.IGNORECASE,
+)
+
+
+def _printed_definition_text(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> str:
+    parts: list[str] = []
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        for key in ("definition_as_printed", "ratio_as_printed"):
+            raw = src.get(key)
+            if isinstance(raw, str) and raw.strip():
+                parts.append(raw.strip())
+    return "\n".join(parts)
+
+
+def printed_hk_evaporation_ratio(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None = None,
+) -> bool:
+    """True when the source prints J_exp over the maximum Hertz-Knudsen rate.
+
+    Both the ratio (experimental evaporation rate over J_vac, J_max, or J_hk)
+    and a statement that the denominator is that theoretical maximum are
+    required. A bare condensation coefficient is false. gas_system_as_printed
+    is not read: it names the chemical system, not this ratio.
+    """
+
+    text = _printed_definition_text(values, row)
+    if not text or _FILM_GROWTH_RE.search(text):
+        return False
+    return bool(
+        _HK_NUMERATOR_RE.search(text)
+        and _HK_DENOMINATOR_RE.search(text)
+        and _HK_DIVISION_RE.search(text)
+        and _HK_MAXIMUM_RATE_RE.search(text)
+    )
+
+
+def _alpha_condensation_contradiction(
+    blob: str,
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> str | None:
+    """Refusal for a condensation or film-growth coefficient, or None.
+
+    One owner for the alias contradiction and the arrhenius corroboration.
+    The locator blob, source_term_as_printed, and definition_as_printed are
+    all refusal inputs. Film growth refuses even when the definition also
+    prints the Hertz-Knudsen ratio. A condensation word is rescued only when
+    that printed definition passes ``printed_hk_evaporation_ratio``.
+    """
+
+    printed_parts: list[str] = []
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        for key in ("source_term_as_printed", "definition_as_printed"):
+            raw = src.get(key)
+            if isinstance(raw, str) and raw.strip():
+                printed_parts.append(raw.strip())
+    printed = "\n".join(printed_parts)
+    if _FILM_GROWTH_RE.search(blob) or _FILM_GROWTH_RE.search(printed):
+        return _CONDENSATION_NOT_EVAPORATION_ALPHA
+    names_condensation = bool(_CONDENSATION_WORD_RE.search(blob)) or bool(
+        _CONDENSATION_WORD_RE.search(printed)
+    )
+    if names_condensation and not printed_hk_evaporation_ratio(values, row):
+        return _CONDENSATION_NOT_EVAPORATION_ALPHA
+    return None
+
+
+def _gas_text_from_state_value(value: object) -> str | None:
+    if isinstance(value, str):
+        text = value.strip()
+        return text or None
+    if isinstance(value, Value):
+        if value.kind is ValueKind.POINT and value.point is not None:
+            return str(value.point).strip() or None
+        return None
+    if isinstance(value, Mapping):
+        point = value.get("point")
+        if point not in (None, ""):
+            return str(point).strip() or None
+    return None
+
+
+def _condition_point_text(raw: object) -> str | None:
+    if isinstance(raw, str):
+        text = raw.strip()
+        return text or None
+    if isinstance(raw, Located):
+        if not raw.state.is_value:
+            return None
+        return _gas_text_from_state_value(raw.state.value)
+    if not isinstance(raw, Mapping):
+        return None
+    state = raw.get("state")
+    if isinstance(state, State):
+        if not state.is_value:
+            return None
+        return _gas_text_from_state_value(state.value)
+    if isinstance(state, Mapping):
+        if str(state.get("tag") or "value") != "value":
+            return None
+        return _gas_text_from_state_value(state.get("value"))
+    return _gas_text_from_state_value(raw)
+
+
+def classify_alpha_run_gas(text: str | None) -> str | None:
+    """H2 or vacuum from one run-condition string. None when it says neither or both."""
+
+    if not text:
+        return None
+    token = " ".join(str(text).replace("_", " ").split())
+    h2 = _H2_RUN_GAS_RE.search(token) is not None
+    vacuum = _VACUUM_RUN_GAS_RE.search(token) is not None
+    if h2 == vacuum:
+        return None
+    return ALPHA_GAS_SYSTEM_H2 if h2 else ALPHA_GAS_SYSTEM_VACUUM
+
+
+def _iter_run_gas_texts(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None,
+) -> Iterator[str]:
+    """Run condition only. gas_system_as_printed is the system name, not the gas."""
+
+    for src in (values, row):
+        if not isinstance(src, Mapping):
+            continue
+        printed = src.get("pressure_as_printed")
+        if isinstance(printed, str) and printed.strip():
+            yield printed.strip()
+        mix = _condition_point_text(src.get("gas_mix"))
+        if mix:
+            yield mix
+        conditions = src.get("point_conditions")
+        if isinstance(conditions, Mapping):
+            mix = _condition_point_text(conditions.get("gas_mix"))
+            if mix:
+                yield mix
+
+
+def printed_alpha_run_gas_system(
+    values: Mapping[str, Any] | None,
+    row: Mapping[str, Any] | None = None,
+) -> str | None:
+    """vacuum or H2 when every classified run condition agrees. Else None."""
+
+    found = {
+        gas
+        for text in _iter_run_gas_texts(values, row)
+        if (gas := classify_alpha_run_gas(text)) is not None
+    }
+    if len(found) != 1:
+        return None
+    return next(iter(found))
+
+
+def _with_hk_ratio_alpha_labels(
+    provenance: Mapping[str, Any] | None,
+    *,
+    quantity: Quantity | None,
+    values: Mapping[str, Any] | None,
+    obs: Mapping[str, Any] | None,
+    species: Species | None,
+) -> Mapping[str, Any] | None:
+    """Carry the printed term and the family key the leave-one-out pool reads.
+
+    melt_family is ``phase:formula:gas_system``. Phase and gas are in the key
+    so a crystal row does not string-match a melt row, and H2 does not
+    string-match vacuum. Labels are written only for the printed HK ratio.
+    """
+
+    if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA or species is None:
+        return provenance
+    if not printed_hk_evaporation_ratio(values, obs):
+        return provenance
+    phase = phase_token(species)
+    formula = str(species.formula or "")
+    if phase is None or not formula:
+        return provenance
+    selected = dict(provenance or {})
+    term = None
+    for src in (values, obs):
+        if isinstance(src, Mapping):
+            raw_term = src.get("source_term_as_printed")
+            if isinstance(raw_term, str) and raw_term.strip():
+                term = raw_term
+                break
+    if term is not None:
+        selected["source_term_as_printed"] = term
+    selected["alpha_definition"] = HK_RATIO_ALPHA_DEFINITION
+    gas = printed_alpha_run_gas_system(values, obs)
+    if gas is None:
+        selected.pop("gas_system", None)
+        selected.pop("melt_family", None)
+        return selected
+    selected["gas_system"] = gas
+    selected["melt_family"] = f"{phase.value}:{formula}:{gas}"
+    return selected
+
+
+def evaporation_alpha_family_key(
+    observation: Observation,
+) -> tuple[str, str, str] | None:
+    """(phase, formula, gas_system) for one evaporation coefficient.
+
+    gas_system is the provenance label when the HK ratio wrote one, else a
+    vacuum or H2 gas_mix on the row. There is no species-only fallback: a
+    missing phase or gas leaves the row out of every pool.
+    """
+
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    if quantity_token(identity) is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        return None
+    species = identity.species
+    if species is None:
+        return None
+    phase = phase_token(species)
+    formula = str(species.formula or "")
+    if phase is None or not formula:
+        return None
+    gas = None
+    provenance = observation.provenance
+    if isinstance(provenance, Mapping):
+        recorded = provenance.get("gas_system")
+        if recorded in _HK_RATIO_GAS_SYSTEMS:
+            gas = str(recorded)
+    if gas is None:
+        conditions = observation.point_conditions
+        if isinstance(conditions, Mapping):
+            gas = classify_alpha_run_gas(
+                _condition_point_text(conditions.get("gas_mix"))
+            )
+    if gas not in _HK_RATIO_GAS_SYSTEMS:
+        return None
+    return (phase.value, formula, gas)
+
+
+def evaporation_alpha_pool_members(
+    observations: Iterable[Observation],
+) -> dict[tuple[str, str, str], frozenset[str]]:
+    """Observation ids in each (phase, formula, gas_system) pool."""
+
+    pools: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    for observation in observations:
+        key = evaporation_alpha_family_key(observation)
+        if key is None:
+            continue
+        pools[key].add(observation.observation_id)
+    return {key: frozenset(ids) for key, ids in pools.items()}
+
+
+def evaporation_alpha_loo_member_ids(
+    observations: Iterable[Observation],
+    query: Observation,
+) -> frozenset[str]:
+    """Other sources in the query's family. Empty when the query has no family.
+
+    Leave-one-out drops the query's source_id. It does not fall back to every
+    row of the same formula, so crystal and H2 rows stay out of a melt or
+    vacuum consensus keyed on a different family.
+    """
+
+    key = evaporation_alpha_family_key(query)
+    if key is None:
+        return frozenset()
+    return frozenset(
+        observation.observation_id
+        for observation in observations
+        if evaporation_alpha_family_key(observation) == key
+        and observation.source_id != query.source_id
+        and observation.observation_id != query.observation_id
+    )
+
+
 def _quantity_contradiction(
     candidate: Quantity,
     obs_type: str | None,
@@ -6396,12 +7356,9 @@ def _quantity_contradiction(
             r"relative volatil|relative evaporation coefficient", blob
         ):
             return "source names Olette relative volatility, not an HKL/Langmuir alpha"
-        if re.search(
-            r"\bcondensation\b|film growth|growth coefficient|growth/condensation|"
-            r"alpha\(cond\)|α\(cond\)",
-            blob,
-        ):
-            return "source names a condensation or film-growth coefficient, not evaporation_coefficient_alpha"
+        condensation = _alpha_condensation_contradiction(blob, values, row)
+        if condensation:
+            return condensation
         amount = _alpha_numeric(values)
         if amount is not None and not (Decimal("0") < amount <= Decimal("1")):
             return (
@@ -6524,10 +7481,7 @@ def _quantity_corroborated(
         form = values.get("alpha_form")
         if isinstance(form, Mapping) and str(form.get("type") or "").lower() == "arrhenius":
             blob = _row_text_blob(None, values, units, row)
-            if re.search(
-                r"\bcondensation\b|film growth|growth coefficient|growth/condensation",
-                blob,
-            ):
+            if _alpha_condensation_contradiction(blob, values, row):
                 return False
             return True
         return False
@@ -7104,6 +8058,9 @@ def map_quantity(
                 "specific_gas_yield conversion has no verified input basis for "
                 "quoted_from_other_workers rows"
             )
+            return State.unknown(reason), reason
+        if isinstance(raw, str) and "carryover" in raw.casefold():
+            reason = PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE
             return State.unknown(reason), reason
         if isinstance(raw, str) and raw in QUANTITY_ALIASES:
             inferred = QUANTITY_ALIASES[raw]
@@ -10004,6 +10961,10 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "delta_q_replicate_1",
         "delta_q_replicate_2",
     ),
+    Quantity.WALL_DEPOSIT_AREAL_RATE: (
+        "value",
+        "surface_deposition_areal_mass_rate",
+    ),
     Quantity.DENSITY: (
         "density_g_cm3",
         "density_kg_m3_also_printed",
@@ -11772,6 +12733,19 @@ def _selection_from_named_field(
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
             )
+        if q_token is Quantity.WALL_DEPOSIT_AREAL_RATE:
+            amount, trail = convert_areal_rate_to_kg_per_m2_s(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal deposition rate",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2_s", payload, condition_ranges
+            )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
         )
@@ -11852,6 +12826,19 @@ def _selection_from_named_field(
                 )
             return _point_selection(
                 amount, key, trail or "identity:kg_per_m2", payload, condition_ranges
+            )
+        if q_token is Quantity.WALL_DEPOSIT_AREAL_RATE:
+            amount, trail = convert_areal_rate_to_kg_per_m2_s(amount, units)
+            if amount is None:
+                return _unavailable_selection(
+                    trail or f"{key} is not a grounded areal deposition rate",
+                    condition_ranges=condition_ranges,
+                    unused_ancillary=_unused_ancillary(payload, key),
+                    field_name=key,
+                    unit_trail=trail or "identity",
+                )
+            return _point_selection(
+                amount, key, trail or "identity:kg_per_m2_s", payload, condition_ranges
             )
         converted = _convert_compilation_amount(
             amount, q_token, _printed_unit_for_field(payload, key) or units
@@ -15847,6 +16834,11 @@ class Migrator:
         self._oxygen_pressure_conflict: set[str] = set()
         self._initial_composition_conflicts: set[str] = set()
         self._registry_printed_composition_experiments: set[str] = set()
+        # Experiment ids whose sample material prints an amorphous, glassy,
+        # or vitreous solid. A hyphen before the stem is not that print.
+        # Sample has no material field; the word is read here, while the
+        # extract mapping is still intact, and consulted by the reservoir fill.
+        self._amorphous_printed_sample_experiments: set[str] = set()
         # b-718 ROR: exploded children whose printed map is their own row's
         # (not the parent observation's). A row-local map describes that row
         # (often an evaporation residue), so it never promotes to the sample.
@@ -16365,12 +17357,15 @@ class Migrator:
         """Lift printed experiment conditions into an observation identity.
 
         An observation may omit conditions that its declared experiment records
-        once. Pressure inherits only an exact experiment-scope value; a static
-        p_sat row gets a pure reservoir when the sample's printed form and
-        single-component composition agree. Point-scoped effusion phases are
-        resolved here from their own source rows. The C–CO route is resolved
-        through the same guarded waypoint used by consumers, with derived
-        pressure provenance retained.
+        once. Pressure inherits only an exact experiment-scope value. A p_sat
+        or evaporation_coefficient_alpha row gets a pure reservoir when the
+        sample's printed form and single-component composition agree. A sample
+        printed as amorphous stays typed-unknown: Phase.CR would assert a
+        crystal, and Phase.GLASS is not a substitute.
+        Point-scoped effusion phases are resolved here from their own source
+        rows, and only for p_sat. The C–CO route is resolved through the same
+        guarded waypoint used by consumers, with derived pressure provenance
+        retained.
         """
 
         experiment = self.result.experiments.get(experiment_id)
@@ -16392,8 +17387,15 @@ class Migrator:
             if method is not None and method.is_value
             else experiment.method
         )
+        # p_sat and evaporation_coefficient_alpha share this fill. A flux
+        # or evaporation rate does not: it is kinetic, and an unstated
+        # condensed phase cannot supply its reservoir.
+        pure_condensed_reservoir = quantity in {
+            Quantity.P_SAT,
+            Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+        }
         if (
-            quantity is Quantity.P_SAT
+            pure_condensed_reservoir
             and species_formula is not None
             and effective_method.is_value
             and effective_method.value
@@ -16402,11 +17404,6 @@ class Migrator:
                 MethodToken.KNUDSEN_EFFUSION,
             }
         ):
-            # Knudsen effusion qualifies only for a reported pressure: the
-            # orifice is sized so the cell remains near equilibrium with the
-            # condensed sample, and p_sat reports that equilibrium pressure.
-            # A flux/evaporation rate is kinetic, and an unstated condensed
-            # phase cannot supply a reservoir identity.
             sample = experiment.sample
             form = (
                 sample.form.state.value
@@ -16473,7 +17470,8 @@ class Migrator:
                     source_values.get("method_class") or ""
                 ).strip().casefold()
                 point_effusion_psat = (
-                    effective_method.is_value
+                    quantity is Quantity.P_SAT
+                    and effective_method.is_value
                     and effective_method.value is MethodToken.KNUDSEN_EFFUSION
                     and method_class == "measured_tabulated"
                     and gas_formula == species_formula
@@ -16517,13 +17515,28 @@ class Migrator:
                 in {Phase.CR, Phase.L, Phase.GLASS, Phase.SUPERCOOLED_L}
                 and pure_sample
             ):
-                known["reservoir"] = State.of(
-                    make_species(species_formula, sample_phase)
-                )
-                provenance.append(
-                    "identity.reservoir=experiment.sample.form and pure "
-                    "initial_composition (printed sample)"
-                )
+                # condensed_solid maps to Phase.CR. An amorphous, glassy, or
+                # vitreous print must not take that phase, and must not be
+                # rewritten as glass. A hyphenated negation is not that print.
+                if (
+                    sample_phase is Phase.CR
+                    and experiment_id in self._amorphous_printed_sample_experiments
+                ):
+                    known["reservoir"] = State.unknown(
+                        _AMORPHOUS_CRYSTAL_RESERVOIR_REASON
+                    )
+                    provenance.append(
+                        "identity.reservoir remains unknown: "
+                        + _AMORPHOUS_CRYSTAL_RESERVOIR_REASON
+                    )
+                else:
+                    known["reservoir"] = State.of(
+                        make_species(species_formula, sample_phase)
+                    )
+                    provenance.append(
+                        "identity.reservoir=experiment.sample.form and pure "
+                        "initial_composition (printed sample)"
+                    )
 
         existing_pressure = existing.get("total_pressure_Pa")
         pressure_can_fill = "total_pressure_Pa" not in existing
@@ -17003,6 +18016,10 @@ class Migrator:
                 self._registry_printed_composition_experiments.add(
                     experiment.experiment_id
                 )
+            if _sample_prints_amorphous_solid(payload.get("sample")):
+                self._amorphous_printed_sample_experiments.add(
+                    experiment.experiment_id
+                )
             self.result.experiments[experiment.experiment_id] = experiment
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
@@ -17403,9 +18420,24 @@ class Migrator:
                 sample_compositions.pop(sample_id)
             elif sample_id not in ambiguous_sample_compositions:
                 sample_compositions[sample_id] = candidate
+        named_material_composition_records: dict[
+            str, tuple[dict[str, Decimal], Locator | None]
+        ] = {}
+        for _formula, row in rows:
+            record_id = row.get("observation_id")
+            if not isinstance(record_id, str) or not record_id:
+                continue
+            if not isinstance(row, Mapping):
+                continue
+            record = _named_material_record_from_row(row)
+            if record is not None:
+                named_material_composition_records[record_id] = record
         source_context = dict(pressure_identity_context or {})
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["sample_compositions"] = sample_compositions
+        source_context["named_material_composition_records"] = (
+            named_material_composition_records
+        )
         records = phase_field_records(doc)
         self._phase_field_records[source_id] = records
         for problem in () if records is None else records.problems:
@@ -18616,6 +19648,10 @@ class Migrator:
             }
             and value_sel.available
             and value_sel.field_name
+        ) or (
+            q_token is Quantity.WALL_DEPOSIT_AREAL_RATE
+            and value_sel.available
+            and value_sel.field_name
         ):
             original_raw = values.get(value_sel.field_name)
             if isinstance(original_raw, Mapping):
@@ -18772,6 +19808,11 @@ class Migrator:
                         detail=reason,
                     )
                 )
+        if (
+            q_token is Quantity.WALL_DEPOSIT_AREAL_RATE
+            and ident_kwargs.get("per") is None
+        ):
+            ident_kwargs["per"] = State.of(PerBasis.AREA_TIME)
         if source_reference_state is not None:
             ident_kwargs["reference_state"] = source_reference_state
             if source_reference_state.is_unknown:
@@ -19472,6 +20513,36 @@ class Migrator:
             ):
                 ident_kwargs["fO2_Pa"] = State.of(
                     _log_fO2_to_pa(fO2_condition.state.value, fO2_reference_pa)
+                )
+        # t-1593 runs after every other composition write. An unknown
+        # unsupported-component state is not an explicit composition, so a
+        # later branch would otherwise leave identity.composition unset.
+        named_material_lot: tuple[str, str] | None = None
+        raw_mixture = (
+            raw_point_conditions.get("composition")
+            if isinstance(raw_point_conditions, Mapping)
+            else None
+        )
+        mixture_records = context.get("named_material_composition_records")
+        mixture_binding = _named_material_mixture_binding(
+            raw_mixture,
+            records=mixture_records if isinstance(mixture_records, Mapping) else {},
+            source_id=source_id,
+        )
+        if mixture_binding is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": mixture_binding.located,
+            }
+            ident_kwargs["composition"] = mixture_binding.located.state
+            # Parents stay on the composition derivation (references and
+            # composition_records=). Observation.derived_from is value
+            # ancestry: a cited composition record is a different quantity,
+            # and a feedstock token does not resolve.
+            if mixture_binding.lot_reason is not None:
+                named_material_lot = (
+                    mixture_binding.lot_reason,
+                    mixture_binding.lot_source or "",
                 )
         identity = fill_identity(
             quantity,
@@ -20190,6 +21261,17 @@ class Migrator:
                     source=composition.proxy_source,
                 )
             )
+        if named_material_lot is not None and isinstance(q_token, Quantity):
+            lot_reason, lot_source = named_material_lot
+            observation_notices.append(
+                Notice(
+                    kind=NoticeKind.LOT_VARIABILITY,
+                    affected_quantities=(q_token,),
+                    reason=lot_reason,
+                    origin=obs_id,
+                    source=lot_source or None,
+                )
+            )
         hold_reason_notice = _hold_reason_notice(
             hold_reason,
             quantity=q_token,
@@ -20265,6 +21347,14 @@ class Migrator:
                     parameters=(),
                     output_unit="dimensionless",
                 )
+        if isinstance(identity, Identity):
+            observation_provenance = _with_hk_ratio_alpha_labels(
+                observation_provenance,
+                quantity=q_token,
+                values=values if isinstance(values, Mapping) else None,
+                obs=obs if isinstance(obs, Mapping) else None,
+                species=identity.species,
+            )
         observation = Observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
@@ -21768,6 +22858,7 @@ class Migrator:
                     locator=point_locator,
                 ),
             }
+        gas_volume_bases: tuple[str, ...] | None = None
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             if (
@@ -21794,6 +22885,24 @@ class Migrator:
                         and raw_composition.amount_basis is AmountBasis.MOL_INVENTORY
                         and len(raw_composition.components) > 1
                     )
+                    gas_inference = located_composition.inference
+                    subtype_value = (
+                        identity.subtype.value
+                        if identity.subtype is not None and identity.subtype.is_value
+                        else None
+                    )
+                    promotes_gas_volume = (
+                        isinstance(gas_inference, Derivation)
+                        and gas_inference.relation
+                        == NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION.value
+                        and (
+                            q_token_point is Quantity.WALL_DEPOSIT_AREAL_RATE
+                            or (
+                                q_token_point is Quantity.TRANSITION_TEMPERATURE
+                                and subtype_value == "dew_point"
+                            )
+                        )
+                    )
                     promotes_typed_composition = (
                         q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}
                         or (
@@ -21803,11 +22912,14 @@ class Migrator:
                             and "melt" in phase_as_printed.casefold()
                         )
                         or is_printed_mol_inventory
+                        or promotes_gas_volume
                     )
                     if promotes_typed_composition:
                         identity = replace(
                             identity, composition=State.of(raw_composition)
                         )
+                        if promotes_gas_volume:
+                            gas_volume_bases = tuple(gas_inference.inputs)
                 elif q_token_point in {Quantity.VALENCE_RATIO, Quantity.DENSITY}:
                     converted_composition = _composition_located_from_plain(
                         {
@@ -21836,6 +22948,15 @@ class Migrator:
                         identity, total_pressure_Pa=State.of(pressure)
                     )
         child_notices = list(notices)
+        if gas_volume_bases and isinstance(q_token_point, Quantity):
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION,
+                    affected_quantities=(q_token_point,),
+                    reason="; ".join(gas_volume_bases),
+                    origin=point_id,
+                )
+            )
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
