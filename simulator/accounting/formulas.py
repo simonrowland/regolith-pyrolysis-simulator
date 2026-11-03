@@ -591,115 +591,87 @@ def _clean_formula_text(formula: str) -> str:
     return text
 
 
-def _segment_parses(text: str) -> bool:
-    """True when one dot-free segment is an integer-stoichiometry formula."""
+def _strip_one_leading_integer(part: str) -> str:
+    end = 0
+    while end < len(part) and part[end].isdigit():
+        end += 1
+    return part[end:]
+
+
+def _distinct_integer_elements(text: str) -> int | None:
+    """How many elements one integer-subscript formula names.
+
+    None when the text is empty, does not parse, or a count is not a
+    positive integer. A leading segment multiplier is not an element.
+    """
 
     if not text or "." in text or "·" in text:
-        return False
+        return None
     try:
         multiplier, body = _leading_multiplier(text)
-        if multiplier <= 0.0:
-            return False
+        if multiplier <= 0.0 or not multiplier.is_integer():
+            return None
         elements = _FormulaParser(body).parse()
     except AccountingError:
-        return False
-    return bool(elements)
+        return None
+    if not elements:
+        return None
+    for count in elements.values():
+        if count <= 0.0 or not float(count).is_integer():
+            return None
+    return len(elements)
 
 
-def _canonical_integer_multiplier(segment: str) -> bool:
-    """A leading multiplier is a canonical integer, or absent.
+def _is_integer_compound_adduct(text: str) -> bool:
+    """True when every ASCII dot separates multi-element integer formulas.
 
-    ``2SiO2`` and ``10H2O`` are multipliers. ``08Fe1`` is not: a leading
-    zero is the fractional part of a decimal subscript (``Na1.08Fe``),
-    not an adduct count.
+    Split on '.' and strip one leading integer multiplier from each part
+    after the first. It is an adduct only if every part is an
+    integer-subscript formula with at least two distinct elements;
+    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
+    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
+    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
+    ``Mg1.5SiO4``, and ``Fe2.3O4`` stay one species because a part is a
+    single element. ``FeO1.5`` stays one species because the part after
+    the dot has no element. ``SiO1.5C0.5`` stays one species because it
+    has a single-element part and an elementless part. An empty piece
+    from a leading, trailing, or doubled dot is not an adduct.
     """
 
-    match = _NUMBER_RE.match(segment)
-    if match is None:
-        return True
-    token = match.group(0)
-    if "." in token:
+    if not text or "." not in text or "·" in text:
         return False
-    return not (len(token) > 1 and token.startswith("0"))
-
-
-def _is_integer_adduct(text: str) -> bool:
-    """True when text is one closed integer formula or a dot-separated chain.
-
-    ``Al2O3.2SiO2.2H2O`` is three closed formulas, so every digit-flanked
-    dot is an adduct multiplier. ``Na1.08Fe1.17Si3.13O8`` is not: ``08Fe1``
-    is not a canonical integer multiplier, so the dots stay inside one
-    species. An empty piece from a leading, trailing, or doubled dot is
-    not an adduct.
-    """
-
-    if not text or "·" in text:
+    parts = text.split(".")
+    if any(part == "" for part in parts):
         return False
-    pieces = text.split(".")
-    if not pieces or any(piece == "" for piece in pieces):
-        return False
-    return all(
-        _segment_parses(piece) and _canonical_integer_multiplier(piece)
-        for piece in pieces
-    )
-
-
-def _dot_is_decimal_subscript(text: str, index: int) -> bool:
-    """True when the ASCII dot at index is a coefficient, not an adduct.
-
-    ``FeO1.5``, ``FeO1.33``, and ``NaO0.5`` end in the fractional digits,
-    so the dot is a subscript. ``Fe0.947O``, ``SiO1.5C0.5``, and
-    ``Na1.08Fe1.17Si3.13O8`` stay one species because a side is not a
-    chain of closed integer formulas. ``CuSO4.5H2O``, ``3Al2O3.2SiO2``,
-    and ``Al2O3.2SiO2.2H2O`` are adducts: each dot-separated piece parses
-    with a canonical integer multiplier, so the dot separates.
-    """
-
-    if index <= 0 or index + 1 >= len(text) or text[index] != ".":
-        return False
-    if not text[index - 1].isdigit() or not text[index + 1].isdigit():
-        return False
-    cursor = index + 1
-    while cursor < len(text) and text[cursor].isdigit():
-        cursor += 1
-    if cursor == len(text):
-        return True
-    nxt = text[cursor]
-    if not (nxt.isupper() or nxt in _OPEN_TO_CLOSE):
-        return True
-    left = text[:index]
-    right = text[index + 1 :]
-    return not (_is_integer_adduct(left) and _is_integer_adduct(right))
+    for index, part in enumerate(parts):
+        body = part if index == 0 else _strip_one_leading_integer(part)
+        count = _distinct_integer_elements(body)
+        if count is None or count < 2:
+            return False
+    return True
 
 
 def _split_ascii_adducts(text: str) -> list[str]:
     if not text:
         return []
-    if "." not in text:
-        return [text]
-    segments: list[str] = []
-    start = 0
-    for index, char in enumerate(text):
-        if char == "." and not _dot_is_decimal_subscript(text, index):
-            segments.append(text[start:index])
-            start = index + 1
-    segments.append(text[start:])
-    return segments
+    if _is_integer_compound_adduct(text):
+        return text.split(".")
+    return [text]
 
 
 def _split_formula_segments(formula: str) -> list[str]:
     """Split hydrate and adduct boundaries. Keep a decimal subscript intact.
 
     A middle dot (U+00B7) always separates segments: ``CuSO4·5H2O`` is
-    five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII ``.``
-    is a decimal subscript of one species when a digit flanks it and the
-    two sides are not both chains of closed integer formulas: ``FeO1.5``,
-    ``Fe0.947O``, ``KO0.5``, ``SiO1.5C0.5``, and ``Na1.08Fe1.17Si3.13O8``
-    stay one species. ``CuSO4.5H2O``, ``3Al2O3.2SiO2``, and
-    ``Al2O3.2SiO2.2H2O`` still split, because every piece is a closed
-    integer formula and the dot is the adduct multiplier. A dot
-    that is not flanked by digits is always a separator (``Na2O.SiO2``,
-    ``K2O.2SiO2``), including the leading-dot spelling ``Fe.947O``.
+    five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII
+    dot-string is an adduct only when splitting on '.' and stripping one
+    leading integer from each part after the first leaves every part an
+    integer-subscript formula of at least two distinct elements;
+    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
+    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
+    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
+    ``Mg1.5SiO4``, ``Fe2.3O4``, ``FeO1.5``, and ``SiO1.5C0.5`` stay one
+    species.
     """
 
     pieces: list[str] = []
