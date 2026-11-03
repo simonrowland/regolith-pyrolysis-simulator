@@ -6193,7 +6193,8 @@ def _fe_redox_material(
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
     except UnparseableCompositionComponent:
-        # ValueError would swallow this. The row refusal lives in compile_residual.
+        # ValueError would relabel this invalid_redox_composition.
+        # predict_with_engine returns the typed row refusal.
         raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return _FeRedoxRefusal(
@@ -8789,6 +8790,51 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _engine_prediction_or_unparseable_component(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> EnginePrediction:
+    """Return one prediction. One unparseable component refuses that row."""
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+        )
+    except UnparseableCompositionComponent as exc:
+        identity = (
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_SOURCE,
+            refusal_detail={
+                "reason": "unparseable_composition_component",
+                "component": exc.component,
+            },
+            identity=identity,
+        )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8802,7 +8848,7 @@ def predict_with_engine(
     """Dispatch one engine and close any handle opened for this call."""
 
     if isinstance(handles, dict):
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -8815,7 +8861,7 @@ def predict_with_engine(
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -11981,27 +12027,11 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
-        from simulator.accounting.exceptions import UnparseableCompositionComponent
-
-        try:
-            prediction = predictor(
-                engine,
-                _melt_prediction_reference(implied_alpha_reference or reference),
-                **predictor_kwargs,
-            )
-        except UnparseableCompositionComponent as exc:
-            # One unparseable component refuses this row. It must not abort
-            # score_store. fo2_ladder._weight_percent still catches the base
-            # UnknownSpeciesError and returns None; that caller is not a
-            # store-wide residual loop, so it is left as it is.
-            return _refused(
-                RefusalReason.INVALID_SOURCE,
-                {
-                    "reason": "unparseable_composition_component",
-                    "component": exc.component,
-                },
-                execution=Execution(state=ExecutionState.NOT_PROBED),
-            )
+        prediction = predictor(
+            engine,
+            _melt_prediction_reference(implied_alpha_reference or reference),
+            **predictor_kwargs,
+        )
 
     notices = union_notices(notices, prediction.notices)
     identity_composition = (

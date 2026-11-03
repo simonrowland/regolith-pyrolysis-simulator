@@ -253,6 +253,32 @@ def parse_formula(
     return SpeciesFormula(species=species_id, elements=totals)
 
 
+def atoms_parse_formula_else_janaf(
+    formula: str,
+) -> tuple[tuple[str, float], ...] | None:
+    """Atom counts for one component name.
+
+    A successful ``parse_formula`` wins, so ``CuSO4.5H2O`` stays five
+    waters. ``AccountingError`` (a segment with no body, or a multiplier
+    that is not positive) falls back to JANAF ``formula_composition``,
+    which keeps decimal subscripts such as ``FeO1.5`` and ``KO0.5``.
+    None means both failed. Other exceptions propagate.
+    """
+
+    try:
+        parsed = parse_formula(formula)
+    except AccountingError:
+        from simulator.reference_data.janaf import formula_composition
+
+        return formula_composition(formula)
+    return tuple(
+        sorted(
+            (str(element), float(count))
+            for element, count in parsed.elements.items()
+        )
+    )
+
+
 def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFormula:
     """Convert registry entries into SpeciesFormula objects."""
 

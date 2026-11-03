@@ -10,9 +10,12 @@ class UnknownSpeciesError(AccountingError):
 
 
 class UnparseableCompositionComponent(UnknownSpeciesError):
-    """One composition component name is not a parseable species formula.
+    """A component name that neither formula parser accepts.
 
-    ``component`` is that name. A scorer refuses the row that carries it.
+    ``parse_formula`` raised ``AccountingError`` and JANAF
+    ``formula_composition`` returned no atoms. Decimal subscripts that
+    JANAF accepts (``FeO1.5``, ``KO0.5``) are not this error.
+    ``component`` is that name. ``predict_with_engine`` refuses the row.
     Callers that already catch ``UnknownSpeciesError`` still catch this.
     """
 

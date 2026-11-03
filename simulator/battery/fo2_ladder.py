@@ -434,10 +434,15 @@ def _weight_percent(
             comp = state.value
     if comp is None:
         return None
-    from simulator.accounting.exceptions import UnknownSpeciesError
+    from simulator.accounting.exceptions import (
+        UnparseableCompositionComponent,
+        UnknownSpeciesError,
+    )
 
     try:
         return composition_wt_pct(comp)
+    except UnparseableCompositionComponent:
+        raise
     except (UnknownSpeciesError, ValueError, TypeError, ArithmeticError):
         return None
 

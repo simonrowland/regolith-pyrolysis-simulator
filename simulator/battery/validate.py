@@ -103,7 +103,10 @@ from simulator.battery.oxygen_balance import (
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
 )
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.formulas import (
+    atoms_parse_formula_else_janaf,
+    parse_formula,
+)
 from simulator.battery.validity import (
     _partial_pressure_observations_by_experiment,
     run_validity_gates,
@@ -518,10 +521,9 @@ def _term_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
     # Decimal subscripts (NaO0.5, Fe0.947O) fail parse_formula and must
     # still use the JANAF tokenizer.
     if "." in formula or "[" in formula:
-        parsed = _accounting_composition(formula)
-        if parsed is not None:
-            return parsed
-        return formula_composition(formula)
+        # Same owner as oxide_molar_mass_g_mol. parse_formula wins;
+        # AccountingError falls back to JANAF atoms.
+        return atoms_parse_formula_else_janaf(formula)
     parsed = formula_composition(formula)
     if parsed is None:
         expanded = _expand_parenthetical_groups(formula)
