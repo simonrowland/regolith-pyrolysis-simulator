@@ -3,7 +3,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, StateTag, ValueKind
+from simulator.battery.enums import EvidenceClass, RefusalReason, StateTag, ValueKind
 from tests.battery.factories import migrate_one_extract
 
 
@@ -18,6 +18,7 @@ DH298_ID = "wetzel_2012_sio_sublimation_enthalpy_298K"
 
 def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     raw = yaml.safe_load(EXTRACT.read_text())
+    assert raw["review_status"] == "draft"
     observations = raw["species"]["SiO"]["observations"]
     rows = {row["observation_id"]: row for row in observations}
 
@@ -31,7 +32,7 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     for experiment in experiments:
         sample = experiment["sample"]
         assert sample["material"] == "amorphous SiO powder"
-        assert sample["form"]["state"]["value"] == "condensed_solid"
+        assert "form" not in sample
         assert sample["initial_composition"]["state"]["value"]["basis"] == "nominal_pure_substance"
         assert sample["initial_composition"]["state"]["value"]["components"] == [["SiO", "1"]]
         assert sample["purity"]["value"] == 99.99
@@ -92,6 +93,12 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     assert "total_pressure_Pa" not in pressure["values"]
     assert "total_pressure_Pa" not in alpha["values"]
     assert raw["benches"][0]["other_facts"][1]["name"] == "chamber_base_pressure_after_bakeout"
+    alpha_deviation = next(
+        fact
+        for fact in raw["benches"][0]["other_facts"]
+        if fact["name"] == "SiO_alpha_mean_statistical_deviation"
+    )
+    assert alpha_deviation["approximate"] is True
 
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
@@ -99,6 +106,10 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     migrated = [row for row in result.observations.values() if row.source_id == raw["source_id"]]
     assert len(migrated) == 4
     assert not result.validation.hard_issues
+    assert sum(
+        issue.reason is RefusalReason.IDENTITY_INCOMPLETE
+        for issue in result.validation.issues
+    ) == 10
 
     migrated_by_source_id = {
         row.observation_id.rsplit("::", 1)[-1]: row for row in migrated
@@ -155,11 +166,19 @@ def test_wetzel_sio_fits_table_rows_and_migration() -> None:
     alpha_composition = migrated_by_source_id[ALPHA_ID].identity.composition
     assert alpha_composition is not None and alpha_composition.is_value
     assert alpha_composition.value.components == (("SiO", Decimal("1")),)
+    alpha_reservoir = migrated_by_source_id[ALPHA_ID].identity.reservoir
+    assert alpha_reservoir is not None and alpha_reservoir.is_unknown
+    assert alpha_reservoir.reason == "no reservoir mapped from source"
     pressure_reservoir = migrated_by_source_id[PRESSURE_ID].identity.reservoir
-    assert pressure_reservoir is not None and pressure_reservoir.is_value
-    assert pressure_reservoir.value.formula == "SiO"
-    assert pressure_reservoir.value.phase.is_value
-    assert pressure_reservoir.value.phase.value is Phase.CR
+    assert pressure_reservoir is not None and pressure_reservoir.is_unknown
+    assert pressure_reservoir.reason == "no reservoir mapped from source"
+    assert not any(
+        row.identity.reservoir is not None
+        and row.identity.reservoir.is_value
+        and row.identity.reservoir.value.phase.is_value
+        and row.identity.reservoir.value.phase.value.value == "cr"
+        for row in migrated
+    )
 
     unavailable_count = sum(row.value.kind is ValueKind.UNAVAILABLE for row in migrated)
     assert unavailable_count == 4
