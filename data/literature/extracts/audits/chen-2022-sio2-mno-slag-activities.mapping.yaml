@@ -1,0 +1,72 @@
+source_id: chen-2022-sio2-mno-slag-activities
+source:
+  citation: Chen et al. (2022), Thermodynamic activity of SiO2 in CaO-SiO2-Al2O3-MnO-MgO system molten slags, ISIJ
+    International 62(7).
+  doi: 10.2355/isijinternational.ISIJINT-2022-018
+  year: 2022
+extraction:
+  method: Manual transcription from MinerU table drafts and pdftotext-layout with full-page render verification.
+  date: '2026-11-03'
+  worker: codex
+review_status: draft
+tables:
+- page: 3
+  table_index: 2
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: measured_reduced
+  phase: l
+  rows:
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  - 32
+  - 33
+  - 34
+  - 35
+  - 36
+  - 37
+  - 38
+  - 39
+  values:
+  - column: 12
+    species: SiO2
+    phase: l
+    scale_factor:
+      header: Activity ( $\times 10^{-3}$ )
+      exponent: -3
+      direction: cell_times_factor_equals_quantity
+  - column: 13
+    species: MnO
+    phase: l
+    scale_factor:
+      header: Activity ( $\times 10^{-3}$ )
+      exponent: -3
+      direction: cell_times_factor_equals_quantity
