@@ -1293,18 +1293,6 @@ def _validate_observation(
             )
         )
     if (
-        ev.is_value
-        and ev.value is EvidenceClass.MODEL_DERIVED
-        and raw_inputs is None
-    ):
-        issues.append(
-            _issue(
-                f"{path}.derivation.raw_inputs",
-                RefusalReason.CONDITIONAL_FIELD,
-                "model_derived requires raw_inputs not_printed",
-            )
-        )
-    if (
         raw_inputs is not None
         and ev.is_value
         and ev.value is EvidenceClass.MODEL_DERIVED

@@ -2,18 +2,17 @@
 set -eu
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-task_scratch=/private/tmp/claude-501/main-review/w1103t1610
 target="$repo_root/simulator/battery/records.py"
-backup="$task_scratch/tmp/t1610-records.XXXXXX"
-log="$task_scratch/tmp/t1610-mutation.XXXXXX"
+: "${TMPDIR:?set a writable task temp directory before running this script}"
 
-mkdir -p "$task_scratch/tmp" "$task_scratch/ompi" \
-  /private/tmp/claude-501/main-review/mplcache
-export DYLD_FALLBACK_LIBRARY_PATH=/Users/simonrowland/lib
-export MPLCONFIGDIR=/private/tmp/claude-501/main-review/mplcache
-export OMPI_MCA_orte_tmpdir_base="$task_scratch/ompi"
-export PRTE_MCA_prte_tmpdir_base="$task_scratch/ompi"
-export TMPDIR="$task_scratch/tmp"
+export MPLCONFIGDIR="${MPLCONFIGDIR:-$TMPDIR/mplcache}"
+export OMPI_MCA_orte_tmpdir_base="${OMPI_MCA_orte_tmpdir_base:-$TMPDIR/ompi}"
+export PRTE_MCA_prte_tmpdir_base="${PRTE_MCA_prte_tmpdir_base:-$TMPDIR/ompi}"
+mkdir -p "$TMPDIR" "$MPLCONFIGDIR" \
+  "$OMPI_MCA_orte_tmpdir_base" "$PRTE_MCA_prte_tmpdir_base"
+backup="$TMPDIR/t1610-records.XXXXXX"
+log="$TMPDIR/t1610-mutation.XXXXXX"
+python_bin="$repo_root/../../.venv/bin/python"
 export PYTHONPATH="$repo_root"
 
 backup=$(mktemp "$backup")
@@ -29,7 +28,7 @@ trap 'exit 1' HUP INT TERM
 perl -0pi -e 's/and has_section_or_equation/and has_section_or_equation\n            and isinstance(locator.equation, str)\n            and bool(locator.equation.strip())/ or die "could not apply equation-required mutation\n"' "$target"
 
 set +e
-/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python \
+"$python_bin" \
   -m pytest -q -n 0 -p no:cacheprovider \
   tests/battery/test_mechanisms.py \
   -k test_model_derived_prose_method_without_equation_passes >"$log" 2>&1

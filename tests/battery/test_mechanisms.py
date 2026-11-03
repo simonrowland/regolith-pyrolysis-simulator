@@ -1471,21 +1471,57 @@ def test_model_derived_without_method_requires_method_unknown_notice() -> None:
     )
 
 
-def test_model_derived_requires_not_printed_raw_input_state() -> None:
+def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
     experiment = F.tabulation_experiment()
+    parent = F.observation(
+        "raw-1",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
     observation = F.observation(
-        "model-derived-without-raw-input-state",
+        "model-derived-with-printed-parent",
         experiment.experiment_id,
         F.o2_identity(),
         Decimal("0"),
         evidence=EvidenceClass.MODEL_DERIVED,
     )
+    assert observation.derivation is not None
+    observation = replace(
+        observation,
+        derivation=replace(
+            observation.derivation,
+            method=Located(
+                State.of("Gibbs energy minimisation with the authors' model"),
+                locator=F.loc(page=164, section=2.2),
+            ),
+            references=("Shornikov et al. (2008)",),
+            raw_inputs=None,
+        ),
+    )
+    report = validate_corpus([F.work()], [experiment], [parent, observation])
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
+def test_model_derived_none_printed_references_without_notice_are_rejected() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("none_printed",),
+    )
     issues = validate_corpus(
-        [F.work()], [experiment], [observation]
+        [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
     assert any(
-        issue.path.endswith(".derivation.raw_inputs")
-        and issue.detail == "model_derived requires raw_inputs not_printed"
+        issue.path.endswith(".derivation.references")
+        and "requires named references or none_printed with a notice" in issue.detail
         for issue in issues
     )
 
