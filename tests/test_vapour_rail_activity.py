@@ -143,7 +143,7 @@ def test_p2o5_dilute_activity_has_literature_grounded_gamma_upper_envelope():
 
 def test_henrian_gamma_property_emits_upper_bound_never_point():
     answer = henrian_unknown_gamma_upper_bound(
-        component_id="CaO",
+        component_id="Na2O",
         activity_exponent=1.0,
         standard_state=_RAOULTIAN,
         mole_fraction=0.25,
@@ -163,7 +163,7 @@ def test_henrian_gamma_property_emits_upper_bound_never_point():
 
 def test_henrian_negative_pressure_exponent_reverses_activity_bound():
     answer = henrian_unknown_gamma_upper_bound(
-        component_id="CaO",
+        component_id="Na2O",
         activity_exponent=-1.0,
         standard_state=_RAOULTIAN,
         mole_fraction=0.25,
@@ -172,6 +172,18 @@ def test_henrian_negative_pressure_exponent_reverses_activity_bound():
     assert answer.bound_direction is BoundDirection.LOWER
     assert answer.value == pytest.approx(0.25)
     assert answer.authority is False
+
+
+def test_henrian_bound_refuses_solid_reference_gamma_without_temperature():
+    answer = henrian_unknown_gamma_upper_bound(
+        component_id="CaO",
+        activity_exponent=1.0,
+        standard_state=_RAOULTIAN,
+        mole_fraction=0.25,
+    )
+    assert answer.verdict is ActivityVerdictKind.REFUSAL
+    assert answer.refusal_code is ActivityRefusalCode.MONOTONICITY_UNPROVED
+    assert "temperature_K required" in (answer.detail or "")
 
 
 def test_henrian_refuses_nonfinite_pressure_exponent():
@@ -683,7 +695,7 @@ def test_as_pressure_activity_refusal_none_and_bound_numeric_contract():
         )
 
     bound = henrian_unknown_gamma_upper_bound(
-        component_id="CaO",
+        component_id="Na2O",
         activity_exponent=1.0,
         standard_state=_RAOULTIAN,
         mole_fraction=0.2,
