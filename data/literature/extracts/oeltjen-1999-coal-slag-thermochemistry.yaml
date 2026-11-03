@@ -8,19 +8,21 @@ source:
   version: Jül-3688, August 1999
   corpus_asset: raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf
   corpus_sha256: c253ab795342c9397bbde04bb0df89dfcc9b98fa54fecd3dd7a114e936759d4d
-  source_note: Six own KEMS sample series; numeric pressure/activity results are plotted in Figures 6.21-6.22, with
-    no numeric run table or per-point uncertainties. The source review records an unresolved sample 6 SiO2 composition
-    discrepancy (0.725/0.735); Table 5.1 is retained as printed and figure labels are kept separate.
+  source_note: Six own KEMS sample series. Experimental activity symbols in Figures 6.21 and 6.22 are digitized.
+    The source prints no numeric run table and no per-point uncertainty. The source review records an unresolved
+    sample 6 SiO2 composition discrepancy (0.725/0.735); Table 5.1 is retained as printed and figure labels are
+    kept separate.
 extraction:
   method: Machine-text-first transcription from MinerU table blocks and pdftotext-layout; Table 4.1 and Table 5.1
-    cell values and row-column assignments checked against the page renders. Figure plots catalogued without digitization.
+    cell values and row-column assignments checked against the page renders. Figures 6.21 and 6.22 experimental
+    symbols were read at 600 dpi from labelled axis ticks. Model curves and the other figure records were not digitized.
   date: '2026-11-02'
   worker: w1103oe-oe99
   provenance_path: data/literature/extracts/audits/oeltjen-1999-coal-slag-thermochemistry.audit.md
   source_note: Own K and Na partial pressures are described as derived from unprinted detector signals by equation
     5.1; alkali-oxide activities are reduced from pressures using equations 5.2-5.6 and the stoichiometric-evaporation
-    assumption. The thesis does not tabulate numeric own pressure or activity series, so no numeric observations
-    are emitted. The model predictions are figure-only and remain separate from measured figure records.
+    assumption. The stored activities are the figure reads of that reduction, not pressures recomputed here. Model
+    curves stay figure-only.
 review_status: draft
 fidelity_samples:
 - species: K2O
@@ -71,6 +73,30 @@ fidelity_samples:
     pdf_page_index: 28
     table: '4.1'
     row_label: BK2
+- species: K2O
+  observation_id: oeltjen_1999_figure_6_21
+  field: printed_sample_labels
+  value:
+  - 0.097K2O-0.729SiO2-0.174Al2O3 (1)
+  - 0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)
+  - 0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)
+  locator:
+    page: 72
+    published_page: 58
+    pdf_page_index: 71
+    figure: '6.21'
+- species: Na2O
+  observation_id: oeltjen_1999_figure_6_22
+  field: printed_sample_labels
+  value:
+  - 0.085Na2O-0.735SiO2-0.18Al2O3 (4)
+  - 0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)
+  - 0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)
+  locator:
+    page: 73
+    published_page: 59
+    pdf_page_index: 72
+    figure: '6.22'
 benches:
 - id: oeltjen_1999_kems_bench
   identity:
@@ -631,7 +657,1387 @@ experiments:
         note: The printed activity-point interval for sample (6) is 1620 to 1810 K.
 species:
   K2O:
-    observations: []
+    observations:
+    - observation_id: oeltjen_1999_fig621_s1_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1615.96'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '4.123823e-13'
+        log10_activity: '-12.3847'
+        axis_1000_per_K: '0.52935'
+        read_uncertainty_log10_activity: '0.0595'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '3.09'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 47
+        marker_height_px: 49
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1595.35'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '2.953929e-13'
+        log10_activity: '-12.5296'
+        axis_1000_per_K: '0.53519'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00081'
+        read_uncertainty_T_K: '2.83'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 44
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1585.28'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '2.484849e-13'
+        log10_activity: '-12.6047'
+        axis_1000_per_K: '0.53809'
+        read_uncertainty_log10_activity: '0.0571'
+        read_uncertainty_1000_per_K: '0.00083'
+        read_uncertainty_T_K: '2.86'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 45
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1568.40'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '1.823896e-13'
+        log10_activity: '-12.7390'
+        axis_1000_per_K: '0.54302'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '2.94'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 47
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1555.04'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '1.371197e-13'
+        log10_activity: '-12.8629'
+        axis_1000_per_K: '0.54699'
+        read_uncertainty_log10_activity: '0.0619'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '2.89'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 47
+        marker_height_px: 51
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p06
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1545.06'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '1.201434e-13'
+        log10_activity: '-12.9203'
+        axis_1000_per_K: '0.54999'
+        read_uncertainty_log10_activity: '0.0583'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '2.86'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 47
+        marker_height_px: 48
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s1_p07
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_1
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled circle'
+        series_numeral: '1'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1515.05'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.9'
+                Al2O3: '17.4'
+                K2O: '9.7'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '1'
+      values:
+        quantity: activity
+        activity: '6.585671e-14'
+        log10_activity: '-13.1814'
+        axis_1000_per_K: '0.55922'
+        read_uncertainty_log10_activity: '0.0619'
+        read_uncertainty_1000_per_K: '0.00094'
+        read_uncertainty_T_K: '3.00'
+        marker_glyph: circle
+        printed_series_numeral: '1'
+        legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+        marker_width_px: 51
+        marker_height_px: 51
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1568.50'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '9.740921e-15'
+        log10_activity: '-14.0114'
+        axis_1000_per_K: '0.54299'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '2.94'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 47
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1541.83'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '6.129146e-15'
+        log10_activity: '-14.2126'
+        axis_1000_per_K: '0.55097'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00088'
+        read_uncertainty_T_K: '2.91'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 48
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1515.47'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '3.705954e-15'
+        log10_activity: '-14.4311'
+        axis_1000_per_K: '0.55909'
+        read_uncertainty_log10_activity: '0.0607'
+        read_uncertainty_1000_per_K: '0.00092'
+        read_uncertainty_T_K: '2.95'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 50
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1456.74'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '1.118407e-15'
+        log10_activity: '-14.9514'
+        axis_1000_per_K: '0.57807'
+        read_uncertainty_log10_activity: '0.0619'
+        read_uncertainty_1000_per_K: '0.00088'
+        read_uncertainty_T_K: '2.65'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 48
+        marker_height_px: 51
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s2_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_2
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled square'
+        series_numeral: '2'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1427.01'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '69.6'
+                Al2O3: '18.6'
+                CaO: '6.3'
+                K2O: '5.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '2'
+      values:
+        quantity: activity
+        activity: '6.585671e-16'
+        log10_activity: '-15.1814'
+        axis_1000_per_K: '0.58818'
+        read_uncertainty_log10_activity: '0.0619'
+        read_uncertainty_1000_per_K: '0.00094'
+        read_uncertainty_T_K: '2.72'
+        marker_glyph: square
+        printed_series_numeral: '2'
+        legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+        marker_width_px: 51
+        marker_height_px: 51
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1775.86'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '1.665712e-13'
+        log10_activity: '-12.7784'
+        axis_1000_per_K: '0.48804'
+        read_uncertainty_log10_activity: '0.0571'
+        read_uncertainty_1000_per_K: '0.00090'
+        read_uncertainty_T_K: '3.79'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 49
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1734.24'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '9.147449e-14'
+        log10_activity: '-13.0387'
+        axis_1000_per_K: '0.49816'
+        read_uncertainty_log10_activity: '0.0571'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '3.49'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 47
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1694.50'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '4.906819e-14'
+        log10_activity: '-13.3092'
+        axis_1000_per_K: '0.50822'
+        read_uncertainty_log10_activity: '0.0546'
+        read_uncertainty_1000_per_K: '0.00088'
+        read_uncertainty_T_K: '3.42'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 48
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1656.83'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '2.570988e-14'
+        log10_activity: '-13.5899'
+        axis_1000_per_K: '0.51814'
+        read_uncertainty_log10_activity: '0.0583'
+        read_uncertainty_1000_per_K: '0.00087'
+        read_uncertainty_T_K: '3.23'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 47
+        marker_height_px: 48
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1619.79'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '1.356438e-14'
+        log10_activity: '-13.8676'
+        axis_1000_per_K: '0.52828'
+        read_uncertainty_log10_activity: '0.0571'
+        read_uncertainty_1000_per_K: '0.00083'
+        read_uncertainty_T_K: '2.97'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 45
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p06
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1578.46'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '8.513340e-15'
+        log10_activity: '-14.0699'
+        axis_1000_per_K: '0.54007'
+        read_uncertainty_log10_activity: '0.0546'
+        read_uncertainty_1000_per_K: '0.00083'
+        read_uncertainty_T_K: '2.84'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 45
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig621_s3_p07
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_3
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid K2O
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        marker: 'filled triangle'
+        series_numeral: '3'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1538.44'
+          locator:
+            page: 72
+            published_page: 58
+            pdf_page_index: 71
+            figure: '6.21'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '62.9'
+                Al2O3: '19.7'
+                FeO: '14.2'
+                K2O: '3.2'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '3'
+      values:
+        quantity: activity
+        activity: '4.283512e-15'
+        log10_activity: '-14.3682'
+        axis_1000_per_K: '0.55200'
+        read_uncertainty_log10_activity: '0.0546'
+        read_uncertainty_1000_per_K: '0.00083'
+        read_uncertainty_T_K: '2.72'
+        marker_glyph: triangle
+        printed_series_numeral: '3'
+        legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+        marker_width_px: 45
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
     context:
     - observation_id: oeltjen_1999_table4_1_sk1
       type: printed_model_system_composition
@@ -767,8 +2173,8 @@ species:
         published_page: 58
         pdf_page_index: 71
         figure: '6.21'
-        note: Figure inventory only; numeric plotted values are not transcribed.
-      units: as plotted; numeric values not transcribed
+        note: Experimental symbols digitized at 600 dpi. Model curves were not read.
+      units: log10 activity versus 1/T in units of 1000/K
       values:
         quantity: figure_records
         method_class: figure_only
@@ -778,15 +2184,127 @@ species:
         topic_translation: Own measured K2O activities for synthetic samples 1-3 versus modified quasichemical model
           predictions
         content_kind: own_kems_measured_activity
-        numeric_values_digitized: false
+        numeric_values_digitized: true
+        render_dpi: 600
+        ordinate_scale: log10
+        abscissa_scale: linear
+        abscissa_as_printed: '1/T [1000/K]'
+        ordinate_as_printed: activity with decade labels 10 to a printed power
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+        read_uncertainty_rule: half the marker bounding box in data units
+        model_curves_digitized: false
+        x_fit_slope_per_px: '3.684692610824266e-05'
+        x_fit_intercept: '0.4440032297948539'
+        y_fit_slope_log10_per_px: '-0.002428862368735805'
+        y_fit_intercept_log10: '-7.412866093553284'
+        x_tick_rms: '3.4517363246642965e-05'
+        x_tick_max_residual: '6.845979183889295e-05'
+        y_tick_rms_log10: '0.002787868317231977'
+        y_tick_max_residual_log10: '0.003939105729171999'
+        experimental_point_count: 19
+        x_calibration_ticks:
+          - pixel: '976.0'
+            printed: '0.48'
+            fit_value: '0.48'
+            fitted: '0.47997'
+            residual: '-0.00003'
+          - pixel: '1520.0'
+            printed: '0.5'
+            fit_value: '0.50'
+            fitted: '0.50001'
+            residual: '0.00001'
+          - pixel: '2063.0'
+            printed: '0.52'
+            fit_value: '0.52'
+            fitted: '0.52002'
+            residual: '0.00002'
+          - pixel: '2606.0'
+            printed: '0.54'
+            fit_value: '0.54'
+            fitted: '0.54003'
+            residual: '0.00003'
+          - pixel: '3149.0'
+            printed: '0.56'
+            fit_value: '0.56'
+            fitted: '0.56003'
+            residual: '0.00003'
+          - pixel: '3689.0'
+            printed: '0.58'
+            fit_value: '0.58'
+            fitted: '0.57993'
+            residual: '-0.00007'
+          - pixel: '4234.0'
+            printed: '0.6'
+            fit_value: '0.60'
+            fitted: '0.60001'
+            residual: '0.00001'
+        y_calibration_ticks:
+          - pixel: '1478.5'
+            printed: '10^-11'
+            log10: '-11'
+            fitted: '-11.00394'
+            residual: '-0.00394'
+          - pixel: '1887.0'
+            printed: '10^-12'
+            log10: '-12'
+            fitted: '-11.99613'
+            residual: '0.00387'
+          - pixel: '2300.0'
+            printed: '10^-13'
+            log10: '-13'
+            fitted: '-12.99925'
+            residual: '0.00075'
+          - pixel: '2711.0'
+            printed: '10^-14'
+            log10: '-14'
+            fitted: '-13.99751'
+            residual: '0.00249'
+          - pixel: '3125.0'
+            printed: '10^-15'
+            log10: '-15'
+            fitted: '-15.00306'
+            residual: '-0.00306'
+          - pixel: '3535.5'
+            printed: '10^-16'
+            log10: '-16'
+            fitted: '-16.00011'
+            residual: '-0.00011'
         printed_sample_labels:
         - 0.097K2O-0.729SiO2-0.174Al2O3 (1)
         - 0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)
         - 0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)
-        evidence_class_if_digitized: measured_reduced
-        audit_note: Own activity values are reduced from measured K partial pressures using the printed equations
-          and stoichiometric-evaporation assumption. No numeric run table or point uncertainties are printed; figure
-          points are not digitized.
+        stored_observation_evidence_class: measured_reduced
+        audit_note: Nineteen experimental symbols were read. The legend prints line styles for the model curves
+          only. Each series is bound by the numeral printed beside one glyph of that cluster. Circles are sample 1
+          (7). Squares are sample 2 (5). Triangles are sample 3 (7). Read uncertainty is half the marker box and
+          is about 0.055 to 0.062 in log10 activity. Calibration residuals are about 0.003 in log10 and are not
+          used as the point uncertainty. No point lies more than 15 K outside the printed temperature window.
+    - observation_id: oeltjen_1999_figure_6_21_marker_legend
+      type: figure_marker_legend
+      locator:
+        page: 72
+        published_page: 58
+        pdf_page_index: 71
+        figure: '6.21'
+        note: Numeral crops bind each glyph to the parenthetical sample in the printed legend.
+      units: marker glyph to printed legend label
+      values:
+        pairings:
+          - marker_glyph: circle
+            printed_numeral: '1'
+            legend_line_style: solid
+            legend_label: '0.097K2O-0.729SiO2-0.174Al2O3 (1)'
+            table_5_1_sample: '1'
+          - marker_glyph: square
+            printed_numeral: '2'
+            legend_line_style: dashed
+            legend_label: '0.055K2O-0.696SiO2-0.186Al2O3-0.063CaO (2)'
+            table_5_1_sample: '2'
+          - marker_glyph: triangle
+            printed_numeral: '3'
+            legend_line_style: dash-dot
+            legend_label: '0.032K2O-0.629SiO2-0.197Al2O3-0.142FeO (3)'
+            table_5_1_sample: '3'
     - observation_id: oeltjen_1999_figure_6_23
       type: figure_record
       locator:
@@ -953,7 +2471,1316 @@ species:
         numeric_values_digitized: false
         audit_note: Modified-quasichemical-model K2O activity; liquid phases only.
   Na2O:
-    observations: []
+    observations:
+    - observation_id: oeltjen_1999_fig622_s4_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_4
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled circle'
+        series_numeral: '4'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1616.14'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '73.5'
+                Al2O3: '18.0'
+                Na2O: '8.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '4'
+      values:
+        quantity: activity
+        activity: '5.487822e-11'
+        log10_activity: '-10.2606'
+        axis_1000_per_K: '0.52930'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00110'
+        read_uncertainty_T_K: '3.93'
+        marker_glyph: circle
+        printed_series_numeral: '4'
+        legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+        marker_width_px: 51
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s4_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_4
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled circle'
+        series_numeral: '4'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1577.84'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '73.5'
+                Al2O3: '18.0'
+                Na2O: '8.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '4'
+      values:
+        quantity: activity
+        activity: '3.305978e-11'
+        log10_activity: '-10.4807'
+        axis_1000_per_K: '0.54025'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00110'
+        read_uncertainty_T_K: '3.77'
+        marker_glyph: circle
+        printed_series_numeral: '4'
+        legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+        marker_width_px: 51
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s4_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_4
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled circle'
+        series_numeral: '4'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1534.45'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '73.5'
+                Al2O3: '18.0'
+                Na2O: '8.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '4'
+      values:
+        quantity: activity
+        activity: '1.810089e-11'
+        log10_activity: '-10.7423'
+        axis_1000_per_K: '0.55322'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '3.39'
+        marker_glyph: circle
+        printed_series_numeral: '4'
+        legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+        marker_width_px: 48
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s4_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_4
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled circle'
+        series_numeral: '4'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1483.98'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '73.5'
+                Al2O3: '18.0'
+                Na2O: '8.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '4'
+      values:
+        quantity: activity
+        activity: '8.849118e-12'
+        log10_activity: '-11.0531'
+        axis_1000_per_K: '0.56911'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '3.20'
+        marker_glyph: circle
+        printed_series_numeral: '4'
+        legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+        marker_width_px: 48
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s4_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_4
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled circle'
+        series_numeral: '4'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1447.25'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '73.5'
+                Al2O3: '18.0'
+                Na2O: '8.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '4'
+      values:
+        quantity: activity
+        activity: '5.011872e-12'
+        log10_activity: '-11.3000'
+        axis_1000_per_K: '0.58126'
+        read_uncertainty_log10_activity: '0.0480'
+        read_uncertainty_1000_per_K: '0.00106'
+        read_uncertainty_T_K: '3.13'
+        marker_glyph: circle
+        printed_series_numeral: '4'
+        legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+        marker_width_px: 49
+        marker_height_px: 49
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s5_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_5
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled square'
+        series_numeral: '5'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1336.04'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '59.6'
+                Al2O3: '11.6'
+                CaO: '24.3'
+                Na2O: '4.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '5'
+      values:
+        quantity: activity
+        activity: '3.250125e-11'
+        log10_activity: '-10.4881'
+        axis_1000_per_K: '0.62143'
+        read_uncertainty_log10_activity: '0.0500'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '2.68'
+        marker_glyph: square
+        printed_series_numeral: '5'
+        legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+        marker_width_px: 48
+        marker_height_px: 51
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s5_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_5
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled square'
+        series_numeral: '5'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1310.93'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '59.6'
+                Al2O3: '11.6'
+                CaO: '24.3'
+                Na2O: '4.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '5'
+      values:
+        quantity: activity
+        activity: '2.099907e-11'
+        log10_activity: '-10.6778'
+        axis_1000_per_K: '0.63128'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '2.60'
+        marker_glyph: square
+        printed_series_numeral: '5'
+        legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+        marker_width_px: 48
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s5_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_5
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled square'
+        series_numeral: '5'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1295.97'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '59.6'
+                Al2O3: '11.6'
+                CaO: '24.3'
+                Na2O: '4.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '5'
+      values:
+        quantity: activity
+        activity: '1.505220e-11'
+        log10_activity: '-10.8224'
+        axis_1000_per_K: '0.63730'
+        read_uncertainty_log10_activity: '0.0490'
+        read_uncertainty_1000_per_K: '0.00110'
+        read_uncertainty_T_K: '2.71'
+        marker_glyph: square
+        printed_series_numeral: '5'
+        legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+        marker_width_px: 51
+        marker_height_px: 50
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s5_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_5
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled square'
+        series_numeral: '5'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1268.92'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '59.6'
+                Al2O3: '11.6'
+                CaO: '24.3'
+                Na2O: '4.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '5'
+      values:
+        quantity: activity
+        activity: '1.047370e-11'
+        log10_activity: '-10.9799'
+        axis_1000_per_K: '0.64848'
+        read_uncertainty_log10_activity: '0.0470'
+        read_uncertainty_1000_per_K: '0.00110'
+        read_uncertainty_T_K: '2.62'
+        marker_glyph: square
+        printed_series_numeral: '5'
+        legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+        marker_width_px: 51
+        marker_height_px: 48
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s5_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_5
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled square'
+        series_numeral: '5'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1252.75'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '59.6'
+                Al2O3: '11.6'
+                CaO: '24.3'
+                Na2O: '4.5'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '5'
+      values:
+        quantity: activity
+        activity: '8.302330e-12'
+        log10_activity: '-11.0808'
+        axis_1000_per_K: '0.65535'
+        read_uncertainty_log10_activity: '0.0461'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '2.41'
+        marker_glyph: square
+        printed_series_numeral: '5'
+        legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+        marker_width_px: 48
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p01
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1538.08'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '5.757050e-12'
+        log10_activity: '-11.2398'
+        axis_1000_per_K: '0.55211'
+        read_uncertainty_log10_activity: '0.0441'
+        read_uncertainty_1000_per_K: '0.00101'
+        read_uncertainty_T_K: '3.33'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 47
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p02
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1493.63'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '2.960738e-12'
+        log10_activity: '-11.5286'
+        axis_1000_per_K: '0.56600'
+        read_uncertainty_log10_activity: '0.0461'
+        read_uncertainty_1000_per_K: '0.00097'
+        read_uncertainty_T_K: '3.03'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 45
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p03
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1474.67'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '2.125690e-12'
+        log10_activity: '-11.6725'
+        axis_1000_per_K: '0.57214'
+        read_uncertainty_log10_activity: '0.0461'
+        read_uncertainty_1000_per_K: '0.00101'
+        read_uncertainty_T_K: '3.10'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 47
+        marker_height_px: 47
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p04
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1456.24'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '1.606941e-12'
+        log10_activity: '-11.7940'
+        axis_1000_per_K: '0.57824'
+        read_uncertainty_log10_activity: '0.0441'
+        read_uncertainty_1000_per_K: '0.00099'
+        read_uncertainty_T_K: '2.97'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 46
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p05
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1432.99'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '1.087677e-12'
+        log10_activity: '-11.9635'
+        axis_1000_per_K: '0.58612'
+        read_uncertainty_log10_activity: '0.0451'
+        read_uncertainty_1000_per_K: '0.00097'
+        read_uncertainty_T_K: '2.83'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 45
+        marker_height_px: 46
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p06
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1403.89'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '7.421642e-13'
+        log10_activity: '-12.1295'
+        axis_1000_per_K: '0.59629'
+        read_uncertainty_log10_activity: '0.0470'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '2.92'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 48
+        marker_height_px: 48
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p07
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1379.20'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '4.638740e-13'
+        log10_activity: '-12.3336'
+        axis_1000_per_K: '0.60520'
+        read_uncertainty_log10_activity: '0.0441'
+        read_uncertainty_1000_per_K: '0.00104'
+        read_uncertainty_T_K: '2.83'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 48
+        marker_height_px: 45
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+    - observation_id: oeltjen_1999_fig622_s6_p08
+      type: activity_coefficient
+      experiment: oeltjen_1999_kems_sample_6
+      phase: l
+      regime: knudsen_effusion
+      units: dimensionless activity
+      standard_state: pure liquid Na2O
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        marker: 'filled triangle'
+        series_numeral: '6'
+      derivation:
+        relation: |
+          Activities in Figures 6.21 and 6.22 are this thesis's own KEMS results, reduced from measured alkali partial pressures. Equation (5.1), PDF page 45: P_i = (P_0 * a_0 * sigma_0 * gamma_0 * I_i * T_i) / (a_i * sigma_i * gamma_i * I_0 * T_0) = K * (I_i * T_i) / (a_i * sigma_i * gamma_i). Equation (5.2), PDF page 46: Na2O(l) <=> 2 Na(g) + 0.5 O2(g). The printed sentence says the conversion is carried out for Na and holds analogously for K. Equation (5.3): a(Na2O(l)) = P(Na)^2 * P(O2)^0.5 / k_p, with k_p taken from the FACT pure-substance database. Equation (5.4), FeO(g) <=> Fe(g) + 0.5 O2(g), is printed as an alternative oxygen route limited to the two Fe-bearing samples above about 1700 K. The third printed method is stoichiometric evaporation. The thesis states: "Die Annahme stöchiometrischer Verdampfung stellt die dritte Methode zur Bestimmung des O2-Partialdrucks dar." For each O2 molecule the reaction in equation (5.2) produces four Na atoms, so equation (5.5) prints P(Na)^2 * P(O2)^0.5 = P(Na)^2 * 0.5 * P(Na)^0.5 = 0.5 * P(Na)^2.5. Equation (5.6): a(Na2O(l)) = P(Na)^2.5 / (2 * k_p). The stored number is the activity read from the figure, not a pressure recomputed here.
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 46
+            published_page: 32
+            pdf_page_index: 45
+            equation: '5.6'
+            note: Detector signals and alkali partial pressures are not printed. The relation quotes equations 5.1-5.6 and the stoichiometric-evaporation assumption.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1344.40'
+          locator:
+            page: 73
+            published_page: 59
+            pdf_page_index: 72
+            figure: '6.22'
+            note: T_C is the read abscissa converted by T_K = 1000 / x and T_C = T_K - 273.15. x is the printed 1/T axis in units of 1000/K.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_percent
+              amount_basis: mole_percent
+              components:
+                SiO2: '72.5'
+                Al2O3: '12.7'
+                FeO: '9.8'
+                Na2O: '5.0'
+          locator:
+            page: 41
+            published_page: 27
+            pdf_page_index: 40
+            table: '5.1'
+            row_label: '6'
+      values:
+        quantity: activity
+        activity: '2.353965e-13'
+        log10_activity: '-12.6282'
+        axis_1000_per_K: '0.61822'
+        read_uncertainty_log10_activity: '0.0431'
+        read_uncertainty_1000_per_K: '0.00093'
+        read_uncertainty_T_K: '2.43'
+        marker_glyph: triangle
+        printed_series_numeral: '6'
+        legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+        marker_width_px: 43
+        marker_height_px: 44
+        method_class: measured_reduced
+        figure_digitized: true
+        reference_state_as_printed: 'Referenzzustand: flüssig'
     context:
     - observation_id: oeltjen_1999_table4_1_bk1
       type: printed_model_system_composition
@@ -1153,8 +3980,8 @@ species:
         published_page: 59
         pdf_page_index: 72
         figure: '6.22'
-        note: Figure inventory only; numeric plotted values are not transcribed.
-      units: as plotted; numeric values not transcribed
+        note: Experimental symbols digitized at 600 dpi. Model curves were not read.
+      units: log10 activity versus 1/T in units of 1000/K
       values:
         quantity: figure_records
         method_class: figure_only
@@ -1164,16 +3991,139 @@ species:
         topic_translation: Own measured Na2O activities for synthetic samples 4-6 versus modified quasichemical
           model predictions
         content_kind: own_kems_measured_activity
-        numeric_values_digitized: false
+        numeric_values_digitized: true
+        render_dpi: 600
+        ordinate_scale: log10
+        abscissa_scale: linear
+        abscissa_as_printed: '1/T [1000/K]'
+        ordinate_as_printed: activity with decade labels 10 to a printed power
+        reference_state_as_printed: 'Referenzzustand: flüssig'
+        read_uncertainty_rule: half the marker bounding box in data units
+        model_curves_digitized: false
+        x_fit_slope_per_px: '4.3189165580034556e-05'
+        x_fit_intercept: '0.48170046798521465'
+        y_fit_slope_log10_per_px: '-0.001960203959577418'
+        y_fit_intercept_log10: '-7.079496020668758'
+        x_tick_rms: '8.833660782582962e-05'
+        x_tick_max_residual: '0.00017033148050282776'
+        y_tick_rms_log10: '0.001974852693685999'
+        y_tick_max_residual_log10: '0.003232386511715646'
+        experimental_point_count: 18
+        excluded_non_data_markers:
+          - glyph: square
+            reason: filled square in the in-plot method label Knudsen-Effusionsmassenspektrometrie
+            pixel_x: '2956'
+            pixel_y: '1612'
+        x_calibration_ticks:
+          - pixel: '888.0'
+            printed: '0.52'
+            fit_value: '0.52'
+            fitted: '0.52005'
+            residual: '0.00005'
+          - pixel: '1350.5'
+            printed: '0.54'
+            fit_value: '0.54'
+            fitted: '0.54003'
+            residual: '0.00003'
+          - pixel: '1809.0'
+            printed: '0.56'
+            fit_value: '0.56'
+            fitted: '0.55983'
+            residual: '-0.00017'
+          - pixel: '2278.0'
+            printed: '0.58'
+            fit_value: '0.58'
+            fitted: '0.58009'
+            residual: '0.00009'
+          - pixel: '2737.5'
+            printed: '0.6'
+            fit_value: '0.60'
+            fitted: '0.59993'
+            residual: '-0.00007'
+          - pixel: '3205.0'
+            printed: '0.62'
+            fit_value: '0.62'
+            fitted: '0.62012'
+            residual: '0.00012'
+          - pixel: '3664.0'
+            printed: '0.64'
+            fit_value: '0.64'
+            fitted: '0.63995'
+            residual: '-0.00005'
+          - pixel: '4128.5'
+            printed: '0.66'
+            fit_value: '0.66'
+            fitted: '0.66001'
+            residual: '0.00001'
+        y_calibration_ticks:
+          - pixel: '1490.5'
+            printed: '10^-10'
+            log10: '-10'
+            fitted: '-10.00118'
+            residual: '-0.00118'
+          - pixel: '1999.5'
+            printed: '10^-11'
+            log10: '-11'
+            fitted: '-10.99892'
+            residual: '0.00108'
+          - pixel: '2509.0'
+            printed: '10^-12'
+            log10: '-12'
+            fitted: '-11.99765'
+            residual: '0.00235'
+          - pixel: '3022.0'
+            printed: '10^-13'
+            log10: '-13'
+            fitted: '-13.00323'
+            residual: '-0.00323'
+          - pixel: '3530.0'
+            printed: '10^-14'
+            log10: '-14'
+            fitted: '-13.99902'
+            residual: '0.00098'
         printed_sample_labels:
         - 0.085Na2O-0.735SiO2-0.18Al2O3 (4)
         - 0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)
         - 0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)
-        evidence_class_if_digitized: measured_reduced
-        audit_note: Own activity values are reduced from measured Na partial pressures using the printed equations
-          and stoichiometric-evaporation assumption. No numeric run table or point uncertainties are printed; figure
-          points are not digitized. The source review flags an unresolved sample 6 SiO2 composition discrepancy;
-          the figure label is retained as printed.
+        stored_observation_evidence_class: measured_reduced
+        audit_note: Eighteen experimental symbols were read. A filled square inside the in-plot method label
+          Knudsen-Effusionsmassenspektrometrie is the method key and was excluded. The legend prints line styles
+          for the model curves only. Circles are sample 4 (5). Squares are sample 5 (5). Triangles are sample 6
+          (8). Read uncertainty is half the marker box and is about 0.043 to 0.050 in log10 activity. The coldest
+          sample 5 read is 1525.9 K, about 4 K below the printed 1530 K window, and was not moved. The sample 6
+          figure label prints 0.725 SiO2 while Table 5.1 prints 72.5 mol percent; the observations keep Table 5.1
+          and this label is retained as printed.
+    - observation_id: oeltjen_1999_figure_6_22_marker_legend
+      type: figure_marker_legend
+      locator:
+        page: 73
+        published_page: 59
+        pdf_page_index: 72
+        figure: '6.22'
+        note: Numeral crops bind each glyph to the parenthetical sample in the printed legend. The method-key square is excluded.
+      units: marker glyph to printed legend label
+      values:
+        pairings:
+          - marker_glyph: circle
+            printed_numeral: '4'
+            legend_line_style: solid
+            legend_label: '0.085Na2O-0.735SiO2-0.18Al2O3 (4)'
+            table_5_1_sample: '4'
+          - marker_glyph: square
+            printed_numeral: '5'
+            legend_line_style: dashed
+            legend_label: '0.045Na2O-0.596SiO2-0.116Al2O3-0.243CaO (5)'
+            table_5_1_sample: '5'
+          - marker_glyph: triangle
+            printed_numeral: '6'
+            legend_line_style: dash-dot
+            legend_label: '0.05Na2O-0.725SiO2-0.127Al2O3-0.098FeO (6)'
+            table_5_1_sample: '6'
+        excluded_non_data_markers:
+          - glyph: square
+            reason: filled square in the in-plot method label Knudsen-Effusionsmassenspektrometrie
+            pixel_x: '2956'
+            pixel_y: '1612'
     - observation_id: oeltjen_1999_figure_6_26
       type: figure_record
       locator:
