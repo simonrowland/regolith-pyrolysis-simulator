@@ -7307,6 +7307,21 @@ def _explicit_point_conditions(raw: object) -> dict[str, Located[Any]]:
     }
 
 
+def _required_point_pressure(
+    identity: Identity | None,
+    point_conditions: Mapping[str, Located[Any]] | None,
+) -> State[Decimal] | None:
+    if identity is None or "total_pressure_Pa" not in profile_for(identity).required:
+        return None
+    located = (point_conditions or {}).get("total_pressure_Pa")
+    if not isinstance(located, Located):
+        return None
+    state = located.state
+    if state.is_value and not isinstance(state.value, Decimal):
+        return None
+    return state
+
+
 def _located_explicit_point_composition(
     located: object,
 ) -> Located[Composition] | None:
@@ -21887,17 +21902,26 @@ class Migrator:
                             duration_s=duration_state,
                         )
                     )
+        has_point_children = bool(exploded) or any(
+            isinstance(values.get(key), list) and values[key]
+            for key in (
+                "points",
+                "tests",
+                "rows",
+                "rows_as_printed",
+                "series",
+                "tabulated_delta_fG_kJ_mol",
+            )
+        )
+        explicit_conditions: dict[str, Located[Any]] = {}
         if q_token in PHASE_ROW_QUANTITIES:
             # Parent rows do not otherwise ingest point_conditions. These
             # four quantities do: the printed atmosphere and the printed sum
             # have to reach every emitted observation.
-            explicit_conditions: dict[str, Located[Any]] = {}
-            explicit_conditions.update(
-                _explicit_point_conditions(obs.get("point_conditions"))
-            )
-            explicit_conditions.update(
-                _explicit_point_conditions(values.get("point_conditions"))
-            )
+            explicit_conditions = {
+                **_explicit_point_conditions(obs.get("point_conditions")),
+                **_explicit_point_conditions(values.get("point_conditions")),
+            }
             if (
                 "printed_sum" not in explicit_conditions
                 and values.get("printed_sum") is not None
@@ -21907,11 +21931,18 @@ class Migrator:
                     explicit_conditions["printed_sum"] = located_value(
                         printed_sum, locator
                     )
-            if explicit_conditions:
-                point_conditions = {
-                    **(point_conditions or {}),
-                    **explicit_conditions,
-                }
+        elif not has_point_children:
+            # On a scalar observation the values-level condition belongs to
+            # that row. A parent condition on an exploded series stays scoped
+            # by the quantity gate above; each child merges its own condition.
+            explicit_conditions = _explicit_point_conditions(
+                values.get("point_conditions")
+            )
+        if explicit_conditions:
+            point_conditions = {
+                **(point_conditions or {}),
+                **explicit_conditions,
+            }
         # Printed oxygen beats a derived graphite C–CO pressure. Stamp it
         # into ident_kwargs before experiment inheritance, which fills only
         # axes still absent. The scratch fill decides whether this profile
@@ -22044,6 +22075,13 @@ class Migrator:
             if identity_for_profile is not None
             else None
         )
+        pressure_state = (
+            _required_point_pressure(identity_for_profile, point_conditions)
+            if not has_point_children
+            else None
+        )
+        if pressure_state is not None:
+            ident_kwargs["total_pressure_Pa"] = pressure_state
         uncompared_identity_axes = (
             _uncompared_axes_for(identity_for_profile)
             if identity_for_profile is not None
@@ -24409,6 +24447,19 @@ class Migrator:
                 **parent_point_conditions,
                 **(point_conditions or {}),
             }
+        if (
+            q_token_point not in PHASE_ROW_QUANTITIES
+            and isinstance(q_token_point, Quantity)
+            and isinstance(raw_item, Mapping)
+        ):
+            row_pressure_state = _required_point_pressure(
+                identity,
+                _explicit_point_conditions(raw_item.get("point_conditions")),
+            )
+            if row_pressure_state is not None:
+                identity = replace(
+                    identity, total_pressure_Pa=row_pressure_state
+                )
         oxygen_decision, oxygen_decision_fallback = _scoped_oxygen_decision(
             facts=oxygen_facts,
             from_fallback=oxygen_from_fallback,
