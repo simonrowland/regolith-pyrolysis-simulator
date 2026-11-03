@@ -99,7 +99,6 @@ BLEND_RENDER = (
     ("0.05S", "0.95", "0.00", "0.05", "1.80"),
     ("0S", "0.86", "0.14", "0.00", "0.00"),
 )
-
 # Independent transcription of prose liquidus estimates and their state from pp. 5–6.
 LIQUIDUS_RENDER = (
     ("Mer10", 3, "0", "0", "1762.5", "forsterite", 5),
@@ -148,15 +147,62 @@ def _assert_table2_grid(document: dict, render_grid) -> None:
         assert values["value_as_published"] == sulfur
         assert values["value"] == float(sulfur.removesuffix("*"))
         assert values["T_C_as_printed"] == temperature
+        assert values["phase_label"] == "melt"
+        assert values["phase_label_as_printed"] == "Gl"
+        assert values["basis"] == "wt_percent"
         assert values["source_as_published"] == source
         assert values["phase_assemblage_as_published"] == phases
         assert conditions["sample_id"]["state"]["value"] == sample
         assert conditions["pressure_GPa"]["state"]["value"]["value_as_published"] == pressure
         assert conditions["duration_min"]["state"]["value"]["value_as_published"] == duration
-        assert conditions["fO2_delta_IW"]["state"]["value"]["delta_as_published"] == diw
-        assert conditions["fO2_delta_IW"]["state"]["value"]["reference_buffer"] == "iron-wüstite (IW)"
+        assert Decimal(str(conditions["fO2_delta_IW"]["state"]["value"])) == Decimal(
+            diw.replace("−", "-")
+        )
+        assert conditions["fO2_delta_IW"]["units"] == "delta_IW"
+        assert conditions["fO2_delta_IW"]["reference_buffer_as_published"] == (
+            "iron-wüstite (IW)"
+        )
+        assert values["oxygen_buffer_as_published"] == "iron-wüstite (IW)"
+        assert values["fO2_delta_IW_method_as_published"] == (
+            "calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)"
+        )
+        composition = conditions["composition"]
+        assert composition["state"]["tag"] == "unknown"
+        assert composition["state"]["reason"] == (
+            "the combined oxide plus Fe/FeS starting mixture is given as separate "
+            "silicate composition and source fractions; no final component map is "
+            "printed and none is reconstructed"
+        )
+        assert composition["locator"]["table"] == "1"
+        assert composition["locator"]["row"] == system
+        starting = conditions["starting_silicate_composition_as_published"]
+        assert starting["state"]["tag"] == "value"
+        assert starting["locator"]["table"] == "1"
+        assert starting["locator"]["row"] == system
+        assert conditions["source_blend_as_published"]["state"]["tag"] == "value"
+        assert conditions["source_blend_as_published"]["locator"]["table"] == "1"
         assert conditions["assemblage_as_published"]["state"]["value"] == phases
-        expected_container = "MgSiO3" if "Ens" in phases and "Fo" not in phases else "Mg2SiO4" if "Fo" in phases and "Ens" not in phases else "SiO2"
+        assert conditions["assemblage_as_published"]["locator"]["table"] == "2"
+        sulfide_phases = [
+            phase for phase in phases.split(", ") if phase in {"FeS", "FeMgS"}
+        ]
+        sulfide = conditions["sulfide_phase_as_published"]
+        if sulfide_phases:
+            assert sulfide["state"]["tag"] == "value"
+            assert sulfide["state"]["value"] == ", ".join(sulfide_phases)
+        else:
+            assert sulfide["state"]["tag"] == "unknown"
+            assert sulfide["state"]["reason"] == (
+                "no sulfide phase is listed in the Table 2 experimental-phases cell for this run"
+            )
+        assert sulfide["locator"]["table"] == "2"
+        expected_container = (
+            "MgSiO3"
+            if "Ens" in phases and "Fo" not in phases
+            else "Mg2SiO4"
+            if "Fo" in phases and "Ens" not in phases
+            else "SiO2"
+        )
         assert container == expected_container
 
 
@@ -183,6 +229,25 @@ def test_independent_render_grids_bind_each_table2_cell_and_mutations_fail() -> 
     changed_observation["values"]["value_as_published"] = "6.27*"
     with pytest.raises(AssertionError):
         _assert_table2_grid(changed_document, TABLE2_RENDER)
+
+    deletion_paths = (
+        ("values", "phase_label"),
+        ("values", "phase_label_as_printed"),
+        ("point_conditions", "composition"),
+        ("point_conditions", "fO2_delta_IW"),
+        ("point_conditions", "sulfide_phase_as_published"),
+    )
+    for section, key in deletion_paths:
+        missing_binding = copy.deepcopy(document)
+        first_sulfur_row = next(
+            row
+            for species in missing_binding["species"].values()
+            for row in species.get("observations") or []
+            if row.get("observation_id") == "lu26_mer10_3gpa_a21_1650c_01_s_in_glass"
+        )
+        del first_sulfur_row[section][key]
+        with pytest.raises(KeyError):
+            _assert_table2_grid(missing_binding, TABLE2_RENDER)
 
 
 def test_liquidus_estimates_and_deferred_figure_records_are_complete() -> None:
@@ -259,8 +324,55 @@ def test_isolated_migration_keeps_species_temperature_and_conditions(tmp_path: P
         if observation.identity.species.formula == "S"
     ]
     assert len(sulfur_rows) == 61
-    assert all(observation.point_conditions["fO2_delta_IW"].state.is_value for observation in sulfur_rows)
-    assert all(observation.point_conditions["fO2_delta_IW"].locator is not None for observation in sulfur_rows)
+    for observation in sulfur_rows:
+        composition = observation.point_conditions["composition"]
+        assert composition.state.is_unknown
+        assert composition.state.reason == (
+            "the combined oxide plus Fe/FeS starting mixture is given as separate "
+            "silicate composition and source fractions; no final component map is "
+            "printed and none is reconstructed"
+        )
+        assert composition.locator is not None
+        assert composition.locator.table == "1"
+        assert composition.locator.page == 2
+        starting = observation.point_conditions["starting_silicate_composition_as_published"]
+        assert starting.state.is_value
+        assert starting.locator is not None
+        assert starting.locator.table == "1"
+        source_blend = observation.point_conditions["source_blend_as_published"]
+        assert source_blend.state.is_value
+        assert source_blend.locator is not None
+        assert source_blend.locator.table == "1"
+        assemblage = observation.point_conditions["assemblage_as_published"]
+        assert assemblage.state.is_value
+        assert assemblage.locator is not None
+        assert assemblage.locator.table == "2"
+        raw_id = observation.observation_id.split("::T=", 1)[0]
+        raw = raw_rows[raw_id][1]
+        raw_phases = raw["values"]["phase_assemblage_as_published"]
+        listed_sulfides = [
+            phase for phase in raw_phases.split(", ") if phase in {"FeS", "FeMgS"}
+        ]
+        sulfide = observation.point_conditions["sulfide_phase_as_published"]
+        assert sulfide.locator is not None
+        assert sulfide.locator.table == "2"
+        if listed_sulfides:
+            assert sulfide.state.is_value
+            assert sulfide.state.value == ", ".join(listed_sulfides)
+        else:
+            assert sulfide.state.is_unknown
+            assert sulfide.state.reason == (
+                "no sulfide phase is listed in the Table 2 experimental-phases cell for this run"
+            )
+        delta_iw = observation.point_conditions["fO2_delta_IW"]
+        assert delta_iw.state.is_value
+        assert delta_iw.locator is not None
+        raw_delta = raw_rows[raw_id][1]["point_conditions"]["fO2_delta_IW"]["state"]["value"]
+        assert delta_iw.state.value == Decimal(str(raw_delta).replace("−", "-"))
+        assert observation.identity.phase_role.is_value
+        assert observation.identity.phase_role.value.value == "melt"
+        assert observation.identity.fO2_Pa.is_unknown
+        assert "buffer-relative fO2 (iron-wüstite (IW))" in observation.identity.fO2_Pa.reason
 
 
 def test_source_locators_resolve_on_the_cited_physical_pages() -> None:
