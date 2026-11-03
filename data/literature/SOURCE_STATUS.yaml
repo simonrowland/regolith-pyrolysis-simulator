@@ -8,15 +8,15 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2295
+  sources: 2310
   by_stage:
     located: 209
-    inbox: 1265
-    in_progress: 231
-    ingested_partial: 143
-    ingested_complete: 130
+    inbox: 1253
+    in_progress: 238
+    ingested_partial: 151
+    ingested_complete: 133
     wired: 0
-    unknown: 317
+    unknown: 326
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -6296,13 +6296,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: colson-floden-haugen-2005-nio-feo-o2-activities
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/colson-floden-haugen-2005-nio-feo-o2-activities/SOURCE.md
-    - raw/colson-floden-haugen-2005-nio-feo-o2-activities/colson-floden-haugen-2005-nio-feo-o2-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -6967,22 +6966,12 @@ sources:
   total_rows: 30
   inbox_exclusion_reason: null
 - source_id: delgado-2015-mg-thermite-regolith
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/delgado-2015-mg-thermite-regolith/SOURCE.md
-    - raw/delgado-2015-mg-thermite-regolith/delgado-2015-mg-thermite-regolith.pdf
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/DONE
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/mineru.log
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/delgado-2015-mg-thermite-regolith-p002-p003.md
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/delgado-2015-mg-thermite-regolith-p002-p003_content_list.json
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/delgado-2015-mg-thermite-regolith-p002-p003_content_list_v2.json
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/delgado-2015-mg-thermite-regolith-p002-p003_middle.json
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/delgado-2015-mg-thermite-regolith-p002-p003_model.json
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/images/e13b87ed0825cf1514a21e1f63645dc47dad697739beff06545675f35583fa5e.jpg
-    - raw/delgado-2015-mg-thermite-regolith/ocr-mineru/p002-p003/out/delgado-2015-mg-thermite-regolith-p002-p003/vlm/images/ef316bdd4aac729ec3d1bdac79a25a700f5b44b62ba7421f5020a2af8a7e3017.jpg
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -8530,13 +8519,12 @@ sources:
   total_rows: 1
   inbox_exclusion_reason: null
 - source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/SOURCE.md
-    - raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/fredrickson-chasanov-1973-na2o-enthalpy-1300k.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -10969,13 +10957,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: hayashi-2025-ca-fe-silicate-redox-activities
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/hayashi-2025-ca-fe-silicate-redox-activities/SOURCE.md
-    - raw/hayashi-2025-ca-fe-silicate-redox-activities/hayashi-2025-ca-fe-silicate-redox-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/hayashi-2025-ca-fe-silicate-redox-activities.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -11147,13 +11134,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: hertl-1967-solid-sio-disproportionation-vaporization
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/hertl-1967-solid-sio-disproportionation-vaporization/SOURCE.md
-    - raw/hertl-1967-solid-sio-disproportionation-vaporization/hertl-1967-solid-sio-disproportionation-vaporization.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -11696,13 +11682,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/SOURCE.md
-    - raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -12141,13 +12126,12 @@ sources:
   total_rows: 9
   inbox_exclusion_reason: null
 - source_id: itoh-1988-na2s-beta-alumina-emf
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/itoh-1988-na2s-beta-alumina-emf/SOURCE.md
-    - raw/itoh-1988-na2s-beta-alumina-emf/itoh-1988-na2s-beta-alumina-emf.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/itoh-1988-na2s-beta-alumina-emf.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -20107,13 +20091,12 @@ sources:
   total_rows: 127
   inbox_exclusion_reason: null
 - source_id: kress-carmichael-1989-lime-iron-silicate-redox
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kress-carmichael-1989-lime-iron-silicate-redox/SOURCE.md
-    - raw/kress-carmichael-1989-lime-iron-silicate-redox/kress-carmichael-1989-lime-iron-silicate-redox.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -24843,13 +24826,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/SOURCE.md
-    - raw/nagahara-ozawa-1996-forsterite-hydrogen-evaporation/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -26037,103 +26019,22 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: oeltjen-1999-coal-slag-thermochemistry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/oeltjen-1999-coal-slag-thermochemistry/SOURCE.md
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/DONE
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/mineru.log
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/out/oeltjen-1999-coal-slag-thermochemistry-p001-p005/vlm/oeltjen-1999-coal-slag-thermochemistry-p001-p005.md
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/out/oeltjen-1999-coal-slag-thermochemistry-p001-p005/vlm/oeltjen-1999-coal-slag-thermochemistry-p001-p005_content_list.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/out/oeltjen-1999-coal-slag-thermochemistry-p001-p005/vlm/oeltjen-1999-coal-slag-thermochemistry-p001-p005_content_list_v2.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/out/oeltjen-1999-coal-slag-thermochemistry-p001-p005/vlm/oeltjen-1999-coal-slag-thermochemistry-p001-p005_middle.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p001-p005/out/oeltjen-1999-coal-slag-thermochemistry-p001-p005/vlm/oeltjen-1999-coal-slag-thermochemistry-p001-p005_model.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/DONE
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/mineru.log
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/out/oeltjen-1999-coal-slag-thermochemistry-p006-p010/vlm/oeltjen-1999-coal-slag-thermochemistry-p006-p010.md
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/out/oeltjen-1999-coal-slag-thermochemistry-p006-p010/vlm/oeltjen-1999-coal-slag-thermochemistry-p006-p010_content_list.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/out/oeltjen-1999-coal-slag-thermochemistry-p006-p010/vlm/oeltjen-1999-coal-slag-thermochemistry-p006-p010_content_list_v2.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/out/oeltjen-1999-coal-slag-thermochemistry-p006-p010/vlm/oeltjen-1999-coal-slag-thermochemistry-p006-p010_middle.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p006-p010/out/oeltjen-1999-coal-slag-thermochemistry-p006-p010/vlm/oeltjen-1999-coal-slag-thermochemistry-p006-p010_model.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/DONE
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/mineru.log
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/out/oeltjen-1999-coal-slag-thermochemistry-p011-p020/vlm/oeltjen-1999-coal-slag-thermochemistry-p011-p020.md
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/out/oeltjen-1999-coal-slag-thermochemistry-p011-p020/vlm/oeltjen-1999-coal-slag-thermochemistry-p011-p020_content_list.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/out/oeltjen-1999-coal-slag-thermochemistry-p011-p020/vlm/oeltjen-1999-coal-slag-thermochemistry-p011-p020_content_list_v2.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/out/oeltjen-1999-coal-slag-thermochemistry-p011-p020/vlm/oeltjen-1999-coal-slag-thermochemistry-p011-p020_middle.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p011-p020/out/oeltjen-1999-coal-slag-thermochemistry-p011-p020/vlm/oeltjen-1999-coal-slag-thermochemistry-p011-p020_model.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/DONE
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/mineru.log
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/0870b3c6f6d578ce2c891b6451a53858e2e992cd21be838a73cbf6e7029c4ecd.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/0c670c1b33cb01a46b0347ed930f8723fe0bfe497bfb81b7f19c9df81ee3e939.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/0d1b1046336564d7f87155a7ccc48a8bb409ad06f1e5b07dd9d421e4f569bbb0.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/107d7716391dc4737849de2e952e474dddbe43ebff07bfdbe68dc5202bbb47c8.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/1156022d457d7da8886011b2e090aef921c13c8d098bb5592bd259a66430065e.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/14288ae4b3abf91f0b4e7cbf533295ef0882b859abbc80046da3a0284ff25d11.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/15d58485adb6c9dad3ad1fe8b2a8ec0534ceca8a51b6835eedb65227c2d0121a.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/1638d21ce699c7c3ba165b8035e1ff071cb51fd4910d21d627da86ba2121cc07.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/185cb935d8300ca5014ebaead16a5be3a32c9a1a594441eb77c320621e1fa5d6.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/1becef9b351d4463c330a69d0d18e2d91241d590608a5cc47d89bd43e2637f1c.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/212107e4139c0a5b6a8b685ddd13469bfa96c272f9965ac6e42a4fd4562ca243.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/261bd6867444b044a26cf1e9f31f80c1229d5e19c8d13ed749c403005316afce.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/3376d31de488dec0da175451611f76ce38755708267d9971b440c870e408589f.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/34a794270964b4830ec9fc01addadeaab1b8972b5dd119fbeeb84d771235510a.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/358242c545842813621030969605584e6ec0add3e703ea7fb7509944f5c6865f.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/35aec3f803c0bb6f5a978afd14f5759582c63e3901b80efc669c0adbb4007ef0.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/3cc6581d19538a46ccb45a9e49548a7c8f4c6f4fc938e56c9c3b104b482e992f.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/3e762336ba2ba0da5b362c40388f5022a9cef8967e908938ddb0c40305cf95e8.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/3f9beb0d208aa2be36c02055fd187b00e550eff552349e07b4cfb1c64d1373be.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/4aeb8937460eec219f87af615fc38d741d7abbe714dd188010be51f1e366ce31.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/56c506e450e4bd0e4b2cada6e95ca1baccb1cee4c76601c1162181646e5f6aa1.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/594031917a00efafb91aae7acdf7e84890a873fcdf7ff579a2095a4d6a238907.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/5e8b49a1bb5733901417012058884809ab1555372956a71fb8552b8d9f0b216c.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/664107333a8a67489b64cf772d0d7f3f88e6e4a08fe7cc8439af1c48be90fda2.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/6c682f7b7dfe346886de8cbe9cc295bbb391c532c4cb3baa06e3b99c55b81f58.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/6da185ecabb47ce9fb00d955fad7b859b4f106d0792fca0f268aacda5b800e20.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/6dd50264a033e9667e782305ce152f987b53e86f9dff91b5784f89f471aa5fcf.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/6fe09ba6217716f5b1dc4ccf53ea4de69b89a497e315cbb1a76206a73d6feb18.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/73fe936f65e526c7ce5b129326a9c55d3cde6d67314876bc8c493d2e1463a6c2.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/7d587dfae4f0f5a118f74cf310d6d0156b3a3c083e6e862c163ad95eb6e30bfc.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/821f3bc12e4594b1f540bea684ed6ee711ab05d34a061bb25e3d714bd6941afa.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/95db97d222e2b8c202960d490425ddacfec2c6036e93ed747414bda4f72e6d71.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/a0ea75e9c23f43f779782cbc507ec3ec45e9e2139077f22103a2d9a5b7a439ef.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/ade27ee13f051433ded46e11390c76450f6fd51999c400ce4d5ffb4276eeeeec.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/afa047d80bf29336130f3393bb074900e060be81cffeefe106eb5abeacc6c56e.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/bf6bdcd738818e67f7e1df8641ada13b507ac52ae9a54846e28333b1f539d6ea.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/c0cb635a3a99c82713ea20702062309254b8c274fb8bdf7fe357c4695f983c77.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/ce0f4b70ac9b80cba2c2c1a9c013fd039a626e5f52986172a580f7a15367e6dd.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/cfb324edf45d553fafeab7bd5cb8f5b9e0b900ddc3dbe8f29d9ec4f7993ed393.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/d1f53a2cd0068fd35b85ae0a0005db87679a10f847a1b1de1dcefb9ba4336c5e.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/d5b827886d2d87d34607888776e48625dd424274a0d40f64a96fe535429c50d8.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/dd4ae3a8e6f2251529c8ee5537d45a7972ff59f26d6b6d4d6f260cc3821637e9.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/de2cfbe0379c57ae36f9d27c121ccfad87868f4fe4ce7496a01d4252a89f7450.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/dfd18db6aea2eb0edf23f0c00d23dc15acea94f66d37b51ac42375914aad402a.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/e1a6825d245accfc57662839fae8caac453a24f01d27fbe1c563c8fefa6df96e.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/ee69e51ad72ef82786ad2da25817b522b6370a96aae5d5d12ea9b5d37e9d1e42.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/f1f88eae6c55e15da6eea240bf38b90a416c35d1bb089fbbca5ad8435b27ffea.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/f4fe6c8ca0c28709ee9333174e5f85a629febe07b13e3509cbe085ba2ea73280.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/f56bb6a22734226a93d8b1f3470ecf4bd5cf53cf95e79131d51f4db469e11126.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/fc336c19c29e7c95898e41723a8b28e9bb6bb385d85fa9d2612bc8f261153fb6.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/images/fccddf0c5ffa70c27ea6661369aea8058e794a714d8ee7c63175a622e0e5fdd2.jpg
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040.md
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040_content_list.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040_content_list_v2.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040_middle.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040_model.json
-    - raw/oeltjen-1999-coal-slag-thermochemistry/oeltjen-1999-coal-slag-thermochemistry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: ohare-1972-na2o-formation-enthalpy
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/ohare-1972-na2o-formation-enthalpy/SOURCE.md
-    - raw/ohare-1972-na2o-formation-enthalpy/ohare-1972-na2o-formation-enthalpy.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -28063,12 +27964,12 @@ sources:
   total_rows: 10
   inbox_exclusion_reason: null
 - source_id: related-beerkens-1986-deposits-condensation-thesis
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/related-beerkens-1986-deposits-condensation-thesis/related-beerkens-1986-deposits-condensation-thesis.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -29583,13 +29484,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/roeder-1974-iron-activity-olivine-basaltic-liquids/SOURCE.md
-    - raw/roeder-1974-iron-activity-olivine-basaltic-liquids/roeder-1974-iron-activity-olivine-basaltic-liquids.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -32741,7 +32641,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/shornikov-2022-meteorite-redox-evaporation.yaml
+    - data/literature/extracts/shornikov-2022-meteorite-redox-evaporation.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -34037,13 +33937,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: sugawara-2011-sodium-silicate-fusion-mixing
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/sugawara-2011-sodium-silicate-fusion-mixing/SOURCE.md
-    - raw/sugawara-2011-sodium-silicate-fusion-mixing/sugawara-2011-sodium-silicate-fusion-mixing.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -34952,12 +34851,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tachibana-takigawa-2014-forsterite-condensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/tachibana-takigawa-2014-forsterite-condensation/tachibana-takigawa-2014-forsterite-condensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -35317,12 +35216,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tatsumi-2004-iron-condensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/tatsumi-2004-iron-condensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -36725,13 +36624,12 @@ sources:
   total_rows: 538
   inbox_exclusion_reason: null
 - source_id: wang-2009-cr-slag-kems-original
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/wang-2009-cr-slag-kems-original/SOURCE.md
-    - raw/wang-2009-cr-slag-kems-original/wang-2009-cr-slag-kems-original.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/wang-2009-cr-slag-kems-original.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
