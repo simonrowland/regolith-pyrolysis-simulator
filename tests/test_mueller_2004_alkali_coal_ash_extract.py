@@ -53,20 +53,45 @@ def test_mueller_2004_text_anchors_and_table_rows_match_rendered_page(tmp_path: 
     )
 
     # Run the production migrator on an isolated copy. The source does not
-    # state exact total pressure or independent fO2; its full slag map is refused
-    # because the migrator has no CO2 component token.
+    # state exact total pressure or independent fO2. 742826248 (t-1609)
+    # identifies CO2, so the untreated Table I map is stored whole, including
+    # CO2 and SO3. The TiO2 series prints no complete mixture, so its
+    # composition stays unknown.
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
     from tests.battery.test_migrate import _migrate_real_extract
 
     migrated = _migrate_real_extract(
         tmp_path, "mueller-2004-alkali-oxide-activity-coal-ash.yaml", write=True
     )
     assert len(migrated.observations) == 4
+    printed = table_context[0]["values"]["components_as_printed"]
+    expected_composition = wt_pct_to_mole_fraction(
+        {str(name): Decimal(str(amount)) for name, amount in printed.items()}
+    )
     for observation in migrated.observations.values():
         assert observation.identity.temperature_K.value == Decimal("1673.15")
         assert observation.identity.total_pressure_Pa.tag.value == "unknown"
         assert observation.identity.fO2_Pa.tag.value == "unknown"
-        assert observation.identity.composition.tag.value == "unknown"
-    assert len(migrated.validation.issues) == 12
+        stem = next(
+            observation_id
+            for observation_id in expected
+            if f"::{observation_id}::" in observation.observation_id
+        )
+        composition = observation.identity.composition
+        if stem.endswith("_untreated_1400c"):
+            assert composition.is_value
+            assert composition.value.components == expected_composition.components
+        else:
+            assert composition.tag.value == "unknown"
+            assert composition.reason == "no composition mapped from source"
+    composition_gaps = [
+        issue.path
+        for issue in migrated.validation.issues
+        if str(issue.path).endswith("identity.composition")
+    ]
+    assert len(migrated.validation.issues) == 10
+    assert len(composition_gaps) == 2
+    assert all("tio2" in str(path) for path in composition_gaps)
     assert len(migrated.registry_issues) == 0
     # Green's grounded-unprinted-input handling keeps these four derivations
     # on the observations instead of leaving derived_from queue entries.
