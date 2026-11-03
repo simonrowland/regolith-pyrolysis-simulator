@@ -287,6 +287,27 @@ def test_context_preserves_starting_crystal_tables_auxiliary_columns_and_model_f
     assert model["values"]["fit_comparison_as_printed"]["R_squared"] == "0.94"
 
 
+def test_intro_saturation_bundle_marks_the_uncited_example_unattributed():
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    row = find_context_row(document, "zagrtdenov_2020_intro_literature_cr_saturation_values")
+    assert row["values"]["method_class"] == "quoted_unattributed"
+    assert "names no source for the ~1220 ppm" in row["values"]["attribution_note"]
+    assert row["values"]["values_as_printed"][2]["attribution"] == (
+        "No source is named for this example in the paper."
+    )
+    assert row["values"]["values_as_printed"][0]["attribution"] == "Forsythe & Fisk (1994)"
+    assert row["values"]["values_as_printed"][1]["attribution"] == "Roeder & Reynolds (1991)"
+    assert row["values"]["values_as_printed"][3]["attribution"] == "Gale et al. (2013)"
+
+    mutated = deepcopy(document)
+    changed = find_context_row(
+        mutated, "zagrtdenov_2020_intro_literature_cr_saturation_values"
+    )
+    changed["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        assert changed["values"]["method_class"] == "quoted_unattributed"
+
+
 def test_source_test_needs_no_external_corpus_files():
     # This test reads only the committed extract; REGOLITH_CORPUS_ROOT may point at an absent tree.
     assert EXTRACT.is_file()
