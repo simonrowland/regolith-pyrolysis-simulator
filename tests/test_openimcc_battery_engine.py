@@ -957,6 +957,225 @@ def test_vapor_engine_reports_same_sign_residual_when_no_bracket_exists(
     assert bracket_residuals[-1][1] > 0.0  # F(0) stays positive at the Knudsen limit.
 
 
+@pytest.mark.parametrize(
+    ("outcome", "expected_reason", "expected_edge_detail", "expected_tail"),
+    (
+        (
+            "not_bracketed",
+            "oxygen_balance_no_admitted_bracket:same_sign_residual",
+            "log10(pO2/bar)=(-3, -2), F(low)=1.0, F(high)=2.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root is not bracketed: "
+            "F(low)=1.0, F(high)=2.0 | "
+            "log10(pO2/bar)=(-3, -1), F(low)=1.0, F(high)=3.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root is not bracketed: "
+            "F(low)=1.0, F(high)=3.0 | "
+            "log10(pO2/bar)=(-3, 0), F(low)=1.0, F(high)=4.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root is not bracketed: "
+            "F(low)=1.0, F(high)=4.0",
+            "",
+        ),
+        (
+            "above_one_bar",
+            "oxygen_balance_no_admitted_bracket:same_sign_residual",
+            "log10(pO2/bar)=(-3, -2), F(low)=-4.0, F(high)=-3.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root is not bracketed: "
+            "F(low)=-4.0, F(high)=-3.0 | "
+            "log10(pO2/bar)=(-3, -1), F(low)=-4.0, F(high)=-2.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root is not bracketed: "
+            "F(low)=-4.0, F(high)=-2.0 | "
+            "log10(pO2/bar)=(-3, 0), F(low)=-4.0, F(high)=-1.0; inner refusal: "
+            "imcc_gas_oxygen_balance_failed: oxygen-balance root lies above pO2 = "
+            "1 bar, outside the Knudsen molecular-flow regime where the effusion "
+            "law holds; no value returned (F(1 bar)=-1.0)",
+            "; A root above 1 bar lies outside molecular-flow effusion validity "
+            "(Kn << 1 at the orifice), so no admitted root exists. It is not a "
+            "solver miss, and the admitted window must not be widened to find it.",
+        ),
+    ),
+)
+def test_vapor_engine_pins_full_same_sign_refusal_message(
+    monkeypatch,
+    outcome: str,
+    expected_reason: str,
+    expected_edge_detail: str,
+    expected_tail: str,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def fake_inner_solve(_pressure_model, _metadata, *, bracket, **_kwargs):
+        low, high = bracket
+        if outcome == "above_one_bar" and high == 0.0:
+            raise _OxygenBalanceRefusal(
+                "imcc_gas_oxygen_balance_failed",
+                "oxygen-balance root lies above pO2 = 1 bar, outside the Knudsen "
+                "molecular-flow regime where the effusion law holds; no value "
+                "returned (F(1 bar)=-1.0)",
+            )
+        f_low = low + 4.0 if outcome == "not_bracketed" else low - 1.0
+        f_high = high + 4.0 if outcome == "not_bracketed" else high - 1.0
+        raise _OxygenBalanceRefusal(
+            "imcc_gas_oxygen_balance_failed",
+            "oxygen-balance root is not bracketed: "
+            f"F(low)={f_low:.1f}, F(high)={f_high:.1f}",
+        )
+
+    monkeypatch.setattr(battery, "_solve_cell_oxygen_balance", fake_inner_solve)
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        logp = round(math.log10(po2_bar))
+        if logp < -3:
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason="engine_crash",
+                engine_reason="subprocess_died",
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={"Mg": 1.0, "O2": po2_bar},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    expected = (
+        f"{expected_reason}: no sign-changing bracket was found in the admitted "
+        "pO2 window reachable from the chosen start; start_pO2_bar=0.001; "
+        "searched_window_pO2_bar=[0.001, 1]; "
+        "lower_stop=pO2=0.0001 bar; guard=engine_crash: subprocess_died; "
+        "upper_stop=OpenIMCC Knudsen molecular-flow limit pO2=1 bar; "
+        "expansion stops at the first refused one-dex trial or solver limit on "
+        "each side and does not establish whether a root exists in another "
+        "admitted window in log10(pO2/bar) range [-30, 0]; "
+        f"bracket edge evidence: {expected_edge_detail}{expected_tail}"
+    )
+    assert str(exc_info.value) == expected
+    assert exc_info.value.backend_status_reason == expected
+
+
+def test_vapor_engine_uses_family_reason_when_start_neighbors_refuse_before_f(
+    monkeypatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def unexpected_inner_solve(*_args, **_kwargs):
+        pytest.fail("the inner solver must not run without an admitted bracket")
+
+    monkeypatch.setattr(battery, "_solve_cell_oxygen_balance", unexpected_inner_solve)
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        if math.isclose(po2_bar, 1e-6, rel_tol=1e-12):
+            return SimpleNamespace(
+                status="ok",
+                gas_partial_pressures_Pa={"K": 1.0},
+                invalid_gas_partial_pressure_components=(),
+            )
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason="out_of_basis",
+            engine_reason="temperature_range",
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert str(exc_info.value) == (
+        "oxygen_balance_no_admitted_bracket: no sign-changing bracket was found "
+        "in the admitted pO2 window reachable from the chosen start; "
+        "start_pO2_bar=1e-06; searched_window_pO2_bar=[1e-06, 1e-06]; "
+        "lower_stop=pO2=1e-07 bar; guard=out_of_basis: temperature_range; "
+        "upper_stop=pO2=1e-05 bar; guard=out_of_basis: temperature_range; "
+        "expansion stops at the first refused one-dex trial or solver limit on "
+        "each side and does not establish whether a root exists in another "
+        "admitted window in log10(pO2/bar) range [-30, 0]"
+    )
+
+
+@pytest.mark.parametrize(
+    ("trial_reason", "engine_reason", "expected_code"),
+    (
+        ("engine_timeout", "test timeout", "oxygen_balance_no_admitted_bracket"),
+        ("unavailable", "test unavailable", "oxygen_balance_no_admitted_bracket"),
+        ("out_of_basis", "test out of basis", "oxygen_balance_no_admitted_bracket"),
+        (
+            "gate_refused_in_adapter",
+            "silicate_window",
+            "oxygen_balance_no_admitted_bracket:silicate_window_refusal",
+        ),
+        (
+            "engine_crash",
+            "subprocess_died",
+            "oxygen_balance_no_admitted_bracket:engine_domain_crash",
+        ),
+    ),
+)
+def test_vapor_engine_types_refusal_inside_admitted_bracket_from_recorded_reason(
+    monkeypatch,
+    trial_reason: str,
+    engine_reason: str,
+    expected_code: str,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def inspect_inner_trial(pressure_model, _metadata, **_kwargs):
+        pressure_model(10.0**-6.5)
+
+    monkeypatch.setattr(battery, "_solve_cell_oxygen_balance", inspect_inner_trial)
+
+    def engine_call_at_po2(po2_bar: float) -> SimpleNamespace:
+        if math.isclose(po2_bar, 10.0**-6.5, rel_tol=1e-12):
+            return SimpleNamespace(
+                status="refusal",
+                refusal_reason=trial_reason,
+                engine_reason=engine_reason,
+                gas_partial_pressures_Pa={},
+                invalid_gas_partial_pressure_components=(),
+            )
+        return SimpleNamespace(
+            status="ok",
+            gas_partial_pressures_Pa={"K": 1.0},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert exc_info.value.reason_code == expected_code
+    assert str(exc_info.value) == (
+        f"{expected_code}: engine refused a trial while checking an admitted "
+        "bracket; last_admitted_pO2_bar=1e-07; guard at pO2=3.16228e-07 bar: "
+        f"{trial_reason}: {engine_reason}"
+    )
+
+
 def test_cell_oxygen_balance_keeps_above_knudsen_reason_code() -> None:
     _require_oxygen_balance()
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -976,7 +1195,11 @@ def test_cell_oxygen_balance_keeps_above_knudsen_reason_code() -> None:
         )
 
     assert exc_info.value.reason_code == "imcc_gas_oxygen_balance_failed"
-    assert "root lies above pO2 = 1 bar" in str(exc_info.value)
+    assert str(exc_info.value) == (
+        "imcc_gas_oxygen_balance_failed: oxygen-balance root lies above pO2 = "
+        "1 bar, outside the Knudsen molecular-flow regime where the effusion "
+        "law holds; no value returned (F(1 bar)=-7.996336597883851e-08)"
+    )
 
 
 def test_vapor_engine_finds_admitted_start_away_from_seed() -> None:
@@ -1084,6 +1307,46 @@ def test_vapor_engine_lists_guards_when_every_start_grid_point_is_refused() -> N
     assert "engine_crash: subprocess_died: 15" in detail
     assert "engine_crash: subprocess_fe_free_absolute_fo2_crash: 10" in detail
     assert "out_of_basis: temperature_range: 6" in detail
+
+
+@pytest.mark.parametrize(
+    ("refusal_reason", "expected_reason", "expected_count"),
+    (
+        ("engine_timeout", "oxygen_balance_no_admitted_bracket", "engine_timeout: test refusal: 31"),
+        ("out_of_basis", "oxygen_balance_no_admitted_bracket", "out_of_basis: test refusal: 31"),
+    ),
+)
+def test_vapor_engine_uses_family_reason_for_untyped_start_grid_refusals(
+    refusal_reason: str,
+    expected_reason: str,
+    expected_count: str,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OxygenBalanceRefusal,
+        _solve_vapor_engine_cell_oxygen_balance,
+    )
+
+    def engine_call_at_po2(_po2_bar: float) -> SimpleNamespace:
+        return SimpleNamespace(
+            status="refusal",
+            refusal_reason=refusal_reason,
+            engine_reason="test refusal",
+            gas_partial_pressures_Pa={},
+            invalid_gas_partial_pressure_components=(),
+        )
+
+    with pytest.raises(_OxygenBalanceRefusal) as exc_info:
+        _solve_vapor_engine_cell_oxygen_balance(
+            engine_call_at_po2,
+            temperature_K=1800.0,
+            cell_material=None,
+        )
+
+    assert str(exc_info.value) == (
+        f"{expected_reason}: no admitted starting cell in log10(pO2/bar) range "
+        f"[-30, 0]; last_admitted_pO2_bar=none; starting-cell guard refusals: "
+        f"{expected_count}"
+    )
 
 
 def test_vapor_engine_labels_all_silicate_window_start_refusals() -> None:
