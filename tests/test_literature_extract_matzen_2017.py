@@ -103,6 +103,7 @@ def test_matzen_rows_migrate_as_points_with_run_axes(tmp_path: Path) -> None:
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     result = migrate(isolated_root(tmp_path, document), write=False)
     rows = list(result.observations.values())
+    assert len(rows) == 180
     assert result.validation is not None
     assert result.validation.hard_issues == ()
     assert all(row.value.kind is ValueKind.POINT for row in rows)
