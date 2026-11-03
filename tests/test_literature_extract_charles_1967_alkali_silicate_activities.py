@@ -6,7 +6,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import QUANTITY_UNITS, Quantity, ValueKind
+from simulator.battery.identity import THERMOCHEMICAL_CALORIE_J
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -152,19 +153,38 @@ def test_all_rendered_cells_migrate_with_exact_conditions_and_mutation_guard() -
     assert len(rows) == 120
     assert result.validation is not None
     assert not result.validation.hard_issues
-    assert sum(row.value.kind is ValueKind.POINT for row in rows.values()) == 90
-    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values()) == 30
-    expected_unavailable = {
+    assert sum(row.value.kind is ValueKind.POINT for row in rows.values()) == 120
+    assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values()) == 0
+    assert QUANTITY_UNITS[Quantity.PARTIAL_MOLAR_ENTHALPY] == (
+        "kJ_per_declared_mol_basis"
+    )
+    source_rows_by_id = _all_rows(document)
+    expected_enthalpy_values = {}
+    for table, specification in TABLES.items():
+        for temperature, *_ in specification["rows"]:
+            observation_id = (
+                f"charles_1967_table_{table.lower()}_sio2_"
+                f"partial_molar_enthalpy_{temperature}"
+            )
+            source_row = source_rows_by_id[observation_id]
+            printed_value = Decimal(source_row["values"]["value"])
+            if source_row["units"] == "kcal/mole":
+                expected_value = printed_value * THERMOCHEMICAL_CALORIE_J
+            elif source_row["units"] == "cal/mole":
+                expected_value = (
+                    printed_value * THERMOCHEMICAL_CALORIE_J / Decimal("1000")
+                )
+            else:
+                raise AssertionError(
+                    f"unexpected printed enthalpy unit: {source_row['units']}"
+                )
+            expected_enthalpy_values[observation_id] = expected_value
+    assert len(expected_enthalpy_values) == 30
+    assert set(expected_enthalpy_values) == {
         f"charles_1967_table_{table.lower()}_sio2_partial_molar_enthalpy_{temperature}"
         for table, specification in TABLES.items()
         for temperature, *_ in specification["rows"]
     }
-    unavailable_ids = {
-        row.observation_id.split("::", 1)[1].split("::T=", 1)[0]
-        for row in rows.values()
-        if row.value.kind is ValueKind.UNAVAILABLE
-    }
-    assert unavailable_ids == expected_unavailable
     assert all(row.identity.quantity.is_value for row in rows.values())
     assert all(row.identity.species is not None and row.identity.species.phase.is_value for row in rows.values())
 
@@ -186,7 +206,9 @@ def test_all_rendered_cells_migrate_with_exact_conditions_and_mutation_guard() -
             assert Decimal(0) < activity.value.point <= Decimal(1)
             assert coefficient.value.kind is ValueKind.POINT
             assert coefficient.value.point == Decimal(10) ** Decimal(log_gamma)
-            assert enthalpy_row.value.kind is ValueKind.UNAVAILABLE
+            assert enthalpy_row.value.kind is ValueKind.POINT
+            enthalpy_id = f"{stem}_partial_molar_enthalpy_{temperature}"
+            assert enthalpy_row.value.point == expected_enthalpy_values[enthalpy_id]
             assert composition.value.kind is ValueKind.POINT
             assert composition.value.point == Decimal(x1.strip("()*"))
             for migrated in (activity, coefficient, enthalpy_row, composition):
