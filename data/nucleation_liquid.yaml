@@ -1,0 +1,54 @@
+schema_version: 1
+
+# Liquid density and surface tension for classical homogeneous nucleation.
+# This is not material_densities.yaml. That file owns the Assael linear
+# densities used for stratification. A species absent from this file has
+# no sourced sigma or rho, and the rate owner returns unevaluable.
+# The fog threshold 1e6 m^-3 s^-1 is the rate function's constant, not a
+# coefficient stored here.
+#
+# Saturation pressure is not copied into the Na row. Na uses the
+# Browning-Potter owner (engines/builtin/sodium_saturation.py) and the
+# pure_component_saturation block in data/vapor_pressures.yaml.
+
+species:
+  Na:
+    formula: Na
+    model: fink_leibowitz_anl_re_95_2
+    citation: "Fink, J.K. and Leibowitz, L. Thermodynamic and Transport Properties of Sodium Liquid and Vapor. ANL/RE-95/2 (1995). Liquid density rho = 219 + 275.32*tau + 511.58*tau^0.5 kg/m3 and surface tension sigma = 240.5*(1 - T/2503.7)^1.126 mN/m, with tau = 1 - T/2503.7."
+    saturation_owner: browning_potter
+    # Fink critical temperature in tau = 1 - T/T_ref. Not a melting point.
+    reference_temperature_K: 2503.7
+    # Same handbook melting point as the saturation block. Below this
+    # temperature the liquid correlation is an extrapolation.
+    melting_temperature_K: 370.98
+    density:
+      a_kg_m3: 219.0
+      b_kg_m3: 275.32
+      c_kg_m3: 511.58
+      tau_exponent: 0.5
+    surface_tension:
+      # sigma / (mN/m) = A * tau^exponent. The rate function converts mN/m
+      # to N/m. tau uses reference_temperature_K.
+      A_mN_per_m: 240.5
+      exponent: 1.126
+
+  H2O:
+    formula: H2O
+    model: classical_sanity_point
+    citation: "Classical nucleation sanity row at 293.15 K (20 C), the comparison quoted as 293 K. Not the ice-sublimation owner in vapor_pressures.yaml (Feistel and Wagner 2007, valid through 273.16 K). Liquid properties are this cited point only."
+    # Only this temperature is sourced. Other temperatures are unevaluable.
+    temperature_K: 293.15
+    # Wagner and Pruss, J. Phys. Chem. Ref. Data 31, 387 (2002), IAPWS-95
+    # liquid density at 293.15 K and 101325 Pa.
+    density_kg_m3: 998.2067
+    # Wagner and Pruss (2002) liquid-vapor saturation pressure at 293.15 K,
+    # 2.3388 kPa. Not read from the ice curve.
+    saturation_pressure_Pa: 2338.8
+    surface_tension:
+      model: iapws_r1_76_2014
+      citation: "IAPWS R1-76(2014). sigma = B*tau^mu*(1 + b*tau) mN/m, tau = 1 - T/Tc, Tc = 647.096 K, B = 235.8 mN/m, mu = 1.256, b = -0.625. Evaluated only at temperature_K."
+      critical_temperature_K: 647.096
+      B_mN_per_m: 235.8
+      mu: 1.256
+      b: -0.625
