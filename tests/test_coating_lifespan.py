@@ -470,3 +470,219 @@ def test_overlay_module_has_no_commit_batch_or_atomledger_dependency() -> None:
 
     assert calls == []
     assert names == []
+
+
+def _transport_record(**overrides: object) -> dict[str, object]:
+    record: dict[str, object] = {
+        "status": "extrapolated",
+        "authority_level": "extrapolated",
+        "model_domain": "Kn < 0.01 certified",
+        "doctrine_category": 2,
+        "affected_species": ("Na",),
+        "detail": "continuum continuation",
+        "knudsen_number": 0.02,
+        "overhead_pressure_pa": 10.0,
+        "commanded_pressure_pa": 20.0,
+    }
+    record.update(overrides)
+    return record
+
+
+def _record_transport(model: SimpleNamespace, record: dict[str, object], *, species: str = "Na") -> None:
+    from simulator.wall_deposition import _record_wall_pressure_notice
+
+    _record_wall_pressure_notice(
+        model,
+        "evaporation_transport_notices_by_species",
+        species,
+        "evaporation",
+        record,
+    )
+
+
+def test_evaporation_transport_notice_collapses_probe_floats() -> None:
+    model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+        _evaporation_transport_notice_hour=1,
+    )
+    _record_transport(model, _transport_record())
+    _record_transport(
+        model,
+        _transport_record(knudsen_number=0.08, overhead_pressure_pa=30.0),
+    )
+    stored = model.last_sticking_alpha_provenance_notice[
+        "evaporation_transport_notices_by_species"
+    ]["Na"]
+    assert list(stored) == ["evaporation"]
+    group = stored["evaporation"]
+    assert group["occurrences"] == 2
+    assert group["probe_ids_first"] == "evaporation"
+    assert group["probe_ids_last"] == "evaporation#2"
+    assert group["knudsen_number"] == {"min": 0.02, "max": 0.08}
+    assert group["overhead_pressure_pa"] == {"min": 10.0, "max": 30.0}
+    assert group["commanded_pressure_pa"] == 20.0
+    assert group["authority_level"] == "extrapolated"
+    assert group["affected_species"] == ("Na",)
+
+    _record_transport(
+        model,
+        _transport_record(
+            affected_species=("K",),
+            knudsen_number=0.05,
+            overhead_pressure_pa=12.0,
+        ),
+    )
+    assert list(stored) == ["evaporation", "evaporation#3"]
+    other = stored["evaporation#3"]
+    assert other["occurrences"] == 1
+    assert other["knudsen_number"] == 0.05
+    assert other["probe_ids_first"] == "evaporation#3"
+    assert other["affected_species"] == ("K",)
+
+
+def test_equal_probe_floats_stay_a_scalar_and_a_new_hour_resets() -> None:
+    model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+        _evaporation_transport_notice_hour=1,
+    )
+    _record_transport(model, _transport_record())
+    _record_transport(model, _transport_record(affected_species=["Na"]))
+    stored = model.last_sticking_alpha_provenance_notice[
+        "evaporation_transport_notices_by_species"
+    ]["Na"]["evaporation"]
+    assert stored["occurrences"] == 2
+    assert stored["knudsen_number"] == 0.02
+    assert stored["affected_species"] == ("Na",)
+
+    model._evaporation_transport_notice_hour = 2
+    _record_transport(model, _transport_record(knudsen_number=0.04))
+    by_species = model.last_sticking_alpha_provenance_notice[
+        "evaporation_transport_notices_by_species"
+    ]
+    assert list(by_species) == ["Na"]
+    assert list(by_species["Na"]) == ["evaporation"]
+    assert by_species["Na"]["evaporation"]["occurrences"] == 1
+    assert by_species["Na"]["evaporation"]["knudsen_number"] == 0.04
+
+
+def test_empty_notice_after_reset_restarts_probe_labels() -> None:
+    model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+        _evaporation_transport_notice_hour=1,
+    )
+    _record_transport(model, _transport_record())
+    _record_transport(model, _transport_record(knudsen_number=0.09))
+    model.last_sticking_alpha_provenance_notice = {}
+    _record_transport(model, _transport_record(knudsen_number=0.03))
+    stored = model.last_sticking_alpha_provenance_notice[
+        "evaporation_transport_notices_by_species"
+    ]["Na"]
+    assert list(stored) == ["evaporation"]
+    assert stored["evaporation"]["occurrences"] == 1
+    assert stored["evaporation"]["probe_ids_last"] == "evaporation"
+
+
+def test_wall_saturation_notices_stay_on_exact_record_identity() -> None:
+    from simulator.wall_deposition import _record_wall_pressure_notice
+
+    model = SimpleNamespace(
+        last_sticking_alpha_provenance_notice={},
+        _evaporation_transport_notice_hour=1,
+    )
+    first = {"status": "extrapolated", "temperature_K": 3200.0, "reason": "above range"}
+    second = {"status": "extrapolated", "temperature_K": 3300.0, "reason": "above range"}
+    _record_wall_pressure_notice(
+        model, "wall_saturation_pressure_extrapolations_by_species",
+        "Fe", "stage", first,
+    )
+    _record_wall_pressure_notice(
+        model, "wall_saturation_pressure_extrapolations_by_species",
+        "Fe", "stage", dict(first),
+    )
+    _record_wall_pressure_notice(
+        model, "wall_saturation_pressure_extrapolations_by_species",
+        "Fe", "stage", second,
+    )
+    stored = model.last_sticking_alpha_provenance_notice[
+        "wall_saturation_pressure_extrapolations_by_species"
+    ]["Fe"]
+    assert list(stored) == ["stage", "stage#2"]
+    assert "occurrences" not in stored["stage"]
+    assert stored["stage"]["temperature_K"] == 3200.0
+    assert stored["stage#2"]["temperature_K"] == 3300.0
+
+
+def test_coating_merge_widens_collapsed_transport_ranges() -> None:
+    def authority(species: str, record: dict[str, object], extra: dict | None = None) -> dict:
+        by_probe = {"evaporation": record}
+        if extra:
+            by_probe.update(extra)
+        return {
+            "evaporation_transport_notices_by_species": {species: by_probe},
+        }
+
+    carried = FoulingTerminalSnapshot.from_trace(_trace(
+        {("hot_wall", "Al"): 0.2},
+        authority("Al", {
+            "status": "extrapolated",
+            "authority_level": "extrapolated",
+            "model_domain": "Kn < 0.01 certified",
+            "doctrine_category": 2,
+            "affected_species": ["Al"],
+            "detail": "continuum continuation",
+            "knudsen_number": {"min": 0.02, "max": 0.08},
+            "overhead_pressure_pa": {"min": 10.0, "max": 30.0},
+            "commanded_pressure_pa": 20.0,
+            "occurrences": 4,
+            "probe_ids_first": "evaporation",
+            "probe_ids_last": "evaporation#4",
+        }),
+    ))
+    run_export = FoulingTerminalSnapshot.from_trace(_trace(
+        {("hot_wall", "Al"): 0.1},
+        authority("Al", {
+            "status": "extrapolated",
+            "authority_level": "extrapolated",
+            "model_domain": "Kn < 0.01 certified",
+            "doctrine_category": 2,
+            "affected_species": ["Al"],
+            "detail": "continuum continuation",
+            "knudsen_number": {"min": 0.01, "max": 0.05},
+            "overhead_pressure_pa": {"min": 8.0, "max": 40.0},
+            "commanded_pressure_pa": 20.0,
+            "occurrences": 2,
+            "probe_ids_first": "evaporation",
+            "probe_ids_last": "evaporation#2",
+        }, extra={
+            "evaporation#3": {
+                "status": "extrapolated",
+                "authority_level": "extrapolated",
+                "model_domain": "Kn < 0.01 certified",
+                "doctrine_category": 2,
+                "affected_species": ["K"],
+                "detail": "continuum continuation",
+                "knudsen_number": 0.04,
+                "overhead_pressure_pa": 11.0,
+                "commanded_pressure_pa": 20.0,
+                "occurrences": 1,
+                "probe_ids_first": "evaporation#3",
+                "probe_ids_last": "evaporation#3",
+            },
+        }),
+    ))
+    post_merge, _per_run_net = merge_run_snapshot(carried, run_export)
+    stored = post_merge.wall_deposit_sticking_authority[
+        "evaporation_transport_notices_by_species"
+    ]["Al"]
+    assert set(stored) == {"evaporation", "evaporation#3"}
+    group = stored["evaporation"]
+    assert group["occurrences"] == 6
+    assert group["knudsen_number"] == {"min": 0.01, "max": 0.08}
+    assert group["overhead_pressure_pa"] == {"min": 8.0, "max": 40.0}
+    assert group["commanded_pressure_pa"] == 20.0
+    assert group["probe_ids_first"] == "evaporation"
+    assert group["probe_ids_last"] == "evaporation#4"
+    other = stored["evaporation#3"]
+    assert other["occurrences"] == 1
+    assert other["knudsen_number"] == 0.04
+    assert other["affected_species"] == ("K",)

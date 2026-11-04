@@ -18,6 +18,22 @@ from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 SECONDS_PER_HOUR = 3600.0
 
+# Probe identity is the ``evaporation`` / ``evaporation#N`` key. Exact
+# equality kept one copy per probe because knudsen_number and the overhead
+# pressures differ on every probe. Those floats are content, not identity:
+# a merged group stores min and max and never replaces two different values
+# with one. Categorical fields (reason, detail, model_domain, affected
+# species, doctrine code) stay in the identity, so a different notice stays
+# its own group. The live map is one hour; the next hour replaces it after
+# the previous hour's snapshot has detached the dict.
+EVAPORATION_TRANSPORT_NOTICES = "evaporation_transport_notices_by_species"
+_TRANSPORT_NOTICE_BOOKKEEPING = (
+    "occurrences",
+    "probe_ids_first",
+    "probe_ids_last",
+)
+_HOUR_UNSET = object()
+
 
 def _record_wall_pressure_notice(
     model: Any,
@@ -26,6 +42,9 @@ def _record_wall_pressure_notice(
     segment: str,
     record: Mapping[str, Any],
 ) -> None:
+    if kind == EVAPORATION_TRANSPORT_NOTICES:
+        _record_collapsed_transport_notice(model, species, segment, record)
+        return
     records = model.last_sticking_alpha_provenance_notice.setdefault(kind, {}).setdefault(species, {})
     if any(
         existing == record for key, existing in records.items()
@@ -38,6 +57,249 @@ def _record_wall_pressure_notice(
         key = f"{segment}#{suffix}"
         suffix += 1
     records[key] = dict(record)
+
+
+def _is_numeric_span(value: Any) -> bool:
+    if type(value) is float:
+        return True
+    if not isinstance(value, Mapping) or set(value.keys()) != {"min", "max"}:
+        return False
+    return type(value.get("min")) is float and type(value.get("max")) is float
+
+
+def _numeric_bounds(value: Any) -> tuple[float, float] | None:
+    if type(value) is float:
+        return value, value
+    if _is_numeric_span(value) and isinstance(value, dict):
+        return value["min"], value["max"]
+    return None
+
+
+def _freeze_notice_value(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return tuple(
+            sorted(
+                (str(key), _freeze_notice_value(item))
+                for key, item in value.items()
+            )
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze_notice_value(item) for item in value)
+    if isinstance(value, (set, frozenset)):
+        return tuple(sorted(
+            (_freeze_notice_value(item) for item in value),
+            key=repr,
+        ))
+    return value
+
+
+def transport_notice_content_key(record: Mapping[str, Any]) -> tuple[Any, ...]:
+    """Identity of one notice, excluding probe floats and bookkeeping."""
+
+    categorical: list[tuple[str, Any]] = []
+    numeric_names: list[str] = []
+    for key in sorted(record):
+        if key in _TRANSPORT_NOTICE_BOOKKEEPING:
+            continue
+        value = record[key]
+        if _is_numeric_span(value):
+            numeric_names.append(str(key))
+            continue
+        categorical.append((str(key), _freeze_notice_value(value)))
+    return (tuple(categorical), tuple(numeric_names))
+
+
+def _probe_ordinal(probe_id: str, segment: str) -> int | None:
+    if probe_id == segment:
+        return 1
+    prefix = f"{segment}#"
+    if probe_id.startswith(prefix):
+        suffix = probe_id[len(prefix):]
+        if suffix.isdigit():
+            return int(suffix)
+    return None
+
+
+def _probe_label(segment: str, ordinal: int) -> str:
+    if ordinal <= 1:
+        return segment
+    return f"{segment}#{ordinal}"
+
+
+def _widen_numeric_field(group: dict[str, Any], key: str, value: Any) -> None:
+    incoming = _numeric_bounds(value)
+    if incoming is None:
+        return
+    current = _numeric_bounds(group.get(key))
+    if current is None:
+        group[key] = value if type(value) is float else {
+            "min": incoming[0],
+            "max": incoming[1],
+        }
+        return
+    low = incoming[0] if incoming[0] < current[0] else current[0]
+    high = incoming[1] if incoming[1] > current[1] else current[1]
+    # Equal endpoints stay a scalar so a one-value group is the original field.
+    if low == high or (math.isnan(low) and math.isnan(high)):
+        group[key] = low
+        return
+    group[key] = {"min": low, "max": high}
+
+
+def _merge_transport_notice_values(
+    group: dict[str, Any],
+    record: Mapping[str, Any],
+    *,
+    segment: str,
+) -> None:
+    group["occurrences"] = int(group.get("occurrences", 1)) + int(
+        record.get("occurrences", 1)
+    )
+    # Both ends of both spans. A later, shorter run must not shrink the label,
+    # and an earlier first probe must not be dropped because last is set.
+    labels = (
+        str(group.get("probe_ids_first") or ""),
+        str(group.get("probe_ids_last") or ""),
+        str(record.get("probe_ids_first") or ""),
+        str(record.get("probe_ids_last") or ""),
+    )
+    ordinals = [
+        ordinal
+        for ordinal in (
+            _probe_ordinal(label, segment) for label in labels if label
+        )
+        if ordinal is not None
+    ]
+    if ordinals:
+        group["probe_ids_first"] = _probe_label(segment, min(ordinals))
+        group["probe_ids_last"] = _probe_label(segment, max(ordinals))
+    elif record.get("probe_ids_last"):
+        group["probe_ids_last"] = record["probe_ids_last"]
+    for key, value in record.items():
+        if key in _TRANSPORT_NOTICE_BOOKKEEPING:
+            continue
+        if _is_numeric_span(value):
+            _widen_numeric_field(group, str(key), value)
+
+
+def _collapsed_transport_notice(
+    record: Mapping[str, Any],
+    probe_id: str,
+) -> dict[str, Any]:
+    collapsed = {
+        key: value
+        for key, value in record.items()
+        if key not in _TRANSPORT_NOTICE_BOOKKEEPING
+    }
+    collapsed["occurrences"] = int(record.get("occurrences", 1))
+    collapsed["probe_ids_first"] = str(record.get("probe_ids_first") or probe_id)
+    collapsed["probe_ids_last"] = str(record.get("probe_ids_last") or probe_id)
+    return collapsed
+
+
+def _merge_species_transport_notices(
+    current: dict[str, Any],
+    incoming: Mapping[str, Any],
+    *,
+    segment: str,
+) -> None:
+    index: dict[tuple[Any, ...], str] = {}
+    for key, record in current.items():
+        if isinstance(record, Mapping):
+            index[transport_notice_content_key(record)] = str(key)
+    for key, record in incoming.items():
+        if not isinstance(record, Mapping):
+            continue
+        plain = dict(record)
+        content = transport_notice_content_key(plain)
+        existing_key = index.get(content)
+        if existing_key is None:
+            new_key = str(key)
+            suffix = 2
+            while new_key in current:
+                new_key = f"{key}#{suffix}"
+                suffix += 1
+            current[new_key] = _collapsed_transport_notice(plain, new_key)
+            index[content] = new_key
+            continue
+        _merge_transport_notice_values(
+            current[existing_key],
+            plain,
+            segment=segment,
+        )
+
+
+def merge_collapsed_evaporation_transport_notices(
+    destination: dict[str, Any],
+    incoming: Mapping[str, Any],
+    *,
+    segment: str = "evaporation",
+) -> None:
+    """Merge per-species transport notices without dropping a different value."""
+
+    for species, by_segment in incoming.items():
+        if not isinstance(by_segment, Mapping):
+            continue
+        current = destination.setdefault(str(species), {})
+        if not isinstance(current, dict):
+            continue
+        _merge_species_transport_notices(current, by_segment, segment=segment)
+
+
+def _record_collapsed_transport_notice(
+    model: Any,
+    species: str,
+    segment: str,
+    record: Mapping[str, Any],
+) -> None:
+    notice = model.last_sticking_alpha_provenance_notice
+    hour = getattr(model, "_evaporation_transport_notice_hour", None)
+    seen = getattr(model, "_evaporation_transport_notice_hour_seen", _HOUR_UNSET)
+    if seen is not _HOUR_UNSET and seen != hour:
+        # Replace the dict. The published snapshot already copied the previous
+        # hour; clearing in place would mutate that snapshot's shared map.
+        notice[EVAPORATION_TRANSPORT_NOTICES] = {}
+    model._evaporation_transport_notice_hour_seen = hour
+    by_species = notice.setdefault(EVAPORATION_TRANSPORT_NOTICES, {})
+    if not by_species:
+        # reset_run_sticking_authority replaces the notice without telling the
+        # index. An empty live map is a new hour's worth of probes.
+        model._evaporation_transport_content_index = {}
+        model._evaporation_transport_probe_ordinal = {}
+    records = by_species.setdefault(species, {})
+    ordinals = getattr(model, "_evaporation_transport_probe_ordinal", None)
+    if not isinstance(ordinals, dict):
+        ordinals = {}
+        model._evaporation_transport_probe_ordinal = ordinals
+    ordinal = int(ordinals.get(species, 0)) + 1
+    ordinals[species] = ordinal
+    probe_id = _probe_label(segment, ordinal)
+    index_by_species = getattr(model, "_evaporation_transport_content_index", None)
+    if not isinstance(index_by_species, dict):
+        index_by_species = {}
+        model._evaporation_transport_content_index = index_by_species
+    index = index_by_species.setdefault(species, {})
+    content = transport_notice_content_key(record)
+    existing_key = index.get(content)
+    if existing_key is None or existing_key not in records:
+        index[content] = probe_id
+        records[probe_id] = _collapsed_transport_notice(record, probe_id)
+        return
+    # The incoming evaporation notice has no probe id. The ordinal above is
+    # this probe's identity; stamp it so the stored span grows.
+    incoming = {
+        key: value
+        for key, value in record.items()
+        if key not in _TRANSPORT_NOTICE_BOOKKEEPING
+    }
+    incoming["occurrences"] = int(record.get("occurrences", 1))
+    incoming["probe_ids_first"] = probe_id
+    incoming["probe_ids_last"] = probe_id
+    _merge_transport_notice_values(
+        records[existing_key],
+        incoming,
+        segment=segment,
+    )
 
 
 def wall_deposit_candidate_kg(

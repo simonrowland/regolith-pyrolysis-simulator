@@ -2475,6 +2475,12 @@ class EvaporationMixin:
         if continuum_notice and condensation_model is not None:
             from simulator.wall_deposition import _record_wall_pressure_notice
 
+            # One melt.hour is one published snapshot. Probes inside the hour
+            # share it; the next hour replaces the live map after publish.
+            melt = getattr(self, 'melt', None)
+            condensation_model._evaporation_transport_notice_hour = int(
+                getattr(melt, 'hour', 0) or 0
+            )
             for species, series in diagnostic.get('evaporation_series_resistance', {}).items():
                 if notice := series.get('continuum_extrapolation_notice'):
                     _record_wall_pressure_notice(

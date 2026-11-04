@@ -27,6 +27,10 @@ from simulator.diagnostics import (
     _status_bearing_alpha_record,
     wall_deposit_sticking_authority_status,
 )
+from simulator.wall_deposition import (
+    EVAPORATION_TRANSPORT_NOTICES,
+    merge_collapsed_evaporation_transport_notices,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSAL_EVENTS,
@@ -329,18 +333,27 @@ def _merged_wall_deposit_sticking_authority(
         for key in (
             "wall_saturation_pressure_refusals_by_species",
             "wall_saturation_pressure_extrapolations_by_species",
-            "evaporation_transport_notices_by_species",
+            EVAPORATION_TRANSPORT_NOTICES,
         ):
             raw_records = authority.get(key)
             if isinstance(raw_records, Mapping):
                 by_species = merged.setdefault(key, {})
-                if isinstance(by_species, dict):
-                    for species, by_segment in raw_records.items():
-                        if not isinstance(by_segment, Mapping):
-                            continue
-                        current = by_species.setdefault(str(species), {})
-                        if isinstance(current, dict):
-                            current.update(_plain_authority_mapping(by_segment))
+                if not isinstance(by_species, dict):
+                    continue
+                if key == EVAPORATION_TRANSPORT_NOTICES:
+                    # dict.update would replace the shared ``evaporation`` key
+                    # and drop the other run's numeric range.
+                    merge_collapsed_evaporation_transport_notices(
+                        by_species,
+                        _plain_authority_mapping(raw_records),
+                    )
+                    continue
+                for species, by_segment in raw_records.items():
+                    if not isinstance(by_segment, Mapping):
+                        continue
+                    current = by_species.setdefault(str(species), {})
+                    if isinstance(current, dict):
+                        current.update(_plain_authority_mapping(by_segment))
 
         raw_carriers = authority.get("vapour_carrier_authority_by_species")
         if isinstance(raw_carriers, Mapping):
