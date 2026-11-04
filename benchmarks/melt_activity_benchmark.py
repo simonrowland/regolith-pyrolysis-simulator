@@ -484,6 +484,15 @@ class ImccEngine:
 
         pack = self._load()
         try:
+            from simulator.melt_backend.openimcc_bridge import (
+                OpenImccCompositionPolicyRefusal,
+                check_liquid_reference_standards,
+            )
+
+            liquid_standard_flags = check_liquid_reference_standards(
+                composition_wt_pct,
+                melt_pack=pack,
+            )
             result = evaluate(
                 composition_wt_pct,
                 float(temperature_K),
@@ -492,6 +501,14 @@ class ImccEngine:
                 enable_sp_extension=not self.published,
                 allow_extrapolation=self.allow_extrapolation,
                 allow_out_of_envelope=self.allow_out_of_envelope,
+            )
+        except OpenImccCompositionPolicyRefusal as exc:
+            return EngineResult(
+                status="refused",
+                reason=_reason_line(exc),
+                details={
+                    "liquid_standard_refusal": dict(exc.diagnostics),
+                },
             )
         except (
             ImccCompositionOutsideValidatedEnvelopeError,
@@ -521,6 +538,10 @@ class ImccEngine:
             "envelope_status": labels.envelope_status,
             "pack_sha256": _imcc_pack_sha256(self.pack_path),
             "observable_family": "activity",
+            "liquid_standard_flags": [
+                flag.as_dict() | {"reason": flag.reason}
+                for flag in liquid_standard_flags
+            ],
         }
         if self.allow_extrapolation or self.allow_out_of_envelope:
             # Temperature mark is orthogonal to envelope_status. Publish

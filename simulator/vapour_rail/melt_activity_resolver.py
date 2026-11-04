@@ -2691,7 +2691,10 @@ def build_imcc_activity_shadow(
         return payload
 
     try:
-        from simulator.melt_backend.openimcc_bridge import evaluate
+        from simulator.melt_backend.openimcc_bridge import (
+            evaluate,
+            liquid_standard_flag_notices,
+        )
 
         low, high = openimcc_bridge._temperature_domain_K()
         payload["imcc_domain_K"] = [low, high]
@@ -2747,7 +2750,10 @@ def build_imcc_activity_shadow(
         {
             "status": "ok",
             "flags": list(result.flags),
-            "notices": list(result.notices),
+            "notices": [
+                *result.notices,
+                *liquid_standard_flag_notices(result.liquid_standard_flags),
+            ],
             "openimcc_version": result.openimcc_version,
             "pack_model_id": result.pack_model_id,
             "pack_version": result.pack_version,

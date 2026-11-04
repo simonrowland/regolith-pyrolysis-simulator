@@ -204,10 +204,51 @@ def test_default_bridge_returns_only_composition_dependent_flag_records() -> Non
     }
 
 
+def test_benchmark_refuses_a_published_pack_standard_mismatch():
+    from benchmarks import melt_activity_benchmark as benchmark
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    engine = benchmark.build_engines(
+        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
+    )[0]
+
+    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
+
+    assert result.status == "refused"
+    assert "oxide=K2O" in result.reason
+    assert "declared=" in result.reason
+    assert "active=" in result.reason
+    assert "pack=" in result.reason
+
+
+def test_benchmark_carries_default_pack_liquid_standard_flags():
+    from benchmarks import melt_activity_benchmark as benchmark
+    from simulator.melt_backend import openimcc_bridge
+
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    engine = benchmark.build_engines(
+        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
+    )[0]
+    engine._pack = openimcc_bridge._load_pack("default")
+
+    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
+
+    assert result.status == "ok", result.reason
+    flags = result.details["liquid_standard_flags"]
+    assert any(
+        flag["kind"] == "reference-unknown" and flag["row_key"] == "K2SiO3"
+        for flag in flags
+    )
+
+
 def test_binary_pot_backend_exposes_liquid_standard_flags_in_notices() -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import Engine, NoticeKind, Quantity
     from simulator.diagnostic_helpers.binary_pot_battery import (
         _OpenImccBatteryBackend,
     )
+    from simulator.battery.score import cell_notices
 
     backend = _OpenImccBatteryBackend("openimcc")
     result = backend.equilibrate(
@@ -219,7 +260,19 @@ def test_binary_pot_backend_exposes_liquid_standard_flags_in_notices() -> None:
     assert any(
         notice.get("row_key") == "K2SiO3"
         and notice.get("kind") == "openimcc_liquid_standard_flag"
+        and notice.get("standard_kind") == "reference-unknown"
         and "basis" in notice
         and "citation" in notice
         for notice in notices
+    )
+    translated = cell_notices(
+        Quantity.P_PARTIAL,
+        Engine.OPENIMCC,
+        SimpleNamespace(notices=notices),
+    )
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and "row=K2SiO3;" in notice.reason
+        and "citation=" in notice.reason
+        for notice in translated
     )

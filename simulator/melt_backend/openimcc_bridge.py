@@ -7,7 +7,7 @@ absent.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
 from importlib import metadata
@@ -514,6 +514,28 @@ def check_liquid_reference_standards(
     )
     _refuse_on_liquid_standard_failures(assessment)
     return assessment.flags
+
+
+def liquid_standard_flag_notices(
+    flags: Sequence[LiquidStandardFlag],
+) -> tuple[dict[str, Any], ...]:
+    """Translate owner records to the notice mapping shared by engine adapters."""
+    return tuple(
+        {
+            "kind": "openimcc_liquid_standard_flag",
+            "standard_kind": flag.kind,
+            "authority": None,
+            "reason": flag.reason,
+            "oxide": flag.oxide,
+            "standard_id": flag.standard_id,
+            "active_standard_id": flag.active_standard_id,
+            "basis": flag.basis,
+            "citation": flag.citation,
+            "row_key": flag.row_key,
+            "pack": flag.pack,
+        }
+        for flag in flags
+    )
 
 
 def evaluate_gas_oxygen_balance(
@@ -1325,4 +1347,5 @@ __all__ = [
     "liquid_standard_assessment",
     "evaluate_openimcc",
     "check_liquid_reference_standards",
+    "liquid_standard_flag_notices",
 ]

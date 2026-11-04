@@ -5479,7 +5479,11 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
-        elif kind in {"openimcc_flag", "openimcc_notice"}:
+        elif kind in {
+            "openimcc_flag",
+            "openimcc_notice",
+            "openimcc_liquid_standard_flag",
+        }:
             notices.append(
                 Notice(
                     kind=NoticeKind.ENGINE_MODEL_CAVEAT,

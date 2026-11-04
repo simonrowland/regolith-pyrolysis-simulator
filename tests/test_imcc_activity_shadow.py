@@ -176,7 +176,8 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
         for row in shadow["activities_by_oxide"].values()
     )
     assert any(
-        notice.get("row_key") == "K2SiO3"
+        isinstance(notice, dict)
+        and notice.get("row_key") == "K2SiO3"
         and notice.get("kind") == "openimcc_liquid_standard_flag"
         and notice.get("basis")
         and notice.get("citation")

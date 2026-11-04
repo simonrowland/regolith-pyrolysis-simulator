@@ -2661,6 +2661,11 @@ class _OpenImccBatteryBackend:
         notices: list[dict[str, Any]] = [
             _carried_ferric_fold_notice(row) for row in fold_notices
         ]
+        notices.extend(
+            self._bridge.liquid_standard_flag_notices(
+                result.liquid_standard_flags
+            )
+        )
         authority: str | None = None
         outside_domain = bool(
             result.extrapolated or result.envelope_status != "inside"

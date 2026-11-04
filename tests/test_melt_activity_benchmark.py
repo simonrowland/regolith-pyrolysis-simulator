@@ -386,40 +386,6 @@ def test_imcc_benchmark_uses_openimcc():
     assert result.details["model_id"] == "IMCC-SF04"
 
 
-def test_imcc_benchmark_refuses_a_published_pack_standard_mismatch():
-    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
-    engine = benchmark.build_engines(
-        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
-    )[0]
-
-    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
-
-    assert result.status == "refused"
-    assert "oxide=K2O" in result.reason
-    assert "declared=" in result.reason
-    assert "active=" in result.reason
-    assert "pack=" in result.reason
-
-
-def test_imcc_benchmark_carries_default_pack_liquid_standard_flags():
-    from simulator.melt_backend import openimcc_bridge
-
-    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
-    engine = benchmark.build_engines(
-        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
-    )[0]
-    engine._pack = openimcc_bridge._load_pack("default")
-
-    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
-
-    assert result.status == "ok", result.reason
-    flags = result.details["liquid_standard_flags"]
-    assert any(
-        flag["kind"] == "reference-unknown" and flag["row_key"] == "K2SiO3"
-        for flag in flags
-    )
-
-
 def test_coverage_map_reports_silicate_band_miss_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(
