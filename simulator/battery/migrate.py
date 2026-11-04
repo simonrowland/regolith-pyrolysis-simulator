@@ -3717,6 +3717,16 @@ def located_value(value: object, locator: Locator | None) -> Located[Any]:
     return Located(State.of(value), locator=locator)
 
 
+def _relocated(
+    state: State[Any], source: object, locator: Locator | None
+) -> Located[Any]:
+    return Located(
+        state,
+        locator=locator,
+        inference=source.inference if isinstance(source, Located) else None,
+    )
+
+
 def torr_to_pa(pressure_torr: object) -> Decimal:
     """P_Pa = P_Torr × 101325 / 760 (CGPM 1954 atmosphere)."""
 
@@ -24168,9 +24178,10 @@ class Migrator:
             # map, expose that composition to condition consumers as well.
             point_conditions = {
                 **(point_conditions or {}),
-                "composition": Located(
+                "composition": _relocated(
                     identity.composition,
-                    locator=point_locator,
+                    (point_conditions or {}).get("composition"),
+                    point_locator,
                 ),
             }
         if identity.composition is None or not identity.composition.is_value:
@@ -24237,6 +24248,14 @@ class Migrator:
                         identity = replace(
                             identity, composition=converted_composition.state
                         )
+                        point_conditions = {
+                            **(point_conditions or {}),
+                            "composition": _relocated(
+                                converted_composition.state,
+                                converted_composition,
+                                point_locator,
+                            ),
+                        }
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
             or not identity.total_pressure_Pa.is_value

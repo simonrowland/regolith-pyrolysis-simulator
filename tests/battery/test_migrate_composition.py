@@ -6,7 +6,7 @@ import re
 from collections import Counter, OrderedDict
 from copy import deepcopy
 from dataclasses import replace
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from unittest.mock import patch
 
@@ -2743,6 +2743,172 @@ def test_residue_ppm_experiment_inherited_renormalization_notice(
     assert notices[0].original == Decimal("104")
 
 
+def _renormalization_notices(observation):
+    return tuple(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    )
+
+
+def test_liu_child_rebuild_keeps_composition_renormalization_notice(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    extract["source_id"] = "liu-2023-chromium-oxide-activity"
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "phase_as_printed": "melt",
+                        "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                    }
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / "liu", extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(
+            "liu-2023-chromium-oxide-activity::na_psat::T=1473"
+        )
+    )
+
+    notices = _renormalization_notices(child)
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+@pytest.mark.parametrize(
+    ("quantity", "point_value", "units", "valence_basis"),
+    (
+        ("density", {"density_kg_m3": "3000"}, "kg/m3", None),
+        (
+            "valence_ratio",
+            {"value": "0.5"},
+            "dimensionless",
+            {
+                "numerator_oxidation_states": [1],
+                "denominator_kind": "total_element",
+                "value_form": "fraction",
+            },
+        ),
+    ),
+)
+def test_late_child_composition_conversion_keeps_renormalization_notice(
+    tmp_path: Path,
+    quantity: str,
+    point_value: dict[str, str],
+    units: str,
+    valence_basis: dict | None,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    values = {
+        "quantity": quantity,
+        "method_class": "measured_direct",
+        "series": [
+            {
+                "T_K": 1473,
+                **point_value,
+                "point_conditions": {
+                    "composition": {
+                        "state": {
+                            "tag": "value",
+                            "value": {"SiO2": "55", "MgO": "49"},
+                        },
+                        "locator": {"table": "2", "page": 3},
+                    }
+                },
+            }
+        ],
+    }
+    if valence_basis is not None:
+        values["valence_basis"] = valence_basis
+    row.update(
+        {
+            "type": quantity,
+            "phase": "l",
+            "units": units,
+            "values": values,
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path / quantity, extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(f"fixture-source::na_psat::T=1473")
+    )
+
+    notices = _renormalization_notices(child)
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+_INDEPENDENT_KEPT_COMPONENTS = {
+    "Al2O3",
+    "CaF2",
+    "CaO",
+    "FeO",
+    "K2O",
+    "MgO",
+    "Na2O",
+    "P2O5",
+    "SiO2",
+    "T.Fe",
+    "TiO2",
+}
+
+
+def _independent_kept_oxide_total(cells: object) -> Decimal | None:
+    if not isinstance(cells, dict):
+        return None
+    total = Decimal("0")
+    for name, raw in cells.items():
+        if name not in _INDEPENDENT_KEPT_COMPONENTS:
+            continue
+        try:
+            amount = Decimal(str(raw))
+        except (InvalidOperation, TypeError):
+            continue
+        if amount.is_finite() and amount >= 0:
+            total += amount
+    return total
+
+
+def _printed_cells_for_source_row(row: dict, experiments: dict) -> object:
+    values = row.get("values") or {}
+    for field in (
+        "oxide_wt_pct_as_printed",
+        "composition_wt_percent_as_printed",
+        "composition_wt_pct",
+    ):
+        cells = values.get(field)
+        if isinstance(cells, dict):
+            return cells
+    experiment = experiments.get(row.get("experiment"))
+    sample = experiment.get("sample") if isinstance(experiment, dict) else None
+    printed = sample.get("printed_composition") if isinstance(sample, dict) else None
+    state = printed.get("state") if isinstance(printed, dict) else None
+    cells = state.get("value") if isinstance(state, dict) else None
+    return cells if isinstance(cells, dict) else None
+
+
 def test_renormalization_notice_follows_composition_across_source_stores() -> None:
     extract_names = (
         "doyle-1988-feo-activity-multicomponent-magma.yaml",
@@ -2751,42 +2917,61 @@ def test_renormalization_notice_follows_composition_across_source_stores() -> No
         "taniguchi-1997-feo-cas.yaml",
     )
     band = "95-102 wt% kept oxide total"
-    marker_prefix = "renormalized to 100 wt% from kept oxide total S="
 
     for name in extract_names:
+        extract_path = REPO_ROOT / "data/literature/extracts" / name
+        source = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+        source_id = source["source_id"]
+        source_rows = [
+            row
+            for species in source["species"].values()
+            for row in species["observations"]
+        ]
+        experiments = {
+            experiment["experiment_id"]: experiment
+            for experiment in source.get("experiments", [])
+        }
         migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
-        migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / name)
+        migrator._migrate_extract(extract_path)
         migrator.finalize()
         for observation in migrator.result.observations.values():
-            condition = (observation.point_conditions or {}).get("composition")
-            inputs = (
-                condition.inference.inputs
-                if isinstance(condition, Located) and condition.inference is not None
-                else ()
+            source_observation_id = observation.observation_id.removeprefix(
+                f"{source_id}::"
             )
-            renormalization_inputs = tuple(
-                item for item in inputs if item.startswith(marker_prefix)
+            source_row = max(
+                (
+                    row
+                    for row in source_rows
+                    if source_observation_id == row.get("observation_id")
+                    or source_observation_id.startswith(
+                        f"{row.get('observation_id')}::"
+                    )
+                ),
+                key=lambda row: len(str(row.get("observation_id", ""))),
+                default=None,
             )
+            assert source_row is not None, observation.observation_id
+            cells = _printed_cells_for_source_row(source_row, experiments)
+            kept_total = _independent_kept_oxide_total(cells)
+            composition = observation.identity.composition
+            admitted_composition = composition is not None and composition.is_value
+            if admitted_composition:
+                assert cells is not None, observation.observation_id
             notices = tuple(
                 notice
                 for notice in observation.notices
                 if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
                 and notice.band == band
             )
-            if renormalization_inputs:
-                assert len(renormalization_inputs) == 1
-                assert isinstance(condition, Located)
-                assert condition.state.is_value
-                assert observation.identity.composition is not None
-                assert observation.identity.composition.is_value
+            should_notice = (
+                admitted_composition
+                and kept_total is not None
+                and Decimal("102") < kept_total <= Decimal("105")
+            )
+            assert len(notices) == int(should_notice), observation.observation_id
+            if should_notice:
                 assert len(notices) == 1
-                assert notices[0].original == Decimal(
-                    renormalization_inputs[0]
-                    .removeprefix(marker_prefix)
-                    .removesuffix(" wt% (d-336 item 2)")
-                )
-            else:
-                assert not notices
+                assert notices[0].original == kept_total
 
 
 def test_initial_charge_mass_loss_map_refuses_blank_suffixed_major_oxide() -> None:
