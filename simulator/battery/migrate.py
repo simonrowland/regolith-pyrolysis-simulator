@@ -4594,78 +4594,6 @@ def _composition_projection_notice(
     )
 
 
-def _carried_composition_projection_notice(
-    composition: State[Composition] | None,
-    point_conditions: Mapping[str, Located[Any]] | None,
-    *,
-    printed_composition: Located[Any] | None = None,
-    quantity: Quantity | None,
-    origin: str,
-) -> Notice | None:
-    """Disclose a trace projection when the carried identity matches its print."""
-
-    if composition is None or not composition.is_value or quantity is None:
-        return None
-    carried = composition.value
-    printed = (point_conditions or {}).get("printed_composition")
-    if not isinstance(printed, Located) or not printed.state.is_value:
-        printed = printed_composition
-    if not isinstance(printed, Located) or not printed.state.is_value:
-        return None
-    printed_map = printed.state.value
-    if not isinstance(printed_map, Mapping):
-        return None
-    closure_context = {"printed_composition": printed_map}
-    try:
-        wt = _oxide_mass_percent_components(printed_map)
-    except (ArithmeticError, ValueError):
-        return None
-    if not wt or _missing_major_oxide_names(printed_map, printed_map):
-        return None
-    volatile = _printed_volatile_mass_percent(wt, closure_context)
-    closure_wt = {**wt, **volatile}
-    for name, amount in _printed_composition_closure_components(
-        closure_context
-    ).items():
-        if name not in closure_wt:
-            closure_wt[name] = amount
-    if _percent_composition_closure_error(closure_wt, "mass") is not None:
-        return None
-    projection_notice = _composition_projection_notice(
-        wt,
-        closure_context=closure_context,
-        quantity=quantity,
-        origin=origin,
-        declared_component_map=printed_map,
-    )
-    if projection_notice is None:
-        return None
-    if carried.amount_basis is AmountBasis.MASS_PERCENT:
-        if any(amount != 0 for amount in volatile.values()):
-            projected = replace(
-                _mole_fraction_from_wt_percent_components(wt), basis=carried.basis
-            )
-        else:
-            projected = Composition(
-                basis=carried.basis,
-                components=tuple(
-                    (str(name), as_decimal(amount))
-                    for name, amount in _oxide_mass_percent_components(wt).items()
-                ),
-                amount_basis=AmountBasis.MASS_PERCENT,
-            )
-    elif carried.amount_basis is AmountBasis.MOLE_FRACTION:
-        projected = _mole_fraction_from_wt_percent_components(wt)
-    else:
-        return None
-    if (
-        projected.components != carried.components
-        or projected.amount_basis is not carried.amount_basis
-    ):
-        return None
-    return projection_notice
-
-
 def _printed_volatile_mass_percent(*payloads: object) -> dict[str, Decimal]:
     """Read numeric volatile amounts attached to this composition row only."""
 
@@ -22286,26 +22214,8 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
-        notice_experiment = self.result.experiments.get(experiment_id)
-        carried_projection_notice = _carried_composition_projection_notice(
-            identity.composition,
-            point_conditions,
-            printed_composition=(
-                notice_experiment.sample.printed_composition
-                if notice_experiment is not None
-                else None
-            ),
-            quantity=q_token if isinstance(q_token, Quantity) else None,
-            origin=obs_id,
-        )
-        for candidate_notice in (projection_notice, carried_projection_notice):
-            if candidate_notice is not None and not any(
-                notice.kind is NoticeKind.COMPOSITION_PROJECTED
-                and notice.dropped == candidate_notice.dropped
-                and notice.reason == candidate_notice.reason
-                for notice in observation_notices
-            ):
-                observation_notices.append(candidate_notice)
+        if projection_notice is not None:
+            observation_notices.append(projection_notice)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
@@ -24292,27 +24202,13 @@ class Migrator:
             origin=point_id,
             declared_component_map=point_declared_component_map,
         )
-        carried_projection_notice = _carried_composition_projection_notice(
-            identity.composition,
-            point_conditions,
-            printed_composition=(
-                experiment.sample.printed_composition
-                if experiment is not None
-                else None
-            ),
-            quantity=(
-                q_token_point if isinstance(q_token_point, Quantity) else None
-            ),
-            origin=point_id,
-        )
-        for candidate_notice in (projection_notice, carried_projection_notice):
-            if candidate_notice is not None and not any(
-                notice.kind is NoticeKind.COMPOSITION_PROJECTED
-                and notice.dropped == candidate_notice.dropped
-                and notice.reason == candidate_notice.reason
-                for notice in child_notices
-            ):
-                child_notices.append(candidate_notice)
+        if projection_notice is not None and not any(
+            notice.kind is NoticeKind.COMPOSITION_PROJECTED
+            and notice.dropped == projection_notice.dropped
+            and notice.reason == projection_notice.reason
+            for notice in child_notices
+        ):
+            child_notices.append(projection_notice)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
