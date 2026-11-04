@@ -384,6 +384,14 @@ def test_doyle_residual_converts_observation_and_declared_prediction_once(
     assert residual.numeric.value.quantize(Decimal("0.000001")) == Decimal(
         "-0.131654"
     )
+    already_converted, _candidate = compile_residual(
+        reference,
+        engine,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+    assert already_converted.numeric == residual.numeric
 
 
 @pytest.mark.parametrize(
@@ -479,6 +487,14 @@ def test_colson_residual_converts_observation_and_declared_prediction_once(
     assert residual.numeric.value.quantize(Decimal("0.000001")) == Decimal(
         "-0.527559"
     )
+    already_converted, _candidate = compile_residual(
+        reference,
+        engine,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+    assert already_converted.numeric == residual.numeric
 
 
 def test_distin_closed_redox_residual_line_matches_green_bytes(
