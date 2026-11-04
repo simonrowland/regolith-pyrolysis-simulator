@@ -30,7 +30,7 @@ PYTEST = [
     "no:cacheprovider",
     "tests/battery/test_scored_phase_echo.py",
     "-k",
-    "test_migrated_bonnand_glass_major_refuses_before_equilibrate",
+    "test_migrated_borisov_2004_row_refuses_the_echo",
 ]
 
 
