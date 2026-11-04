@@ -843,6 +843,15 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             )
             assert activity.reason == "out_of_gamma_domain"
             assert answer.is_flux_active
+        elif species_id in {"Ca", "Mg"}:
+            # d-144's JANAF conversion preserves the reported activity value
+            # but flags its liquid branch below the solid/liquid crossing.
+            assert activity.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+            assert activity.value == pytest.approx(
+                original_activities[species_id], rel=0.0, abs=0.0
+            )
+            assert "authority=bridge" in activity.reason
+            assert "metastable (supercooled) liquid" in activity.reason
         else:
             assert activity.verdict is ActivityVerdictKind.POINT
             assert activity.value == pytest.approx(
@@ -1040,8 +1049,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # d-144 (5b5d2a080) changes CaO/MgO activities and their melt-composition
-    # feedback; the 1400 C head rate moves by -7.26e-6 kg/hr.
+    # d-144 (5b5d2a080) multiplies solid-reference gamma by
+    # exp(-DeltaGfus/RT). At the resulting 1673.15 K step, the CaO and MgO
+    # factors are 0.06790255 (-1.168114 dex) and 0.09493137 (-1.022590 dex).
+    # This lowers Ca/Mg vapor terms and their coupled melt-composition
+    # contribution. A paired one-step run with DeltaGfus=0 gives
+    # 0.06423670196107581 kg/hr; enabling d-144 lowers non-phosphorus head
+    # rate to 0.06422943778094445 kg/hr (-7.26418e-6 kg/hr, -0.011309%).
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.06422943778094445, rel=1e-12, abs=1e-12
     )
@@ -1071,9 +1085,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # d-144 (5b5d2a080) liquid-reference CaO/MgO activity changes move
-        # non-phosphorus head flux by -7.26e-6 kg/hr; the Ar cover and ramp
-        # still put this first step at 1400 C and 2.47% of transport capacity.
+        # The paired conversion-on/off mechanism and predicted negative rate
+        # delta are documented above; the Ar cover and ramp still put this
+        # first step at 1400 C and 2.47% of transport capacity.
         (
             1,
             1400.0,
