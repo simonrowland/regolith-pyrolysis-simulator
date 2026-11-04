@@ -4233,22 +4233,22 @@ species:
                 value: cr
               polymorph:
                 tag: unknown
-                reason: The paper identifies solid SiO2 but does not state its polymorph.
+                reason: The paper does not state a SiO2 polymorph; solid SiO2 is the task's JANAF-based secondary evidence.
             component_basis: SiO2
-        inferred: false
+        inferred: true
         note: >-
-          Table 3 column 5 is SiO2 activity. Equation (12), published p. 19, defines the activity by the ion-current
-          comparison; equation (13) identifies the reference current as over the individual SiO2 oxide. The paper
-          identifies solid SiO2 but does not state a polymorph. No standard Gibbs function for this SiO2 reference is
-          given; reference (66) supplies equilibrium data for deriving oxygen partial pressure, not a Gibbs function
-          for the SiO2 reference.
+          Table 3 column 5 is SiO2 activity. Equation (12), published p. 19, defines the activity by the ratio of SiO+
+          ion currents over the melt and the individual oxide samples. The paper does not identify the solid phase or
+          polymorph; solid SiO2 is the task's JANAF-based secondary evidence. No standard Gibbs function for this SiO2
+          reference is given; reference (66) supplies equilibrium data for deriving oxygen partial pressure, not a Gibbs
+          function for the SiO2 reference.
         locator:
           page: 5
           published_page: 19
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -8849,7 +8849,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -11206,7 +11206,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -12353,7 +12353,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -13735,7 +13735,7 @@ species:
           pdf_page_index: 4
           section: Results
           equation: '10–13'
-          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”; Eq. (13), p. 19, defines reference currents as “over the individual oxides (CaO, Al2O3, SiO2), respectively.”"
+          note: "Eqs. (10)–(12) define oxide activities by comparing ion currents over the ternary melt with currents over individual pure-oxide samples; Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant. Table 1 caption, p. 19: “Over Individual Oxides CaO, Al2O3, and SiO2 at 1933 K”."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed

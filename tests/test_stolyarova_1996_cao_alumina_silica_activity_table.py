@@ -82,6 +82,24 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
     assert cells_by_column["2"][("0.61", "0.50")] == "0.251"
     assert cells_by_column["5"][("1.00", "0.50")] == "0.519"
 
+    sio2_column5 = next(
+        observation
+        for observation in document["species"]["SiO2"]["observations"]
+        if observation.get("locator", {}).get("table") == "3"
+    )
+    standard_state = sio2_column5["standard_state"]
+    assert standard_state["inferred"] is True
+    assert "solid SiO2 is the task's JANAF-based secondary evidence" in standard_state[
+        "note"
+    ]
+    assert "Equation (12)" in standard_state["note"]
+    assert "Equation (13) identifies the reference current" not in standard_state[
+        "note"
+    ]
+    locator_note = standard_state["locator"]["note"]
+    assert "Eqs. (10)–(12)" in locator_note
+    assert "Eq. (13) defines the MoO3/MoO2 oxygen equilibrium constant" in locator_note
+
     migrated = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     assert migrated.validation is not None
     assert migrated.validation.hard_issues == ()
