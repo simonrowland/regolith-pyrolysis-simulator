@@ -101,8 +101,10 @@ def test_table_ia_per_cell_uncertainties_migrate_with_source_unit_and_locator(
 
     oxygen_id = "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"
     oxygen = _series_by_id(document, oxygen_id)
-    assert oxygen["values"]["method_class"] == "measured_reduced"
-    assert oxygen["values"]["evidence_class"] == "measured_reduced"
+    # Table Ib prints P_O as calculated from equilibrium (1), not as an
+    # m/z 16 ion current corrected for O2 fragmentation.
+    assert oxygen["values"]["method_class"] == "quoted_attributed"
+    assert oxygen["values"]["evidence_class"] == "quoted_attributed"
     assert oxygen["values"]["method_as_printed"] == "Calculated from equilibrium (1)"
     assert oxygen["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
     assert oxygen["derivation"]["raw_inputs"]["locator"]["table"] == "Ib"
