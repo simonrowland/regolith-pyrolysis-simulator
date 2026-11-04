@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 from simulator.battery.enums import Engine, ExecutionState
+from simulator.battery.generators.bench import activity_request_for_engine
 from simulator.battery.score import predict_with_engine
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_COEFFICIENTS,
@@ -34,9 +35,13 @@ def _score_activity(
         isolated=False,
     )
     assert prediction.execution.state is ExecutionState.PRODUCED
+    request = activity_request_for_engine(
+        experiment, observation, "internal-analytical"
+    )
+    assert request is not None and request.payload is not None
     expected = melt_oxide_activity(
         oxide,
-        {name: float(value) for name, value in composition.items()},
+        request.payload["composition_mol"],
         temperature_K=float(temperature_K),
     )
     assert expected is not None
