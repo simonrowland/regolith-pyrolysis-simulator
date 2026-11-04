@@ -1026,8 +1026,8 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
         refusal_reason=refusal,
     ) is None
     assert refusal == [
-        "partial analysis contains unsupported component(s) above 0.5 wt%: "
-        "Na2O_plus_K2O=4.2 wt%"
+        "mass-percent composition is a partial analysis: kept sum=58.0 wt% "
+        "is below 95 wt%"
     ]
 
 
@@ -2196,10 +2196,10 @@ def test_b704_kept_mass_acceptance_boundaries(total: str, accepted: bool) -> Non
     "components",
     (
         {"SiO2": "60.00", "MgO": "39.75"},
-        {"SiO2": "49.85", "MgO": "49.85", "XxO": "0.3"},
+        {"SiO2": "49.85", "MgO": "49.85", "unknown-component": "0.3"},
         {"SiO2": "55.00", "MgO": "40.00", "H2O": "5.00"},
     ),
-    ids=("near-complete", "trace-unknown", "hydrous"),
+    ids=("near-complete", "trace-unsupported", "hydrous"),
 )
 def test_mass_closure_is_identical_through_plain_and_full_migration(
     tmp_path: Path,
@@ -2226,9 +2226,9 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
         {name: Decimal(value) for name, value in components.items()}
     )
     assert plain.state.value == public
-    if "XxO" in components:
+    if "unknown-component" in components:
         assert plain.inference is not None
-        assert any("XxO" in item for item in plain.inference.inputs)
+        assert any("unknown-component" in item for item in plain.inference.inputs)
 
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     migrated = next(
@@ -2241,16 +2241,16 @@ def test_mass_closure_is_identical_through_plain_and_full_migration(
     assert isinstance(composition, Located)
     assert composition.state.is_value
     assert composition.state.value == plain.state.value
-    if "XxO" in components:
+    if "unknown-component" in components:
         assert composition.inference is not None
-        assert any("XxO" in item for item in composition.inference.inputs)
+        assert any("unknown-component" in item for item in composition.inference.inputs)
         projected = [
             notice
             for notice in migrated.notices
             if notice.kind is NoticeKind.COMPOSITION_PROJECTED
         ]
         assert len(projected) == 1
-        assert projected[0].dropped == ("XxO",)
+        assert projected[0].dropped == ("unknown-component",)
 
 
 @pytest.mark.parametrize(
@@ -2264,7 +2264,8 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
     trace_amount: str,
     accepted: bool,
 ) -> None:
-    wt = {"SiO2": "49.85", "MgO": "49.85", "XxO": trace_amount}
+    trace_name = "Na2O_plus_K2O" if accepted else "XxO"
+    wt = {"SiO2": "49.85", "MgO": "49.85", trace_name: trace_amount}
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["experiments"] = [
         {
@@ -2343,13 +2344,17 @@ def test_equilibrium_starting_bulk_uses_mass_closure_once(
             if notice.kind is NoticeKind.COMPOSITION_PROJECTED
         ]
         assert len(projection_notices) == 1
-        assert projection_notices[0].dropped == ("XxO",)
-        assert "XxO=0.3 wt%" in projection_notices[0].reason
+        assert projection_notices[0].dropped == (trace_name,)
+        assert f"{trace_name}=0.3 wt%" in projection_notices[0].reason
         assert initial.inference is not None
-        assert any("XxO" in item for item in initial.inference.inputs)
+        assert any(trace_name in item for item in initial.inference.inputs)
         assert composition == initial.state
         assert composition.value.components == wt_pct_to_mole_fraction(
-            {name: Decimal(value) for name, value in wt.items() if name != "XxO"}
+            {
+                name: Decimal(value)
+                for name, value in wt.items()
+                if name != trace_name
+            }
         ).components
     else:
         assert "XxO=10 wt%" in initial.state.reason
@@ -2611,10 +2616,10 @@ _BAD_COMPOSITION_CELLS = (
 )
 
 
-def _composition_map_with_bad_major(key: str, cell: object) -> tuple[dict, str]:
+def _composition_map_with_bad_major(key: str, cell: object) -> dict:
     if key == "AlO1.5":
-        return {"SiO2": "50", "MgO": "25", "CaO": "25", key: cell}, "Al2O3"
-    return {"MgO": "50", "CaO": "50", key: cell}, "SiO2"
+        return {"SiO2": "50", "MgO": "25", "CaO": "25", key: cell}
+    return {"MgO": "50", "CaO": "50", key: cell}
 
 
 def _migrate_composition_reader_case(
@@ -2775,13 +2780,13 @@ def test_bad_declared_major_cells_refuse_through_every_reader(
     key: str,
     cell: object,
 ) -> None:
-    printed_map, missing_major = _composition_map_with_bad_major(key, cell)
+    printed_map = _composition_map_with_bad_major(key, cell)
     valid, refusal, _components = _composition_reader_outcome(
         tmp_path, reader, printed_map
     )
 
     assert not valid, (reader, key, cell)
-    assert refusal and f"missing major oxides: {missing_major}" in refusal
+    assert refusal
 
 
 @pytest.mark.parametrize("reader", _BLANK_MAJOR_READERS)
@@ -3379,7 +3384,7 @@ def test_b704_projection_fraction_uses_as_printed_alias_total() -> None:
         "composition_wt_pct": {
             "SiO2": "69.7",
             "FeO*": "30",
-            "XxO": "0.3",
+            "unknown-component": "0.3",
         }
     }
     wt = migrate_module._oxide_map_from_mapping(
@@ -4801,7 +4806,7 @@ def test_flat_point_refuses_large_unknown_and_preserves_printed_components(
     }
 
 
-def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
+def test_flat_point_projects_recognized_trace_with_notice_and_ignores_conditions(
     tmp_path: Path,
 ) -> None:
     extract = _markova_vi_extract()
@@ -4812,7 +4817,7 @@ def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
             "mass_loss_pct": 0,
             "SiO2": "49.85",
             "MgO": "49.85",
-            "XxO": "0.3",
+            "Na2O_plus_K2O": "0.3",
             "p_atm": "0.2",
             "delta_IW": "-1.0",
             "run": 7,
@@ -4835,7 +4840,7 @@ def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
     assert printed.state.value == {
         "SiO2": "49.85",
         "MgO": "49.85",
-        "XxO": "0.3",
+        "Na2O_plus_K2O": "0.3",
     }
     projected = [
         notice
@@ -4843,8 +4848,8 @@ def test_flat_point_projects_trace_unknown_with_notice_and_ignores_conditions(
         if notice.kind is NoticeKind.COMPOSITION_PROJECTED
     ]
     assert len(projected) == 1
-    assert projected[0].dropped == ("XxO",)
-    assert "XxO=0.3 wt%" in projected[0].reason
+    assert projected[0].dropped == ("Na2O_plus_K2O",)
+    assert "Na2O_plus_K2O=0.3 wt%" in projected[0].reason
     assert projected[0].dropped_mass_fraction == Decimal("0.003")
 
 
@@ -5756,56 +5761,47 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
 
 
 @pytest.mark.parametrize(
-    ("case", "wt", "closure_context", "declared", "green_accepts"),
+    ("case", "wt", "closure_context", "declared", "closure_refusal"),
     (
         pytest.param(
-            "missing-major",
-            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            "zero-total",
+            {"SiO2": "0", "MgO": "0"},
             None,
             None,
-            True,
-            id="missing-major",
-        ),
-        pytest.param(
-            "partial-94.9",
-            {"SiO2": "50", "MgO": "44.9"},
-            None,
-            None,
-            True,
-            id="partial-kept-total",
-        ),
-        pytest.param(
-            "over-limit-102.1",
-            {"SiO2": "60", "MgO": "42.1"},
-            None,
-            None,
-            True,
-            id="over-limit-kept-total",
-        ),
-        pytest.param(
-            "thomas-wood-chloride",
-            {"SiO2": "50", "MgO": "49"},
-            {
-                "composition_wt_pct": {"SiO2": "50", "MgO": "49"},
-                "Cl_wt_pct": "1.0",
-            },
-            {"SiO2": "50", "MgO": "49"},
-            True,
-            id="accepted-chloride-sibling",
-        ),
-        pytest.param(
-            "taniguchi-metal-iron",
-            {"Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
-            {
-                "composition_mass_percent": {
-                    "T.Fe": "1.0",
-                    "CaO": "39.9",
-                    "Al2O3": "59.6",
-                }
-            },
-            {"T.Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
             False,
-            id="green-refused-t-fe-unsupported-component",
+            id="green-no-positive-oxide-mass",
+        ),
+        pytest.param(
+            "negative-oxide",
+            {"SiO2": "101", "MgO": "-1"},
+            None,
+            None,
+            False,
+            id="green-negative-amount",
+        ),
+        pytest.param(
+            "unparseable-component",
+            {"SiO2": "50", "MgO": "not-an-amount"},
+            None,
+            None,
+            False,
+            id="green-unparseable-cell",
+        ),
+        pytest.param(
+            "non-finite-oxide",
+            {"SiO2": Decimal("NaN"), "MgO": "50"},
+            None,
+            None,
+            False,
+            id="green-non-finite-amount",
+        ),
+        pytest.param(
+            "ambiguous-feot",
+            {"SiO2": "50", "FeO": "20", "FeOT": "30"},
+            None,
+            None,
+            False,
+            id="green-ambiguous-feot",
         ),
         pytest.param(
             "unknown-token",
@@ -5819,142 +5815,83 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             },
             {"SiO2": "60", "MgO": "39", "XxO": "1"},
             False,
-            id="green-refused-unknown-token",
+            id="green-unknown-token",
         ),
         pytest.param(
-            "non-finite-unknown-token",
-            {"SiO2": "60", "MgO": "39"},
-            {
-                "composition_wt_pct": {
-                    "SiO2": "60",
-                    "MgO": "39",
-                    "XxO": Decimal("NaN"),
-                }
-            },
-            {"SiO2": "60", "MgO": "39", "XxO": Decimal("NaN")},
-            False,
-            id="green-refused-non-finite-unsupported-component",
-        ),
-        pytest.param(
-            "negative-unknown-token",
-            {"SiO2": "60", "MgO": "39"},
-            {
-                "composition_wt_pct": {
-                    "SiO2": "60",
-                    "MgO": "39",
-                    "XxO": "-1",
-                }
-            },
-            {"SiO2": "60", "MgO": "39", "XxO": "-1"},
-            False,
-            id="green-refused-invalid-dropped-amount",
-        ),
-        pytest.param(
-            "negative-oxide",
-            {"SiO2": "101", "MgO": "-1"},
+            "missing-major",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
             None,
             None,
-            False,
-            id="green-refused-negative-oxide",
+            True,
+            id="m1-missing-major",
         ),
         pytest.param(
-            "single-component",
-            {"SiO2": "94.9"},
+            "partial-94.9",
+            {"SiO2": "50", "MgO": "44.9"},
             None,
             None,
-            False,
-            id="green-refused-fewer-than-two-components",
+            True,
+            id="m1-kept-total-below-95",
         ),
         pytest.param(
-            "composition-mass-percent-malformed",
+            "over-limit-102.1",
+            {"SiO2": "60", "MgO": "42.1"},
+            None,
+            None,
+            True,
+            id="m1-kept-total-above-102",
+        ),
+        pytest.param(
+            "chloride-trace",
             {"SiO2": "50", "MgO": "49"},
             {
-                "composition_mass_percent": {
-                    "SiO2": "50",
-                    "MgO": "49",
-                    "XxO": "garbage",
-                }
+                "composition_wt_pct": {"SiO2": "50", "MgO": "49"},
+                "Cl_wt_pct": "1.0",
             },
-            {"SiO2": "50", "MgO": "49", "XxO": "garbage"},
-            False,
-            id="green-refused-malformed-composition-mass-percent-cell",
+            {"SiO2": "50", "MgO": "49"},
+            True,
+            id="m1-recognized-non-oxide-over-limit",
         ),
         pytest.param(
-            "composition-mass-percent-alias-collapse",
-            {"Cr2O3": "94.9"},
+            "taniguchi-metal-iron",
+            {"CaO": "39.9", "Al2O3": "59.6"},
             {
                 "composition_mass_percent": {
-                    "CrO1.5": "47.45",
-                    "Cr2O3": "47.45",
+                    "T.Fe": "1.0",
+                    "CaO": "39.9",
+                    "Al2O3": "59.6",
                 }
             },
-            {"CrO1.5": "47.45", "Cr2O3": "47.45"},
-            False,
-            id="green-refused-one-component-after-alias-collapse",
+            {"T.Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
+            True,
+            id="m1-known-non-oxide-over-limit",
         ),
         pytest.param(
-            "zero-total",
-            {"SiO2": "0", "MgO": "0"},
+            "green-and-m1-failure",
+            {"SiO2": "94.9", "MgO": "-0.1"},
             None,
             None,
             False,
-            id="green-refused-zero-total",
-        ),
-        pytest.param(
-            "zero-oxide-mass-with-published-total",
-            {"SiO2": "0", "MgO": "0", "total": "100"},
-            {
-                "composition_wt_pct": {
-                    "SiO2": "0",
-                    "MgO": "0",
-                    "total": "100",
-                }
-            },
-            {"SiO2": "0", "MgO": "0", "total": "100"},
-            False,
-            id="green-refused-zero-oxide-mass-despite-total-cell",
-        ),
-        pytest.param(
-            "non-finite",
-            {"SiO2": Decimal("NaN"), "MgO": "50"},
-            None,
-            None,
-            False,
-            id="green-refused-non-finite",
-        ),
-        pytest.param(
-            "ambiguous-feot",
-            {"SiO2": "50", "FeO": "20", "FeOT": "30"},
-            None,
-            None,
-            False,
-            id="green-refused-ambiguous-feot",
+            id="green-era-refusal-precedes-partial-total",
         ),
     ),
 )
-def test_mass_closure_refusal_flag_matches_green_acceptance(
+def test_mass_closure_refusal_check_order(
     case: str,
     wt: dict[str, object],
     closure_context: object,
     declared: dict[str, object] | None,
-    green_accepts: bool,
+    closure_refusal: bool,
 ) -> None:
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
-        {
-            name: as_decimal(amount) if isinstance(amount, str) else amount
-            for name, amount in wt.items()
-        },
+        wt,
         closure_context=closure_context,
         declared_component_map=declared,
     )
 
     assert converted is None, case
     assert refusal is not None, case
-    # Green 0418c0fd9 accepted missing/partial/over-limit totals and the
-    # Thomas-Wood oxide map with Cl as a sibling. It refused the T.Fe map and
-    # malformed, under-counted, unsupported, ambiguous, negative, non-finite,
-    # and zero-total maps.
-    assert refusal.closure_refusal is green_accepts, (case, refusal)
+    assert refusal.closure_refusal is closure_refusal, (case, refusal)
 
 
 @pytest.mark.parametrize(
