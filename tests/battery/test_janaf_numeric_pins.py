@@ -30,6 +30,17 @@ def test_mgo_janaf_fusion_entropy_uses_printed_3000_k_values() -> None:
     assert entropy == Decimal("24.804")
 
 
+def test_janaf_fusion_crossing_numeric_pins() -> None:
+    # Preserve the crossing resolver's published-table interpolation before
+    # moving the shared calculation into reference_data.janaf_fusion.
+    assert janaf_fusion_energy("MgO", Decimal("3000")).melting_temperature_K == (
+        Decimal("3104.968203497615262321144674")
+    )
+    assert janaf_fusion_energy("CaO", Decimal("3000")).melting_temperature_K == (
+        Decimal("3200.0")
+    )
+
+
 def test_d144_janaf_fusion_gibbs_temperature_chord_numeric_pins() -> None:
     expected_kJ_per_mol = {
         ("CaO", Decimal("1873")): Decimal("32.59870"),
