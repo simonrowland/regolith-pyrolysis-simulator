@@ -8870,6 +8870,10 @@ def predict_with_engine(
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
+    if isolated is None and engine is Engine.INTERNAL_ANALYTICAL and not handles:
+        # Store scoring and censuses use the child CPU budget by default. A
+        # caller-supplied live handle keeps its explicit in-process semantics.
+        isolated = True
     if isinstance(handles, dict):
         return _engine_prediction_or_unparseable_component(
             engine,

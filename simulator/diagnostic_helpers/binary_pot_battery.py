@@ -175,18 +175,21 @@ _DEFAULT_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
-# Per-cell hard wall around equilibrate(). Five loaded-host runs each on
-# 2026-11-04 (1m load 18–41) for the Rys Na row, Stolyarova Al2O/TiO rows, and
-# Costa/Stolyarova effusion pins had median slowest-call cost of 0.55–1.05 s
-# process CPU and 0.60–1.19 s wall. Maxima were 3.77 s CPU (Costa closure) and
-# 6.55 s wall (Al2O row 14; wall/CPU 1.86). The 15 s IA limit is 2.29x that
-# observed wall maximum, leaving 8.45 s for measured scheduling spread while
-# retaining a hard refusal for hangs.
+# Five loaded-host runs each on 2026-11-04 for Rys Na, Stolyarova Al2O/TiO,
+# and the Costa/Stolyarova closures had CPU medians of 1.05, 0.57, 0.55, 0.89,
+# and 0.71 s; individual CPU times ranged 0.54–3.77 s (Costa maximum). A 10 s
+# ITIMER_PROF budget is 2.65x that maximum, with 6.23 s extra CPU headroom for
+# the observed spread. The largest wall time was 6.55 s (Al2O row 14; max
+# wall/CPU ratio 1.86). The 120 s wall backstop is 12x the CPU budget and 18.3x
+# the measured wall maximum; it refuses blocked hangs, though extreme
+# scheduling can still exhaust this residual wall budget. Non-isolated calls
+# cannot be charged process CPU, so they retain this generous wall cap.
 # ThermoEngine forwards its budget to its nested warm worker; its 60 s limit
 # covers the measured 54.75 s D3 SiO2 maximum. Isolated-cell workers get a
 # separate 2 s response margin.
+_INTERNAL_ANALYTICAL_CPU_BUDGET_S = 10.0
 _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
-    "internal-analytical": 15.0,
+    "internal-analytical": 120.0,
     "alphamelts": 30.0,
     "thermoengine": 60.0,
     "vaporock": 70.0,
@@ -3605,12 +3608,13 @@ def _crash_cell_from_returncode(
     notices: Sequence[Mapping[str, Any]],
     authority: str | None,
     certified_band: Mapping[str, Any] | None,
+    timeout_reason: str | None = None,
 ) -> EquilibrateCell:
     if timed_out:
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_TIMEOUT,
-            "isolated cell exceeded hard timeout",
+            timeout_reason or "isolated cell exceeded hard timeout",
         )
         engine_status = "TimeoutError"
         exit_signal = None
@@ -3674,11 +3678,13 @@ class _IsolatedCellWorkerFailure(RuntimeError):
         timed_out: bool = False,
         returncode: int | None = None,
         detail: str = "",
+        timeout_reason: str | None = None,
     ) -> None:
         super().__init__(detail)
         self.timed_out = timed_out
         self.returncode = returncode
         self.detail = detail
+        self.timeout_reason = timeout_reason
 
 
 class _IsolatedCellEngine:
@@ -3701,11 +3707,46 @@ def _handle_isolated_cell_request(
     payload: Mapping[str, Any],
     _diagnostic_log: Any,
 ) -> dict[str, Any]:
-    handles = {resource.handle.name: resource.handle}
-    resource.handle, _owns_handle = open_cached_battery_engine_handle(
-        resource.handle.name, handles
-    )
-    return run_isolated_cell_worker(payload, handle=resource.handle)
+    def run_request() -> dict[str, Any]:
+        handles = {resource.handle.name: resource.handle}
+        resource.handle, _owns_handle = open_cached_battery_engine_handle(
+            resource.handle.name, handles
+        )
+        return run_isolated_cell_worker(payload, handle=resource.handle)
+
+    if resource.handle.name == "internal-analytical":
+        return _run_internal_analytical_with_cpu_budget(run_request)
+    return run_request()
+
+
+def _run_internal_analytical_with_cpu_budget(
+    call: Callable[[], dict[str, Any]],
+) -> dict[str, Any]:
+    """Run one IA cell under a child-process CPU timer.
+
+    SIGPROF's default action terminates this isolated child when its process
+    CPU budget expires. The parent recognizes that signal as engine_timeout;
+    terminating the child also stops any backend thread left inside native code.
+    """
+
+    if not all(
+        hasattr(signal, name)
+        for name in ("SIGPROF", "ITIMER_PROF", "setitimer", "getitimer")
+    ):
+        raise RuntimeError("internal-analytical CPU timer is unavailable")
+    budget_s = float(_INTERNAL_ANALYTICAL_CPU_BUDGET_S)
+    if not math.isfinite(budget_s) or budget_s <= 0.0:
+        raise ValueError("internal-analytical CPU budget must be positive")
+    previous_timer = signal.getitimer(signal.ITIMER_PROF)
+    if previous_timer != (0.0, 0.0):
+        raise RuntimeError("internal-analytical CPU timer is already active")
+    previous_handler = signal.signal(signal.SIGPROF, signal.SIG_DFL)
+    signal.setitimer(signal.ITIMER_PROF, budget_s)
+    try:
+        return call()
+    finally:
+        signal.setitimer(signal.ITIMER_PROF, 0.0)
+        signal.signal(signal.SIGPROF, previous_handler)
 
 
 class _IsolatedCellWorker:
@@ -3753,9 +3794,22 @@ class _IsolatedCellWorker:
                     detail=str(exc),
                 ) from exc
             except EngineWorkerDied as exc:
+                cpu_signal = getattr(signal, "SIGPROF", None)
+                cpu_budget_fired = (
+                    self.engine == "internal-analytical"
+                    and cpu_signal is not None
+                    and exc.returncode == -int(cpu_signal)
+                )
                 raise _IsolatedCellWorkerFailure(
+                    timed_out=cpu_budget_fired,
                     returncode=exc.returncode,
                     detail=exc.detail,
+                    timeout_reason=(
+                        "equilibrate exceeded hard CPU budget of "
+                        f"{_INTERNAL_ANALYTICAL_CPU_BUDGET_S:g}s"
+                        if cpu_budget_fired
+                        else None
+                    ),
                 ) from exc
             except EngineWorkerRemoteError as exc:
                 raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
@@ -3848,6 +3902,7 @@ def _run_cell_in_subprocess(
             notices=notices,
             authority=authority,
             certified_band=certified_band,
+            timeout_reason=exc.timeout_reason,
         )
     try:
         cell = EquilibrateCell.from_payload(raw)
