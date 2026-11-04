@@ -578,6 +578,83 @@ def test_partial_equilibrium_phase_child_refusal_keeps_green_parent_identity(
     assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
 
 
+def test_missing_major_equilibrium_child_keeps_green_parent_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    parent_initial_charge = dict(_OXIDES)
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = parent_initial_charge
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "MgO": "50",
+                "Al2O3": None,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    # Green keeps the parent X0 identity when the child has a blank major
+    # oxide; the closure refusal stays on the child point condition.
+    expected_charge = wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
+    )
+    assert identity_composition.value.components == expected_charge.components
+    child_composition = child.point_conditions["composition"]
+    assert child_composition.state.is_unknown
+    assert "missing major oxides: Al2O3" in child_composition.state.reason
+
+
+def test_ambiguous_feot_mass_loss_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "mass_loss_fraction"
+    values.pop("component_amount")
+    values["mass_loss_fraction"] = "0.2"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "mass_loss_fraction": "0.2",
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "FeO": "25",
+                "FeOT": "25",
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green routes its preexisting ambiguous-FeOT refusal to identity even
+    # for mass-loss rows, replacing the parent's valid starting composition.
+    assert "ambiguous total iron components: FeOT with FeO" in (
+        identity_composition.reason or ""
+    )
+
+
 def test_partial_mass_map_refusal_preserves_equal_valued_mole_datum(
     tmp_path: Path,
 ) -> None:

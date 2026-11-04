@@ -1345,6 +1345,7 @@ def test_markova_initial_charge_stays_context_under_refusal_mutation(
         obj,
         *,
         refusal_reason=None,
+        refusal_classification=None,
         declared_map=False,
         declared_component_map=None,
         closure_context=None,
@@ -3621,7 +3622,7 @@ def test_b704_volatile_cells_are_classified_before_closure(
         assert refusal is None
     else:
         assert refusal is not None
-        assert "malformed printed component amount for 'H2O'" in refusal
+        assert "malformed printed component amount for 'H2O'" in refusal.reason
 
 
 def test_b704_hydrous_datum_state_completes_full_migration(tmp_path: Path) -> None:
@@ -5765,7 +5766,7 @@ def test_inline_chloride_above_dropped_limit_is_refused() -> None:
 
     assert converted is None
     assert refusal is not None
-    assert "Cl=1 wt%" in refusal
+    assert "Cl=1 wt%" in refusal.reason
 
 
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
@@ -5947,7 +5948,7 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
             if refusal is not None:
                 assert converted is None
                 assert composition_state["tag"] == "unknown"
-                assert composition_state["reason"] == refusal
+                assert composition_state["reason"] == refusal.reason
                 refused_residue_rows[(panel, temperature_c)] = sum(
                     expected.values(), Decimal("0")
                 )
@@ -6676,7 +6677,7 @@ def test_miki_explicit_mole_composition_is_not_lost_for_unknown_quantity() -> No
     }
 
 
-def test_thomas_wood_row_composition_keeps_its_closure_refusal() -> None:
+def test_thomas_wood_row_composition_refusal_stays_on_point_condition() -> None:
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(
         REPO_ROOT
@@ -6692,9 +6693,12 @@ def test_thomas_wood_row_composition_keeps_its_closure_refusal() -> None:
         )
     )
 
-    composition = observation.identity.composition
-    assert composition is not None and composition.is_unknown
-    assert "missing major oxides: FeO" in composition.reason
+    # Green does not use this row map for identity. The m1 closure refusal
+    # stays with the point condition instead of replacing an absent identity.
+    assert observation.identity.composition is None
+    composition = observation.point_conditions["composition"]
+    assert composition.state.is_unknown
+    assert "missing major oxides: FeO" in composition.state.reason
 
 
 def test_nasa_bulk_oxide_row_keeps_its_closure_refusal() -> None:
@@ -6743,7 +6747,7 @@ def test_richter_starting_bulk_map_is_identity_for_evaporation_rows() -> None:
     )
 
 
-def test_hashimoto_starting_average_columns_form_identity_composition() -> None:
+def test_hashimoto_starting_average_columns_do_not_fill_identity_composition() -> None:
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(
         REPO_ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
@@ -6757,17 +6761,9 @@ def test_hashimoto_starting_average_columns_form_identity_composition() -> None:
         )
     )
 
-    composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value == wt_pct_to_mole_fraction(
-        {
-            "SiO2": Decimal("35.43"),
-            "Al2O3": Decimal("3.16"),
-            "FeO": Decimal("35.04"),
-            "MgO": Decimal("23.84"),
-            "CaO": Decimal("2.53"),
-        }
-    )
+    # Green leaves identity composition absent. The accepted starting_Ave_ map
+    # is source data, and this identity profile does not require composition.
+    assert observation.identity.composition is None
 
 
 def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() -> None:

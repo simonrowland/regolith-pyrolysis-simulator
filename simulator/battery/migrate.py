@@ -1569,6 +1569,16 @@ def _percent_composition_closure_error(
     return None
 
 
+class _MassPercentClosureError(ValueError):
+    """A refusal introduced by the mass-percent closure rule."""
+
+
+@dataclass(frozen=True)
+class _CompositionRefusal:
+    reason: str
+    closure_refusal: bool = False
+
+
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
@@ -4882,7 +4892,7 @@ def _wt_percent_conversion_or_refusal(
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
-) -> tuple[Composition | None, str | None]:
+) -> tuple[Composition | None, _CompositionRefusal | None]:
     try:
         missing_major = tuple(
             dict.fromkeys(
@@ -4918,7 +4928,7 @@ def _wt_percent_conversion_or_refusal(
                 )
             ):
                 reason += "; " + closure_error
-            raise ValueError(reason)
+            raise _MassPercentClosureError(reason)
 
         declared_maps = [declared_component_map]
         declared_from_context = _declared_printed_composition_map(closure_context)
@@ -4982,14 +4992,14 @@ def _wt_percent_conversion_or_refusal(
         )
         dropped_mass = sum(dropped.values(), Decimal("0"))
         if any(not amount.is_finite() or amount < 0 for amount in dropped.values()):
-            raise ValueError(
+            raise _MassPercentClosureError(
                 "unsupported printed component has a negative or non-finite amount"
             )
         if dropped_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
             details = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
-            raise ValueError(
+            raise _MassPercentClosureError(
                 "partial analysis contains unsupported component(s) above "
                 f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}"
             )
@@ -5003,17 +5013,21 @@ def _wt_percent_conversion_or_refusal(
             if name not in closure_wt:
                 closure_wt[name] = amount
 
-        errors: list[str] = []
         closure_error = _percent_composition_closure_error(closure_wt, "mass")
         if closure_error is not None:
-            errors.append(closure_error)
-        if errors:
-            raise ValueError("; ".join(errors))
+            raise _MassPercentClosureError(closure_error)
 
         converted = _mole_fraction_from_wt_percent_components(oxide_wt)
         return converted, None
+    except _MassPercentClosureError as exc:
+        return None, _CompositionRefusal(
+            f"mass-percent composition is not usable: {exc}",
+            closure_refusal=True,
+        )
     except (ArithmeticError, ValueError) as exc:
-        return None, f"mass-percent composition is not usable: {exc}"
+        return None, _CompositionRefusal(
+            f"mass-percent composition is not usable: {exc}"
+        )
 
 
 def _printed_mass_percent_map_refusal(
@@ -5115,7 +5129,7 @@ def _printed_mass_percent_map_refusal(
             declared_component_map=declared,
         )
         if refusal is not None:
-            return True, refusal
+            return True, refusal.reason
         return True, None
 
     closure_amounts = {
@@ -5143,9 +5157,12 @@ def _wt_percent_conversion_or_raise(
         declared_component_map=declared_component_map,
     )
     if converted is None:
-        detail = (refusal or "mass-percent composition is not usable").removeprefix(
-            "mass-percent composition is not usable: "
+        reason = (
+            refusal.reason
+            if refusal is not None
+            else "mass-percent composition is not usable"
         )
+        detail = reason.removeprefix("mass-percent composition is not usable: ")
         raise ValueError(detail)
     return converted
 
@@ -5162,7 +5179,11 @@ def _wt_percent_conversion_state(
         declared_component_map=declared_component_map,
     )
     if converted is None:
-        return State.unknown(refusal or "mass-percent composition is not usable")
+        return State.unknown(
+            refusal.reason
+            if refusal is not None
+            else "mass-percent composition is not usable"
+        )
     return State.of(converted)
 
 
@@ -5182,7 +5203,7 @@ def _mass_percent_composition_state(
     )
     if converted is None:
         assert refusal is not None
-        return State.unknown(refusal)
+        return State.unknown(refusal.reason)
     if any(
         amount != 0
         for amount in _printed_volatile_mass_percent(wt, closure_context).values()
@@ -5276,6 +5297,7 @@ def _oxide_map_from_mapping(
     obj: object,
     *,
     refusal_reason: list[str] | None = None,
+    refusal_classification: list[_CompositionRefusal] | None = None,
     # Enables parsing direct component columns; guard policy is carried
     # separately by declared_component_map when a named field was selected.
     declared_map: bool = False,
@@ -5306,9 +5328,13 @@ def _oxide_map_from_mapping(
         )
         if refusal is None:
             return True
+        if refusal_classification is not None:
+            refusal_classification.append(refusal)
         if refusal_reason is not None:
             refusal_reason.append(
-                refusal.removeprefix("mass-percent composition is not usable: ")
+                refusal.reason.removeprefix(
+                    "mass-percent composition is not usable: "
+                )
             )
         return False
 
@@ -5353,6 +5379,7 @@ def _oxide_map_from_mapping(
             got = _oxide_map_from_mapping(
                 nested_for_parse,
                 refusal_reason=refusal_reason,
+                refusal_classification=refusal_classification,
                 declared_map=True,
                 declared_component_map=nested,
                 closure_context=row_context,
@@ -5467,7 +5494,9 @@ def _printed_initial_charge_row_map(
         if refusal is not None:
             if refusal_reason is not None:
                 refusal_reason.append(
-                    refusal.removeprefix("mass-percent composition is not usable: ")
+                    refusal.reason.removeprefix(
+                        "mass-percent composition is not usable: "
+                    )
                 )
             return None
         return got
@@ -5546,19 +5575,6 @@ def _initial_oxide_map_from_values(
         )
     if quantity and "composition" not in quantity and not declared_map:
         return None
-    starting_average = {
-        str(key)[len("starting_Ave_") :]: value
-        for key, value in values.items()
-        if str(key).startswith("starting_Ave_")
-    }
-    if starting_average:
-        return _oxide_map_from_mapping(
-            starting_average,
-            refusal_reason=refusal_reason,
-            declared_map=True,
-            declared_component_map=starting_average,
-            closure_context=(values if closure_context is None else closure_context),
-        )
     missing = _missing_major_oxide_names(values, declared_component_map)
     missing_reason = "missing major oxides: " + ", ".join(missing) if missing else None
     ranked = _point_rows(values)
@@ -22695,6 +22711,7 @@ class Migrator:
         point_oxide_map: dict[str, Decimal] | None = None
         point_map_declared = False
         point_composition_refusal: list[str] = []
+        point_composition_refusal_classifications: list[_CompositionRefusal] = []
         point_composition_located: Located[Composition] | None = None
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
@@ -22759,6 +22776,7 @@ class Migrator:
                 point_oxide_map = _oxide_map_from_mapping(
                     parent_values,
                     refusal_reason=point_composition_refusal,
+                    refusal_classification=point_composition_refusal_classifications,
                     declared_map=True,
                     declared_component_map=parent_printed_map,
                     closure_context=parent_values,
@@ -22776,6 +22794,7 @@ class Migrator:
                     point_oxide_map = _oxide_map_from_mapping(
                         raw_item,
                         refusal_reason=point_composition_refusal,
+                        refusal_classification=point_composition_refusal_classifications,
                         declared_map=point_map_declared,
                         closure_context=raw_item,
                         preserve_printed_map_on_refusal=True,
@@ -22785,6 +22804,11 @@ class Migrator:
                     raw_item,
                     refusal_reason=(
                         point_composition_refusal if point_map_explicit else None
+                    ),
+                    refusal_classification=(
+                        point_composition_refusal_classifications
+                        if point_map_explicit
+                        else None
                     ),
                     declared_map=point_map_declared,
                     closure_context=raw_item,
@@ -23114,18 +23138,10 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        # A closure refusal may replace identity only at a site where green
-        # wrote this row map there; other quantities keep their parent target.
+        # Only closure-rule refusals suppress green's identity write.
         point_mass_closure_refused = any(
-            marker in reason
-            for reason in point_composition_refusal
-            for marker in (
-                "mass-percent composition is a partial analysis:",
-                "mass-percent composition exceeds the accepted kept-sum limit:",
-                "partial analysis contains unsupported component(s) above ",
-                "mass-percent composition contains a negative or non-finite amount",
-                "unsupported printed component has a negative or non-finite amount",
-            )
+            refusal.closure_refusal
+            for refusal in point_composition_refusal_classifications
         )
         if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
@@ -23165,8 +23181,8 @@ class Migrator:
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
-        elif point_composition_refusal and (
-            q_token_point is not Quantity.MASS_LOSS_FRACTION
+        elif (
+            point_composition_refusal
             and point_composition_located is None
             and point_catalogue is None
             and (

@@ -1,4 +1,4 @@
-"""write=False residue migrations match green 5dd775292.
+"""write=False residue migrations match green 0418c0fd9.
 
 The temp-root setup copies tests/battery/test_migrate.py::_migrate_real_extract
 (original extract text, one INDEX row, migrate(root, write=False)). Importing
@@ -17,7 +17,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-GREEN = "5dd775292"
+GREEN = "0418c0fd9"
 SOURCES = (
     "ivanova-2018-spinel-rich-cai-evaporation",
     "kems-026-markova-1984",
@@ -291,7 +291,7 @@ def diff_payloads(
     return report
 
 
-def test_printed_residue_migrations_match_green_5dd775292(tmp_path: Path) -> None:
+def test_printed_residue_migrations_match_green_0418c0fd9(tmp_path: Path) -> None:
     green_src = tmp_path / "green-migrate.py"
     with green_src.open("w") as handle:
         subprocess.run(
@@ -328,25 +328,15 @@ def test_printed_residue_migrations_match_green_5dd775292(tmp_path: Path) -> Non
         "kems-015-hashimoto-1983::"
         "hashimoto_1983_table1_starting_composition"
     )
-    assert composition_changes == {"kems-015-hashimoto-1983": [row_id]}
+    assert composition_changes == {}, composition_changes
     tip_rows = {str(row["id"]): row for row in tip["kems-015-hashimoto-1983"]}
     green_rows = {
         str(row["id"]): row
         for row in green_payload["sources"]["kems-015-hashimoto-1983"]
     }
-    assert tip_rows[row_id]["identity_composition"] == {
-        "tag": "value",
-        "basis": "printed_oxides",
-        "amount_basis": "mole_fraction",
-        "components": [
-            ["Al2O3", "0.01776054124964630516635698291"],
-            ["CaO", "0.02585443302100830695634774455"],
-            ["FeO", "0.2794942400441881150076001642"],
-            ["MgO", "0.3389669610365857597845753442"],
-            ["SiO2", "0.3379238246485715130851197644"],
-        ],
-        "proxy_flag": None,
-    }
+    # Green leaves Hashimoto's starting_Ave_ row out of identity composition;
+    # an accepted printed mass map does not add a composition identity axis.
+    assert tip_rows[row_id]["identity_composition"] is None
     assert green_rows[row_id]["identity_composition"] is None
     assert report["decimal_text_only_total"] == 0, report
 
@@ -355,9 +345,6 @@ if __name__ == "__main__":
     import sys
 
     green_src = Path(os.environ["PARITY_GREEN_SRC"]).resolve()
-    # e47e33186 adds phase_for_sample_form; 81256c01a imports it from migrate.
-    # Bind that name from the worktree module before a822c275f, which does
-    # not define it, replaces simulator.battery.migrate.
     import simulator.battery as battery_pkg
 
     sys.modules.pop("simulator.battery.migrate", None)
