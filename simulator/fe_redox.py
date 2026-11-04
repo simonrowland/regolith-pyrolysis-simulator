@@ -469,7 +469,13 @@ def kress91_furnace_activity_pressure_bar(
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
-    T_C = float(T_K) - 273.15
+    temperature_K = float(T_K)
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        raise Kress91InvalidControls(
+            'Holzheid stoichiometric FeO gamma invalid control T_K: expected '
+            f'finite positive value, got {T_K!r}'
+        )
+    T_C = temperature_K - 273.15
     points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
     first_C, last_C = points[0][0], points[-1][0]
     span_C = last_C - first_C
@@ -492,35 +498,32 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         edge_T_K = edge_C + 273.15
         edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
         edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
-        central = math.exp(math.log(edge_gamma) * edge_T_K / float(T_K))
+        central = math.exp(math.log(edge_gamma) * edge_T_K / temperature_K)
         multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
 
         # Scale both printed sigma edges with the same ln(gamma) law. The
-        # public band is symmetric, so widen its sigma to enclose those edges
-        # and at least preserve the nearest tabulated segment spread.
+        # output band is symmetric in log space and must contain these limits
+        # plus the nearest tabulated segment spread.
         scaled_low = math.exp(
-            math.log(edge_gamma - edge_sigma) * edge_T_K / float(T_K)
+            math.log(edge_gamma - edge_sigma) * edge_T_K / temperature_K
         )
         scaled_high = math.exp(
-            math.log(edge_gamma + edge_sigma) * edge_T_K / float(T_K)
+            math.log(edge_gamma + edge_sigma) * edge_T_K / temperature_K
         )
         edge_points = points[:2] if below else points[-2:]
         edge_segment_spread = abs(
             HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
             * (edge_points[1][1] - edge_points[0][1])
         )
-        sigma_band = max(
-            central - scaled_low,
-            scaled_high - central,
-            edge_segment_spread,
-        )
         # The existing band width is in gamma units. Convert its symmetric
-        # gamma-space half-width to dex using the larger log distance to either
-        # edge, then combine it with the measured log10 model scatter in
-        # quadrature. Convert the expanded dex interval back to gamma values.
+        # edge-scaled limits and segment spread to dex using the larger log
+        # distance to either boundary, then add model scatter in quadrature.
+        # Convert the expanded dex interval back to gamma values.
+        band_low = min(scaled_low, central - edge_segment_spread)
+        band_high = max(scaled_high, central + edge_segment_spread)
         sigma_band_log10 = max(
-            math.log10(central / (central - sigma_band)),
-            math.log10((central + sigma_band) / central),
+            math.log10(central / band_low),
+            math.log10(band_high / central),
         )
         target_1400_T_K = points[1][0] + 273.15
         printed_1400_multiplier = points[1][1]

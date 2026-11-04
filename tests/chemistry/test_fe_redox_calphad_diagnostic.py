@@ -12,6 +12,7 @@ from simulator.fe_redox import (
     HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL,
     HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA,
     HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
+    Kress91InvalidControls,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
@@ -73,6 +74,18 @@ def test_holzheid_gamma_interpolates_inside_certified_band(
     assert band["conversion_status"] == "interpolated_verified_range"
     assert band["authority_level"] == "certified"
     assert band["notice"] is None
+
+
+@pytest.mark.parametrize("temperature_K", [math.nan, math.inf, -math.inf])
+def test_holzheid_gamma_refuses_non_finite_temperature(temperature_K: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match="finite positive"):
+        holzheid_stoich_feo_gamma_band(temperature_K)
+
+
+@pytest.mark.parametrize("temperature_K", [0.0, -10.0])
+def test_holzheid_gamma_refuses_non_positive_temperature(temperature_K: float) -> None:
+    with pytest.raises(Kress91InvalidControls, match="finite positive"):
+        holzheid_stoich_feo_gamma_band(temperature_K)
 
 
 @pytest.mark.parametrize(
@@ -214,14 +227,13 @@ def test_holzheid_regular_solution_table_matches_independent_edge_law(
         * (edge_pair[1][1] - edge_pair[0][1])
     )
     assert notice["edge_segment_spread"] == pytest.approx(edge_segment_spread)
-    sigma_band_gamma = max(
-        independent_gamma - scaled_low,
-        scaled_high - independent_gamma,
-        edge_segment_spread,
-    )
+    # Build the independent log interval from the transported sigma edges and
+    # the minimum nearest-segment spread, then symmetrize in dex.
+    band_low_gamma = min(scaled_low, independent_gamma - edge_segment_spread)
+    band_high_gamma = max(scaled_high, independent_gamma + edge_segment_spread)
     sigma_band_log10 = max(
-        math.log10(independent_gamma / (independent_gamma - sigma_band_gamma)),
-        math.log10((independent_gamma + sigma_band_gamma) / independent_gamma),
+        math.log10(independent_gamma / band_low_gamma),
+        math.log10(band_high_gamma / independent_gamma),
     )
     target_1400_T_K = points[1][0] + 273.15
     model_scatter_log10 = max(
