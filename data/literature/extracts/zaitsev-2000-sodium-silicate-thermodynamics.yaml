@@ -355,7 +355,32 @@ species:
         locator: {page: 7, published_page: 535, pdf_page_index: 6, table: '4'}
         phase: l
         units: dimensionless activity
-        standard_state: pure liquid Na2O
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: Na2O
+                phase:
+                  tag: value
+                  value: l
+              component_basis: Na2O
+          inferred: false
+          note: >-
+            Table 4 caption states the standard states are pure liquid SiO2
+            and Na2O (published p.535). The paper uses IVTANTERMO
+            thermodynamic-property data [7] to reduce results to its beta-Na2O
+            standard for partial Gibbs energies (published p.532), but names
+            no separate Gibbs function or table for the liquid activity
+            standard. Reference [7] is L. V. Gurvich, IVTANTERMO: An Automated
+            Database of the Thermodynamic Properties of Substances, Vestn.
+            Akad. Nauk SSSR, 1983, no. 3, pp. 54-65.
+          locator:
+            page: 7
+            published_page: 535
+            pdf_page_index: 6
+            table: '4'
         composition_basis: printed_mole_fraction
         composition_derivation: 'binary Na2O-SiO2 as declared on p.535; x_Na2O = 1 - x_SiO2'
         values:

@@ -3,6 +3,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import Phase, ReferenceStateConvention
 from simulator.battery.migrate import Migrator
 
 
@@ -62,6 +63,24 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert all(
         len(observation.derived_from or ()) == 29 for observation in reduced_silica_rows
     )
+    na2o_rows = [
+        observation
+        for observation in migrator.result.observations.values()
+        if (
+            "::zaitsev_2000_table4_na2o_experimental_activity::"
+            in observation.observation_id
+        )
+    ]
+    assert len(na2o_rows) == 29
+    assert all(
+        observation.identity.reference_state.is_value
+        and observation.identity.reference_state.value.convention
+        is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        and observation.identity.reference_state.value.endmember.formula == "Na2O"
+        and observation.identity.reference_state.value.endmember.phase.value
+        is Phase.L
+        for observation in na2o_rows
+    )
 
     species = document["species"]
     table5 = {
@@ -96,6 +115,12 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
     assert (sio2[0]["activity"], sio2[0]["locator"]["page"]) == ("0.860", 7)
     assert (sio2[-1]["activity"], sio2[-1]["locator"]["page"]) == ("3.77e-6", 7)
     assert (na2o[0]["activity"], na2o[0]["locator"]["page"]) == ("7.19e-10", 7)
+    model_activities = next(
+        item
+        for item in document["species"]["SiO2"]["context"]
+        if item["observation_id"] == "zaitsev_2000_table4_calculated_activities"
+    )
+    assert model_activities["values"]["method_class"] == "model_derived"
 
     own_enthalpy = next(
         row
