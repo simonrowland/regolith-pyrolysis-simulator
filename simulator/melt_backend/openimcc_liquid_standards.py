@@ -34,6 +34,12 @@ def _check_pack_standards(
     helper finish, then omit that oxide from the active map. The checker can
     then classify its declaration as reference-unknown. The temporary hooks
     are serialized and thread-scoped; solve calls run after they are restored.
+
+    INTERIM: remove this hook when t-1647 re-pins to the OpenIMCC release that
+    handles per-oxide unknown references in active_liquid_standards. The lock
+    serializes our patch windows; the thread check delegates unrelated callers
+    to the original functions while the module attributes are patched. Both
+    attributes are restored in finally before any solve call.
     """
     gas = importlib.import_module("openimcc.gas")
     standards = importlib.import_module("openimcc.standards")
@@ -356,9 +362,8 @@ def assess_liquid_standards(
         for record in pack_records.records
         if record.kind in _REFUSAL_KINDS
     )
-    if refusals:
-        return LiquidStandardAssessment(refusals=refusals, flags=())
-
+    # Preserve dependent disclosures even when a separate row causes refusal;
+    # flag-only findings do not become additional refusal causes.
     present_oxides = _positive_composition_oxides(composition)
     flags: list[LiquidStandardFlag] = []
     seen: set[tuple[str, str, str, str, str]] = set()
@@ -430,7 +435,7 @@ def assess_liquid_standards(
                         pack=_pack_label(pack_records.pack, pack_records.role),
                     )
                 )
-    return LiquidStandardAssessment(refusals=(), flags=tuple(flags))
+    return LiquidStandardAssessment(refusals=refusals, flags=tuple(flags))
 
 
 __all__ = [

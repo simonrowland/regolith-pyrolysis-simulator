@@ -3548,6 +3548,7 @@ def _predict_sossi_residue_cohort(
         melt_pack_identity: dict[str, str] = {}
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
+        liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
         if engine == "openimcc":
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 _ENGINE_OUTER_TIMEOUT_S,
@@ -3591,6 +3592,9 @@ def _predict_sossi_residue_cohort(
                         ) from exc
                     gas_parent_oxide_activities = dict(
                         state.parent_oxide_activities
+                    )
+                    liquid_standard_flags.update(
+                        dict.fromkeys(state.liquid_standard_flags)
                     )
                     gas_parent_oxides = tuple(state.parent_oxides)
                     if mno_channel_active:
@@ -3700,6 +3704,9 @@ def _predict_sossi_residue_cohort(
                         "source_id": _SOSSI_SOURCE_ID,
                         "experiment_id": experiment_id,
                         "engine": engine,
+                        "liquid_standard_flags": tuple(
+                            flag.as_dict() for flag in liquid_standard_flags
+                        ),
                         "run_refusal": {
                             **exc.as_record(),
                             "cohort": "sossi_residue_cohort",
@@ -3838,6 +3845,9 @@ def _predict_sossi_residue_cohort(
                         "source_id": _SOSSI_SOURCE_ID,
                         "experiment_id": experiment_id,
                         "engine": engine,
+                        "liquid_standard_flags": tuple(
+                            flag.as_dict() for flag in liquid_standard_flags
+                        ),
                         "run_refusal": {
                             **run_refusal.as_record(),
                             "cohort": "sossi_residue_cohort",
@@ -3919,6 +3929,9 @@ def _predict_sossi_residue_cohort(
                     ),
                     "liquid_rows_used": liquid_rows_used,
                     "melt_pack_identity": dict(melt_pack_identity),
+                    "liquid_standard_flags": tuple(
+                        flag.as_dict() for flag in liquid_standard_flags
+                    ),
                     **(
                         {"melt_activity_input_policy": dict(melt_activity_input_policy)}
                         if melt_activity_input_policy

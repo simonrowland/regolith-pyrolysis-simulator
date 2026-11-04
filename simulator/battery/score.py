@@ -10429,7 +10429,9 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=engine_version,
             )
-        extra_notices.extend(standard_assessment.notices)
+        # The OpenIMCC adapter carries the same flags on the cell and
+        # cell_notices translates them below. Keep this preflight for typed
+        # refusals; attaching its notices here would duplicate each disclosure.
     authority = Authority.BRIDGE
     certified_band = None
     if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
