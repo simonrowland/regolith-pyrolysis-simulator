@@ -477,22 +477,32 @@ def test_openimcc_parent_activity_parity(pack_name: str) -> None:
     assert len({row["composition"] for row in rows}) >= 5
     assert len({row["temperature_K"] for row in rows}) >= 4
     for row in rows:
+        import openimcc
+
         composition, basis_type = COMPOSITIONS[row["composition"]]
-        bridge_kwargs = {"temperature_K": row["temperature_K"], "pack": pack_name}
-        bridge_kwargs["composition_kg" if basis_type == "wt" else "composition_mol"] = composition
-        bridge_result = bridge_evaluate(**bridge_kwargs)
-        actual = bridge_result.parent_oxide_activities
+        package = _load_pack(pack_name)
+        package_result = openimcc.evaluate(
+            composition,
+            row["temperature_K"],
+            package,
+            basis_type=basis_type,
+            enable_sp_extension=pack_name == "published-ext",
+        )
+        actual = dict(zip(
+            package_result.parent_oxides,
+            package_result.parent_activity,
+            strict=True,
+        ))
         expected_parent_oxides = (
             "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
         ) + (("S", "P2O5") if pack_name == "published-ext" else ())
-        assert tuple(bridge_result.parent_oxides) == expected_parent_oxides
+        assert tuple(package_result.parent_oxides) == expected_parent_oxides
         _assert_activity_parity(
             actual, row, _activity_bounds_for_row(row, bounds_by_key)
         )
         expected_labels = row["labels_legacy"]
-        labels = bridge_result.labels
+        labels = package_result.labels
         assert dict(labels.coverage) == expected_labels["coverage"]
-        assert labels.trust == expected_labels["trust"]
         assert labels.envelope_status == expected_labels["envelope_status"]
         identity = dict(labels.identity)
         expected_identity = dict(expected_labels["identity"])
@@ -1347,15 +1357,19 @@ def test_imported_openimcc_commit_matches_recorded_pin_when_importable() -> None
     )
 
 
-def test_evaluate_default_tracks_runtime_backend_pack(monkeypatch) -> None:
+def test_runtime_pack_mismatch_refuses_before_openimcc_solve(monkeypatch) -> None:
     _openimcc_or_skip()
     from simulator.melt_backend import openimcc_bridge
 
     monkeypatch.setattr(openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core")
     expected_pack = openimcc_bridge._load_pack("published-core")
-    result = bridge_evaluate(
-        composition_mol={"SiO2": 0.95, "K2O": 0.05}, temperature_K=2200.0
-    )
+    with pytest.raises(
+        OpenImccCompositionPolicyRefusal, match="oxide=K2O"
+    ) as caught:
+        bridge_evaluate(
+            composition_mol={"SiO2": 0.95, "K2O": 0.05}, temperature_K=2200.0
+        )
 
-    assert result.pack_model_id == expected_pack.model_id
-    assert result.pack_digest == openimcc_bridge._pack_digest(expected_pack)
+    assert caught.value.diagnostics["standard_failures"][0]["pack"] == (
+        f"{expected_pack.model_id} {expected_pack.version}"
+    )

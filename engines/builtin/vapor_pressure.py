@@ -44,7 +44,7 @@ from __future__ import annotations
 
 import math
 import warnings as runtime_warnings
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
@@ -923,6 +923,7 @@ def _same_composition_temperature_bridge(
     from simulator.melt_backend.openimcc_bridge import evaluate_cleaned_melt
 
     points: list[tuple[float, dict[str, float]]] = []
+    standard_flags: dict[tuple[str, str, str, str], Any] = {}
     attempted: list[float] = []
     domain_low, domain_high = openimcc_bridge._temperature_domain_K()
 
@@ -946,6 +947,10 @@ def _same_composition_temperature_bridge(
                 )
             except refusal_types:
                 continue
+            for flag in cleaned.bridge.liquid_standard_flags:
+                standard_flags[
+                    (flag.pack, flag.kind, flag.oxide, flag.row_key)
+                ] = flag
             probe_authority = {
                 "provider": "openimcc",
                 "activities_by_oxide": {
@@ -1064,7 +1069,24 @@ def _same_composition_temperature_bridge(
         "attempted_temperatures_K": attempted,
         "cap_K": _TEMPERATURE_BRIDGE_CAP_K,
         "continuations_by_parent": continuations_by_parent,
+        "liquid_standard_flags": tuple(
+            standard_flags[key] for key in sorted(standard_flags)
+        ),
     }
+
+
+def _openimcc_liquid_standard_notices(flags: Sequence[Any]) -> list[dict[str, Any]]:
+    """Translate bridge standard records to the vapor-pressure diagnostics."""
+    return [
+        {
+            "kind": "openimcc_liquid_standard",
+            "code": "openimcc_liquid_standard",
+            "standard_kind": flag.kind,
+            "reason": flag.reason,
+            **flag.as_dict(),
+        }
+        for flag in flags
+    ]
 
 
 def _build_high_t_melt_activity_authority(
@@ -1257,12 +1279,20 @@ def _build_high_t_melt_activity_authority(
             bridge_result["continuations_by_parent"] if bridge_result else {}
         )
         if bridge_result is not None:
+            standard_notices = _openimcc_liquid_standard_notices(
+                bridge_result["liquid_standard_flags"]
+            )
+            base["notices"].extend(standard_notices)
             base["temperature_bridge"] = {
                 "call_count": bridge_result["call_count"],
                 "attempted_temperatures_K": list(
                     bridge_result["attempted_temperatures_K"]
                 ),
                 "cap_K": bridge_result["cap_K"],
+                "liquid_standard_flags": [
+                    flag.as_dict()
+                    for flag in bridge_result["liquid_standard_flags"]
+                ],
             }
         can_continue = (
             hour is not None and bool(certificates)
@@ -1471,7 +1501,11 @@ def _build_high_t_melt_activity_authority(
             bridge.parent_oxide_x_star_ratios,
         )
     )
-    base["notices"].extend(typed_openimcc_notices)
+    liquid_standard_flags = tuple(bridge.liquid_standard_flags)
+    liquid_standard_notices = _openimcc_liquid_standard_notices(
+        liquid_standard_flags
+    )
+    base["notices"].extend([*liquid_standard_notices, *typed_openimcc_notices])
     base.update(
         {
             "activities_by_oxide": dict(cleaned.single_cation_activities),
@@ -1488,9 +1522,15 @@ def _build_high_t_melt_activity_authority(
             "openimcc_pack_digest": bridge.pack_digest,
             "openimcc_flags": list(bridge.flags),
             "openimcc_notices": (
-                list(bridge.notices) + policy_notices + typed_openimcc_notices
+                list(bridge.notices)
+                + policy_notices
+                + liquid_standard_notices
+                + typed_openimcc_notices
             ),
             "openimcc_typed_notices": typed_openimcc_notices,
+            "openimcc_liquid_standard_flags": [
+                flag.as_dict() for flag in liquid_standard_flags
+            ],
             "openimcc_policy_notices": policy_notices,
             "openimcc_envelope_status": bridge.envelope_status,
             "openimcc_extrapolated": bool(bridge.extrapolated),

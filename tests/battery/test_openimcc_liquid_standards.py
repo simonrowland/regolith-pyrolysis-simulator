@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from types import SimpleNamespace
-from typing import Any, Callable
+from typing import Any
 
 import openimcc
 from openimcc.redox_pack import load_redox_pack
@@ -10,22 +10,14 @@ from openimcc.redox_pack import load_redox_pack
 from simulator.battery.enums import (
     AmountBasis,
     Engine,
-    NoticeKind,
-    Quantity,
     RefusalReason,
 )
 from simulator.battery.records import Composition, State
 from simulator.battery import residue
 from simulator.battery import score
+from simulator.melt_backend import openimcc_bridge
 from simulator.melt_backend.openimcc_bridge import _load_pack
-
-
-def _resolve_standards() -> Callable[..., Any]:
-    resolver = getattr(
-        score, "_resolve_openimcc_liquid_reference_standards", None
-    )
-    assert callable(resolver), "OpenIMCC liquid-reference owner is missing"
-    return resolver
+from simulator.melt_backend.openimcc_liquid_standards import assess_liquid_standards
 
 
 def _default_composition() -> dict[str, float]:
@@ -33,58 +25,47 @@ def _default_composition() -> dict[str, float]:
     return {oxide: 1.0 for oxide in pack.parent_oxides} | {"MnO": 1.0}
 
 
-def _notice_facts(notices: tuple[Any, ...]) -> list[str]:
-    assert all(notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT for notice in notices)
-    return [notice.reason for notice in notices]
+def _flag_facts(flags: tuple[Any, ...]) -> set[tuple[str, str, str, str]]:
+    return {
+        (flag.pack, flag.oxide, flag.kind, flag.row_key)
+        for flag in flags
+    }
 
 
 def test_sf04_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
-    resolve = _resolve_standards()
-    assessment = resolve(
+    assessment = assess_liquid_standards(
+        _load_pack("published-core"),
+        load_redox_pack(),
+        None,
         {"K2O": 1.0, "SiO2": 1.0},
-        Quantity.ACTIVITY,
-        consumer="melt",
-        melt_pack=_load_pack("published-core"),
-        redox_pack=load_redox_pack(),
     )
 
-    assert assessment.refusal_reason is RefusalReason.METRIC_DOMAIN
-    reason = str(assessment.refusal_detail["reason"])
-    assert "oxide=K2O" in reason
-    assert "pack=IMCC-SF04 1.0.2" in reason
-    assert assessment.refusal_detail["category"] == 2
-    failures = assessment.refusal_detail["standard_failures"]
+    assert not assessment.flags
     assert any(
-        failure["kind"] == "mismatch"
-        and failure["oxide"] == "K2O"
-        and failure["declared_standard_id"]
-        and failure["active_standard_id"]
-        and failure["declared_standard_id"] != failure["active_standard_id"]
-        for failure in failures
+        failure.kind == "mismatch"
+        and failure.oxide == "K2O"
+        and failure.declared_standard_id
+        and failure.active_standard_id
+        and failure.declared_standard_id != failure.active_standard_id
+        for failure in assessment.refusals
     )
-    assert assessment.notices == ()
 
 
 def test_redox_consumer_refuses_melt_pack_standard_mismatch() -> None:
-    assessment = _resolve_standards()(
+    assessment = assess_liquid_standards(
+        _load_pack("published-core"),
+        load_redox_pack(),
+        None,
         {"K2O": 1.0, "SiO2": 1.0},
-        Quantity.FE3_FE2_RATIO,
-        consumer="redox",
-        melt_pack=_load_pack("published-core"),
-        redox_pack=load_redox_pack(),
     )
 
-    assert assessment.refusal_reason is RefusalReason.METRIC_DOMAIN
-    assert assessment.refusal_detail["category"] == 2
-    failures = assessment.refusal_detail["standard_failures"]
     assert any(
-        failure["kind"] == "mismatch" and failure["oxide"] == "K2O"
-        for failure in failures
+        failure.kind == "mismatch" and failure.oxide == "K2O"
+        for failure in assessment.refusals
     )
 
 
 def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
-    resolve = _resolve_standards()
     melt_pack = _load_pack("default")
     redox_pack = load_redox_pack()
     records = openimcc.check_pack_standards(
@@ -111,42 +92,30 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     assert len(unknown_records & active_rows) == 3
     assert sum(record.kind == "non-source-basis" for record in records) == 3
 
-    melt_assessment = resolve(
-        _default_composition(),
-        Quantity.ACTIVITY,
-        consumer="melt",
-        melt_pack=melt_pack,
-        redox_pack=redox_pack,
+    melt_assessment = assess_liquid_standards(
+        melt_pack, None, None, _default_composition()
     )
-    redox_assessment = resolve(
-        _default_composition(),
-        Quantity.ACTIVITY,
-        consumer="redox",
-        melt_pack=melt_pack,
-        redox_pack=redox_pack,
+    redox_assessment = assess_liquid_standards(
+        melt_pack, redox_pack, None, _default_composition()
     )
-    assert melt_assessment.refusal_reason is None
-    assert redox_assessment.refusal_reason is None
+    assert not melt_assessment.refusals
+    assert not redox_assessment.refusals
 
-    melt_facts = _notice_facts(melt_assessment.notices)
-    facts = _notice_facts(redox_assessment.notices)
+    melt_facts = _flag_facts(melt_assessment.flags)
+    facts = _flag_facts(redox_assessment.flags)
     assert len(melt_facts) == 10
-    assert set(melt_facts).issubset(facts)
+    assert melt_facts.issubset(facts)
     unknown_rows = {
-        fact.split("row=", 1)[1].split(";", 1)[0]
-        for fact in facts
-        if "kind=reference-unknown" in fact
+        row_key
+        for _pack, _oxide, kind, row_key in facts
+        if kind == "reference-unknown"
     }
     assert unknown_rows == {"K2SiO3", "K2Si2O5", "K2Si4O9"}
 
     non_source_rows = {
-        (
-            fact.split("pack=", 1)[1].split(";", 1)[0],
-            fact.split("oxide=", 1)[1].split(";", 1)[0],
-            fact.split("row=", 1)[1].split(";", 1)[0],
-        )
-        for fact in facts
-        if "kind=non-source-basis" in fact
+        (pack, oxide, row_key)
+        for pack, oxide, kind, row_key in facts
+        if kind == "non-source-basis"
     }
     assert non_source_rows == {
         ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O", "KAlSiO4"),
@@ -163,28 +132,23 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     }
     assert len(facts) == 14
     assert all(
-        "standard_id=" in fact and "basis=" in fact and "citation=" in fact
-        for fact in facts
+        flag.standard_id and flag.basis and flag.citation
+        for flag in redox_assessment.flags
     )
 
 
 def test_missing_reaction_oxide_suppresses_that_rows_notice() -> None:
-    resolve = _resolve_standards()
     composition = _default_composition()
     composition.pop("SiO2")
-    assessment = resolve(
-        composition,
-        Quantity.ACTIVITY,
-        consumer="melt",
-        melt_pack=_load_pack("default"),
-        redox_pack=load_redox_pack(),
+    assessment = assess_liquid_standards(
+        _load_pack("default"), None, None, composition
     )
 
-    assert assessment.refusal_reason is None
+    assert not assessment.refusals
     assert "K2SiO3" not in {
-        fact.split("row=", 1)[1].split(";", 1)[0]
-        for fact in _notice_facts(assessment.notices)
-        if "kind=reference-unknown" in fact
+        flag.row_key
+        for flag in assessment.flags
+        if flag.kind == "reference-unknown"
     }
 
 
@@ -232,9 +196,7 @@ def test_hashimoto_residue_route_refuses_melt_pack_mismatch(
 ) -> None:
     mismatch_pack = _load_pack("published-core")
     monkeypatch.setattr(
-        openimcc,
-        "load_datapack",
-        lambda *_args, **_kwargs: mismatch_pack,
+        openimcc_bridge, "_load_pack", lambda _name: mismatch_pack
     )
     composition = Composition(
         basis="mole_inventory",

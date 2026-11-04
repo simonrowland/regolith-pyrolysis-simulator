@@ -44,6 +44,11 @@ from simulator.melt_backend.base import (
     MeltBackend,
     split_cleaned_melt_account,
 )
+from simulator.melt_backend.openimcc_liquid_standards import (
+    LiquidStandardAssessment,
+    LiquidStandardFlag,
+    assess_liquid_standards,
+)
 
 try:  # Optional dependency: C1 must remain importable without openimcc.
     import openimcc as _openimcc
@@ -230,6 +235,14 @@ class OpenImccCompositionPolicyRefusal(RuntimeError):
         super().__init__(f"reason={self.code}: {detail}")
 
 
+@dataclass(frozen=True)
+class OpenImccRedoxBridgeResult:
+    """One redox solve and its dependent liquid-reference flag records."""
+
+    result: Any
+    liquid_standard_flags: tuple[LiquidStandardFlag, ...]
+
+
 class OpenImccOxygenBalanceUnavailableError(RuntimeError):
     """Typed refusal when the installed package lacks the balance solver."""
 
@@ -280,6 +293,7 @@ class OpenImccBridgeResult:
     coverage: Mapping[str, str]
     activity_coefficients: Mapping[str, Mapping[str, Any]] | None = None
     parent_oxide_x_star_ratios: Mapping[str, float] = field(default_factory=dict)
+    liquid_standard_flags: tuple[LiquidStandardFlag, ...] = ()
 
     def to_transport(self) -> dict[str, Any]:
         """Return every result field in a plain, multiprocessing-safe shape."""
@@ -310,6 +324,9 @@ class OpenImccBridgeResult:
                 for key, value in (self.activity_coefficients or {}).items()
             },
             "parent_oxide_x_star_ratios": dict(self.parent_oxide_x_star_ratios),
+            "liquid_standard_flags": tuple(
+                flag.as_dict() for flag in self.liquid_standard_flags
+            ),
         }
 
     @classmethod
@@ -332,6 +349,10 @@ class OpenImccBridgeResult:
             coverage=payload["coverage"],
             activity_coefficients=payload["activity_coefficients"],
             parent_oxide_x_star_ratios=payload["parent_oxide_x_star_ratios"],
+            liquid_standard_flags=tuple(
+                LiquidStandardFlag(**item)
+                for item in payload.get("liquid_standard_flags", ())
+            ),
         )
 
     def __post_init__(self) -> None:
@@ -356,6 +377,7 @@ class OpenImccBridgeResult:
                 }
             ),
         )
+        object.__setattr__(self, "liquid_standard_flags", tuple(self.liquid_standard_flags))
 
 
 @dataclass(frozen=True)
@@ -419,6 +441,79 @@ def _require_openimcc() -> Any:
     if _openimcc is None:
         raise OpenImccUnavailableError(_OPENIMCC_IMPORT_ERROR)
     return _openimcc
+
+
+def liquid_standard_assessment(
+    composition: Mapping[str, float],
+    *,
+    melt_pack: Any | None = None,
+    redox_pack: Any | None = None,
+    include_redox: bool = False,
+    profile: str | None = None,
+) -> LiquidStandardAssessment:
+    """Check the exact loaded pack set through the shared domain owner."""
+
+    _require_openimcc()
+    if melt_pack is None:
+        melt_pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
+    if include_redox and redox_pack is None:
+        from openimcc.redox_pack import load_redox_pack
+
+        redox_pack = load_redox_pack()
+    return assess_liquid_standards(
+        melt_pack,
+        redox_pack,
+        profile,
+        composition,
+    )
+
+
+def _refuse_on_liquid_standard_failures(
+    assessment: LiquidStandardAssessment,
+) -> None:
+    if assessment.refusals:
+        failures = tuple(item.as_dict() for item in assessment.refusals)
+        reason = (
+            "invalid_input; fail_closed_category=2; "
+            "openimcc liquid-reference refusal: "
+            + " | ".join(item.reason for item in assessment.refusals)
+        )
+        raise OpenImccCompositionPolicyRefusal(
+            "openimcc_liquid_standard_refused",
+            reason,
+            diagnostics={
+                "invalid_input": True,
+                "category": 2,
+                "standard_failures": failures,
+            },
+        )
+
+
+def check_liquid_reference_standards(
+    composition: Mapping[str, float],
+    *,
+    melt_pack: Any | None = None,
+    redox_pack: Any | None = None,
+    include_redox: bool = False,
+    profile: str | None = None,
+) -> tuple[LiquidStandardFlag, ...]:
+    """Apply the shared domain owner's typed outcome to one pack set."""
+
+    _require_openimcc()
+    if melt_pack is None:
+        melt_pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
+    if include_redox and redox_pack is None:
+        from openimcc.redox_pack import load_redox_pack
+
+        redox_pack = load_redox_pack()
+    assessment = liquid_standard_assessment(
+        composition,
+        melt_pack=melt_pack,
+        redox_pack=redox_pack,
+        profile=profile,
+    )
+    _refuse_on_liquid_standard_failures(assessment)
+    return assessment.flags
 
 
 def evaluate_gas_oxygen_balance(
@@ -963,6 +1058,10 @@ def evaluate(
     if pack is None:
         pack = DEFAULT_BACKEND_PACK_NAME
     loaded_pack = _load_pack(pack)
+    liquid_flags = check_liquid_reference_standards(
+        composition,
+        melt_pack=loaded_pack,
+    )
     result = package.evaluate(
         composition,
         float(temperature_K),
@@ -1047,10 +1146,44 @@ def evaluate(
         coverage={str(name): str(value) for name, value in labels.coverage.items()},
         activity_coefficients=activity_coefficients,
         parent_oxide_x_star_ratios=parent_oxide_x_star_ratios,
+        liquid_standard_flags=liquid_flags,
     )
 
 
 evaluate_openimcc = evaluate
+
+
+def evaluate_redox(
+    inventory: Mapping[str, float],
+    temperature_K: float,
+    mode: str,
+    *,
+    composition: Mapping[str, float],
+    lambda_imposed: float | None = None,
+) -> OpenImccRedoxBridgeResult:
+    """Evaluate OpenIMCC redox after checking both packs used by its solve."""
+
+    package = _require_openimcc()
+    melt_pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
+    from openimcc.redox_pack import load_redox_pack
+
+    redox_pack = load_redox_pack()
+    standard_flags = check_liquid_reference_standards(
+        composition,
+        melt_pack=melt_pack,
+        redox_pack=redox_pack,
+    )
+    evaluator = getattr(package, "evaluate_redox", None)
+    if not callable(evaluator):
+        from openimcc.redox import evaluate_redox as evaluator
+
+    result = evaluator(
+        inventory,
+        temperature_K,
+        mode,
+        lambda_imposed=lambda_imposed,
+    )
+    return OpenImccRedoxBridgeResult(result, standard_flags)
 
 
 class OpenImccMeltBackend(MeltBackend):
@@ -1151,6 +1284,13 @@ class OpenImccMeltBackend(MeltBackend):
                 status="out_of_domain",
                 warnings=[str(exc)],
                 phase_assemblage_available=False,
+                diagnostics={
+                    "openimcc_liquid_standard_refusal": dict(
+                        getattr(exc, "diagnostics", {})
+                    )
+                }
+                if isinstance(exc, OpenImccCompositionPolicyRefusal)
+                else {},
             )
         return EquilibriumResult(
             temperature_C=temperature_C,
@@ -1160,6 +1300,11 @@ class OpenImccMeltBackend(MeltBackend):
             activity_coefficients=dict(result.parent_oxide_activities),
             phase_assemblage_available=False,
             liquid_fraction=None,
+            diagnostics={
+                "openimcc_liquid_standard_flags": [
+                    flag.as_dict() for flag in result.liquid_standard_flags
+                ]
+            },
         )
 
 
@@ -1167,6 +1312,7 @@ __all__ = [
     "OPENIMCC_INSTALL_HINT",
     "OpenImccBridgeResult",
     "OpenImccMeltBackend",
+    "OpenImccRedoxBridgeResult",
     "OpenImccCleanedMeltResult",
     "OpenImccCompositionPolicyRefusal",
     "OpenImccUnavailableError",
@@ -1174,5 +1320,8 @@ __all__ = [
     "FE2O3_TO_FEO_TOTAL_WT_FACTOR",
     "evaluate",
     "evaluate_cleaned_melt",
+    "evaluate_redox",
+    "liquid_standard_assessment",
     "evaluate_openimcc",
+    "check_liquid_reference_standards",
 ]

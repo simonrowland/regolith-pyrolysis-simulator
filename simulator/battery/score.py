@@ -6651,317 +6651,63 @@ def _openimcc_redox_result_evidence(
 
 
 @dataclass(frozen=True)
-class _OpenImccLiquidStandardIndex:
-    melt_records: tuple[Any, ...]
-    redox_records: tuple[Any, ...]
-    melt_rows: Mapping[str, frozenset[str]]
-    redox_rows: Mapping[str, frozenset[str]]
-    melt_row_standards: Mapping[str, Any]
-    redox_row_standards: Mapping[str, Any]
-
-
-@dataclass(frozen=True)
 class _OpenImccLiquidStandardAssessment:
     refusal_reason: RefusalReason | None
     refusal_detail: Mapping[str, object]
     notices: tuple[Notice, ...]
+    flags: tuple[Any, ...] = ()
 
 
-_OPENIMCC_LIQUID_STANDARD_INDEX: dict[
-    tuple[str, str], _OpenImccLiquidStandardIndex
-] = {}
-
-
-def _openimcc_oxide_name(value: object) -> str:
-    return str(value).removesuffix("(l)")
-
-
-def _openimcc_melt_pack_rows(pack: object) -> dict[str, frozenset[str]]:
-    kernel = getattr(pack, "kernel_datapack", None)
-    reactions = getattr(kernel, "reactions", ())
-    parents = getattr(kernel, "parent_oxides", ())
-    stoichiometry = getattr(kernel, "nu", None)
-    if stoichiometry is None:
-        return {}
-    rows: dict[str, frozenset[str]] = {}
-    for row_index, row_key in enumerate(reactions):
-        reactant_oxides = frozenset(
-            _openimcc_oxide_name(parent)
-            for parent_index, parent in enumerate(parents)
-            if float(stoichiometry[parent_index, row_index]) != 0.0
+def _openimcc_liquid_standard_notices(
+    flags: Sequence[Any], quantity: Quantity
+) -> tuple[Notice, ...]:
+    """Translate bridge flag records to the battery's notice contract."""
+    return tuple(
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(quantity,),
+            reason=flag.reason,
+            origin="openimcc.check_pack_standards",
         )
-        rows[str(row_key)] = reactant_oxides
-    return rows
-
-
-def _openimcc_redox_pack_rows(pack: object) -> dict[str, frozenset[str]]:
-    content = getattr(pack, "content", {})
-    if not isinstance(content, Mapping):
-        return {}
-    parent_oxides = {
-        _openimcc_oxide_name(parent.get("parent_oxide"))
-        for parent in content.get("parent_registry", ())
-        if isinstance(parent, Mapping)
-        and isinstance(parent.get("parent_oxide"), str)
-        and "O" in str(parent["parent_oxide"])
-    }
-    rows: dict[str, frozenset[str]] = {}
-    for row in content.get("rows", ()):
-        if not isinstance(row, Mapping):
-            continue
-        species: set[str] = set()
-        for side in ("reactants", "products"):
-            terms = row.get(side, {})
-            if isinstance(terms, Mapping):
-                species.update(str(name) for name in terms)
-        reactant_oxides = frozenset(
-            oxide
-            for name in species
-            if (oxide := _openimcc_oxide_name(name)) in parent_oxides
-        )
-        row_key = row.get("complex") or row.get("row")
-        if row_key is not None:
-            rows[str(row_key)] = reactant_oxides
-    return rows
-
-
-def _openimcc_flagged_row_standards(
-    pack: object,
-    rows: Mapping[str, frozenset[str]],
-    records: Sequence[Any],
-) -> dict[str, Any]:
-    import openimcc
-
-    row_keys: set[str] = set()
-    for record in records:
-        if record.kind not in {"reference-unknown", "non-source-basis"}:
-            continue
-        candidates = (
-            (record.row_key,)
-            if record.row_key is not None
-            else rows.keys()
-        )
-        row_keys.update(
-            row_key
-            for row_key in candidates
-            if row_key in rows and record.oxide in rows[row_key]
-        )
-    return {
-        row_key: openimcc.pack_row_liquid_standards(pack, row_key)
-        for row_key in row_keys
-    }
-
-
-def _openimcc_standard_index(
-    melt_pack: object, redox_pack: object
-) -> _OpenImccLiquidStandardIndex:
-    import openimcc
-
-    melt_digest = str(
-        getattr(melt_pack, "binding_digest", None) or id(melt_pack)
+        for flag in flags
     )
-    redox_digest = str(
-        getattr(redox_pack, "canonical_digest", None) or id(redox_pack)
-    )
-    cache_key = (melt_digest, redox_digest)
-    cached = _OPENIMCC_LIQUID_STANDARD_INDEX.get(cache_key)
-    if cached is not None:
-        return cached
-
-    melt_rows = _openimcc_melt_pack_rows(melt_pack)
-    redox_rows = _openimcc_redox_pack_rows(redox_pack)
-    melt_records = tuple(openimcc.check_pack_standards(melt_pack))
-    all_records = tuple(
-        openimcc.check_pack_standards(melt_pack, redox_pack=redox_pack)
-    )
-    index = _OpenImccLiquidStandardIndex(
-        melt_records=melt_records,
-        redox_records=all_records[len(melt_records):],
-        melt_rows=melt_rows,
-        redox_rows=redox_rows,
-        melt_row_standards=_openimcc_flagged_row_standards(
-            melt_pack, melt_rows, melt_records
-        ),
-        redox_row_standards=_openimcc_flagged_row_standards(
-            redox_pack, redox_rows, all_records[len(melt_records):]
-        ),
-    )
-    _OPENIMCC_LIQUID_STANDARD_INDEX[cache_key] = index
-    return index
 
 
-def _openimcc_positive_composition_oxides(
-    composition: Mapping[str, object],
-) -> frozenset[str]:
-    oxides: set[str] = set()
-    for name, raw_amount in composition.items():
-        if isinstance(raw_amount, bool):
-            continue
-        try:
-            amount = float(raw_amount)
-        except (TypeError, ValueError, OverflowError):
-            continue
-        if not math.isfinite(amount) or amount <= 0.0:
-            continue
-        oxide = _openimcc_oxide_name(name)
-        oxides.add("FeO" if oxide == "FeO_total" else oxide)
-        if oxide == "Fe2O3":
-            # The OpenIMCC battery path folds ferric oxide onto its FeO basis.
-            oxides.add("FeO")
-    return frozenset(oxides)
-
-
-def _openimcc_liquid_standard_pack_label(pack: object, role: str) -> str:
-    if role == "redox":
-        content = getattr(pack, "content", {})
-        version = (
-            content.get("version", "unknown")
-            if isinstance(content, Mapping)
-            else "unknown"
-        )
-        return f"openimcc-redox-pack {version}"
-    model_id = str(getattr(pack, "model_id", "openimcc melt pack"))
-    version = str(getattr(pack, "version", "unknown"))
-    return f"{model_id} {version}"
-
-
-def _resolve_openimcc_liquid_reference_standards(
+def _score_openimcc_liquid_standard_assessment(
     composition: Mapping[str, object],
     quantity: Quantity,
     *,
-    consumer: Literal["melt", "redox"],
+    include_redox: bool = False,
     melt_pack: object | None = None,
-    redox_pack: object | None = None,
 ) -> _OpenImccLiquidStandardAssessment:
-    """Resolve pack references once, then disclose only composition dependencies."""
-    import openimcc
+    """Translate typed bridge outcomes for score rows that consume OpenIMCC."""
+    from simulator.melt_backend.openimcc_bridge import (
+        OpenImccCompositionPolicyRefusal,
+        check_liquid_reference_standards,
+    )
 
-    from openimcc.redox_pack import load_redox_pack
-
-    if melt_pack is None:
-        melt_pack = openimcc.load_datapack()
-    if redox_pack is None:
-        redox_pack = load_redox_pack()
-    index = _openimcc_standard_index(melt_pack, redox_pack)
-    relevant: list[tuple[Any, str]] = [
-        (record, "melt") for record in index.melt_records
-    ]
-    if consumer == "redox":
-        relevant.extend((record, "redox") for record in index.redox_records)
-
-    refusal_kinds = {"mismatch", "undeclared", "redox-mismatch"}
-    refusal_records = [
-        (record, role)
-        for record, role in relevant
-        if record.kind in refusal_kinds
-    ]
-    if refusal_records:
-        failures: list[dict[str, object]] = []
-        reasons: list[str] = []
-        for record, role in refusal_records:
-            pack = melt_pack if role == "melt" else redox_pack
-            pack_label = _openimcc_liquid_standard_pack_label(pack, role)
-            active = record.active or "<missing>"
-            reasons.append(
-                f"kind={record.kind}; oxide={record.oxide}; "
-                f"declared={record.declared}; active={active}; pack={pack_label}"
-            )
-            failures.append(
-                {
-                    "kind": record.kind,
-                    "oxide": record.oxide,
-                    "declared_standard_id": record.declared,
-                    "active_standard_id": record.active,
-                    "pack": pack_label,
-                }
-            )
-        reason = (
-            "invalid_input; fail_closed_category=2; "
-            "openimcc liquid-reference refusal: "
-            + " | ".join(reasons)
+    try:
+        flags = check_liquid_reference_standards(
+            composition,
+            melt_pack=melt_pack,
+            include_redox=include_redox,
         )
+    except OpenImccCompositionPolicyRefusal as exc:
         return _OpenImccLiquidStandardAssessment(
             refusal_reason=RefusalReason.METRIC_DOMAIN,
             refusal_detail={
-                "reason": reason,
-                "category": 2,
-                "invalid_input": True,
-                "standard_failures": tuple(failures),
+                "reason": str(exc),
+                "category": exc.diagnostics.get("category", 2),
+                "invalid_input": exc.diagnostics.get("invalid_input", True),
+                "standard_failures": exc.diagnostics.get("standard_failures", ()),
             },
             notices=(),
         )
-
-    present_oxides = _openimcc_positive_composition_oxides(composition)
-    notices: list[Notice] = []
-    seen_reasons: set[str] = set()
-    for record, role in relevant:
-        if record.kind not in {"reference-unknown", "non-source-basis"}:
-            continue
-        pack = melt_pack if role == "melt" else redox_pack
-        rows = index.melt_rows if role == "melt" else index.redox_rows
-        row_standards = (
-            index.melt_row_standards
-            if role == "melt"
-            else index.redox_row_standards
-        )
-        row_keys = (record.row_key,) if record.row_key is not None else rows.keys()
-        for row_key in row_keys:
-            reaction_oxides = rows.get(row_key)
-            effective = row_standards.get(row_key)
-            if reaction_oxides is None or effective is None:
-                continue
-            if record.oxide not in reaction_oxides:
-                continue
-            # Physics ruling: a row is a dependency when every oxide in its
-            # reaction is present above zero in the evaluated composition.
-            # This intentionally over-flags uncertain active rows, which is
-            # the safe direction for disclosure until OpenIMCC reports rows
-            # that entered the solve.
-            if not reaction_oxides.issubset(present_oxides):
-                continue
-            if record.kind == "reference-unknown":
-                if effective.get(record.oxide) != record.declared:
-                    continue
-                standard_id = record.declared
-                basis = effective.standard_basis.get(record.oxide) or "unknown"
-                citation = (
-                    effective.standard_citations.get(record.oxide)
-                    or record.citation
-                    or "unknown"
-                )
-            else:
-                if (
-                    effective.get(record.oxide) != record.standard_id
-                    or effective.standard_basis.get(record.oxide) != record.basis
-                ):
-                    continue
-                standard_id = record.standard_id or record.declared
-                basis = record.basis or "unknown"
-                citation = record.citation or "unknown"
-            pack_label = _openimcc_liquid_standard_pack_label(pack, role)
-            reason = (
-                f"openimcc_liquid_standard; kind={record.kind}; "
-                f"pack={pack_label}; "
-                f"row={row_key}; oxide={record.oxide}; "
-                f"standard_id={standard_id}; "
-                f"active_standard_id={record.active or 'unknown'}; "
-                f"basis={basis}; citation={citation}"
-            )
-            if reason in seen_reasons:
-                continue
-            seen_reasons.add(reason)
-            notices.append(
-                Notice(
-                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
-                    affected_quantities=(quantity,),
-                    reason=reason,
-                    origin="openimcc.check_pack_standards",
-                )
-            )
     return _OpenImccLiquidStandardAssessment(
         refusal_reason=None,
         refusal_detail={},
-        notices=tuple(notices),
+        notices=_openimcc_liquid_standard_notices(flags, quantity),
+        flags=tuple(flags),
     )
 
 
@@ -6985,11 +6731,7 @@ def _openimcc_residue_standard_assessment(
         components = composition
     else:
         components = {}
-    return _resolve_openimcc_liquid_reference_standards(
-        components,
-        quantity,
-        consumer="melt",
-    )
+    return _score_openimcc_liquid_standard_assessment(components, quantity)
 
 
 def _openimcc_standard_refusal_prediction(
@@ -7095,7 +6837,10 @@ def _predict_distin_closed_feo_activity(
     inventory["Fe"] = inventory.get("Fe", 0.0) + 1.0
     try:
         import openimcc
-        import openimcc.redox as openimcc_redox
+        from simulator.melt_backend.openimcc_bridge import (
+            OpenImccCompositionPolicyRefusal,
+            evaluate_redox,
+        )
     except ImportError as exc:
         return refused(
             RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -7104,26 +6849,30 @@ def _predict_distin_closed_feo_activity(
                 "detail": str(exc),
             },
         )
-    standard_assessment = _resolve_openimcc_liquid_reference_standards(
-        dict(composition.components),
-        Quantity.ACTIVITY,
-        consumer="redox",
-    )
-    if standard_assessment.refusal_reason is not None:
-        return refused(
-            standard_assessment.refusal_reason,
-            standard_assessment.refusal_detail,
-        )
     try:
-        result = openimcc_redox.evaluate_redox(
-            inventory, float(temperature_K), "closed"
+        bridge_result = evaluate_redox(
+            inventory,
+            float(temperature_K),
+            "closed",
+            composition=dict(composition.components),
+        )
+    except OpenImccCompositionPolicyRefusal as exc:
+        return refused(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": str(exc),
+                **exc.diagnostics,
+            },
         )
     except openimcc.ImccRefusal as exc:
         return refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "openimcc_closed_redox_refused", "detail": str(exc)},
-            standard_assessment.notices,
         )
+    result = bridge_result.result
+    standard_notices = _openimcc_liquid_standard_notices(
+        bridge_result.liquid_standard_flags, Quantity.ACTIVITY
+    )
     if result.metal_buffered is not True:
         return refused(
             RefusalReason.METRIC_DOMAIN,
@@ -7132,7 +6881,7 @@ def _predict_distin_closed_feo_activity(
                 "metal_buffered": bool(result.metal_buffered),
                 "flags": list(result.flags),
             },
-            standard_assessment.notices,
+            standard_notices,
         )
     try:
         activity = float(result.parent_activity["FeO"])
@@ -7141,7 +6890,7 @@ def _predict_distin_closed_feo_activity(
         return refused(
             RefusalReason.METRIC_DOMAIN,
             {"reason": "openimcc_closed_redox_output_missing", "detail": str(exc)},
-            standard_assessment.notices,
+            standard_notices,
         )
     if not math.isfinite(activity) or activity <= 0.0 or not math.isfinite(fo2_log):
         return refused(
@@ -7151,12 +6900,12 @@ def _predict_distin_closed_feo_activity(
                 "a_FeO": activity,
                 "log10_fO2_bar": fo2_log,
             },
-            standard_assessment.notices,
+            standard_notices,
         )
     authority, band, notices = _openimcc_redox_result_evidence(
         result, Quantity.ACTIVITY
     )
-    notices = (*standard_assessment.notices, *notices)
+    notices = (*standard_notices, *notices)
     from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
 
     oxygen_notice = fo2_tier_notice(
@@ -7341,6 +7090,10 @@ def _predict_fe_redox(
             )
         try:
             import openimcc
+            from simulator.melt_backend.openimcc_bridge import (
+                OpenImccCompositionPolicyRefusal,
+                evaluate_redox,
+            )
         except ImportError as exc:
             return refused(
                 RefusalReason.OPENIMCC_NOT_IMPORTABLE,
@@ -7349,41 +7102,43 @@ def _predict_fe_redox(
                     "detail": str(exc),
                 },
             )
-        standard_assessment = _resolve_openimcc_liquid_reference_standards(
-            material.composition_wt,
-            Quantity.FE3_FE2_RATIO,
-            consumer="redox",
-        )
-        if standard_assessment.refusal_reason is not None:
-            return refused(
-                standard_assessment.refusal_reason,
-                standard_assessment.refusal_detail,
-            )
         try:
-            result = openimcc.evaluate_redox(
+            bridge_result = evaluate_redox(
                 inventory,
                 float(material.temperature),
                 "imposed",
+                composition=material.composition_wt,
                 lambda_imposed=float(fo2_log) * math.log(10.0),
+            )
+        except OpenImccCompositionPolicyRefusal as exc:
+            return refused(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": str(exc),
+                    **exc.diagnostics,
+                },
             )
         except openimcc.ImccRefusal as exc:
             return refused(
                 RefusalReason.METRIC_DOMAIN,
                 {"reason": "openimcc_redox_refused", "detail": str(exc)},
-                notices=standard_assessment.notices,
             )
+        result = bridge_result.result
+        standard_notices = _openimcc_liquid_standard_notices(
+            bridge_result.liquid_standard_flags, Quantity.FE3_FE2_RATIO
+        )
         prediction_value = result.ferric_fe_mol / result.ferrous_fe_mol
         if not math.isfinite(prediction_value) or prediction_value <= 0.0:
             return refused(
                 RefusalReason.METRIC_DOMAIN,
                 {"reason": "predicted_fe3_fe2_ratio_nonpositive_or_nonfinite"},
-                notices=standard_assessment.notices,
+                notices=standard_notices,
             )
 
         authority, band, notices = _openimcc_redox_result_evidence(
             result, Quantity.FE3_FE2_RATIO
         )
-        notices = (*standard_assessment.notices, *notices)
+        notices = (*standard_notices, *notices)
         prediction_identity = replace(
             identity,
             composition=material.composition_state,
@@ -9277,10 +9032,8 @@ def _predict_mass_loss_with_residue(
             if isinstance(initial_value, Composition)
             else {}
         )
-        standard_assessment = _resolve_openimcc_liquid_reference_standards(
-            components,
-            Quantity.MASS_LOSS_FRACTION,
-            consumer="melt",
+        standard_assessment = _score_openimcc_liquid_standard_assessment(
+            components, Quantity.MASS_LOSS_FRACTION
         )
         if standard_assessment.refusal_reason is not None:
             return EnginePrediction(
@@ -10649,10 +10402,9 @@ def _predict_with_engine(
     extra_notices: list[Notice] = list(input_notices)
     if engine is Engine.OPENIMCC:
         backend = getattr(handle, "backend", None)
-        standard_assessment = _resolve_openimcc_liquid_reference_standards(
+        standard_assessment = _score_openimcc_liquid_standard_assessment(
             wt or {},
             quantity,
-            consumer="melt",
             melt_pack=getattr(backend, "_pack", None),
         )
         if standard_assessment.refusal_reason is not None:

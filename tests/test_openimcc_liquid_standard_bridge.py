@@ -6,7 +6,6 @@ from typing import Any
 import pytest
 
 import openimcc
-import openimcc.redox
 from openimcc.redox_pack import load_redox_pack
 
 from engines.builtin import vapor_pressure
@@ -112,7 +111,7 @@ def test_redox_bridge_returns_melt_and_redox_flag_records(monkeypatch: Any) -> N
     if not callable(evaluate_redox):
         return
     monkeypatch.setattr(
-        openimcc.redox,
+        openimcc,
         "evaluate_redox",
         lambda *_args, **_kwargs: object(),
     )
