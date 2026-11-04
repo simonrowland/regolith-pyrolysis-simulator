@@ -9,7 +9,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import Quantity
-from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_migrate import _migrate_real_extract, to_plain
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -99,6 +99,15 @@ def test_table3_cells_and_migration_match_page9_render(tmp_path):
     assert all(row.identity.composition.is_value for row in table3_rows)
     assert all(row.value.kind.value == "point" for row in table3_rows)
     assert sum(row.value.kind.value == "unavailable" for row in table3_rows) == 0
+    sio2_rows = [
+        row for row in table3_rows if row.identity.species.formula == "SiO2"
+    ]
+    assert sio2_rows
+    for row in sio2_rows:
+        reference_state = to_plain(row.identity.reference_state)
+        assert reference_state["tag"] == "value"
+        assert reference_state["value"]["endmember"]["phase"]["value"] == "cr"
+        assert reference_state["value"]["endmember"]["polymorph"]["tag"] == "unknown"
     assert all(row.point_conditions["temperature_K"].locator is not None for row in table3_rows)
     assert all(row.point_conditions["composition"].locator is not None for row in table3_rows)
     assert all("total_pressure_Pa" not in row.point_conditions for row in table3_rows)

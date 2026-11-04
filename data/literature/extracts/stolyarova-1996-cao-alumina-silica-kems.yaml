@@ -4232,12 +4232,16 @@ species:
                 tag: value
                 value: cr
               polymorph:
-                tag: value
-                value: cristobalite_high
+                tag: unknown
+                reason: The paper identifies solid SiO2 but does not state its polymorph.
             component_basis: SiO2
-        inferred: true
-        inference: >-
-          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        inferred: false
+        note: >-
+          Table 3 column 5 is SiO2 activity. Equation (12), published p. 19, defines the activity by the ion-current
+          comparison; equation (13) identifies the reference current as over the individual SiO2 oxide. The paper
+          identifies solid SiO2 but does not state a polymorph. No standard Gibbs function for this SiO2 reference is
+          given; reference (66) supplies equilibrium data for deriving oxygen partial pressure, not a Gibbs function
+          for the SiO2 reference.
         locator:
           page: 5
           published_page: 19
