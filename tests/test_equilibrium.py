@@ -12,6 +12,7 @@ from simulator.core import (
     _MeltRedoxLiquidusFloorFallback,
     _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
 )
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.equilibrium import (
     EquilibriumMixin,
     _internal_analytical_control_refusal,
@@ -724,6 +725,113 @@ def test_replay_and_originless_live_curves_feed_the_liquid_feo_domain():
     )
     assert above_floor.below_liquidus is False
     assert above_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+
+
+def _oxide_batch_sim() -> PyrolysisSimulator:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    return PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {
+            "oxide": {
+                "label": "Oxide",
+                "composition_wt_pct": {"SiO2": 60.0, "FeO": 40.0},
+            }
+        },
+        {"metals": {}, "oxide_vapors": {}},
+    )
+
+
+def _replay_record(*, liquidus_T_C: float) -> dict:
+    return {
+        "disposition": "replay",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": liquidus_T_C,
+            "solidus_T_C": 1050.0,
+        },
+    }
+
+
+def test_load_batch_drops_a_retained_liquid_feo_curve():
+    """A second batch must not keep the previous batch's liquidus.
+
+    load_batch sets melt.hour back to 0. The retained curve is cleared
+    with the redox pin, so the new establish is what the domain reads.
+    """
+
+    sim = _oxide_batch_sim()
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: _replay_record(
+        liquidus_T_C=1700.0
+    )
+    sim.load_batch("oxide")
+    first = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert first["liquidus_T_C"] == 1700.0
+    assert sim._liquid_feo_resolved_curve_hour == sim.melt.hour
+
+    sim.load_batch("oxide")
+    assert sim.melt.hour == 0
+    assert sim._liquid_feo_resolved_curve_hour is None
+    assert sim._liquid_feo_resolved_curve is not None
+    fallback = _MeltRedoxLiquidusFloorFallback(
+        source="none:liquidus_unavailable",
+        reason="test",
+        liquidus_status="invalid",
+    )
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: fallback
+    second = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert isinstance(second, _MeltRedoxLiquidusFloorFallback)
+    at_1300 = PyrolysisSimulator.liquid_feo_domain_at(sim, 1300.0 + 273.15)
+    assert at_1300.below_liquidus is False
+    assert at_1300.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert at_1300.liquidus_T_C == float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: _replay_record(
+        liquidus_T_C=1700.0
+    )
+    sim.load_batch("oxide")
+    replay = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert replay["liquidus_T_C"] == 1700.0
+    pinned = {
+        "disposition": "live",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+        },
+    }
+    sim.load_batch("oxide")
+    sim._melt_redox_liquidus_gate_record = lambda **_kwargs: pinned
+    sim._melt_redox_gate_record_is_admitted = lambda _value, **_kwargs: True
+    pinned_curve = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            sim
+        )
+    )
+    assert pinned_curve["liquidus_T_C"] == 1700.0
+    assert sim._melt_redox_gate_authority_tick_hour == sim.melt.hour
+    assert sim._liquid_feo_resolved_curve_hour is None
+    at_1500 = PyrolysisSimulator.liquid_feo_domain_at(sim, 1500.0 + 273.15)
+    assert at_1500.below_liquidus is True
+    assert at_1500.liquidus_T_C == 1700.0
+    assert at_1500.source == "gate_liquid_fraction"
 
 
 def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
