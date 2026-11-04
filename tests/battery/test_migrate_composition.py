@@ -2337,26 +2337,23 @@ def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
         "MgO": Decimal("47"),
         "H2O": Decimal("7"),
     }
-    state = migrate_module._mass_percent_composition_state(
-        printed, basis="printed_oxides", closure_context=printed
-    )
-    notice = migrate_module._mass_percent_renormalization_notice(
+    located = migrate_module._mass_percent_composition_located(
         printed,
+        basis="printed_oxides",
+        locator=None,
         closure_context=printed,
-        quantity=Quantity.ACTIVITY_COEFFICIENT,
-        origin="fixture",
-        admitted=state.is_value,
     )
 
-    assert state.is_value
-    assert state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert located.state.is_value
+    assert located.state.value.amount_basis is AmountBasis.MOLE_FRACTION
     assert migrate_module._mass_percent_kept_total(
         printed, closure_context=printed
     ) == Decimal("104")
-    assert notice is not None
-    assert notice.original == Decimal("104")
-    assert notice.band == "95-102 wt% kept oxide total"
-    assert notice.affected_quantities == (Quantity.ACTIVITY_COEFFICIENT,)
+    assert located.inference is not None
+    assert (
+        "renormalized to 100 wt% from kept oxide total S=104 wt% (d-336 item 2)"
+        in located.inference.inputs
+    )
 
 
 def test_refused_high_kept_total_has_no_projection_notice() -> None:
@@ -2381,12 +2378,6 @@ def test_refused_high_kept_total_has_no_projection_notice() -> None:
         declared_component_map=printed,
     )
     assert notice is None
-    assert migrate_module._mass_percent_renormalization_notice(
-        printed,
-        quantity=Quantity.ACTIVITY_COEFFICIENT,
-        origin="fixture",
-        admitted=False,
-    ) is None
 
 
 @pytest.mark.parametrize(
@@ -2659,7 +2650,9 @@ def test_printed_phase_vector_checks_mass_closure_once(
     assert observation.identity.composition.is_value
 
 
-def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> None:
+def _residue_ppm_extract(
+    printed_composition: dict[str, str | None], observation_id: str
+) -> dict:
     extract = deepcopy(FIXTURE_EXTRACT)
     extract["experiments"] = [
         {
@@ -2679,7 +2672,7 @@ def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> N
                 "printed_composition": {
                     "state": {
                         "tag": "value",
-                        "value": {"SiO2": None, "MgO": "50", "CaO": "50"},
+                        "value": printed_composition,
                     },
                     "locator": {"table": "1", "row": "1"},
                 },
@@ -2689,7 +2682,7 @@ def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> N
     row = extract["species"]["Na"]["observations"][0]
     row.update(
         {
-            "observation_id": "residue-blank-major",
+            "observation_id": observation_id,
             "experiment": "residue-run",
             "type": "residue_component_composition",
             "units": "ppm",
@@ -2702,18 +2695,98 @@ def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> N
             {"T_C": "1200", "run_id": "residue-run", "residue_ppm": "12.59"}
         ],
     }
+    return extract
 
-    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+def _residue_ppm_observation(result):
     observation = next(
         item
         for item in result.observations.values()
         if item.identity.quantity.is_value
-        and item.identity.quantity.value is migrate_module.Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and item.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and item.identity.temperature_K.is_value
+        and item.identity.temperature_K.value == Decimal("1473.15")
     )
+    return observation
+
+
+def test_residue_ppm_starting_map_refuses_blank_major_oxide(tmp_path: Path) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": None, "MgO": "50", "CaO": "50"}, "residue-blank-major"
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
 
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
     assert "missing major oxides: SiO2" in observation.identity.composition.reason
+
+
+def test_residue_ppm_experiment_inherited_renormalization_notice(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": "55", "MgO": "49"}, "residue-renormalized"
+    )
+    result = migrate(_write_min_tree(tmp_path / "residue", extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+
+
+def test_renormalization_notice_follows_composition_across_source_stores() -> None:
+    extract_names = (
+        "doyle-1988-feo-activity-multicomponent-magma.yaml",
+        "doyle-1989-tio2-feo-activity-magma.yaml",
+        "kunisada-1986-na-silicate-dephosphorization.yaml",
+        "taniguchi-1997-feo-cas.yaml",
+    )
+    band = "95-102 wt% kept oxide total"
+    marker_prefix = "renormalized to 100 wt% from kept oxide total S="
+
+    for name in extract_names:
+        migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+        migrator._migrate_extract(REPO_ROOT / "data/literature/extracts" / name)
+        migrator.finalize()
+        for observation in migrator.result.observations.values():
+            condition = (observation.point_conditions or {}).get("composition")
+            inputs = (
+                condition.inference.inputs
+                if isinstance(condition, Located) and condition.inference is not None
+                else ()
+            )
+            renormalization_inputs = tuple(
+                item for item in inputs if item.startswith(marker_prefix)
+            )
+            notices = tuple(
+                notice
+                for notice in observation.notices
+                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == band
+            )
+            if renormalization_inputs:
+                assert len(renormalization_inputs) == 1
+                assert isinstance(condition, Located)
+                assert condition.state.is_value
+                assert observation.identity.composition is not None
+                assert observation.identity.composition.is_value
+                assert len(notices) == 1
+                assert notices[0].original == Decimal(
+                    renormalization_inputs[0]
+                    .removeprefix(marker_prefix)
+                    .removesuffix(" wt% (d-336 item 2)")
+                )
+            else:
+                assert not notices
 
 
 def test_initial_charge_mass_loss_map_refuses_blank_suffixed_major_oxide() -> None:
