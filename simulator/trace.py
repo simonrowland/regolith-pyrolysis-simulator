@@ -7,6 +7,7 @@ import math
 from types import MappingProxyType
 from typing import Any, Mapping
 
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
 from simulator.accounting.queries import AccountingQueries, stage_purity
 from simulator.diagnostics import wall_deposit_sticking_authority_status
 from simulator.state import PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX, HourSnapshot
@@ -77,6 +78,13 @@ class PhysicsTrace:
     extraction_completeness_by_target: Mapping[str, Mapping[str, Any]] = field(
         default_factory=dict
     )
+    # Species kilograms on process.alkali_cartridge_solid_residue.
+    # Not part of product_ledger_kg: that map is separated products, and
+    # merging residue metal into it made readers treat it as an ingot.
+    # Extraction completeness adds this map when it counts captured mass.
+    alkali_cartridge_solid_residue_kg: Mapping[str, float] = field(
+        default_factory=dict
+    )
 
     @classmethod
     def from_simulator(cls, sim: Any) -> "PhysicsTrace":
@@ -122,6 +130,9 @@ class PhysicsTrace:
             for target, entry in extraction_by_target.items()
             if isinstance(entry, Mapping)
         }
+        residue_kg = queries.species_kg_by_accounts(
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,)
+        )
         return cls(
             snapshots=snapshots,
             product_ledger_kg=_freeze_mapping(queries.product_ledger()),
@@ -156,6 +167,7 @@ class PhysicsTrace:
             extraction_completeness_by_target=_freeze_nested_mapping(
                 extraction_by_target
             ),
+            alkali_cartridge_solid_residue_kg=_freeze_mapping(residue_kg),
         )
 
     def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
@@ -176,6 +188,7 @@ class PhysicsTrace:
                 _thaw_value(self.wall_deposit_by_segment_species_delta),
                 _thaw_value(self.impurity_delta),
                 _thaw_value(self.extraction_completeness_by_target),
+                _thaw_value(self.alkali_cartridge_solid_residue_kg),
             ),
         )
 

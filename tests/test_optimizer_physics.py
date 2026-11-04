@@ -1939,6 +1939,147 @@ def test_extraction_completeness_gate_margin_matches_7913470_golden() -> None:
     )
 
 
+def test_extraction_completeness_counts_cartridge_residue_with_the_vapor_contract() -> None:
+    """Residue Fe stays off the separated ledger and in the captured numerator.
+
+    Element balance, mol Fe / mol Fe. The condensation train holds 0.25 mol
+    Fe and the cartridge residue holds another 0.25 mol Fe. Cleaned-melt
+    FeO holds 0.5 mol, and FeO has one Fe atom, so the residual is 0.5 mol
+    Fe. Captured / (captured + residual) = 0.50 / 1.00 = 0.50. Dropping
+    the residue parcel is 0.25 / 0.75. The vapour contract counts the
+    residue account. The report must match 0.50 with the carried
+    provenance and without it. A non-iron residue species must not raise.
+    """
+    from dataclasses import replace
+    from pathlib import Path
+
+    import yaml
+
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.completeness import (
+        completion_contracts_from_setpoints,
+        vapor_contract_completeness,
+    )
+    from simulator.accounting.queries import AccountingQueries
+
+    train_mol = 0.25
+    residue_fe_mol = 0.25
+    residual_feo_mol = 0.5
+    captured_mol = train_mol + residue_fe_mol
+    expected_fraction = captured_mol / (captured_mol + residual_feo_mol)
+    omitted_fraction = train_mol / (train_mol + residual_feo_mol)
+
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.condensation_train",
+        {"Fe": train_mol},
+        source="condensation train",
+        material_origin="feedstock",
+    )
+    ledger.load_external_mol(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        {"Fe": residue_fe_mol, "SiO2": 1.0},
+        source="stage-4 cartridge solids",
+        material_origin="feedstock",
+    )
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"FeO": residual_feo_mol},
+        source="cleaned melt",
+        material_origin="feedstock",
+    )
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        train=SimpleNamespace(stages=[]),
+        _unspent_additive_reagents_kg=lambda: {},
+        record=SimpleNamespace(snapshots=(), additives_kg={}),
+        condensation_model=None,
+    )
+    queries = AccountingQueries(sim)
+    setpoints = yaml.safe_load(
+        (
+            Path(__file__).resolve().parent.parent / "data" / "setpoints.yaml"
+        ).read_text()
+    )
+    contract = next(
+        item
+        for item in completion_contracts_from_setpoints(setpoints)
+        if item.contract_id == "C2A_continuous.Fe.vapor"
+    )
+    vapor = vapor_contract_completeness(contract, queries)
+    assert vapor.completeness_fraction == pytest.approx(expected_fraction)
+    assert vapor.completeness_fraction != pytest.approx(omitted_fraction)
+
+    sim._last_extraction_completeness_diagnostic = {
+        "detail_by_target_species": {
+            "Fe": {
+                "product_target_equiv_mol": vapor.product_target_equiv_mol,
+                "residual_target_equiv_mol": vapor.residual_target_equiv_mol,
+                "denominator_target_equiv_mol": (
+                    vapor.denominator_target_equiv_mol
+                ),
+                "wall_deposit_target_equiv_mol": (
+                    vapor.wall_deposit_target_equiv_mol
+                ),
+                "reagent_target_equiv_mol": vapor.reagent_target_equiv_mol,
+                "gross_product_target_equiv_mol": (
+                    vapor.gross_product_target_equiv_mol
+                ),
+                "contract_id": vapor.contract_id,
+                "feedstock_recovered_reagent_target_equiv_mol": (
+                    vapor.feedstock_recovered_reagent_target_equiv_mol
+                ),
+                "credit_line_reagent_target_equiv_mol": (
+                    vapor.credit_line_reagent_target_equiv_mol
+                ),
+                "external_additive_reagent_target_equiv_mol": (
+                    vapor.external_additive_reagent_target_equiv_mol
+                ),
+                "denominator_basis_source": vapor.denominator_basis_source,
+                "reason": vapor.reason,
+            },
+        },
+        "completeness_by_target_species": {
+            "Fe": vapor.completeness_fraction,
+        },
+    }
+    trace = PhysicsTrace.from_simulator(sim)
+    train_kg = ledger.project_account_kg("process.condensation_train")["Fe"]
+    residue_kg = ledger.project_account_kg(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    )
+    assert trace.product_ledger_kg["Fe"] == pytest.approx(train_kg)
+    assert "SiO2" not in trace.product_ledger_kg
+    assert trace.alkali_cartridge_solid_residue_kg["Fe"] == pytest.approx(
+        residue_kg["Fe"]
+    )
+    assert trace.alkali_cartridge_solid_residue_kg["SiO2"] == pytest.approx(
+        residue_kg["SiO2"]
+    )
+
+    constraints = PhysicsConstraintSet(target_species=("Fe",))
+    report = extraction_completeness_report(trace, constraints)
+    margin = constraints.extraction_completeness(trace)
+
+    assert report["status"] == "reported"
+    assert report["completeness_fraction"] == pytest.approx(expected_fraction)
+    assert "contradicts ledger" not in str(report["reason"])
+    assert margin.observed == pytest.approx(expected_fraction)
+    assert "contradicts ledger" not in margin.detail
+    assert "insufficient-evidence" not in margin.detail
+
+    bare = replace(trace, extraction_completeness_by_target={})
+    bare_report = extraction_completeness_report(bare, constraints)
+    bare_margin = constraints.extraction_completeness(bare)
+
+    assert bare_report["status"] == "reported"
+    assert bare_report["completeness_fraction"] == pytest.approx(
+        expected_fraction
+    )
+    assert bare_margin.observed == pytest.approx(expected_fraction)
+
+
 def test_physics_gates_do_not_restore_ellingham_or_mre_gate() -> None:
     assert all("ellingham" not in gate for gate in GATE_ORDER)
     assert all("mre" not in gate.lower() for gate in GATE_ORDER)
