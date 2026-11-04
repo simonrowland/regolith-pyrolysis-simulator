@@ -5,7 +5,12 @@ from decimal import Decimal
 
 import pytest
 
-from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    _wt_percent_conversion_or_refusal,
+    _wt_percent_conversion_state,
+    wt_pct_to_mole_fraction,
+    wt_pct_to_mole_fraction_derivation,
+)
 
 from simulator.battery.enums import AmountBasis, BenchIdentityBasis, FO2Channel, MethodToken, ValueKind
 from simulator.battery.records import (
@@ -101,6 +106,44 @@ def _charge(single: bool = True) -> Sample:
         ),
         surface_area_m2=factories.located(Value.point_of("1e-4")),
     )
+
+
+def test_nonfinite_printed_mass_component_refuses_charge_before_value_build() -> None:
+    sample = replace(
+        _charge(single=False),
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=None,
+        printed_composition=factories.located(
+            {"MgO": Decimal("40"), "SiO2": Decimal("Infinity")}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert not result.by_species
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.MISSING_EVIDENCE
+
+
+@pytest.mark.parametrize(
+    "chloride,expected_species",
+    [(None, {"MgO"}), ("0.1 ± 0.01", {"MgO"}), ("not numeric", set())],
+)
+def test_printed_volatile_cells_do_not_abort_or_partially_parse_charge(
+    chloride, expected_species
+) -> None:
+    sample = replace(
+        _charge(single=False),
+        mass_kg=factories.located(Value.point_of("0.001")),
+        initial_composition=None,
+        printed_composition=factories.located(
+            {"MgO": Decimal("99.9" if chloride is not None else "100"), "Cl": chloride}
+        ),
+    )
+    result = charge_moles_by_species(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert set(result) == expected_species
 
 
 def test_charge_moles_sanity_and_typed_absence() -> None:
@@ -802,6 +845,33 @@ def test_g2_uses_explicit_evaporation_alpha() -> None:
 @pytest.mark.parametrize("silica,expected_mass", [("50", "0.0009"), ("60", "0.001")])
 def test_partial_printed_oxide_inventory_preserves_printed_mass_basis(silica, expected_mass) -> None:
     printed = {"MgO": Decimal("40"), "SiO2": Decimal(silica)}
+    if silica == "50":
+        refusal = _wt_percent_conversion_state(
+            printed, declared_component_map=printed
+        )
+        # b-704 does not turn this 90 wt% partial assay into a charge vector.
+        assert refusal.is_unknown
+        assert "kept sum=90 wt% is below 95 wt%" in refusal.reason
+        sample = replace(
+            _charge(single=False),
+            mass_kg=factories.located(Value.point_of("0.001")),
+            initial_composition=factories.located(
+                wt_pct_to_mole_fraction(
+                    {"MgO": Decimal("40"), "SiO2": Decimal("60")}
+                )
+            ),
+            printed_composition=factories.located(printed),
+        )
+        result = charge_moles_by_species(
+            replace(factories.kems_experiment(), sample=sample), _bench()
+        )
+        assert set(result) == {"MgO", "SiO2"}
+        assert all(
+            route.route == "mass_times_mole_fraction"
+            for item in result.values()
+            for route in item.routes
+        )
+        return
     sample = replace(
         _charge(single=False),
         mass_kg=factories.located(Value.point_of("0.001")),
@@ -892,6 +962,269 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
     assert "observation_normalized_initial_composition" in {
         route.route for route in result.routes
     }
+
+
+def test_b704_waypoint_guard_uses_row_closure_and_preserves_independent_routes() -> None:
+    experiment = factories.kems_experiment()
+    bench = _bench()
+    oxides = {"SiO2": Decimal("54.90"), "MgO": Decimal("40.00")}
+    hydrous = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [[name, str(amount)] for name, amount in oxides.items()],
+                }
+            ),
+        ),
+    )
+    observation = replace(
+        factories.observation(
+            "hydrous-row",
+            experiment.experiment_id,
+            factories.o2_identity(),
+            1,
+        ),
+        point_conditions={"H2O": factories.located(Decimal("5.00"))},
+    )
+    accepted = normalized_composition(hydrous, bench, observation)
+    assert accepted.selected is not None
+    expected, refusal = _wt_percent_conversion_or_refusal(
+        oxides,
+        closure_context={"point_conditions": {"H2O": "5.00"}},
+        declared_component_map=oxides,
+    )
+    assert refusal is None and expected is not None
+    assert accepted.selected.value == expected.as_map()
+
+    nonclosing = replace(
+        hydrous,
+        sample=replace(
+            hydrous.sample,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [["SiO2", "45"], ["MgO", "45"]],
+                }
+            ),
+        ),
+    )
+    refused = normalized_composition(nonclosing, bench)
+    assert refused.selected is None
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+    locator = factories.loc()
+    independent = Located(
+        factories.State.of(
+            Composition(
+                "independent",
+                (("SiO2", Decimal("0.75")), ("MgO", Decimal("0.25"))),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+        locator,
+    )
+    derived_from_nonclosing = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            )
+        ),
+        locator,
+        wt_pct_to_mole_fraction_derivation(
+            {"SiO2": Decimal("45"), "MgO": Decimal("45")}, locator
+        ),
+    )
+    refused_derived = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                printed_composition=None,
+                initial_composition=derived_from_nonclosing,
+            ),
+        ),
+        bench,
+    )
+    assert refused_derived.selected is None
+    assert refused_derived.absence is not None
+    assert refused_derived.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+    valid_derived = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+            )
+        ),
+        locator,
+        wt_pct_to_mole_fraction_derivation(
+            {"SiO2": Decimal("60"), "MgO": Decimal("40")}, locator
+        ),
+    )
+    derived_with_refused_sibling = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                initial_composition=valid_derived,
+            ),
+        ),
+        bench,
+    )
+    assert derived_with_refused_sibling.selected is not None
+    assert derived_with_refused_sibling.selected.route == "normalized_initial_composition"
+    assert derived_with_refused_sibling.selected.value == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    ).as_map()
+
+    standalone_derived = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                printed_composition=None,
+                initial_composition=valid_derived,
+            ),
+        ),
+        bench,
+    )
+    assert standalone_derived.selected is not None
+
+    independent_result = normalized_composition(
+        replace(
+            nonclosing,
+            sample=replace(
+                nonclosing.sample,
+                initial_composition=independent,
+            ),
+        ),
+        bench,
+    )
+    assert independent_result.selected is not None
+    assert independent_result.selected.value == independent.state.value.as_map()
+
+
+def test_b704_refused_printed_map_cannot_fall_through_to_engine_route() -> None:
+    base = factories.kems_experiment()
+
+    def experiment_with_printed(components: list[tuple[str, str]]):
+        return replace(
+            base,
+            sample=replace(
+                base.sample,
+                initial_composition=None,
+                printed_composition=factories.located(
+                    {
+                        "amount_basis": AmountBasis.MASS_PERCENT.value,
+                        "components": [[name, amount] for name, amount in components],
+                    }
+                ),
+            ),
+        )
+
+    accepted = normalized_composition(
+        experiment_with_printed([("SiO2", "49.5"), ("MgO", "50"), ("Cl", "0.5")]),
+        _bench(),
+    )
+    assert accepted.selected is not None
+    assert accepted.selected.route == "normalized_printed_composition"
+
+    for components in (
+        [("SiO2", "49.4"), ("MgO", "50"), ("Cl", "0.6")],
+        [("SiO2", "48.4"), ("MgO", "50"), ("Cl", "0.6")],
+    ):
+        refused = normalized_composition(experiment_with_printed(components), _bench())
+        assert refused.selected is None
+        assert refused.routes == ()
+        assert refused.absence is not None
+        assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_b704_waypoint_guard_normalizes_wt_suffix_before_closure() -> None:
+    base = factories.kems_experiment()
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            initial_composition=None,
+            printed_composition=factories.located(
+                {"SiO2_wt_pct": Decimal("45"), "MgO_wt_pct": Decimal("45")}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
+    base = factories.kems_experiment()
+    locator = factories.loc()
+    derived = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction(
+                {"MgO": Decimal("50"), "SiO2": Decimal("50")}
+            )
+        ),
+        locator,
+        Derivation("wt_pct_to_mole_fraction", ("source",), (), "mol_fraction"),
+    )
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            initial_composition=derived,
+            printed_composition=factories.located(
+                {"MgO": Decimal("40"), "SiO2": Decimal("Infinity")}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
+def test_blank_printed_major_refuses_unparameterized_derived_initial_but_keeps_charge() -> None:
+    from simulator.battery.records import Derivation
+
+    base = factories.kems_experiment()
+    locator = factories.loc()
+    initial = Located(
+        factories.State.of(
+            wt_pct_to_mole_fraction({"SiO2": Decimal("100")})
+        ),
+        locator,
+        Derivation("wt_pct_to_mole_fraction", ("source",), (), "mol_fraction"),
+    )
+    experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            mass_kg=factories.located(Value.point_of("0.001")),
+            initial_composition=initial,
+            printed_composition=factories.located(
+                {"MgO": Decimal("100"), "SiO2": None}
+            ),
+        ),
+    )
+
+    waypoint = normalized_composition(experiment, _bench())
+    charge = charge_moles_by_species(experiment, _bench())
+
+    assert waypoint.selected is None
+    assert waypoint.absence is not None
+    assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert set(charge) == {"MgO"}
 
 
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:

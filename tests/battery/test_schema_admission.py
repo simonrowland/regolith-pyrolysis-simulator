@@ -722,14 +722,11 @@ def test_review_printed_composition_matrix(boundary, reason, case, components):
         sample["initial_composition"] = canonical
     elif reason is not None and boundary != "sample_initial":
         sample["initial_composition"] = {"state": {"tag": "unknown", "reason": reason}}
-    if case == "malformed" and boundary != "sample_printed":
-        with pytest.raises(ValueError):
-            _serialized_consumer_inputs(sample, conditions)
-        return
     inputs = _serialized_consumer_inputs(sample, conditions)
     requests = engine_point_requests(inputs)
     valid = case == "valid" or (
-        boundary.endswith("with_sample_initial") and case in ("negative", "zero", "infinite", "nan")
+        boundary.endswith("with_sample_initial")
+        and case in ("negative", "zero", "infinite", "nan", "malformed")
     ) or (
         case == "ambiguous" and not boundary.endswith("with_sample_initial")
     )
