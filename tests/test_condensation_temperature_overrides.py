@@ -744,11 +744,43 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
 
     default_ceiling = trap_ceiling(None)
     custom_ceiling = trap_ceiling(custom_vapor_pressures)
+    # The 40 C wall still has f_eq = 1 for Ca: P_sat is far below the
+    # inlet partial. This test's area is 1 m^2 on the stage-number key,
+    # so the cartridge heat NTU is about 10^3. The production e-NTU then
+    # sits on its NTU -> infinity limit and takes the supply that reaches
+    # the visit. The booked kilograms are that eta, not a second ceiling.
     assert default_ceiling == 1.0
     assert custom_ceiling == 1.0
-    assert default_stage4 == inlet_kg_hr * default_ceiling
-    assert custom_stage4 == inlet_kg_hr * custom_ceiling
+    trap_identity = (trap.stage_number, trap.sub_order)
     collector_identity = (collector.stage_number, collector.sub_order)
+    for route in (default_route, custom_route):
+        detail = route.cartridge_capture_by_species['Ca']
+        assert detail['f_eq'] == pytest.approx(
+            condensation_module.equilibrium_capture_fraction(
+                detail['p_sat_pa'], detail['p_local_pa'],
+            )
+        )
+        assert detail['f_eq'] == pytest.approx(1.0)
+        assert detail['eta_vapour'] == pytest.approx(
+            condensation_module.vapour_entu_capture_fraction(
+                detail['f_eq'], detail['ntu_mass'],
+            )
+        )
+        assert detail['eta'] == pytest.approx(detail['eta_vapour'])
+        assert detail['ntu_mass'] > 40.0
+        trap_kg = route.capture_kg_by_stage_identity[trap_identity]['Ca']
+        assert trap_kg == pytest.approx(detail['supply_kg_hr'] * detail['eta'])
+        assert trap_kg == pytest.approx(detail['supply_kg_hr'])
+    assert default_stage4 == pytest.approx(
+        default_route.capture_kg_by_stage_identity[collector_identity]['Ca']
+        + default_route.capture_kg_by_stage_identity[trap_identity]['Ca']
+    )
+    assert custom_stage4 == pytest.approx(
+        custom_route.capture_kg_by_stage_identity[collector_identity]['Ca']
+        + custom_route.capture_kg_by_stage_identity[trap_identity]['Ca']
+    )
+    assert default_stage4 == pytest.approx(inlet_kg_hr)
+    assert custom_stage4 == pytest.approx(inlet_kg_hr)
     default_collector = default_route.capture_kg_by_stage_identity[
         collector_identity
     ]["Ca"]

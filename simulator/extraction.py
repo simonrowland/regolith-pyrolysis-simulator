@@ -447,6 +447,43 @@ class ExtractionMixin:
             + float(delta_kg),
         )
 
+    def _retarget_stage_collection_source(
+        self,
+        source_account: str,
+        destination_account: str,
+        stage_idx: int,
+        species: str,
+        kg: float,
+    ) -> None:
+        """Move one source-map key and leave ``collected_kg`` where it is.
+
+        The cartridge swing changes which ledger account backs the stage
+        inventory. ``_remove_stage_collection_source_projection`` also
+        deletes ``stage.collected_kg``, which is the physical cartridge
+        inventory and stays.
+        """
+
+        move_kg = max(0.0, float(kg))
+        if move_kg <= self._LEDGER_KG_TOL:
+            return
+        source_key = (source_account, int(stage_idx), species)
+        tracked = max(
+            0.0,
+            float(self._stage_collection_kg_by_source.get(source_key, 0.0)),
+        )
+        take_kg = min(tracked, move_kg)
+        remain_kg = tracked - take_kg
+        if remain_kg <= self._LEDGER_KG_TOL:
+            self._stage_collection_kg_by_source.pop(source_key, None)
+        else:
+            self._stage_collection_kg_by_source[source_key] = remain_kg
+        if take_kg <= self._LEDGER_KG_TOL:
+            return
+        dest_key = (destination_account, int(stage_idx), species)
+        self._stage_collection_kg_by_source[dest_key] = (
+            self._stage_collection_kg_by_source.get(dest_key, 0.0) + take_kg
+        )
+
     def _record_stage_routed_metal_credits(
         self,
         recipe: str,
