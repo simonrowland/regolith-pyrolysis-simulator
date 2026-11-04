@@ -15776,6 +15776,55 @@ def test_partial_pressure_point_sample_is_not_species_formula(tmp_path: Path) ->
     assert observation.identity.species.formula == "O2"
 
 
+def test_point_sample_label_different_from_printed_species_never_infers(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {"T_K": 1200.0, "p_Pa": 2.0, "sample": "Cu12.1"},
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 3.0,
+                    "sample": "Cu13.1",
+                    "species_as_printed": "Cu",
+                },
+            ],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    extract["species"] = {"Cu": {"observations": [row]}}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    ]
+    assert len(observations) == 2
+    assert {observation.identity.species.formula for observation in observations} == {
+        "Cu"
+    }
+
+
+def test_bare_sample_label_equal_to_parent_species_remains_a_formula_candidate() -> None:
+    from simulator.battery.migrate import _sample_label_formula_candidate
+
+    assert (
+        _sample_label_formula_candidate(
+            parent_formula="Cu",
+            sample_label="Cu",
+            species_as_printed=None,
+        )
+        == "Cu"
+    )
+
+
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
     extracts_src = REPO_ROOT / "data" / "literature" / "extracts"
     names = [

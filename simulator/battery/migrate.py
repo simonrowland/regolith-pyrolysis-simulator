@@ -4602,6 +4602,22 @@ def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str
     )
 
 
+def _sample_label_formula_candidate(
+    *,
+    parent_formula: str,
+    sample_label: object,
+    species_as_printed: object,
+) -> str | None:
+    """Return a sample label only when it repeats the parent's species."""
+
+    label = sample_label.strip() if isinstance(sample_label, str) else ""
+    parent = str(parent_formula or "").strip()
+    # Labels such as Cu12.1 and integer sample codes are not stoichiometry.
+    if not label or species_as_printed is not None or label != parent:
+        return None
+    return label
+
+
 def bulk_property_species_formula(
     *,
     quantity: Quantity | None,
@@ -20669,12 +20685,10 @@ class Migrator:
                 else (quantity if isinstance(quantity, Quantity) else None)
             )
             sample = raw_item.get("sample") or raw_item.get("id")
-            # Florin's Cu12.1-style sample IDs are labels, not formulas.
-            sample_label = (
-                sample.strip()
-                if isinstance(sample, str)
-                and source_id != "florin-2025-cu-silicate-evaporation"
-                else None
+            sample_label = _sample_label_formula_candidate(
+                parent_formula=species.formula,
+                sample_label=sample,
+                species_as_printed=raw_item.get("species_as_printed"),
             )
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
