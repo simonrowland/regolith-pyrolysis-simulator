@@ -94,7 +94,7 @@ from simulator.battery.score import (
     _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
-    _paired_engine_rail_benchmarks,
+    _paired_engine_rail_comparisons,
     _residual_engine_observable,
     compile_residual,
     compute_metric,
@@ -7437,7 +7437,7 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
     ]
 
 
-def test_paired_engine_rail_benchmarks_include_all_shared_comparisons() -> None:
+def test_paired_engine_rail_comparisons_include_all_shared_rows() -> None:
     rows = [
         {
             "rail": Rail.VAPOUR.value,
@@ -7495,7 +7495,7 @@ def test_paired_engine_rail_benchmarks_include_all_shared_comparisons() -> None:
         },
     ]
 
-    records = _paired_engine_rail_benchmarks(
+    records = _paired_engine_rail_comparisons(
         rows,
         primary_engines=("openimcc", "internal-analytical"),
         comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),

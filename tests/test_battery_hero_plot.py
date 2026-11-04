@@ -430,7 +430,7 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
         json.dumps(
             {
                 "kind": "battery_hero_history",
-                "schema_version": 1,
+                "schema_version": 2,
                 "store_sha": "old-store",
                 "commit_date": "2026-10-18T10:27:53-04:00",
                 "metrics": [
@@ -630,7 +630,7 @@ def test_deck_legends_include_points_refusals_and_history_on_empty_axes(
         json.dumps(
             {
                 "kind": "battery_hero_history",
-                "schema_version": 1,
+                "schema_version": 2,
                 "store_sha": "test-store",
                 "commit_date": "2026-10-18T10:27:53-04:00",
                 "metrics": [
@@ -2068,6 +2068,7 @@ def test_current_hero_summary_uses_input_metrics_when_history_is_stale(
         json.dumps(
             {
                 "kind": "battery_hero_history",
+                "schema_version": 2,
                 "store_revision": "old-store",
                 "commit_date": "2026-10-18T10:27:53-04:00",
                 "metrics": [
@@ -2475,6 +2476,7 @@ def test_hero_svg_and_png_are_byte_identical_for_the_same_input(tmp_path: Path) 
         json.dumps(
             {
                 "kind": "battery_hero_history",
+                "schema_version": 2,
                 "store_sha": "hero-test",
                 "store_revision": "hero-test",
                 "commit_date": "2026-10-18T10:27:53-04:00",
@@ -2546,6 +2548,7 @@ def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures
         json.dumps(
             {
                 "kind": "battery_hero_history",
+                "schema_version": 2,
                 "store_revision": "formatted-store",
                 "commit_date": "2026-10-18T10:27:53-04:00",
                 "metrics": [
