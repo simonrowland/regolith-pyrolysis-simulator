@@ -9,6 +9,9 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.fe_redox import (
+    HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL,
+    HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA,
+    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     holzheid_stoich_feo_gamma_band,
@@ -50,28 +53,16 @@ def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
 
 
 @pytest.mark.parametrize(
-    (
-        "temperature_C",
-        "expected_multiplier",
-        "expected_gamma",
-        "expected_status",
-        "notice_side",
-    ),
+    ("temperature_C", "expected_multiplier", "expected_gamma"),
     [
-        (1300.001, 2.0199992, 3.43399864, "interpolated_verified_range", None),
-        (1299.0, 2.0208, 3.43536, "extrapolated_below_verified_range", "below"),
-        (1000.0, 2.26, 3.842, "extrapolated_below_verified_range", "below"),
-        (1599.999, 1.6600014, 2.82200238, "interpolated_verified_range", None),
-        (1601.0, 1.6586, 2.81962, "extrapolated_above_verified_range", "above"),
-        (1800.0, 1.38, 2.346, "extrapolated_above_verified_range", "above"),
+        (1300.001, 2.0199992, 3.43399864),
+        (1599.999, 1.6600014, 2.82200238),
     ],
 )
-def test_holzheid_gamma_interpolates_and_extrapolates_with_flagged_edge_trend(
+def test_holzheid_gamma_interpolates_inside_certified_band(
     temperature_C: float,
     expected_multiplier: float,
     expected_gamma: float,
-    expected_status: str,
-    notice_side: str | None,
 ) -> None:
     band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
 
@@ -79,20 +70,30 @@ def test_holzheid_gamma_interpolates_and_extrapolates_with_flagged_edge_trend(
         expected_multiplier, abs=1e-12
     )
     assert band["central"] == pytest.approx(expected_gamma, abs=1e-12)
-    assert band["conversion_status"] == expected_status
-    if notice_side is None:
-        assert band["authority_level"] == "certified"
-        assert band["notice"] is None
-    else:
-        assert band["authority_level"] == "extrapolated"
-        notice = band["notice"]
-        assert notice["kind"] == "out_of_certified_band"
-        assert notice["authority_level"] == "extrapolated"
-        assert notice["side"] == notice_side
-        assert notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
-        assert notice["uncertainty_band"] >= notice["edge_segment_spread"]
-        assert band["measurement_low"] <= band["central"] - notice["edge_segment_spread"]
-        assert band["measurement_high"] >= band["central"] + notice["edge_segment_spread"]
+    assert band["conversion_status"] == "interpolated_verified_range"
+    assert band["authority_level"] == "certified"
+    assert band["notice"] is None
+
+
+@pytest.mark.parametrize(
+    ("edge_C", "outside_delta_C"),
+    [(1300.0, -1e-6), (1600.0, 1e-6)],
+)
+def test_holzheid_gamma_is_continuous_at_certified_edges(
+    edge_C: float,
+    outside_delta_C: float,
+) -> None:
+    at_edge = holzheid_stoich_feo_gamma_band(edge_C + 273.15)
+    just_outside = holzheid_stoich_feo_gamma_band(
+        edge_C + outside_delta_C + 273.15
+    )
+
+    assert at_edge["conversion_status"] == "interpolated_verified_range"
+    assert just_outside["conversion_status"].startswith("extrapolated_")
+    assert just_outside["central"] == pytest.approx(at_edge["central"], abs=1e-8)
+    assert just_outside["conversion_multiplier"] == pytest.approx(
+        at_edge["conversion_multiplier"], abs=1e-8
+    )
 
 
 def test_holzheid_gamma_preserves_in_span_values() -> None:
@@ -101,9 +102,166 @@ def test_holzheid_gamma_preserves_in_span_values() -> None:
     assert band["conversion_multiplier"] == pytest.approx(1.94, abs=1e-12)
     assert band["central"] == pytest.approx(1.70 * 1.94, abs=1e-12)
     assert band["measurement_sigma"] == pytest.approx(0.22 * 1.94, abs=1e-12)
+    assert band["measurement_low"] == pytest.approx(1.70 * 1.94 - 0.22 * 1.94)
+    assert band["measurement_high"] == pytest.approx(1.70 * 1.94 + 0.22 * 1.94)
     assert band["conversion_status"] == "interpolated_verified_range"
     assert band["authority_level"] == "certified"
     assert band["notice"] is None
+
+
+def test_holzheid_1300_edge_reproduces_printed_1600_gamma() -> None:
+    low_edge_C, low_multiplier = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0]
+    _, high_multiplier = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1]
+    low_edge_T_K = low_edge_C + 273.15
+    high_edge_T_K = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1][0] + 273.15
+    low_edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * low_multiplier
+    predicted_1600_gamma = math.exp(
+        math.log(low_edge_gamma) * low_edge_T_K / high_edge_T_K
+    )
+    printed_1600_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * high_multiplier
+
+    assert predicted_1600_gamma == pytest.approx(2.818, abs=0.001)
+    assert abs(predicted_1600_gamma - printed_1600_gamma) < 0.01
+
+
+def test_holzheid_1400_gamma_residual_from_each_edge_is_pinned() -> None:
+    points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+    target_T_K = 1400.0 + 273.15
+    printed_multiplier = points[1][1]
+    predicted_multipliers = []
+    residuals = []
+
+    for edge_C, edge_multiplier in (points[0], points[-1]):
+        edge_T_K = edge_C + 273.15
+        edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
+        predicted_gamma = math.exp(math.log(edge_gamma) * edge_T_K / target_T_K)
+        predicted_multiplier = predicted_gamma / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+        predicted_multipliers.append(predicted_multiplier)
+        residuals.append(
+            (predicted_multiplier - printed_multiplier) / printed_multiplier
+        )
+
+    # The printed point is about 3.2% (0.0145 dex) above the curve; its W is
+    # 16.60 kJ/mol versus 16.14/16.16 at the edges, scatter around constant W.
+    assert predicted_multipliers == pytest.approx(
+        [1.87641, 1.87917], abs=1e-5
+    )
+    assert [100.0 * residual for residual in residuals] == pytest.approx(
+        [-3.278, -3.136], abs=0.001
+    )
+    assert all(abs(residual) < 0.05 for residual in residuals)
+
+
+# Replaces b-1124's linear-only expectations at 1299, 1000, 1601, and 1800 C.
+@pytest.mark.parametrize(
+    ("temperature_C", "printed_gamma"),
+    [
+        (1670.0, 2.718),
+        (1750.0, 2.613),
+        (1900.0, 2.445),
+        (2200.0, 2.194),
+        (950.0, 4.888),
+        (225.0, 49.2),
+    ],
+)
+def test_holzheid_regular_solution_table_matches_independent_edge_law(
+    temperature_C: float,
+    printed_gamma: float,
+) -> None:
+    T_K = temperature_C + 273.15
+    points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+    below = temperature_C < points[0][0]
+    edge_C, edge_multiplier = points[0] if below else points[-1]
+    edge_T_K = edge_C + 273.15
+    edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
+    independent_gamma = math.exp(math.log(edge_gamma) * edge_T_K / T_K)
+    band = holzheid_stoich_feo_gamma_band(T_K)
+    notice = band["notice"]
+
+    assert band["central"] == pytest.approx(independent_gamma, rel=1e-14)
+    assert band["conversion_multiplier"] == pytest.approx(
+        independent_gamma / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL,
+        rel=1e-14,
+    )
+    assert band["central"] == pytest.approx(printed_gamma, rel=0.0011)
+    assert band["conversion_status"] == (
+        "extrapolated_below_verified_range"
+        if below
+        else "extrapolated_above_verified_range"
+    )
+    assert band["authority_level"] == "extrapolated"
+    assert notice["kind"] == "out_of_certified_band"
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["side"] == ("below" if below else "above")
+    assert notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
+    assert notice["edge_used"] == {
+        "temperature_C": edge_C,
+        "temperature_K": edge_T_K,
+    }
+    expected_W_J_mol = 8.314462618 * edge_T_K * math.log(edge_gamma)
+    assert notice["W_J_mol"] == pytest.approx(expected_W_J_mol, rel=1e-14)
+    assert 16130.0 <= notice["W_J_mol"] <= 16160.0
+    assert notice["distance_outside_span_widths"] == pytest.approx(
+        abs(temperature_C - edge_C) / (points[-1][0] - points[0][0])
+    )
+
+    edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
+    scaled_low = math.exp(math.log(edge_gamma - edge_sigma) * edge_T_K / T_K)
+    scaled_high = math.exp(math.log(edge_gamma + edge_sigma) * edge_T_K / T_K)
+    edge_pair = points[:2] if below else points[-2:]
+    edge_segment_spread = abs(
+        HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+        * (edge_pair[1][1] - edge_pair[0][1])
+    )
+    assert notice["edge_segment_spread"] == pytest.approx(edge_segment_spread)
+    sigma_band_gamma = max(
+        independent_gamma - scaled_low,
+        scaled_high - independent_gamma,
+        edge_segment_spread,
+    )
+    sigma_band_log10 = max(
+        math.log10(independent_gamma / (independent_gamma - sigma_band_gamma)),
+        math.log10((independent_gamma + sigma_band_gamma) / independent_gamma),
+    )
+    target_1400_T_K = points[1][0] + 273.15
+    model_scatter_log10 = max(
+        abs(
+            math.log10(
+                points[1][1]
+                / (
+                    math.exp(
+                        math.log(
+                            HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+                            * scatter_edge_multiplier
+                        )
+                        * (scatter_edge_C + 273.15)
+                        / target_1400_T_K
+                    )
+                    / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+                )
+            )
+        )
+        for scatter_edge_C, scatter_edge_multiplier in (points[0], points[-1])
+    )
+    sigma_ext_log10 = math.sqrt(sigma_band_log10**2 + model_scatter_log10**2)
+    expected_low = 10.0 ** (math.log10(independent_gamma) - sigma_ext_log10)
+    expected_high = 10.0 ** (math.log10(independent_gamma) + sigma_ext_log10)
+
+    assert notice["sigma_band_log10"] == pytest.approx(sigma_band_log10)
+    assert notice["model_scatter_log10"] == pytest.approx(model_scatter_log10)
+    assert notice["uncertainty_band_log10"] == pytest.approx(sigma_ext_log10)
+    assert notice["uncertainty_band_log10"] == pytest.approx(
+        math.sqrt(
+            notice["sigma_band_log10"] ** 2
+            + notice["model_scatter_log10"] ** 2
+        )
+    )
+    assert notice["uncertainty_band"] == band["measurement_sigma"]
+    assert band["measurement_low"] == pytest.approx(expected_low)
+    assert band["measurement_high"] == pytest.approx(expected_high)
+    assert band["measurement_sigma"] >= edge_segment_spread
+    assert band["measurement_low"] <= scaled_low
+    assert band["measurement_high"] >= scaled_high
 
 
 def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():

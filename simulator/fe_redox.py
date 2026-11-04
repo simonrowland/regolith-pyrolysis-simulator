@@ -468,51 +468,96 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def _linear_interpolate_or_extrapolate(
-    points: tuple[tuple[float, float], ...],
-    x: float,
-) -> tuple[float, str]:
-    # Outside the data span, extend the nearest segment linearly in its
-    # interpolation variable (temperature_C); retain the out-of-band status.
-    if x < points[0][0]:
-        x0, y0 = points[0]
-        x1, y1 = points[1]
-        return y0 + (x - x0) * (y1 - y0) / (x1 - x0), (
-            'extrapolated_below_verified_range'
-        )
-    if x > points[-1][0]:
-        x0, y0 = points[-2]
-        x1, y1 = points[-1]
-        return y1 + (x - x1) * (y1 - y0) / (x1 - x0), (
-            'extrapolated_above_verified_range'
-        )
-    for (x0, y0), (x1, y1) in zip(points, points[1:]):
-        if x0 <= x <= x1:
-            frac = (x - x0) / (x1 - x0)
-            return y0 + frac * (y1 - y0), 'interpolated_verified_range'
-    return points[-1][1], 'interpolated_verified_range'
-
-
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     T_C = float(T_K) - 273.15
-    multiplier, status = _linear_interpolate_or_extrapolate(
-        HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
-        T_C,
-    )
-    central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
-    sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+    points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
+    first_C, last_C = points[0][0], points[-1][0]
+    span_C = last_C - first_C
+    # With T-independent excess enthalpy, regular-solution RT ln(gamma) = W.
+    # Holding W at the nearest verified edge gives ln(gamma(T)) =
+    # ln(gamma(T_edge)) * T_edge / T. Here W is in J/mol, R is
+    # 8.314462618 J/mol/K, and both temperatures are in K. From the 1300 C
+    # edge this gives gamma(1600 C) = 2.818 versus the printed 2.822; W from
+    # the two edges is 16.137 and 16.157 kJ/mol. At T_edge the ratio is one,
+    # so the extrapolation is continuous with the unchanged in-span value.
+    # At 1400 C the edge predictions are multipliers 1.87641/1.87917, with
+    # residuals -3.278%/-3.136% against printed 1.94. The point is about 3.2%
+    # (0.0145 dex) above the curve: W is 16.60 kJ/mol there versus 16.14/16.16
+    # at the edges, consistent with scatter around constant W rather than trend.
     notice = None
     authority_level = 'certified'
-    if status != 'interpolated_verified_range':
-        authority_level = 'extrapolated'
-        below = status == 'extrapolated_below_verified_range'
-        edge = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[:2] if below else (
-            HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-2:]
+    if T_C < first_C or T_C > last_C:
+        below = T_C < first_C
+        edge_C, edge_multiplier = points[0] if below else points[-1]
+        edge_T_K = edge_C + 273.15
+        edge_gamma = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * edge_multiplier
+        edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
+        central = math.exp(math.log(edge_gamma) * edge_T_K / float(T_K))
+        multiplier = central / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+
+        # Scale both printed sigma edges with the same ln(gamma) law. The
+        # public band is symmetric, so widen its sigma to enclose those edges
+        # and at least preserve the nearest tabulated segment spread.
+        scaled_low = math.exp(
+            math.log(edge_gamma - edge_sigma) * edge_T_K / float(T_K)
         )
+        scaled_high = math.exp(
+            math.log(edge_gamma + edge_sigma) * edge_T_K / float(T_K)
+        )
+        edge_points = points[:2] if below else points[-2:]
         edge_segment_spread = abs(
-            HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * (edge[1][1] - edge[0][1])
+            HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+            * (edge_points[1][1] - edge_points[0][1])
         )
-        sigma = max(sigma, edge_segment_spread)
+        sigma_band = max(
+            central - scaled_low,
+            scaled_high - central,
+            edge_segment_spread,
+        )
+        # The existing band width is in gamma units. Convert its symmetric
+        # gamma-space half-width to dex using the larger log distance to either
+        # edge, then combine it with the measured log10 model scatter in
+        # quadrature. Convert the expanded dex interval back to gamma values.
+        sigma_band_log10 = max(
+            math.log10(central / (central - sigma_band)),
+            math.log10((central + sigma_band) / central),
+        )
+        target_1400_T_K = points[1][0] + 273.15
+        printed_1400_multiplier = points[1][1]
+        model_scatter_log10 = 0.0
+        for scatter_edge_C, scatter_edge_multiplier in (points[0], points[-1]):
+            scatter_edge_gamma = (
+                HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * scatter_edge_multiplier
+            )
+            curve_1400_gamma = math.exp(
+                math.log(scatter_edge_gamma)
+                * (scatter_edge_C + 273.15)
+                / target_1400_T_K
+            )
+            curve_1400_multiplier = (
+                curve_1400_gamma / HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
+            )
+            model_scatter_log10 = max(
+                model_scatter_log10,
+                abs(math.log10(printed_1400_multiplier / curve_1400_multiplier)),
+            )
+        sigma_ext_log10 = math.sqrt(
+            sigma_band_log10**2 + model_scatter_log10**2
+        )
+        measurement_low = 10.0 ** (math.log10(central) - sigma_ext_log10)
+        measurement_high = 10.0 ** (math.log10(central) + sigma_ext_log10)
+        sigma = max(central - measurement_low, measurement_high - central)
+        gas_constant_j_mol_k = 8.314462618
+        excess_enthalpy_j_mol = (
+            gas_constant_j_mol_k * edge_T_K * math.log(edge_gamma)
+        )
+        distance_outside_span_widths = abs(T_C - edge_C) / span_C
+        authority_level = 'extrapolated'
+        status = (
+            'extrapolated_below_verified_range'
+            if below
+            else 'extrapolated_above_verified_range'
+        )
         notice = {
             'type': 'typed_notice',
             'kind': 'out_of_certified_band',
@@ -520,14 +565,33 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             'authority_level': authority_level,
             'side': 'below' if below else 'above',
             'certified_band': {
-                'temperature_C': (
-                    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0][0],
-                    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1][0],
-                ),
+                'temperature_C': (first_C, last_C),
             },
+            'edge_used': {
+                'temperature_C': edge_C,
+                'temperature_K': edge_T_K,
+            },
+            'W_J_mol': excess_enthalpy_j_mol,
+            'distance_outside_span_widths': distance_outside_span_widths,
+            'sigma_band_log10': sigma_band_log10,
+            'model_scatter_log10': model_scatter_log10,
+            'uncertainty_band_log10': sigma_ext_log10,
             'uncertainty_band': sigma,
             'edge_segment_spread': edge_segment_spread,
         }
+    else:
+        for (x0, y0), (x1, y1) in zip(points, points[1:]):
+            if x0 <= T_C <= x1:
+                frac = (T_C - x0) / (x1 - x0)
+                multiplier = y0 + frac * (y1 - y0)
+                break
+        else:
+            multiplier = points[-1][1]
+        status = 'interpolated_verified_range'
+        central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
+        sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+        measurement_low = max(0.0, central - sigma)
+        measurement_high = central + sigma
     return {
         'basis': 'stoichiometric_FeO_l',
         'temperature_C': T_C,
@@ -536,8 +600,8 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
         'authority_level': authority_level,
         'notice': notice,
         'central': central,
-        'measurement_low': max(0.0, central - sigma),
-        'measurement_high': central + sigma,
+        'measurement_low': measurement_low,
+        'measurement_high': measurement_high,
         'measurement_sigma': sigma,
         'source': FEO_ACTIVITY_DIAGNOSTIC_SOURCES['holzheid_gamma'],
         'conversion_source': (
