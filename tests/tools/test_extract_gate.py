@@ -99,6 +99,39 @@ def test_isolated_migration_reports_kinds_and_refusals(tmp_path: Path, monkeypat
     assert next(item for item in report.findings if item.check == "isolated-migration").severity == "HARD"
 
 
+def test_kress_pdf_lineage_resolves_in_stub_index_gate(monkeypatch):
+    path = (
+        REPO_ROOT
+        / "data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml"
+    )
+    doc = load_cached_safe_yaml(path.read_text(encoding="utf-8"))
+    migrators = []
+    original_migrator = gate.migrate.Migrator
+
+    def capture_migrator(*args, **kwargs):
+        migrator = original_migrator(*args, **kwargs)
+        migrators.append(migrator)
+        return migrator
+
+    monkeypatch.setattr(gate.migrate, "Migrator", capture_migrator)
+    report = gate.GateReport()
+
+    issues = gate._migrate_one(path, doc, report)
+    assert report.migration_hard_issues == 0
+    assert issues == []
+    assert len(migrators) == 1
+    validation = migrators[0].result.validation
+    assert validation is not None
+    hard_issue_details = [issue.detail for issue in validation.hard_issues]
+    assert hard_issue_details.count("derived observation requires derived_from") == 0
+    assert (
+        hard_issue_details.count(
+            "derived_from 'pdf:kress-carmichael-1988-iron-oxidation-stoichiometry' does not resolve"
+        )
+        == 0
+    )
+
+
 def test_scored_species_misfiling_and_three_non_scored_shapes(tmp_path: Path):
     doc = _document()
     doc["species"] = {
