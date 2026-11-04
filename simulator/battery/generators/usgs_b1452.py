@@ -2163,6 +2163,19 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
         if token.column == "uncertainty":
             exclude(token, UNCERTAINTY_EXCLUDE_REASON)
             continue
+        if (
+            kind == "table_298k"
+            and token.column == "entropy_s298"
+            and token.row_index is not None
+            and _formula_from_formula_line(_row_name(payload, token.row_index) or "")[0]
+            in {"TbO1.714", "TbO1.812"}
+            and _formula_weight_as_published(payload, row_index=token.row_index) is None
+        ):
+            exclude(
+                token,
+                "blank-formula-weight terbium formula line; substance entropy is on the name row",
+            )
+            continue
         if kind in {"table1_symbols", "table2_weights"} and token.column not in {
             "atomic_weight",
             "atomic_weight_right",

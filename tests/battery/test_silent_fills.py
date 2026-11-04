@@ -242,6 +242,23 @@ def test_iron_alias_without_oxygen_is_a_typed_refusal(alias, monkeypatch) -> Non
     assert alias in prediction.refusal_detail["multivalent"]
 
 
+def test_iron_alias_does_not_hide_an_unparseable_sibling(monkeypatch) -> None:
+    opened = _no_engine(monkeypatch)
+    ident = _melt(
+        (("FeOt", "0.2"), ("foobar", "0.1"), ("SiO2", "0.7")),
+        "SiO2",
+        fO2_Pa=None,
+        total_P=Decimal("1e5"),
+    )
+    obs = F.observation("feot-foobar", "exp", ident, Decimal("0.4"))
+
+    prediction = predict_with_engine(Engine.ALPHAMELTS, obs, isolated=False)
+
+    assert opened == []
+    assert prediction.refusal_detail["reason"] == "unparseable_composition_component"
+    assert prediction.refusal_detail["component"] == "foobar"
+
+
 def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
     seen = _capture_cell(monkeypatch)
     ident = _melt(
