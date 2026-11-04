@@ -175,11 +175,18 @@ _DEFAULT_PRESSURE_BAR = 1.0e-6
 _DEFAULT_FO2_LOG = -9.0
 _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
-# Per-cell wall around equilibrate(). ThermoEngine forwards this same budget
-# to its nested warm worker; its 60 s limit covers the measured 54.75 s D3
-# SiO2 maximum. The isolated-cell worker gets a separate 2 s response margin.
+# Per-cell hard wall around equilibrate(). Five loaded-host runs each on
+# 2026-11-04 (1m load 18–41) for the Rys Na row, Stolyarova Al2O/TiO rows, and
+# Costa/Stolyarova effusion pins had median slowest-call cost of 0.55–1.05 s
+# process CPU and 0.60–1.19 s wall. Maxima were 3.77 s CPU (Costa closure) and
+# 6.55 s wall (Al2O row 14; wall/CPU 1.86). The 15 s IA limit is 2.29x that
+# observed wall maximum, leaving 8.45 s for measured scheduling spread while
+# retaining a hard refusal for hangs.
+# ThermoEngine forwards its budget to its nested warm worker; its 60 s limit
+# covers the measured 54.75 s D3 SiO2 maximum. Isolated-cell workers get a
+# separate 2 s response margin.
 _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
-    "internal-analytical": 5.0,
+    "internal-analytical": 15.0,
     "alphamelts": 30.0,
     "thermoengine": 60.0,
     "vaporock": 70.0,
