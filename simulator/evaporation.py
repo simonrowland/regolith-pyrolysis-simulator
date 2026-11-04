@@ -108,6 +108,69 @@ def _headspace_reuse_or_load(sim: Any, key: str, loader):
     return loaded
 
 
+def _partial_channel_refusal_notes(
+    host: Any,
+    flux_overlay_report: Mapping[str, Any],
+    vapor_pressures: Mapping[str, float],
+    *,
+    record: bool,
+) -> list:
+    """Record peer-channel refusals that the flux map drops.
+
+    The headspace replay calls this once per probe so the host note
+    count matches a full provider probe. The winning probe's diagnostic
+    still receives the same notes through ``_calculate_evaporation``.
+    ``host`` is only the note bucket: seam tests call
+    ``_calculate_evaporation`` on a ``SimpleNamespace``, which has no
+    method to look up.
+    """
+
+    channel_states = dict(
+        flux_overlay_report.get('batch_channel_states', {}) or {}
+    )
+    notes: list = []
+    if not channel_states:
+        return notes
+    from simulator.silent_zero import (
+        CATEGORY_REFUSE,
+        ZeroBecause,
+        note_dict,
+        record_on_host,
+    )
+
+    detail = (
+        'channel state=refusal while peer channels still '
+        'debit; species omitted from flux (silent zero residual '
+        'of b-126 F3). Counted as category-1 missing input; '
+        'hard raise deferred pending blast-radius rebaseline.'
+    )
+    for species, state in sorted(channel_states.items()):
+        if str(state) != 'refusal':
+            continue
+        if species in vapor_pressures:
+            continue
+        note = note_dict(
+            ZeroBecause.REFUSED_UPSTREAM,
+            site='evaporation.partial_channel_refusal',
+            species=str(species),
+            field='batch_channel_state',
+            detail=detail,
+            doctrine_category=CATEGORY_REFUSE,
+        )
+        notes.append(note)
+        if record:
+            record_on_host(
+                host,
+                ZeroBecause.REFUSED_UPSTREAM,
+                site='evaporation.partial_channel_refusal',
+                species=str(species),
+                field='batch_channel_state',
+                detail=note['detail'],
+                doctrine_category=CATEGORY_REFUSE,
+            )
+    return notes
+
+
 def evaporation_flux_refusal_from_configuration_error(
     exc: BaseException,
 ) -> EvaporationFluxRefusal:
@@ -1316,7 +1379,8 @@ class EvaporationMixin:
                 except Exception:
                     predicted = None
                 if predicted is not None:
-                    self._partial_channel_refusal_notes(
+                    _partial_channel_refusal_notes(
+                        self,
                         flux_overlay_report,
                         vapor_pressures,
                         record=True,
@@ -1810,65 +1874,6 @@ class EvaporationMixin:
             effective_pressure_source,
         )
 
-    def _partial_channel_refusal_notes(
-        self,
-        flux_overlay_report: Mapping[str, Any],
-        vapor_pressures: Mapping[str, float],
-        *,
-        record: bool,
-    ) -> list:
-        """Record peer-channel refusals that the flux map drops.
-
-        The headspace replay calls this once per probe so the host note
-        count matches a full provider probe. The winning probe's diagnostic
-        still receives the same notes through ``_calculate_evaporation``.
-        """
-
-        channel_states = dict(
-            flux_overlay_report.get('batch_channel_states', {}) or {}
-        )
-        notes: list = []
-        if not channel_states:
-            return notes
-        from simulator.silent_zero import (
-            CATEGORY_REFUSE,
-            ZeroBecause,
-            note_dict,
-            record_on_host,
-        )
-
-        detail = (
-            'channel state=refusal while peer channels still '
-            'debit; species omitted from flux (silent zero residual '
-            'of b-126 F3). Counted as category-1 missing input; '
-            'hard raise deferred pending blast-radius rebaseline.'
-        )
-        for species, state in sorted(channel_states.items()):
-            if str(state) != 'refusal':
-                continue
-            if species in vapor_pressures:
-                continue
-            note = note_dict(
-                ZeroBecause.REFUSED_UPSTREAM,
-                site='evaporation.partial_channel_refusal',
-                species=str(species),
-                field='batch_channel_state',
-                detail=detail,
-                doctrine_category=CATEGORY_REFUSE,
-            )
-            notes.append(note)
-            if record:
-                record_on_host(
-                    self,
-                    ZeroBecause.REFUSED_UPSTREAM,
-                    site='evaporation.partial_channel_refusal',
-                    species=str(species),
-                    field='batch_channel_state',
-                    detail=note['detail'],
-                    doctrine_category=CATEGORY_REFUSE,
-                )
-        return notes
-
     def _calculate_evaporation(
         self,
         equilibrium,
@@ -2242,7 +2247,8 @@ class EvaporationMixin:
         # vapor_pressures and surface as flux 0 with no raise (all-non-debit
         # already refuses above). Record each refused species so incomplete
         # extraction is visible while the catalog can still subtract.
-        _partial_sz_notes = self._partial_channel_refusal_notes(
+        _partial_sz_notes = _partial_channel_refusal_notes(
+            self,
             flux_overlay_report,
             vapor_pressures,
             record=_record_host_partial_channel_notes,
