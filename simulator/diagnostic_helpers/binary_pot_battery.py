@@ -177,13 +177,15 @@ _WT_PCT_SUM_TOLERANCE = 1.0e-9
 
 # Five loaded-host runs each on 2026-11-04 for Rys Na, Stolyarova Al2O/TiO,
 # and the Costa/Stolyarova closures had CPU medians of 1.05, 0.57, 0.55, 0.89,
-# and 0.71 s; individual CPU times ranged 0.54–3.77 s (Costa maximum). A 10 s
-# ITIMER_PROF budget is 2.65x that maximum, with 6.23 s extra CPU headroom for
-# the observed spread. The largest wall time was 6.55 s (Al2O row 14; max
-# wall/CPU ratio 1.86). The 120 s wall backstop is 12x the CPU budget and 18.3x
-# the measured wall maximum; it refuses blocked hangs, though extreme
-# scheduling can still exhaust this residual wall budget. Non-isolated calls
-# cannot be charged process CPU, so they retain this generous wall cap.
+# and 0.71 s; individual CPU times ranged 0.54–3.77 s (range 3.23 s, Costa
+# maximum). Set the per-request ITIMER_PROF budget to round_up_1(3.77 +
+# 1.9 × 3.23) = 10 s, using nearly twice the measured run-to-run CPU range
+# (6.14 s) as margin beyond the observed maximum. The largest wall time was
+# 6.55 s (Al2O row 14; max wall/CPU ratio 1.86). The 120 s wall backstop is
+# 12x the CPU budget and 18.3x the measured wall maximum; it refuses blocked
+# hangs. Extreme scheduling can still exhaust this residual wall budget.
+# Explicit in-process IA handles retain the wall cap because process CPU cannot
+# be isolated from their caller.
 # ThermoEngine forwards its budget to its nested warm worker; its 60 s limit
 # covers the measured 54.75 s D3 SiO2 maximum. Isolated-cell workers get a
 # separate 2 s response margin.

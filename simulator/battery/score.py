@@ -8870,10 +8870,13 @@ def predict_with_engine(
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
-    if isolated is None and engine is Engine.INTERNAL_ANALYTICAL and not handles:
-        # Store scoring and censuses use the child CPU budget by default. A
-        # caller-supplied live handle keeps its explicit in-process semantics.
-        isolated = True
+    if isolated is None and engine is Engine.INTERNAL_ANALYTICAL:
+        # Only an IA handle means the caller explicitly owns an in-process IA
+        # backend. Other engines in the shared score cache do not suppress the
+        # child CPU budget.
+        isolated = not bool(
+            handles and handles.get(Engine.INTERNAL_ANALYTICAL.value) is not None
+        )
     if isinstance(handles, dict):
         return _engine_prediction_or_unparseable_component(
             engine,
@@ -10029,7 +10032,7 @@ def _predict_with_engine(
             experiment=experiment,
             bench=bench,
             handles=handle_map,
-            isolated=use_isolated,
+            isolated=isolated,
             notices=extra_notices,
         )
         if isinstance(borrowed, EnginePrediction):
@@ -12054,6 +12057,10 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
+        if predictor is predict_with_engine and engine is Engine.INTERNAL_ANALYTICAL:
+            # Whole-store scoring owns the shared handle cache. Keep every IA
+            # row on the warm CPU-budget worker after the cache is populated.
+            predictor_kwargs["isolated"] = True
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
