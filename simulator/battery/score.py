@@ -9620,6 +9620,21 @@ def _predict_with_engine(
                         authority=Authority.BRIDGE,
                     )
                 )
+            source_composition_range_notice = (
+                activity.source_composition_range_notice
+            )
+            if source_composition_range_notice is not None:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=source_composition_range_notice,
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
             certified_band = None
             if activity.valid_range_K is not None:
                 low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))

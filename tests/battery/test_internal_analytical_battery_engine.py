@@ -257,11 +257,17 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
 
 
 @pytest.mark.parametrize(
-    ("formula", "temperature_K", "expected_notices"),
+    (
+        "formula",
+        "temperature_K",
+        "outside_source_composition_range",
+        "expected_notices",
+    ),
     [
         (
             "MnO",
             Decimal("1473.15"),
+            True,
             frozenset(
                 {
                     # activity_request_for_engine defaults to SHARED_LADDER,
@@ -305,6 +311,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "K2O",
             Decimal("1500"),
+            True,
             frozenset(
                 {
                     Notice(
@@ -322,6 +329,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "Al2O3",
             Decimal("1473.15"),
+            True,
             frozenset(
                 {
                     Notice(
@@ -348,6 +356,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "P2O5",
             Decimal("1873"),
+            True,
             frozenset(
                 {
                     Notice(
@@ -365,6 +374,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "CaO",
             Decimal("1873"),
+            True,
             frozenset(
                 {
                     Notice(
@@ -382,6 +392,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "MgO",
             Decimal("1873"),
+            False,
             frozenset(
                 {
                     Notice(
@@ -401,6 +412,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
 def test_internal_analytical_row_uses_gamma_reference_notice(
     formula: str,
     temperature_K: Decimal,
+    outside_source_composition_range: bool,
     expected_notices: frozenset[Notice],
 ) -> None:
     experiment, bench, observation = _case(
@@ -423,7 +435,21 @@ def test_internal_analytical_row_uses_gamma_reference_notice(
         isolated=False,
     )
     assert prediction.execution.state is ExecutionState.PRODUCED
-    assert frozenset(prediction.notices) == expected_notices
+    source_range_notices = tuple(
+        notice
+        for notice in prediction.notices
+        if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    )
+    assert len(source_range_notices) == int(outside_source_composition_range)
+    for notice in source_range_notices:
+        assert notice.reason.startswith(
+            "ia_constant_gamma_outside_source_composition_range"
+        )
+        assert f"oxide={formula}" in notice.reason
+        assert "range=" in notice.reason and "source=" in notice.reason
+    assert frozenset(prediction.notices) - frozenset(source_range_notices) == (
+        expected_notices
+    )
 
 
 def test_internal_analytical_scores_cho_suito_1994_sio2_row() -> None:

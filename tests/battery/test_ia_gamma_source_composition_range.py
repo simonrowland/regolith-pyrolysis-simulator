@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
+from pathlib import Path
+
+import yaml
 
 from simulator.battery.enums import Engine, ExecutionState
 from simulator.battery.generators.bench import activity_request_for_engine
@@ -22,12 +26,20 @@ def _score_activity(
     temperature_K: str,
     *,
     baseline_value: str | None = None,
+    source_id: str | None = None,
+    observation_id: str | None = None,
 ):
     experiment, bench, observation = _case(
         composition=_composition(*composition.items()),
         formula=oxide,
         temperature=Decimal(temperature_K),
     )
+    if source_id is not None or observation_id is not None:
+        observation = replace(
+            observation,
+            source_id=source_id or observation.source_id,
+            observation_id=observation_id or observation.observation_id,
+        )
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
         observation,
@@ -63,14 +75,27 @@ def _source_range_notices(prediction):
 
 
 def test_kambayashi_kato_mgo_binary_row_is_flagged_without_changing_value() -> None:
-    # Kambayashi & Kato 1984 Table 2, p. 246: x(SiO2)=0.795, x(MgO)=0.205,
-    # 1973 K. This binary composition is outside the cited CMAS basicity band.
+    extract_path = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/extracts/kambayashi-kato-1984-mgo-sio2-1973k.yaml"
+    )
+    extract = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    row = next(
+        row
+        for row in extract["species"]["MgO"]["observations"]
+        if row["observation_id"]
+        == "kambayashi_kato_1984_mgo_sio2_1973k_p006_t02_r02_c03"
+    )
+    # Kambayashi & Kato 1984 Table 2, p. 246. This binary composition is
+    # outside the cited CMAS basicity band.
     prediction = _score_activity(
         "MgO",
-        {"SiO2": "0.795", "MgO": "0.205"},
-        "1973",
+        row["values"]["composition_mole_fraction"],
+        row["values"]["T_K"],
         # Golden output from the unmodified 0ea42527e scorer.
         baseline_value="0.009960556690592466",
+        source_id=extract["source_id"],
+        observation_id=row["observation_id"],
     )
 
     notices = _source_range_notices(prediction)
@@ -103,7 +128,7 @@ def test_unrecorded_source_composition_range_is_still_flagged() -> None:
     reason = notices[0].reason
     assert "oxide=K2O" in reason
     assert "unrecorded" in reason.lower()
-    assert "DeMaria et al. 1971" in reason
+    assert "De Maria et al. 1971" in reason
 
 
 def test_every_declared_gamma_has_source_composition_range_metadata() -> None:
