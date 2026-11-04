@@ -2979,27 +2979,27 @@ def _iron_saturated_feo_comparison(
     quantity = quantity_token(identity)
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
+    reference_state = identity.reference_state
     if (
         reference.source_id == _COLSON_WUSTITE_SOURCE_ID
         and quantity is Quantity.ACTIVITY_COEFFICIENT
         and identity.species is not None
         and identity.species.formula == _FEO_STOICHIOMETRIC_FORMULA
         and phase_token(identity.species) is Phase.L
+        and (reference_state is None or reference_state.is_unknown)
     ):
         # Colson et al. (2005), p. 7, Table 3 footnote a reports gamma_FeO
         # relative to liquid wüstite; its extract has no closed state token.
-        identity = replace(
-            identity,
-            reference_state=State.of(
-                StandardState(
-                    convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
-                    endmember=replace(
-                        identity.species, formula=_FEO_WUSTITE_FORMULA
-                    ),
-                    component_basis=_FEO_WUSTITE_FORMULA,
-                )
-            ),
+        reference_state = State.of(
+            StandardState(
+                convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                endmember=replace(
+                    identity.species, formula=_FEO_WUSTITE_FORMULA
+                ),
+                component_basis=_FEO_WUSTITE_FORMULA,
+            )
         )
+        identity = replace(identity, reference_state=reference_state)
         reference = replace(reference, identity=identity)
     if (
         identity.reference_state is None
