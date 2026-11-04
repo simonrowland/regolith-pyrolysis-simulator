@@ -522,6 +522,34 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
     )
 
 
+def test_internal_analytical_cell_carries_mgo_fusion_conversion_notice() -> None:
+    pot = BinaryPot(
+        pot_id="mgo_sio2_60_40",
+        kato_1993_table4_system=None,
+        why="high-temperature liquid-reference notice probe",
+        composition_wt_pct={"MgO": 60.0, "SiO2": 40.0},
+    )
+    cell = equilibrate_cell(
+        open_battery_engine("internal-analytical"),
+        pot,
+        temperature_K=4500.0,
+        po2=Po2Request(mode="commanded", po2_bar=1e-10),
+        timeout_s=30.0,
+        isolated=False,
+    )
+
+    assert cell.status == "ok", cell.refusal_reason
+    notice = next(
+        notice
+        for notice in cell.notices
+        if notice.get("kind") == "out_of_certified_band"
+        and "d144_fusion_conversion" in str(notice.get("reason") or "")
+    )
+    assert notice["authority"] == AUTHORITY_EXTRAPOLATED
+    assert "terminal Gibbs chord" in notice["reason"]
+    assert "certified_band_K=[298.15, 4000]" in notice["reason"]
+
+
 def test_pots_load_and_sum_to_100_wt_pct() -> None:
     pots, grid = load_binary_pots(DEFAULT_POTS_PATH)
     assert len(pots) == 8
