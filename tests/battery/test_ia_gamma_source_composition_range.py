@@ -203,7 +203,11 @@ def test_anorthite_diopside_primary_bounds_are_unrecorded() -> None:
 
 def test_beckett_mgo_mole_fraction_limit_is_enforced_inside_basicity_window() -> None:
     prediction = _score_activity(
-        "MgO", {"MgO": "0.6", "SiO2": "0.4"}, "1873"
+        "MgO",
+        {"MgO": "0.6", "SiO2": "0.4"},
+        "1873",
+        # Golden output from the unmodified 0ea42527e scorer.
+        baseline_value="0.029152848850514536",
     )
 
     notices = _source_range_notices(prediction)
@@ -219,6 +223,8 @@ def test_beckett_full_liquid_mole_fraction_set_is_declared_and_enforced() -> Non
         "MgO",
         {"MgO": "0.1", "Al2O3": "0.46", "SiO2": "0.44"},
         "1873",
+        # Golden output from the unmodified 0ea42527e scorer.
+        baseline_value="0.003327950782022208",
     )
 
     notices = _source_range_notices(prediction)
