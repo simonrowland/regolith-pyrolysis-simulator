@@ -14,10 +14,10 @@ extraction:
     3–9 were not digitized (Figure 5 is calculated). The authors calculate
     Na2O activity from stoichiometric Na2O(l,s) vaporization, assume ideal gas
     behavior, neglect dimers, monoxides, and atomic oxygen, use pO2 = pNa/4,
-    and take Kp from the FACT pure-substance database. The activity values
-    reduce measured partial pressures through Eq. 3, but the pressure inputs
-    for these points are not stored, so the reported activities are
-    quoted_attributed. The calibration
+    and take Kp from the FACT pure-substance database. The source calls these
+    measured activities and says they are calculated from determined KEMS
+    partial pressures through Eq. 3, so they are measured_reduced. The pressure
+    inputs for these points are not stored. The calibration
     constant was determined against pure silver partial pressure. The source
     does not report the KEMS run total pressure or oxygen fugacity; the
     apparatus vacuum statement is not assigned to the sample as a pressure.
@@ -47,19 +47,56 @@ species:
         type: activity_coefficient
         locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
         regime: kems_effusion
+        standard_state_as_printed: >-
+          "Therefore, the alkali oxide activity was calculated according to eq 3:
+          aNa2O = pNa^2.5/(2Kp). Where, ai is the activity, pi is the
+          determined partial pressure, and Kp is the equilibrium constant of
+          (2). The data of the equilibrium constant were taken from the FACT
+          pure substance database.17" Equation (2) is Na2O(l,s) ⇌ 2Na(g) +
+          1/2O2(g).
+        standard_state:
+          state:
+            tag: unknown
+            reason: >-
+              Equation (2) prints Na2O(l,s), which names both liquid and solid
+              and does not specify one reference phase for these activities.
+          inferred: false
+          note: >-
+            The source names the FACT pure substance database [17] for Kp but
+            does not print one phase-specific Gibbs function here.
+          locator:
+            page: 3
+            published_page: 2595
+            pdf_page_index: 2
+            section: Experimental Setup
+            equation: '3'
         units: dimensionless activity
         uncertainty: {note: No per-run uncertainty is printed.}
         note: The paper reports AlSi8Na1 was partly molten and contained mullite and cristobalite after measurement.
         values:
           quantity: activity
-          method_class: quoted_attributed
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Equation (3) reduces the determined KEMS sodium partial pressure
+              to Na2O activity; the source takes Kp for Equation (2) from
+              FACT [17]. The pressure inputs for these reported points are not
+              printed.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 2595
+                pdf_page_index: 2
+                section: Experimental Setup
+                equation: '3'
+            output_unit: dimensionless
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
           activity: 5e-14
           approximate: true
           activity_as_published: about 5 × 10^-14
           composition_role: datum_state
-          reference_state_as_published: 'Eq. 3 defines aNa2O from Na2O(l,s) stoichiometric vaporization and Kp from the FACT pure-substance database.'
           composition_wt_pct: {SiO2: '81.12', Al2O3: '17.67', Na2O: '1.21'}
           quote: 'The sodium oxide activity in AlSi8Na1 is about 5 × 10^-14 at 1400 °C.'
           points:
@@ -78,18 +115,55 @@ species:
         type: activity_coefficient
         locator: {page: 5, published_page: 2597, pdf_page_index: 4, section: Results and Discussion}
         regime: kems_effusion
+        standard_state_as_printed: >-
+          "Therefore, the alkali oxide activity was calculated according to eq 3:
+          aNa2O = pNa^2.5/(2Kp). Where, ai is the activity, pi is the
+          determined partial pressure, and Kp is the equilibrium constant of
+          (2). The data of the equilibrium constant were taken from the FACT
+          pure substance database.17" Equation (2) is Na2O(l,s) ⇌ 2Na(g) +
+          1/2O2(g).
+        standard_state:
+          state:
+            tag: unknown
+            reason: >-
+              Equation (2) prints Na2O(l,s), which names both liquid and solid
+              and does not specify one reference phase for these activities.
+          inferred: false
+          note: >-
+            The source names the FACT pure substance database [17] for Kp but
+            does not print one phase-specific Gibbs function here.
+          locator:
+            page: 3
+            published_page: 2595
+            pdf_page_index: 2
+            section: Experimental Setup
+            equation: '3'
         units: dimensionless activity
         uncertainty: {note: No per-run uncertainty is printed.}
         values:
           quantity: activity
-          method_class: quoted_attributed
+          method_class: measured_reduced
+          derivation:
+            relation: >-
+              Equation (3) reduces the determined KEMS sodium partial pressure
+              to Na2O activity; the source takes Kp for Equation (2) from
+              FACT [17]. The pressure inputs for these reported points are not
+              printed.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator:
+                page: 3
+                published_page: 2595
+                pdf_page_index: 2
+                section: Experimental Setup
+                equation: '3'
+            output_unit: dimensionless
           admission_status: admitted
           attribution: 'Willenborg et al. (2006), present work.'
           activity: 2e-13
           approximate: true
           activity_as_published: about 2 × 10^-13
           composition_role: datum_state
-          reference_state_as_published: 'Eq. 3 defines aNa2O from Na2O(l,s) stoichiometric vaporization and Kp from the FACT pure-substance database.'
           composition_wt_pct: {SiO2: '74.06', Al2O3: '17.10', MgO: '7.43', Na2O: '1.02'}
           quote: 'The sodium oxide activity in AlSi8Mg8Na1 is about 2 × 10^-13 at 1400 °C.'
           points:

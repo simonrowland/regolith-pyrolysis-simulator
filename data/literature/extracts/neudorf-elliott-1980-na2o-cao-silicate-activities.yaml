@@ -710,6 +710,33 @@ species:
         note: row 1; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: &neudorf_na2o_reference_state
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            component_basis: Na2O
+            endmember:
+              formula: Na2O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not crystal
+              charge:
+                tag: value
+                value: 0
+            reference_pressure_bar: '1.01325'
+        inferred: false
+        note: >-
+          Published page 608 defines the standard as pure liquid Na2O at 1 atm.
+          Lin and Elliott [24] provide the Na2O-WO3 reference-melt partial Gibbs
+          function in Eq. [5], GM(Na2O),(tung) = -95.10 - 347.2 NWO3 kJ at
+          1200 K. This is for the reference melt; the paper does not identify a
+          separate Gibbs function or table for pure liquid Na2O.
+        locator: *id004
       values:
         log_a_star_as_printed: '8.82'
         printed_log_form_as_published: log a*Na2O
@@ -718,7 +745,6 @@ species:
         NCaO_as_printed: '0.00'
         NNa_plus_as_printed: '1.00'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -768,6 +794,27 @@ species:
         note: row 2; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
+      derived_from: &richardson_eq8_lineage
+      - neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_richardson_eq8_model_context
+      derivation: &richardson_eq8_derivation
+        relation: The authors calculate this Table IV log activity using the Richardson ideal-mixing relation identified by Eq. [8]¹¹.
+        inputs: *richardson_eq8_lineage
+        output_unit: dimensionless log activity as printed
+        method:
+          state:
+            tag: value
+            value: By Eq. [8]¹¹ as printed in the Table IV header.
+          locator:
+            page: 7
+            pdf_page_index: 6
+            published_page: 613
+            table: IV
+            equation: '8'
+        references:
+        - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+        - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
       values:
         log_a_star_as_printed: '8.93'
         printed_log_form_as_published: log a*Na2O
@@ -776,9 +823,8 @@ species:
         NCaO_as_printed: '0.02'
         NNa_plus_as_printed: '0.971'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
         admission_status: typed_refusal
         refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
           those figure-only values are intentionally undigitized, so no parent observation rows are stored.
@@ -804,7 +850,7 @@ species:
             note: Table IV row 2 prints NNa2O and NCaO.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      method_class: author_derived
+      method_class: model_derived
     - observation_id: neudorf_elliott_1980_table4_row2_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -817,6 +863,8 @@ species:
         note: row 2; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '8.89'
         printed_log_form_as_published: log a*Na2O
@@ -825,7 +873,6 @@ species:
         NCaO_as_printed: '0.02'
         NNa_plus_as_printed: '0.971'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -850,6 +897,10 @@ species:
         note: row 3; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
+      derived_from: *richardson_eq8_lineage
+      derivation: *richardson_eq8_derivation
       values:
         log_a_star_as_printed: '9.05'
         printed_log_form_as_published: log a*Na2O
@@ -858,9 +909,8 @@ species:
         NCaO_as_printed: '0.04'
         NNa_plus_as_printed: '0.939'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
         admission_status: typed_refusal
         refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
           those figure-only values are intentionally undigitized, so no parent observation rows are stored.
@@ -886,7 +936,7 @@ species:
             note: Table IV row 3 prints NNa2O and NCaO.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      method_class: author_derived
+      method_class: model_derived
     - observation_id: neudorf_elliott_1980_table4_row3_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -899,6 +949,8 @@ species:
         note: row 3; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.00'
         printed_log_form_as_published: log a*Na2O
@@ -907,7 +959,6 @@ species:
         NCaO_as_printed: '0.04'
         NNa_plus_as_printed: '0.939'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -932,6 +983,10 @@ species:
         note: row 4; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
+      derived_from: *richardson_eq8_lineage
+      derivation: *richardson_eq8_derivation
       values:
         log_a_star_as_printed: '9.16'
         printed_log_form_as_published: log a*Na2O
@@ -940,9 +995,8 @@ species:
         NCaO_as_printed: '0.06'
         NNa_plus_as_printed: '0.906'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
         admission_status: typed_refusal
         refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
           those figure-only values are intentionally undigitized, so no parent observation rows are stored.
@@ -968,7 +1022,7 @@ species:
             note: Table IV row 4 prints NNa2O and NCaO.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      method_class: author_derived
+      method_class: model_derived
     - observation_id: neudorf_elliott_1980_table4_row4_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -981,6 +1035,8 @@ species:
         note: row 4; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.14'
         printed_log_form_as_published: log a*Na2O
@@ -989,7 +1045,6 @@ species:
         NCaO_as_printed: '0.06'
         NNa_plus_as_printed: '0.906'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1014,6 +1069,10 @@ species:
         note: row 5; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
+      derived_from: *richardson_eq8_lineage
+      derivation: *richardson_eq8_derivation
       values:
         log_a_star_as_printed: '9.29'
         printed_log_form_as_published: log a*Na2O
@@ -1022,9 +1081,8 @@ species:
         NCaO_as_printed: '0.08'
         NNa_plus_as_printed: '0.871'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
         admission_status: typed_refusal
         refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
           those figure-only values are intentionally undigitized, so no parent observation rows are stored.
@@ -1050,7 +1108,7 @@ species:
             note: Table IV row 5 prints NNa2O and NCaO.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      method_class: author_derived
+      method_class: model_derived
     - observation_id: neudorf_elliott_1980_table4_row5_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1063,6 +1121,8 @@ species:
         note: row 5; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.27'
         printed_log_form_as_published: log a*Na2O
@@ -1071,7 +1131,6 @@ species:
         NCaO_as_printed: '0.08'
         NNa_plus_as_printed: '0.871'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1096,6 +1155,10 @@ species:
         note: row 6; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
+      derived_from: *richardson_eq8_lineage
+      derivation: *richardson_eq8_derivation
       values:
         log_a_star_as_printed: '9.41'
         printed_log_form_as_published: log a*Na2O
@@ -1104,9 +1167,8 @@ species:
         NCaO_as_printed: '0.10'
         NNa_plus_as_printed: '0.833'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
         admission_status: typed_refusal
         refusal_reason: The Table IV input measurements are plotted in Figs. 3–7 and are not tabulated;
           those figure-only values are intentionally undigitized, so no parent observation rows are stored.
@@ -1132,7 +1194,7 @@ species:
             note: Table IV row 6 prints NNa2O and NCaO.
         fO2_Pa: *id002
         total_pressure_Pa: *id003
-      method_class: author_derived
+      method_class: model_derived
     - observation_id: neudorf_elliott_1980_table4_row6_interpolated_log_a_star_na2o
       experiment: neudorf_elliott_1980_cell_emf
       type: activity_coefficient
@@ -1145,6 +1207,8 @@ species:
         note: row 6; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.41'
         printed_log_form_as_published: log a*Na2O
@@ -1153,7 +1217,6 @@ species:
         NCaO_as_printed: '0.10'
         NNa_plus_as_printed: '0.833'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1471,6 +1534,29 @@ species:
         emf_values_as_printed: No numerical cell emf is tabulated; measured potentials are used in Eq.
           [4].
         vapor_values_as_printed: No vapor-pressure values are reported.
+    - observation_id: neudorf_elliott_1980_richardson_eq8_model_context
+      type: context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 612
+        section: Na2O-CaO-SiO2 System
+        note: Results and Discussion explains the Richardson ideal-mixing calculation used in Table IV.
+      units: As printed; activities dimensionless, composition mole fractions.
+      values:
+        quantity: ternary_Na2O_activity_model_method_and_inputs
+        method_class: model_derived
+        table_column_as_printed: By Eq. [8]¹¹
+        model_as_printed: Richardson ideal mixing of pseudobinary Na2O-SiO2 and CaO-SiO2 components, modified for Na+ monovalency.
+        temperature_as_printed: 1070 °C
+        N_SiO2_as_printed: '0.65'
+        x_as_printed: '0.538'
+        a_SiO2_Na_binary_as_printed: approximately 0.24
+        a_SiO2_Ca_binary_as_printed: roughly 1.56
+        a_SiO2_Ca_binary_method_as_printed: Estimated by extrapolating Rein and Chipman [25] activity data at 1550 and 1600 °C to 1070 °C.
+        references:
+        - F. D. Richardson [11], Trans. Faraday Soc., 1956, vol. 52, p. 1312.
+        - H. R. Rein and J. Chipman [25], Trans. AIME, 1955, vol. 203, pp. 1250-1254.
   SiO2:
     observations:
     - observation_id: neudorf_elliott_1980_table2_sio2_fit_row1
