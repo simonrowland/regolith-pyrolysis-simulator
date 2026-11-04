@@ -203,10 +203,18 @@ def test_anorthite_diopside_primary_bounds_are_unrecorded() -> None:
     assert "oxide=SiO2" in reason
     assert "range=unrecorded" in reason
     assert "Ghiorso & Sack 1995" in reason
-    assert (
-        MELT_OXIDE_ACTIVITY_COEFFICIENTS["Al2O3"]
-        .source_composition_range.description.startswith("UNRECORDED")
+
+
+def test_alumina_anorthite_diopside_bounds_are_unrecorded() -> None:
+    reason = _direct_range_notice(
+        "Al2O3",
+        {"CaO": "0.33", "SiO2": "0.33", "Al2O3": "0.34"},
+        "1600",
     )
+
+    assert "oxide=Al2O3" in reason
+    assert "range=unrecorded" in reason
+    assert "Ghiorso & Sack 1995" in reason
 
 
 def test_beckett_mgo_mole_fraction_limit_is_enforced_inside_basicity_window() -> None:
