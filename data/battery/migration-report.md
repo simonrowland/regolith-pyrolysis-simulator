@@ -1,9 +1,9 @@
 # Battery v2.1 migration report
 
 rows in: 89572
-records out (observations): 179694
+records out (observations): 179594
 works: 756
-experiments: 6879
+experiments: 6874
 queue size: 120653
 identical-payload dedupe aliases: 342
 metadata files: 50
@@ -17468,7 +17468,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0001.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0002.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1850 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1858 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02.json` | 1 | 18 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0005-phase-02.json` | 1 | 29 | 0 |
@@ -17805,8 +17805,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0199.json` | 1 | 16 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0200.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0201.json` | 1 | 62 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 34 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 27 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0204.json` | 1 | 38 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205-phase-02.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205.json` | 1 | 37 | 0 |
@@ -18243,13 +18243,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0168-sodium-oxide.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0169-bunsenite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0170-phosphorus-pentoxide.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0171-po-aqueous-ion.json` | 1 | 2 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0171-po-aqueous-ion.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0172-litharge.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0173-massicot.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0174-minium.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0175-sulfur-dioxide.json` | 1 | 3 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0176-sulfur-trioxide.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0177-so-aqueous-ion.json` | 1 | 2 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0177-so-aqueous-ion.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0178-so-aqueous-ion.json` | 1 | 2 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0179-valentioite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0180-scandium-sesquioxide.json` | 1 | 0 | 0 |
@@ -18351,7 +18351,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0276-powellite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0277-wulfenite.json` | 1 | 1 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0278-scheelite.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0279-ferberite.json` | 1 | 1 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0279-ferberite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0280-stolzite.json` | 1 | 1 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0281-kyanite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0282-andalusite.json` | 1 | 4 | 0 |
@@ -18387,7 +18387,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0312-leonhardite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0313-microcline.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0314-high-sanidine.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0315-adularia.json` | 1 | 4 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0315-adularia.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0316-kalsi-o-glass.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0317-kaliophilite.json` | 1 | 3 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0318-leucite.json` | 1 | 4 | 0 |
@@ -18552,7 +18552,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0143-sylvite.json` | 1 | 106 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0144-chloromagnesite.json` | 1 | 88 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0145-scacchite.json` | 1 | 67 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0146-salammoniac.json` | 1 | 15 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0146-salammoniac.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0147-halite.json` | 1 | 100 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0148-cotunnite.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0149-fluorite.json` | 1 | 101 | 0 |
@@ -18590,8 +18590,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0181-ca-2-sio-4.json` | 1 | 104 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0182-calcium-olivine.json` | 1 | 48 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0183-gehlenite.json` | 1 | 72 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0184-grcssular.json` | 1 | 73 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0185-merwinite.json` | 1 | 72 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0184-grcssular.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0185-merwinite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0186-akermanite.json` | 1 | 69 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0187-sphene.json` | 1 | 87 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0188-fayalite.json` | 1 | 91 | 0 |
