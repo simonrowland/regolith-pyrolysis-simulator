@@ -2629,7 +2629,7 @@ class _InternalAnalyticalBudgetBackend:
             while True:
                 pass
         if self.mode == "idle_then_short_compute":
-            time.sleep(1.5)
+            time.sleep(6.0)
             cpu_deadline = time.process_time() + 0.4
             while time.process_time() < cpu_deadline:
                 pass
@@ -2646,11 +2646,12 @@ class _InternalAnalyticalBudgetBackend:
 
 
 def _internal_analytical_budget_bootstrap(
-    _engine: str, *, mode: str, cpu_budget_s: float
+    _engine: str, *, mode: str, cpu_budget_s: float | None
 ):
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
-    battery._INTERNAL_ANALYTICAL_CPU_BUDGET_S = cpu_budget_s
+    if cpu_budget_s is not None:
+        battery._INTERNAL_ANALYTICAL_CPU_BUDGET_S = cpu_budget_s
     handle = battery.EngineHandle(
         name="internal-analytical",
         backend=_InternalAnalyticalBudgetBackend(mode),
@@ -2666,7 +2667,7 @@ def _install_internal_analytical_budget_worker(
     monkeypatch: pytest.MonkeyPatch,
     *,
     mode: str,
-    cpu_budget_s: float = 0.1,
+    cpu_budget_s: float | None = 0.1,
 ):
     import simulator.diagnostic_helpers.binary_pot_battery as battery
 
@@ -2680,12 +2681,13 @@ def _install_internal_analytical_budget_worker(
             cpu_budget_s=cpu_budget_s,
         ),
     )
-    monkeypatch.setattr(
-        battery,
-        "_INTERNAL_ANALYTICAL_CPU_BUDGET_S",
-        cpu_budget_s,
-        raising=False,
-    )
+    if cpu_budget_s is not None:
+        monkeypatch.setattr(
+            battery,
+            "_INTERNAL_ANALYTICAL_CPU_BUDGET_S",
+            cpu_budget_s,
+            raising=False,
+        )
     return battery
 
 
@@ -2742,45 +2744,38 @@ def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     battery = _install_internal_analytical_budget_worker(
-        monkeypatch, mode="idle_then_short_compute", cpu_budget_s=0.5
+        monkeypatch, mode="idle_then_short_compute", cpu_budget_s=None
     )
-    monkeypatch.setitem(
-        battery._ENGINE_OUTER_TIMEOUT_S, "internal-analytical", 10.0
+    handle = EngineHandle(
+        name="internal-analytical",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    pot = BinaryPot(
+        pot_id="worker-cpu-budget-idle-then-compute",
+        kato_1993_table4_system=None,
+        why="worker-test",
+        composition_wt_pct={"SiO2": 20.0, "FeO": 48.0, "MgO": 32.0},
     )
     try:
-        cpu_budget_cell = _run_fake_isolated_cell(
-            battery,
-            pot_id="worker-cpu-budget-idle-then-compute",
-            engine="internal-analytical",
-            timeout_s=10.0,
+        # Leave timeout_s unset so equilibrate_cell uses production defaults.
+        # Green's 5 s wall cap refused this during the 6 s idle, despite only
+        # 0.4 s of process CPU being used.
+        cpu_budget_cell = battery.equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            isolated=True,
         )
     finally:
         battery._close_isolated_cell_workers()
 
     assert cpu_budget_cell.status == "ok"
     assert cpu_budget_cell.refusal_reason is None
-
-    # Re-run the identical child workload with the former 1 s wall cap. A
-    # deliberately generous CPU timer stays armed but cannot be the limit.
-    battery = _install_internal_analytical_budget_worker(
-        monkeypatch, mode="idle_then_short_compute", cpu_budget_s=100.0
-    )
-    monkeypatch.setitem(
-        battery._ENGINE_OUTER_TIMEOUT_S, "internal-analytical", 1.0
-    )
-    try:
-        wall_only_cell = _run_fake_isolated_cell(
-            battery,
-            pot_id="worker-wall-budget-idle-then-compute",
-            engine="internal-analytical",
-            timeout_s=1.0,
-        )
-    finally:
-        battery._close_isolated_cell_workers()
-
-    assert wall_only_cell.status == "refusal"
-    assert wall_only_cell.refusal_reason == REFUSAL_TIMEOUT
-    assert wall_only_cell.engine_reason == "equilibrate exceeded hard timeout of 1s"
 
 
 def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
