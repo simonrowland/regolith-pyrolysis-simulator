@@ -103,19 +103,29 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     }
     assert unknown_rows == {"K2SiO3", "K2Si2O5", "K2Si4O9"}
 
-    non_source_records = {
+    non_source_rows = {
         (
             fact.split("pack=", 1)[1].split(";", 1)[0],
             fact.split("oxide=", 1)[1].split(";", 1)[0],
+            fact.split("row=", 1)[1].split(";", 1)[0],
         )
         for fact in facts
         if "kind=non-source-basis" in fact
     }
-    assert non_source_records == {
-        ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O"),
-        ("IMCC-SF04-D066 1.0.3-d066-v1", "FeO"),
-        ("openimcc-redox-pack 1.4.0", "MnO"),
+    assert non_source_rows == {
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O", "KAlSiO4"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O", "KAlSi3O8"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O", "KAlO2"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "K2O", "KAlSi2O6"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "FeO", "FeTiO3"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "FeO", "Fe2SiO4"),
+        ("IMCC-SF04-D066 1.0.3-d066-v1", "FeO", "FeAl2O4"),
+        ("openimcc-redox-pack 1.4.0", "MnO", "MnO(l)"),
+        ("openimcc-redox-pack 1.4.0", "MnO", "MnSiO3(l)"),
+        ("openimcc-redox-pack 1.4.0", "MnO", "Mn2SiO4(l)"),
+        ("openimcc-redox-pack 1.4.0", "MnO", "MnAl2O4(l)"),
     }
+    assert len(facts) == 14
     assert all(
         "standard_id=" in fact and "basis=" in fact and "citation=" in fact
         for fact in facts
