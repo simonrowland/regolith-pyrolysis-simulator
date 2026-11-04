@@ -7,7 +7,9 @@ log10 Kf = 0.092. The Ellingham segment at that temperature is
 
 from __future__ import annotations
 
+import functools
 import re
+import signal
 from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
@@ -24,6 +26,7 @@ from simulator.battery.compilation_tier import (
 from simulator.battery.enums import (
     AdmissionStatus,
     AssetRole,
+    AmountBasis,
     Authority,
     Engine,
     EvidenceClass,
@@ -50,6 +53,7 @@ from simulator.battery.identity import (
     standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
+    Composition,
     SourceFile,
     SourceFiles,
     Species,
@@ -371,6 +375,118 @@ def _context(*observations, works=None, experiments=None, origins=None):
         origins=origins or {},
         extract_review={obs.source_id or "": None for obs in observations},
         hostname="test",
+    )
+
+
+class _CpuTimerProbeBackend:
+    def __init__(self, marker_path: str) -> None:
+        self.marker_path = Path(marker_path)
+
+    def equilibrate(self, **_kwargs):
+        remaining_s, _interval_s = signal.getitimer(signal.ITIMER_PROF)
+        with self.marker_path.open("a", encoding="utf-8") as marker:
+            marker.write(f"{remaining_s:.9f}\n")
+        from simulator.melt_backend.base import EquilibriumResult
+
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 50.0}},
+            vapor_pressures_Pa={"Na": 1.0, "Al2O": 1.0},
+        )
+
+
+def _bootstrap_ia_timer_probe(engine: str, *, marker_path: str):
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        EngineHandle,
+        _IsolatedCellEngine,
+    )
+
+    handle = EngineHandle(
+        name=engine,
+        backend=_CpuTimerProbeBackend(marker_path),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    return _IsolatedCellEngine(handle), "cpu-timer-probe"
+
+
+def test_compilation_census_isolates_each_ia_row_with_cpu_timer(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.battery.validity import GateOutcome
+    import simulator.battery.score as score_module
+
+    experiment = F.kems_experiment()
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("0.5")), ("Na2O", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.activity_identity(
+            formula="SiO2",
+            component_basis="SiO2",
+            composition=composition,
+        ),
+        quantity=State.of(Quantity.P_PARTIAL),
+        species=Species("Na", Phase.G),
+        reservoir=State.not_applicable("mixture partial pressure"),
+    )
+    rows = tuple(
+        F.observation(
+            f"ia-compilation-census-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id="janaf-4th",
+        )
+        for index in range(2)
+    )
+    context = _context(*rows, experiments={experiment.experiment_id: experiment})
+    monkeypatch.setattr(
+        score_module, "run_validity_gates", lambda *args, **kwargs: GateOutcome(True)
+    )
+    timer_markers = tmp_path / "ia-census-timers.txt"
+    battery._close_isolated_cell_workers()
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        functools.partial(
+            _bootstrap_ia_timer_probe,
+            marker_path=str(timer_markers),
+        ),
+    )
+    isolated_timeouts: list[float] = []
+    run_isolated = battery._run_cell_in_subprocess
+
+    def capture_isolated_call(*args, **kwargs):
+        isolated_timeouts.append(kwargs["timeout_s"])
+        return run_isolated(*args, **kwargs)
+
+    monkeypatch.setattr(battery, "_run_cell_in_subprocess", capture_isolated_call)
+    try:
+        compilation_tier_census(
+            context,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            audit_compile_residual=False,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert isolated_timeouts == [
+        battery._ENGINE_OUTER_TIMEOUT_S["internal-analytical"]
+    ] * len(rows)
+    timer_values = [float(line) for line in timer_markers.read_text().splitlines()]
+    assert len(timer_values) == len(rows)
+    assert all(
+        0.0 < remaining_s <= battery._INTERNAL_ANALYTICAL_CPU_BUDGET_S
+        for remaining_s in timer_values
     )
 
 
