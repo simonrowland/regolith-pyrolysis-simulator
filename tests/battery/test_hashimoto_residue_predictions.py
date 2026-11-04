@@ -94,15 +94,27 @@ def _fake_openimcc_bridge_result(**_kwargs):
             }
         },
         parent_oxide_x_star_ratios={"SiO2": 0.875},
+        liquid_standard_flags=_kwargs.get("liquid_standard_flags", ()),
     )
 
 
 def test_openimcc_bridge_result_round_trips_through_isolated_worker():
     from simulator.battery.residue import _evaluate_openimcc_isolated
+    from simulator.melt_backend.openimcc_bridge import (
+        _load_pack,
+        check_liquid_reference_standards,
+    )
 
-    direct = _fake_openimcc_bridge_result()
+    default_pack = _load_pack("default")
+    flags = check_liquid_reference_standards(
+        {oxide: 1.0 for oxide in default_pack.parent_oxides}
+    )
+    selected_flags = (flags[0],)
+    direct = _fake_openimcc_bridge_result(liquid_standard_flags=selected_flags)
     isolated = _evaluate_openimcc_isolated(
-        _fake_openimcc_bridge_result, timeout_s=10.0
+        _fake_openimcc_bridge_result,
+        timeout_s=10.0,
+        liquid_standard_flags=selected_flags,
     )
 
     assert isolated == direct
@@ -122,7 +134,9 @@ def test_openimcc_bridge_result_round_trips_through_isolated_worker():
         "coverage",
         "activity_coefficients",
         "parent_oxide_x_star_ratios",
+        "liquid_standard_flags",
     }
+    assert isolated.liquid_standard_flags == selected_flags
     assert isinstance(isolated.parent_oxide_activities, MappingProxyType)
     assert isinstance(isolated.coverage, MappingProxyType)
     assert isinstance(isolated.activity_coefficients, MappingProxyType)

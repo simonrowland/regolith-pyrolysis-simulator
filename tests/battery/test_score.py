@@ -9668,7 +9668,7 @@ def test_hashimoto_integrator_preserves_failure_reason_for_scorer(
     from simulator.melt_backend import openimcc_bridge
 
     monkeypatch.setattr(
-        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "default"
     )
     context = load_score_context(sources=("kems-015-hashimoto-1983",))
     reference = next(

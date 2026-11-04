@@ -80,7 +80,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     from simulator.chemistry.melt_activity import melt_oxide_activity
 
     monkeypatch.setattr(
-        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "default"
     )
 
     def no_evaporation(inventory, *_args, **_kwargs):
@@ -140,7 +140,7 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
 
     gas_pack = openimcc.load_gas_datapack()
     package_identity = openimcc.engine_binding_identity(
-        openimcc_bridge._load_pack("published-core"), gas_pack
+        openimcc_bridge._load_pack("default"), gas_pack
     )
     expected_identity = {
         "engine_binding_digest": package_identity.digest,
