@@ -761,7 +761,7 @@ def test_pinned_openimcc_closed_redox_is_invariant_to_added_fe(migration) -> Non
     redox = pytest.importorskip("openimcc.redox")
     from simulator.melt_backend.openimcc_bridge import imported_openimcc_commit
 
-    assert imported_openimcc_commit() == "66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    assert imported_openimcc_commit() == "9f25dfe9d62c888f24ccad3322dcfc6ba218a4e8"
     observation = next(
         row
         for row in _feo_rows(migration)
