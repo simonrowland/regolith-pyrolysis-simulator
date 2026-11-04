@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import sys
 import warnings
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -304,6 +305,90 @@ def test_warning_dedupe_keeps_pressure_results_and_notices_unchanged(
     messages = [str(item.message) for item in after_warnings]
     assert any("pO2_bar_used': 1e-31" in message for message in messages)
     assert any("3273.15 K" in message for message in messages)
+
+
+def test_warning_locations_match_green_direct_warn_call_sites(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    dedupe = engine_local_config.warn_once_with_summary
+
+    def pressure_result():
+        backend = AlphaMELTSBackend()
+        return backend._activities_times_antoine(
+            3000.0,
+            {"TiO2": 0.6, "MnO": 0.4},
+            {"TiO2": 60.0, "MnO": 40.0},
+            pO2_bar=1e-31,
+        )
+
+    monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
+    monkeypatch.setattr(
+        engine_local_config, "warn_once_with_summary", _emit_every_warning
+    )
+    with warnings.catch_warnings(record=True) as baseline_warnings:
+        warnings.simplefilter("always")
+        baseline_result = pressure_result()
+
+    monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
+    monkeypatch.setattr(engine_local_config, "warn_once_with_summary", dedupe)
+    with warnings.catch_warnings(record=True) as deduped_warnings:
+        warnings.simplefilter("always")
+        deduped_result = pressure_result()
+
+    assert baseline_result == deduped_result
+    assert [str(item.message) for item in baseline_warnings] == [
+        str(item.message) for item in deduped_warnings
+    ]
+    baseline_locations = [
+        (str(item.message), Path(item.filename).resolve(), item.lineno)
+        for item in baseline_warnings
+    ]
+    deduped_locations = [
+        (str(item.message), Path(item.filename).resolve(), item.lineno)
+        for item in deduped_warnings
+    ]
+    assert any("pO2_outside_evaluator_band" in msg for msg, *_ in baseline_locations)
+    assert any("Ti melt-source reaction" in msg for msg, *_ in baseline_locations)
+    assert any("Mn melt-source reaction" in msg for msg, *_ in baseline_locations)
+    assert deduped_locations == baseline_locations
+
+
+def test_error_filter_on_emitter_caller_raises_without_counting_repeat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.vapour_rail.channels import validate_physical_pO2_bar
+
+    monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
+    with warnings.catch_warnings():
+        warnings.filterwarnings("error", category=UserWarning, module=__name__)
+        with pytest.raises(UserWarning, match="Physical pO2 evaluation notice"):
+            validate_physical_pO2_bar(1e-40)
+
+    assert engine_local_config._WARNING_REPEAT_COUNTS == {}
+
+
+def test_lineno_filter_matches_emitter_caller_line(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.vapour_rail.channels import validate_physical_pO2_bar
+
+    monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
+
+    def emit_pO2_warning() -> None:
+        validate_physical_pO2_bar(1e-40)
+
+    caller_lineno = emit_pO2_warning.__code__.co_firstlineno + 1
+    with warnings.catch_warnings():
+        warnings.filterwarnings(
+            "error",
+            category=UserWarning,
+            module=__name__,
+            lineno=caller_lineno,
+        )
+        with pytest.raises(UserWarning, match="Physical pO2 evaluation notice"):
+            emit_pO2_warning()
+
+    assert engine_local_config._WARNING_REPEAT_COUNTS == {}
 
 
 def test_not_converged_vaporock_keys_include_backend_cause(
