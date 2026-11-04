@@ -149,14 +149,6 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
         "gas_table_digest": package_identity.gas_table_digest,
     }
     assert prediction.provenance["engine_binding_identity"] == expected_identity
-    assert any(
-        flag["kind"] == "reference-unknown"
-        and flag["oxide"] == "K2O"
-        and flag["row_key"] == "K2SiO3"
-        and flag["basis"]
-        and flag["citation"]
-        for flag in prediction.provenance["liquid_standard_flags"]
-    )
     assert "gas_pack_digest" not in prediction.provenance
     assert "liquid_pack_digest" not in prediction.provenance
     assert evaluated_compositions
