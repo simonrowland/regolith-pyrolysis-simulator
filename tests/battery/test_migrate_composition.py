@@ -5784,12 +5784,12 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         ),
         pytest.param(
             "thomas-wood-chloride",
-            {"MgO": "99"},
+            {"SiO2": "50", "MgO": "49"},
             {
-                "composition_wt_pct": {"MgO": "99"},
+                "composition_wt_pct": {"SiO2": "50", "MgO": "49"},
                 "Cl_wt_pct": "1.0",
             },
-            {"MgO": "99"},
+            {"SiO2": "50", "MgO": "49"},
             True,
             id="accepted-chloride-sibling",
         ),
@@ -5804,8 +5804,8 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 }
             },
             {"T.Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
-            True,
-            id="accepted-metal-iron",
+            False,
+            id="green-refused-t-fe-unsupported-component",
         ),
         pytest.param(
             "unknown-token",
@@ -5820,6 +5820,20 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             {"SiO2": "60", "MgO": "39", "XxO": "1"},
             False,
             id="green-refused-unknown-token",
+        ),
+        pytest.param(
+            "non-finite-unknown-token",
+            {"SiO2": "60", "MgO": "39"},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "60",
+                    "MgO": "39",
+                    "XxO": Decimal("NaN"),
+                }
+            },
+            {"SiO2": "60", "MgO": "39", "XxO": Decimal("NaN")},
+            False,
+            id="green-refused-non-finite-unsupported-component",
         ),
         pytest.param(
             "negative-unknown-token",
@@ -5842,6 +5856,63 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             None,
             False,
             id="green-refused-negative-oxide",
+        ),
+        pytest.param(
+            "single-component",
+            {"SiO2": "94.9"},
+            None,
+            None,
+            False,
+            id="green-refused-fewer-than-two-components",
+        ),
+        pytest.param(
+            "composition-mass-percent-malformed",
+            {"SiO2": "50", "MgO": "49"},
+            {
+                "composition_mass_percent": {
+                    "SiO2": "50",
+                    "MgO": "49",
+                    "XxO": "garbage",
+                }
+            },
+            {"SiO2": "50", "MgO": "49", "XxO": "garbage"},
+            False,
+            id="green-refused-malformed-composition-mass-percent-cell",
+        ),
+        pytest.param(
+            "composition-mass-percent-alias-collapse",
+            {"Cr2O3": "94.9"},
+            {
+                "composition_mass_percent": {
+                    "CrO1.5": "47.45",
+                    "Cr2O3": "47.45",
+                }
+            },
+            {"CrO1.5": "47.45", "Cr2O3": "47.45"},
+            False,
+            id="green-refused-one-component-after-alias-collapse",
+        ),
+        pytest.param(
+            "zero-total",
+            {"SiO2": "0", "MgO": "0"},
+            None,
+            None,
+            False,
+            id="green-refused-zero-total",
+        ),
+        pytest.param(
+            "zero-oxide-mass-with-published-total",
+            {"SiO2": "0", "MgO": "0", "total": "100"},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "0",
+                    "MgO": "0",
+                    "total": "100",
+                }
+            },
+            {"SiO2": "0", "MgO": "0", "total": "100"},
+            False,
+            id="green-refused-zero-oxide-mass-despite-total-cell",
         ),
         pytest.param(
             "non-finite",
@@ -5879,10 +5950,30 @@ def test_mass_closure_refusal_flag_matches_green_acceptance(
 
     assert converted is None, case
     assert refusal is not None, case
-    # This table is pinned to 0418c0fd9's measured converter outcomes: it
-    # accepted missing/partial/over-limit totals and the Cl/T.Fe row shapes,
-    # while refusing XxO, negative/non-finite oxides, and ambiguous FeOT.
+    # Green 0418c0fd9 accepted missing/partial/over-limit totals and the
+    # Thomas-Wood oxide map with Cl as a sibling. It refused the T.Fe map and
+    # malformed, under-counted, unsupported, ambiguous, negative, non-finite,
+    # and zero-total maps.
     assert refusal.closure_refusal is green_accepts, (case, refusal)
+
+
+@pytest.mark.parametrize(
+    ("payload", "declared_map"),
+    (
+        pytest.param(None, False, id="non-mapping-input"),
+        pytest.param(
+            {"SiO2": "50", "MgO": "50"},
+            False,
+            id="unmarked-flat-map",
+        ),
+    ),
+)
+def test_green_parser_refuses_unmapped_inputs(
+    payload: object,
+    declared_map: bool,
+) -> None:
+    # Green 0418c0fd9 returned no map for both parser-level refusal shapes.
+    assert _oxide_map_from_mapping(payload, declared_map=declared_map) is None
 
 
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:

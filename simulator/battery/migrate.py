@@ -1579,11 +1579,22 @@ class _CompositionRefusal:
     closure_refusal: bool = False
 
 
+# Green 0418c0fd9's parser/converter refuses these map inputs:
+# - Non-map input (_oxide_map_from_mapping:4053-54).
+# - Unmarked flat map (_oxide_map_from_mapping:4122-23).
+# - Fewer than two components after alias merge (_oxide_map_from_mapping:4076-84, 4137-38).
+# - Unparseable composition_mass_percent cell (_oxide_map_from_mapping:4067-69).
+# - Ambiguous FeOT with FeO or Fe2O3 (wt_pct_to_mole_fraction:3935-38).
+# - Unsupported numeric component (wt_pct_to_mole_fraction:3940-54).
+# - Negative supported-oxide amount (wt_pct_to_mole_fraction:3965-67).
+# - Non-positive supported-oxide mass (wt_pct_to_mole_fraction:3972-73).
+# - Non-finite supported amount raises at the negative check (wt_pct_to_mole_fraction:3966).
+# - Non-finite unsupported amount is rejected as unsupported (wt_pct_to_mole_fraction:3948-54).
 def _green_accepts_mass_percent_map(
     wt: Mapping[str, Decimal],
     declared_maps: Sequence[Mapping[str, Any] | None],
 ) -> bool:
-    """Whether the Green converter accepted the printed map's component cells."""
+    """Whether Green's converter would accept this already-extracted oxide map."""
 
     component_names: set[str] = set()
     original_maps = [item for item in declared_maps if item is not None]
@@ -1599,6 +1610,10 @@ def _green_accepts_mass_percent_map(
                 or _is_composition_condition_key(name)
             ):
                 continue
+            # m1 retains T.Fe as an elemental alias; Green's wt% converter
+            # rejects it as an unsupported numeric component.
+            if name == "T.Fe":
+                return False
             kind, amount = _classify_composition_cell(raw_amount)
             if kind == "blank":
                 continue
@@ -1612,6 +1627,23 @@ def _green_accepts_mass_percent_map(
             ):
                 return False
             component_names.add(name)
+    if len(component_names) < 2:
+        return False
+    positive_mass = Decimal("0")
+    for raw_name, amount in wt.items():
+        name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+        if (
+            name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            or name not in _COMPOSITION_COMPONENTS
+        ):
+            continue
+        if amount is None:
+            continue
+        if not amount.is_finite() or amount < 0:
+            return False
+        positive_mass += amount
+    if positive_mass <= 0:
+        return False
     return not (
         "FeOT" in component_names
         and component_names.intersection({"FeO", "Fe2O3"})
@@ -5047,9 +5079,8 @@ def _wt_percent_conversion_or_refusal(
                 "partial analysis contains unsupported component(s) above "
                 f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}"
             )
-            # Green accepted Thomas-Wood's Cl sibling and Taniguchi's T.Fe
-            # alias, but rejected an unknown XxO map cell. Only the former
-            # are new m1 closure refusals.
+            # Green accepted Thomas-Wood's Cl sibling, but rejected T.Fe and
+            # unknown XxO map cells. Only the Cl sibling is a new m1 refusal.
             if _green_accepts_mass_percent_map(wt, declared_maps):
                 raise _MassPercentClosureError(reason)
             raise ValueError(reason)
