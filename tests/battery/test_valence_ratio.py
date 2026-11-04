@@ -611,8 +611,8 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     table4_rows = [*log_ratios, *slope_rows]
     assert len(table4_rows) == 12
     for row in table4_rows:
-        assert row.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert row.evidence.attribution == "Berry and O'Neill (2004), Table 4"
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert row.evidence.attribution is None
         assert not row.derived_from
         pressure = row.identity.total_pressure_Pa
         if row in log_ratios:
@@ -982,7 +982,7 @@ def test_tranell_2002_table_i_rows_migrate_with_render_pinned_values_and_conditi
         assert row.identity.total_pressure_Pa is not None
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.total_pressure_Pa.reason == (
-            "no total_pressure_Pa mapped from source"
+            "Total pressure is not stated for the Table I runs."
         )
         assert conditions["temperature_K"].state.value == row.identity.temperature_K.value
         assert conditions["fO2_Pa"].state.value.kind is ValueKind.POINT
