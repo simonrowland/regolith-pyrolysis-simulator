@@ -143,10 +143,12 @@ def test_kim_2014_printed_table_rows_migrate_and_bind_to_samples(tmp_path: Path)
     prediction = predict_with_engine(Engine.MAGEMIN, phase_row)
     assert prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prediction.authority is Authority.REFUSED
-    # t-1617 / d-323: Table 1's V assay is the same analyzed phase map, so the
-    # echo guard refuses it before checking the coefficient basis.
-    assert prediction.refusal_reason is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
-    assert prediction.refusal_detail["input_provenance"] == "scored_phase_analysis"
+    # Phase is the token "l". The V/Mo/Ni map is not printed as this run's
+    # analysed glass, so the basis gate refuses the mass-percent identity.
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["detail"] == (
+        "printed mass-percent phase identity cannot be read as moles"
+    )
 
     expected_parameters = {
         "kim2014_table3_epsilon_C^V": (Decimal("-1.94"), "0.018"),

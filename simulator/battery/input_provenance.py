@@ -77,7 +77,15 @@ _STARTING_PHRASE = (
 # Word boundaries. "unbatched" and "nominally" are not a printed start.
 _STARTING_WORD = re.compile(r"\b(?:batched|nominal)\b", re.IGNORECASE)
 _ANALYSIS_NOTE = ("final slag", "product glass")
-_ANALYSIS_WORD = re.compile(r"\banalys[ez]ed\b", re.IGNORECASE)
+# "analysed" and "analyzed". analys[ez]ed matches neither spelling.
+_ANALYSIS_WORD = re.compile(r"\banaly[sz]ed\b", re.IGNORECASE)
+_QUENCH_WORD = re.compile(r"\bquench(?:ed|ing)?\b", re.IGNORECASE)
+_GLASS_WORD = re.compile(r"\bglass\b", re.IGNORECASE)
+# "whether ... glass is not stated" names glass only to deny it.
+_GLASS_NOT_STATED = re.compile(
+    r"whether\b.{0,80}?\bglass\b.{0,40}?\bnot stated\b",
+    re.IGNORECASE | re.DOTALL,
+)
 
 _GLASS_ONLY = re.compile(
     r"crystal[-\s]+free|glass[-\s]+only|entirely liquid|no crystals|"
@@ -155,15 +163,33 @@ def composition_with_provenance(composition: Composition, provenance: str) -> Co
     return replace(composition, input_provenance=provenance)
 
 
+def printed_quench_glass_phase(text: str | None) -> bool:
+    """Printed phase is quenched glass, including glass plus quench crystals.
+
+    Bare glass is not this evidence. The quench-crystal regex names crystals
+    and does not by itself make a phase an analysed glass. A clause that
+    says whether the sample is glass is not stated does not count.
+    """
+
+    if not isinstance(text, str) or not text.strip():
+        return False
+    if _QUENCH_WORD.search(text) is None:
+        return False
+    affirmed = _GLASS_NOT_STATED.sub(" ", text)
+    return _GLASS_WORD.search(affirmed) is not None
+
+
 def phase_map_provenance(
     map_locator: Locator | None,
     row_locator: Locator | None,
-) -> str:
-    """A phase-row oxide map is the analysis, unless its own locator is a start.
+    phase_text: str | None = None,
+) -> str | None:
+    """Classify a phase-row oxide map only from printed evidence.
 
     Gorojovsky Table 1 is a starting-material locator on the composition map.
-    Bonnand's post-run glass map has no locator of its own. A final-slag or
-    analysed-phase note stays the analysis even when the tables differ.
+    A final-slag or analysed-phase note is the analysis even when the tables
+    differ. A printed phase of quenched glass is that run's analysed glass.
+    Bare glass, and a locator that does not say, leave provenance unset.
     Component values are not read.
     """
 
@@ -182,7 +208,12 @@ def phase_map_provenance(
         and str(map_locator.table) != str(row_locator.table)
     ):
         return PRINTED_STARTING_BULK
-    return SCORED_PHASE_ANALYSIS
+    folded = phase_text.casefold() if isinstance(phase_text, str) else ""
+    if any(token in folded for token in _ANALYSIS_NOTE) or _ANALYSIS_WORD.search(folded):
+        return SCORED_PHASE_ANALYSIS
+    if printed_quench_glass_phase(phase_text):
+        return SCORED_PHASE_ANALYSIS
+    return None
 
 
 def label_marks_initial(text: str) -> bool:

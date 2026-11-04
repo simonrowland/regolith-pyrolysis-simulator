@@ -677,22 +677,30 @@ def test_printed_bulk_refuses_a_single_liquid_when_assemblage_is_unstated(
     )
 
 
-def test_migrated_bonnand_glass_major_refuses_before_equilibrate(
+def test_migrated_bonnand_bare_glass_is_not_stamped_and_scores(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _block_equilibrate(monkeypatch)
+    """Phase 'glass' is not printed evidence that the map is analysed glass.
+
+    Provenance stays unset, so the echo guard does not fire and the pre-d-323
+    path scores a mocked liquid.
+    """
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage",
+        lambda *_a, **_k: _liquid(1.0, {"MgO": 10.0}),
+    )
     observation, experiment = _observation(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite.yaml",
         "bonnand_2020_A1_mgo",
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_value
-    assert composition.value.input_provenance == "scored_phase_analysis"
+    assert composition.value.input_provenance is None
+    assert _input_composition_echo_detail(observation.identity) is None
     prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
-    assert prediction.refusal_detail["detail"] == "input_composition_is_scored_phase_analysis"
-    assert prediction.refusal_detail["formula"] == "MgO"
-    assert prediction.refusal_detail["input_provenance"] == "scored_phase_analysis"
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal("10.0")
 
 
 def test_migrated_borisov_2004_row_refuses_the_echo(
@@ -711,9 +719,15 @@ def test_migrated_borisov_2004_row_refuses_the_echo(
     assert prediction.refusal_detail["formula"] == "NiO"
 
 
-def test_taniguchi_stamp_refuses_before_the_basis_gate(
+def test_taniguchi_metal_fe_reaches_the_basis_gate(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """A metal Fe assay is not analysed glass, so the basis gate runs.
+
+    Equilibrate must not run: the printed mass-percent identity is refused
+    first.
+    """
+
     _block_equilibrate(monkeypatch)
     observation, experiment = _observation(
         "taniguchi-1997-feo-cas.yaml",
@@ -721,10 +735,9 @@ def test_taniguchi_stamp_refuses_before_the_basis_gate(
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_value
-    assert composition.value.input_provenance == "scored_phase_analysis"
+    assert composition.value.input_provenance is None
     prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
-    assert prediction.refusal_reason is not RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_kunisada_final_slag_refuses_before_the_basis_gate(
@@ -743,14 +756,21 @@ def test_kunisada_final_slag_refuses_before_the_basis_gate(
     assert prediction.refusal_reason is not RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
-def test_kim_2014_measured_v_row_is_stamped_as_phase_analysis() -> None:
-    observation, _experiment_row = _observation(
+def test_kim_2014_measured_v_row_is_not_stamped_analysed_glass(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Phase 'l' and a V/Mo/Ni mass-percent map are not analysed glass."""
+
+    _block_equilibrate(monkeypatch)
+    observation, experiment = _observation(
         "kim-2014-carbon-fe-v-mo-ni.yaml",
         "kim_2014_carbon_fe_v_mo_ni_p003_t01_r02_c02",
     )
     composition = observation.identity.composition
     assert composition is not None and composition.is_value
-    assert composition.value.input_provenance == "scored_phase_analysis"
+    assert composition.value.input_provenance is None
+    prediction = _predict(observation, observation.identity, experiment)
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
 def test_gorojovsky_starting_bulk_passes_the_guard() -> None:
@@ -837,7 +857,55 @@ def test_batched_and_nominal_match_as_words() -> None:
             Locator(table="1", note="unbatched and nominally dry"),
             None,
         )
+        is None
+    )
+    assert (
+        phase_map_provenance(None, None, phase_text="quenched peridotite glass")
         == "scored_phase_analysis"
+    )
+    assert (
+        phase_map_provenance(
+            None, None, phase_text="l quenched silicate glass"
+        )
+        == "scored_phase_analysis"
+    )
+    assert (
+        phase_map_provenance(
+            None,
+            None,
+            phase_text="liquid slag at 1773 K, analyzed after quench",
+        )
+        == "scored_phase_analysis"
+    )
+    assert phase_map_provenance(None, None, phase_text="glass") is None
+    assert phase_map_provenance(None, None, phase_text="quench crystals") is None
+    assert (
+        phase_map_provenance(
+            None,
+            None,
+            phase_text="quenched slag; whether it formed glass is not stated",
+        )
+        is None
+    )
+    assert (
+        phase_map_provenance(
+            None,
+            None,
+            phase_text="quenched slag; whether the sample is glass is not stated",
+        )
+        is None
+    )
+    assert (
+        phase_map_provenance(None, None, phase_text="glass + quench crystals")
+        == "scored_phase_analysis"
+    )
+    assert (
+        phase_map_provenance(
+            Locator(table="1", note="starting composition"),
+            None,
+            phase_text="quenched silicate glass",
+        )
+        == "printed_starting_bulk"
     )
 
 
@@ -861,8 +929,17 @@ def test_pt_loop_hyphen_and_quench_crystals_are_not_crystal_bearing() -> None:
     assert crystalline.crystalline
 
 
-def test_jin_table4_valence_rows_stamp_the_measured_glass() -> None:
+def test_jin_table4_bare_glass_is_not_stamped_analysed_glass() -> None:
+    """Phase 'glass' and a silent composition note are not analysed-glass evidence.
+
+    Table 4 is Cr(VI)/Cr(total) on a water-quenched glass. The phase field is
+    the word glass, and the Table 2 composition note does not say the map is
+    that run's analysed glass. Provenance stays unset, so the d-323 silence
+    refusal does not run. The printed Fe2O3 cell stays on the oxide map.
+    """
+
     from simulator.battery.identity import quantity_token
+    from simulator.battery.score import _FeRedoxMaterial
 
     migrator = _load("jin-2022-cl-cr-sulfur-glass-solubility.yaml")
     rows = [
@@ -875,12 +952,11 @@ def test_jin_table4_valence_rows_stamp_the_measured_glass() -> None:
     for observation in rows:
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
-        assert composition.value.input_provenance == "scored_phase_analysis"
+        assert composition.value.input_provenance is None
         names = {name for name, _amount in composition.value.components}
         assert "Fe2O3" in names
         assert "FeO" not in names
         experiment = migrator.result.experiments.get(observation.experiment_id)
         material = _fe_redox_material(observation, observation.identity, experiment)
-        assert getattr(material, "reason", None) is (
-            RefusalReason.INPUT_PHASE_ASSEMBLAGE_UNSTATED
-        )
+        assert isinstance(material, _FeRedoxMaterial)
+        assert material.notices == ()

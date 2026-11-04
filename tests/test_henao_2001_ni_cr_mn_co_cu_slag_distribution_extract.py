@@ -207,11 +207,11 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions() -> None:
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     assert all(row.point_conditions and "fO2_log" in row.point_conditions for row in observations)
     assert all(row.identity.fO2_Pa.tag.value == "value" for row in observations)
-    # t-1617 / SC-458: the printed phase assay is retained as composition
-    # context, but marked so it cannot echo back as its own scoring input.
+    # Table rows print phase_label slag or metal. They do not print that the
+    # oxide map is this run's analysed glass, so provenance stays unset.
     assert all(row.identity.composition is not None and row.identity.composition.is_value for row in observations)
     assert all(
-        row.identity.composition.value.input_provenance == "scored_phase_analysis"
+        row.identity.composition.value.input_provenance is None
         for row in observations
     )
     assert all(row.locator and row.locator.page and row.locator.published_page for row in observations)

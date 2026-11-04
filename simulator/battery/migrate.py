@@ -5845,6 +5845,8 @@ def _stamp_promoted_point_composition(
     The copy happens after ``_finalize_input_provenance``. The composition
     locator is classified on its own: the point row's table is a different
     table, and that comparison would call a measured glass a starting bulk.
+    A silent locator is not stamped. Passing the row phase here would stamp
+    only this copy and split it from the point-condition composition.
     """
 
     if composition.input_provenance is not None:
@@ -5856,10 +5858,10 @@ def _stamp_promoted_point_composition(
         ELEMENT_WT_PERCENT_FEO_T_BASIS,
     }:
         return composition
-    return composition_with_provenance(
-        composition,
-        phase_map_provenance(locator, locator),
-    )
+    token = phase_map_provenance(locator, locator)
+    if token is None:
+        return composition
+    return composition_with_provenance(composition, token)
 
 
 def _finalize_input_provenance(
@@ -5872,13 +5874,14 @@ def _finalize_input_provenance(
     map_locator: Locator | None,
     point_conditions: Mapping[str, Any] | None,
     derivation_relation: str | None = None,
+    phase_text: str | None = None,
 ) -> None:
-    """Stamp a token when the writer has not, then upgrade a d-323 candidate.
+    """Stamp a token when printed evidence says so, then upgrade a d-323 candidate.
 
     Catalogue proxies stay unset. initial_charge_only is a printed start.
-    Anything else with no token takes the map-locator class, and that class
-    is scored_phase_analysis when the locator does not say. The stored
-    component amounts are the printed vector; the scorer removes scored
+    Anything else with no token takes the map-locator class. A silent locator
+    stays unset unless the printed phase is that run's analysed glass. The
+    stored component amounts are the printed vector; the scorer removes scored
     components when the token is analysed_melt_minus_scored.
     """
 
@@ -5913,9 +5916,12 @@ def _finalize_input_provenance(
         if composition.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
             token = PRINTED_STARTING_BULK
         else:
-            token = phase_map_provenance(map_locator, row_locator)
-        composition = composition_with_provenance(composition, token)
-        ident_kwargs["composition"] = State.of(composition)
+            token = phase_map_provenance(
+                map_locator, row_locator, phase_text=phase_text
+            )
+        if token is not None:
+            composition = composition_with_provenance(composition, token)
+            ident_kwargs["composition"] = State.of(composition)
     if composition.input_provenance != SCORED_PHASE_ANALYSIS:
         if (
             composition.input_provenance == ANALYSED_MELT_MINUS_SCORED
@@ -7476,6 +7482,25 @@ def _printed_field_text(raw: object) -> str | None:
         text = "; ".join(part for part in parts if part)
         return text or None
     return None
+
+
+def _phase_evidence_text(*candidates: object) -> str | None:
+    """Printed phase strings the provenance classifier is allowed to read.
+
+    ``phase`` is often a closed token (``l``, ``glass``). ``phase_as_measured``
+    keeps the printed words. Classification stays in ``phase_map_provenance``.
+    """
+
+    parts: list[str] = []
+    for raw in candidates:
+        if not isinstance(raw, str):
+            continue
+        text = " ".join(raw.split())
+        if text and text not in parts:
+            parts.append(text)
+    if not parts:
+        return None
+    return " ".join(parts)
 
 
 def compilation_phase_text(doc: Mapping[str, Any]) -> object:
@@ -22977,6 +23002,11 @@ class Migrator:
             derivation_relation=(
                 value_derivation.relation if value_derivation is not None else None
             ),
+            phase_text=_phase_evidence_text(
+                phase_raw,
+                obs.get("phase_as_measured"),
+                values.get("phase_as_measured") if isinstance(values, Mapping) else None,
+            ),
         )
         identity = fill_identity(
             quantity,
@@ -24677,6 +24707,11 @@ class Migrator:
             row_locator=point_locator,
             map_locator=child_map_locator,
             point_conditions=parent_point_conditions,
+            phase_text=_phase_evidence_text(
+                printed_phase_text,
+                raw_item.get("phase_as_measured") if isinstance(raw_item, Mapping) else None,
+                raw_item.get("phase") if isinstance(raw_item, Mapping) else None,
+            ),
         )
         identity = fill_identity(quantity, species, **ident_kwargs)
         converted: Derivation | None = None
