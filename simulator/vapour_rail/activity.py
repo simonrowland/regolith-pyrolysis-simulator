@@ -28,14 +28,11 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
     _melt_oxide_gamma_for_activity,
+    R_J_PER_MOL_K,
+    activity_from_chemical_potentials,
     melt_oxide_activity_coefficient,
 )
-from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
-
-# CODATA R, J/(mol·K). Activities use mu in J/mol so RT ln(a) is dimensionally
-# consistent: [J/mol] / ([J/(mol·K)] · [K]) is dimensionless.
-R_J_PER_MOL_K: Final[float] = GAS_CONSTANT
 
 REASON_HENRIAN_GAMMA_UNMEASURED: Final[str] = "henrian_gamma_unmeasured"
 BOUND_NOT_POINT: Final[str] = "bound-not-point"
@@ -688,56 +685,6 @@ def composition_fingerprint(composition: Mapping[str, float]) -> str:
         if _fingerprint_float(value) != 0.0
     }
     return _stable_hash(cleaned)
-
-
-def activity_from_chemical_potentials(
-    mu_J_per_mol: float,
-    mu0_J_per_mol: float,
-    temperature_K: float,
-) -> float:
-    """Compute ``a = exp((mu - mu0) / (R T))`` with explicit derivation.
-
-    Premise
-        At fixed T, P the chemical potential of component *i* relative to a
-        pure-endmember standard state is
-        ``mu_i = mu_i0 + R T ln(a_i)`` (Raoultian pure-endmember convention).
-
-    Algebra
-        ``ln(a_i) = (mu_i - mu_i0) / (R T)``
-        ``a_i = exp((mu_i - mu_i0) / (R T))``
-
-    Units
-        ``mu``, ``mu0`` in J/mol; ``R`` in J/(mol·K); ``T`` in K → argument of
-        ``exp`` is dimensionless.
-
-    Limiting case
-        ``mu_i = mu_i0`` ⇒ ``a_i = 1`` (pure endmember at the standard state).
-    """
-
-    if not is_declared_real_scalar(mu_J_per_mol) or not is_declared_real_scalar(
-        mu0_J_per_mol
-    ) or not is_declared_real_scalar(
-        temperature_K,
-        allow_numeric_str=True,
-    ):
-        raise TypeError("chemical potential inputs must be numeric")
-    mu_J_per_mol = float(mu_J_per_mol)
-    mu0_J_per_mol = float(mu0_J_per_mol)
-    if not math.isfinite(mu_J_per_mol) or not math.isfinite(mu0_J_per_mol):
-        raise ValueError("chemical potentials must be finite")
-    temperature_K = float(temperature_K)
-    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
-        raise ValueError("temperature_K must be finite and positive")
-    argument = (mu_J_per_mol - mu0_J_per_mol) / (R_J_PER_MOL_K * temperature_K)
-    if not math.isfinite(argument):
-        raise ValueError("activity exponent is non-finite")
-    # Guard extreme underflow/overflow into a typed failure rather than 0/inf.
-    if argument < -700.0 or argument > 700.0:
-        raise ValueError("activity exponent outside representable range")
-    activity = math.exp(argument)
-    if not math.isfinite(activity) or activity <= 0.0:
-        raise ValueError("activity must be finite and positive")
-    return activity
 
 
 def prove_pressure_monotone_nondecreasing_in_activity(

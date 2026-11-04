@@ -15,6 +15,8 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Any
 
+from simulator.physical_constants import GAS_CONSTANT
+from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.accounting.formulas import (
     project_oxide_composition,
     resolve_species_formula,
@@ -80,6 +82,7 @@ def normalize_high_t_melt_activity(value: Any) -> str:
 # 0.99, so the shipped mid-range path is the constant table gamma. Changing
 # the number would move activities for X in the seam; do not retune it here.
 MELT_OXIDE_ENDMEMBER_CONTINUITY_BLEND_START = 0.99
+R_J_PER_MOL_K = GAS_CONSTANT
 R_KJ_PER_MOL_K = 8.31446261815324e-3
 
 
@@ -145,6 +148,56 @@ reference_state_provenance: dict[
     ),
     "P2O5": "unverified",
 }
+
+
+def activity_from_chemical_potentials(
+    mu_J_per_mol: float,
+    mu0_J_per_mol: float,
+    temperature_K: float,
+) -> float:
+    """Compute ``a = exp((mu - mu0) / (R T))`` with explicit derivation.
+
+    Premise
+        At fixed T, P the chemical potential of component *i* relative to a
+        pure-endmember standard state is
+        ``mu_i = mu_i0 + R T ln(a_i)`` (Raoultian pure-endmember convention).
+
+    Algebra
+        ``ln(a_i) = (mu_i - mu_i0) / (R T)``
+        ``a_i = exp((mu_i - mu_i0) / (R T))``
+
+    Units
+        ``mu``, ``mu0`` in J/mol; ``R`` in J/(mol·K); ``T`` in K → argument of
+        ``exp`` is dimensionless.
+
+    Limiting case
+        ``mu_i = mu_i0`` ⇒ ``a_i = 1`` (pure endmember at the standard state).
+    """
+
+    if not is_declared_real_scalar(mu_J_per_mol) or not is_declared_real_scalar(
+        mu0_J_per_mol
+    ) or not is_declared_real_scalar(
+        temperature_K,
+        allow_numeric_str=True,
+    ):
+        raise TypeError("chemical potential inputs must be numeric")
+    mu_J_per_mol = float(mu_J_per_mol)
+    mu0_J_per_mol = float(mu0_J_per_mol)
+    if not math.isfinite(mu_J_per_mol) or not math.isfinite(mu0_J_per_mol):
+        raise ValueError("chemical potentials must be finite")
+    temperature_K = float(temperature_K)
+    if not math.isfinite(temperature_K) or temperature_K <= 0.0:
+        raise ValueError("temperature_K must be finite and positive")
+    argument = (mu_J_per_mol - mu0_J_per_mol) / (R_J_PER_MOL_K * temperature_K)
+    if not math.isfinite(argument):
+        raise ValueError("activity exponent is non-finite")
+    # Guard extreme underflow/overflow into a typed failure rather than 0/inf.
+    if argument < -700.0 or argument > 700.0:
+        raise ValueError("activity exponent outside representable range")
+    activity = math.exp(argument)
+    if not math.isfinite(activity) or activity <= 0.0:
+        raise ValueError("activity must be finite and positive")
+    return activity
 
 
 # provenance: gamma_alkali_melt_activity
