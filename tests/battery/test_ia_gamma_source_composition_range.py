@@ -120,15 +120,48 @@ def test_kambayashi_kato_mgo_binary_row_is_flagged_without_changing_value() -> N
 
 
 def test_cmas_midrange_row_is_not_flagged() -> None:
+    composition = {
+        "CaO": "0.25",
+        "MgO": "0.25",
+        "Al2O3": "0.1",
+        "SiO2": "0.4",
+    }
     prediction = _score_activity(
         "MgO",
-        {"CaO": "0.25", "MgO": "0.25", "Al2O3": "0.1", "SiO2": "0.4"},
+        composition,
         "1873",
         # Golden output from the unmodified 0ea42527e scorer.
         baseline_value="0.011042745776710052",
     )
 
-    assert _source_range_notices(prediction) == ()
+    assert prediction.value == Decimal("0.011042745776710052")
+    for oxide in ("CaO", "MgO"):
+        source_range = MELT_OXIDE_ACTIVITY_COEFFICIENTS[
+            oxide
+        ].source_composition_range
+        assert source_range is not None
+        assert source_range.source_temperature_isotherm_K == 1873.15
+
+    activity = melt_oxide_activity(
+        "MgO",
+        {name: float(amount) for name, amount in composition.items()},
+        temperature_K=1873.15,
+    )
+    assert activity is not None
+    assert activity.source_composition_range_notice is None
+
+
+def test_beckett_cmas_midrange_row_is_flagged_outside_1600c_isotherm() -> None:
+    reason = _direct_range_notice(
+        "MgO",
+        {"CaO": "0.25", "MgO": "0.25", "Al2O3": "0.1", "SiO2": "0.4"},
+        "1200",
+    )
+
+    assert "oxide=MgO" in reason
+    assert "source_isotherm=1873.15 K" in reason
+    assert "row_temperature=1200 K" in reason
+    assert "Beckett 2002 p. 95" in reason
 
 
 def test_unrecorded_source_composition_range_is_still_flagged() -> None:
