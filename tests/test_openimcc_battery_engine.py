@@ -2968,19 +2968,16 @@ def test_allibert_single_phase_table_ii_scores_flagged_without_in_cell_pressures
         for residual in residuals
     )
     scored = [residual for residual in residuals if residual.numeric is not None]
-    assert len(scored) == 7
+    # d-144 (5b5d2a080) makes the seven CaO rows scoreable on the liquid
+    # reference. Each of the 14 distinct observations emits one residual.
+    assert len(scored) == 14
     assert {residual.reference for residual in scored} == {
         observation.observation_id
         for observation in rows
-        if observation.identity.species.formula == "Al2O3"
+        if observation.identity.species.formula in {"Al2O3", "CaO"}
     }
     unscored = [residual for residual in residuals if residual.numeric is None]
-    assert len(unscored) == 7
-    assert {residual.reference for residual in unscored} == {
-        observation.observation_id
-        for observation in rows
-        if observation.identity.species.formula == "CaO"
-    }
+    assert unscored == []
     assert all(
         residual.score_eligible is False
         and any(

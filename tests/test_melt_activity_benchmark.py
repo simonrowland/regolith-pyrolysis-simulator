@@ -837,7 +837,9 @@ def test_internal_analytical_live_adapter_converts_gamma_to_parent_oxide_basis()
     )
 
     assert result.status == "ok"
-    assert result.gammas["MgO"] == pytest.approx(0.8968179981767649)
+    # d-144 (5b5d2a080) applies exp(-ΔG_fus/RT) to convert the solid
+    # reference to liquid at the experimental temperature.
+    assert result.gammas["MgO"] == pytest.approx(0.14412028859638726)
 
 
 def test_missing_point_observable_is_recorded_as_observable_unavailable():

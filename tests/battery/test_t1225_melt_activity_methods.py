@@ -165,7 +165,10 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         assert identity_notice.authority.value == "certified"
         own_row = scored[observation.observation_id]
         assert own_row.numeric is not None
-        assert abs(own_row.numeric.value - Decimal("1.281")) <= Decimal("0.001")
+        # d-144 (5b5d2a080) converts the 1823 K CaO(s) comparison with
+        # ΔG_fus=33.80370 kJ/mol to the liquid reference, lowering the
+        # residual by 0.969 dex.
+        assert abs(own_row.numeric.value - Decimal("0.3123171356698106")) <= Decimal("0.001")
         assert own_row.score_eligible is False
         assert not any(
             notice.reason == "fusion_source_reference_phase_unprinted"
