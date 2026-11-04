@@ -129,6 +129,47 @@ def test_internal_analytical_in_process_and_isolated_values_match(
         assert isolated.refusal_reason == in_process.refusal_reason, observation_id
 
 
+def test_default_ia_isolation_ignores_other_engine_handle(
+    monkeypatch: pytest.MonkeyPatch,
+    _score_context,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    observation = _score_context.observations[_CENSUS_CELLS[0]]
+    experiment = _score_context.experiments[observation.experiment_id]
+    isolated_timeouts: list[float] = []
+    run_isolated = battery._run_cell_in_subprocess
+
+    def capture_isolated_call(*args, **kwargs):
+        isolated_timeouts.append(kwargs["timeout_s"])
+        return run_isolated(*args, **kwargs)
+
+    monkeypatch.setattr(battery, "_run_cell_in_subprocess", capture_isolated_call)
+    handles = {
+        Engine.VAPOROCK.value: battery.EngineHandle(
+            name=Engine.VAPOROCK.value,
+            backend=object(),
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=False,
+        )
+    }
+    try:
+        prediction = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            observation,
+            handles=handles,
+            experiment=experiment,
+            bench=_bench_for_score(experiment, _score_context.benches),
+        )
+    finally:
+        battery.close_battery_engine_handles(handles)
+
+    assert prediction.value is not None
+    assert isolated_timeouts == [battery._ENGINE_OUTER_TIMEOUT_S["internal-analytical"]]
+
+
 def test_whole_store_ia_uses_isolated_worker_with_other_engine_cached(
     monkeypatch: pytest.MonkeyPatch,
     _score_context,
