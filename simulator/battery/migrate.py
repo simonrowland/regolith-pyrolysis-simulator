@@ -1776,9 +1776,7 @@ def _composition_located_from_plain(
         else:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
-            if isinstance(payload, Mapping) and isinstance(
-                payload.get("inference"), Mapping
-            ):
+            if isinstance(payload, Mapping) and "inference" in payload:
                 serialized_inference = source.inference
         try:
             declared_component_map = _declared_printed_composition_map(payload)
@@ -1796,21 +1794,16 @@ def _composition_located_from_plain(
                 locator=locator,
             )
         accepted_wt = _oxide_mass_percent_components(wt)
-        source_note = _wt_percent_derivation_source_note(
-            wt, payload, declared_component_map=declared_component_map
+        derivation = _mass_percent_composition_derivation(
+            accepted_wt,
+            locator,
+            closure_context=composition_context,
+            source_note=_wt_percent_derivation_source_note(
+                wt, payload, declared_component_map=declared_component_map
+            ),
+            admitted=serialized_inference is None,
         )
-        if serialized_inference is None:
-            derivation = _mass_percent_composition_derivation(
-                accepted_wt,
-                locator,
-                closure_context=composition_context,
-                source_note=source_note,
-            )
-        else:
-            derivation = wt_pct_to_mole_fraction_derivation(
-                accepted_wt, locator, source_note=source_note
-            )
-        renormalization_input = next(
+        renorm_input = next(
             (
                 item
                 for item in (serialized_inference.inputs if serialized_inference else ())
@@ -1818,11 +1811,8 @@ def _composition_located_from_plain(
             ),
             None,
         )
-        if renormalization_input and renormalization_input not in derivation.inputs:
-            derivation = replace(
-                derivation,
-                inputs=(*derivation.inputs, renormalization_input),
-            )
+        if renorm_input:
+            derivation = replace(derivation, inputs=(*derivation.inputs, renorm_input))
         return Located(
             State.of(composition),
             locator=locator,
