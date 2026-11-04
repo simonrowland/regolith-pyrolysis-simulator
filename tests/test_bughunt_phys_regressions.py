@@ -1000,6 +1000,56 @@ def test_successful_step_structurally_shares_committed_history(monkeypatch) -> N
     assert isinstance(direct_snapshot.value.__cause__, AssertionError)
 
 
+def test_successful_step_shares_append_only_condenser_histories() -> None:
+    """Fog, bulk-gas, and cold-spot rows committed before the hour stay shared."""
+
+    class CommittedNotice:
+        def __deepcopy__(self, _memo):
+            raise AssertionError("committed condenser history must stay off the hot deepcopy path")
+
+    class FakeLedger:
+        def __init__(self) -> None:
+            self._balances = {}
+            self._policies = {}
+            self._transitions = []
+            self._terminal_debit_authorized_transition_ids = set()
+            self._external_loads = []
+
+        @property
+        def transitions(self):
+            return self._transitions
+
+    committed = CommittedNotice()
+    sim = object.__new__(PyrolysisSimulator)
+    sim._poisoned_hour = None
+    sim._pending_shuttle_bakeout_cycle_increment = ""
+    sim.melt = SimpleNamespace(hour=4)
+    sim.record = BatchRecord(snapshots=[])
+    sim._condensation_model = SimpleNamespace(
+        operating_history=[],
+        vapour_fog_history=[committed],
+        stage_bulk_gas_history=[committed],
+        cold_spot_history=[committed],
+        last_sticking_alpha_provenance_notice={},
+    )
+    sim.runtime_state = {"nested": {"temperature_C": 25.0}}
+    sim.atom_ledger = FakeLedger()
+    sim._chem_registry = object()
+    sim._chem_kernel = object()
+    sim._build_chemistry_kernel = lambda: object()
+    sim._step_one_hour = lambda: HourSnapshot(hour=4)
+
+    assert sim.step().hour == 4
+    model = sim._condensation_model
+    assert model.vapour_fog_history == [committed]
+    assert model.vapour_fog_history[0] is committed
+    assert model.stage_bulk_gas_history[0] is committed
+    assert model.cold_spot_history[0] is committed
+    with pytest.raises(RefusalStateSnapshotError) as direct_snapshot:
+        sim._snapshot_terminal_refusal_hour_state()
+    assert isinstance(direct_snapshot.value.__cause__, AssertionError)
+
+
 def _refusal_step_sim() -> PyrolysisSimulator:
     class FakeLedger:
         def __init__(self) -> None:
