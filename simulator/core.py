@@ -542,6 +542,8 @@ def _deepcopy_refusal_state(value: Any, memo: Dict[int, Any]) -> Any:
         ) from exc
 
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -973,6 +975,10 @@ FLOW_MASS_ACCOUNTS = (
     'process.stage0_salt_feed',
     'process.stage0_foulant',
     'process.condensation_train',
+    # The Stage-4 freeze-out cartridge and its melt-out solid residue hold
+    # ledger mass, so the flow balance has to count them.
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     WALL_DEPOSIT_ACCOUNT,
     *PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS,
