@@ -79,12 +79,17 @@ def test_invalid_pO2_is_a_typed_refusal(vapor_pressure_data, oxygen):
 
 @pytest.mark.parametrize("route", ["helper", "fallback"])
 @pytest.mark.parametrize("species,exponent", [("SiO", -0.5), ("Si", -1.0)])
-def test_b984_actual_oxygen_reaction_law_and_notice(vapor_pressure_data, route, species, exponent):
+def test_b984_actual_oxygen_reaction_law_and_notice(
+    vapor_pressure_data, route, species, exponent, monkeypatch,
+):
+    from simulator import engine_local_config
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
+    monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     backend = AlphaMELTSBackend()
     answers = {}
     receipts = {}
+    warning_messages = []
     for oxygen in (1e-31, 1e-30, 1e-29, 1e-12, 1e-9, 1e-8, 100.0, 1000.0):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
@@ -97,10 +102,11 @@ def test_b984_actual_oxygen_reaction_law_and_notice(vapor_pressure_data, route, 
                     1600.0, {"SiO2": 1.0}, {"SiO2": 100.0}, pO2_bar=oxygen,
                 )[species]
                 receipts[oxygen] = backend._antoine_floor_inversion_notices.get(species)
+        warning_messages.extend(str(item.message) for item in caught)
         answers[oxygen] = pressure
-        if oxygen in (1e-31, 1000.0):
-            assert any("pO2_outside_evaluator_band" in str(w.message)
-                       and repr(oxygen) in str(w.message) for w in caught)
+    assert len(warning_messages) == 1
+    assert "pO2_outside_evaluator_band" in warning_messages[0]
+    assert repr(1e-31) in warning_messages[0]
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import atexit
 import ctypes
 import hashlib
 import json
@@ -12,6 +13,7 @@ import re
 import shutil
 import socket
 import subprocess
+import threading
 import tomllib
 import warnings
 from dataclasses import dataclass, field
@@ -20,7 +22,8 @@ from pathlib import PurePosixPath
 from typing import Any, Mapping
 
 logger = logging.getLogger(__name__)
-_LEGACY_WARNED: set[str] = set()
+_WARNING_REPEAT_COUNTS: dict[str, int] = {}
+_WARNING_REPEAT_LOCK = threading.RLock()
 _ALPHAMELTS_BINARY_NAMES = (
     "alphamelts2",
     "alphamelts_macos",
@@ -935,13 +938,54 @@ def is_legacy_cache_version(version: str) -> bool:
     return False
 
 
+def warn_once_with_summary(
+    key: str,
+    message: str,
+    *,
+    category: type[Warning] = UserWarning,
+    stacklevel: int = 2,
+) -> bool:
+    """Emit one full warning per key and count repeats for the exit summary."""
+    warning_key = str(key)
+    with _WARNING_REPEAT_LOCK:
+        if warning_key in _WARNING_REPEAT_COUNTS:
+            _WARNING_REPEAT_COUNTS[warning_key] += 1
+            return False
+        # Keep warnings-as-errors behavior: register the key only after the
+        # first warning has passed through Python's configured filters.
+        warnings.warn(
+            message,
+            category,
+            stacklevel=stacklevel + 1,
+        )
+        _WARNING_REPEAT_COUNTS[warning_key] = 0
+    return True
+
+
+def _flush_warning_repeat_summaries() -> None:
+    with _WARNING_REPEAT_LOCK:
+        summaries = tuple(
+            (key, count)
+            for key, count in sorted(_WARNING_REPEAT_COUNTS.items())
+            if count
+        )
+        for key, _count in summaries:
+            _WARNING_REPEAT_COUNTS[key] = 0
+    for key, count in summaries:
+        logger.warning("%s: %d repeats suppressed", key, count)
+
+
+atexit.register(_flush_warning_repeat_summaries)
+
+
 def warn_legacy_once(engine: str, message: str) -> None:
     key = str(engine).strip().lower()
-    if key in _LEGACY_WARNED:
-        return
-    _LEGACY_WARNED.add(key)
-    warnings.warn(message, stacklevel=3)
-    logger.warning(message)
+    if warn_once_with_summary(
+        f"legacy_engine_identity:{key}",
+        message,
+        stacklevel=2,
+    ):
+        logger.warning(message)
 
 
 def _legacy_engine_path_command(engine: str) -> str | None:

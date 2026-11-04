@@ -841,9 +841,14 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
         raise ValueError(f"pO2_bar must be finite and positive; got {pO2_bar!r}")
     notice = _pO2_evaluation_notice(oxygen)
     if notice is not None:
-        import warnings
+        from simulator.engine_local_config import warn_once_with_summary
 
-        warnings.warn(str(notice), UserWarning, stacklevel=2)
+        warn_once_with_summary(
+            'simulator.vapour_rail.channels.validate_physical_pO2_bar:'
+            f'{notice["reason"]}',
+            str(notice),
+            stacklevel=2,
+        )
     return oxygen
 
 

@@ -25,6 +25,7 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    dedupe = engine_local_config.warn_once_with_summary
     monkeypatch.setattr(
         engine_local_config, "_WARNING_REPEAT_COUNTS", {}, raising=False
     )
@@ -65,7 +66,6 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
         before = [project() for _ in range(50)]
     assert len(before_warnings) == 50
 
-    dedupe = engine_local_config.warn_once_with_summary
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     monkeypatch.setattr(engine_local_config, "warn_once_with_summary", dedupe)
     caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
@@ -90,6 +90,7 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
 def test_warning_dedupe_keeps_pressure_results_and_notices_unchanged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    dedupe = engine_local_config.warn_once_with_summary
     monkeypatch.setattr(
         engine_local_config, "_WARNING_REPEAT_COUNTS", {}, raising=False
     )
@@ -130,17 +131,25 @@ def test_warning_dedupe_keeps_pressure_results_and_notices_unchanged(
         for item in before_warnings
     )
 
-    dedupe = engine_local_config.warn_once_with_summary
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     monkeypatch.setattr(engine_local_config, "warn_once_with_summary", dedupe)
     with warnings.catch_warnings(record=True) as after_warnings:
         warnings.simplefilter("always")
         after = [project() for _ in range(2)]
 
-    assert after_warnings
-    assert [item for item in after_warnings if "pO2_outside_evaluator_band" in str(item.message)]
-    assert [item for item in after_warnings if "Ti melt-source reaction" in str(item.message)]
-    assert [item for item in after_warnings if "Mn melt-source reaction" in str(item.message)]
+    assert len(after_warnings) == 3
+    assert any(
+        "pO2_outside_evaluator_band" in str(item.message)
+        for item in after_warnings
+    )
+    assert any(
+        "Ti melt-source reaction" in str(item.message)
+        for item in after_warnings
+    )
+    assert any(
+        "Mn melt-source reaction" in str(item.message)
+        for item in after_warnings
+    )
     assert before == after
     diagnostics = after[0][2]
     notices = diagnostics["pO2_floor_inversion_notices_by_species"]

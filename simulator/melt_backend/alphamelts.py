@@ -1087,7 +1087,6 @@ class _MELTSBackendSupport(MeltBackend):
         self._engine_version: Optional[str] = None
         self._vaporock_available = False
         self._vaporock_helper: Optional[VapoRockBackend] = None
-        self._vaporock_unavailable_logged = False
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
@@ -1223,8 +1222,11 @@ class _MELTSBackendSupport(MeltBackend):
             warnings.simplefilter('ignore', UserWarning)
             self._vaporock_helper.initialize({})
         self._vaporock_available = self._vaporock_helper.is_available()
-        if not self._vaporock_available and not self._vaporock_unavailable_logged:
-            warnings.warn(
+        if not self._vaporock_available:
+            from simulator.engine_local_config import warn_once_with_summary
+
+            warn_once_with_summary(
+                'simulator.melt_backend.alphamelts.vaporock_unavailable',
                 'VapoRock vapor-melt library unavailable; alphaMELTS vapor '
                 'pressures fall back to activity x Antoine rows; '
                 'vapor_pressures_source records per-species Antoine-row '
@@ -1233,7 +1235,6 @@ class _MELTSBackendSupport(MeltBackend):
                 'first-principles evidence class.',
                 stacklevel=2,
             )
-            self._vaporock_unavailable_logged = True
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
@@ -5853,7 +5854,10 @@ class _MELTSBackendSupport(MeltBackend):
         if result.status != 'ok' or not pressures:
             detail = '; '.join(result.warnings) if result.warnings else (
                 f'status={result.status}, empty vapor_pressures_Pa')
-            warnings.warn(
+            from simulator.engine_local_config import warn_once_with_summary
+
+            warn_once_with_summary(
+                'simulator.melt_backend.alphamelts.vaporock_fallback',
                 'VapoRock returned no usable vapor pressures '
                 f'({detail}); using activity x Antoine fallback rows '
                 '(fit_target=pure_component_psat is a fit target, not a '

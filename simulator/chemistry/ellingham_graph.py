@@ -321,11 +321,14 @@ def effective_equilibrium_pressure_Pa(
             T_K, source_activity=a_ox, pO2_bar=pO2,
         )
         if evaluation.out_of_range:
-            import warnings
+            from simulator.engine_local_config import warn_once_with_summary
 
-            warnings.warn(
+            warn_once_with_summary(
+                'simulator.chemistry.ellingham_graph:'
+                f'{species}:{evaluation.status}',
                 f"{species} melt-source reaction: {evaluation.status} "
-                f"at {T_K:g} K", UserWarning, stacklevel=2,
+                f"at {T_K:g} K",
+                stacklevel=2,
             )
         return evaluation.pressure_pa
     if row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"):
