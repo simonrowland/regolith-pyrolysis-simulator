@@ -150,11 +150,19 @@ def test_whole_store_ia_uses_isolated_worker_with_other_engine_cached(
         return run_isolated(*args, **kwargs)
 
     monkeypatch.setattr(battery, "_run_cell_in_subprocess", capture_isolated_call)
+    cached_vaporock = battery.EngineHandle(
+        name=Engine.VAPOROCK.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
     score_store(
         context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
         include_diagnostics=False,
-        handles={Engine.VAPOROCK.value: object()},
+        handles={Engine.VAPOROCK.value: cached_vaporock},
     )
 
     assert isolated_timeouts == [battery._ENGINE_OUTER_TIMEOUT_S["internal-analytical"]]
