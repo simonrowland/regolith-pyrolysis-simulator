@@ -20796,7 +20796,10 @@ class Migrator:
                 if isinstance(printed_species, str)
                 else None
             )
-            if use_printed_point_species and printed_species_formula is not None:
+            if printed_species_formula is not None and (
+                use_printed_point_species
+                or raw_item.get("species_as_printed") is not None
+            ):
                 species = make_species(
                     printed_species_formula,
                     species.phase,

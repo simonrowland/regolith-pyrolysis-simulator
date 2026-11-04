@@ -15554,13 +15554,13 @@ def test_sauerborn_mass_loss_points_explode_with_point_t(tmp_path: Path) -> None
     assert len(points) == 2
     by_value = {o.value.point: o for o in points}
     sio2 = by_value[as_decimal("0.011")]
-    assert sio2.identity.species.formula == "SiO2"
+    assert sio2.identity.species.formula == "Na"
     assert quantity_token(sio2.identity) is Quantity.MASS_LOSS_FRACTION
     assert sio2.value.kind is ValueKind.POINT
     assert float(sio2.identity.temperature_K.value) == 1673.15
     assert sio2.admission.status is AdmissionStatus.ADMITTED
     ms2 = by_value[as_decimal("0.032")]
-    assert ms2.identity.species.formula == "unknown"
+    assert ms2.identity.species.formula == "Na"
     assert float(ms2.identity.temperature_K.value) == 1836.15
     assert ms2.admission.status is AdmissionStatus.ADMITTED
 
@@ -15695,6 +15695,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
                 {
                     "test": "2b",
                     "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
                     "Tmax_C": None,
                     "Tmax_C_as_printed": ">800",
                     "mass_loss_pct": 16.0,
@@ -15702,6 +15703,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
                 {
                     "test": 3,
                     "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
                     "Tmax_C": 700.0,
                     "mass_loss_pct": 37.0,
                 },
@@ -15736,7 +15738,7 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
     assert len(points) == 3
     by_value = {float(o.value.point): o for o in points}
     mls = by_value[0.101]
-    assert mls.identity.species.formula == "unknown"
+    assert mls.identity.species.formula == "Na"
     assert float(mls.identity.temperature_K.value) == 1474.0 + 273.15
     assert mls.admission.status is AdmissionStatus.ADMITTED
     bound = by_value[0.16]
@@ -15812,17 +15814,55 @@ def test_point_sample_label_different_from_printed_species_never_infers(
     }
 
 
-def test_bare_sample_label_equal_to_parent_species_remains_a_formula_candidate() -> None:
-    from simulator.battery.migrate import _sample_label_formula_candidate
-
-    assert (
-        _sample_label_formula_candidate(
-            parent_formula="Cu",
-            sample_label="Cu",
-            species_as_printed=None,
-        )
-        == "Cu"
+def test_bare_sample_label_equal_to_parent_species_still_infers(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [{"T_K": 1200.0, "p_Pa": 2.0, "sample": "Cu"}],
+        },
     )
+    row = extract["species"]["Na"]["observations"][0]
+    extract["species"] = {"Cu": {"observations": [row]}}
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "Cu"
+
+
+def test_point_species_as_printed_overrides_parent_formula(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 2.0,
+                    "sample": "FeTiO3",
+                    "species_as_printed": "FeTiO3",
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "FeTiO3"
 
 
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
