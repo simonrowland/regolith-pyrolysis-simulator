@@ -8912,6 +8912,35 @@ def predict_with_engine(
         )
 
 
+_BUILTIN_SCORE_PREDICTOR = predict_with_engine
+
+
+def _score_predict_with_engine(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode | None = None,
+) -> EnginePrediction:
+    """Route scorer calls while preserving custom predictor keyword contracts."""
+
+    predictor = predict_with_engine
+    kwargs: dict[str, object] = {"handles": handles, "experiment": experiment}
+    if predictor is _BUILTIN_SCORE_PREDICTOR:
+        if bench is not None:
+            kwargs["bench"] = bench
+        if fo2_mode is not None:
+            kwargs["fo2_mode"] = fo2_mode
+        if engine is Engine.INTERNAL_ANALYTICAL:
+            # Scoring owns a shared handle cache, but every IA row still uses
+            # the CPU-budgeted child. Direct predictor callers keep their own
+            # default, which may deliberately use an IA handle in-process.
+            kwargs["isolated"] = True
+    return predictor(engine, observation, **kwargs)
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -11969,9 +11998,20 @@ def compile_residual(
     ):
         prediction = _knudsen_residue_prediction(context, reference, engine)
     if prediction is None:
-        predictor = predict or predict_with_engine
+        builtin_predictor = (
+            predict is _BUILTIN_SCORE_PREDICTOR
+            or (
+                predict is None
+                and predict_with_engine is _BUILTIN_SCORE_PREDICTOR
+            )
+        )
+        predictor = (
+            _score_predict_with_engine
+            if predict is None or predict is _BUILTIN_SCORE_PREDICTOR
+            else predict
+        )
         if (
-            predictor is predict_with_engine
+            builtin_predictor
             and _knudsen_vapour_equilibrium(quantity, experiment)
         ):
             # Identity, whether fO2 is printed or supplied by the selector.
@@ -12046,21 +12086,15 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        # The recorded bench goes to the built-in predictor whether it is
-        # selected implicitly (predict=None) or explicitly
-        # (predict=predict_with_engine): the reactive-cell label follows the
-        # bench, not the call style (b-693/b-691 r2 finding 6). Caller-supplied
-        # predictors keep the handles/experiment keyword contract.
-        if predictor is predict_with_engine and experiment is not None:
+        # The recorded bench follows the built-in predictor whether it is
+        # selected implicitly or explicitly. Caller-supplied predictors keep
+        # the handles/experiment keyword contract.
+        if builtin_predictor and experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
-        if predictor is predict_with_engine and fo2_mode is not None:
+        if builtin_predictor and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
-        if predictor is predict_with_engine and engine is Engine.INTERNAL_ANALYTICAL:
-            # Whole-store scoring owns the shared handle cache. Keep every IA
-            # row on the warm CPU-budget worker after the cache is populated.
-            predictor_kwargs["isolated"] = True
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
