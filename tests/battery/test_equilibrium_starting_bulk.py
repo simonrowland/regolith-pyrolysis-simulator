@@ -527,7 +527,7 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     assert identity.reason == _BLANK_REASON
 
 
-def test_partial_equilibrium_phase_child_refusal_keeps_parent_initial_charge(
+def test_partial_equilibrium_phase_child_refusal_keeps_green_parent_identity(
     tmp_path: Path,
 ) -> None:
     document = _extract(_initial())
@@ -543,7 +543,6 @@ def test_partial_equilibrium_phase_child_refusal_keeps_parent_initial_charge(
         {
             "T_C": 1030,
             "component_amount": _GLASS_AL2O3,
-            "composition_mol": {"SiO2": "0.5", "Al2O3": "0.5"},
             "composition_wt_pct": {
                 "SiO2": "50.5",
                 "Al2O3": _GLASS_AL2O3,
@@ -564,7 +563,8 @@ def test_partial_equilibrium_phase_child_refusal_keeps_parent_initial_charge(
     child = children[0]
     identity_composition = child.identity.composition
     assert identity_composition is not None and identity_composition.is_value
-    # Without provenance, the distinct parent charge is lost when the sample-start equality is false.
+    # Green keeps the parent initial charge in identity; the refused child map
+    # belongs only in point_conditions for an equilibrium-phase row.
     expected_charge = wt_pct_to_mole_fraction(
         {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
     )
@@ -578,7 +578,9 @@ def test_partial_equilibrium_phase_child_refusal_keeps_parent_initial_charge(
     assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
 
 
-def test_partial_child_refusal_applies_to_equal_measured_datum(tmp_path: Path) -> None:
+def test_partial_mass_map_refusal_preserves_equal_valued_mole_datum(
+    tmp_path: Path,
+) -> None:
     document = _extract(_initial())
     values = document["species"]["Al2O3"]["observations"][0]["values"]
     values["quantity"] = "equilibrium_phase_composition"
@@ -600,12 +602,22 @@ def test_partial_child_refusal_applies_to_equal_measured_datum(tmp_path: Path) -
     result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
     child = next(iter(result.observations.values()))
     assert child.identity.composition is not None
-    # Without provenance, value equality masks this measured datum's refusal.
-    assert child.identity.composition.is_unknown
-    assert "kept sum=68.75 wt%" in (child.identity.composition.reason or "")
+    # Green keeps the child's explicit 0.5/0.5 mole map in identity even though
+    # its parallel partial mass-percent point map is refused by m1.
+    assert child.identity.composition.is_value
+    assert child.identity.composition.value.basis == "printed_mole_fraction"
+    assert dict(child.identity.composition.value.components) == {
+        "SiO2": Decimal("0.5"),
+        "Al2O3": Decimal("0.5"),
+    }
+    point_composition = child.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
 
 
-def test_partial_pressure_refusal_keeps_starting_identity(tmp_path: Path) -> None:
+def test_partial_pressure_refusal_replaces_green_point_map_identity(
+    tmp_path: Path,
+) -> None:
     document = _extract(_initial(), component="0.000001")
     observation = document["species"]["Al2O3"]["observations"][0]
     observation["units"] = "Pa"
@@ -629,14 +641,83 @@ def test_partial_pressure_refusal_keeps_starting_identity(tmp_path: Path) -> Non
     result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
     observation = next(iter(result.observations.values()))
     assert observation.identity.composition is not None
-    # Without the P_PARTIAL guard, its later point-map branch replaces the start.
-    assert observation.identity.composition.is_value
-    identity_value = observation.identity.composition.value
-    expected_start = _starting_mole_fraction()
-    assert identity_value.components == expected_start.components
-    assert identity_value.basis == expected_start.basis
-    assert identity_value.amount_basis is expected_start.amount_basis
-    assert identity_value.proxy_flag == "initial_charge_only"
+    # Green writes the converted P_PARTIAL point map into identity; m1 refuses
+    # that same target when its 68.75 wt% kept total fails closure.
+    assert observation.identity.composition.is_unknown
+    assert "kept sum=68.75 wt%" in (observation.identity.composition.reason or "")
     point_composition = observation.point_conditions["composition"]
     assert point_composition.state.is_unknown
     assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
+
+
+def test_partial_pressure_refusal_replaces_undeclared_measured_parent_map(
+    tmp_path: Path,
+) -> None:
+    document = _extract({}, quantity="p_partial", component="0.000001")
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    # Green writes the P_PARTIAL child map into identity even when the parent
+    # has an undeclared-role measured map; closure refusal replaces that target.
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "kept sum=68.75 wt%" in (observation.identity.composition.reason or "")
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
+
+
+def test_partial_pressure_accepted_datum_replaces_parent_starting_map(
+    tmp_path: Path,
+) -> None:
+    document = _extract(
+        _initial((
+            ("SiO2", "50"),
+            ("MgO", "50"),
+        )),
+        quantity="p_partial",
+        component="0.000001",
+    )
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_role"] = "initial_charge_only"
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_role": "datum_state",
+            "composition_wt_pct": {"SiO2": "75", "MgO": "25"},
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    expected = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("75"), "MgO": Decimal("25")}
+    )
+    # Green replaces the 50/50 parent with the accepted 75/25 datum map.
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert observation.identity.composition.value == expected
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_value
+    assert point_composition.state.value == expected

@@ -5069,6 +5069,8 @@ def test_markova_1984_live_mass_loss_identity_uses_its_own_panel_initial_charge(
     ) == Decimal("100.01")
     identity_composition = observation.identity.composition
     assert identity_composition is not None and identity_composition.is_value
+    # Green puts the panel X0 in identity and the residual map in
+    # point_conditions.composition; closure refusal applies only to the latter.
     assert identity_composition.value == wt_pct_to_mole_fraction(
         starting_charge.state.value
     )
@@ -6709,9 +6711,12 @@ def test_nasa_bulk_oxide_row_keeps_its_closure_refusal() -> None:
         )
     )
 
-    composition = observation.identity.composition
-    assert composition is not None and composition.is_unknown
-    assert "kept sum=92.7 wt% is below 95 wt%" in composition.reason
+    # Green placed the accepted row map in point_conditions, not identity;
+    # m1 keeps the closure refusal at that same target.
+    assert observation.identity.composition is None
+    composition = observation.point_conditions["composition"]
+    assert composition.state.is_unknown
+    assert "kept sum=92.7 wt% is below 95 wt%" in composition.state.reason
 
 
 def test_richter_starting_bulk_map_is_identity_for_evaporation_rows() -> None:

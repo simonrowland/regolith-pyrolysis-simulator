@@ -5577,6 +5577,17 @@ def _initial_oxide_map_from_values(
             return got
         if refusal_reason is not None and len(refusal_reason) > refusal_count:
             return None
+    rowless_values = _values_without_row_lists(values)
+    if rowless_values != values:
+        has_rowless_composition = _has_explicit_composition_field(rowless_values) or any(
+            _is_printed_chemical_component_name(str(name))
+            and _classify_composition_cell(value)[0] == "number"
+            for name, value in rowless_values.items()
+        )
+        if not has_rowless_composition:
+            # The rows carry their own maps; an empty parent shell is not a
+            # zero-total starting composition.
+            return None
     got = _oxide_map_from_mapping(
         values,
         refusal_reason=refusal_reason,
@@ -6331,7 +6342,7 @@ def _apply_equilibrium_starting_bulk(
     point_conditions: Mapping[str, Located[Any]] | None,
     *,
     origin: str,
-) -> tuple[Mapping[str, Located[Any]] | None, list[Notice], bool]:
+) -> tuple[Mapping[str, Located[Any]] | None, list[Notice]]:
     """Hand the printed starting bulk to an equilibrium phase row.
 
     Closed system, so the starting bulk is the system composition. The
@@ -6349,10 +6360,10 @@ def _apply_equilibrium_starting_bulk(
     """
 
     if experiment is None:
-        return point_conditions, [], False
+        return point_conditions, []
     initial = experiment.sample.initial_composition
     if initial is None:
-        return point_conditions, [], False
+        return point_conditions, []
     mass_percent_refusal = (
         initial.state.is_unknown
         and (initial.state.reason or "").startswith(
@@ -6365,11 +6376,11 @@ def _apply_equilibrium_starting_bulk(
         or initial.state.value.amount_basis
         not in {AmountBasis.MOLE_FRACTION, AmountBasis.MOL_INVENTORY}
     ):
-        return point_conditions, [], False
+        return point_conditions, []
     if _row_printed_composition_unknown(point_conditions):
-        return point_conditions, [], False
+        return point_conditions, []
     if _keeps_existing_composition(ident_kwargs.get("composition")):
-        return point_conditions, [], False
+        return point_conditions, []
     ident_kwargs["composition"] = initial.state
     existing_point = (point_conditions or {}).get("composition")
     if not (
@@ -6381,8 +6392,30 @@ def _apply_equilibrium_starting_bulk(
             "composition": initial,
         }
     if mass_percent_refusal:
-        return point_conditions, [], True
+        return point_conditions, []
     notices: list[Notice] = []
+    printed = experiment.sample.printed_composition
+    printed_values = (
+        printed.state.value
+        if printed is not None
+        and printed.state.is_value
+        and isinstance(printed.state.value, Mapping)
+        else None
+    )
+    if (
+        initial.inference is not None
+        and initial.inference.relation == "wt_pct_to_mole_fraction"
+        and printed_values is not None
+    ):
+        projection_notice = _composition_projection_notice(
+            _mass_percent_components(printed_values),
+            closure_context=printed_values,
+            quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+            origin=origin,
+            declared_component_map=printed_values,
+        )
+        if projection_notice is not None:
+            notices.append(projection_notice)
     causes = _open_system_starting_bulk_causes(experiment)
     if causes:
         notices.append(
@@ -6412,18 +6445,15 @@ def _apply_equilibrium_starting_bulk(
                 authority=Authority.EXTRAPOLATED,
             )
         )
-    printed = experiment.sample.printed_composition
     if (
-        printed is not None
-        and printed.state.is_value
-        and isinstance(printed.state.value, Mapping)
+        printed_values is not None
         and any(
             _mass_percent_component_key(str(key))[0] == "FeOT"
-            for key in printed.state.value
+            for key in printed_values
         )
     ):
         weights: dict[str, Decimal] = {}
-        for key, raw in printed.state.value.items():
+        for key, raw in printed_values.items():
             name, _has_mass_suffix = _mass_percent_component_key(str(key))
             kind, amount = _classify_composition_cell(raw)
             if kind == "number" and amount is not None:
@@ -6435,7 +6465,7 @@ def _apply_equilibrium_starting_bulk(
         )
         if iron is not None:
             notices.append(iron)
-    return point_conditions, notices, True
+    return point_conditions, notices
 
 
 def _initial_charge_only_missing_composition(
@@ -20452,7 +20482,6 @@ class Migrator:
                 source_derivation,
             )
         evidence = legacy_admission_evidence(evidence, admission)
-        identity_composition_from_starting_material = False
         if source_composition_located is not None:
             # A source-declared point-condition composition is authoritative.
             # In particular, a typed refusal here cannot be replaced by a
@@ -20466,28 +20495,15 @@ class Migrator:
             )
         elif initial_composition is not None:
             ident_kwargs["composition"] = State.of(initial_composition)
-            identity_composition_from_starting_material = (
-                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            )
         elif catalogue_composition is not None:
             ident_kwargs["composition"] = catalogue_composition.state
-            identity_composition_from_starting_material = (
-                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            )
         elif composition_located is not None:
             ident_kwargs["composition"] = composition_located.state
-            identity_composition_from_starting_material = (
-                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            )
         elif initial_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 initial_oxide_map,
                 closure_context=composition_closure_context,
                 declared_component_map=_named_printed_composition_map(values),
-            )
-            identity_composition_from_starting_material = (
-                composition_role_error is None
-                and composition_role != "datum_state"
             )
         elif isinstance(sample_composition, tuple):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
@@ -20496,10 +20512,6 @@ class Migrator:
                 declared_component_map=_named_printed_composition_map(
                     sample_composition[2]
                 ),
-            )
-            identity_composition_from_starting_material = (
-                composition_role_error is None
-                and composition_role != "datum_state"
             )
         elif composition_refusal:
             ident_kwargs["composition"] = State.unknown(
@@ -20881,10 +20893,8 @@ class Migrator:
         )
         if explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
-            identity_composition_from_starting_material = False
         elif explicit_composition_refusal is not None:
             ident_kwargs["composition"] = explicit_composition_refusal
-            identity_composition_from_starting_material = False
         elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
@@ -21121,7 +21131,6 @@ class Migrator:
                 and isinstance(located_composition.state.value, Composition)
             ):
                 ident_kwargs["composition"] = located_composition.state
-                identity_composition_from_starting_material = False
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
             printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
             ident_kwargs["fO2_Pa"] = (
@@ -21335,8 +21344,7 @@ class Migrator:
                         "composition": located_composition,
                     }
                     ident_kwargs["composition"] = composition_state
-                    identity_composition_from_starting_material = False
-            point_conditions, starting_bulk_notices, starting_bulk_identity_set = (
+            point_conditions, starting_bulk_notices = (
                 _apply_equilibrium_starting_bulk(
                     experiment,
                     ident_kwargs,
@@ -21344,41 +21352,11 @@ class Migrator:
                     origin=obs_id,
                 )
             )
-            identity_composition_from_starting_material |= (
-                starting_bulk_identity_set
-            )
             initial = (
                 experiment.sample.initial_composition
                 if experiment is not None
                 else None
             )
-            starting_printed = (
-                experiment.sample.printed_composition
-                if experiment is not None
-                else None
-            )
-            if (
-                projection_notice is None
-                and initial is not None
-                and initial.state.is_value
-                and identity_composition_from_starting_material
-                and starting_printed is not None
-                and starting_printed.state.is_value
-                and isinstance(starting_printed.state.value, Mapping)
-            ):
-                starting_map = starting_printed.state.value
-                projection_notice = _composition_projection_notice(
-                    starting_map,
-                    closure_context={"printed_composition": starting_map},
-                    quantity=q_token
-                    if isinstance(q_token, Quantity)
-                    else None,
-                    origin=obs_id,
-                    declared_component_map=starting_map,
-                )
-                projection_notices = (
-                    () if projection_notice is None else (projection_notice,)
-                )
             if _is_printed_phase_mass_stamp(
                 ident_kwargs.get("composition")
             ):
@@ -21393,7 +21371,6 @@ class Migrator:
                 if initial is not None and initial.state.is_unknown:
                     composition_state = initial.state
                     located_composition = initial
-                    identity_composition_from_starting_material = True
                 else:
                     # A valid printed start was closure-checked when converted.
                     # Only a phase vector left as the identity input needs its
@@ -21407,7 +21384,6 @@ class Migrator:
                     located_composition = Located(
                         composition_state, locator=printed.locator
                     )
-                    identity_composition_from_starting_material = False
                 ident_kwargs["composition"] = composition_state
                 point_conditions = {
                     **(point_conditions or {}),
@@ -21647,9 +21623,6 @@ class Migrator:
                     experiment_id=experiment_id,
                     locator=locator,
                     identity_base=(yield_quantity, species, ident_kwargs),
-                    identity_composition_from_starting_material=(
-                        identity_composition_from_starting_material
-                    ),
                     evidence=evidence,
                     admission=point_admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -21776,9 +21749,6 @@ class Migrator:
                         experiment_id=experiment_id,
                         locator=locator,
                         identity_base=(quantity, point_species, ident_kwargs),
-                        identity_composition_from_starting_material=(
-                            identity_composition_from_starting_material
-                        ),
                         evidence=evidence,
                         admission=admission,
                         uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -21907,9 +21877,6 @@ class Migrator:
                     experiment_id=experiment_id,
                     locator=locator,
                     identity_base=(quantity, species, ident_kwargs),
-                    identity_composition_from_starting_material=(
-                        identity_composition_from_starting_material
-                    ),
                     evidence=evidence,
                     admission=admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -21967,9 +21934,6 @@ class Migrator:
             # returned. Explicit row point_conditions overwrite inferred ones.
             before = self._count(source_key).observations_out
             point_identity_kwargs = dict(ident_kwargs)
-            point_identity_composition_from_starting_material = (
-                identity_composition_from_starting_material
-            )
             point_parent_conditions = point_conditions
             rowless_values = _values_without_row_lists(values)
             # Same declared-map rule as the parent probe. Without it a
@@ -22004,13 +21968,8 @@ class Migrator:
                             rowless_values
                         ),
                     )
-                    point_identity_composition_from_starting_material = (
-                        composition_role_error is None
-                        and composition_role != "datum_state"
-                    )
                 else:
                     point_identity_kwargs.pop("composition", None)
-                    point_identity_composition_from_starting_material = False
                 if point_parent_conditions:
                     point_parent_conditions = {
                         key: condition
@@ -22120,11 +22079,6 @@ class Migrator:
                             quantity,
                             species,
                             point_identity_kwargs if non_yield_points else ident_kwargs,
-                        ),
-                        identity_composition_from_starting_material=(
-                            point_identity_composition_from_starting_material
-                            if non_yield_points
-                            else identity_composition_from_starting_material
                         ),
                         evidence=evidence,
                         admission=admission,
@@ -22648,7 +22602,6 @@ class Migrator:
         experiment_id: str,
         locator: Locator,
         identity_base: tuple[Quantity | State[Quantity], Species, dict[str, Any]],
-        identity_composition_from_starting_material: bool = False,
         evidence: Evidence,
         admission: Admission,
         uncertainty: Uncertainty,
@@ -23060,11 +23013,6 @@ class Migrator:
                 point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
-        preserve_starting_identity_composition = (
-            identity_composition_from_starting_material
-            and isinstance(ident_kwargs.get("composition"), State)
-            and ident_kwargs["composition"].is_value
-        )
         if malformed_composition_amount is not None:
             self.result.registry_issues.append(
                 ValidationIssue(
@@ -23074,20 +23022,10 @@ class Migrator:
                 )
             )
         if point_catalogue is not None:
-            if not (
-                preserve_starting_identity_composition
-                and point_composition_refusal
-            ):
-                ident_kwargs["composition"] = point_catalogue.state
-                identity_composition_from_starting_material = False
+            ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
-            if not (
-                preserve_starting_identity_composition
-                and point_composition_refusal
-            ):
-                ident_kwargs["composition"] = point_composition_located.state
-                identity_composition_from_starting_material = False
+            ident_kwargs["composition"] = point_composition_located.state
         elif q_token is Quantity.TRANSITION_TEMPERATURE:
             raw_point_conditions = (
                 raw_item.get("point_conditions")
@@ -23106,14 +23044,12 @@ class Migrator:
             if (
                 isinstance(located_composition, Located)
                 and located_composition.state.is_unknown
-                and not preserve_starting_identity_composition
                 and not (
                     isinstance(inherited_composition, State)
                     and inherited_composition.is_value
                 )
             ):
                 ident_kwargs["composition"] = located_composition.state
-                identity_composition_from_starting_material = False
         if (
             q_token is Quantity.TRANSITION_TEMPERATURE
             and isinstance(raw_item, Mapping)
@@ -23178,29 +23114,31 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if point_composition_refusal and not preserve_starting_identity_composition:
-            ident_kwargs["composition"] = State.unknown(
-                composition_unknown_reason(point_composition_refusal)
+        # A closure refusal may replace identity only at a site where green
+        # wrote this row map there; other quantities keep their parent target.
+        point_mass_closure_refused = any(
+            marker in reason
+            for reason in point_composition_refusal
+            for marker in (
+                "mass-percent composition is a partial analysis:",
+                "mass-percent composition exceeds the accepted kept-sum limit:",
+                "partial analysis contains unsupported component(s) above ",
+                "mass-percent composition contains a negative or non-finite amount",
+                "unsupported printed component has a negative or non-finite amount",
             )
-            identity_composition_from_starting_material = False
-        elif (
-            q_token_point is Quantity.P_PARTIAL
-            and point_oxide_map
-            and not preserve_starting_identity_composition
-        ):
+        )
+        if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
-            identity_composition_from_starting_material = False
         elif (
             point_oxide_map
             and (
                 q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
                 or source_id == "liu-2023-chromium-oxide-activity"
             )
-            and not preserve_starting_identity_composition
             and not (
                 ident_kwargs.get("composition") is not None
                 and ident_kwargs["composition"].is_value
@@ -23214,23 +23152,52 @@ class Migrator:
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
-            identity_composition_from_starting_material = False
         elif (
             point_oxide_map
             and q_token_point is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             and _initial_charge_row_kinds(raw_item)
-            and not preserve_starting_identity_composition
             and not getattr(ident_kwargs.get("composition"), "is_value", False)
         ):
+            # Green uses an explicitly marked initial-charge phase row as the
+            # identity target when no parent identity composition is available.
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
-            identity_composition_from_starting_material = True
+        elif point_composition_refusal and (
+            q_token_point is not Quantity.MASS_LOSS_FRACTION
+            and point_composition_located is None
+            and point_catalogue is None
+            and (
+                not point_mass_closure_refused
+                or (
+                    point_oxide_map is not None
+                    and q_token_point
+                    in {Quantity.DENSITY, Quantity.VALENCE_RATIO}
+                    and not (
+                        isinstance(ident_kwargs.get("composition"), State)
+                        and ident_kwargs["composition"].is_value
+                    )
+                )
+            )
+            and not (
+                q_token_point
+                in {
+                    Quantity.ACTIVITY,
+                    Quantity.ACTIVITY_COEFFICIENT,
+                    Quantity.DENSITY,
+                    Quantity.VALENCE_RATIO,
+                }
+                and isinstance(ident_kwargs.get("composition"), State)
+                and ident_kwargs["composition"].is_value
+            )
+        ):
+            ident_kwargs["composition"] = State.unknown(
+                composition_unknown_reason(point_composition_refusal)
+            )
         elif (
             ident_kwargs.get("composition") is None
-            and not preserve_starting_identity_composition
         ):
             composition_refusal: list[str] = []
             initial_map = (
@@ -23250,12 +23217,10 @@ class Migrator:
                         parent_values
                     ),
                 )
-                identity_composition_from_starting_material = True
             elif composition_refusal:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason(composition_refusal)
                 )
-                identity_composition_from_starting_material = False
         if (
             q_token_point is Quantity.P_SAT
             and isinstance(raw_item, Mapping)
@@ -24499,7 +24464,10 @@ class Migrator:
             if isinstance(quantity, Quantity)
             else (quantity.value if isinstance(quantity, State) and quantity.is_value else None)
         )
-        if q_for_comp in _BULK_PROPERTY_QUANTITIES and ident_kwargs.get("composition") is None:
+        if (
+            q_for_comp in _BULK_PROPERTY_QUANTITIES
+            and ident_kwargs.get("composition") is None
+        ):
             ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
         identity = fill_identity(quantity, species, **ident_kwargs)
         if species.phase.is_unknown:
