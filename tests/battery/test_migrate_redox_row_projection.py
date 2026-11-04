@@ -47,6 +47,23 @@ def test_kress_table1_redox_rows_project_printed_conditions() -> None:
         for item in extract["species"]["Fe"]["observations"]
         if item["observation_id"] == "kress_1988_table1_measured_redox_series"
     )
+    experiment = next(
+        item
+        for item in extract["experiments"]
+        if item["experiment_id"] == "kress_1988_table1_equilibration_series"
+    )
+    assert experiment["ambient_pressure_evidence"] == {
+        "evidence_class": "gas_mixing",
+        "quote": (
+            "Oxygen fugacity was imposed by a furnace atmosphere consisting of a "
+            "CO-CO₂ gas mixture (Deines et al., 1974)."
+        ),
+        "locator": {
+            "published_page": 1269,
+            "pdf_page_index": 2,
+            "section": "Experimental Technique",
+        },
+    }
     source_rows = series["values"]["rows"]
     assert len(source_rows) == 63
     printed_cells = {
@@ -329,6 +346,22 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         assert point["composition"].state.is_value
         assert point["composition"].state.value == expected
         assert point["composition"].locator.table == "S-2"
+
+
+def test_aithala_s1_uncertainties_quote_figure1_error_bar_level() -> None:
+    extract = yaml.safe_load(AITHALA.read_text(encoding="utf-8"))
+    rows = [
+        item
+        for item in extract["species"]["Fe"]["observations"]
+        if item.get("locator", {}).get("table") == "S-1"
+        and item.get("values", {}).get("quantity") == "fe3_fe2_ratio"
+    ]
+    assert len(rows) == 16
+    for row in rows:
+        uncertainty = row["uncertainty"]["Fe3_over_FeT"]
+        assert '"error bars represent 2σ"' in uncertainty
+        assert "Fig. 1 caption, published p. 20" in uncertainty
+        assert "Table S-1 does not label the cell ± level" in uncertainty
 
 
 def test_aithala_vf_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:

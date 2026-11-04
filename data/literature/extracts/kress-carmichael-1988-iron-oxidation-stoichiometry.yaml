@@ -73,6 +73,10 @@ experiments:
     method: quench_equilibration
     method_as_printed: ferric-ferrous equilibrium experiments across air, CO2, and CO-CO2 gas environments; individual Table 1 runs are not assigned an atmosphere; samples quenched by dropping into cold distilled water previously boiled
     locator: {published_page: 1267-1269, pdf_page_index: 0-2, section: Abstract and Experimental Technique}
+    ambient_pressure_evidence:
+      evidence_class: gas_mixing
+      quote: 'Oxygen fugacity was imposed by a furnace atmosphere consisting of a CO-CO₂ gas mixture (Deines et al., 1974).'
+      locator: {published_page: 1269, pdf_page_index: 2, section: Experimental Technique}
     sample:
       printed_composition:
         state: {tag: value, value: six silicate melt compositions; individual run compositions transcribed in Table 1}
