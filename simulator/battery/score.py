@@ -6843,24 +6843,24 @@ def _resolve_openimcc_liquid_reference_standards(
     if redox_pack is None:
         redox_pack = load_redox_pack()
     index = _openimcc_standard_index(melt_pack, redox_pack)
-    pack = melt_pack if consumer == "melt" else redox_pack
-    pack_label = _openimcc_liquid_standard_pack_label(pack, consumer)
-    rows = index.melt_rows if consumer == "melt" else index.redox_rows
-    row_standards = (
-        index.melt_row_standards
-        if consumer == "melt"
-        else index.redox_row_standards
-    )
-    records = index.melt_records if consumer == "melt" else index.redox_records
+    relevant: list[tuple[Any, str]] = [
+        (record, "melt") for record in index.melt_records
+    ]
+    if consumer == "redox":
+        relevant.extend((record, "redox") for record in index.redox_records)
 
     refusal_kinds = {"mismatch", "undeclared", "redox-mismatch"}
     refusal_records = [
-        record for record in records if record.kind in refusal_kinds
+        (record, role)
+        for record, role in relevant
+        if record.kind in refusal_kinds
     ]
     if refusal_records:
         failures: list[dict[str, object]] = []
         reasons: list[str] = []
-        for record in refusal_records:
+        for record, role in refusal_records:
+            pack = melt_pack if role == "melt" else redox_pack
+            pack_label = _openimcc_liquid_standard_pack_label(pack, role)
             active = record.active or "<missing>"
             reasons.append(
                 f"kind={record.kind}; oxide={record.oxide}; "
@@ -6894,9 +6894,16 @@ def _resolve_openimcc_liquid_reference_standards(
     present_oxides = _openimcc_positive_composition_oxides(composition)
     notices: list[Notice] = []
     seen_reasons: set[str] = set()
-    for record in records:
+    for record, role in relevant:
         if record.kind not in {"reference-unknown", "non-source-basis"}:
             continue
+        pack = melt_pack if role == "melt" else redox_pack
+        rows = index.melt_rows if role == "melt" else index.redox_rows
+        row_standards = (
+            index.melt_row_standards
+            if role == "melt"
+            else index.redox_row_standards
+        )
         row_keys = (record.row_key,) if record.row_key is not None else rows.keys()
         for row_key in row_keys:
             reaction_oxides = rows.get(row_key)
@@ -6931,6 +6938,7 @@ def _resolve_openimcc_liquid_reference_standards(
                 standard_id = record.standard_id or record.declared
                 basis = record.basis or "unknown"
                 citation = record.citation or "unknown"
+            pack_label = _openimcc_liquid_standard_pack_label(pack, role)
             reason = (
                 f"openimcc_liquid_standard; kind={record.kind}; "
                 f"pack={pack_label}; "
@@ -6954,6 +6962,53 @@ def _resolve_openimcc_liquid_reference_standards(
         refusal_reason=None,
         refusal_detail={},
         notices=tuple(notices),
+    )
+
+
+def _openimcc_residue_standard_assessment(
+    engine: Engine,
+    composition: object,
+    quantity: Quantity,
+) -> _OpenImccLiquidStandardAssessment | None:
+    if engine is not Engine.OPENIMCC:
+        return None
+    located_state = getattr(composition, "state", None)
+    if located_state is not None:
+        composition = (
+            located_state.value
+            if getattr(located_state, "is_value", False)
+            else {}
+        )
+    if isinstance(composition, Composition):
+        components: Mapping[str, object] = composition.as_map()
+    elif isinstance(composition, Mapping):
+        components = composition
+    else:
+        components = {}
+    return _resolve_openimcc_liquid_reference_standards(
+        components,
+        quantity,
+        consumer="melt",
+    )
+
+
+def _openimcc_standard_refusal_prediction(
+    engine: Engine,
+    reference: Observation,
+    assessment: _OpenImccLiquidStandardAssessment | None,
+) -> EnginePrediction | None:
+    if assessment is None or assessment.refusal_reason is None:
+        return None
+    return EnginePrediction(
+        engine=engine,
+        channel=ENGINE_CHANNELS[engine],
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        authority=Authority.REFUSED,
+        coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+        lineage_complete=False,
+        refusal_reason=assessment.refusal_reason,
+        refusal_detail=assessment.refusal_detail,
+        identity=reference.identity,
     )
 
 
@@ -11473,9 +11528,28 @@ def _hashimoto_residue_prediction(
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
     cache_key = (_HASHIMOTO_SOURCE_ID, engine)
+    standard_notices: tuple[Notice, ...] = ()
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
+        experiment = context.experiments.get(reference.experiment_id)
+        sample = None if experiment is None else experiment.sample
+        standard_assessment = _openimcc_residue_standard_assessment(
+            engine,
+            (
+                None
+                if sample is None
+                else getattr(sample, "printed_composition", None)
+            ),
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        standard_refusal = _openimcc_standard_refusal_prediction(
+            engine, reference, standard_assessment
+        )
+        if standard_refusal is not None:
+            return standard_refusal
+        if standard_assessment is not None:
+            standard_notices = standard_assessment.notices
         if cache_key not in cache:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
@@ -11662,6 +11736,7 @@ def _hashimoto_residue_prediction(
                 origin="hashimoto-residue-addendum-a",
             )
         )
+        notices.extend(standard_notices)
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -11706,6 +11781,7 @@ def _hashimoto_residue_prediction(
         notices = _hashimoto_engine_floor_inversion_notices(
             engine, engine_floor_diagnostics
         )
+        notices = (*standard_notices, *notices)
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -11741,7 +11817,25 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
     )
 
     experiment = context.experiments.get(reference.experiment_id)
+    standard_notices: tuple[Notice, ...] = ()
     try:
+        sample = None if experiment is None else experiment.sample
+        standard_assessment = _openimcc_residue_standard_assessment(
+            engine,
+            (
+                None
+                if sample is None
+                else getattr(sample, "initial_composition", None)
+            ),
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        standard_refusal = _openimcc_standard_refusal_prediction(
+            engine, reference, standard_assessment
+        )
+        if standard_refusal is not None:
+            return standard_refusal
+        if standard_assessment is not None:
+            standard_notices = standard_assessment.notices
         cache_key = (f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:{printed_source_pressure(reference)}", engine)
         if cache is not None and cache_key in cache:
             result = cache[cache_key]
@@ -11761,7 +11855,7 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=(*standard_notices, *result["notices"]), identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
@@ -11771,7 +11865,7 @@ def _knudsen_residue_prediction(context, reference, engine, cache=None) -> Engin
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
             refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
-            notices=getattr(exc, "notices", ()), identity=reference.identity,
+            notices=(*standard_notices, *getattr(exc, "notices", ())), identity=reference.identity,
         )
 
 
@@ -11801,7 +11895,26 @@ def _sossi_residue_prediction(
             identity=reference.identity,
         )
     cache_key = (_SOSSI_SOURCE_ID, engine)
+    standard_notices: tuple[Notice, ...] = ()
     try:
+        experiment = context.experiments.get(reference.experiment_id)
+        sample = None if experiment is None else experiment.sample
+        standard_assessment = _openimcc_residue_standard_assessment(
+            engine,
+            (
+                None
+                if sample is None
+                else getattr(sample, "printed_composition", None)
+            ),
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        standard_refusal = _openimcc_standard_refusal_prediction(
+            engine, reference, standard_assessment
+        )
+        if standard_refusal is not None:
+            return standard_refusal
+        if standard_assessment is not None:
+            standard_notices = standard_assessment.notices
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
             _predict_sossi_residue_cohort,
@@ -11930,6 +12043,7 @@ def _sossi_residue_prediction(
                 band=str(band),
             ),
         ]
+        notices.extend(standard_notices)
         activity_extensions = provenance.get("melt_activity_extensions")
         mno_activity_extension = (
             activity_extensions.get("MnO")
@@ -12026,6 +12140,7 @@ def _sossi_residue_prediction(
                 "experiment_id": reference.experiment_id,
                 "detail": str(getattr(exc, "detail", "")),
             },
+            notices=standard_notices,
             identity=reference.identity,
         )
 
