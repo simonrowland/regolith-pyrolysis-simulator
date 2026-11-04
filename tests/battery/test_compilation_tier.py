@@ -6762,8 +6762,9 @@ def test_missing_nonlocal_alumina_candidate_node_refuses_stability_selection(
     import pytest
 
     from simulator.battery.generators import janaf
+    from simulator.reference_data import janaf_fusion
 
-    original_loader = janaf.load_table_document
+    original_loader = janaf_fusion.load_table_document
 
     def missing_alumina_node(path):
         document = original_loader(path)
@@ -6777,7 +6778,7 @@ def test_missing_nonlocal_alumina_candidate_node_refuses_stability_selection(
         ]
         return incomplete
 
-    monkeypatch.setattr(janaf, "load_table_document", missing_alumina_node)
+    monkeypatch.setattr(janaf_fusion, "load_table_document", missing_alumina_node)
     janaf._fusion_table_points.cache_clear()
     janaf._janaf_pure_solid_table_temperature_range.cache_clear()
 
