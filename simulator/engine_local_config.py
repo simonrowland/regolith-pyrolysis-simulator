@@ -981,6 +981,8 @@ def warn_once_with_summary(
     re-flood scorer stderr. ``always`` and ``error`` still reach ``warn`` on
     every call for tests and warnings-as-errors.
     """
+    # Preserve the callsite of the direct warnings.warn this helper replaces.
+    stacklevel += 1
     warning_key = str(key)
     try:
         warning_frame = sys._getframe(stacklevel - 1)
@@ -1002,6 +1004,8 @@ def warn_once_with_summary(
             _WARNING_REPEAT_COUNTS[warning_key] = previous_count + 1
             return False
 
+        # Production keys have distinct text; warnings' module action can
+        # collapse distinct keys if their message text becomes identical.
         warnings.warn(message, category, stacklevel=stacklevel)
         if previous_count == 0:
             _WARNING_REPEAT_COUNTS[warning_key] = 1
