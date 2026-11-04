@@ -5691,6 +5691,16 @@ def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
     return temperature_K
 
 
+# Fink Table 1.2-2 assigns 25% to 9% over 400-600 K. The cautious end is a
+# saturation pressure 25% below the extrapolated equation. The stage notice
+# uses that scale only to say whether a clear extrapolated evaluation sits
+# within the caution of the fog threshold. The rate itself stays on the owner.
+_SATURATION_HANDBOOK_CAUTION_SCALE = 0.75
+_FOG_CLEAR_WITHIN_HANDBOOK_CAUTION = (
+    "fog clear at nominal P_sat; extrapolated, within the handbook caution of the threshold"
+)
+
+
 def _stage_vapour_fog_notice(
     stage: CondensationStage,
     species: str,
@@ -5718,6 +5728,12 @@ def _stage_vapour_fog_notice(
 
     The returned eta is unchanged. When J exceeds the fog threshold the
     notice marks that eta as an upper bound, not as the capture.
+
+    ``saturation_authority`` and ``saturation_notice`` are the owner's
+    fields, copied unchanged. When the flag is off and the saturation
+    pressure is extrapolated, a second owner evaluation at 0.75 P_sat
+    decides the handbook sentence. That sentence is absent when the flag
+    is already on, and absent when the lower pressure still does not cross.
     """
 
     notice: dict[str, Any] = {
@@ -5734,6 +5750,8 @@ def _stage_vapour_fog_notice(
         'p_Pa': partial_pressure_Pa,
         'J_m3_s': None,
         'saturation_ratio': None,
+        'saturation_authority': None,
+        'saturation_notice': None,
         'reason': None,
         'eta_molecular': eta,
         'eta_role': None,
@@ -5756,10 +5774,27 @@ def _stage_vapour_fog_notice(
         notice['reason'] = str(exc)
         return notice
     code = fog_capture_code(result)
+    saturation_notice = result.saturation_notice
+    if code is None and result.saturation_authority == 'extrapolated':
+        caution = nucleation_rate(
+            species,
+            temperature_K,
+            partial_pressure_Pa,
+            saturation_pressure_scale=_SATURATION_HANDBOOK_CAUTION_SCALE,
+        )
+        if fog_capture_code(caution) == NOTICE_FOG:
+            if saturation_notice:
+                saturation_notice = (
+                    f"{saturation_notice} {_FOG_CLEAR_WITHIN_HANDBOOK_CAUTION}"
+                )
+            else:
+                saturation_notice = _FOG_CLEAR_WITHIN_HANDBOOK_CAUTION
     notice.update({
         'code': code,
         'J_m3_s': result.rate_m3_s,
         'saturation_ratio': result.saturation_ratio,
+        'saturation_authority': result.saturation_authority,
+        'saturation_notice': saturation_notice,
         'reason': result.reason,
         'critical_cluster_molecules': result.critical_cluster_molecules,
         'property_notice': result.property_notice,
