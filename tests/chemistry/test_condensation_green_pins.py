@@ -98,15 +98,24 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
         ).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
     expected = json.loads(PINS.read_text())[name]
+    # Collect every species before failing: stopping at the first mismatch
+    # hid stale Cr/SiO pins behind an Fe miss through two repins.
+    mismatches = {}
     for species in SPECIES:
         if species not in expected:
             continue
         if name == "full_lunar" and species in {"Fe", "Cr", "SiO"}:
-            assert actual[species] == expected[species]
+            matches = actual[species] == expected[species]
         else:
-            assert actual[species] == pytest.approx(
+            matches = actual[species] == pytest.approx(
                 expected[species], rel=1e-10, abs=1e-14
             )
+        if not matches:
+            mismatches[species] = {
+                "actual": actual[species],
+                "expected": expected[species],
+            }
+    assert not mismatches, mismatches
     if runner_output is not None:
         assert actual["runner_sha256"] == expected["runner_sha256"]
 
@@ -148,8 +157,9 @@ def _without_engine_versions(value):
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
     # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
-    # 9666fc129 plus the de32c69ca runner regen). Lunar full runs diverge
-    # between the laptop and studio-3, so this pin is not a laptop re-run.
+    # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
+    # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
+    # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
