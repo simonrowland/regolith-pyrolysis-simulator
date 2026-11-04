@@ -46,6 +46,28 @@ def _flag_facts(flags: tuple[Any, ...]) -> set[tuple[str, str, str, str]]:
     }
 
 
+def _expected_standard_notice_reasons(
+    melt_pack: object,
+    composition: dict[str, float],
+    *,
+    redox_pack: object | None = None,
+) -> set[str]:
+    assessment = assess_liquid_standards(
+        melt_pack, redox_pack, None, composition
+    )
+    assert assessment.refusals
+    assert assessment.flags
+    return {flag.reason for flag in assessment.flags}
+
+
+def _prediction_standard_notice_reasons(prediction: Any) -> set[str]:
+    return {
+        notice.reason
+        for notice in prediction.notices
+        if notice.origin == "openimcc.check_pack_standards"
+    }
+
+
 def test_sf04_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
     assessment = assess_liquid_standards(
         _load_pack("published-core"),
@@ -255,6 +277,193 @@ def test_openimcc_residue_result_carries_liquid_standard_notices(
 
     assert prediction.value == Decimal("0.1")
     assert any("row=K2SiO3;" in notice.reason for notice in prediction.notices)
+
+
+def test_score_melt_refusal_carries_dependent_standard_notices(
+    monkeypatch: Any,
+) -> None:
+    pack = _load_pack("published-core")
+    components = {"K2O": 1.0, "SiO2": 1.0}
+    composition = Composition(
+        basis="mole_inventory",
+        components=tuple(
+            (oxide, Decimal(str(amount)))
+            for oxide, amount in components.items()
+        ),
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    experiment = SimpleNamespace(
+        sample=SimpleNamespace(
+            initial_composition=SimpleNamespace(state=State.of(composition))
+        )
+    )
+    monkeypatch.setattr(
+        openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "published-core"
+    )
+
+    prediction = score._predict_mass_loss_with_residue(
+        Engine.OPENIMCC,
+        SimpleNamespace(temperature_K=State.of(Decimal("1800"))),
+        "test-channel",
+        ("openimcc",),
+        experiment,
+        SimpleNamespace(source_id="liquid-standard-refusal-test"),
+    )
+
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert _prediction_standard_notice_reasons(prediction) == (
+        _expected_standard_notice_reasons(pack, components)
+    )
+
+
+def test_score_preflight_refusal_carries_dependent_standard_notices(
+    monkeypatch: Any,
+) -> None:
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        EvidenceClass,
+        Phase,
+        Quantity,
+        UncertaintyKind,
+        ValueKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Evidence,
+        Observation,
+        Species,
+        Uncertainty,
+        Value,
+    )
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    components = {"K2O": 20.0, "SiO2": 80.0}
+    composition = Composition(
+        basis="oxide_wt_pct",
+        components=tuple(
+            (oxide, Decimal(str(amount)))
+            for oxide, amount in components.items()
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("K", Phase.G),
+        temperature_K=State.of(Decimal("1800")),
+        total_pressure_Pa=State.of(Decimal("101325")),
+        fO2_Pa=State.of(Decimal("1e-6")),
+        composition=State.of(composition),
+    )
+    observation = Observation(
+        observation_id="liquid-standard-preflight-refusal",
+        experiment_id="liquid-standard-preflight-refusal",
+        identity=identity,
+        value=Value(ValueKind.POINT, point=Decimal("1e-6")),
+        uncertainty=Uncertainty(UncertaintyKind.NONE),
+        evidence=Evidence(State.of(EvidenceClass.MEASURED_DIRECT)),
+        admission=Admission(AdmissionStatus.ADMITTED, "test"),
+        notices=(),
+    )
+    pack = _load_pack("published-core")
+    backend = _OpenImccBatteryBackend("openimcc")
+    backend._pack = pack
+    handle = SimpleNamespace(
+        name=Engine.OPENIMCC.value,
+        available=True,
+        backend=backend,
+        identity=backend._identity,
+    )
+
+    prediction = score._predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        handles={Engine.OPENIMCC.value: handle},
+    )
+
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert _prediction_standard_notice_reasons(prediction) == (
+        _expected_standard_notice_reasons(pack, components)
+    )
+
+
+def test_closed_redox_refusal_carries_dependent_standard_notices(
+    monkeypatch: Any,
+) -> None:
+    components = {"FeO": 1.0, "K2O": 1.0, "SiO2": 1.0}
+    composition = Composition(
+        basis="oxide_inventory",
+        components=tuple(
+            (oxide, Decimal(str(amount)))
+            for oxide, amount in components.items()
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    pack = _load_pack("published-core")
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: pack)
+    identity = SimpleNamespace(
+        composition=State.of(composition),
+        temperature_K=State.of(Decimal("1800")),
+    )
+
+    prediction = score._predict_distin_closed_feo_activity(
+        Engine.OPENIMCC,
+        SimpleNamespace(source_id="distin-closed-redox-standard-refusal"),
+        identity,
+        "test-channel",
+        ("openimcc",),
+    )
+
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert _prediction_standard_notice_reasons(prediction) == (
+        _expected_standard_notice_reasons(
+            pack, components, redox_pack=load_redox_pack()
+        )
+    )
+
+
+def test_imposed_redox_refusal_carries_dependent_standard_notices(
+    monkeypatch: Any,
+) -> None:
+    components = {"FeO": 10.0, "K2O": 20.0, "SiO2": 70.0}
+    composition = Composition(
+        basis="oxide_wt_pct",
+        components=tuple(
+            (oxide, Decimal(str(amount)))
+            for oxide, amount in components.items()
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+    pack = _load_pack("published-core")
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: pack)
+    monkeypatch.setattr(
+        score,
+        "_fe_redox_material",
+        lambda *_args: score._FeRedoxMaterial(
+            temperature=Decimal("1800"),
+            composition_state=State.of(composition),
+            composition_wt=components,
+        ),
+    )
+    monkeypatch.setattr(
+        score,
+        "_printed_fe_redox_fo2_log",
+        lambda *_args: Decimal("-10"),
+    )
+
+    prediction = score._predict_fe_redox(
+        Engine.OPENIMCC,
+        SimpleNamespace(source_id="imposed-redox-standard-refusal"),
+        SimpleNamespace(),
+        "test-channel",
+    )
+
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert _prediction_standard_notice_reasons(prediction) == (
+        _expected_standard_notice_reasons(pack, components)
+    )
 
 
 def test_isolated_residue_worker_preserves_typed_liquid_standard_refusal() -> None:

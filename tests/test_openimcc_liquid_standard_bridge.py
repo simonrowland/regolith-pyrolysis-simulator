@@ -53,11 +53,21 @@ def test_shared_owner_reports_sf04_k2o_mismatch_with_disclosures() -> None:
 
 
 def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
+    composition = {"K2O": 1.0, "SiO2": 1.0}
+    assessment = openimcc_bridge.liquid_standard_assessment(
+        composition,
+        melt_pack=_load_pack("published-core"),
+    )
+    expected_flags = [
+        flag.as_dict() | {"reason": flag.reason}
+        for flag in assessment.flags
+    ]
+
     with pytest.raises(
         openimcc_bridge.OpenImccCompositionPolicyRefusal
     ) as caught:
         openimcc_bridge.evaluate(
-            composition_mol={"K2O": 1.0, "SiO2": 1.0},
+            composition_mol=composition,
             temperature_K=1800.0,
             pack="published-core",
         )
@@ -66,6 +76,7 @@ def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
     assert refusal.code == "openimcc_liquid_standard_refused"
     assert refusal.diagnostics["invalid_input"] is True
     assert refusal.diagnostics["category"] == 2
+    assert refusal.diagnostics["liquid_standard_flags"] == expected_flags
     failures = refusal.diagnostics["standard_failures"]
     assert any(
         item["kind"] == "mismatch"

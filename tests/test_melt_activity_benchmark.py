@@ -389,18 +389,29 @@ def _default_d066_imcc_benchmark_engine():
 
 
 def test_imcc_benchmark_uses_openimcc():
+    from simulator.melt_backend import openimcc_bridge
+
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     engine = benchmark.build_engines(
         ["imcc-published"], fixture, alphamelts_timeout_s=1.0
     )[0]
     engine._load()
-    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
+    composition = {"K2O": 20.0, "SiO2": 80.0}
+    assessment = openimcc_bridge.liquid_standard_assessment(
+        composition, melt_pack=engine._load()
+    )
+    expected_flags = [
+        flag.as_dict() | {"reason": flag.reason}
+        for flag in assessment.flags
+    ]
+    result = engine.evaluate(composition, 1800.0, 1.0e-9)
 
     assert result.status == "refused"
     assert "oxide=K2O" in result.reason
     assert "declared=FC87-Glushko-K2O" in result.reason
     assert "active=K-012" in result.reason
     assert result.details["liquid_standard_refusal"]["category"] == 2
+    assert result.details["liquid_standard_flags"] == expected_flags
 
     passing = _default_d066_imcc_benchmark_engine().evaluate(
         {"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9
@@ -408,6 +419,21 @@ def test_imcc_benchmark_uses_openimcc():
     assert passing.status == "ok", passing.reason
     assert passing.details["trust"] == "internal-analytical"
     assert passing.details["model_id"] == "IMCC-SF04-D066"
+
+
+def test_imcc_extension_benchmark_refuses_undeclared_pack_standards():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    engine = benchmark.build_engines(
+        ["imcc-ext"], fixture, alphamelts_timeout_s=1.0
+    )[0]
+    pack = engine._load()
+
+    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
+
+    assert result.status == "refused"
+    failures = result.details["liquid_standard_refusal"]["standard_failures"]
+    assert {failure["kind"] for failure in failures} == {"undeclared"}
+    assert {failure["oxide"] for failure in failures} == set(pack.parent_oxides)
 
 
 def test_coverage_map_reports_silicate_band_miss_below_30_sio2():
