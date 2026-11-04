@@ -570,7 +570,7 @@ _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
     "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
 )
 _OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
-    name="JANAF-type",
+    name="JANAF Fe-019",
     offset_j_mol=Decimal(0),
 )
 
@@ -680,7 +680,7 @@ def _canonical_log10_feo_activity(
     temperature_K: Decimal,
     offset_j_mol: Decimal,
 ) -> Decimal:
-    """Convert one FeO activity from its engine standard to JANAF Fe-019."""
+    """Convert one FeO activity or coefficient to JANAF Fe-019."""
 
     if offset_j_mol == 0:
         return log10_engine_activity
@@ -710,7 +710,8 @@ def _canonicalize_feo_activity_prediction(
     if not isinstance(comparison_identity, Identity):
         return prediction, None
     if (
-        quantity_token(comparison_identity) is not Quantity.ACTIVITY
+        quantity_token(comparison_identity)
+        not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         or comparison_identity.species is None
         or comparison_identity.species.formula.strip().casefold() != "feo"
     ):
@@ -2620,10 +2621,12 @@ _HOLZHEID_EQ9_SLOPE_AT_K = Decimal("1673.15")
 # Holzheid 1997 pp. 30–31 printed γ_stoich/γ_wüstite.
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
+_COLSON_WUSTITE_SOURCE_ID = "colson-floden-haugen-2005-nio-feo-o2-activities"
 _HOLZHEID_WUSTITE_SOURCE_IDS = frozenset(
     {
         "doyle-1988-feo-activity-multicomponent-magma",
         "doyle-1989-tio2-feo-activity-magma",
+        _COLSON_WUSTITE_SOURCE_ID,
     }
 )
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
@@ -2971,13 +2974,38 @@ def _iron_saturated_feo_comparison(
     if (
         reference.admission.status is not AdmissionStatus.ADMITTED
         or not isinstance(identity, Identity)
-        or identity.reference_state is None
-        or not identity.reference_state.is_value
-        or not isinstance(identity.reference_state.value, StandardState)
     ):
         return None
     quantity = quantity_token(identity)
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+    if (
+        reference.source_id == _COLSON_WUSTITE_SOURCE_ID
+        and quantity is Quantity.ACTIVITY_COEFFICIENT
+        and identity.species is not None
+        and identity.species.formula == _FEO_STOICHIOMETRIC_FORMULA
+        and phase_token(identity.species) is Phase.L
+    ):
+        # Colson et al. (2005), p. 7, Table 3 footnote a reports gamma_FeO
+        # relative to liquid wüstite; its extract has no closed state token.
+        identity = replace(
+            identity,
+            reference_state=State.of(
+                StandardState(
+                    convention=ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+                    endmember=replace(
+                        identity.species, formula=_FEO_WUSTITE_FORMULA
+                    ),
+                    component_basis=_FEO_WUSTITE_FORMULA,
+                )
+            ),
+        )
+        reference = replace(reference, identity=identity)
+    if (
+        identity.reference_state is None
+        or not identity.reference_state.is_value
+        or not isinstance(identity.reference_state.value, StandardState)
+    ):
         return None
     standard_state = identity.reference_state.value
     if (
@@ -12396,7 +12424,10 @@ def compile_residual(
         coefficient_sources=expanded_sources,
         lineage_complete=lineage_complete,
     )
-    if quantity is Quantity.ACTIVITY and formula.strip().casefold() == "feo":
+    if (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and formula.strip().casefold() == "feo"
+    ):
         canonical_prediction, standard_refusal = (
             _canonicalize_feo_activity_prediction(prediction, identity=identity)
         )

@@ -118,11 +118,12 @@ def _case(
 
 
 @pytest.mark.parametrize(
-    ("engine", "sources", "expected_digest"),
+    ("engine", "sources", "expected_standard_name", "expected_digest"),
     (
         (
             Engine.INTERNAL_ANALYTICAL,
             ("nasa-cea-thermo",),
+            "JANAF-type",
             _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[Engine.INTERNAL_ANALYTICAL],
         ),
         (
@@ -132,6 +133,7 @@ def _case(
                 pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
                 condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
             ),
+            "JANAF Fe-019",
             _RESIDUAL_SHA256_BEFORE_STANDARD_STEP[Engine.OPENIMCC],
         ),
     ),
@@ -139,6 +141,7 @@ def _case(
 def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
     engine: Engine,
     sources: tuple[str, ...],
+    expected_standard_name: str,
     expected_digest: str,
 ) -> None:
     context, _experiment, reference, prediction = _case(engine, sources)
@@ -150,7 +153,7 @@ def test_declared_zero_offset_feo_standards_preserve_residual_bytes(
     standard, refusal = resolver(engine, prediction.coefficient_sources)
     assert refusal is None
     assert standard is not None
-    assert standard.name == "JANAF-type"
+    assert standard.name == expected_standard_name
     assert standard.offset_j_mol == Decimal(0)
 
     canonical_prediction, refusal = converter(prediction)
