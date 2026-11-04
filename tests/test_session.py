@@ -551,6 +551,97 @@ def test_session_adjust_campaign_override_po2_switches_atmosphere_to_controlled_
     assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(1.0)
 
 
+def test_campaign_override_po2_above_active_total_leaves_both_pressures():
+    """pO2 above the live total is a typed refusal, not a raised total."""
+    session = SimSession().start(_config(campaign="C4"))
+    sim = session.simulator
+    assert sim.melt.campaign == CampaignPhase.C4
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    before_po2 = sim.melt.pO2_mbar
+    before_total = sim.melt.p_total_mbar
+    before_atmosphere = sim.melt.atmosphere
+    before_overrides = deepcopy(sim.campaign_mgr.overrides)
+
+    with pytest.raises(ValueError) as exc_info:
+        session.adjust(
+            "campaign_override",
+            1.0,
+            campaign="C4",
+            field="pO2_mbar",
+        )
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_exceeds_total"
+    assert sim.melt.pO2_mbar == pytest.approx(before_po2)
+    assert sim.melt.p_total_mbar == pytest.approx(before_total)
+    assert sim.melt.atmosphere == before_atmosphere
+    assert sim.campaign_mgr.overrides == before_overrides
+
+    session.adjust(
+        "campaign_override",
+        0.2,
+        campaign="C4",
+        field="pO2_mbar",
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(0.2)
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    assert sim.campaign_mgr.overrides["C4"]["pO2_mbar"] == pytest.approx(0.2)
+
+
+def test_inactive_c4_po2_above_configured_total_is_not_stored():
+    """The C4 select is not compared with whichever campaign is live.
+
+    C0's total is 1.0 mbar. A 1.0 mbar C4 pO2 would pass that comparison
+    and still exceed C4's own 0.2 mbar total. The override is not stored.
+    """
+    session = SimSession().start(_config(campaign="C0"))
+    sim = session.simulator
+    before_po2 = sim.melt.pO2_mbar
+    before_total = sim.melt.p_total_mbar
+    assert before_total == pytest.approx(1.0)
+
+    with pytest.raises(ValueError) as exc_info:
+        session.adjust(
+            "campaign_override",
+            1.0,
+            campaign="C4",
+            field="pO2_mbar",
+        )
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_exceeds_total"
+    assert "0.2" in str(exc_info.value)
+    assert sim.melt.pO2_mbar == pytest.approx(before_po2)
+    assert sim.melt.p_total_mbar == pytest.approx(before_total)
+    assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C4", {})
+
+    session.adjust(
+        "campaign_override",
+        0.2,
+        campaign="C4",
+        field="pO2_mbar",
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(before_po2)
+    assert sim.melt.p_total_mbar == pytest.approx(before_total)
+    assert sim.campaign_mgr.overrides["C4"]["pO2_mbar"] == pytest.approx(0.2)
+
+
+def test_campaign_override_po2_numeric_string_is_refused():
+    session = SimSession().start(_config(campaign="C2A"))
+    sim = session.simulator
+    before_po2 = sim.melt.pO2_mbar
+
+    with pytest.raises(ValueError) as exc_info:
+        session.adjust(
+            "campaign_override",
+            "1.0",
+            campaign="C2A",
+            field="pO2_mbar",
+        )
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_not_numeric"
+    assert sim.melt.pO2_mbar == pytest.approx(before_po2)
+    assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+
 def test_session_adjust_campaign_override_po2_zero_leaves_atmosphere_alone():
     """W5 complement: pO2=0 is the operator CLEARING the setpoint, not
     requesting controlled-O2. Atmosphere must stay where it is — the

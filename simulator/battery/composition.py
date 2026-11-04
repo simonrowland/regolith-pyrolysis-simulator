@@ -93,15 +93,16 @@ def composition_wt_pct(composition: Composition) -> dict[str, float] | None:
     Sanity: equal moles of SiO2 (60.084) and MgO (40.304) → ~59.9/40.1 wt%.
     """
 
-    from simulator.diagnostic_helpers.binary_pot_scoring import oxide_molar_mass_g_mol
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     masses: dict[str, float] = {}
     for oxide, amount in composition.components:
-        if parse_species_formula(oxide) is None:
-            return None
         n = float(amount)
         if not math.isfinite(n) or n < 0.0:
             return None
+        # Raises UnparseableCompositionComponent when parse_formula and
+        # JANAF both fail. A decimal subscript parses in parse_formula,
+        # so its mass is those atoms.
         mass = n * oxide_molar_mass_g_mol(oxide)
         if not math.isfinite(mass) or mass < 0.0:
             return None

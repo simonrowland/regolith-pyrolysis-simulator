@@ -54,6 +54,7 @@ def test_florin_2025_isotope_series_and_isolated_migration() -> None:
         }
     ]
     assert len(sample_observations) == 48
+    assert {row.identity.species.formula for row in sample_observations} == {"Cu"}
     assert all(
         str(row.identity.temperature_K.value)
         in {"1473.15", "1573.15", "1673.15", "1773.15"}

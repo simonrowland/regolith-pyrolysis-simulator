@@ -6551,6 +6551,8 @@ def _fe_redox_material(
     assert composition_state is not None and composition_state.is_value
     composition = composition_state.value
     assert isinstance(composition, Composition)
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -6559,6 +6561,10 @@ def _fe_redox_material(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        # predict_with_engine returns the typed row refusal.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
@@ -6768,17 +6774,30 @@ def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
 def _oxide_element_inventory(
     amounts: Mapping[str, object], *, amount_basis: AmountBasis
 ) -> dict[str, float]:
-    """Expand oxide amounts into element moles for the pinned openimcc solver."""
-    from simulator.accounting.formulas import parse_formula
+    """Expand oxide amounts into element moles for the pinned openimcc solver.
+
+    Atom counts are atoms_parse_formula_else_janaf. A mass-percent amount
+    is divided by oxide_molar_mass_g_mol, the same mass the weight map uses.
+    Both parsers failing raises UnparseableCompositionComponent.
+    """
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
     for oxide, amount in amounts.items():
-        formula = parse_formula(oxide, species=oxide)
+        name = str(oxide)
+        atoms = atoms_parse_formula_else_janaf(name)
+        if not atoms:
+            raise UnparseableCompositionComponent(name)
         formula_amount = float(amount)
         if amount_basis is AmountBasis.MASS_PERCENT:
-            formula_amount /= formula.molar_mass_g_mol
-        for element, atom_moles in formula.atom_moles(formula_amount).items():
-            inventory[element] = inventory.get(element, 0.0) + atom_moles
+            formula_amount /= oxide_molar_mass_g_mol(name)
+        for element, count in atoms:
+            inventory[element] = (
+                inventory.get(element, 0.0) + float(count) * formula_amount
+            )
     return inventory
 
 
@@ -6873,11 +6892,16 @@ def _predict_distin_closed_feo_activity(
             RefusalReason.IDENTITY_UNKNOWN,
             {"reason": "distin_closed_redox_temperature_missing"},
         )
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         inventory = _oxide_element_inventory(
             dict(composition.components),
             amount_basis=composition.amount_basis,
         )
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
             RefusalReason.INVALID_IDENTITY,
@@ -7105,11 +7129,16 @@ def _predict_fe_redox(
 
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
+        from simulator.accounting.exceptions import UnparseableCompositionComponent
+
         try:
             inventory = _oxide_element_inventory(
                 material.composition_wt,
                 amount_basis=AmountBasis.MASS_PERCENT,
             )
+        except UnparseableCompositionComponent:
+            # ValueError would relabel this invalid_redox_composition.
+            raise
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
                 RefusalReason.INVALID_IDENTITY,
@@ -10014,7 +10043,6 @@ def _predict_named_fe_valence(
             },
             identity=identity,
         )
-
     if form == "non_fe":
         return unsupported(
             "non_fe_valence_not_fe3_fe2",
@@ -10043,6 +10071,55 @@ def _predict_named_fe_valence(
     )
 
 
+def _engine_prediction_or_unparseable_component(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
+) -> EnginePrediction:
+    """Return one prediction. One unparseable component refuses that row."""
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
+        )
+    except UnparseableCompositionComponent as exc:
+        identity = (
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_SOURCE,
+            refusal_detail={
+                "reason": "unparseable_composition_component",
+                "component": exc.component,
+            },
+            identity=identity,
+        )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -10058,7 +10135,7 @@ def predict_with_engine(
     """Dispatch one engine and close any handle opened for this call."""
 
     if isinstance(handles, dict):
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -10073,7 +10150,7 @@ def predict_with_engine(
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,

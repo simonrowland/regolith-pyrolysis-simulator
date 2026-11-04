@@ -4376,7 +4376,12 @@ _FEOT_COMPOSITION_DERIVATION_NOTE = (
 
 
 def oxide_molar_mass(oxide: str) -> Decimal:
-    """Composition-component molar mass (g/mol) from CIAAW/NIST weights."""
+    """Composition-component molar mass (g/mol) from CIAAW/NIST weights.
+
+    The alias table still chooses the mass formula (CrO1.5 uses M(Cr2O3)).
+    A tabulated MOLAR_MASS entry wins. Otherwise the mass is
+    oxide_molar_mass_g_mol of that formula.
+    """
 
     mass_formula = _COMPOSITION_COMPONENTS.get(oxide, (oxide, oxide, False))[0]
 
@@ -4384,11 +4389,9 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 
     if mass_formula in MOLAR_MASS:
         return as_decimal(str(MOLAR_MASS[mass_formula]))
-    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
-    return as_decimal(
-        str(parse_formula(mass_formula, species=mass_formula).molar_mass_g_mol)
-    )
+    return as_decimal(str(oxide_molar_mass_g_mol(mass_formula)))
 
 
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
@@ -13251,13 +13254,15 @@ def mass_fraction_pair_to_valence_ratio(
         # Hand check from Johnston row 1: 0.021/1.50 = 0.014.
         return numerator_wt_pct / denominator_wt_pct
 
-    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
     def cation_moles(wt_pct: Decimal, basis: str) -> Decimal:
         formula = element if basis == "element" else basis
         try:
-            parsed = parse_formula(formula, species=formula)
-            cations = as_decimal(str(parsed.elements.get(element, 0)))
+            atoms = atoms_parse_formula_else_janaf(formula)
+            if not atoms:
+                raise ValueError(f"unparseable composition component {formula!r}")
+            cations = as_decimal(str(dict(atoms).get(element, 0)))
             molar_mass = oxide_molar_mass(formula)
         except (TypeError, ValueError, KeyError) as exc:
             raise IdentityRefusal(
@@ -24209,7 +24214,13 @@ class Migrator:
                 else (quantity if isinstance(quantity, Quantity) else None)
             )
             sample = raw_item.get("sample") or raw_item.get("id")
-            sample_label = sample.strip() if isinstance(sample, str) else None
+            # Florin's Cu12.1-style sample IDs are labels, not formulas.
+            sample_label = (
+                sample.strip()
+                if isinstance(sample, str)
+                and source_id != "florin-2025-cu-silicate-evaporation"
+                else None
+            )
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
             )
@@ -24291,7 +24302,10 @@ class Migrator:
                     polymorph=species.polymorph,
                     charge=species.charge,
                 )
-            elif sample_label and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            elif (
+                sample_label
+                and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            ):
                 from simulator.accounting.formulas import parse_formula
 
                 try:
