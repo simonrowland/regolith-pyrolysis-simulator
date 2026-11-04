@@ -25,9 +25,11 @@ Public contract: the original five canonical buckets
 ``industrial_mixed_glass``, ``refractory_ceramic_rump``,
 ``unclassified``) remain stable. PROD-1 added additive convenience
 views (``ingots_metals``, ``oxygen``, ``glass``,
-``captured_volatiles``, ``process_inventory_spent_reductant``) for
-product-specific UI/report slices without removing or reshaping the
-canonical buckets.
+``captured_volatiles``, ``process_inventory_spent_reductant``,
+``alkali_cartridge_solid_residue``) for product-specific UI/report
+slices without removing or reshaping the canonical buckets. The
+cartridge residue is its own captured class. It is not folded into
+ingots or into the train volatile slice.
 
 E6a scope: the classifier function. E6b (deferred) is the runner CLI
 + markdown report wrapping E6a.
@@ -39,6 +41,9 @@ import math
 from typing import Any, Mapping
 
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
@@ -84,7 +89,12 @@ from simulator.vapour_rail.instrumentation import (
 CAPTURED_VOLATILE_ACCOUNTS: tuple[str, ...] = (
     'process.condensation_train',
 )
-"""Captured volatile accounts; terminal escape is an offgas_vented loss."""
+"""Train volatile slice only. Terminal escape is an offgas_vented loss.
+
+The cartridge residue is a mixed solid condensate and has its own
+class. Metals and silica on that account would be stripped by the
+volatile exclusions below, so this tuple stays the train.
+"""
 
 PROCESS_INVENTORY_SPENT_REDUCTANT_ACCOUNTS: tuple[str, ...] = (
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
@@ -184,6 +194,13 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'captured_volatiles': {
                 'kg_by_species': {species: kg, ...},
                 'class_total_kg': float,
+            },
+            'alkali_cartridge_solid_residue': {
+                'label': 'Stage-4 cartridge solid residue (unseparated)',
+                'kg_by_species': {species: kg, ...},
+                'class_total_kg': float,
+                'account': 'process.alkali_cartridge_solid_residue',
+                'disposition': 'captured_unseparated',
             },
             'process_inventory_spent_reductant': {
                 'kg_by_species': {species: kg, ...},
@@ -511,6 +528,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             if has_mixed_glass_inventory else {}
         )
 
+    # Full composition, including metals, silica, and O2. This is the
+    # captured-unseparated class, not a volatile slice and not an ingot.
+    residue_kg_by_species = _ledger_species_kg(
+        sim,
+        (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,),
+    )
+    residue_total_kg = float(sum(residue_kg_by_species.values()))
+
     # ----- Unclassified bin -----
     source_account_kg = metal_accounting.get('source_account_kg', {})
     if source_account_kg:
@@ -548,6 +573,12 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             remaining = amount
             for account in CAPTURED_VOLATILE_ACCOUNTS:
                 remaining -= allocate_source_mass(account, species, remaining)
+        for species, amount in residue_kg_by_species.items():
+            allocate_source_mass(
+                ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+                species,
+                amount,
+            )
         for species, amount in rump_kg_by_species.items():
             allocate_source_mass(
                 C7_AL_CREDIT_ACCOUNT,
@@ -597,6 +628,7 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             | set(captured_volatiles_kg_by_species.keys())
             | set(spent_reductant_kg_by_species.keys())
             | set(rump_kg_by_species.keys())
+            | set(residue_kg_by_species.keys())
         )
         unclassified = dict(cleanup_native_kg)
         for species, kg in products.items():
@@ -662,6 +694,17 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         'captured_volatiles': {
             'kg_by_species': captured_volatiles_kg_by_species,
             'class_total_kg': captured_volatiles_total_kg,
+        },
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: {
+            'label': ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+            'kg_by_species': residue_kg_by_species,
+            'class_total_kg': residue_total_kg,
+            'account': ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+            'disposition': 'captured_unseparated',
+            'note': (
+                'Mixed condensate captured on the Stage-4 freeze-out '
+                'cartridge. It is not a separated metal product.'
+            ),
         },
         'process_inventory_spent_reductant': {
             'kg_by_species': spent_reductant_kg_by_species,
@@ -815,6 +858,9 @@ def _metal_product_accounting(sim, *, products):
     stage_by_source: dict[str, dict[str, float]] = {}
     stage_collections = getattr(sim, '_stage_collection_kg_by_source', {}) or {}
     stages = list(getattr(getattr(sim, 'train', None), 'stages', ()) or ())
+    # The residue account is absent on purpose. Accepting it here would
+    # pull residue metals into clean Fe. classify_products reports the
+    # whole residue balance as its own class instead.
     allowed_stage_sources = set(METAL_PHASE_ACCOUNTS) | {
         CONDENSATION_TRAIN_ACCOUNT,
         CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
@@ -1312,6 +1358,10 @@ def build_product_story(
                 continue
             elif account == CONDENSATION_TRAIN_ACCOUNT:
                 continue
+            elif account == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT:
+                # Own story bucket below. Do not also file it as
+                # unrecovered process inventory.
+                continue
             elif account.startswith('process.'):
                 target = unrecovered_process_inventory
             elif species in _PRODUCT_STORY_CLASSIFIED_SPECIES:
@@ -1365,6 +1415,18 @@ def build_product_story(
             else terminal_residue
         )
         _merge_product_story_mass(target, species, mass)
+
+    residue_class = (
+        classification.get(ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS)
+        if isinstance(classification, Mapping)
+        else None
+    )
+    if isinstance(residue_class, Mapping):
+        residue_story_kg = dict(residue_class.get('kg_by_species') or {})
+    else:
+        residue_story_kg = dict(
+            account_kg.get(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, {})
+        )
 
     oxygen = product_story_bucket(extracted_projection['oxygen'])
     oxygen['partition_kg'] = {
@@ -1429,6 +1491,9 @@ def build_product_story(
         'glass': product_story_bucket(glass),
         'oxygen': oxygen,
         'captured_volatiles': product_story_bucket(captured_volatiles),
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: product_story_bucket(
+            residue_story_kg
+        ),
         'refractory_ceramic': refractory_ceramic_bucket,
         'terminal_residue': residue_bucket,
         'escaped_to_vacuum': product_story_bucket(escaped_to_vacuum),

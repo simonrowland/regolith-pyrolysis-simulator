@@ -19,6 +19,7 @@ from flask import Blueprint, Response, abort, current_app, render_template, json
 import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
+from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
 from simulator.additive_calculations import (
     ADDITIVE_MASS_MARGIN,
@@ -2438,12 +2439,14 @@ def _product_strip(result: Mapping[str, Any]) -> dict[str, Any]:
             'items': [],
         }
 
+    # Strip order only. Class assignment stays in classify_products.
     order = {
         'ingots_metals': 0,
         'glass': 1,
         'oxygen': 2,
         'captured_volatiles': 3,
         'refractory_ceramic_rump': 4,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS: 5,
     }
     items = []
     for row in outputs:

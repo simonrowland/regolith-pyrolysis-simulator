@@ -12,7 +12,13 @@ from types import MappingProxyType, SimpleNamespace
 from collections.abc import Callable, Mapping as MappingABC, Sequence
 from typing import Any, Mapping, TypeVar
 
-from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+    METAL_PHASE_ACCOUNTS,
+    SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    STAGE_COLLECTION_BACKING_ACCOUNTS,
+)
 from simulator.accounting.completeness import evaporation_quantity_unavailability
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.cost_parameters import (
@@ -233,6 +239,16 @@ _OXIDE_KEY_ALIASES = MappingProxyType(
 )
 _VENTED_PRODUCT_ACCOUNTS = frozenset(
     {"terminal.oxygen_melt_offgas_vented_to_vacuum", "vent"}
+)
+# Metal phases plus the condenser-train backing accounts. The backing
+# tuple is the owner of train, cartridge, residue, and chromium.
+# Chromium is also matched by the terminal.* arm; each account is
+# visited once. Residue species count as captured for venting rank.
+_CAPTURED_PROCESS_ACCOUNTS = frozenset(
+    {
+        *METAL_PHASE_ACCOUNTS,
+        *STAGE_COLLECTION_BACKING_ACCOUNTS,
+    }
 )
 # Source: AccountingQueries.product_ledger merges sim._unspent_additive_reagents_kg(),
 # which emits unspent_<element>_reagent entries for additive bookkeeping.
@@ -3089,13 +3105,7 @@ def _captured_products_mol(
                     continue
                 if not (
                     account_name.startswith("terminal.")
-                    or account_name
-                    in {
-                        "process.metal_phase",
-                        "process.metal_phase_bottom_pool",
-                        "process.metal_phase_float_layer",
-                        "process.condensation_train",
-                    }
+                    or account_name in _CAPTURED_PROCESS_ACCOUNTS
                 ):
                     continue
                 species_mol = (
@@ -4046,6 +4056,10 @@ def _product_bins(product_classes: Mapping[str, Any]) -> Mapping[str, Any]:
         ("oxygen", "O2"),
         ("captured_volatiles", "Captured volatiles"),
         ("refractory_ceramic_rump", "Refractory ceramic/rump"),
+        (
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+        ),
     ):
         value = product_classes.get(key)
         if not isinstance(value, Mapping):

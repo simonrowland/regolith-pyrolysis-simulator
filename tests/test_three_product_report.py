@@ -19,13 +19,22 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
-from simulator.accounting.queries import TERMINAL_RUMP_CLASS_TOLERANCE_PCT
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+)
+from simulator.accounting.queries import (
+    AccountingQueries,
+    TERMINAL_RUMP_CLASS_TOLERANCE_PCT,
+)
 from simulator.backends import BackendSelectionPolicy
 from simulator.session import SimSession, SimSessionConfig
 from simulator.three_product_report import (
     METAL_PRODUCT_SPECIES,
     O2_PRODUCT_SPECIES,
     PURE_SILICA_GLASS_SPECIES,
+    build_product_story,
     classify_products,
 )
 
@@ -76,6 +85,7 @@ def test_classifier_returns_documented_5_bucket_shape():
         'glass',
         'captured_volatiles',
         'process_inventory_spent_reductant',
+        'alkali_cartridge_solid_residue',
     }
     assert canonical_buckets <= result.keys()
     assert set(result.keys()) == canonical_buckets | additive_buckets
@@ -85,7 +95,7 @@ def test_classifier_returns_documented_5_bucket_shape():
         'metals_plus_O2', 'pure_silica_glass',
         'industrial_mixed_glass', 'refractory_ceramic_rump',
         'ingots_metals', 'unrecovered_metal_phase', 'oxygen', 'glass',
-        'captured_volatiles',
+        'captured_volatiles', 'alkali_cartridge_solid_residue',
     ):
         assert 'class_total_kg' in result[bucket]
         assert isinstance(result[bucket]['class_total_kg'], float)
@@ -559,6 +569,91 @@ def test_spent_reductant_residue_surfaces_as_process_inventory_bucket():
     assert result['refractory_ceramic_rump']['rump_kg_by_species'] == {'CaO': 1.0}
     assert 'Na2O' not in result['refractory_ceramic_rump']['rump_kg_by_species']
     assert 'Na2O' not in result['unclassified']['kg_by_species']
+
+
+def _residue_capture_sim():
+    """Metal-phase Fe, residue Fe/SiO2/MgO, and train Na. No stage routing."""
+    accounts = {
+        'process.metal_phase': {'Fe': 6.0},
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: {
+            'Fe': 4.0,
+            'SiO2': 3.0,
+            'MgO': 1.0,
+        },
+        'process.condensation_train': {'Na': 2.0},
+    }
+
+    class Ledger:
+        def project_account_kg(self, account):
+            return dict(accounts.get(account, {}))
+
+        def mol_by_account(self):
+            return {}
+
+    sim = SimpleNamespace(
+        atom_ledger=Ledger(),
+        train=SimpleNamespace(stages=[]),
+        _unspent_additive_reagents_kg=lambda: {},
+        record=SimpleNamespace(
+            snapshots=(),
+            initial_inventory=SimpleNamespace(metal_alloy_kg={}),
+            feedstock_key='fixture',
+            feedstock_label='Fixture',
+            batch_mass_kg=16.0,
+        ),
+    )
+    sim.product_ledger = lambda: AccountingQueries(sim).product_ledger()
+    return sim
+
+
+def test_product_ledger_counts_residue_species_once():
+    products = _residue_capture_sim().product_ledger()
+
+    assert products['Fe'] == pytest.approx(10.0)
+    assert products['SiO2'] == pytest.approx(3.0)
+    assert products['MgO'] == pytest.approx(1.0)
+    assert products['Na'] == pytest.approx(2.0)
+
+
+def test_residue_is_captured_once_as_its_own_class():
+    sim = _residue_capture_sim()
+    result = classify_products(sim)
+    residue = result[ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS]
+
+    assert residue['label'] == ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL
+    assert residue['kg_by_species'] == {'Fe': 4.0, 'MgO': 1.0, 'SiO2': 3.0}
+    assert residue['class_total_kg'] == pytest.approx(8.0)
+    assert residue['account'] == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    assert residue['disposition'] == 'captured_unseparated'
+    assert result['ingots_metals']['species_kg'].get('Fe', 0.0) == 0.0
+    assert result['metals_plus_O2']['metals_kg'].get('Fe', 0.0) == 0.0
+    assert result['unrecovered_metal_phase']['species_kg']['Fe'] == pytest.approx(6.0)
+    assert result['captured_volatiles']['kg_by_species'] == {}
+    for species in ('Fe', 'SiO2', 'MgO'):
+        assert species not in result['unclassified']['kg_by_species']
+    assert (
+        result['ingots_metals']['species_kg'].get('Fe', 0.0)
+        + result['unrecovered_metal_phase']['species_kg']['Fe']
+        + residue['kg_by_species']['Fe']
+    ) == pytest.approx(sim.product_ledger()['Fe'])
+
+    story = build_product_story(
+        sim,
+        terminal_rump_by_species={},
+        classification=result,
+    )
+    assert story[ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS]['species_kg'] == {
+        'Fe': 4.0,
+        'MgO': 1.0,
+        'SiO2': 3.0,
+    }
+    assert story[ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS]['class_total_kg'] == (
+        pytest.approx(8.0)
+    )
+    assert story['metal_ingots']['species_kg'].get('Fe', 0.0) == 0.0
+    assert story['unrecovered_metal_phase']['species_kg']['Fe'] == pytest.approx(6.0)
+    for species in ('Fe', 'MgO', 'SiO2'):
+        assert species not in story['unrecovered_process_inventory']['species_kg']
 
 
 # ---------------------------------------------------------------------------

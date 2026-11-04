@@ -17,9 +17,11 @@ from simulator.accounting.formulas import (
 from simulator.account_ids import (
     ALKALI_CARTRIDGE_ACCOUNT,
     ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
+    STAGE_COLLECTION_BACKING_ACCOUNTS,
 )
 from simulator.accounting.queries import (
     TERMINAL_RUMP_REFRACTORY_OXIDES,
@@ -68,7 +70,11 @@ _EVAPORATION_SOURCE_ACCOUNTS = (
 # accounts. Transfers between them may be counted twice, so it is a
 # conservative upper bound, not an estimate.
 _CONSERVATIVE_LEDGER_UPPER_BOUND_BASIS = "conservative_ledger_bound"
-TARGET_YIELD_PRODUCT_ACCOUNTS = (
+# Condenser-train backing accounts come from STAGE_COLLECTION_BACKING_ACCOUNTS.
+# dict.fromkeys drops the train and chromium names already listed above,
+# so those balances are summed once. The cartridge and the residue are the
+# accounts this tuple did not already name.
+TARGET_YIELD_PRODUCT_ACCOUNTS = tuple(dict.fromkeys((
     _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.stage0_salt_phase",
     "terminal.stage0_chloride_salt_phase",
@@ -80,6 +86,10 @@ TARGET_YIELD_PRODUCT_ACCOUNTS = (
     METAL_FLOAT_LAYER_ACCOUNT,
     "process.condensation_train",
     "process.overhead_gas",
+    *STAGE_COLLECTION_BACKING_ACCOUNTS,
+)))
+_UNSEPARATED_RESIDUE_YIELD_NOTICE = (
+    f"target mass sits in {ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL}"
 )
 TARGET_YIELD_DENOMINATOR_SOURCE = "initial_process.cleaned_melt"
 TARGET_YIELD_NUMERATOR_SOURCE = "narrow_product_accounts"
@@ -259,6 +269,7 @@ class TargetSpeciesYield:
     denominator_source: str = TARGET_YIELD_DENOMINATOR_SOURCE
     numerator_source: str = TARGET_YIELD_NUMERATOR_SOURCE
     provenance_rule: str = TARGET_YIELD_PROVENANCE_RULE
+    notices: tuple[str, ...] = ()
 
 
 def evaporation_quantity_unavailability(
@@ -811,11 +822,20 @@ def target_species_yield_by_initial_cleaned_melt(
         for species, kg in initial_cleaned_melt_kg.items()
     }
     product_kg = _species_kg_by_accounts(queries, TARGET_YIELD_PRODUCT_ACCOUNTS)
+    # The residue account is already inside TARGET_YIELD_PRODUCT_ACCOUNTS.
+    # This read only decides the notice. It is not added to the numerator.
+    residue_kg = _species_kg_by_accounts(
+        queries,
+        (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,),
+    )
     results: dict[str, TargetSpeciesYield] = {}
     for raw_target in target_species:
         target = str(raw_target)
+        notices: tuple[str, ...] = ()
         try:
             element = _target_element(target)
+            if _target_relevant_species_kg(element, residue_kg):
+                notices = (_UNSEPARATED_RESIDUE_YIELD_NOTICE,)
             denominator_mol = _target_yield_denominator_element_mol(
                 element,
                 initial,
@@ -847,6 +867,7 @@ def target_species_yield_by_initial_cleaned_melt(
                     exact_product_kg=float(product_species_kg.get(target, 0.0)),
                     gross_product_target_equiv_mol=gross_product_mol,
                     excluded_non_feedstock_reagent_target_equiv_mol=excluded_mol,
+                    notices=notices,
                 )
                 continue
             unavailable = evaporation_quantity_unavailability(
@@ -860,6 +881,7 @@ def target_species_yield_by_initial_cleaned_melt(
                     0.0,
                     denominator_mol,
                     f"unavailable: {unavailable['reason']}",
+                    notices=notices,
                 )
                 continue
             results[target] = TargetSpeciesYield(
@@ -871,6 +893,7 @@ def target_species_yield_by_initial_cleaned_melt(
                 exact_product_kg=float(product_species_kg.get(target, 0.0)),
                 gross_product_target_equiv_mol=gross_product_mol,
                 excluded_non_feedstock_reagent_target_equiv_mol=excluded_mol,
+                notices=notices,
             )
         except (AccountingError, KeyError, TypeError, ValueError) as exc:
             results[target] = TargetSpeciesYield(
@@ -879,6 +902,7 @@ def target_species_yield_by_initial_cleaned_melt(
                 0.0,
                 0.0,
                 f"blocked: {exc}",
+                notices=notices,
             )
     return results
 

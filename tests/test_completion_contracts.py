@@ -854,6 +854,54 @@ def test_e1b_target_yield_fails_closed_on_c7_credit_without_provenance() -> None
     assert "unclean additive/reagent provenance for Al" in result.reason
 
 
+def test_target_yield_counts_unseparated_residue_once_and_notices_it() -> None:
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+    )
+
+    train_kg = 0.25 * MOLAR_MASS["Fe"] / 1000.0
+    residue_kg = 0.25 * MOLAR_MASS["Fe"] / 1000.0
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Fe",),
+        {"FeO": MOLAR_MASS["FeO"] / 1000.0},
+        _FakeQueries({
+            "process.condensation_train": {"Fe": train_kg},
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: {
+                "Fe": residue_kg,
+                "MgO": 1.0,
+            },
+        }),
+    )["Fe"]
+
+    assert result.product_species_kg["Fe"] == pytest.approx(train_kg + residue_kg)
+    assert "MgO" not in result.product_species_kg
+    assert result.product_target_equiv_mol == pytest.approx(0.5)
+    assert result.initial_cleaned_target_equiv_mol == pytest.approx(1.0)
+    assert result.yield_fraction == pytest.approx(0.5)
+    assert result.notices == (
+        f"target mass sits in {ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL}",
+    )
+
+
+def test_target_yield_omits_residue_notice_when_residue_lacks_the_target() -> None:
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+
+    result = target_species_yield_by_initial_cleaned_melt(
+        ("Fe",),
+        {"FeO": MOLAR_MASS["FeO"] / 1000.0},
+        _FakeQueries({
+            "process.condensation_train": {
+                "Fe": MOLAR_MASS["Fe"] / 1000.0,
+            },
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: {"SiO2": 1.0},
+        }),
+    )["Fe"]
+
+    assert result.yield_fraction == pytest.approx(1.0)
+    assert result.notices == ()
+
+
 def test_vapor_contract_blocks_unsupported_provenance_rule() -> None:
     contract = replace(
         _contracts_by_id()["C2A_continuous.Na.vapor"],

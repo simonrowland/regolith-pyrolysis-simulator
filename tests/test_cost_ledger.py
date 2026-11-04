@@ -220,6 +220,54 @@ def test_recovered_condensate_can_carry_prior_cost_back_to_reagent_inventory():
     assert summary["transition_balance_max_abs"] <= 1e-12
 
 
+def test_cartridge_residue_keeps_its_own_cost_bearing_lot():
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    )
+    from simulator.cost_ledger import (
+        _is_cost_bearing_account,
+        _is_target_product_account,
+    )
+
+    assert _is_target_product_account(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT)
+    assert _is_cost_bearing_account(ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT)
+    assert not _is_target_product_account(ALKALI_CARTRIDGE_ACCOUNT)
+    assert not _is_cost_bearing_account(ALKALI_CARTRIDGE_ACCOUNT)
+    assert not _is_target_product_account("terminal.slag")
+
+    ledger = CostLedger()
+    ledger.seed_external_material(
+        account="process.reagent_inventory",
+        species="Fe",
+        quantity_kg=6.0,
+        cost=CostVector(electrical_kWh=6.0),
+    )
+    ledger.apply_reagent_full_cost_event(
+        process_step="residue_capture",
+        reagent_account="process.reagent_inventory",
+        reagent_species="Fe",
+        reagent_quantity_kg=6.0,
+        beneficiary_outputs_kg={
+            ("process.metal_phase", "Fe"): 2.0,
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Fe"): 4.0,
+            (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "SiO2"): 3.0,
+        },
+    )
+
+    summary = ledger.summary()
+    metal_key = "process.metal_phase:Fe"
+    residue_fe = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:Fe"
+    residue_silica = f"{ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT}:SiO2"
+    assert summary["product_costs"][metal_key]["quantity_kg"] == pytest.approx(2.0)
+    assert summary["product_costs"][residue_fe]["quantity_kg"] == pytest.approx(4.0)
+    assert summary["product_costs"][residue_silica]["quantity_kg"] == pytest.approx(3.0)
+    assert metal_key in summary["active_inventory_costs"]
+    assert residue_fe in summary["active_inventory_costs"]
+    assert residue_silica in summary["active_inventory_costs"]
+    assert f"{ALKALI_CARTRIDGE_ACCOUNT}:Fe" not in summary["product_costs"]
+
+
 def test_import_modes_are_reporting_only_and_apply_launch_penalty_when_enabled():
     mature = CostImportContext.mature()
     bootstrap = CostImportContext.bootstrap_narrative(available_supplier_species=("Na",))
