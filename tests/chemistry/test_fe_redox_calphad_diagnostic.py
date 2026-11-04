@@ -516,6 +516,52 @@ def test_liquid_feo_at_or_above_liquidus_is_byte_identical():
     assert "notices" not in guarded
 
 
+def test_cold_holzheid_gamma_liquidus_notice_and_in_span_gamma():
+    cold_T_K = 225.0 + 273.15
+    cold_domain = _below_liquidus_domain(cold_T_K)
+    cold_kwargs = {
+        "comp_wt": _BASALTIC_FE_MELT_WT,
+        "fO2_log": feo_iw_log10_fO2_bar(cold_T_K) - 2.0,
+        "T_K": cold_T_K,
+        "pressure_bar": 1e-6,
+    }
+    cold_plain = calphad_ferrous_feo_activity_diagnostic(**cold_kwargs)
+    cold_guarded = calphad_ferrous_feo_activity_diagnostic(
+        **cold_kwargs,
+        liquid_domain=cold_domain,
+    )
+
+    assert cold_guarded["gamma_FeO"]["central"] == pytest.approx(
+        49.2,
+        rel=0.0011,
+    )
+    assert cold_guarded["gamma_FeO"] == cold_plain["gamma_FeO"]
+    assert cold_guarded["notices"] == [_expected_below_liquidus_notice(cold_domain)]
+
+    in_span_T_K = 1400.0 + 273.15
+    above_domain = LiquidFeODomain(
+        below_liquidus=False,
+        temperature_K=in_span_T_K,
+        liquidus_T_C=1300.0,
+        solidus_T_C=1050.0,
+        source="gate_liquid_fraction",
+    )
+    in_span_kwargs = {
+        "comp_wt": _BASALTIC_FE_MELT_WT,
+        "fO2_log": feo_iw_log10_fO2_bar(in_span_T_K) - 2.0,
+        "T_K": in_span_T_K,
+        "pressure_bar": 1e-6,
+    }
+    in_span_plain = calphad_ferrous_feo_activity_diagnostic(**in_span_kwargs)
+    in_span_guarded = calphad_ferrous_feo_activity_diagnostic(
+        **in_span_kwargs,
+        liquid_domain=above_domain,
+    )
+
+    assert "notices" not in in_span_guarded
+    assert in_span_guarded["gamma_FeO"] == in_span_plain["gamma_FeO"]
+
+
 def test_omitted_liquid_domain_does_not_mean_below_liquidus():
     fO2_log = feo_iw_log10_fO2_bar(_T_K) - 2.0
     kwargs = {
