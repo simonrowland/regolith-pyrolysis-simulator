@@ -49,29 +49,23 @@ def test_sauerborn_melts_liquidus_is_model_derived_and_mutation_sensitive():
         _assert_model_row(mutated)
 
 
-def _assert_1261_is_model_derived_with_unknown_method(document: dict) -> None:
+def _assert_1261_is_an_authors_estimate(document: dict) -> None:
     row = next(
         row
         for species in document["species"].values()
         for row in species.get("observations", [])
         if row["observation_id"] == UNKNOWN_METHOD_OBSERVATION_ID
     )
-    assert row["values"]["evidence_class"] == "model_derived"
-    assert row["values"]["method_class"] == "model_derived"
+    assert row["values"]["evidence_class"] == "author_estimate"
+    assert row["values"]["method_class"] == "authors_estimate"
     assert row["values"]["liquidus_C"] == 1261
     assert "derived_from" not in row
-    derivation = row["derivation"]
-    assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
-    assert derivation["raw_inputs"]["locator"]["figure"] == "5.56"
-    assert derivation["method"]["state"]["tag"] == "unknown"
-    assert "method_unknown" in derivation["method"]["state"]["reason"]
-    assert derivation["method"]["locator"]["figure"] == "5.56"
-    assert derivation["references"] == []
+    assert "derivation" not in row
 
 
-def test_1261_theoretical_value_is_not_quoted_when_method_is_unknown():
+def test_1261_theoretical_value_is_an_authors_estimate_not_a_quotation():
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
-    _assert_1261_is_model_derived_with_unknown_method(document)
+    _assert_1261_is_an_authors_estimate(document)
 
     mutated = deepcopy(document)
     row = next(
@@ -82,4 +76,4 @@ def test_1261_theoretical_value_is_not_quoted_when_method_is_unknown():
     )
     row["values"]["evidence_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):
-        _assert_1261_is_model_derived_with_unknown_method(mutated)
+        _assert_1261_is_an_authors_estimate(mutated)
