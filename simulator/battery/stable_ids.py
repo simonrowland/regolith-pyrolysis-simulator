@@ -101,6 +101,7 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
         "quote",
         "composition_role",
         "derived_from",
+        "duplicate_of_observation_id",
     }
     if not include_locator:
         skip.add("locator")

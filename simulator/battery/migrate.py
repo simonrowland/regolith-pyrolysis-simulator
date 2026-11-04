@@ -938,6 +938,12 @@ def _provenance_from_extract(
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
+    duplicate_field = "duplicate_of_observation_id"
+    for source in (values, obs):
+        if duplicate_field in source:
+            selected = dict(selected or {})
+            selected[duplicate_field] = source[duplicate_field]
+            break
     if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}:
         condensed_form = obs.get("condensed_form", values.get("condensed_form"))
         if condensed_form is not None:
@@ -24493,6 +24499,16 @@ class Migrator:
             provenance = _printed_scalar_provenance(
                 provenance, raw_item, value_sel
             )
+            if (
+                isinstance(raw_item, Mapping)
+                and "duplicate_of_observation_id" in raw_item
+            ):
+                provenance = {
+                    **(provenance or {}),
+                    "duplicate_of_observation_id": raw_item[
+                        "duplicate_of_observation_id"
+                    ],
+                }
             val = value_sel.amount
             trail = value_sel.unit_trail
             for key in value_sel.unused_ancillary:

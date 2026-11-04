@@ -553,6 +553,9 @@ FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
+FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
+    "reference_polymorph_inferred_stable_phase"
+)
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
@@ -2001,6 +2004,12 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
+        and reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED}:")
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED)
+    if any(
+        isinstance(reason, str)
         and reason.startswith(
             f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
         )
@@ -2072,18 +2081,410 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     )
 
 
+# d-338. A printed pure solid with no polymorph is scored as the crystal
+# stable at T in the JANAF tables this owner already uses. The margin is the
+# solid-solid stability-identity change only. The crystal/liquid crossing
+# stays on the fusion path: above it there is no solid to infer, and a point
+# below it is still that solid. SiO2 at 1973 K is about 21 K under the JANAF
+# cristobalite/liquid crossing and is still beta-cristobalite; putting melting
+# inside this window would refuse that printed solid.
+REFERENCE_POLYMORPH_INFERENCE_MARGIN_K = Decimal(25)
+REFERENCE_POLYMORPH_INFERRED_REASON = FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED
+REFERENCE_SOLID_INFERRED_REASON = "reference_solid_inferred"
+REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON = (
+    "reference_polymorph_near_phase_transition"
+)
+REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON = (
+    "reference_polymorph_quench_or_metastable_stated"
+)
+REFERENCE_POLYMORPH_ABOVE_MELTING_REASON = "printed_solid_reference_above_melting"
+# FeO1.5 is hematite only above the hematite–magnetite equilibrium. The
+# token names that field; the notice band carries T, the printed fO2, and
+# the equilibrium fO2.
+FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON = "feo1_5_outside_hematite_stability_field"
+_REFERENCE_POLYMORPH_REFUSAL_REASONS = frozenset(
+    {
+        "fusion_source_reference_phase_unprinted",
+        REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
+        REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
+        REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+        FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON,
+    }
+)
+# a(MO1.5) = a(M2O3)^(1/2) on the dimer's crystal. NaO0.5 is not in this
+# map: the ruling names Al, Cr, and Fe only.
+_ONE_CATION_OXIDE_DIMER = {
+    "AlO1.5": "Al2O3",
+    "CrO1.5": "Cr2O3",
+    "FeO1.5": "Fe2O3",
+}
+_JANAF_BAR_PA = Decimal(100000)
+_QUENCH_OR_METASTABLE_WORD = re.compile(
+    r"\b(?:quench(?:ed|ing)?|metastable)\b",
+    re.IGNORECASE,
+)
+_QUENCH_NEGATION = re.compile(
+    r"\b(?:no|not|without|never|neither|nor)\b"
+    r"|\bdoes not\b|\bdo not\b|\bis not\b|\bisn't\b",
+    re.IGNORECASE,
+)
+_INFERRED_SOLID_REASON = re.compile(
+    r"\bsolid\b.{0,80}\binferred\b|\binferred\b.{0,40}\bsolid\b",
+    re.IGNORECASE,
+)
+
+
+def _polymorph_reason_states_quench_or_metastable(reason: str) -> bool:
+    """Quench or metastable stated for this reference polymorph, not a negation."""
+
+    for match in _QUENCH_OR_METASTABLE_WORD.finditer(reason):
+        window = reason[max(0, match.start() - 40) : match.start()]
+        if _QUENCH_NEGATION.search(window):
+            continue
+        return True
+    return False
+
+
+def _omitted_reason_states_inferred_solid(reason: str) -> bool:
+    """The solid itself, not only its polymorph, was inferred.
+
+    ``standard_state.inferred`` does not survive migration onto
+    ``Identity.reference_state``. The polymorph omission reason is the text
+    the scorer still has. Secondary evidence is that statement. A source that
+    only says the polymorph was not named does not match.
+    """
+
+    if "secondary evidence" in reason.casefold():
+        return True
+    return _INFERRED_SOLID_REASON.search(reason) is not None
+
+
+def _reference_polymorph_notice(
+    reference: Observation,
+    *,
+    kind: NoticeKind,
+    reason: str,
+    band: str,
+    authority: Authority | None = None,
+    certification: str | None = None,
+) -> Notice:
+    return Notice(
+        kind=kind,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=reason,
+        origin=reference.observation_id,
+        band=band,
+        authority=authority,
+        certification=certification,
+    )
+
+
+def _hematite_magnetite_equilibrium_fO2_Pa(temperature_K: Decimal) -> Decimal:
+    """Oxygen pressure where pure hematite and pure magnetite are in equilibrium.
+
+    Premise: hematite (JANAF Fe-030) is the pure Fe2O3 crystal, and the
+    adjacent oxide at lower fO2 is magnetite (Fe-032). Formation reactions
+    at 1 bar are 2 Fe + 3/2 O2 = Fe2O3 and 3 Fe + 2 O2 = Fe3O4, so
+    6 Fe2O3 = 4 Fe3O4 + O2.
+    Algebra: ΔG = 4 G(Fe-032) − 6 G(Fe-030), and fO2/bar = exp(−ΔG / RT).
+    Hematite is the stable pure oxide only when the printed fO2 is above
+    that value. The d-333 iron-saturation owner is the iron–liquid boundary,
+    not this one; both boundaries are read from the JANAF tables this scorer
+    already uses, not from a fixed 1735 K.
+    Units: G is J/mol and R is J/(mol·K), so the exponent is dimensionless
+    and fO2 is in bar. Multiply by 1e5 Pa/bar.
+    Sanity: the equilibrium is 1 bar near 1737 K and 0.21 bar (air) near
+    1657 K. A printed 10^-9 atm is far below either figure.
+    """
+
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    delta_g_J = (
+        4 * _janaf_formation_gibbs_J("Fe-032", temperature_K)
+        - 6 * _janaf_formation_gibbs_J("Fe-030", temperature_K)
+    )
+    fO2_bar = (-delta_g_J / (JANAF_R_J_PER_MOL_K * temperature_K)).exp()
+    return fO2_bar * _JANAF_BAR_PA
+
+
+def _feo1_5_hematite_field_refusal(
+    reference: Observation,
+    identity: Identity,
+    temperature_K: Decimal,
+) -> Notice | None:
+    """Refuse FeO1.5 unless the printed fO2 is inside the hematite field."""
+
+    try:
+        equilibrium_Pa = _hematite_magnetite_equilibrium_fO2_Pa(temperature_K)
+    except (KeyError, ValueError) as exc:
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            reason=(
+                "fusion conversion missing input for FeO1.5: "
+                f"hematite-magnetite equilibrium unavailable: {exc}"
+            ),
+            band=f"JANAF Fe-030/Fe-032 equilibrium at {temperature_K} K: {exc}",
+        )
+    printed = identity.fO2_Pa
+    printed_Pa = (
+        Decimal(str(printed.value))
+        if printed is not None and printed.is_value and printed.value is not None
+        else None
+    )
+    if printed_Pa is None or printed_Pa <= equilibrium_Pa:
+        printed_text = "absent" if printed_Pa is None else f"{printed_Pa} Pa"
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON,
+            band=(
+                "FeO1.5 maps to hematite only above the JANAF "
+                "hematite-magnetite equilibrium 6 Fe2O3 = 4 Fe3O4 + O2 "
+                f"(tables Fe-030/Fe-032); printed fO2={printed_text}; "
+                f"equilibrium fO2={equilibrium_Pa} Pa at T={temperature_K} K"
+            ),
+        )
+    return None
+
+
+def _decide_omitted_reference_polymorph(
+    reference: Observation,
+    identity: Identity,
+    standard_state: StandardState,
+    formula: str,
+    temperature_K: Decimal,
+) -> tuple[Observation | None, Notice | None]:
+    """Infer the stable JANAF crystal for a printed, unnamed pure solid.
+
+    Returns ``(updated reference, None)`` when the row may convert, or
+    ``(None, refusal)`` when inference is refused. The stored record is not
+    written; ``updated`` is the working observation whose polymorph is the
+    inferred crystal so the named fusion path can run. A refusal is typed
+    and carries no converted value.
+    """
+
+    from simulator.battery.generators.janaf import (
+        JANAFFusionPolymorphUnavailable,
+        _FUSION_TABLES,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_solid_stability_transitions,
+    )
+
+    polymorph_state = standard_state.endmember.polymorph
+    assert polymorph_state is not None
+    reason_text = polymorph_state.reason or ""
+    if _polymorph_reason_states_quench_or_metastable(reason_text):
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
+            band="source states a quench or a metastable reference phase",
+        )
+
+    # Premise: a printed one-cation solid references the dimer's crystal,
+    # a(MO1.5) = a(M2O3)^(1/2). Algebra: a(M2O3) = a(MO1.5)^2, then the
+    # dimer's JANAF fusion shift. Units: both activities are dimensionless.
+    # Sanity: Kume a(AlO1.5)=0.0253 squares to 0.00064009 on corundum.
+    # FeO1.5 is hematite only inside the Fe-030/Fe-032 fO2 field; otherwise
+    # the printed point is kept and the refusal names that field.
+    mapped_from: str | None = None
+    dimer = _ONE_CATION_OXIDE_DIMER.get(formula)
+    if dimer is not None:
+        if formula == "FeO1.5":
+            field_refusal = _feo1_5_hematite_field_refusal(
+                reference, identity, temperature_K
+            )
+            if field_refusal is not None:
+                return None, field_refusal
+        mapped_from = formula
+        formula = dimer
+        assert reference.value.point is not None
+        endmember = replace(standard_state.endmember, formula=formula)
+        standard_state = replace(
+            standard_state, endmember=endmember, component_basis=formula
+        )
+        identity = replace(identity, reference_state=State.of(standard_state))
+        reference = replace(
+            reference,
+            identity=identity,
+            value=replace(reference.value, point=reference.value.point ** 2),
+        )
+
+    def missing(detail: str) -> Notice:
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            reason=f"fusion conversion missing input for {formula}: {detail}",
+            band=f"JANAF fusion data for {formula}: {detail}",
+        )
+
+    try:
+        stability = _janaf_stable_crystal_set(formula, temperature_K)
+    except JANAFFusionPolymorphUnavailable as exc:
+        return None, missing(f"incomplete JANAF stability candidate set: {exc}")
+
+    try:
+        _default_solid, liquid_table = _FUSION_TABLES[formula]
+    except KeyError:
+        return None, missing(f"no JANAF fusion table pair for {formula}")
+
+    try:
+        fusion = _janaf_fusion_energy_for_pair(
+            formula,
+            stability.selected.table_id,
+            liquid_table,
+            temperature_K,
+        )
+    except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+        return None, missing(str(exc))
+
+    if temperature_K >= fusion.melting_temperature_K:
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+            band=(
+                f"T={temperature_K} K >= JANAF T_fus="
+                f"{fusion.melting_temperature_K} K; "
+                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+            ),
+        )
+
+    try:
+        transitions = janaf_solid_stability_transitions(formula)
+    except JANAFFusionPolymorphUnavailable as exc:
+        return None, missing(f"incomplete JANAF stability candidate set: {exc}")
+    near = [
+        item
+        for item in transitions
+        if abs(temperature_K - item.temperature_K)
+        <= REFERENCE_POLYMORPH_INFERENCE_MARGIN_K
+    ]
+    if near:
+        nearest = min(
+            near, key=lambda item: abs(temperature_K - item.temperature_K)
+        )
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
+            band=(
+                f"T={temperature_K} K is within "
+                f"{REFERENCE_POLYMORPH_INFERENCE_MARGIN_K} K of the JANAF "
+                f"solid-solid transition at {nearest.temperature_K} K "
+                f"({nearest.stable_below.polymorph.value}"
+                f"/{nearest.stable_above.polymorph.value})"
+            ),
+        )
+
+    selected = stability.selected
+    # Premise: the source named a pure solid oxide and no polymorph. The
+    # comparison standard is the crystal with the lowest formation G in this
+    # JANAF table at T.
+    # Algebra: the next polymorph differs by dG = G_next - G_stable. At equal
+    # chemical potential, G + RT ln(a) is unchanged, so
+    # d log10(a) = dG / (R T ln 10) and
+    # sizing_dex = |G_stable - G_next| * 1000 / (R T ln 10).
+    # Units: (kJ/mol) * (1000 J/kJ) / ((J/(mol·K)) * K) = dimensionless dex.
+    # Sanity: cristobalite versus tridymite near 1950 K is about 0.01 dex.
+    # JANAF has no tridymite table, so the nearest tabulated alternative is
+    # whatever crystal this table actually carries. The notice names that
+    # partner. "not sized" when it has no second polymorph.
+    nearest_alternative = None
+    if stability.alternatives:
+        nearest_alternative = min(
+            stability.alternatives,
+            key=lambda item: abs(
+                item.gibbs_kJ_per_mol - selected.gibbs_kJ_per_mol
+            ),
+        )
+        sizing_dex = str(
+            abs(nearest_alternative.gibbs_kJ_per_mol - selected.gibbs_kJ_per_mol)
+            * Decimal(1000)
+            / _rt_ln_10_j_per_mol_K(temperature_K)
+        )
+    else:
+        sizing_dex = "not sized"
+    payload = {
+        "comparison_phase": (
+            None
+            if nearest_alternative is None
+            else nearest_alternative.polymorph.value
+        ),
+        "comparison_table_id": (
+            None if nearest_alternative is None else nearest_alternative.table_id
+        ),
+        "phase": selected.polymorph.value,
+        "sizing_dex": sizing_dex,
+        "table_id": selected.table_id,
+    }
+    if formula == "SiO2":
+        payload["janaf_tridymite"] = "absent"
+    if mapped_from is not None:
+        payload["dimer_formula"] = formula
+        payload["dimer_solid_activity"] = str(reference.value.point)
+        payload["printed_formula"] = mapped_from
+    notices = [
+        _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            reason=(
+                f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
+                + json.dumps(payload, sort_keys=True)
+            ),
+            band=(
+                f"JANAF stable polymorph {selected.polymorph.value} "
+                f"table {selected.table_id}"
+            ),
+            authority=Authority.CERTIFIED,
+            certification=(
+                "NIST-JANAF solid formation Gibbs energies compared at T"
+            ),
+        )
+    ]
+    if _omitted_reason_states_inferred_solid(reason_text):
+        notices.append(
+            _reference_polymorph_notice(
+                reference,
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                reason=REFERENCE_SOLID_INFERRED_REASON,
+                band="solid reference is inferred secondary evidence",
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "source omission reason states the solid itself was inferred"
+                ),
+            )
+        )
+    endmember = replace(
+        standard_state.endmember, polymorph=State.of(selected.polymorph)
+    )
+    updated = replace(
+        reference,
+        identity=replace(
+            identity,
+            reference_state=State.of(replace(standard_state, endmember=endmember)),
+        ),
+        notices=union_notices(reference.notices, tuple(notices)),
+    )
+    return updated, None
+
+
 def _fusion_energy_when_polymorph_absent(
     reference: Observation,
     formula: str,
     temperature_K: Decimal,
 ) -> tuple[Observation, object, Notice | None, Notice | None]:
-    """JANAF fusion for a pure-solid identity that never named a polymorph.
+    """JANAF fusion for a pure-solid identity that never set the polymorph axis.
 
-    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``
-    and is refused before this runs (d-165). ``polymorph is None`` is the
-    melt-activity benchmark's pure-solid standard: the stable JANAF crystal at
-    T supplies the fusion pair, and a stability-bound notice records the
-    inference. Returns ``(reference, fusion, refusal, inference)``. A refusal
+    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``.
+    d-338 decides that record in ``_decide_omitted_reference_polymorph`` before
+    this runs. ``polymorph is None`` is the melt-activity benchmark's pure-solid
+    standard: the stable JANAF crystal at T supplies the fusion pair, and a
+    stability-bound notice records the inference. That notice is not the d-338
+    flag. This copy stays because the benchmark never printed an omitted
+    polymorph. Returns ``(reference, fusion, refusal, inference)``. A refusal
     notice means the value must stay on the solid number.
     """
 
@@ -2287,6 +2688,64 @@ def _janaf_fusion_energy_for_reference(
         else polymorph
     )
     solid_table, liquid_table = _fusion_table_pair(formula, janaf_polymorph)
+    return _janaf_fusion_energy_for_pair(
+        formula, solid_table, liquid_table, temperature_K
+    )
+
+
+def _inferred_reference_polymorph(notices: Sequence[Notice]) -> Polymorph | None:
+    """Polymorph d-338 wrote onto the working comparison, if it did."""
+
+    prefix = f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
+    for notice in notices:
+        if not notice.reason.startswith(prefix):
+            continue
+        payload = json.loads(notice.reason[len(prefix) :])
+        phase = payload.get("phase")
+        if not isinstance(phase, str):
+            return None
+        return Polymorph(phase)
+    return None
+
+
+def _janaf_fusion_energy_for_scored_reference(
+    source_reference: Observation,
+    comparison_reference: Observation,
+    temperature_K: Decimal,
+):
+    """Fusion pair for the band.
+
+    The stored row still says the polymorph is unknown. When this owner
+    inferred one, the conversion notice names that crystal and the band must
+    use the same pair. A named source keeps ``_janaf_fusion_energy_for_reference``.
+    """
+
+    phase = _inferred_reference_polymorph(comparison_reference.notices)
+    if phase is None:
+        return _janaf_fusion_energy_for_reference(source_reference, temperature_K)
+    identity = source_reference.identity
+    if not isinstance(identity, Identity) or identity.reference_state is None:
+        from simulator.battery.generators.janaf import JANAFFusionPolymorphUnavailable
+
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    formula = identity.reference_state.value.endmember.formula
+    comparison_identity = comparison_reference.identity
+    if (
+        isinstance(comparison_identity, Identity)
+        and comparison_identity.reference_state is not None
+        and comparison_identity.reference_state.is_value
+    ):
+        # A one-cation row is scored on the dimer crystal. The stored
+        # species stays as printed; the working endmember carries the dimer.
+        formula = comparison_identity.reference_state.value.endmember.formula
+    from simulator.battery.generators.janaf import (
+        _fusion_table_pair,
+        _janaf_fusion_energy_for_pair,
+    )
+
+    solid_table, liquid_table = _fusion_table_pair(formula, phase)
     return _janaf_fusion_energy_for_pair(
         formula, solid_table, liquid_table, temperature_K
     )
@@ -3296,23 +3755,31 @@ def fusion_comparison_reference(
         janaf_fusion_energy,
     )
 
-    # d-165: a source that records the solid but not its polymorph stays on the
-    # printed number. polymorph is None is not that record — the melt-activity
-    # benchmark's pure-solid identity never set the axis, and the stable JANAF
-    # crystal still converts it onto the liquid basis.
+    # d-338: a printed pure solid that names no polymorph takes the JANAF
+    # crystal stable at T. polymorph is None is not that record — the
+    # melt-activity benchmark's pure-solid identity never set the axis, and
+    # ``_fusion_energy_when_polymorph_absent`` still converts it.
     if (
         observed_reference_phase is Phase.CR
         and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
     ):
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason="fusion_source_reference_phase_unprinted",
-            origin=reference.observation_id,
-            band="JANAF fusion conversion requires the source-named solid polymorph",
+        updated, refusal = _decide_omitted_reference_polymorph(
+            reference, identity, standard_state, formula, temperature_K
         )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+        if refusal is not None:
+            return replace(
+                reference, notices=union_notices(reference.notices, (refusal,))
+            )
+        assert updated is not None
+        reference = updated
+        identity = updated.identity
+        assert (
+            identity.reference_state is not None
+            and identity.reference_state.is_value
+        )
+        standard_state = identity.reference_state.value
+        formula = standard_state.endmember.formula
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
@@ -13426,6 +13893,19 @@ def compile_residual(
             candidate,
         )
 
+    if (
+        prediction is not None
+        and prediction.refusal_reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and prediction.refusal_detail.get("reason") == "duplicate_of"
+    ):
+        return _refused(
+            RefusalReason.REFERENTIAL_INTEGRITY,
+            prediction.refusal_detail,
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+            exclusions=("duplicate_of",),
+        )
+
     if _is_quantity_not_predicted(quantity):
         return _refused(
             RefusalReason.UNSUPPORTED,
@@ -13630,15 +14110,15 @@ def compile_residual(
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
 
-    unprinted_reference_phase = next(
+    reference_polymorph_refusal = next(
         (
             notice
             for notice in notices
-            if notice.reason == "fusion_source_reference_phase_unprinted"
+            if notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
         ),
         None,
     )
-    if unprinted_reference_phase is not None:
+    if reference_polymorph_refusal is not None:
         if (
             engine is Engine.INTERNAL_ANALYTICAL
             and experiment is not None
@@ -13649,7 +14129,7 @@ def compile_residual(
                 {
                     "reason": RefusalReason.METHOD_UNKNOWN.value,
                     "method_reason": experiment.method.reason,
-                    "secondary_reasons": [unprinted_reference_phase.reason],
+                    "secondary_reasons": [reference_polymorph_refusal.reason],
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
@@ -13660,7 +14140,7 @@ def compile_residual(
             return _refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {
-                    "reason": unprinted_reference_phase.reason,
+                    "reason": reference_polymorph_refusal.reason,
                     "formula": formula,
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
@@ -14004,7 +14484,7 @@ def compile_residual(
             ),
         )
 
-    if unprinted_reference_phase is not None:
+    if reference_polymorph_refusal is not None:
         if (
             prediction.execution.state is not ExecutionState.PRODUCED
             or prediction.value is None
@@ -14020,7 +14500,7 @@ def compile_residual(
                 secondary_reasons = (secondary_reasons,)
             detail["secondary_reasons"] = list(
                 dict.fromkeys(
-                    (*secondary_reasons, unprinted_reference_phase.reason)
+                    (*secondary_reasons, reference_polymorph_refusal.reason)
                 )
             )
             return _refused(
@@ -14034,7 +14514,7 @@ def compile_residual(
             return _refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {
-                    "reason": unprinted_reference_phase.reason,
+                    "reason": reference_polymorph_refusal.reason,
                     "formula": formula,
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
@@ -14317,7 +14797,7 @@ def compile_residual(
             notices = union_notices(notices, (printed.notice,))
 
         source_phase_missing = any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
             for notice in reference.notices
         )
         fusion_conversion = any(
@@ -14325,11 +14805,17 @@ def compile_residual(
         )
         if source_phase_missing:
             fusion_band_refusal = {
-                "reason": "fusion_source_reference_phase_unprinted"
+                "reason": next(
+                    notice.reason
+                    for notice in reference.notices
+                    if notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
+                )
             }
         elif fusion_conversion:
             assert T is not None
-            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            fusion_energy = _janaf_fusion_energy_for_scored_reference(
+                source_reference, reference, T
+            )
             if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
                 fusion_band_refusal = {
                     "reason": "conversion_uncertainty_unprinted",
@@ -14713,6 +15199,59 @@ def _is_compilation_thermo_reference(
     )
 
 
+def _has_duplicate_observation_link(observation: Observation) -> bool:
+    provenance = observation.provenance
+    return (
+        isinstance(provenance, Mapping)
+        and "duplicate_of_observation_id" in provenance
+    )
+
+
+def _duplicate_observation_refusal_detail(
+    context: ScoreContext, observation: Observation
+) -> dict[str, object]:
+    provenance = observation.provenance
+    assert isinstance(provenance, Mapping)
+    target = provenance["duplicate_of_observation_id"]
+    detail: dict[str, object] = {
+        "reason": "duplicate_of",
+        "primary_observation_id": target,
+    }
+    if not isinstance(target, str) or not target.strip():
+        detail["resolution"] = "primary_id_invalid"
+        return detail
+
+    target = target.strip()
+    primary = context.observations.get(target)
+    if primary is None and observation.source_id:
+        primary = context.observations.get(f"{observation.source_id}::{target}")
+    if primary is None and "::" not in target:
+        matches = [
+            candidate
+            for candidate in context.observations.values()
+            if candidate.observation_id.endswith(f"::{target}")
+        ]
+        if len(matches) == 1:
+            primary = matches[0]
+        elif matches:
+            detail["resolution"] = "primary_ambiguous"
+            detail["primary_matches"] = sorted(
+                candidate.observation_id for candidate in matches
+            )
+            return detail
+    if primary is None:
+        detail["resolution"] = "primary_missing"
+        return detail
+
+    detail["primary_observation_id"] = primary.observation_id
+    if primary.admission.status is not AdmissionStatus.ADMITTED:
+        detail["resolution"] = "primary_not_admitted"
+        detail["primary_admission_status"] = primary.admission.status.value
+    else:
+        detail["resolution"] = "excluded"
+    return detail
+
+
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     """Admitted or pending comparison evidence; class labels do not gate scoring.
 
@@ -14728,6 +15267,8 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     for obs in context.observations.values():
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
+            continue
+        if _has_duplicate_observation_link(obs):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
@@ -14823,9 +15364,9 @@ def _score_store_with_decisions(
     provided_handles = dict(handles or {})
     resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
+    seen = {o.observation_id for o in refs}
     fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
-        seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
             if obs.observation_id not in seen:
                 refs.append(obs)
@@ -14844,6 +15385,10 @@ def _score_store_with_decisions(
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+    for obs in context.observations.values():
+        if _has_duplicate_observation_link(obs) and obs.observation_id not in seen:
+            refs.append(obs)
+            seen.add(obs.observation_id)
     if measured_only:
         refs = [
             obs for obs in refs
@@ -14917,6 +15462,11 @@ def _score_store_with_decisions(
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
+                duplicate_detail = (
+                    _duplicate_observation_refusal_detail(context, obs)
+                    if _has_duplicate_observation_link(obs)
+                    else None
+                )
                 for point in _iter_compilation_series_cells(obs, origin):
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
@@ -14971,7 +15521,8 @@ def _score_store_with_decisions(
                     for engine in engine_set:
                         prediction = None
                         if (
-                            diagnostic
+                            duplicate_detail is None
+                            and diagnostic
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo
@@ -14987,7 +15538,8 @@ def _score_store_with_decisions(
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _HASHIMOTO_SOURCE_ID
@@ -15000,7 +15552,8 @@ def _score_store_with_decisions(
                                 residue_prediction_cache,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _SOSSI_SOURCE_ID
@@ -15013,7 +15566,8 @@ def _score_store_with_decisions(
                                 residue_prediction_cache,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and experiment is not None and experiment.method.is_value
@@ -15021,6 +15575,24 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
+                            )
+                        if duplicate_detail is not None:
+                            prediction = EnginePrediction(
+                                engine=engine,
+                                channel=ENGINE_CHANNELS[engine],
+                                execution=Execution(
+                                    state=ExecutionState.NOT_PROBED
+                                ),
+                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[
+                                    engine
+                                ],
+                                refusal_reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                                refusal_detail=duplicate_detail,
+                                identity=(
+                                    point.identity
+                                    if isinstance(point.identity, Identity)
+                                    else None
+                                ),
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point

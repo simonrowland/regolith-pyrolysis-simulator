@@ -235,9 +235,9 @@ def _with_activity_reference_polymorph(
 def _without_activity_reference_polymorph(identity: Identity) -> Identity:
     """Pure solid whose polymorph axis was never set.
 
-    An omitted source polymorph (``State.unknown``) stays on the printed
-    number (d-165, c1ec62344). ``polymorph is None`` is the melt-benchmark
-    solid, and 800194114 still converts it with the stable JANAF crystal.
+    ``polymorph is None`` is the melt-benchmark solid. An omitted source
+    polymorph (``State.unknown``) is the printed record and is decided by
+    d-338, not by this helper.
     """
 
     reference_state = identity.reference_state
@@ -6638,6 +6638,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6683,6 +6684,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             "reference_converted_via_fusion;probe",
         ),
         (
+            FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
+        ),
+        (
             FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
             NoticeKind.DERIVATION_USES_COMPILATION,
             "source_flagged_less_reliable:probe",
@@ -6725,6 +6731,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6750,6 +6757,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
+        ),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
         ),
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
@@ -6782,6 +6793,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
@@ -13598,10 +13610,18 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
 @pytest.mark.parametrize(
     "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
+def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
     temperature: Decimal,
 ) -> None:
-    from simulator.battery.score import fusion_comparison_reference
+    """CaO has one JANAF crystal below its melting point, so the omission is sized 'not sized'."""
+
+    import json
+
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -13622,15 +13642,27 @@ def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
         source_id="synthetic-unknown-cao-polymorph",
     )
     assert reference.admission.status is AdmissionStatus.ADMITTED
+    stable = _janaf_stable_crystal_set("CaO", temperature)
 
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert converted.value.point == reference.value.point
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
+    notice = next(
+        item
         for item in converted.notices
+        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
     )
+    detail = json.loads(notice.reason.split(":", 1)[1])
+
+    assert stable.alternatives == ()
+    assert detail == {
+        "comparison_phase": None,
+        "comparison_table_id": None,
+        "phase": stable.selected.polymorph.value,
+        "sizing_dex": "not sized",
+        "table_id": stable.selected.table_id,
+    }
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point != reference.value.point
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
@@ -13710,25 +13742,45 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal(
     )
 
 
-def test_kume_2000_silica_unnamed_phase_is_not_converted() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_kume_2000_silica_unnamed_phase_infers_the_stable_crystal() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+        temperature_of,
+    )
 
     context = load_score_context(sources=("kume-2000-cao-activities",))
     reference = context.observations[
         "kume-2000-cao-activities::kume_2000_table1_sample_1_sio2_activity"
     ]
+    temperature = temperature_of(reference.identity)
+    assert temperature is not None
+    stable = _janaf_stable_crystal_set("SiO2", temperature)
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
-        for notice in comparison.notices
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
     )
+    detail = json.loads(notice.reason.split(":", 1)[1])
+    nearest = min(
+        stable.alternatives,
+        key=lambda item: abs(item.gibbs_kJ_per_mol - stable.selected.gibbs_kJ_per_mol),
+    )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert detail["comparison_phase"] == nearest.polymorph.value
+    assert detail["comparison_table_id"] == nearest.table_id
+    assert detail["janaf_tridymite"] == "absent"
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
-def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
+def test_unnamed_source_phase_scores_with_the_inferred_polymorph_flag() -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -13756,26 +13808,37 @@ def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
         source_id="synthetic-valid-method-solid-reference",
     )
     context = _context(F.work(), experiment, reference, review="reviewed")
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     residual, candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
-        prediction=_predict(Decimal("0.3"), identity),
+        prediction=_predict(converted.value.point, converted.identity),
     )
 
+    # Prediction is the converted liquid point, so the residual is zero.
+    # The row is still NO_BAND: the inference flag is a flagged stratum and
+    # the JANAF fusion sigma is unprinted.
     assert residual.status is ResidualStatus.NO_BAND
-    assert residual.numeric is not None
     assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.numeric.value == Decimal("0")
     assert residual.refusal is not None
-    assert residual.refusal.detail["reason"] == (
-        "fusion_source_reference_phase_unprinted"
-    )
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
     assert candidate is not None
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
         for notice in residual.notices
     )
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
     quartz_identity = _with_activity_reference_polymorph(identity, "quartz")
     mismatched, _candidate = compile_residual(
@@ -13837,19 +13900,26 @@ def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in comparison.notices
     )
 
 
-def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_silica_reference_phase_selects_the_stable_janaf_table() -> None:
+    import json
 
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
+
+    temperature = Decimal("1823")
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
-            T_K=Decimal("1823"),
+            T_K=temperature,
             endmember_phase=Phase.CR,
             component_basis="SiO2",
         ),
@@ -13863,17 +13933,30 @@ def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-ambiguous-solid-reference",
     )
+    stable = _janaf_stable_crystal_set("SiO2", temperature)
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
-        for item in comparison.notices
+    detail = json.loads(
+        next(
+            item.reason
+            for item in comparison.notices
+            if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
+    )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+def test_kang_silica_unnamed_reference_phase_infers_the_stable_crystal() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+        temperature_of,
     )
 
-
-def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
     source = "kang-2007-sio2-activity-cas-low-silica"
     context = load_score_context(sources=(source,))
     rows = [
@@ -13885,20 +13968,24 @@ def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
     ]
     assert len(rows) == 22
 
-    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
-        for reference in rows:
-            residual, _candidate = compile_residual(
-                reference, engine, context=context
+    for reference in rows:
+        temperature = temperature_of(reference.identity)
+        assert temperature is not None
+        stable = _janaf_stable_crystal_set(
+            reference.identity.reference_state.value.endmember.formula,
+            temperature,
+        )
+        comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert any(
+            notice.reason.startswith(
+                f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
             )
-
-            assert residual.status is ResidualStatus.REFUSED
-            assert residual.execution.state is ExecutionState.NOT_PROBED
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-            assert (
-                residual.refusal.detail["reason"]
-                == "fusion_source_reference_phase_unprinted"
-            )
+            and stable.selected.polymorph.value in notice.reason
+            and stable.selected.table_id in notice.reason
+            for notice in comparison.notices
+        )
+        assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def _quartz_silica_activity_observation():
@@ -13991,14 +14078,21 @@ def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
     }
 
 
-def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_alumina_reference_phase_infers_the_stable_crystal() -> None:
+    import json
 
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
+
+    temperature = Decimal("1800")
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="Al2O3",
-            T_K=Decimal("1800"),
+            T_K=temperature,
             endmember_phase=Phase.CR,
             component_basis="Al2O3",
         ),
@@ -14012,18 +14106,27 @@ def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-ambiguous-solid-reference",
     )
+    stable = _janaf_stable_crystal_set("Al2O3", temperature)
 
     comparison = fusion_comparison_reference(reference)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
-        for item in comparison.notices
+    detail = json.loads(
+        next(
+            item.reason
+            for item in comparison.notices
+            if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
     )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_silica_reference_with_row_band_still_infers_the_stable_crystal() -> None:
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14054,16 +14157,21 @@ def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> 
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
+        item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
         for item in comparison.notices
     )
 
 
-def test_unnamed_cao_reference_phase_is_not_converted() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_cao_reference_phase_converts_on_the_only_janaf_solid() -> None:
+    import json
+
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14083,15 +14191,30 @@ def test_unnamed_cao_reference_phase_is_not_converted() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-cao-reference",
     )
+    benchmark = F.observation(
+        "single-table-cao-reference-benchmark",
+        experiment.experiment_id,
+        _without_activity_reference_polymorph(identity),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-cao-reference",
+    )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
-        for notice in comparison.notices
+    benchmark_comparison = fusion_comparison_reference(
+        benchmark, engine=Engine.OPENIMCC
     )
+    detail = json.loads(
+        next(
+            notice.reason
+            for notice in comparison.notices
+            if notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
+    )
+
+    assert detail["sizing_dex"] == "not sized"
+    assert comparison.value.point == benchmark_comparison.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
 @pytest.mark.parametrize(
@@ -14616,7 +14739,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
         is Phase.CR
     )
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in before_comparison.notices
     )
     assert (
@@ -14788,14 +14911,19 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     if polymorph is None:
+        from simulator.battery.score import REFERENCE_POLYMORPH_INFERRED_REASON
+
+        assert comparison.value.point != reference.value.point
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
             for notice in comparison.notices
         )
         return
+
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
 
     assert not any(
         notice.reason.startswith("reference_converted_via_fusion;")
@@ -16863,7 +16991,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(allibert_cao_rows) == 8
         assert all(
             any(
-                notice.reason == "fusion_source_reference_phase_unprinted"
+                notice.reason.startswith(
+                    "reference_polymorph_inferred_stable_phase:"
+                )
                 for notice in row.notices
             )
             for row in allibert_cao_rows
@@ -16893,7 +17023,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             row.refusal is not None
             and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
             and "fusion_source_reference_phase_unprinted"
-            in row.refusal.detail.get("secondary_reasons", ())
+            not in row.refusal.detail.get("secondary_reasons", ())
+            and any(
+                notice.reason.startswith(
+                    "reference_polymorph_inferred_stable_phase:"
+                )
+                for notice in row.notices
+            )
             for row in affected_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
@@ -16914,17 +17050,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
                 assert "source polymorph is unknown" not in conversion_notice.reason
             else:
                 assert polymorph.is_unknown
-                missing_input_notice = next(
-                    notice
+                assert any(
+                    notice.reason.startswith(
+                        "reference_polymorph_inferred_stable_phase:"
+                    )
                     for notice in row.notices
-                    if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-                    and notice.reason.startswith("fusion conversion missing input:")
                 )
-                assert "JANAF solid table Al-096 represents polymorph corundum" in (
-                    missing_input_notice.reason
-                )
-                assert "measured reference polymorph is unknown" in (
-                    missing_input_notice.reason
+                assert any(
+                    notice.reason.startswith("reference_converted_via_fusion;")
+                    for notice in row.notices
                 )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
@@ -17091,10 +17225,17 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
     residual = next(row for row in residuals if row.reference == observation_id)
 
-    assert residual.numeric is None
-    assert residual.status is ResidualStatus.REFUSED
     assert residual.score_eligible is False
+    assert residual.refusal is None or (
+        residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+        or residual.refusal.detail.get("reason")
+        != "fusion_source_reference_phase_unprinted"
+    )
     assert any(
+        notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+        for notice in residual.notices
+    )
+    assert not any(
         notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in residual.notices
     )
@@ -18397,6 +18538,122 @@ def test_filtered_score_context_resolves_cross_source_validation_parent(
     )
 
 
+def _duplicate_of_score_fixture(
+    *,
+    duplicate_target: str | None = "primary",
+    primary_status: AdmissionStatus = AdmissionStatus.ADMITTED,
+    include_primary: bool = True,
+):
+    primary_id = "primary-source::primary"
+    twin_id = "secondary-source::twin"
+    experiment = F.tabulation_experiment()
+    identity = F.o2_identity()
+    primary = F.observation(
+        primary_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=primary_status,
+        source_id="primary-source",
+    )
+    twin = F.observation(
+        twin_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="secondary-source",
+    )
+    if duplicate_target is not None:
+        twin = replace(
+            twin,
+            provenance={"duplicate_of_observation_id": duplicate_target},
+        )
+    observations = (primary, twin) if include_primary else (twin,)
+    context = _context(
+        F.work(), experiment, *observations, review="reviewed"
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=lambda _engine, point, **_kwargs: _predict(
+            point.value.point, point.identity
+        ),
+    )
+    return context, residuals
+
+
+def test_duplicate_of_scores_one_twin_and_keeps_typed_primary_reference() -> None:
+    context, residuals = _duplicate_of_score_fixture()
+
+    assert "secondary-source::twin" not in {
+        observation.observation_id
+        for observation in score_mod.comparison_candidates(context)
+    }
+    by_reference = {row.reference: row for row in residuals}
+    assert set(by_reference) == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+    assert by_reference["primary-source::primary"].numeric is not None
+    twin = by_reference["secondary-source::twin"]
+    assert twin.numeric is None
+    assert twin.score_eligible is False
+    assert twin.refusal is not None
+    assert twin.refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert twin.refusal.detail == {
+        "reason": "duplicate_of",
+        "primary_observation_id": "primary-source::primary",
+        "resolution": "excluded",
+    }
+
+
+def test_identical_unlinked_observation_still_scores_independently() -> None:
+    _context_without_link, residuals = _duplicate_of_score_fixture(
+        duplicate_target=None
+    )
+
+    assert {row.reference for row in residuals if row.numeric is not None} == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+
+
+@pytest.mark.parametrize(
+    ("include_primary", "primary_status", "resolution"),
+    (
+        (False, AdmissionStatus.ADMITTED, "primary_missing"),
+        (True, AdmissionStatus.PENDING, "primary_not_admitted"),
+    ),
+)
+def test_duplicate_of_missing_or_unadmitted_primary_refuses_without_dropping(
+    include_primary: bool,
+    primary_status: AdmissionStatus,
+    resolution: str,
+) -> None:
+    _context_with_bad_link, residuals = _duplicate_of_score_fixture(
+        primary_status=primary_status,
+        include_primary=include_primary,
+    )
+
+    twins = [
+        row for row in residuals if row.reference == "secondary-source::twin"
+    ]
+    assert len(twins) == 1
+    assert twins[0].numeric is None
+    assert twins[0].refusal is not None
+    assert twins[0].refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    expected_detail = {
+        "reason": "duplicate_of",
+        "primary_observation_id": (
+            "primary" if resolution == "primary_missing" else "primary-source::primary"
+        ),
+        "resolution": resolution,
+    }
+    if resolution == "primary_not_admitted":
+        expected_detail["primary_admission_status"] = "pending"
+    assert twins[0].refusal.detail == expected_detail
 def _printed_diameter_experiment(
     diameter: Value,
     *,

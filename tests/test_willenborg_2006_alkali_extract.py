@@ -7,7 +7,7 @@ from unittest.mock import patch
 import yaml
 
 import simulator.battery.migrate as migrate_module
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import AdmissionStatus, EvidenceClass, Quantity, ValueKind
 from simulator.battery.migrate import wt_pct_to_mole_fraction
 
 
@@ -58,14 +58,31 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
     for observation in observations:
         values = observation["values"]
         assert values["quantity"] == "activity"
+        assert values["attribution"] == "Willenborg et al. (2006), present work."
         assert "activity_coefficient" not in values
         assert "phase" not in observation
-        assert "standard_state" not in observation
+        assert observation["standard_state_as_printed"] == (
+            '"Therefore, the alkali oxide activity was calculated according to eq 3: '
+            'aNa2O = pNa^2.5/(2Kp). Where, ai is the activity, pi is the '
+            'determined partial pressure, and Kp is the equilibrium constant '
+            'of (2). The data of the equilibrium constant were taken from the '
+            'FACT pure substance database.17" Equation (2) is Na2O(l,s) '
+            '⇌ 2Na(g) + 1/2O2(g).'
+        )
+        assert observation["standard_state"]["state"]["tag"] == "unknown"
+        assert observation["standard_state"]["inferred"] is False
+        assert observation["standard_state"]["locator"]["published_page"] == 2595
+        assert observation["standard_state"]["locator"]["section"] == "Experimental Setup"
+        assert observation["standard_state"]["locator"]["equation"] == "3"
+        assert values["method_class"] == "measured_reduced"
+        assert values["derivation"]["raw_inputs"]["state"] == {
+            "tag": "value",
+            "value": "not_printed",
+        }
         if observation["observation_id"] == "willenborg_2006_alsi8na1_na2o_activity_1400":
             assert "partly molten" in observation["note"]
             assert "mullite and cristobalite" in observation["note"]
         assert values["approximate"] is True
-        assert values["reference_state_as_published"].startswith("Eq. 3 defines aNa2O from Na2O(l,s)")
         point = values["points"][0]
         assert Decimal(str(values["activity"])) == expected_values[observation["observation_id"]]
         assert Decimal(str(point["activity"])) == expected_values[observation["observation_id"]]
@@ -92,6 +109,12 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
     assert source_count.rows_in == 2
     assert source_count.observations_out == 2
     assert len(source_rows) == 2
+    assert sum(
+        row.admission.status is AdmissionStatus.ADMITTED for row in source_rows
+    ) == 2
+    assert sum(
+        row.admission.status is AdmissionStatus.REJECTED for row in source_rows
+    ) == 0
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in source_rows) == 0
     assert migrated.result.validation is not None
     assert len(migrated.result.validation.issues) == 2
@@ -113,6 +136,9 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
         assert row.value.approximate is True
         assert row.identity.quantity.value is Quantity.ACTIVITY
         assert row.identity.reference_state.is_unknown
+        assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert row.derivation is not None
+        assert row.derivation.has_located_unprinted_raw_inputs
         assert row.identity.species.phase.is_unknown
         assert row.identity.temperature_K.value == Decimal("1673.15")
         assert row.identity.composition.is_value
