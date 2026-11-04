@@ -126,30 +126,37 @@ def test_isolated_migration_preserves_known_phases_temperatures_and_run_conditio
             assert row.identity.species.phase.value is Phase.CR
         assert row.identity.composition is None or row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa is None or row.identity.total_pressure_Pa.is_unknown
-        assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
+        if local_id == "dohmen_1998_table1_v929_product":
+            assert row.identity.fO2_Pa.is_value
+            assert row.identity.fO2_Pa.value == Decimal("0.00002")
+        else:
+            assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
         assert row.identity.temperature_K.is_value
         assert row.identity.temperature_K.value == expected_temperature[local_id]
         assert row.point_conditions is not None
         temperature = row.point_conditions["temperature_K"]
         assert temperature.state.is_value
-        assert temperature.state.value == expected_temperature[local_id]
+        assert temperature.state.value.point == expected_temperature[local_id]
         assert temperature.locator is not None
         assert temperature.locator.page == 4
         assert temperature.locator.table == "1"
         assert "total_pressure_Pa" not in row.point_conditions
-        assert "fO2_Pa" not in row.point_conditions
         source_conditions = source_rows[local_id]["values"]["point_conditions"]
         sample_pressure = source_conditions["total_pressure_Pa"]
         assert sample_pressure["state"]["tag"] == "unknown"
         assert "locator" in sample_pressure
         reported_oxygen = source_conditions["fO2_Pa"]
         assert "locator" in reported_oxygen
+        point_oxygen = row.point_conditions["fO2_Pa"]
+        assert point_oxygen.locator is not None
         if local_id == "dohmen_1998_table1_v929_product":
             assert reported_oxygen["state"]["tag"] == "value"
             assert reported_oxygen["state"]["value"]["point"] == "0.00002"
             assert reported_oxygen["state"]["value"]["approximate"] is True
+            assert point_oxygen.state.value.point == Decimal("0.00002")
         else:
             assert reported_oxygen["state"]["tag"] == "unknown"
+            assert point_oxygen.state.is_unknown
         experiment = result.experiments[row.experiment_id]
         if local_id == "dohmen_1998_table1_v937_product":
             assert experiment.sample.form is not None
