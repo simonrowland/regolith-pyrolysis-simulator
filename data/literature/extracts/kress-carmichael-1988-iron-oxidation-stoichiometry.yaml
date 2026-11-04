@@ -110,7 +110,7 @@ species:
           note: All 63 experiment rows. See the paired CSV transcription for the same rows in oxide-column form.
         experiment: kress_1988_table1_equilibration_series
         derived_from: ['pdf:kress-carmichael-1988-iron-oxidation-stoichiometry']
-        phase: quenched_silicate_glass
+        phase: quenched silicate glass
         regime: quench_equilibration
         units: 'dimensionless Fe3+/Fe2+ ratio, reduced from oxide wt%; T in °C; log10 fO2 as printed'
         uncertainty: >-
@@ -231,8 +231,16 @@ species:
             - {experiment_id: B120, composition: JDFD2, T_C: '1632', log10_fO2: '-4.74', oxide_wt_percent: {SiO2: '52.02', TiO2: '1.98', Al2O3: '14.28', Fe2O3: '2.75', Cr2O3: '0.03', FeO: '10.01', MnO: '0.23', MgO: '7.21', CaO: '11.41', Na2O: '0.85', K2O: '0.12', P2O5: '0.03', V2O3: '0.09'}, FeO_wt_pct: '10.01', Fe2O3_wt_pct: '2.75', locator: {published_page: 1271, pdf_page_index: 4, table: '1', record: B120}, point_conditions: {fO2_log: {state: {tag: value, value: '-4.74'}, locator: {published_page: 1271, pdf_page_index: 4, table: '1', record: B120}}}}
       - observation_id: kress_1988_mean_measured_log_ratio_slope
         type: composition_series
-        locator: {published_page: 1269, pdf_page_index: 2, section: Results and Discussion}
+        locator:
+          published_page: 1269
+          pdf_page_index: 2
+          section: Experimental Technique and Results and Discussion
+          note: >-
+            “All experiments were examined under a polarizing microscope to verify the absence of a crystalline phase.”
+            “For each glass sample, 22-24 points were analyzed.”
         experiment: kress_1988_table1_equilibration_series
+        phase: quenched silicate glass
+        phase_as_published: glass sample
         units: 'dimensionless slope: ln(X_Fe2O3/X_FeO) versus ln(fO2)'
         derived_from: [kress_1988_table1_measured_redox_series]
         derivation:
