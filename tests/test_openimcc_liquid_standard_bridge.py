@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 import openimcc
+import openimcc.redox
 from openimcc.redox_pack import load_redox_pack
 
 from engines.builtin import vapor_pressure
@@ -80,6 +81,61 @@ def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
     assert "pack=" in reason
     assert "declared=" in reason
     assert "active=" in reason
+
+
+def test_redox_bridge_refuses_melt_pack_mismatch(monkeypatch: Any) -> None:
+    evaluate_redox = getattr(openimcc_bridge, "evaluate_redox", None)
+    assert callable(evaluate_redox), "OpenIMCC redox bridge entry point is missing"
+    if not callable(evaluate_redox):
+        return
+    mismatch_pack = _load_pack("published-core")
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: mismatch_pack)
+
+    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as caught:
+        evaluate_redox(
+            {"Fe": 1.0, "O": 2.0, "K": 1.0, "Si": 1.0},
+            1800.0,
+            "closed",
+            composition={"K2O": 1.0, "SiO2": 1.0},
+        )
+
+    assert caught.value.diagnostics["category"] == 2
+    assert any(
+        failure["kind"] == "mismatch" and failure["oxide"] == "K2O"
+        for failure in caught.value.diagnostics["standard_failures"]
+    )
+
+
+def test_redox_bridge_returns_melt_and_redox_flag_records(monkeypatch: Any) -> None:
+    evaluate_redox = getattr(openimcc_bridge, "evaluate_redox", None)
+    assert callable(evaluate_redox), "OpenIMCC redox bridge entry point is missing"
+    if not callable(evaluate_redox):
+        return
+    monkeypatch.setattr(
+        openimcc.redox,
+        "evaluate_redox",
+        lambda *_args, **_kwargs: object(),
+    )
+    composition = _default_composition() | {"MnO": 1.0}
+    result = evaluate_redox(
+        {"Fe": 1.0, "O": 2.0},
+        1800.0,
+        "closed",
+        composition=composition,
+    )
+
+    melt_rows = {
+        flag.row_key
+        for flag in result.liquid_standard_flags
+        if flag.pack == f"{_load_pack('default').model_id} {_load_pack('default').version}"
+    }
+    redox_rows = {
+        flag.row_key
+        for flag in result.liquid_standard_flags
+        if flag.pack.startswith("openimcc-redox-pack ")
+    }
+    assert {"K2SiO3", "Fe2SiO4"}.issubset(melt_rows)
+    assert {"MnO(l)", "MnSiO3(l)"}.issubset(redox_rows)
 
 
 def test_production_vapor_pressure_caller_keeps_standard_refusal_visible(
