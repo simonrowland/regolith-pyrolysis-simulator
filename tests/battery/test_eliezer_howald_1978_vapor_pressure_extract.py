@@ -221,12 +221,18 @@ def test_activity_reference_and_method_evidence():
     ko_source = source[ko_id]
     ko_values = ko_source["values"]
     assert ko_values["activity_as_printed"] == "0.7157 × 10^-6"
-    assert ko_source["standard_state_as_printed"] == (
-        '"If the entropy of solution of KO0.5 is approximately ideal and R1 = '
-        '-36 kcal mol-1, the solubility of KO0.5 in tridymite at 1743 K '
-        '(activity of KO0.5(s) = 0.7157 × 10^-6) will be a mole fraction of '
-        'about 0.0234."'
+    printed_definition = (
+        "With either set of equilibrium constants for tridymite, these data "
+        "give a partial molal enthalpy of KO0.5 in tridymite of about "
+        "−36 kcal mol−1. If the entropy of solution of KO0.5 is "
+        "approximately ideal and H̄1 = −36, the solubility of KO0.5 in "
+        "tridymite at 1743 K (activity of KO0.5(s) = 0.7157 × 10^-6) will be "
+        "a mole fraction of about 0.0234."
     )
+    assert ko_source["standard_state_as_printed"] == (
+        f'"{printed_definition}"'
+    )
+    assert ko_values["derivation"]["method"]["state"]["value"] == printed_definition
     standard_state = ko_source["standard_state"]["state"]["value"]
     assert standard_state["convention"] == "raoultian_pure_endmember"
     assert standard_state["endmember"]["formula"] == "KO0.5"
@@ -294,6 +300,28 @@ def test_activity_evidence_mutation_fails(tmp_path, monkeypatch):
         EXTRACT,
         "method_class: model_derived\n        derivation:\n          relation: >-\n            The authors use their Redlich-Kister",
         "method_class: author_derived\n        derivation:\n          relation: >-\n            The authors use their Redlich-Kister",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_activity_reference_and_method_evidence,
+    )
+
+
+def test_ko05_printed_reference_mutation_fails(tmp_path, monkeypatch):
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "            approximately ideal and H̄1 = −36, the solubility of KO0.5 in",
+        "            approximately ideal and H̄1 = −35, the solubility of KO0.5 in",
+        tmp_path=tmp_path,
+        monkeypatch=monkeypatch,
+        assertion=test_activity_reference_and_method_evidence,
+    )
+
+
+def test_ko05_derivation_method_mutation_fails(tmp_path, monkeypatch):
+    assert_extract_source_mutation_fails(
+        EXTRACT,
+        "                approximately ideal and H̄1 = −36, the solubility of KO0.5 in",
+        "                approximately ideal and H̄1 = −35, the solubility of KO0.5 in",
         tmp_path=tmp_path,
         monkeypatch=monkeypatch,
         assertion=test_activity_reference_and_method_evidence,

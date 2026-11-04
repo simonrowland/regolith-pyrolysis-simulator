@@ -472,10 +472,12 @@ species:
         section: Thermodynamic properties of tridymite
       phase: cr
       standard_state_as_printed: >-
-        "If the entropy of solution of KO0.5 is approximately ideal and R1 =
-        -36 kcal mol-1, the solubility of KO0.5 in tridymite at 1743 K
-        (activity of KO0.5(s) = 0.7157 × 10^-6) will be a mole fraction of
-        about 0.0234."
+        "With either set of equilibrium constants for tridymite, these data
+        give a partial molal enthalpy of KO0.5 in tridymite of about
+        −36 kcal mol−1. If the entropy of solution of KO0.5 is
+        approximately ideal and H̄1 = −36, the solubility of KO0.5 in
+        tridymite at 1743 K (activity of KO0.5(s) = 0.7157 × 10^-6) will be
+        a mole fraction of about 0.0234."
       standard_state:
         state:
           tag: value
@@ -559,7 +561,7 @@ species:
             The authors use their Redlich-Kister thermodynamic relations for
             liquid KO0.5-SiO2 and the tridymite-saturated liquid, then state
             the solid KO0.5 activity using the ideal entropy of solution and
-            R1 = -36 kcal mol-1.
+            H̄1 = −36.
           inputs:
           - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table3_standard_state_context
           - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
@@ -568,9 +570,12 @@ species:
             state:
               tag: value
               value: >-
-                Calculate activities of solid KO0.5 in tridymite-saturated
-                liquid; apply the approximately ideal entropy of solution and
-                R1 = -36 kcal mol-1.
+                With either set of equilibrium constants for tridymite, these
+                data give a partial molal enthalpy of KO0.5 in tridymite of
+                about −36 kcal mol−1. If the entropy of solution of KO0.5 is
+                approximately ideal and H̄1 = −36, the solubility of KO0.5 in
+                tridymite at 1743 K (activity of KO0.5(s) = 0.7157 × 10^-6)
+                will be a mole fraction of about 0.0234.
             locator:
               page: 5
               pdf_page_index: 4
