@@ -5,12 +5,18 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO = Path(__file__).resolve().parents[2]
 SOSS = REPO / "data/literature/extracts/sossi-2020-magma-ocean-redox.yaml"
 AITHALA = REPO / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+KRESS = (
+    REPO
+    / "data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml"
+)
 AITHALA_ALLF_RUNS = {
     "aithala-2026-1800-30",
     "aithala-2026-1900-30",
@@ -32,6 +38,70 @@ def _composition(observation):
     state = observation.identity.composition
     assert state is not None and state.is_value
     return state.value
+
+
+def test_kress_table1_redox_rows_project_printed_conditions() -> None:
+    extract = yaml.safe_load(KRESS.read_text(encoding="utf-8"))
+    series = next(
+        item
+        for item in extract["species"]["Fe"]["observations"]
+        if item["observation_id"] == "kress_1988_table1_measured_redox_series"
+    )
+    source_rows = series["values"]["rows"]
+    assert len(source_rows) == 63
+    printed_cells = {
+        "71": {
+            "T_C": "1461",
+            "log10_fO2": "-7.17",
+            "SiO2": "51.36",
+            "Fe2O3": "1.09",
+            "FeO": "10.34",
+        },
+        "B120": {
+            "T_C": "1632",
+            "log10_fO2": "-4.74",
+            "SiO2": "52.02",
+            "Fe2O3": "2.75",
+            "FeO": "10.01",
+        },
+    }
+    by_run = {str(row["experiment_id"]): row for row in source_rows}
+    for run_id, expected in printed_cells.items():
+        row = by_run[run_id]
+        assert row["T_C"] == expected["T_C"]
+        assert row["log10_fO2"] == expected["log10_fO2"]
+        assert row["oxide_wt_percent"]["SiO2"] == expected["SiO2"]
+        assert row["oxide_wt_percent"]["Fe2O3"] == expected["Fe2O3"]
+        assert row["Fe2O3_wt_pct"] == expected["Fe2O3"]
+        assert row["oxide_wt_percent"]["FeO"] == expected["FeO"]
+        assert str(row["FeO_wt_pct"]) == expected["FeO"]
+
+    result = _migrate(KRESS)
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "kress-carmichael-1988-iron-oxidation-stoichiometry"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    assert len(redox_rows) == 63
+    observed_runs = set()
+    for row in redox_rows:
+        conditions = row.point_conditions or {}
+        for key in ("temperature_K", "fO2_log", "composition"):
+            condition = conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table == "1"
+        run_id = conditions["fO2_log"].locator.record
+        observed_runs.add(run_id)
+        assert conditions["temperature_K"].locator.record == run_id
+        assert conditions["composition"].locator.record == run_id
+        assert row.identity.temperature_K is not None
+        assert row.identity.temperature_K.is_value
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_value
+    assert observed_runs == set(by_run)
 
 
 def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:

@@ -1366,6 +1366,41 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
             )
 
 
+def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml"
+    )
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    result = migrator.result
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        origins={key: extract.name for key in result.observations},
+        benches=result.benches,
+    )
+    residuals, _ = score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    residuals = [
+        residual
+        for residual in residuals
+        if "kress-carmichael-1988-iron-oxidation-stoichiometry" in residual.key
+    ]
+    assert len(residuals) == 63
+    assert all(residual.numeric is None for residual in residuals)
+    assert all(
+        residual.refusal is not None
+        and residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        and residual.refusal.detail
+        == {"fields": ["total_pressure_Pa"], "detail": ""}
+        for residual in residuals
+    )
+
+
 def _borisov_row4():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/borisov-2018-compilation.yaml"
