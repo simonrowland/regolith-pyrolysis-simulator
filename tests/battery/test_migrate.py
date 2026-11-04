@@ -11875,7 +11875,8 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
     # point ids move. The Table 2-3 run conditions move the same :h= suffix.
-    # d-338 now resolves the SiO2 standard polymorph to high cristobalite.
+    # The digest pins 30 unknown SiO2 polymorph states copied from the extract (no cristobalite).
+    # d-338 inference lives in score.py::_decide_omitted_reference_polymorph, not migration.
     assert digest == "1e5fd93f852bd4c9c65ae8a0454d8a40a4d04ee1b2ab37efbc25924dda5f403d"
 
 

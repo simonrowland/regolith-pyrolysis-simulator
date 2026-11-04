@@ -250,10 +250,6 @@ def _assert_extracted_table_cells(document: dict) -> None:
 
     for index, row in enumerate(TABLE_IV, start=1):
         base = f"neudorf_elliott_1980_table4_row{index}"
-        calculated = observations.get(f"{base}_calculated_log_a_star_na2o")
-        if calculated is not None:
-            assert calculated["values"]["method_class"] == "model_derived"
-            assert calculated["method_class"] == "model_derived"
         interpolated = observations[f"{base}_interpolated_log_a_star_na2o"]["values"]
         assert (
             interpolated["NNa2O_as_printed"],
@@ -279,9 +275,57 @@ def _assert_extracted_table_cells(document: dict) -> None:
         assert reference["inferred"] is False
         assert reference["locator"]["published_page"] == 608
         assert "Lin and Elliott [24]" in reference["note"]
+        assert "evidence_class" not in interpolated
+        assert interpolated["column_as_printed"] == "Interpolated (†) as printed in the Table IV footnote"
+        assert "activity" not in interpolated
+        assert interpolated["table_reference_footnote_as_printed"] == (
+            "* Relative to pure solid silica (tridymite)."
+        )
         assert (
             interpolated_observation["method_class"] == "author_derived"
         )
+        if row[3] is None:
+            assert f"{base}_calculated_log_a_star_na2o" not in observations
+        else:
+            calculated_observation = observations[
+                f"{base}_calculated_log_a_star_na2o"
+            ]
+            calculated = calculated_observation["values"]
+            assert (
+                calculated["NNa2O_as_printed"],
+                calculated["NCaO_as_printed"],
+                calculated["NNa_plus_as_printed"],
+                calculated["log_a_star_as_printed"],
+            ) == (*row[:3], row[3])
+            assert calculated["quantity"] == "activity"
+            assert calculated["admission_status"] == "typed_refusal"
+            assert calculated["method_class"] == "model_derived"
+            assert calculated_observation["method_class"] == "model_derived"
+            context_id = (
+                "neudorf-elliott-1980-na2o-cao-silicate-activities::context::"
+                "neudorf_elliott_1980_richardson_eq8_model_context"
+            )
+            assert calculated_observation["derived_from"] == [context_id]
+            derivation = calculated_observation["derivation"]
+            assert derivation["inputs"] == [context_id]
+            assert "Richardson ideal-mixing relation" in derivation["relation"]
+            assert derivation["method"]["state"]["value"] == (
+                "By Eq. [8]¹¹ as printed in the Table IV header."
+            )
+            assert derivation["method"]["locator"] == {
+                "page": 7,
+                "pdf_page_index": 6,
+                "published_page": 613,
+                "table": "IV",
+                "equation": "8",
+            }
+            assert any(
+                "Richardson [11]" in reference
+                for reference in derivation["references"]
+            )
+            assert "evidence_class" not in calculated
+            assert calculated["column_as_printed"] == "By Eq. [8]¹¹ as printed in the Table IV header"
+            assert "activity" not in calculated
 
 
 def _assert_sc456_relabels(document: dict) -> None:
@@ -333,54 +377,6 @@ def test_sc456_evidence_class_and_lineage_are_pinned() -> None:
     ]["values"]["evidence_class"] = "quoted_attributed"
     with pytest.raises(AssertionError):
         _assert_sc456_relabels(reverted)
-        assert "evidence_class" not in interpolated
-        assert interpolated["column_as_printed"] == "Interpolated (†) as printed in the Table IV footnote"
-        assert "activity" not in interpolated
-        assert interpolated["table_reference_footnote_as_printed"] == (
-            "* Relative to pure solid silica (tridymite)."
-        )
-        if row[3] is None:
-            assert f"{base}_calculated_log_a_star_na2o" not in observations
-        else:
-            calculated = observations[f"{base}_calculated_log_a_star_na2o"]["values"]
-            assert (
-                calculated["NNa2O_as_printed"],
-                calculated["NCaO_as_printed"],
-                calculated["NNa_plus_as_printed"],
-                calculated["log_a_star_as_printed"],
-            ) == (*row[:3], row[3])
-            assert calculated["quantity"] == "activity"
-            assert calculated["admission_status"] == "typed_refusal"
-            assert calculated["method_class"] == "model_derived"
-            calculated_observation = observations[
-                f"{base}_calculated_log_a_star_na2o"
-            ]
-            assert calculated_observation["method_class"] == "model_derived"
-            context_id = (
-                "neudorf-elliott-1980-na2o-cao-silicate-activities::context::"
-                "neudorf_elliott_1980_richardson_eq8_model_context"
-            )
-            assert calculated_observation["derived_from"] == [context_id]
-            derivation = calculated_observation["derivation"]
-            assert derivation["inputs"] == [context_id]
-            assert "Richardson ideal-mixing relation" in derivation["relation"]
-            assert derivation["method"]["state"]["value"] == (
-                "By Eq. [8]¹¹ as printed in the Table IV header."
-            )
-            assert derivation["method"]["locator"] == {
-                "page": 7,
-                "pdf_page_index": 6,
-                "published_page": 613,
-                "table": "IV",
-                "equation": "8",
-            }
-            assert any(
-                "Richardson [11]" in reference
-                for reference in derivation["references"]
-            )
-            assert "evidence_class" not in calculated
-            assert calculated["column_as_printed"] == "By Eq. [8]¹¹ as printed in the Table IV header"
-            assert "activity" not in calculated
 
 
 def _expected_audit_cells() -> list[tuple[str, str, str, str, str]]:

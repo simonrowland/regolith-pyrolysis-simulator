@@ -58,6 +58,7 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
     for observation in observations:
         values = observation["values"]
         assert values["quantity"] == "activity"
+        assert values["attribution"] == "Willenborg et al. (2006), present work."
         assert "activity_coefficient" not in values
         assert "phase" not in observation
         assert observation["standard_state_as_printed"] == (
