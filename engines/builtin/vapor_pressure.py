@@ -3137,8 +3137,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             from simulator.fe_redox import (
                 kress91_ferrous_feo_activity,
                 kress91_furnace_activity_pressure_bar,
+                liquid_feo_domain_from_controls,
             )
 
+            liquid_domain = liquid_feo_domain_from_controls(controls)
             feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
                 floor_bar=vacuum_floor_bar,
             )
@@ -3148,6 +3150,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 T_K=T_K,
                 pressure_bar=feo_activity_pressure_bar,
                 floor_bar=vacuum_floor_bar,
+                liquid_domain=liquid_domain,
             )
             below_cap_fe_activity_basis = "kress91_ferrous"
         else:
@@ -3193,6 +3196,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 T_K=T_K,
                 pressure_bar=feo_activity_pressure_bar,
                 floor_bar=vacuum_floor_bar,
+                liquid_domain=liquid_domain,
             )
 
         vapor_pressures: dict[str, float] = {}

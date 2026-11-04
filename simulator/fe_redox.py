@@ -1037,6 +1037,98 @@ def _calphad_authority_weight(delta_iw_log10: float) -> float:
     return 1.0 - delta_iw_log10 / CALPHAD_AUTHORITY_BLEND_WIDTH_LOG10
 
 
+LIQUID_MODEL_BELOW_LIQUIDUS_KIND = "liquid_model_below_liquidus"
+
+
+def _finite_domain_float(value: object, name: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise TypeError(f"{name} must be a finite float")
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError(f"{name} must be finite")
+    return number
+
+
+@dataclass(frozen=True, slots=True)
+class LiquidFeODomain:
+    """Liquid-state fact supplied by the liquidus-gate owner.
+
+    fe_redox does not decide the liquidus. ``below_liquidus`` is the
+    owner's statement that this evaluation is below the silicate liquidus.
+    """
+
+    below_liquidus: bool
+    temperature_K: float
+    liquidus_T_C: float | None
+    solidus_T_C: float | None
+    source: str
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.below_liquidus, bool):
+            raise TypeError("below_liquidus must be bool")
+        temperature_K = _finite_domain_float(self.temperature_K, "temperature_K")
+        if temperature_K <= 0.0:
+            raise ValueError("temperature_K must be positive")
+        object.__setattr__(self, "temperature_K", temperature_K)
+        for name in ("liquidus_T_C", "solidus_T_C"):
+            value = getattr(self, name)
+            if value is None:
+                continue
+            object.__setattr__(self, name, _finite_domain_float(value, name))
+        if not isinstance(self.source, str) or not self.source:
+            raise TypeError("source must be a non-empty str")
+
+
+def liquid_feo_domain_from_controls(
+    controls: Mapping[str, object] | None,
+) -> LiquidFeODomain | None:
+    """Read the gate owner's fact from kernel control inputs.
+
+    A missing fact is not a below-liquidus claim. A value of the wrong
+    type is invalid input and refuses.
+    """
+
+    if not controls:
+        return None
+    domain = controls.get("liquid_feo_domain")
+    if domain is None:
+        return None
+    if isinstance(domain, LiquidFeODomain):
+        return domain
+    raise TypeError(
+        "control_inputs.liquid_feo_domain must be LiquidFeODomain, "
+        f"got {type(domain).__name__}"
+    )
+
+
+def _with_liquid_model_below_liquidus_notice(
+    components: dict[str, object],
+    liquid_domain: LiquidFeODomain | None,
+) -> dict[str, object]:
+    """Attach the d-019 notice when the gate owner says T is below the liquidus.
+
+    Holzheid, Ban-ya, and Kress91 are liquid silicate models. The runtime
+    has no crystalline FeO activity to switch to, so the liquid value is
+    still returned and the notice marks authority extrapolated. Omitting
+    the domain, or a domain the owner marks liquid, leaves the dict unchanged.
+    """
+
+    if liquid_domain is None or liquid_domain.below_liquidus is False:
+        return components
+    components["notices"] = [
+        {
+            "type": "typed_notice",
+            "kind": LIQUID_MODEL_BELOW_LIQUIDUS_KIND,
+            "temperature_K": liquid_domain.temperature_K,
+            "liquidus_T_C": liquid_domain.liquidus_T_C,
+            "solidus_T_C": liquid_domain.solidus_T_C,
+            "source": liquid_domain.source,
+            "authority": "extrapolated",
+        }
+    ]
+    return components
+
+
 def kress91_ferrous_feo_activity(
     *,
     comp_wt: Mapping[str, float],
@@ -1044,6 +1136,7 @@ def kress91_ferrous_feo_activity(
     T_K: float,
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+    liquid_domain: LiquidFeODomain | None = None,
 ) -> float:
     components = _calphad_feo_activity_components(
         comp_wt=comp_wt,
@@ -1051,6 +1144,7 @@ def kress91_ferrous_feo_activity(
         T_K=T_K,
         pressure_bar=pressure_bar,
         floor_bar=floor_bar,
+        liquid_domain=liquid_domain,
     )
     return max(0.0, float(components.get('a_FeO_authoritative', 0.0) or 0.0))
 
@@ -1062,6 +1156,7 @@ def _calphad_feo_activity_components(
     T_K: float,
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+    liquid_domain: LiquidFeODomain | None = None,
 ) -> dict[str, object]:
     feot = feot_equivalent_wt_pct(comp_wt)
     mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
@@ -1170,7 +1265,7 @@ def _calphad_feo_activity_components(
     else:
         regime = 'iw_pure_feo_to_iw_pure_feo_plus_1_smooth_blend'
 
-    return {
+    return _with_liquid_model_below_liquidus_notice({
         'status': 'ok',
         'diagnostic_only': False,
         'consumed_by_behavior': True,
@@ -1269,7 +1364,7 @@ def _calphad_feo_activity_components(
         },
         'cation_fractions': cation_fractions,
         'sources': FEO_ACTIVITY_DIAGNOSTIC_SOURCES,
-    }
+    }, liquid_domain)
 
 
 def calphad_ferrous_feo_activity_diagnostic(
@@ -1279,6 +1374,7 @@ def calphad_ferrous_feo_activity_diagnostic(
     T_K: float,
     pressure_bar: float,
     floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+    liquid_domain: LiquidFeODomain | None = None,
 ) -> dict[str, object]:
     return _calphad_feo_activity_components(
         comp_wt=comp_wt,
@@ -1286,6 +1382,7 @@ def calphad_ferrous_feo_activity_diagnostic(
         T_K=T_K,
         pressure_bar=pressure_bar,
         floor_bar=floor_bar,
+        liquid_domain=liquid_domain,
     )
 
 
