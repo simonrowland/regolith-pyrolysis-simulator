@@ -3186,16 +3186,41 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'operating_point_diagnostics': operating_point_diagnostics,
         }
         if capture_native_activities:
-            from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
+            from engines.magemin.domain import (
+                MAGEMIN_NATIVE_MELT_ACTIVITIES,
+                magemin_mgo_activity_from_chemical_potentials,
+            )
 
             native_fields = self._parse_subprocess_native_activities(matlab_text)
+            native_activities: Dict[str, float] = {}
+            for formula, (field, _polymorph) in (
+                MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
+            ):
+                if field not in native_fields:
+                    continue
+                if field == 'Gamma:MgO':
+                    try:
+                        periclase_gbase_kJ = _magemin_endmember_gbase_kJ(
+                            _MAGEMIN_PURE_PHASES['per'],
+                            completed.stdout or '',
+                        )
+                        activity = magemin_mgo_activity_from_chemical_potentials(
+                            native_fields[field],
+                            periclase_gbase_kJ,
+                            temperature_C + 273.15,
+                        )
+                    except (
+                        PurePhaseAccessError,
+                        TypeError,
+                        ValueError,
+                        OverflowError,
+                    ):
+                        continue
+                    native_activities[formula] = activity
+                else:
+                    native_activities[formula] = native_fields[field]
             result.update({
-                'native_activities': {
-                    formula: native_fields[field]
-                    for formula, (field, _polymorph)
-                    in MAGEMIN_NATIVE_MELT_ACTIVITIES.items()
-                    if field in native_fields
-                },
+                'native_activities': native_activities,
                 'solver_status': stdout_metadata.get('solver_status'),
                 'native_phase': stdout_metadata.get('phase_names'),
                 'native_mode': stdout_metadata.get('mode_fractions'),
@@ -3500,10 +3525,39 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _parse_subprocess_native_activities(matlab_text: str) -> Dict[str, float]:
+        """Parse the raw source fields declared for normalized activities."""
+
         from engines.magemin.domain import MAGEMIN_NATIVE_MELT_ACTIVITIES
 
         parsed: Dict[str, float] = {}
+        gamma_sources = {
+            field: field.partition(':')[2]
+            for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values()
+            if field.startswith('Gamma:')
+        }
+        if gamma_sources:
+            in_gamma_section = False
+            for line in matlab_text.splitlines():
+                if line.strip().startswith('Gamma[J]'):
+                    in_gamma_section = True
+                    continue
+                if not in_gamma_section:
+                    continue
+                if not line.strip():
+                    break
+                parts = line.split()
+                if len(parts) != 2:
+                    break
+                for source, oxide in gamma_sources.items():
+                    if parts[0] != oxide:
+                        continue
+                    try:
+                        parsed[source] = float(parts[1])
+                    except ValueError:
+                        parsed[source] = math.nan
         for field, _polymorph in MAGEMIN_NATIVE_MELT_ACTIVITIES.values():
+            if field in gamma_sources:
+                continue
             match = re.search(
                 rf'^\s*{re.escape(field)}\s+([^\s,;]+)',
                 matlab_text,

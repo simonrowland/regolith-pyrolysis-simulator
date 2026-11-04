@@ -95,6 +95,25 @@ class _RegisteredMageminPool:
         return None
 
 
+def test_magemin_native_activity_parser_uses_mgo_gamma_not_raw_amgo():
+    backend = MAGEMinBackend()
+    matlab_text = """Gamma[J] (chemical potential of oxides):
+  SiO2  -1154.53097
+   MgO   -757.50325
+
+System activity:
+ aSiO2 +4.033754e-02
+  aMgO +7.496084e-22
+"""
+
+    fields = backend._parse_subprocess_native_activities(matlab_text)
+
+    assert fields == {
+        "Gamma:MgO": -757.50325,
+        "aSiO2": 4.033754e-2,
+    }
+
+
 @pytest.fixture(scope="module")
 def _preexisting_magemin_pool():
     pool = _RegisteredMageminPool()
@@ -3372,8 +3391,26 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
         matlab_text = (Path(tmpdir) / "output" / "_matlab_output.txt").read_text()
 
     direct_fields = backend._parse_subprocess_native_activities(matlab_text)
-    for formula, field in (("MgO", "aMgO"), ("SiO2", "aSiO2")):
-        direct_activity = direct_fields[field]
+    from engines.magemin.domain import (
+        magemin_mgo_activity_from_chemical_potentials,
+    )
+    from simulator.melt_backend.magemin import (
+        _MAGEMIN_PURE_PHASES,
+        _magemin_endmember_gbase_kJ,
+    )
+
+    periclase_gbase_kJ = _magemin_endmember_gbase_kJ(
+        _MAGEMIN_PURE_PHASES["per"], completed.stdout
+    )
+    direct_mgo_activity = magemin_mgo_activity_from_chemical_potentials(
+        direct_fields["Gamma:MgO"],
+        periclase_gbase_kJ,
+        temperature_C + 273.15,
+    )
+    for formula, direct_activity in (
+        ("MgO", direct_mgo_activity),
+        ("SiO2", direct_fields["aSiO2"]),
+    ):
         adapted_activity = result.activity_coefficients[formula]
         assert abs(adapted_activity - direct_activity) / abs(direct_activity) <= 1e-9
     assert result.diagnostics["magemin_solver_status"] == 0
@@ -3460,11 +3497,19 @@ def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
         output = Path(cwd) / "output"
         output.mkdir()
         (output / "_matlab_output.txt").write_text(
-            "aMgO nan\naSiO2 +8.9e-1\n"
+            "Gamma[J] (chemical potential of oxides):\n"
+            " MgO nan\n\n"
+            "System activity:\n"
+            " aMgO +1.0e-20\naSiO2 +8.9e-1\n"
         )
         return types.SimpleNamespace(
             returncode=0,
-            stdout="Status : 0 [success]\nPhase : liq\nMode  : 1.000000\n",
+            stdout=(
+                " fper:\n----\n          per           wu\n"
+                "   -737.19195   -483.30998\n"
+                "Status : 0 [success]\n"
+                "Phase : liq\nMode  : 1.000000\n"
+            ),
             stderr="",
         )
 

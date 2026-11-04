@@ -18,17 +18,51 @@ from __future__ import annotations
 from typing import Dict, Iterable, List, Mapping, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
+from simulator.chemistry.melt_activity import activity_from_chemical_potentials
 from simulator.scalar_boundary import is_finite
 from simulator.state import OXIDE_SPECIES
 
-# Native melt activities exposed by the ig database. These are standard
-# states, not liquid-endmember activities: periclase for MgO and quartz for
-# SiO2 at the scorer's low-pressure default. Other formulas have no native
-# activity/reference pair in this adapter.
+# Adapter-normalized melt activities and their declared standard states.
+# MAGEMin's documentation declares aMgO on periclase, but 1.9.6's raw row
+# matches exp(Gamma_MgO / RT) without the pure-phase reference (Kume 305:
+# Gamma=-757.503252 kJ/mol, aMgO=7.496084e-22, implied R=8.3144 J/mol/K).
+# Read Gamma:MgO and subtract periclase gbase to normalize it. SiO2's aSiO2
+# row is already on quartz. Other formulas have no native activity/reference
+# pair.
 MAGEMIN_NATIVE_MELT_ACTIVITIES = {
-    'MgO': ('aMgO', 'periclase'),
+    'MgO': ('Gamma:MgO', 'periclase'),
     'SiO2': ('aSiO2', 'quartz'),
 }
+
+
+def magemin_mgo_activity_from_chemical_potentials(
+    gamma_mgo_kJ_per_mol: float,
+    periclase_gbase_kJ_per_mol: float,
+    temperature_K: float,
+) -> float:
+    """Resolve MgO activity on the declared periclase standard state.
+
+    Premise
+        ``mu_MgO(liquid) = mu_MgO(periclase) + R T ln(a_MgO)`` when activity
+        is reported relative to periclase.
+
+    Algebra
+        ``a_MgO = exp((Gamma_MgO - G_periclase) / (R T))``.
+
+    Units
+        MAGEMin prints both potentials as kJ/mol; convert them to J/mol for
+        the shared resolver, which uses R in J/(mol·K) and temperature in K.
+
+    Sanity
+        At periclase saturation the liquid and periclase MgO potentials are
+        equal, so the exponent is zero and ``a_MgO = 1``.
+    """
+
+    return activity_from_chemical_potentials(
+        gamma_mgo_kJ_per_mol * 1000.0,
+        periclase_gbase_kJ_per_mol * 1000.0,
+        temperature_K,
+    )
 
 # Canonical MELTS 14-oxide basis, sourced from
 # ``simulator.state.OXIDE_SPECIES`` (the single source of truth; also the
