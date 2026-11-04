@@ -2722,7 +2722,7 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
 ) -> None:
     """r = 0.25 → R = 1/3. The expected ratio is that quotient, not the helper."""
 
-    def hook(engine, observation, identity, channel, *, handles=None, isolated=None):
+    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
         return EnginePrediction(
             engine=engine,
             channel=channel,
@@ -2771,7 +2771,7 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
 def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    def hook(engine, observation, identity, channel, *, handles=None, isolated=None):
+    def hook(engine, observation, identity, channel, *, handles=None, isolated=None, experiment=None):
         return EnginePrediction(
             engine=engine,
             channel=channel,
