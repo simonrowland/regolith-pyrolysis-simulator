@@ -206,6 +206,7 @@ def test_condensation_efficiency_refuses_nonfinite_eta(monkeypatch):
             residence_s=5.0,
             available_kg=1.0,
             alpha_s_value=0.5,
+            inlet_partial_pressure_pa=100.0,
         )
 
 
@@ -232,6 +233,46 @@ def _series_call(**overrides):
     kwargs = dict(_SERIES_SIO_KWARGS)
     kwargs.update(overrides)
     return condensation._series_resistance_deposition_flux_mol_m2_s(**kwargs)
+
+
+def test_series_flux_missing_saturation_refuses_with_diagnostic(monkeypatch):
+    monkeypatch.setattr(
+        condensation,
+        "_try_antoine_psat_pa",
+        lambda *_args, **_kwargs: (None, False),
+    )
+    diagnostic = {}
+
+    with pytest.raises(condensation.WallSaturationPressureRefusal):
+        _series_call(
+            reactive_product_backstop=False,
+            diagnostic_out=diagnostic,
+        )
+
+    assert diagnostic["wall_saturation_pressure_refused"] is True
+    assert diagnostic["wall_saturation_pressure_pa"] is None
+
+
+def test_wall_candidate_keeps_missing_saturation_diagnostic(monkeypatch):
+    from simulator.wall_deposition import wall_deposit_candidate_for_surface_kg
+
+    monkeypatch.setattr(
+        condensation,
+        "_try_antoine_psat_pa",
+        lambda *_args, **_kwargs: (None, False),
+    )
+    candidate = wall_deposit_candidate_for_surface_kg(
+        _configured_model(),
+        species="Fe",
+        rate_kg_hr=1.0,
+        T_cond_C=1200.0,
+        melt_temperature_C=1700.0,
+        wall_temperature_C=1000.0,
+        surface_area_m2=1.0,
+    )
+
+    assert candidate["status"] == "unavailable"
+    assert "saturation_pressure" in candidate["reason"]
 
 
 @pytest.mark.parametrize(
@@ -576,9 +617,11 @@ def test_wall_alpha_s_wrapper_refuses_metadata_only_entry():
 
 
 def test_wall_alpha_s_wrapper_healthy_and_explicit_zero():
-    """Same wrapper: the cited sidecar Fe value loads, and an explicitly
+    """Same wrapper: the cited Fe condensation edge hold loads, and an explicitly
     configured 0.0 stays the category-3 real limit (no refusal)."""
-    assert condensation._wall_alpha_s("Fe", T_K=1200.0) == pytest.approx(0.02)
+    assert condensation._wall_alpha_s("Fe", T_K=1200.0) == pytest.approx(
+        condensation._wall_alpha_record("Fe", T_K=1200.0)["alpha_s"]
+    )
     assert (
         condensation._wall_alpha_s(
             "Fe",

@@ -171,6 +171,52 @@ def test_stage_purity_panel_renders_emitted_grade_breakdowns_and_activity() -> N
     assert "Silica carryover observed." in html
 
 
+def test_stage_purity_panel_displays_both_stage_four_collectors() -> None:
+    na_mg = _complete_stage(
+        stage_number=4,
+        label="Na/Mg collector",
+        accepted_species=["Na", "Mg"],
+        designated_species_kg={"Na": 5.0},
+        coproduct_species_kg={},
+        impurity_species_kg={},
+        designated_kg=5.0,
+        impurity_kg=0.0,
+        total_kg=5.0,
+        purity_fraction=1.0,
+        verdict="PURE",
+        warning="",
+        activity={"Na": True},
+    )
+    k_trap = _complete_stage(
+        stage_number=4,
+        label="K trap",
+        accepted_species=["K"],
+        designated_species_kg={"K": 9.0},
+        coproduct_species_kg={},
+        impurity_species_kg={},
+        designated_kg=9.0,
+        impurity_kg=0.0,
+        total_kg=9.0,
+        purity_fraction=1.0,
+        verdict="PURE",
+        warning="",
+        activity={"K": True},
+    )
+
+    html = _render_panel({
+        "terminal": {
+            "stage_purity": {
+                "stage_4_alkali_mg_cyclone": na_mg,
+                "stage_4b_k_trap": k_trap,
+            },
+        },
+    })
+
+    assert html.count("Product destination · Stage 4") == 2
+    assert "Na/Mg collector" in html
+    assert "K trap" in html
+
+
 def test_stage_purity_panel_keeps_absent_stage_map_pending() -> None:
     html = _render_panel({"terminal": {}})
 

@@ -45,6 +45,7 @@ def test_run_returns_classification_dict():
     }
     additive_buckets = {
         'ingots_metals',
+        'unrecovered_metal_phase',
         'oxygen',
         'glass',
         'captured_volatiles',
@@ -107,6 +108,7 @@ def test_cli_writes_json_report_to_file(tmp_path):
     assert payload["campaign"] == "C2A"
     assert "classification" in payload
     assert "metals_plus_O2" in payload["classification"]
+    assert "unrecovered_metal_phase" in payload["classification"]
 
 
 def test_supported_formats_only_includes_markdown_and_json():
@@ -278,8 +280,7 @@ def test_default_classification_values_preserve_pre_change_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # b-956: against green the hashed payload only gains keys: the 26
-    # zero-valued oxygen partition keys restored under oxygen.partition_kg
-    # and metals_plus_O2.O2_partition_kg, and an empty
-    # estimated_contributions list on 7 classes. No value changes.
-    assert digest == "a290d5b37eadd34e8c7e3963e045e895305ea459a35a774f19aff370a1dfc28b"
+    # d137: production classification now counts tapped and stage-accepted
+    # metals, with untapped metal-phase balances represented in their own
+    # source-accounted inventory field. This pins the complete runner payload.
+    assert digest == "bd3769a6a08b23046527cbc7f8c81cb064d6e786b3c4b2292e900c16dc60f58c"

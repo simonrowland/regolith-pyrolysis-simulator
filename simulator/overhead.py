@@ -303,6 +303,22 @@ def validate_condenser_geometry_config(config: Mapping | None) -> dict[str, Any]
             _stage_area_key(stage): source
             for stage, source in raw_sources.items()
         }
+
+    raw_diameters = resolved.get('stage_hydraulic_diameter_m')
+    if raw_diameters is not None:
+        if not isinstance(raw_diameters, Mapping):
+            raise OverheadConfigurationError(
+                'condenser_geometry.stage_hydraulic_diameter_m must be a mapping'
+            )
+        # Positive, not the area-ratio floor of 1. A 10 mm plate gap is
+        # Dh = 0.020 m and must not be rejected as "below throat".
+        resolved['stage_hydraulic_diameter_m'] = {
+            _stage_area_key(stage): _required_positive_finite_float(
+                diameter,
+                'condenser_geometry.stage_hydraulic_diameter_m',
+            )
+            for stage, diameter in raw_diameters.items()
+        }
     return resolved
 
 
@@ -494,6 +510,7 @@ class OverheadGasModel:
             )
             for stage, source in DEFAULT_CONDENSER_STAGE_AREA_RATIO_SOURCES.items()
         }
+        self.stage_hydraulic_diameter_m: dict[str, float] = {}
         self._pipe_temperature_C = DEFAULT_PIPE_TEMPERATURE_C  # °C — active pipe/liner wall temperature
         self._liner_temperature_config: Any = DEFAULT_PIPE_TEMPERATURE_C  # °C or schedule — liner temperature config
         self._pipe_segment_temperature_config: Any = None  # °C or mapping — per-segment wall temperature config
@@ -586,6 +603,16 @@ class OverheadGasModel:
                 )
         self.stage_area_ratios = ratios
         self.stage_area_ratio_provenance_by_stage = provenance
+        raw_diameters = source.get('stage_hydraulic_diameter_m') or {}
+        diameters: dict[str, float] = {}
+        if isinstance(raw_diameters, Mapping):
+            for raw_stage, raw_diameter in raw_diameters.items():
+                stage = _stage_area_key(raw_stage)
+                diameters[stage] = _required_positive_finite_float(
+                    raw_diameter,
+                    'condenser_geometry.stage_hydraulic_diameter_m',
+                )
+        self.stage_hydraulic_diameter_m = diameters
 
     def stage_area_m2(self, stage: Any) -> float:
         """Physical area for a named condenser/volatiles stage."""
@@ -837,6 +864,9 @@ class OverheadGasModel:
             'initial_throat_area_m2': self.initial_throat_area_m2,  # m² — user-configured throat cross-section
             'throat_diameter_m': self.pipe_diameter_m,  # m — circular-equivalent throat diameter
             'stage_area_m2_by_stage': self.stage_area_m2_by_stage(),  # m² by stage — throat area × ratio
+            'stage_hydraulic_diameter_m_by_stage': dict(
+                self.stage_hydraulic_diameter_m
+            ),  # m by stage — capture-law gas-side length; not the throat
             'stage_area_geometry_provenance_notice': (
                 self.stage_area_geometry_provenance_notice()
             ),

@@ -67,6 +67,12 @@ from simulator.campaigns import (
     CampaignSetpointMissingRefusal,
     c0_exit_run_notice,
 )
+from simulator.condensation_routing import (
+    COLLECTOR_STAGE_KEY_BY_NUMBER,
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+    stage_key_for_stage,
+)
 from simulator.accounting import AccountingQueries, UnknownSpeciesError
 from simulator.accounting.ledger_api import LedgerAPI
 from simulator.accounting.formulas import (
@@ -178,11 +184,12 @@ SIO_ALPHA_PROVENANCE = (
 )
 SIO_INDUSTRIAL_BENCHMARK_PCT: tuple[int, int] = (8, 15)
 WALL_DEPOSIT_ACCOUNT = "process.wall_deposit"
-SIO_YIELD_STAGE_KEYS: dict[int, str] = {
-    1: "stage_1_fe_condenser_impurity",
-    3: "stage_3_sio_zone_product",
-    4: "stage_4_alkali_mg_carryover",
-    5: "stage_5_dust_filter_carryover",
+SIO_YIELD_STAGE_KEYS: dict[str, str] = {
+    COLLECTOR_STAGE_KEY_BY_NUMBER[1]: "stage_1_fe_condenser_impurity",
+    COLLECTOR_STAGE_KEY_BY_NUMBER[3]: "stage_3_sio_zone_product",
+    NA_COLLECTOR_STAGE_KEY: "stage_4_alkali_mg_carryover",
+    K_TRAP_STAGE_KEY: "stage_4b_k_trap_carryover",
+    COLLECTOR_STAGE_KEY_BY_NUMBER[5]: "stage_5_dust_filter_carryover",
 }
 SIO_WALL_DEPOSIT_SPECIES: tuple[str, ...] = ("SiO", "Na", "K", "Mg", "Fe")
 NOT_APPLICABLE_UNTIL_P0 = "not_applicable_until_p0"
@@ -2752,9 +2759,9 @@ def build_per_hour_summary(
         # ``process.reagent_inventory``. This includes C3 alkali shuttle and
         # C6 Mg recovery transfers; it does not write to the ledger.
         # For Na/K in the C2A_STAGED replay, the exact closure is
-        # ``gross = product + recycled - terminal.offgas`` because the product
-        # projection also includes that named non-train product account; the
-        # other product accounts are zero for these species on this route. The
+        # ``gross = product + recycled``: terminal.offgas is escaped loss,
+        # excluded from the product projection. The other product accounts
+        # are zero for these species on this route. The
         # identity is scoped to this C3 Na/K route, not C6 Mg or other routes.
         condensation_train_kg_cumulative = (
             queries.condensation_train_kg_cumulative()
@@ -2928,15 +2935,20 @@ def build_per_hour_summary(
         metadata = dict(summary["vapour_batch_summary"].get("metadata") or {})
         if pressure_notices:
             metadata["extrapolation_notices_by_species"] = _json_safe(pressure_notices)
-        if any(wall_notice.get(key) for key in (
-            "wall_saturation_pressure_extrapolations_by_species",
-            "wall_saturation_pressure_refusals_by_species",
-            "evaporation_transport_notices_by_species",
-        )):
+        wall_authority = wall_deposit_sticking_authority_status(
+            summary["wall_deposit_cumulative_kg"], wall_notice,
+        )
+        if (
+            any(wall_notice.get(key) for key in (
+                "wall_saturation_pressure_extrapolations_by_species",
+                "wall_saturation_pressure_refusals_by_species",
+                "evaporation_transport_notices_by_species",
+            ))
+            or wall_authority.get("out_of_domain_alpha_count")
+            or wall_authority.get("status_bearing_alpha_count")
+        ):
             metadata["wall_deposit_sticking_authority"] = _json_safe(
-                wall_deposit_sticking_authority_status(
-                    summary["wall_deposit_cumulative_kg"], wall_notice,
-                )
+                wall_authority
             )
         if metadata:
             summary["vapour_batch_summary"]["metadata"] = metadata
@@ -3521,15 +3533,32 @@ def _industrial_sio_verdict(yield_pct: float) -> str:
 
 
 def _stage_silica_fume_kg(sim: PyrolysisSimulator) -> dict[str, float]:
-    by_stage = {stage.stage_number: stage for stage in sim.train.stages}
-    return {
-        key: _clean_report_float(
-            by_stage.get(stage_number).collected_kg.get("SiO2", 0.0)
-            if by_stage.get(stage_number) is not None
-            else 0.0
+    by_stage_key: dict[str, float] = {}
+    for stage in sim.train.stages:
+        stage_key = stage_key_for_stage(
+            stage,
+            fallback_stage_number=None,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=True,
         )
-        for stage_number, key in SIO_YIELD_STAGE_KEYS.items()
+        by_stage_key[stage_key] = (
+            by_stage_key.get(stage_key, 0.0)
+            + float(stage.collected_kg.get("SiO2", 0.0))
+        )
+
+    reported_stage_silica = {
+        report_key: _clean_report_float(by_stage_key.get(stage_key, 0.0))
+        for stage_key, report_key in SIO_YIELD_STAGE_KEYS.items()
     }
+    reported_stage_silica["unreported_stage_silica_capture"] = (
+        _clean_report_float(
+            sum(
+                kg for stage_key, kg in by_stage_key.items()
+                if stage_key not in SIO_YIELD_STAGE_KEYS
+            )
+        )
+    )
+    return reported_stage_silica
 
 
 def _kg_by_species_from_mol_state(
@@ -4466,6 +4495,9 @@ def _apply_sio_wall_sweep_controls(
             pipe_diameter_m=sim.overhead_model.pipe_diameter_m,
             gas_temperature_C=float(sim.melt.temperature_C),
             stage_area_m2_by_stage=sim.overhead_model.stage_area_m2_by_stage(),
+            stage_hydraulic_diameter_m_by_stage=dict(
+                sim.overhead_model.stage_hydraulic_diameter_m
+            ),
             stage_area_geometry_provenance_notice=(
                 sim.overhead_model.stage_area_geometry_provenance_notice()),
             pipe_segment_temperatures_C={
@@ -4656,17 +4688,15 @@ def build_sio_yield_report(
     sio_evolved_kg = sio_evaporated_mol * sio_molar_mass_kg_mol
     sio_yield_pct = sio_evolved_kg / mass_kg * 100.0
 
-    reported_stage_numbers = set(SIO_YIELD_STAGE_KEYS)
     sio_to_silica_fume_kg = _safe_failure_value(
         lambda: {
             **_stage_silica_fume_kg(sim),
+            "condensation_train_silicon_coproduct": _clean_report_float(
+                si_terminal_mol * MOLAR_MASS["Si"] / 1000.0
+            ),
             "terminal_offgas_escape": _clean_report_float(
-                sum(
-                    stage.collected_kg.get("SiO2", 0.0)
-                    for stage in sim.train.stages
-                    if stage.stage_number not in reported_stage_numbers
-                )
-                + sio_escape_mol * sio_molar_mass_kg_mol
+                (sio_escape_mol + sio2_gas_escape_mol)
+                * sio_molar_mass_kg_mol
             ),
         },
         section="sio_yield_report.sio_to_silica_fume_kg",

@@ -170,6 +170,7 @@ class EquipmentDesigner:
         "stage_3": 3,
         "stage3": 3,
         "alkali_stage4": 4,
+        "k_stage4b": 4,
         "stage_4": 4,
         "stage4": 4,
         "terminal": 7,

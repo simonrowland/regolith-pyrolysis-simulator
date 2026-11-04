@@ -171,6 +171,7 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
             float(stage.temp_range_C[1]),
         )
         for stage in default_train.stages
+        if stage.sub_order == 0
     }
     downstream_bounds = {
         "stage_4_to_stage_5": (stage_ranges[5][0], stage_ranges[4][1]),
@@ -187,6 +188,19 @@ def test_overhead_temperature_bounds_are_hot_wall_grounded() -> None:
         assert spec.low == low
         assert spec.high == high
         assert "setpoints.yaml condensation_train.metals_train" in spec.bounds_source
+
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    interface_default = float(
+        setpoints["overhead_headspace"]["pipe_segment_temperatures_C"]
+        ["segments"]["stage_4_to_stage_5"]["default_C"]
+    )
+    interface_spec = schema.spec_for(
+        _path(
+            "overhead_headspace.pipe_segment_temperatures_C.segments."
+            "stage_4_to_stage_5.default_C"
+        )
+    )
+    assert interface_spec.low <= interface_default <= interface_spec.high
 
 
 def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
@@ -376,7 +390,7 @@ def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:
         "overhead_headspace.pipe_segment_temperatures_C.segments."
         "stage_4_to_stage_5.default_C"
     )
-    patch = RecipePatch({wall_offset: -75.0, cold_segment: 425.0})
+    patch = RecipePatch({wall_offset: -75.0, cold_segment: 250.0})
 
     nested = schema.to_setpoints_patch(patch)
 
@@ -385,9 +399,12 @@ def test_wall_temperature_knobs_render_to_setpoints_patch() -> None:
         nested["overhead_headspace"]["pipe_segment_temperatures_C"]["segments"][
             "stage_4_to_stage_5"
         ]["default_C"]
-        == 425.0
+        == 250.0
     )
     assert patch.validated(schema).recipe_id() != RecipePatch({}).recipe_id(schema)
+
+    with pytest.raises(RecipeValidationError, match="above upper bound 250"):
+        RecipePatch({cold_segment: 425.0}).validated(schema)
 
 
 def test_c3_alkali_dosing_knobs_render_to_setpoints_patch() -> None:
