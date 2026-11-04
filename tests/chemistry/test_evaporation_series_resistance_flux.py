@@ -444,3 +444,53 @@ def test_grounded_cr_alpha_uses_series_resistance_path_without_fallback():
     assert result.diagnostic["alpha_used_by_species"]["Cr"] == pytest.approx(0.9)
     assert "missing_alpha" not in result.diagnostic
     assert "unmeasured_alpha_fallback_species" not in result.diagnostic
+
+
+# float.hex of _series_resistance_evaporation_flux_kg_m2_s at 7f557ef9c,
+# before the flux tail was split out. Resistances do not depend on P_bulk
+# once the driving pressure is positive; the hex values pin that flux.
+_SIO_VISCOUS = {
+    "species": "SiO",
+    "P_eq_pa": 500.0,
+    "T_surface_K": 1673.15,
+    "molar_mass_kg_mol": 0.0440849,
+    "alpha_i": 0.1,
+    "knudsen_number": 0.001,
+    "pipe_diameter_m": 0.12,
+    "overhead_pressure_pa": 1000.0,
+    "axial_stir_factor": 0.0,
+    "radial_stir_factor": 1.0,
+    "carrier_gas": "Ar",
+    "T_gas_K": 1673.15,
+    "melt_resistance_enabled": False,
+    "gas_resistance_enabled": True,
+    "extrapolate_continuum": False,
+}
+
+
+def test_series_flux_hex_and_resistances_ignore_p_bulk_when_driven():
+    vacuum = _series_resistance_evaporation_flux_kg_m2_s(
+        P_bulk_pa=0.0,
+        **_SIO_VISCOUS,
+    )
+    partial = _series_resistance_evaporation_flux_kg_m2_s(
+        P_bulk_pa=123.456789,
+        **_SIO_VISCOUS,
+    )
+    gas_off = _series_resistance_evaporation_flux_kg_m2_s(
+        P_bulk_pa=10.0,
+        **{
+            **_SIO_VISCOUS,
+            "alpha_i": 1.0,
+            "knudsen_number": math.inf,
+            "gas_resistance_enabled": False,
+        },
+    )
+
+    assert vacuum.flux_kg_s_m2.hex() == "0x1.add9b50978fd3p-10"
+    assert partial.flux_kg_s_m2.hex() == "0x1.43b6ea6007738p-10"
+    assert gas_off.flux_kg_s_m2.hex() == "0x1.645771c66746ap-2"
+    assert vacuum.r_interface == partial.r_interface
+    assert vacuum.r_gas == partial.r_gas
+    assert vacuum.r_melt == partial.r_melt
+    assert vacuum.k_hk_kg_s_m2_pa == partial.k_hk_kg_s_m2_pa
