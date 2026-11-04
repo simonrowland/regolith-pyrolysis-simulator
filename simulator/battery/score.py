@@ -9935,6 +9935,21 @@ def _predict_with_engine(
                         authority=Authority.BRIDGE,
                     )
                 )
+            source_composition_range_notice = (
+                activity.source_composition_range_notice
+            )
+            if source_composition_range_notice is not None:
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=source_composition_range_notice,
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        authority=Authority.BRIDGE,
+                    )
+                )
             certified_band = None
             has_d144_fusion_domain = activity.authority_status in {
                 "d144_fusion_certified",
