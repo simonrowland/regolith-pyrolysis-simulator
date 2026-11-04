@@ -703,19 +703,146 @@ def test_heat_exchanger_ntu_cancels_pressure_and_is_zero_without_flow_or_area():
         sherwood=3.66,
         carrier_gas="N2",
     )
-    low = condensation._stage_heat_exchanger_ntu(total_pressure_pa=500.0, **common)
-    high = condensation._stage_heat_exchanger_ntu(total_pressure_pa=2000.0, **common)
+    low, low_notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **common,
+    )
+    high, high_notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=2000.0, **common,
+    )
+    assert low_notice is None
+    assert high_notice is None
     assert low > 1.0
     assert high == pytest.approx(low, rel=1.0e-9)
     assert condensation._stage_heat_exchanger_ntu(
         total_pressure_pa=500.0, **{**common, "area_m2": 0.0},
-    ) == 0.0
+    ) == (0.0, None)
     assert condensation._stage_heat_exchanger_ntu(
         total_pressure_pa=500.0, **{**common, "total_molar_flow_mol_s": 0.0},
-    ) == 0.0
+    ) == (0.0, None)
     assert condensation._stage_heat_exchanger_ntu(
         total_pressure_pa=0.0, **common,
-    ) == 0.0
+    ) == (0.0, None)
+
+
+def _mass_transfer_ntu(carrier, temperature_K, pressure_pa, **common):
+    """k_c A / Q from the production diffusivity. Not the heat-NTU factor."""
+
+    diffusivity = condensation._chapman_enskog_d_ab_m2_s(
+        carrier, temperature_K, pressure_pa, carrier=carrier,
+    )
+    coefficient = common["sherwood"] * diffusivity / common["hydraulic_diameter_m"]
+    volumetric = (
+        common["total_molar_flow_mol_s"]
+        * condensation.GAS_CONSTANT_J_MOL_K
+        * common["gas_inlet_K"]
+        / pressure_pa
+    )
+    return coefficient * common["area_m2"] / volumetric
+
+
+def test_carrier_self_lewis_matches_the_review_table():
+    """constackb-ror Le_self, printed to three digits past the leading one.
+
+    N2 1000 K 1.076, Ar 1500 K 1.118, Kr 1500 K 1.128. The acceptance is
+    half a unit in that last printed digit.
+    """
+
+    cases = (("N2", 1000.0, 1.076), ("Ar", 1500.0, 1.118), ("Kr", 1500.0, 1.128))
+    for carrier, temperature_K, expected in cases:
+        lewis, notice = condensation._carrier_self_lewis_number(
+            carrier, temperature_K, 101325.0,
+        )
+        assert notice is None
+        assert lewis == pytest.approx(expected, abs=5.0e-4)
+    low, _ = condensation._carrier_self_lewis_number("N2", 1500.0, 500.0)
+    high, _ = condensation._carrier_self_lewis_number("N2", 1500.0, 2000.0)
+    assert low == pytest.approx(high, rel=1.0e-12)
+    for carrier in ("He", "O2", "CO2"):
+        lewis, notice = condensation._carrier_self_lewis_number(
+            carrier, 1500.0, 101325.0,
+        )
+        assert notice is None
+        assert lewis > 1.0
+
+
+def test_heat_ntu_is_the_review_lewis_factor_on_self_diffusion():
+    """N2 at a 1000 K film. The review's Le_self^(2/3) is 1.050."""
+
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=1000.0,
+        wall_K=1000.0,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    ntu, notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=101325.0, **common,
+    )
+    mass_ntu = _mass_transfer_ntu("N2", 1000.0, 101325.0, **common)
+    assert notice is None
+    assert ntu / mass_ntu == pytest.approx(1.050, abs=5.0e-4)
+
+
+def test_missing_cp_segment_uses_lewis_unity_and_names_the_notice():
+    """N2's CEA gas record starts at 200 K. 100 K has no segment."""
+
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=100.0,
+        wall_K=100.0,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    ntu, notice = condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **common,
+    )
+    assert notice == condensation.HEAT_TRANSFER_LEWIS_UNITY_ASSUMED
+    assert ntu == pytest.approx(
+        _mass_transfer_ntu("N2", 100.0, 500.0, **common),
+        rel=1.0e-12,
+    )
+
+
+def test_heat_ntu_refuses_a_missing_lennard_jones_row(monkeypatch):
+    params = dict(condensation._LENNARD_JONES_PARAMS)
+    params.pop("N2")
+    monkeypatch.setattr(condensation, "_LENNARD_JONES_PARAMS", params)
+    with pytest.raises(condensation.DepositionInputRefusal) as exc_info:
+        condensation._stage_heat_exchanger_ntu(
+            area_m2=0.2828,
+            hydraulic_diameter_m=0.020,
+            gas_inlet_K=1000.0,
+            wall_K=1000.0,
+            total_molar_flow_mol_s=0.01,
+            total_pressure_pa=101325.0,
+            sherwood=3.66,
+            carrier_gas="N2",
+        )
+    assert exc_info.value.parameter == "lennard_jones"
+
+
+def test_heat_ntu_refuses_nonpositive_self_diffusion(monkeypatch):
+    monkeypatch.setattr(
+        condensation,
+        "_chapman_enskog_d_ab_m2_s",
+        lambda *args, **kwargs: 0.0,
+    )
+    with pytest.raises(condensation.DepositionInputRefusal) as exc_info:
+        condensation._stage_heat_exchanger_ntu(
+            area_m2=0.2828,
+            hydraulic_diameter_m=0.020,
+            gas_inlet_K=1000.0,
+            wall_K=1000.0,
+            total_molar_flow_mol_s=0.01,
+            total_pressure_pa=101325.0,
+            sherwood=3.66,
+            carrier_gas="N2",
+        )
+    assert exc_info.value.parameter == "self_diffusion_m2_s"
 
 
 def test_stage1_cools_toward_its_wall_and_a_hot_duct_does_not_reheat():
@@ -756,6 +883,7 @@ def test_stage1_cools_toward_its_wall_and_a_hot_duct_does_not_reheat():
         assert later["T_in_K"] == earlier["T_out_K"]
     stage1 = next(row for row in rows if row["stage_number"] == 1)
     assert stage1["ntu"] > 1.0
+    assert "heat_transfer_notice" not in stage1
     assert stage1["T_wall_K"] == pytest.approx(_fe_stage_wall_K(model))
     assert abs(stage1["T_out_K"] - stage1["T_wall_K"]) < (
         abs(stage1["T_in_K"] - stage1["T_wall_K"]) * 0.5

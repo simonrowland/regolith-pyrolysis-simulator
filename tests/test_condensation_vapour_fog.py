@@ -53,8 +53,10 @@ def _notices(model, species: str, stage_number: int, sub_order: int):
     ]
 
 
-def test_small_collector_keeps_hot_bulk_and_molecular_eta() -> None:
-    """1e-3 m2 does not cool the 1450 C inlet, so neither cold wall fogs."""
+def test_small_collector_keeps_hot_bulk_and_samples_the_cold_wall() -> None:
+    """1e-3 m2 does not cool the 1450 C inlet. The 250 C wall stays clear.
+    The 40 C trap wall is the coldest gas that parcel touches, and Na there fogs.
+    """
 
     model, route = _route_alkali()
     collector = _notices(model, "Na", 4, 0)
@@ -65,22 +67,41 @@ def test_small_collector_keeps_hot_bulk_and_molecular_eta() -> None:
         row for row in model.last_stage_bulk_gas
         if row["stage_number"] == 4 and row["sub_order"] == 0
     )
+    trap_bulk = next(
+        row for row in model.last_stage_bulk_gas
+        if row["stage_number"] == 4 and row["sub_order"] == 1
+    )
     train_inlet_K = 1450.0 + CELSIUS_TO_KELVIN_OFFSET
 
     assert collector[0]["temperature_basis"] == "stage_bulk"
+    assert collector[0]["bulk_temperature_basis"] == "stage_bulk"
     assert collector[0]["T_K"] == collector_bulk["T_bulk_mean_K"]
+    assert collector[0]["bulk_temperature_K"] == collector[0]["T_K"]
+    assert collector[0]["wall_temperature_basis"] == "stage_wall"
+    assert collector[0]["wall_temperature_K"] == pytest.approx(
+        collector_bulk["T_wall_K"],
+    )
     assert collector_bulk["T_in_K"] == pytest.approx(train_inlet_K, abs=40.0)
     assert collector[0]["hour"] == 4
     assert collector[0]["campaign_hour"] == 4
+    assert collector[0]["bulk_clearance_code"] is None
+    assert collector[0]["wall_clearance_code"] is None
     assert collector[0]["code"] is None
+    assert collector[0]["bulk_J_m3_s"] == 0.0
     assert collector[0]["J_m3_s"] == 0.0
-    assert collector[0]["saturation_authority"] == "certified"
+    assert collector[0]["saturation_authority"] == "extrapolated"
     assert collector[0]["eta_role"] is None
 
-    assert trap[0]["code"] is None
-    assert trap[0]["T_K"] == pytest.approx(collector_bulk["T_out_K"], abs=40.0)
-    assert trap[0]["J_m3_s"] == 0.0
-    assert trap[0]["eta_role"] is None
+    assert trap[0]["bulk_temperature_K"] == pytest.approx(trap_bulk["T_bulk_mean_K"])
+    assert trap[0]["wall_temperature_K"] == pytest.approx(trap_bulk["T_wall_K"])
+    assert trap[0]["wall_temperature_basis"] == "stage_wall"
+    assert trap[0]["bulk_clearance_code"] is None
+    assert trap[0]["wall_clearance_code"] == NOTICE_FOG
+    assert trap[0]["code"] == NOTICE_FOG
+    assert trap[0]["clearance_temperature_basis"] == "stage_wall"
+    assert trap[0]["bulk_J_m3_s"] == 0.0
+    assert trap[0]["J_m3_s"] > FOG_RATE_THRESHOLD_M3_S
+    assert trap[0]["eta_role"] == ETA_ROLE_UPPER_BOUND
     assert trap[0]["eta_molecular"] is not None
     assert 0.0 <= trap[0]["eta_molecular"] <= 1.0
 
@@ -139,7 +160,13 @@ def test_sodium_collector_forwards_extrapolated_saturation_and_the_caution() -> 
     )
 
     assert collector["temperature_basis"] == "stage_bulk"
+    assert collector["bulk_temperature_basis"] == "stage_bulk"
     assert collector["T_K"] == pytest.approx(250.0 + CELSIUS_TO_KELVIN_OFFSET)
+    assert collector["bulk_temperature_K"] == collector["T_K"]
+    assert collector["wall_temperature_basis"] == "stage_wall"
+    assert collector["wall_temperature_K"] == pytest.approx(
+        250.0 + CELSIUS_TO_KELVIN_OFFSET,
+    )
     assert collector["code"] is None
     assert collector["J_m3_s"] <= FOG_RATE_THRESHOLD_M3_S
     assert collector["saturation_authority"] == "extrapolated"
@@ -148,14 +175,17 @@ def test_sodium_collector_forwards_extrapolated_saturation_and_the_caution() -> 
     assert _HANDBOOK_CAUTION in collector["saturation_notice"]
 
     assert trap["code"] == NOTICE_FOG
+    assert trap["wall_temperature_K"] == pytest.approx(40.0 + CELSIUS_TO_KELVIN_OFFSET)
     assert trap["saturation_authority"] == "extrapolated"
     assert trap["saturation_notice"]
     assert _HANDBOOK_CAUTION not in trap["saturation_notice"]
 
     model, _route = _route_alkali()
     routed = _notices(model, "Na", 4, 0)[0]
-    assert routed["saturation_authority"] == "certified"
-    assert _HANDBOOK_CAUTION not in (routed["saturation_notice"] or "")
+    assert routed["bulk_temperature_basis"] == "stage_bulk"
+    assert routed["wall_temperature_basis"] == "stage_wall"
+    assert routed["saturation_authority"] == "extrapolated"
+    assert _HANDBOOK_CAUTION in (routed["saturation_notice"] or "")
 
 
 def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
