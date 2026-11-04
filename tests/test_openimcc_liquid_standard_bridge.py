@@ -110,9 +110,10 @@ def test_redox_bridge_returns_melt_and_redox_flag_records(monkeypatch: Any) -> N
     assert callable(evaluate_redox), "OpenIMCC redox bridge entry point is missing"
     if not callable(evaluate_redox):
         return
+    from openimcc import redox
+
     monkeypatch.setattr(
-        openimcc,
-        "evaluate_redox",
+        redox, "evaluate_redox",
         lambda *_args, **_kwargs: object(),
     )
     composition = _default_composition() | {"MnO": 1.0}

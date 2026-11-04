@@ -102,7 +102,7 @@ def _sossi_aithala_redox_context():
 
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     pytest.importorskip("openimcc")
-    import openimcc
+    from openimcc import redox
 
     context, observations = _sossi_aithala_redox_context()
     observation_id = (
@@ -110,13 +110,13 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     )
     observation = observations[observation_id]
     calls = []
-    original_evaluate_redox = openimcc.evaluate_redox
+    original_evaluate_redox = redox.evaluate_redox
 
     def capture_redox_call(*args, **kwargs):
         calls.append((args, kwargs))
         return original_evaluate_redox(*args, **kwargs)
 
-    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+    monkeypatch.setattr(redox, "evaluate_redox", capture_redox_call)
     prediction = predict_with_engine(Engine.OPENIMCC, observation)
 
     assert prediction.value is not None, prediction.refusal_detail
@@ -155,18 +155,18 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
 
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
     pytest.importorskip("openimcc")
-    import openimcc
+    from openimcc import redox
 
     _context, observations = _sossi_aithala_redox_context()
     results = []
-    original_evaluate_redox = openimcc.evaluate_redox
+    original_evaluate_redox = redox.evaluate_redox
 
     def capture_redox_result(*args, **kwargs):
         result = original_evaluate_redox(*args, **kwargs)
         results.append(result)
         return result
 
-    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    monkeypatch.setattr(redox, "evaluate_redox", capture_redox_result)
     total_flags = 0
     total_standard_notices = 0
     for observation_id, observation in sorted(observations.items()):
@@ -315,17 +315,17 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     )
     calls = []
     try:
-        import openimcc
+        from openimcc import redox
     except ImportError:
-        openimcc = None
+        redox = None
     else:
-        original_evaluate_redox = openimcc.evaluate_redox
+        original_evaluate_redox = redox.evaluate_redox
 
         def capture_redox_call(*args, **kwargs):
             calls.append((args, kwargs))
             return original_evaluate_redox(*args, **kwargs)
 
-        monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
+        monkeypatch.setattr(redox, "evaluate_redox", capture_redox_call)
 
     prediction = predict_with_engine(Engine.OPENIMCC, row)
 
@@ -333,7 +333,7 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
         "reason": "missing_input",
         "input": "total_iron",
     }
-    if openimcc is None:
+    if redox is None:
         assert prediction.refusal_reason is RefusalReason.OPENIMCC_NOT_IMPORTABLE
         return
     assert calls, prediction.refusal_detail
@@ -381,7 +381,7 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """
 
     pytest.importorskip("openimcc")
-    import openimcc
+    from openimcc import redox
 
     row4 = _borisov_row4()
 
@@ -397,14 +397,14 @@ def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
         _boom,
     )
     redox_results = []
-    original_evaluate_redox = openimcc.evaluate_redox
+    original_evaluate_redox = redox.evaluate_redox
 
     def capture_redox_result(*args, **kwargs):
         result = original_evaluate_redox(*args, **kwargs)
         redox_results.append(result)
         return result
 
-    monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
+    monkeypatch.setattr(redox, "evaluate_redox", capture_redox_result)
     prediction = predict_with_engine(Engine.OPENIMCC, row4)
 
     assert prediction.refusal_reason is None

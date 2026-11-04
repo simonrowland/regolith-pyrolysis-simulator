@@ -1163,7 +1163,7 @@ def evaluate_redox(
 ) -> OpenImccRedoxBridgeResult:
     """Evaluate OpenIMCC redox after checking both packs used by its solve."""
 
-    package = _require_openimcc()
+    _require_openimcc()
     melt_pack = _load_pack(DEFAULT_BACKEND_PACK_NAME)
     from openimcc.redox_pack import load_redox_pack
 
@@ -1173,16 +1173,17 @@ def evaluate_redox(
         melt_pack=melt_pack,
         redox_pack=redox_pack,
     )
-    evaluator = getattr(package, "evaluate_redox", None)
-    if not callable(evaluator):
-        from openimcc.redox import evaluate_redox as evaluator
+    from openimcc.redox import evaluate_redox as evaluator
 
-    result = evaluator(
-        inventory,
-        temperature_K,
-        mode,
-        lambda_imposed=lambda_imposed,
-    )
+    if lambda_imposed is None:
+        result = evaluator(inventory, temperature_K, mode)
+    else:
+        result = evaluator(
+            inventory,
+            temperature_K,
+            mode,
+            lambda_imposed=lambda_imposed,
+        )
     return OpenImccRedoxBridgeResult(result, standard_flags)
 
 
