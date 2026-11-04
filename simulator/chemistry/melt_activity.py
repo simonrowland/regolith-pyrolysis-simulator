@@ -15,6 +15,10 @@ from decimal import Decimal
 from functools import lru_cache
 from typing import Any
 
+from simulator.accounting.formulas import (
+    project_oxide_composition,
+    resolve_species_formula,
+)
 from simulator.reference_data.janaf_fusion import (
     FusionDomainVerdict,
     _d144_fusion_conversion,
@@ -86,6 +90,9 @@ class _GammaSourceCompositionRange:
     allowed_oxides: frozenset[str] | None = None
     required_oxides: frozenset[str] = frozenset()
     optical_basicity_range: tuple[float, float] | None = None
+    formula_mole_fraction_ranges: tuple[tuple[str, float, float], ...] = ()
+    mass_percent_upper_limits: tuple[tuple[str, float], ...] = ()
+    source_temperature_isotherm_K: float | None = None
 
 
 @dataclass(frozen=True)
@@ -207,11 +214,19 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "range ~0.001-0.15 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), "
         "not a single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CMAS; 0.55 < optical basicity < 0.65",
-            "Sossi & Fegley 2018 Table 2 p. 409; Beckett 2002 pp. 95-96, "
-            "accepted CMAS liquids and Fig. 1a",
+            "CMAS; 0.55 < optical basicity < 0.65; Beckett 2002 accepted "
+            "1600 C liquids: X(CaO)=0-0.71, X(MgO)=0-0.55, "
+            "X(Al2O3)=0-0.45, X(SiO2)=0-0.95",
+            "Sossi & Fegley 2018 Table 2 p. 409; Beckett 2002 p. 95 "
+            "accepted liquids and Fig. 1a p. 96",
             allowed_oxides=frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
             optical_basicity_range=(0.55, 0.65),
+            formula_mole_fraction_ranges=(
+                ("CaO", 0.0, 0.71),
+                ("MgO", 0.0, 0.55),
+                ("Al2O3", 0.0, 0.45),
+                ("SiO2", 0.0, 0.95),
+            ),
         ),
     ),
     "Al2O3": MeltOxideActivityCoefficient(
@@ -224,11 +239,10 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "AlO1.5 range 0.28-0.37 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack "
         "1995), not a single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CMAS anorthite-diopside (An-Di)",
+            "UNRECORDED (primary composition bounds not in corpus; Sossi & "
+            "Fegley list CMAS anorthite-diopside)",
             "Sossi & Fegley 2018 Table 2 p. 409; Ghiorso & Sack 1995, "
             "Contrib. Mineral. Petrol. 119:197-212 (primary bounds not in corpus)",
-            allowed_oxides=frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
-            required_oxides=frozenset({"CaO", "SiO2"}),
         ),
     ),
     "SiO2": MeltOxideActivityCoefficient(
@@ -241,11 +255,10 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "range 0.9-1.1 at 1573-1773 K (CMAS An-Di; Ghiorso & Sack 1995), not "
         "a single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CMAS anorthite-diopside (An-Di)",
+            "UNRECORDED (primary composition bounds not in corpus; Sossi & "
+            "Fegley list CMAS anorthite-diopside)",
             "Sossi & Fegley 2018 Table 2 p. 410; Ghiorso & Sack 1995, "
             "Contrib. Mineral. Petrol. 119:197-212 (primary bounds not in corpus)",
-            allowed_oxides=frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
-            required_oxides=frozenset({"CaO", "SiO2"}),
         ),
     ),
     "TiO2": MeltOxideActivityCoefficient(
@@ -258,10 +271,9 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "range 1.5-1.7 at 1573-1773 K (CMAS; Ghiorso & Sack 1995), not a "
         "single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CMAS",
+            "UNRECORDED (primary composition bounds not in corpus)",
             "Sossi & Fegley 2018 Table 2 p. 410; Ghiorso & Sack 1995, "
             "Contrib. Mineral. Petrol. 119:197-212 (primary bounds not in corpus)",
-            allowed_oxides=frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
         ),
     ),
     "Cr2O3": MeltOxideActivityCoefficient(
@@ -274,11 +286,12 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "CrO1.5 range 23-42 at 1773 K (CAS; Pretorius & Muan 1992), not a "
         "single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CaO-CrOx-SiO2 at 1500 C (Sossi & Fegley label: CAS)",
-            "Pretorius & Muan 1992 Table II p. 1367; Sossi & Fegley 2018 "
+            "CaO-CrOx-SiO2 at 1500 C (1773.15 K; Sossi & Fegley label: CAS)",
+            "Pretorius & Muan 1992 Table II p. 1366; Sossi & Fegley 2018 "
             "Table 2 p. 409",
             allowed_oxides=frozenset({"CaO", "Cr2O3", "SiO2"}),
             required_oxides=frozenset({"CaO", "SiO2"}),
+            source_temperature_isotherm_K=1773.15,
         ),
     ),
     "MgO": MeltOxideActivityCoefficient(
@@ -291,11 +304,19 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "~0.25-4 at 1873 K (CMAS basicity 0.55-0.65; Beckett 2002), not a "
         "single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
-            "CMAS; 0.55 < optical basicity < 0.65",
-            "Sossi & Fegley 2018 Table 2 p. 409; Beckett 2002 pp. 95-96, "
-            "accepted CMAS liquids and Fig. 1a",
+            "CMAS; 0.55 < optical basicity < 0.65; Beckett 2002 accepted "
+            "1600 C liquids: X(CaO)=0-0.71, X(MgO)=0-0.55, "
+            "X(Al2O3)=0-0.45, X(SiO2)=0-0.95",
+            "Sossi & Fegley 2018 Table 2 p. 409; Beckett 2002 p. 95 "
+            "accepted liquids and Fig. 1a p. 96",
             allowed_oxides=frozenset({"CaO", "MgO", "Al2O3", "SiO2"}),
             optical_basicity_range=(0.55, 0.65),
+            formula_mole_fraction_ranges=(
+                ("CaO", 0.0, 0.71),
+                ("MgO", 0.0, 0.55),
+                ("Al2O3", 0.0, 0.45),
+                ("SiO2", 0.0, 0.95),
+            ),
         ),
     ),
     "MnO": MeltOxideActivityCoefficient(
@@ -309,13 +330,19 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
         "row 0.7-3.5 at 1823-1923 K and not a single Table 2 coefficient",
         source_composition_range=_GammaSourceCompositionRange(
             "CaO-SiO2-Al2O3-MnO (<10 mass %) with FetO (<3 mass %), "
-            "liquid-iron saturated; Henry range MnO <9.6 mass %",
+            "liquid-iron saturated at 1873 K; Henry range MnO <9.6 mass %",
             "Ohta & Suito 1995 pp. 295-296, Table IV p. 302; Sossi & Fegley "
             "2018 Table 2 p. 409",
             allowed_oxides=frozenset(
-                {"CaO", "SiO2", "Al2O3", "MnO", "FeO"}
+                {"CaO", "SiO2", "Al2O3", "MnO", "FeO", "Fe2O3"}
             ),
             required_oxides=frozenset({"CaO", "SiO2"}),
+            mass_percent_upper_limits=(
+                ("MnO", 10.0),
+                ("FetO", 3.0),
+                ("MnO", 9.6),
+            ),
+            source_temperature_isotherm_K=1873.0,
         ),
     ),
 }
@@ -338,10 +365,9 @@ P2O5_ACTIVITY_COEFFICIENT = MeltOxideActivityCoefficient(
     valid_range_K=(1823.0, 1923.0),
     anchor_T_K=1873.0,
     source_composition_range=_GammaSourceCompositionRange(
-        "CMFS (composition range as compiled; primary bounds not in corpus)",
+        "UNRECORDED (primary composition bounds not in corpus)",
         "Sossi & Fegley 2018 Table 2 p. 410; Turkdogan 2000, "
-        "ISIJ International 40:964-970",
-        allowed_oxides=frozenset({"CaO", "MgO", "FeO", "SiO2"}),
+        "ISIJ International 40:964-970 (primary bounds not in corpus)",
     ),
 )
 
@@ -574,6 +600,7 @@ def _melt_oxide_source_composition_range_notice(
     parent_oxide: str,
     account_mol: Mapping[str, float],
     coefficient: MeltOxideActivityCoefficient,
+    temperature_K: float | None,
 ) -> str | None:
     source_range = coefficient.source_composition_range
     if source_range is None:
@@ -581,15 +608,32 @@ def _melt_oxide_source_composition_range_notice(
 
     description = source_range.description
     outside = description.startswith("UNRECORDED")
+    present_moles: dict[str, float] = {}
+    temperature_isotherm = source_range.source_temperature_isotherm_K
+    row_temperature: float | None = None
+    if temperature_K is not None:
+        try:
+            candidate_temperature = float(temperature_K)
+        except (TypeError, ValueError, OverflowError):
+            candidate_temperature = math.nan
+        if math.isfinite(candidate_temperature):
+            row_temperature = candidate_temperature
+    isotherm_mismatch = (
+        temperature_isotherm is not None
+        and row_temperature is not None
+        and row_temperature != temperature_isotherm
+    )
+    if isotherm_mismatch:
+        outside = True
     if not outside:
-        present_oxides: set[str] = set()
         for oxide, raw_amount in account_mol.items():
             try:
                 amount = float(raw_amount)
             except (TypeError, ValueError, OverflowError):
                 continue
             if math.isfinite(amount) and amount > 0.0:
-                present_oxides.add(str(oxide))
+                present_moles[str(oxide)] = amount
+        present_oxides = set(present_moles)
 
         allowed_oxides = source_range.allowed_oxides
         if allowed_oxides is not None and not present_oxides.issubset(
@@ -598,6 +642,13 @@ def _melt_oxide_source_composition_range_notice(
             outside = True
         if not source_range.required_oxides.issubset(present_oxides):
             outside = True
+        if source_range.formula_mole_fraction_ranges:
+            total_moles = math.fsum(present_moles.values())
+            if total_moles > 0.0:
+                for oxide, low, high in source_range.formula_mole_fraction_ranges:
+                    fraction = present_moles.get(oxide, 0.0) / total_moles
+                    if not low <= fraction <= high:
+                        outside = True
         if not outside and source_range.optical_basicity_range is not None:
             # Reuse the chemistry module's Duffy-Ingram optical-basicity
             # calculation; this verdict only qualifies the source gamma and
@@ -617,6 +668,46 @@ def _melt_oxide_source_composition_range_notice(
             if basicity is not None and math.isfinite(float(basicity)):
                 low, high = source_range.optical_basicity_range
                 outside = not low < float(basicity) < high
+        if not outside and source_range.mass_percent_upper_limits:
+            try:
+                mass_fractions = project_oxide_composition(
+                    present_moles, source_basis="moles"
+                )
+                if any(
+                    species == "FetO"
+                    for species, _limit in source_range.mass_percent_upper_limits
+                ):
+                    feo_molar_mass = resolve_species_formula(
+                        "FeO"
+                    ).molar_mass_g_per_mol()
+                    # FetO is total iron expressed on the FeO mass basis.
+                    fet_o_mass_terms = []
+                    for species in ("FeO", "Fe2O3"):
+                        formula = resolve_species_formula(species)
+                        feo_equivalent_mass_ratio = (
+                            formula.elements.get("Fe", 0.0)
+                            * feo_molar_mass
+                            / formula.molar_mass_g_per_mol()
+                        )
+                        fet_o_mass_terms.append(
+                            mass_fractions.get(species, 0.0)
+                            * feo_equivalent_mass_ratio
+                        )
+                    fet_o_mass_fraction = math.fsum(fet_o_mass_terms)
+                else:
+                    fet_o_mass_fraction = 0.0
+            except (TypeError, ValueError, OverflowError):
+                mass_fractions = {}
+                fet_o_mass_fraction = 0.0
+            for species, limit in source_range.mass_percent_upper_limits:
+                mass_percent = (
+                    100.0 * fet_o_mass_fraction
+                    if species == "FetO"
+                    else 100.0 * mass_fractions.get(species, 0.0)
+                )
+                if mass_percent >= limit:
+                    outside = True
+                    break
 
     if not outside:
         return None
@@ -625,9 +716,15 @@ def _melt_oxide_source_composition_range_notice(
         if description.startswith("UNRECORDED")
         else description
     )
+    temperature_detail = ""
+    if isotherm_mismatch:
+        temperature_detail = (
+            f"; source_isotherm={temperature_isotherm:g} K"
+            f"; row_temperature={row_temperature:g} K"
+        )
     return (
         "ia_constant_gamma_outside_source_composition_range: "
-        f"oxide={parent_oxide}; range={range_text}; "
+        f"oxide={parent_oxide}; range={range_text}{temperature_detail}; "
         f"source={source_range.citation}"
     )
 
@@ -947,7 +1044,7 @@ def melt_oxide_activity(
         )
     source_composition_range_notice = (
         _melt_oxide_source_composition_range_notice(
-            parent, account_mol, coeff
+            parent, account_mol, coeff, resolved_temperature_K
         )
     )
     if resolved_temperature_K is not None and coeff.valid_range_K is not None:
