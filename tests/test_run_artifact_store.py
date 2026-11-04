@@ -552,6 +552,37 @@ def test_build_run_artifact_captures_available_recipe_and_c3_dose() -> None:
     assert artifact["header"]["recipe_snapshot"] == payload["recipe_snapshot"]
 
 
+def test_headline_yield_does_not_add_cartridge_residue() -> None:
+    artifact = {
+        "header": {"run_id": "residue-headline"},
+        "timesteps": [
+            {
+                "summary": {
+                    "T_C": 1400.0,
+                    "metal_yields_kg": {"Fe": 6.0},
+                    "product_ledger_kg_at_hour": {"Fe": 6.0},
+                    "O2_source_side_potential_kg_cumulative": 1.0,
+                },
+            },
+        ],
+        "product_classification": {
+            "classification": {
+                "alkali_cartridge_solid_residue": {
+                    "kg_by_species": {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+                    "class_total_kg": 8.0,
+                },
+            },
+        },
+    }
+
+    summary = RunArtifactStore._summary(artifact, "residue-headline")
+
+    assert summary["headline_yields_kg"]["Fe"] == 6.0
+    assert summary["summary"] == "Fe 6 kg · O₂ (source-side) 1 kg"
+    assert "10" not in summary["summary"]
+    assert "4" not in summary["summary"]
+
+
 def test_store_save_load_list_and_retention(tmp_path) -> None:
     store = RunArtifactStore(tmp_path / "runs", keep=1)
     first = build_run_artifact(_runner_payload(), run_id="run-1", name="First")

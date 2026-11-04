@@ -266,6 +266,25 @@ def test_cartridge_residue_keeps_its_own_cost_bearing_lot():
     assert residue_fe in summary["active_inventory_costs"]
     assert residue_silica in summary["active_inventory_costs"]
     assert f"{ALKALI_CARTRIDGE_ACCOUNT}:Fe" not in summary["product_costs"]
+    assert "terminal.product:Fe" not in summary["product_costs"]
+
+    from simulator.cost_ledger import _split_beneficiary_outputs
+
+    beneficiary, coproduct = _split_beneficiary_outputs((
+        MaterialLot(
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+            {"Fe": 4.0, "SiO2": 3.0},
+        ),
+        MaterialLot("process.metal_phase", {"Fe": 2.0}),
+    ))
+    residue_fe_key = (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "Fe")
+    residue_silica_key = (ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT, "SiO2")
+    assert beneficiary[residue_fe_key] == pytest.approx(4.0)
+    assert beneficiary[residue_silica_key] == pytest.approx(3.0)
+    assert residue_fe_key not in coproduct
+    assert residue_silica_key not in coproduct
+    assert ("terminal.product", "Fe") not in beneficiary
+    assert ("terminal.product", "Fe") not in coproduct
 
 
 def test_import_modes_are_reporting_only_and_apply_launch_penalty_when_enabled():
