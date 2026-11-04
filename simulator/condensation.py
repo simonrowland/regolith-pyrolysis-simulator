@@ -78,6 +78,7 @@ import copy
 import math
 import warnings
 from collections.abc import Mapping, MutableMapping
+from functools import lru_cache
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -1868,6 +1869,310 @@ def _chapman_enskog_d_ab_m2_s(
     return D_AB_cm2_s * 1.0e-4
 
 
+# Chapman–Enskog viscosity. μ [Pa·s] = 2.6693e-6 * sqrt(M[g/mol] * T[K])
+# / (σ[Å]^2 * Ω^(2,2)*). 26.693 micropoise times 1e-7 Pa·s per micropoise
+# is 2.6693e-6. Neufeld, Janzen & Aziz, J. Chem. Phys. 57, 1100 (1972),
+# give Ω^(2,2)*; the same paper's Ω^(1,1)* is ``_neufeld_collision_integral_omega_d``.
+_CHAPMAN_ENSKOG_VISCOSITY_PA_S_PREFACTOR = 2.6693e-6
+_MONATOMIC_CARRIER_GASES = frozenset({'He', 'Ar', 'Kr'})
+_POLYATOMIC_CARRIER_GASES = frozenset({'N2', 'O2', 'CO2'})
+HEAT_TRANSFER_LEWIS_UNITY_ASSUMED = 'heat_transfer_lewis_unity_assumed'
+_CEA_CARRIER_EXTRACT = (
+    DATA_DIR / 'literature' / 'extracts' / 'nasa-cea-thermo.yaml'
+)
+
+
+def _neufeld_collision_integral_omega_v(T_star: float) -> float:
+    """Neufeld 1972 Ω^(2,2)* for viscosity, at reduced temperature T*.
+
+    Premise. The collision integral is dimensionless. T* = T / (ε/k)
+    from the carrier Lennard-Jones row. Neufeld, Janzen & Aziz,
+    J. Chem. Phys. 57, 1100 (1972), eq. for Ω^(2,2)* over 0.3 <= T* <= 100:
+
+        Ωv = 1.16145 T*^-0.14874
+             + 0.52487 exp(-0.77320 T*)
+             + 2.16178 exp(-2.43787 T*)
+
+    This helper does not refuse T* outside that interval, matching
+    ``_neufeld_collision_integral_omega_d``. T* <= 0 is not a reduced
+    temperature; the fit's negative power is undefined there, so the
+    helper returns 1.
+    """
+
+    if T_star <= 0.0:
+        return 1.0
+    return (
+        1.16145 * T_star ** -0.14874
+        + 0.52487 * math.exp(-0.77320 * T_star)
+        + 2.16178 * math.exp(-2.43787 * T_star)
+    )
+
+
+def _chapman_enskog_viscosity_pa_s(carrier_gas: str, temperature_K: float) -> float:
+    """Carrier viscosity in Pa·s from the Lennard-Jones row and Neufeld Ω^(2,2)*.
+
+    Premise. Chapman–Enskog viscosity for a pure Lennard-Jones gas. The
+    working prefactor is 2.6693e-6 when M is g/mol, σ is Å, and T is K
+    (26.693 micropoise × 1e-7 Pa·s/μP). Ω^(2,2)* is
+    ``_neufeld_collision_integral_omega_v`` (Neufeld 1972).
+
+    Algebra. μ = 2.6693e-6 * sqrt(M T) / (σ^2 Ωv).
+
+    Unit check. sqrt(g/mol * K) / Å^2 is the grouping the micropoise
+    prefactor was fitted to. Multiplying by 1e-7 Pa·s/μP yields Pa·s.
+
+    A missing Lennard-Jones row is missing input. The heat path must not
+    invent a viscosity.
+    """
+
+    carrier_key = _canonical_carrier_gas_key(carrier_gas)
+    row = _LENNARD_JONES_PARAMS.get(carrier_key)
+    if row is None:
+        raise DepositionInputRefusal(
+            'lennard_jones',
+            carrier_key,
+            'carrier has no Lennard-Jones row',
+        )
+    temperature_K = _deposition_finite_scalar('T_film_K', temperature_K)
+    if temperature_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_film_K', temperature_K, 'must be above absolute zero',
+        )
+    sigma_angstrom, epsilon_over_k_K, molar_mass_g_mol = row
+    if sigma_angstrom <= 0.0 or epsilon_over_k_K <= 0.0 or molar_mass_g_mol <= 0.0:
+        raise DepositionInputRefusal(
+            'lennard_jones',
+            carrier_key,
+            'carrier Lennard-Jones row must be positive',
+        )
+    omega_v = _neufeld_collision_integral_omega_v(temperature_K / epsilon_over_k_K)
+    if not math.isfinite(omega_v) or omega_v <= 0.0:
+        raise DepositionInputRefusal(
+            'lennard_jones',
+            carrier_key,
+            'Neufeld viscosity collision integral must be positive',
+        )
+    return (
+        _CHAPMAN_ENSKOG_VISCOSITY_PA_S_PREFACTOR
+        * math.sqrt(molar_mass_g_mol * temperature_K)
+        / (sigma_angstrom ** 2 * omega_v)
+    )
+
+
+@lru_cache(maxsize=1)
+def _polyatomic_carrier_cea_polynomials() -> dict[str, Any]:
+    """NASA CEA gas records for N2, O2, and CO2. Missing file → empty map.
+
+    The loader in ``simulator.chemistry.offgas_fo2`` is the other reader of
+    this extract. It stays there: it raises ``OffgasFO2Unavailable`` for the
+    water-gas-shift species, and this heat path must not import that
+    diagnostic to obtain a heat capacity.
+    """
+
+    from simulator.vapour_rail.nasa_cea import Nasa9Segment, NasaCeaPolynomial
+
+    if not _CEA_CARRIER_EXTRACT.is_file():
+        return {}
+    extract = load_cached_safe_yaml(_CEA_CARRIER_EXTRACT.read_text(encoding='utf-8'))
+    species = extract.get('species') if isinstance(extract, Mapping) else None
+    if not isinstance(species, Mapping):
+        return {}
+    polynomials: dict[str, Any] = {}
+    for name in _POLYATOMIC_CARRIER_GASES:
+        entry = species.get(name)
+        if not isinstance(entry, Mapping):
+            continue
+        observations = entry.get('observations')
+        if not isinstance(observations, list):
+            continue
+        observation = next(
+            (
+                item for item in observations
+                if isinstance(item, Mapping) and item.get('type') == 'gibbs_table'
+            ),
+            None,
+        )
+        if not isinstance(observation, Mapping):
+            continue
+        values = observation.get('values')
+        if not isinstance(values, Mapping):
+            continue
+        if values.get('evaluator_family') != 'nasa_cea_9':
+            continue
+        segments = values.get('segments')
+        if not isinstance(segments, list) or not segments:
+            continue
+        polynomials[name] = NasaCeaPolynomial(
+            name=name,
+            family='nasa_cea_9',
+            standard_state='gas',
+            segments=tuple(
+                Nasa9Segment(
+                    T_min_K=float(segment['T_min_K']),
+                    T_max_K=float(segment['T_max_K']),
+                    coefficients=tuple(segment['a_coefficients']),
+                    b1=float(segment['b1']),
+                    b2=float(segment['b2']),
+                    exponents=tuple(segment['exponents']),
+                )
+                for segment in segments
+                if isinstance(segment, Mapping)
+            ),
+        )
+    return polynomials
+
+
+def _carrier_molar_cp_j_per_mol_k(
+    carrier_key: str,
+    temperature_K: float,
+) -> float | None:
+    """Molar Cp in J/(mol·K), or None when no segment covers this temperature.
+
+    Monatomic He, Ar, and Kr use Cp = 5/2 R. That is the Eucken premise
+    (no internal contribution), not a stand-in for a missing polynomial.
+    The CEA records for those three evaluate to Cp/R = 2.5 within 1e-6
+    on the segments quoted in ``_stage_heat_exchanger_ntu``.
+
+    N2, O2, and CO2 read the NASA CEA extract. A temperature outside
+    every segment, or a carrier with no record, returns None. The caller
+    then uses Le = 1 and names the gap. It does not invent a Cp.
+    """
+
+    if carrier_key in _MONATOMIC_CARRIER_GASES:
+        return 2.5 * GAS_CONSTANT_J_MOL_K
+    if carrier_key not in _POLYATOMIC_CARRIER_GASES:
+        return None
+    polynomial = _polyatomic_carrier_cea_polynomials().get(carrier_key)
+    if polynomial is None:
+        return None
+    from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
+
+    try:
+        cp_over_r = polynomial.evaluate(temperature_K).cp_over_R
+    except NasaCeaDomainError:
+        return None
+    if not math.isfinite(cp_over_r) or cp_over_r <= 0.0:
+        return None
+    return cp_over_r * GAS_CONSTANT_J_MOL_K
+
+
+def _carrier_self_lewis_number(
+    carrier_gas: str,
+    temperature_K: float,
+    pressure_pa: float,
+) -> tuple[float, str | None]:
+    """Carrier self-Lewis number Le_self = α / D_self, and a notice if Cp is missing.
+
+    Premise. Chilton–Colburn equates the heat and mass j-factors, so the
+    heat NTU on a coefficient already built from carrier self-diffusion is
+
+        NTU_heat = Le_self^(2/3) · k_c · A / Q,
+        Le_self = α / D_self,   α = k / (ρ cp).
+
+    A metal-vapour Lewis number is not applied on top of D_self.
+
+    Viscosity. Neufeld 1972 Ω^(2,2)* and
+
+        μ [Pa·s] = 2.6693e-6 sqrt(M[g/mol] T) / (σ[Å]^2 Ωv)
+
+    from ``_chapman_enskog_viscosity_pa_s``. D_self is
+    ``_chapman_enskog_d_ab_m2_s`` of the carrier in itself.
+
+    Conductivity. Eucken, Physikalische Zeitschrift 14, 324 (1913),
+    for a monatomic gas:
+
+        k = (15/4) (R/M) μ
+
+    with M in kg/mol, so R/M is J/(kg·K) and k is W/(m·K). The polyatomic
+    form used for N2, O2, and CO2 is the modified Eucken correction, with
+    the internal heat carried by the self-diffusion term:
+
+        k = (μ/M) [ (15/4) R + (ρ D_self / μ) (Cp − 5/2 R) ]
+
+    Cp is the molar heat capacity. ρ = P M / (R T) for an ideal gas.
+    cp on a mass basis is Cp / M.
+
+    Algebra. α = k M / (ρ Cp). Substituting k:
+
+        α = (μ /(ρ Cp)) [ (15/4) R + (ρ D_self / μ) (Cp − 5/2 R) ]
+        Le_self = α / D_self
+                = 1 + (R/Cp) [ (15/4) (μ /(ρ D_self)) − 5/2 ]
+
+    Limit. Cp = 5/2 R (monatomic, or the modified-Eucken internal term
+    switched off) cancels the second addend inside k and leaves
+
+        α = (3/2) μ / ρ = 1.5 μ R T / (P M),
+
+    which is k = (15/4) (R/M) μ together with cp = (5/2) R / M.
+    Pr = μ / (ρ α) = 2/3. He, Ar, and Kr take this limit because their
+    Cp is 5/2 R.
+
+    Units. μ is Pa·s, D_self is m^2/s, ρ is kg/m^3, Cp is J/(mol·K),
+    M is kg/mol, k is W/(m·K), α is m^2/s, Le_self is dimensionless.
+    D_self scales as 1/P and ρ scales as P, so ρ D_self and Le_self do
+    not depend on pressure.
+
+    A carrier with no Cp segment returns Le_self = 1 and
+    ``heat_transfer_lewis_unity_assumed``. D_self <= 0 and a missing
+    Lennard-Jones row raise ``DepositionInputRefusal``; they are missing
+    input, not a unity Lewis number.
+    """
+
+    carrier_key = _canonical_carrier_gas_key(carrier_gas)
+    temperature_K = _deposition_finite_scalar('T_film_K', temperature_K)
+    pressure_pa = _deposition_finite_scalar('overhead_pressure_pa', pressure_pa)
+    if temperature_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_film_K', temperature_K, 'must be above absolute zero',
+        )
+    if pressure_pa <= 0.0:
+        raise DepositionInputRefusal(
+            'overhead_pressure_pa', pressure_pa, 'must be positive',
+        )
+    molar_mass_kg_mol = carrier_gas_properties(carrier_key).molar_mass_kg_mol
+    if molar_mass_kg_mol <= 0.0:
+        raise DepositionInputRefusal(
+            'molar_mass_kg_mol',
+            molar_mass_kg_mol,
+            'carrier molar mass must be positive',
+        )
+    viscosity_pa_s = _chapman_enskog_viscosity_pa_s(carrier_key, temperature_K)
+    diffusivity_m2_s = _chapman_enskog_d_ab_m2_s(
+        carrier_key,
+        temperature_K,
+        pressure_pa,
+        carrier=carrier_key,
+    )
+    if not math.isfinite(diffusivity_m2_s) or diffusivity_m2_s <= 0.0:
+        raise DepositionInputRefusal(
+            'self_diffusion_m2_s',
+            diffusivity_m2_s,
+            'carrier self-diffusion must be positive',
+        )
+    if not math.isfinite(viscosity_pa_s) or viscosity_pa_s <= 0.0:
+        raise DepositionInputRefusal(
+            'viscosity_pa_s',
+            viscosity_pa_s,
+            'carrier viscosity must be positive',
+        )
+    cp_j_per_mol_k = _carrier_molar_cp_j_per_mol_k(carrier_key, temperature_K)
+    if cp_j_per_mol_k is None:
+        return 1.0, HEAT_TRANSFER_LEWIS_UNITY_ASSUMED
+    density_kg_m3 = (
+        pressure_pa * molar_mass_kg_mol
+        / (GAS_CONSTANT_J_MOL_K * temperature_K)
+    )
+    conductivity_w_m_k = (viscosity_pa_s / molar_mass_kg_mol) * (
+        (15.0 / 4.0) * GAS_CONSTANT_J_MOL_K
+        + (density_kg_m3 * diffusivity_m2_s / viscosity_pa_s)
+        * (cp_j_per_mol_k - 2.5 * GAS_CONSTANT_J_MOL_K)
+    )
+    alpha_m2_s = conductivity_w_m_k * molar_mass_kg_mol / (
+        density_kg_m3 * cp_j_per_mol_k
+    )
+    return alpha_m2_s / diffusivity_m2_s, None
+
+
 def _unsupported_carrier_gas_error(carrier_gas: Any) -> ValueError:
     return ValueError(
         f'Unsupported condensation carrier_gas {carrier_gas!r}; '
@@ -3599,6 +3904,7 @@ class CondensationModel:
                 vapour_species,
                 vapor_pressure_data=self.vapor_pressure_data,
             )
+            heat_transfer_notice = None
             if stage_area_m2 is None or stage_area_m2 == 0.0:
                 stage_wall_K = None
                 stage_ntu = 0.0
@@ -3606,7 +3912,7 @@ class CondensationModel:
                 stage_mean_K = stage_inlet_K
             else:
                 stage_wall_K = _stage_midpoint_temperature_K(stage)
-                stage_ntu = _stage_heat_exchanger_ntu(
+                stage_ntu, heat_transfer_notice = _stage_heat_exchanger_ntu(
                     area_m2=stage_area_m2,
                     hydraulic_diameter_m=(
                         self._hydraulic_diameter_m_for_stage_number(
@@ -3639,6 +3945,8 @@ class CondensationModel:
                 'ntu': stage_ntu,
                 'n_total_mol_s': stage_molar_flow_mol_s,
             }
+            if heat_transfer_notice is not None:
+                bulk_record['heat_transfer_notice'] = heat_transfer_notice
             self.last_stage_bulk_gas.append(bulk_record)
             self.stage_bulk_gas_history.append(bulk_record)
             bulk_gas_K = stage_outlet_K
@@ -5788,6 +6096,82 @@ _FOG_CLEAR_WITHIN_HANDBOOK_CAUTION = (
 )
 
 
+def _fog_clearance_rank(code: str | None) -> int:
+    """Higher is the worse clearance. Fog beats unevaluable, which beats clear."""
+
+    if code == NOTICE_FOG:
+        return 2
+    if code == NOTICE_UNEVALUABLE:
+        return 1
+    return 0
+
+
+def _join_unique_texts(texts: list[str | None]) -> str | None:
+    parts: list[str] = []
+    for text in texts:
+        if text and text not in parts:
+            parts.append(text)
+    if not parts:
+        return None
+    return ' '.join(parts)
+
+
+def _fog_temperature_sample(
+    species: str,
+    temperature_K: float,
+    partial_pressure_Pa: float,
+    basis: str,
+) -> dict[str, Any]:
+    """One nucleation check. The handbook sentence is attached only while the sample is clear."""
+
+    sample: dict[str, Any] = {
+        'temperature_K': temperature_K,
+        'temperature_basis': basis,
+        'code': NOTICE_UNEVALUABLE,
+        'J_m3_s': None,
+        'saturation_ratio': None,
+        'saturation_authority': None,
+        'saturation_notice': None,
+        'reason': None,
+        'critical_cluster_molecules': None,
+        'property_notice': None,
+        'p_Pa': partial_pressure_Pa,
+    }
+    try:
+        result = nucleation_rate(species, temperature_K, partial_pressure_Pa)
+    except NucleationInputError as exc:
+        sample['reason'] = str(exc)
+        return sample
+    code = fog_capture_code(result)
+    saturation_notice = result.saturation_notice
+    if code is None and result.saturation_authority == 'extrapolated':
+        caution = nucleation_rate(
+            species,
+            temperature_K,
+            partial_pressure_Pa,
+            saturation_pressure_scale=_SATURATION_HANDBOOK_CAUTION_SCALE,
+        )
+        if fog_capture_code(caution) == NOTICE_FOG:
+            if saturation_notice:
+                saturation_notice = (
+                    f"{saturation_notice} {_FOG_CLEAR_WITHIN_HANDBOOK_CAUTION}"
+                )
+            else:
+                saturation_notice = _FOG_CLEAR_WITHIN_HANDBOOK_CAUTION
+    sample.update({
+        'code': code,
+        'J_m3_s': result.rate_m3_s,
+        'saturation_ratio': result.saturation_ratio,
+        'saturation_authority': result.saturation_authority,
+        'saturation_notice': saturation_notice,
+        'reason': result.reason,
+        'critical_cluster_molecules': result.critical_cluster_molecules,
+        'property_notice': result.property_notice,
+        'p_Pa': result.partial_pressure_Pa,
+    })
+    return sample
+
+
 def _stage_vapour_fog_notice(
     stage: CondensationStage,
     species: str,
@@ -5800,26 +6184,34 @@ def _stage_vapour_fog_notice(
 ) -> dict[str, Any]:
     """Whether molecular wall capture is still a valid claim at this stage.
 
-    The rate is evaluated at this stage's bulk-gas temperature and at
-    the stage inlet partial pressure. That temperature is the area mean
-    of the stage energy balance (``_stage_bulk_mean_temperature_K``),
-    not the wall and not the film. The film remains the diffusivity
-    temperature only. A hot bulk undersaturates sodium even on a cold
-    wall: 5.89 Pa at 250 C gives J ~ 187 m^-3 s^-1, and the same partial
-    at the melt temperature is undersaturated, so J is 0. The nafog
-    comparison is that bulk temperature. A wide wall band is not sampled
-    again here; the cold end of Stage 5 is not a separate nucleation point.
+    The area-mean bulk temperature stays ``bulk_temperature_K``. It is
+    the integral of the stage energy balance
+    (``_stage_bulk_mean_temperature_K``), not the film. The cold-wall
+    claim is also evaluated at the stage wall temperature, the band
+    midpoint, at the same partial pressure. That wall is the coldest
+    gas the stream touches. The notice code is the worse of the two:
+    fog, then unevaluable, then clear. Both temperatures are reported
+    with their basis.
 
-    The returned eta is unchanged. When J exceeds the fog threshold the
-    notice marks that eta as an upper bound, not as the capture.
+    A hot bulk undersaturates sodium even on a cold wall: 5.89 Pa at
+    250 C gives J ~ 187 m^-3 s^-1, and the same partial at the melt
+    temperature is undersaturated, so J is 0. The 250 C sample is what
+    decides the cold-wall claim. A wide wall band is not scanned again:
+    Stage 5's wall is its midpoint, not a third sample at the cold end.
+
+    The returned eta is unchanged. When the worse J exceeds the fog
+    threshold the notice marks that eta as an upper bound, not as the
+    capture.
 
     ``saturation_authority`` and ``saturation_notice`` are the owner's
-    fields, copied unchanged. When the flag is off and the saturation
-    pressure is extrapolated, a second owner evaluation at 0.75 P_sat
-    decides the handbook sentence. That sentence is absent when the flag
-    is already on, and absent when the lower pressure still does not cross.
+    fields. When a sample is clear and its saturation pressure is
+    extrapolated, a second owner evaluation at 0.75 P_sat decides the
+    handbook sentence. That sentence is absent when that sample's flag
+    is already on. The extrapolated-saturation caution is forwarded
+    when either sample is outside its band.
     """
 
+    wall_temperature_K = _stage_midpoint_temperature_K(stage)
     notice: dict[str, Any] = {
         'code': NOTICE_UNEVALUABLE,
         'stage_number': int(stage.stage_number),
@@ -5831,8 +6223,17 @@ def _stage_vapour_fog_notice(
         'campaign_hour': getattr(melt, 'campaign_hour', None),
         'T_K': None,
         'temperature_basis': 'stage_bulk',
+        'bulk_temperature_K': None,
+        'bulk_temperature_basis': 'stage_bulk',
+        'wall_temperature_K': wall_temperature_K,
+        'wall_temperature_basis': 'stage_wall',
+        'bulk_clearance_code': NOTICE_UNEVALUABLE,
+        'wall_clearance_code': NOTICE_UNEVALUABLE,
+        'clearance_temperature_basis': None,
         'p_Pa': partial_pressure_Pa,
         'J_m3_s': None,
+        'bulk_J_m3_s': None,
+        'wall_J_m3_s': None,
         'saturation_ratio': None,
         'saturation_authority': None,
         'saturation_notice': None,
@@ -5854,42 +6255,50 @@ def _stage_vapour_fog_notice(
         notice['reason'] = 'stage bulk temperature must be above absolute zero'
         return notice
     notice['T_K'] = temperature_K
+    notice['bulk_temperature_K'] = temperature_K
     if partial_pressure_Pa is None:
         notice['reason'] = 'stage inlet partial pressure is missing'
         return notice
-    try:
-        result = nucleation_rate(species, temperature_K, partial_pressure_Pa)
-    except NucleationInputError as exc:
-        notice['reason'] = str(exc)
-        return notice
-    code = fog_capture_code(result)
-    saturation_notice = result.saturation_notice
-    if code is None and result.saturation_authority == 'extrapolated':
-        caution = nucleation_rate(
-            species,
-            temperature_K,
-            partial_pressure_Pa,
-            saturation_pressure_scale=_SATURATION_HANDBOOK_CAUTION_SCALE,
-        )
-        if fog_capture_code(caution) == NOTICE_FOG:
-            if saturation_notice:
-                saturation_notice = (
-                    f"{saturation_notice} {_FOG_CLEAR_WITHIN_HANDBOOK_CAUTION}"
-                )
-            else:
-                saturation_notice = _FOG_CLEAR_WITHIN_HANDBOOK_CAUTION
+    bulk_sample = _fog_temperature_sample(
+        species, temperature_K, partial_pressure_Pa, 'stage_bulk',
+    )
+    wall_sample = _fog_temperature_sample(
+        species, wall_temperature_K, partial_pressure_Pa, 'stage_wall',
+    )
+    if _fog_clearance_rank(wall_sample['code']) > _fog_clearance_rank(bulk_sample['code']):
+        winner = wall_sample
+    else:
+        winner = bulk_sample
+    extrapolated = [
+        sample for sample in (bulk_sample, wall_sample)
+        if sample.get('saturation_authority') == 'extrapolated'
+    ]
+    if extrapolated:
+        saturation_authority = 'extrapolated'
+    else:
+        saturation_authority = winner.get('saturation_authority')
     notice.update({
-        'code': code,
-        'J_m3_s': result.rate_m3_s,
-        'saturation_ratio': result.saturation_ratio,
-        'saturation_authority': result.saturation_authority,
-        'saturation_notice': saturation_notice,
-        'reason': result.reason,
-        'critical_cluster_molecules': result.critical_cluster_molecules,
-        'property_notice': result.property_notice,
-        'p_Pa': result.partial_pressure_Pa,
+        'code': winner['code'],
+        'clearance_temperature_basis': winner['temperature_basis'],
+        'bulk_clearance_code': bulk_sample['code'],
+        'wall_clearance_code': wall_sample['code'],
+        'J_m3_s': winner['J_m3_s'],
+        'bulk_J_m3_s': bulk_sample['J_m3_s'],
+        'wall_J_m3_s': wall_sample['J_m3_s'],
+        'saturation_ratio': winner['saturation_ratio'],
+        'saturation_authority': saturation_authority,
+        'saturation_notice': _join_unique_texts([
+            sample.get('saturation_notice') for sample in extrapolated
+        ]),
+        'reason': winner['reason'],
+        'critical_cluster_molecules': winner['critical_cluster_molecules'],
+        'property_notice': _join_unique_texts([
+            bulk_sample.get('property_notice'),
+            wall_sample.get('property_notice'),
+        ]),
+        'p_Pa': winner['p_Pa'],
     })
-    if code == NOTICE_FOG and eta is not None:
+    if winner['code'] == NOTICE_FOG and eta is not None:
         notice['eta_role'] = ETA_ROLE_UPPER_BOUND
     return notice
 
@@ -5897,8 +6306,10 @@ def _stage_vapour_fog_notice(
 def _stage_film_temperature_K(gas_inlet_K: float, wall_K: float) -> float:
     """Film temperature for stage-collector gas properties.
 
-    Premise. Heat and mass transfer share one NTU (Chilton–Colburn;
-    Le ~ 1 for alkali vapour in N2). ``gas_inlet_K`` is this stage's
+    Premise. Heat and mass transfer share the Chilton–Colburn analogy.
+    The heat NTU multiplies ``k_c A / Q`` by ``Le_self^(2/3)``, with
+    ``Le_self = α / D_self`` of the carrier at this film temperature
+    (``_carrier_self_lewis_number``). ``gas_inlet_K`` is this stage's
     bulk inlet from ``_stage_bulk_outlet_temperature_K`` of the previous
     visited stage. The train inlet is ``CondensationModel.gas_temperature_C``
     (the overhead conductance temperature). A duct the design holds hot
@@ -6001,11 +6412,10 @@ def _stage_bulk_outlet_temperature_K(
     20.7861565453831 * 550 = 11432.3861 J/mol = 11.432386 kJ/mol, and
     340.00 / 11.432386 = 29.740, so iron's latent is 29.740 times that
     sensible change when the stream is the condensing vapour. Carrier
-    cp is quoted on
-    ``_stage_heat_exchanger_ntu``; it cancels in the Lewis-number = 1
-    NTU and is not a number this function reads. Freezing the inlet
-    molar flow understates NTU when a large vapour fraction condenses
-    inside the stage.
+    cp is read by ``_stage_heat_exchanger_ntu`` when it builds
+    ``Le_self``. This function does not read cp; it applies the NTU
+    it is given. Freezing the inlet molar flow understates NTU when a
+    large vapour fraction condenses inside the stage.
     """
 
     gas_inlet_K, wall_K, ntu = _exchanger_state(gas_inlet_K, wall_K, ntu)
@@ -6030,8 +6440,9 @@ def _stage_bulk_mean_temperature_K(
     The bulk mean is T_wall + LMTD. That equals the area mean
         integral_0^1 T(xi) d xi
     because the approach is exponential. NTU -> 0 makes LMTD -> T_in - T_wall,
-    so T_mean -> T_in. The nucleation rate uses this mean: it is the
-    temperature the vapour occupies, not the wall and not the film.
+    so T_mean -> T_in. The fog notice keeps this mean as the bulk
+    temperature. The cold-wall clearance is a second sample at the stage
+    wall, in ``_stage_vapour_fog_notice``.
     """
 
     gas_inlet_K, wall_K, ntu = _exchanger_state(gas_inlet_K, wall_K, ntu)
@@ -6050,7 +6461,7 @@ def _stage_heat_exchanger_ntu(
     total_pressure_pa: float,
     sherwood: float,
     carrier_gas: str,
-) -> float:
+) -> tuple[float, str | None]:
     """Heat-transfer NTU on the capture-law geometry.
 
     Premise. Chilton–Colburn equates the heat and mass j-factors:
@@ -6066,15 +6477,16 @@ def _stage_heat_exchanger_ntu(
     with Q = n_dot R T_in / P the inlet volumetric flow and
     m_dot = rho Q. The existing Sh (``_stirring_enhanced_sherwood``)
     is the laminar 3.66 times the square root of the radial stir
-    factor. It carries no Schmidt number. No carrier thermal
-    conductivity is stored (``transport_constants`` keeps the collision
-    diameter, epsilon/k, and molar mass only). This owner therefore
-    takes the Le = 1 case of the analogy, Nu = Sh, and
-        NTU = k_c A / Q.
-    k_c uses the carrier self-diffusion at the inlet film temperature,
-    and the same Sherwood number as the capture law. Metal-vapour D_AB
-    is not the bulk heat-transfer diffusivity. cp and rho cancel, so
-    the arithmetic does not read a heat capacity. The cp that cancels
+    factor. It carries no Schmidt number. k_c uses the carrier
+    self-diffusion at the inlet film temperature, and the same Sherwood
+    number as the capture law. Metal-vapour D_AB is not the bulk
+    heat-transfer diffusivity. Le_self is the carrier's own α/D_self
+    at that film (``_carrier_self_lewis_number``), so
+
+        NTU = Le_self^{2/3} k_c A / Q.
+
+    Le_self = 1, with notice ``heat_transfer_lewis_unity_assumed``,
+    only when the carrier has no Cp segment. The Cp that enters Le_self
     is the one already in the repo, not a new constant:
 
     Kr and Ar, monatomic. NASA CEA thermo.inp, record Kr (Sugar 1991)
@@ -6109,14 +6521,16 @@ def _stage_heat_exchanger_ntu(
 
     Limits. No area, no molar flow, or no positive total pressure has
     no finite exchanger step, so NTU is 0 and the bulk temperature is
-    unchanged. A carrier with no self-diffusion returns D = 0 from
-    ``_chapman_enskog_d_ab_m2_s``; that is also NTU 0, not a substitute
-    diffusivity.
+    unchanged. D_self <= 0, or a carrier with no Lennard-Jones row, is
+    missing input: ``DepositionInputRefusal`` names ``self_diffusion_m2_s``
+    or ``lennard_jones``. It is not NTU 0.
+    The second return is the unity-Lewis notice, or None when Le_self
+    was computed.
     """
 
     area_m2 = _deposition_finite_scalar('stage_area_m2', area_m2)
     if area_m2 <= 0.0:
-        return 0.0
+        return 0.0, None
     hydraulic_diameter_m = _deposition_finite_scalar(
         'stage_hydraulic_diameter_m', hydraulic_diameter_m,
     )
@@ -6138,16 +6552,32 @@ def _stage_heat_exchanger_ntu(
         or total_pressure_pa <= 0.0
         or sherwood <= 0.0
     ):
-        return 0.0
+        return 0.0, None
     film_K = _stage_film_temperature_K(gas_inlet_K, wall_K)
+    carrier_key = _canonical_carrier_gas_key(carrier_gas)
+    if _LENNARD_JONES_PARAMS.get(carrier_key) is None:
+        raise DepositionInputRefusal(
+            'lennard_jones',
+            carrier_key,
+            'carrier has no Lennard-Jones row',
+        )
     diffusivity_m2_s = _chapman_enskog_d_ab_m2_s(
-        carrier_gas,
+        carrier_key,
         film_K,
         total_pressure_pa,
-        carrier=carrier_gas,
+        carrier=carrier_key,
     )
     if not math.isfinite(diffusivity_m2_s) or diffusivity_m2_s <= 0.0:
-        return 0.0
+        raise DepositionInputRefusal(
+            'self_diffusion_m2_s',
+            diffusivity_m2_s,
+            'carrier self-diffusion must be positive',
+        )
+    lewis_number, lewis_notice = _carrier_self_lewis_number(
+        carrier_key,
+        film_K,
+        total_pressure_pa,
+    )
     volumetric_flow_m3_s = (
         total_molar_flow_mol_s
         * GAS_CONSTANT_J_MOL_K
@@ -6155,11 +6585,17 @@ def _stage_heat_exchanger_ntu(
         / total_pressure_pa
     )
     if volumetric_flow_m3_s <= 0.0:
-        return 0.0
+        return 0.0, None
     mass_transfer_coefficient_m_s = (
         sherwood * diffusivity_m2_s / hydraulic_diameter_m
     )
-    return mass_transfer_coefficient_m_s * area_m2 / volumetric_flow_m3_s
+    ntu = (
+        lewis_number ** (2.0 / 3.0)
+        * mass_transfer_coefficient_m_s
+        * area_m2
+        / volumetric_flow_m3_s
+    )
+    return ntu, lewis_notice
 
 
 def _species_molar_flow_mol_s(
