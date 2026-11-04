@@ -2337,6 +2337,10 @@ class CondensationModel:
         self.last_vapour_fog_notice: list[dict[str, Any]] = []
         self.vapour_fog_history: list[dict[str, Any]] = []
         self._pending_vapour_fog_notice: list[dict[str, Any]] | None = None
+        # One row per visited stage of the last route, plus the run history.
+        # Ducts are not rows: a hot pipe does not change this temperature.
+        self.last_stage_bulk_gas: list[dict[str, Any]] = []
+        self.stage_bulk_gas_history: list[dict[str, Any]] = []
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
@@ -2373,6 +2377,8 @@ class CondensationModel:
         self.last_vapour_fog_notice = []
         self.vapour_fog_history = []
         self._pending_vapour_fog_notice = None
+        self.last_stage_bulk_gas = []
+        self.stage_bulk_gas_history = []
 
     def configure_operating_conditions(
         self,
@@ -3500,12 +3506,31 @@ class CondensationModel:
             )
         inlet_rates = dict(evap_flux.species_kg_hr)
         flowing_rates = dict(inlet_rates)
+        bulk_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        if bulk_gas_K <= 0.0:
+            raise DepositionInputRefusal(
+                'T_gas_K', bulk_gas_K, 'must be above absolute zero',
+            )
+        overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
+        carrier_mol_s, vapour_species = _inlet_carrier_molar_flow_mol_s(
+            inlet_rates,
+            self.wall_species_partial_pressures_pa,
+            overhead_pressure_pa,
+            vapor_pressure_data=self.vapor_pressure_data,
+        )
+        stage_sherwood = _stirring_enhanced_sherwood(
+            self.stir_factor,
+            radial_stir_factor=self.radial_stir_factor,
+        )
+        self.last_stage_bulk_gas = []
         active_pipe_segments = self.active_pipe_segments
         wall_hkl_by_species: dict[str, dict[str, float]] = {}
         self.wall_species_partial_pressures_pa_by_segment = {}
         # The train is causal: each entering wall and then its stage consume
         # one shared inlet mixture. Recompute Dalton partials only AFTER all
         # species at that location have been evaluated, preserving carrier flow.
+        # The bulk temperature changes only on a visited stage that has capture
+        # area. A hot duct keeps its wall schedule and does not reset the gas.
         for stage in sorted(self.train.active_stages, key=stage_visit_key):
             # Validate this destination's coefficient before its incoming wall
             # can consume the supply; a clean stage cannot hide missing alpha.
@@ -3567,6 +3592,56 @@ class CondensationModel:
                 self.overhead_pressure_mbar * 100.0,
                 inlet_rates, {stage_key: flowing_rates},
             )[stage_key]
+            stage_inlet_K = bulk_gas_K
+            stage_area_m2 = self._stage_area_m2_for_stage(stage)
+            stage_molar_flow_mol_s = carrier_mol_s + _tracked_molar_flow_mol_s(
+                flowing_rates,
+                vapour_species,
+                vapor_pressure_data=self.vapor_pressure_data,
+            )
+            if stage_area_m2 is None or stage_area_m2 == 0.0:
+                stage_wall_K = None
+                stage_ntu = 0.0
+                stage_outlet_K = stage_inlet_K
+                stage_mean_K = stage_inlet_K
+            else:
+                stage_wall_K = _stage_midpoint_temperature_K(stage)
+                stage_ntu = _stage_heat_exchanger_ntu(
+                    area_m2=stage_area_m2,
+                    hydraulic_diameter_m=(
+                        self._hydraulic_diameter_m_for_stage_number(
+                            stage.stage_number,
+                        )
+                    ),
+                    gas_inlet_K=stage_inlet_K,
+                    wall_K=stage_wall_K,
+                    total_molar_flow_mol_s=stage_molar_flow_mol_s,
+                    total_pressure_pa=overhead_pressure_pa,
+                    sherwood=stage_sherwood,
+                    carrier_gas=self.carrier_gas,
+                )
+                stage_outlet_K = _stage_bulk_outlet_temperature_K(
+                    stage_inlet_K, stage_wall_K, stage_ntu,
+                )
+                stage_mean_K = _stage_bulk_mean_temperature_K(
+                    stage_inlet_K, stage_wall_K, stage_ntu,
+                )
+            bulk_record = {
+                'hour': getattr(melt, 'hour', None),
+                'campaign_hour': getattr(melt, 'campaign_hour', None),
+                'stage_number': int(stage.stage_number),
+                'sub_order': int(stage.sub_order),
+                'stage_key': stage.stage_key,
+                'T_in_K': stage_inlet_K,
+                'T_out_K': stage_outlet_K,
+                'T_wall_K': stage_wall_K,
+                'T_bulk_mean_K': stage_mean_K,
+                'ntu': stage_ntu,
+                'n_total_mol_s': stage_molar_flow_mol_s,
+            }
+            self.last_stage_bulk_gas.append(bulk_record)
+            self.stage_bulk_gas_history.append(bulk_record)
+            bulk_gas_K = stage_outlet_K
             stage_removed: dict[str, float] = {}
             reactive_stage_capture_kg: dict[str, float] = {}
             for species, route in stage_route_by_species.items():
@@ -3614,6 +3689,7 @@ class CondensationModel:
                         flowing_pressure_pa=(
                             partials.get(species) if reaction is not None else None
                         ),
+                        bulk_gas_inlet_K=stage_inlet_K,
                     )
                 except (WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
                     if isinstance(exc, DepositionInputRefusal) and exc.value is not None:
@@ -3639,6 +3715,7 @@ class CondensationModel:
                     })
                 vapour_fog_notices.append(_stage_vapour_fog_notice(
                     stage, species, melt, partials.get(species), eta, supply,
+                    bulk_temperature_K=stage_mean_K,
                 ))
                 if capture_refused:
                     continue
@@ -4716,6 +4793,7 @@ class CondensationModel:
         efficiency_outcomes: list[dict[str, Any]] | None = None,
         reactive_alkali_silica: bool = False,
         flowing_pressure_pa: float | None = None,
+        bulk_gas_inlet_K: float | None = None,
     ) -> float:
         """Equilibrium-capped kinetic capture integrated over the stage band."""
         def _mint_zero(reason: str, **detail: Any) -> float:
@@ -4803,7 +4881,16 @@ class CondensationModel:
         # so throat Poiseuille flow stays on the ~0.12 m throat.
         gas_side_length_m = self._hydraulic_diameter_m_for_stage_number(
             stage.stage_number)
-        T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        # This stage's bulk inlet. route() passes the energy-balance inlet.
+        # A direct caller omits it and keeps the configured train inlet.
+        if bulk_gas_inlet_K is None:
+            T_gas_K = float(self.gas_temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        else:
+            T_gas_K = _deposition_finite_scalar('T_gas_K', bulk_gas_inlet_K)
+            if T_gas_K <= 0.0:
+                raise DepositionInputRefusal(
+                    'T_gas_K', T_gas_K, 'must be above absolute zero',
+                )
         overhead_pressure_pa = float(self.overhead_pressure_mbar) * 100.0
         band_flux_sum = 0.0
         active_temperature_samples = 0
@@ -5708,23 +5795,20 @@ def _stage_vapour_fog_notice(
     partial_pressure_Pa: float | None,
     eta: float | None,
     supply_kg_hr: float,
+    *,
+    bulk_temperature_K: float,
 ) -> dict[str, Any]:
     """Whether molecular wall capture is still a valid claim at this stage.
 
-    The rate is evaluated at the stage-band midpoint, which is this
-    stage's property temperature, and at the stage inlet partial
-    pressure. t-1604's film temperature is not used. ``_stage_film_temperature_K``
-    is only the diffusivity temperature: T_film = (T_gas,in + T_wall) / 2,
-    and T_gas,in is the train-wide bulk (``CondensationModel.gas_temperature_C``,
-    about the melt temperature). A 40 C wall and a 1450 C inlet put that
-    film near 1018 K. Sodium's saturation pressure there is tens of kPa,
-    so a few-pascal partial is undersaturated and the fog flag would
-    never fire. The nafog comparison is a stage bulk: 250 C gives
-    J ~ 187 m^-3 s^-1 at 5.89 Pa, and J exceeds 1e6 m^-3 s^-1 below
-    515 K. Those temperatures are the stage wall, not the melt. A
-    per-stage energy-balance bulk is not computed (t-1604b). A wide
-    band is represented by its midpoint only; the cold end of Stage 5
-    (200 C) is not a separate sample.
+    The rate is evaluated at this stage's bulk-gas temperature and at
+    the stage inlet partial pressure. That temperature is the area mean
+    of the stage energy balance (``_stage_bulk_mean_temperature_K``),
+    not the wall and not the film. The film remains the diffusivity
+    temperature only. A hot bulk undersaturates sodium even on a cold
+    wall: 5.89 Pa at 250 C gives J ~ 187 m^-3 s^-1, and the same partial
+    at the melt temperature is undersaturated, so J is 0. The nafog
+    comparison is that bulk temperature. A wide wall band is not sampled
+    again here; the cold end of Stage 5 is not a separate nucleation point.
 
     The returned eta is unchanged. When J exceeds the fog threshold the
     notice marks that eta as an upper bound, not as the capture.
@@ -5746,7 +5830,7 @@ def _stage_vapour_fog_notice(
         'hour': getattr(melt, 'hour', None),
         'campaign_hour': getattr(melt, 'campaign_hour', None),
         'T_K': None,
-        'temperature_basis': 'stage_midpoint',
+        'temperature_basis': 'stage_bulk',
         'p_Pa': partial_pressure_Pa,
         'J_m3_s': None,
         'saturation_ratio': None,
@@ -5760,9 +5844,14 @@ def _stage_vapour_fog_notice(
         'property_notice': None,
     }
     try:
-        temperature_K = _stage_midpoint_temperature_K(stage)
+        temperature_K = _deposition_finite_scalar(
+            'T_gas_K', bulk_temperature_K,
+        )
     except DepositionInputRefusal as exc:
         notice['reason'] = str(exc)
+        return notice
+    if temperature_K <= 0.0:
+        notice['reason'] = 'stage bulk temperature must be above absolute zero'
         return notice
     notice['T_K'] = temperature_K
     if partial_pressure_Pa is None:
@@ -5809,17 +5898,14 @@ def _stage_film_temperature_K(gas_inlet_K: float, wall_K: float) -> float:
     """Film temperature for stage-collector gas properties.
 
     Premise. Heat and mass transfer share one NTU (Chilton–Colburn;
-    Le ~ 1 for alkali vapour in N2). At a Stage-4 NTU of about 0.2 the
-    bulk gas barely cools inside the collector, so the property
-    temperature is the film mean, not the wall. ``gas_inlet_K`` is the
-    train-wide bulk inlet, ``CondensationModel.gas_temperature_C`` (the
-    overhead conductance temperature, equal to the melt temperature
-    because the upstream ducts stay hot). ``wall_K`` is the same
-    per-sample wall the band integration already passes as
-    ``T_surface``. Neither temperature is a second literal. A per-stage
-    bulk temperature from an energy balance is a new thermal-train
-    output (t-1604b) and is not computed here. Do not use the 1000 K
-    radiator split or the 150 K floor.
+    Le ~ 1 for alkali vapour in N2). ``gas_inlet_K`` is this stage's
+    bulk inlet from ``_stage_bulk_outlet_temperature_K`` of the previous
+    visited stage. The train inlet is ``CondensationModel.gas_temperature_C``
+    (the overhead conductance temperature). A duct the design holds hot
+    is not a stage of that balance, so it neither cools nor reheats the
+    gas. ``wall_K`` is the per-sample wall the band integration passes
+    as ``T_surface``. Do not use the 1000 K radiator split or the 150 K
+    floor.
 
     Algebra. T_film = (T_gas,in + T_wall) / 2.
 
@@ -5857,6 +5943,315 @@ def _stage_film_temperature_K(gas_inlet_K: float, wall_K: float) -> float:
             'T_surface_K', wall_K, 'must be above absolute zero',
         )
     return 0.5 * (gas_inlet_K + wall_K)
+
+
+def _exchanger_state(
+    gas_inlet_K: float,
+    wall_K: float,
+    ntu: float,
+) -> tuple[float, float, float]:
+    gas_inlet_K = _deposition_finite_scalar('T_gas_K', gas_inlet_K)
+    wall_K = _deposition_finite_scalar('T_surface_K', wall_K)
+    ntu = _deposition_finite_scalar('NTU', ntu)
+    if gas_inlet_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_gas_K', gas_inlet_K, 'must be above absolute zero',
+        )
+    if wall_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_surface_K', wall_K, 'must be above absolute zero',
+        )
+    if ntu < 0.0:
+        raise DepositionInputRefusal('NTU', ntu, 'must be non-negative')
+    return gas_inlet_K, wall_K, ntu
+
+
+def _stage_bulk_outlet_temperature_K(
+    gas_inlet_K: float,
+    wall_K: float,
+    ntu: float,
+) -> float:
+    """Bulk outlet of one isothermal-wall condenser stage.
+
+    Premise. The stage is a heat exchanger at one wall temperature, the
+    stage-band midpoint. The wall is isothermal. Mass flow and properties
+    are frozen at the inlet, so NTU is constant along the area. Upstream
+    ducts are not this exchanger: a pipe the design holds hot does not
+    take a step here.
+
+    Algebra. The gas control volume gives
+        m_dot cp dT = -h (T - T_wall) dA.
+    With NTU = h A / (m_dot cp) and xi = A_local / A,
+        dT / (T - T_wall) = -NTU d xi,
+        T_out = T_wall + (T_in - T_wall) exp(-NTU).
+
+    Unit check. NTU is dimensionless. Both temperatures are kelvin.
+
+    Limits. NTU = 0 leaves T_out = T_in. Large NTU gives T_out -> T_wall.
+    A hotter wall heats the gas toward that wall; a colder wall cools it.
+
+    Latent heat does not enter this ODE. Condensation is at the wall, so
+    ``latent_vaporization_kj_per_mol`` (thermal_budget owner, NIST-JANAF
+    Chase 1998: Fe 340.00 kJ/mol, Na 97.42 kJ/mol) goes to the coolant
+    with the condensate. It is not a gas-temperature source. A monatomic
+    vapour's own cp is ``vapor_cp_j_per_mol_k`` = 2.5 * GAS_CONSTANT.
+    Fe and Na are in ``thermal_train._MONATOMIC_SPECIES``. GAS_CONSTANT
+    is 8.31446261815324 J/mol/K, so cp = 20.7861565453831 J/mol/K.
+    Across 1923.15 K -> 1373.15 K (550 K) the vapour sensible change is
+    20.7861565453831 * 550 = 11432.3861 J/mol = 11.432386 kJ/mol, and
+    340.00 / 11.432386 = 29.740, so iron's latent is 29.740 times that
+    sensible change when the stream is the condensing vapour. Carrier
+    cp is quoted on
+    ``_stage_heat_exchanger_ntu``; it cancels in the Lewis-number = 1
+    NTU and is not a number this function reads. Freezing the inlet
+    molar flow understates NTU when a large vapour fraction condenses
+    inside the stage.
+    """
+
+    gas_inlet_K, wall_K, ntu = _exchanger_state(gas_inlet_K, wall_K, ntu)
+    if ntu == 0.0:
+        return gas_inlet_K
+    return wall_K + (gas_inlet_K - wall_K) * math.exp(-ntu)
+
+
+def _stage_bulk_mean_temperature_K(
+    gas_inlet_K: float,
+    wall_K: float,
+    ntu: float,
+) -> float:
+    """Log-mean bulk temperature along the same exchanger.
+
+    Algebra. T(xi) = T_wall + (T_in - T_wall) exp(-NTU xi), xi in [0, 1],
+    and T_out - T_wall = (T_in - T_wall) exp(-NTU). The log-mean
+    temperature difference is
+        LMTD = ((T_in - T_wall) - (T_out - T_wall))
+               / ln((T_in - T_wall) / (T_out - T_wall))
+             = (T_in - T_wall) (1 - exp(-NTU)) / NTU.
+    The bulk mean is T_wall + LMTD. That equals the area mean
+        integral_0^1 T(xi) d xi
+    because the approach is exponential. NTU -> 0 makes LMTD -> T_in - T_wall,
+    so T_mean -> T_in. The nucleation rate uses this mean: it is the
+    temperature the vapour occupies, not the wall and not the film.
+    """
+
+    gas_inlet_K, wall_K, ntu = _exchanger_state(gas_inlet_K, wall_K, ntu)
+    if ntu == 0.0:
+        return gas_inlet_K
+    return wall_K + (gas_inlet_K - wall_K) * (1.0 - math.exp(-ntu)) / ntu
+
+
+def _stage_heat_exchanger_ntu(
+    *,
+    area_m2: float,
+    hydraulic_diameter_m: float,
+    gas_inlet_K: float,
+    wall_K: float,
+    total_molar_flow_mol_s: float,
+    total_pressure_pa: float,
+    sherwood: float,
+    carrier_gas: str,
+) -> float:
+    """Heat-transfer NTU on the capture-law geometry.
+
+    Premise. Chilton–Colburn equates the heat and mass j-factors:
+        Nu / (Re Pr^{1/3}) = Sh / (Re Sc^{1/3}),
+        Nu = Sh Pr^{1/3} / Sc^{1/3}.
+    Le = alpha / D = Sc / Pr, so Pr^{1/3} / Sc^{1/3} = Le^{-1/3} and
+        Nu = Sh Le^{-1/3}.
+    h = Nu k_thermal / Dh and k_c = Sh D / Dh, so
+        h / (rho cp k_c) = Le^{2/3}.
+    NTU = h A / (n_dot cp). n_dot is the molar flow and cp the molar
+    heat capacity; m_dot cp_mass is the same product. Then
+        NTU = Le^{2/3} k_c A / Q,
+    with Q = n_dot R T_in / P the inlet volumetric flow and
+    m_dot = rho Q. The existing Sh (``_stirring_enhanced_sherwood``)
+    is the laminar 3.66 times the square root of the radial stir
+    factor. It carries no Schmidt number. No carrier thermal
+    conductivity is stored (``transport_constants`` keeps the collision
+    diameter, epsilon/k, and molar mass only). This owner therefore
+    takes the Le = 1 case of the analogy, Nu = Sh, and
+        NTU = k_c A / Q.
+    k_c uses the carrier self-diffusion at the inlet film temperature,
+    and the same Sherwood number as the capture law. Metal-vapour D_AB
+    is not the bulk heat-transfer diffusivity. cp and rho cancel, so
+    the arithmetic does not read a heat capacity. The cp that cancels
+    is the one already in the repo, not a new constant:
+
+    Kr and Ar, monatomic. NASA CEA thermo.inp, record Kr (Sugar 1991)
+    and record Ar (Moore 1971 / Gordon 1999), in
+    data/literature/extracts/nasa-cea-thermo.yaml. On 300–1000 K (Kr)
+    and 200–1000 K (Ar) the coefficients are a = (0, 0, 2.5, 0, 0, 0, 0),
+    so Cp/R = 2.5. docs/model-limitations.md states the same ideal-gas
+    Cp = 5/2 R. The 1000–6000 K segments (Kr a3 = 2.500920585, Ar
+    a3 = 2.500069401) evaluate to Cp/R = 2.500000 within 1e-6 from
+    1000 K through 1923 K, so Cp = 2.5 * 8.31446261815324
+    = 20.786157 J/mol/K.
+
+    N2. The same file, record N2 (Gurvich 1978). The frozen-vibration
+    diatomic limit is Cp = 7/2 R = 3.5 * 8.31446261815324
+    = 29.100619 J/mol/K (docs/model-limitations.md; the same limit is
+    the premise of thermal_train's low-temperature O2 cp). CEA at
+    298.15 K on the 200–1000 K segment is Cp/R = 3.502834,
+    Cp = 29.124184 J/mol/K. At process temperature the 1000–6000 K
+    segment is Cp/R = a1 T^{-2} + a2 T^{-1} + a3 + a4 T + a5 T^2
+    + a6 T^3 + a7 T^4 with a = (587712.406, -2239.249073, 6.06694922,
+    -6.1396855e-4, 1.491806679e-7, -1.923105485e-11, 1.061954386e-15).
+    At 1723.15 K that is Cp/R = 4.261335, Cp = 35.430713 J/mol/K.
+
+    CO2. The same file, record CO2 (Gurvich 1991), 1000–6000 K,
+    a = (117696.2419, -1788.791477, 8.29152319, -9.22315678e-5,
+    4.86367688e-9, -1.891053312e-12, 6.33003659e-16). At 1723.15 K,
+    Cp/R = 7.144486, Cp = 59.402559 J/mol/K.
+
+    Unit check. D is m^2/s, Dh is m, k_c is m/s, A is m^2, Q is m^3/s,
+    and NTU is dimensionless. D scales as 1/P and Q scales as 1/P, so
+    NTU does not depend on pressure when the molar flow is fixed.
+
+    Limits. No area, no molar flow, or no positive total pressure has
+    no finite exchanger step, so NTU is 0 and the bulk temperature is
+    unchanged. A carrier with no self-diffusion returns D = 0 from
+    ``_chapman_enskog_d_ab_m2_s``; that is also NTU 0, not a substitute
+    diffusivity.
+    """
+
+    area_m2 = _deposition_finite_scalar('stage_area_m2', area_m2)
+    if area_m2 <= 0.0:
+        return 0.0
+    hydraulic_diameter_m = _deposition_finite_scalar(
+        'stage_hydraulic_diameter_m', hydraulic_diameter_m,
+    )
+    if hydraulic_diameter_m <= 0.0:
+        raise DepositionInputRefusal(
+            'stage_hydraulic_diameter_m',
+            hydraulic_diameter_m,
+            'must be positive',
+        )
+    total_molar_flow_mol_s = _deposition_finite_scalar(
+        'n_total_mol_s', total_molar_flow_mol_s,
+    )
+    total_pressure_pa = _deposition_finite_scalar(
+        'overhead_pressure_pa', total_pressure_pa,
+    )
+    sherwood = _deposition_finite_scalar('Sherwood', sherwood)
+    if (
+        total_molar_flow_mol_s <= 0.0
+        or total_pressure_pa <= 0.0
+        or sherwood <= 0.0
+    ):
+        return 0.0
+    film_K = _stage_film_temperature_K(gas_inlet_K, wall_K)
+    diffusivity_m2_s = _chapman_enskog_d_ab_m2_s(
+        carrier_gas,
+        film_K,
+        total_pressure_pa,
+        carrier=carrier_gas,
+    )
+    if not math.isfinite(diffusivity_m2_s) or diffusivity_m2_s <= 0.0:
+        return 0.0
+    volumetric_flow_m3_s = (
+        total_molar_flow_mol_s
+        * GAS_CONSTANT_J_MOL_K
+        * gas_inlet_K
+        / total_pressure_pa
+    )
+    if volumetric_flow_m3_s <= 0.0:
+        return 0.0
+    mass_transfer_coefficient_m_s = (
+        sherwood * diffusivity_m2_s / hydraulic_diameter_m
+    )
+    return mass_transfer_coefficient_m_s * area_m2 / volumetric_flow_m3_s
+
+
+def _species_molar_flow_mol_s(
+    species: str,
+    rate_kg_hr: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> float:
+    """mol/s from a kg/hr rate. Unknown molar mass contributes nothing."""
+
+    try:
+        rate = float(rate_kg_hr)
+    except (TypeError, ValueError):
+        return 0.0
+    if not math.isfinite(rate) or rate <= 0.0:
+        return 0.0
+    try:
+        mass_kg_per_molecule = _molecular_mass_kg_per_molecule(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    except MolarMassUnavailable:
+        return 0.0
+    molar_mass_kg_per_mol = mass_kg_per_molecule * AVOGADRO
+    if not math.isfinite(molar_mass_kg_per_mol) or molar_mass_kg_per_mol <= 0.0:
+        return 0.0
+    return rate / molar_mass_kg_per_mol / 3600.0
+
+
+def _tracked_molar_flow_mol_s(
+    species_kg_hr: Mapping[str, float],
+    species_names: tuple[str, ...] | None,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> float:
+    if species_names is None:
+        pairs = species_kg_hr.items()
+    else:
+        pairs = (
+            (species, species_kg_hr.get(species, 0.0))
+            for species in species_names
+        )
+    return math.fsum(
+        _species_molar_flow_mol_s(
+            str(species),
+            rate,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        for species, rate in pairs
+    )
+
+
+def _inlet_carrier_molar_flow_mol_s(
+    inlet_species_kg_hr: Mapping[str, float],
+    inlet_partials_pa: Mapping[str, float],
+    total_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> tuple[float, tuple[str, ...] | None]:
+    """Carrier mol/s, and which species count as the condensing vapour.
+
+    The partial-pressure owner already split the inlet. sum(p_i) is the
+    vapour pressure and P - sum(p_i) is the carrier. On that split
+        n_carrier = n_vapour (P - sum p) / sum p.
+    No partials means the flowing vapour is the whole mixture, so the
+    carrier is zero and every species is tracked. sum(p) >= P likewise
+    has no carrier remainder.
+    """
+
+    if not inlet_partials_pa:
+        return 0.0, None
+    species_names = tuple(str(species) for species in inlet_partials_pa)
+    if total_pressure_pa <= 0.0:
+        return 0.0, species_names
+    vapour_mol_s = _tracked_molar_flow_mol_s(
+        inlet_species_kg_hr,
+        species_names,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    partial_sum_pa = math.fsum(
+        float(pressure) for pressure in inlet_partials_pa.values()
+    )
+    if (
+        vapour_mol_s <= 0.0
+        or partial_sum_pa <= 0.0
+        or partial_sum_pa >= total_pressure_pa
+    ):
+        return 0.0, species_names
+    return (
+        vapour_mol_s * (total_pressure_pa - partial_sum_pa) / partial_sum_pa,
+        species_names,
+    )
 
 
 def _stage_alpha_s(

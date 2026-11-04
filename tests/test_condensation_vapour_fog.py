@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from simulator.condensation import CondensationModel
+from simulator.condensation import CondensationModel, _stage_vapour_fog_notice
 from simulator.nucleation import (
     ETA_ROLE_UPPER_BOUND,
     FOG_RATE_THRESHOLD_M3_S,
@@ -53,26 +53,34 @@ def _notices(model, species: str, stage_number: int, sub_order: int):
     ]
 
 
-def test_cold_stage_flags_sodium_and_keeps_eta() -> None:
+def test_small_collector_keeps_hot_bulk_and_molecular_eta() -> None:
+    """1e-3 m2 does not cool the 1450 C inlet, so neither cold wall fogs."""
+
     model, route = _route_alkali()
     collector = _notices(model, "Na", 4, 0)
     trap = _notices(model, "Na", 4, 1)
     assert len(collector) == 1
     assert len(trap) == 1
+    collector_bulk = next(
+        row for row in model.last_stage_bulk_gas
+        if row["stage_number"] == 4 and row["sub_order"] == 0
+    )
+    train_inlet_K = 1450.0 + CELSIUS_TO_KELVIN_OFFSET
 
-    assert collector[0]["temperature_basis"] == "stage_midpoint"
-    assert collector[0]["T_K"] == pytest.approx(250.0 + CELSIUS_TO_KELVIN_OFFSET)
+    assert collector[0]["temperature_basis"] == "stage_bulk"
+    assert collector[0]["T_K"] == collector_bulk["T_bulk_mean_K"]
+    assert collector_bulk["T_in_K"] == pytest.approx(train_inlet_K, abs=40.0)
     assert collector[0]["hour"] == 4
     assert collector[0]["campaign_hour"] == 4
     assert collector[0]["code"] is None
-    assert collector[0]["J_m3_s"] == pytest.approx(187.0, rel=0.25)
-    assert collector[0]["J_m3_s"] <= FOG_RATE_THRESHOLD_M3_S
+    assert collector[0]["J_m3_s"] == 0.0
+    assert collector[0]["saturation_authority"] == "certified"
     assert collector[0]["eta_role"] is None
 
-    assert trap[0]["code"] == NOTICE_FOG
-    assert trap[0]["T_K"] == pytest.approx(40.0 + CELSIUS_TO_KELVIN_OFFSET)
-    assert trap[0]["J_m3_s"] > FOG_RATE_THRESHOLD_M3_S
-    assert trap[0]["eta_role"] == ETA_ROLE_UPPER_BOUND
+    assert trap[0]["code"] is None
+    assert trap[0]["T_K"] == pytest.approx(collector_bulk["T_out_K"], abs=40.0)
+    assert trap[0]["J_m3_s"] == 0.0
+    assert trap[0]["eta_role"] is None
     assert trap[0]["eta_molecular"] is not None
     assert 0.0 <= trap[0]["eta_molecular"] <= 1.0
 
@@ -111,10 +119,27 @@ _HANDBOOK_CAUTION = (
 def test_sodium_collector_forwards_extrapolated_saturation_and_the_caution() -> None:
     """250 C Na is clear at nominal P_sat. A 25% lower P_sat crosses 1e6."""
 
-    model, _route = _route_alkali()
-    collector = _notices(model, "Na", 4, 0)[0]
-    trap = _notices(model, "Na", 4, 1)[0]
+    train = CondensationTrain.create_default()
+    collector_stage = next(
+        stage for stage in train.stages
+        if stage.stage_number == 4 and stage.sub_order == 0
+    )
+    trap_stage = next(
+        stage for stage in train.stages
+        if stage.stage_number == 4 and stage.sub_order == 1
+    )
+    melt = MeltState(temperature_C=1450.0, hour=4, campaign_hour=4)
+    collector = _stage_vapour_fog_notice(
+        collector_stage, "Na", melt, _P_PA, 0.1, _INLET_KG_HR,
+        bulk_temperature_K=250.0 + CELSIUS_TO_KELVIN_OFFSET,
+    )
+    trap = _stage_vapour_fog_notice(
+        trap_stage, "Na", melt, _P_PA, 0.1, _INLET_KG_HR,
+        bulk_temperature_K=40.0 + CELSIUS_TO_KELVIN_OFFSET,
+    )
 
+    assert collector["temperature_basis"] == "stage_bulk"
+    assert collector["T_K"] == pytest.approx(250.0 + CELSIUS_TO_KELVIN_OFFSET)
     assert collector["code"] is None
     assert collector["J_m3_s"] <= FOG_RATE_THRESHOLD_M3_S
     assert collector["saturation_authority"] == "extrapolated"
@@ -126,6 +151,11 @@ def test_sodium_collector_forwards_extrapolated_saturation_and_the_caution() -> 
     assert trap["saturation_authority"] == "extrapolated"
     assert trap["saturation_notice"]
     assert _HANDBOOK_CAUTION not in trap["saturation_notice"]
+
+    model, _route = _route_alkali()
+    routed = _notices(model, "Na", 4, 0)[0]
+    assert routed["saturation_authority"] == "certified"
+    assert _HANDBOOK_CAUTION not in (routed["saturation_notice"] or "")
 
 
 def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
@@ -143,6 +173,9 @@ def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
 def test_reset_clears_fog_history() -> None:
     model, _route = _route_alkali()
     assert model.vapour_fog_history
+    assert model.stage_bulk_gas_history
     model.reset_run_sticking_authority()
     assert model.vapour_fog_history == []
     assert model.last_vapour_fog_notice == []
+    assert model.stage_bulk_gas_history == []
+    assert model.last_stage_bulk_gas == []
