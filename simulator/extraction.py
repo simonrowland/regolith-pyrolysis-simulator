@@ -28,7 +28,8 @@ from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS, REE_OXIDE_SP
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.condensation_routing import (
     PRODUCT_DESTINATIONS,
-    product_stage_number,
+    product_destination,
+    stage_list_index_for_destination,
 )
 from simulator.config_flags import bool_feature_flag
 from simulator.melt_regime import MeltRegime, melt_regime
@@ -458,7 +459,9 @@ class ExtractionMixin:
             for species, raw_kg in credit.species_kg.items():
                 if species not in destinations:
                     continue
-                stage_idx = product_stage_number(recipe, species)
+                stage_idx = stage_list_index_for_destination(
+                    self.train, destinations.get(species),
+                )
                 if stage_idx is None:
                     continue
                 credit_kg = max(0.0, float(raw_kg))
@@ -981,7 +984,9 @@ class ExtractionMixin:
         *,
         source_account: str = 'process.metal_phase',
     ) -> None:
-        stage_idx = product_stage_number(recipe, species)
+        stage_idx = stage_list_index_for_destination(
+            self.train, product_destination(recipe, species),
+        )
         if stage_idx is None:
             return
         self._project_condensed_species(

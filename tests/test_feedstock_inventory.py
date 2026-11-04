@@ -363,7 +363,9 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
     assert ledger["Fe"] == pytest.approx(55.045872)
     assert ledger["Ni"] == pytest.approx(9.174312)
     assert ledger["metallic_FeNi"] == pytest.approx(137.614679)
-    assert ledger["H2O"] == pytest.approx(45.871560)
+    # Escaped water is a measured zero-recovery channel, not recovered product.
+    assert ledger["H2O"] == 0.0
+    assert sim.atom_ledger.kg_by_account("terminal.offgas")["H2O"] == pytest.approx(45.871560)
     assert "ZrO2" not in ledger
 
     sim.melt.campaign = CampaignPhase.COMPLETE
@@ -1708,8 +1710,8 @@ def test_credit_line_k_product_route_is_removed_from_vapor_denominator():
         wall_deposit_fraction_by_species={"K": 0.0},
         wall_deposit_account_fractions_by_species={"K": {}},
         condensed_for_species=lambda species: 0.01 if species == "K" else 0.0,
-        condensed_by_stage_species={4: {"K": 0.01}},
-        impurity_by_stage_species={4: {}},
+        condensed_by_stage_species={"stage_4b_k_trap": {"K": 0.01}},
+        impurity_by_stage_species={"stage_4b_k_trap": {}},
     )
     sim._route_evaporated_species_to_condensation(route_result, "K", 0.01)
 

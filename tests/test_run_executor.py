@@ -72,8 +72,9 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
 
-    # Pin the complete serialized runner result and the authoritative ledger
-    # projections before changing the per-hour refusal snapshot ownership.
+    # Product-accounting now serializes source-account metal attribution and
+    # the separate unrecovered-phase report. Re-derived this runner payload
+    # from the production path; the authoritative ledger projection is stable.
     ledger = snapshot_atom_ledger(execution.simulator.atom_ledger)
     ledger_state = {
         "gross_account_flows": ledger.gross_account_flows(),
@@ -102,8 +103,11 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
 
     assert execution.status == "ok"
     assert len(execution.snapshots) == 2
+    # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
+    # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
+    # the laptop and studio-3, so this digest is not a laptop re-run.
     assert hashlib.sha256(payload_bytes).hexdigest() == (
-        "48f5ef924f554599242f2cbabd8c12b594cf69b0033a7d2cb4412624e76471b9"
+        "8e53b0f97a3dc81209cf91835192fe1723caf5111c0e1360fbbec0b6a9d2fecb"
     )
     assert hashlib.sha256(ledger_bytes).hexdigest() == (
         "c366b84c33ed81fb2a2c3c376df6cd20ac8366a5ae8e279d1679ba143a9bc4a3"

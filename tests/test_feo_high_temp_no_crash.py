@@ -48,15 +48,14 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
             },
         }
     }
-    setpoints = {
-        "campaigns": {},
-        "chemistry_kernel": {"allow_fallback_vapor": True},
-    }
+    setpoints = _load_yaml("setpoints.yaml")
+    setpoints.setdefault("chemistry_kernel", {})["allow_fallback_vapor"] = True
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     sim = PyrolysisSimulator(backend, setpoints, feedstocks, vapor_pressures)
     sim.load_batch("feo_regression", mass_kg=1000.0)
     sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 6.0
     sim.melt.atmosphere = Atmosphere.HARD_VACUUM
     sim.melt.temperature_C = 1600.0
     sim.melt.pO2_mbar = 0.0
@@ -66,6 +65,10 @@ def test_high_temp_fallback_routes_fe_as_metallic_fe_without_accountingerror():
         equilibrium = sim._get_equilibrium()
         flux = sim._calculate_evaporation(equilibrium)
         flux = sim._apply_analytic_evaporation_depletion(flux)
+        # Match core.step's route setup so the C2A hot-face schedule reaches
+        # the condensation owner before this direct fallback-route exercise.
+        sim._configure_condensation_operating_conditions(flux)
+        sim._apply_lab_surface_temperatures(sample_time_h=7.0)
         sim._route_to_condensation(flux)
         sim._update_melt_composition(flux)
     except AccountingError as exc:

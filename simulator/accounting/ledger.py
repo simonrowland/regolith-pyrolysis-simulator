@@ -1315,12 +1315,32 @@ class AtomLedger:
         return projected
 
     def project_account_mol(self, account: str) -> dict[str, float]:
-        """Project one account to outward-policy mol without changing closure."""
-        return _species_kg_to_mol(
-            self.project_account_kg(account),
-            self.registry,
-            tolerance_kg=0.0,
-        )
+        """Project one account to outward-policy mol without changing closure.
+
+        Premise: ``project_account_kg`` already omits admissible negative
+        dust and refuses a material deficit. Dividing that kg by molar
+        mass is not an identity. Algebra:
+        ``roundtrip = (canonical_mol * M) / M``, and IEEE-754 can give
+        ``roundtrip = canonical_mol + 1 ulp``. Unit check: both sides are
+        mol. Limiting case: a provider that moves the whole outward
+        balance (metal-pool restore) must debit exactly ``canonical_mol``
+        and land on 0, not ``-1 ulp``. Reservoirs stay on the kg
+        conversion because their signed balances are the outward policy.
+        """
+        name = str(account)
+        projected_kg = self.project_account_kg(name)
+        if self.account_policy(name).allow_negative:
+            return _species_kg_to_mol(
+                projected_kg,
+                self.registry,
+                tolerance_kg=0.0,
+            )
+        canonical = self._balances.get(name, {})
+        return dict(sorted(
+            (species, float(canonical[species]))
+            for species in projected_kg
+            if float(canonical.get(species, 0.0)) > 0.0
+        ))
 
     def _projection_tolerance_kg(
         self,

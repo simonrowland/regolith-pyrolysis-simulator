@@ -144,6 +144,15 @@ def _runner_block(path: Path) -> dict:
     return copy.deepcopy(block)
 
 
+def _terminal_offgas_stream(path: Path, species: str) -> dict:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    streams = payload["yield_disposition"]["terminal_species_streams"]
+    return next(
+        row for row in streams
+        if row["account"] == "terminal.offgas" and row["species"] == species
+    )
+
+
 def _wrapped(block: dict, extra_terminal: dict | None = None) -> dict:
     terminal = {"product_classification": block}
     if extra_terminal:
@@ -467,9 +476,13 @@ def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
         volatiles["class_total_kg"],
         state="qualified-product",
     )
-    _assert_traced_kg(
-        volatiles_card, "kg_by_species.CO", volatiles["kg_by_species"]["CO"]
-    )
+    # This fixture's CO is classified as terminal.offgas/offgas_vented by
+    # yield_disposition, not as captured-volatiles product. The older fixture
+    # predated that accounting distinction.
+    assert "CO" not in volatiles["kg_by_species"]
+    offgas_co = _terminal_offgas_stream(RUNNER_MARS, "CO")
+    assert offgas_co["destination"] == "offgas_vented"
+    assert offgas_co["terminal_kg"] > 0.0
     assert "not a product" in block["markdown"]
     assert "flagged capture · not a product" in silica_card
     assert "early-tap" in mixed_card
@@ -748,7 +761,12 @@ def test_p11_ci_runner_captured_volatiles_trace_emitted_species() -> None:
     rump = classification["refractory_ceramic_rump"]
 
     _assert_traced_kg(volatiles_card, "class_total_kg", volatiles["class_total_kg"])
-    _assert_traced_kg(volatiles_card, "kg_by_species.H2O", volatiles["kg_by_species"]["H2O"])
+    # H2O is also a terminal.offgas/offgas_vented stream in this fixture; the
+    # product card must not present it as a captured volatile.
+    assert "H2O" not in volatiles["kg_by_species"]
+    offgas_h2o = _terminal_offgas_stream(RUNNER_CI, "H2O")
+    assert offgas_h2o["destination"] == "offgas_vented"
+    assert offgas_h2o["terminal_kg"] > 0.0
     _assert_traced_kg(
         _card(html, "rump"), "class_total_kg", rump["class_total_kg"], state="qualified-product"
     )

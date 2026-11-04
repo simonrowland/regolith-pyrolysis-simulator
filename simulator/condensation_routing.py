@@ -10,6 +10,20 @@ STAGE_KEY_BY_NUMBER: dict[int, str] = {
     4: 'stage_4_alkali_mg_cyclone',
 }
 
+# Stage 4 keeps its key. The K trap is a sub-stage of 4, not a new
+# public stage number. sub_order 0 is every existing stage.
+NA_COLLECTOR_STAGE_KEY = 'stage_4_alkali_mg_cyclone'
+K_TRAP_STAGE_KEY = 'stage_4b_k_trap'
+K_TRAP_STAGE_NUMBER = 4
+K_TRAP_SUB_ORDER = 1
+STAGE_KEY_BY_IDENTITY: dict[tuple[int, int], str] = {
+    (number, 0): key for number, key in STAGE_KEY_BY_NUMBER.items()
+}
+STAGE_KEY_BY_IDENTITY[(K_TRAP_STAGE_NUMBER, K_TRAP_SUB_ORDER)] = K_TRAP_STAGE_KEY
+# Collector bands the integer registry cannot name. Completeness checks
+# require these keys; they do not renumber stages 5-7.
+SUBSTAGE_COLLECTOR_KEYS: tuple[str, ...] = (K_TRAP_STAGE_KEY,)
+
 # Config includes ducts and downstream monitors as well as product collectors.
 # Keep the product/report registry above stable; reuse its canonical keys here.
 COLLECTOR_STAGE_KEY_BY_NUMBER: dict[int, str] = {
@@ -20,6 +34,47 @@ COLLECTOR_STAGE_KEY_BY_NUMBER: dict[int, str] = {
     7: 'stage_7_accumulator',
 }
 
+
+def stage_key_for_stage(
+    stage: object,
+    *,
+    fallback_stage_number: int | None = None,
+    falsey_sub_order_is_zero: bool = False,
+    include_collector_fallback: bool = False,
+) -> str:
+    """Resolve a stage key from its explicit key, then its identity tuple.
+
+    Callers select their own missing-number and unknown-collector behavior:
+    report projections leave unknown identities unrouted, while the runner
+    assigns them a collector-number key or ``stage_N``.
+    """
+
+    try:
+        stage_number = int(getattr(stage, 'stage_number'))
+    except AttributeError:
+        if fallback_stage_number is None:
+            raise
+        stage_number = int(fallback_stage_number)
+
+    sub_order = getattr(stage, 'sub_order', 0)
+    if falsey_sub_order_is_zero:
+        sub_order = sub_order or 0
+    identity_key = STAGE_KEY_BY_IDENTITY.get(
+        (stage_number, int(sub_order))
+    )
+
+    explicit_key = getattr(stage, 'stage_key', '') or ''
+    if explicit_key:
+        return explicit_key
+    if identity_key:
+        return identity_key
+    if include_collector_fallback:
+        return COLLECTOR_STAGE_KEY_BY_NUMBER.get(
+            stage_number, f'stage_{stage_number}'
+        )
+    return ''
+
+
 STAGE_NUMBER_BY_KEY: dict[str, int] = {
     key: number for number, key in STAGE_KEY_BY_NUMBER.items()
 }
@@ -29,13 +84,18 @@ STAGE_NUMBER_BY_KEY.update({
     'stage_2_cr_harvester': 2,
     'stage_3_silica_baffle': 3,
     'stage_4_alkali_cyclone': 4,
+    K_TRAP_STAGE_KEY: K_TRAP_STAGE_NUMBER,
 })
 
 STAGE_TARGET_SPECIES: dict[int, tuple[str, ...]] = {
     1: ('Fe',),
     2: ('Cr', 'CrO2', 'Mn'),
     3: ('SiO',),
-    4: ('Na', 'K', 'Mg'),
+    4: ('Na', 'Mg'),
+}
+# The integer map cannot hold two target tuples for stage 4.
+STAGE_TARGET_SPECIES_BY_KEY: dict[str, tuple[str, ...]] = {
+    K_TRAP_STAGE_KEY: ('K',),
 }
 
 # Per CLAUDE.md sections 2/5 and Review F routing table. Product aliases
@@ -48,9 +108,9 @@ DESIGNATED_STAGE: dict[str, str] = {
     'Mn': 'stage_2_cr_oxide_harvest',
     'SiO': 'stage_3_sio_zone',
     'SiO2': 'stage_3_sio_zone',
-    'Na': 'stage_4_alkali_mg_cyclone',
-    'K': 'stage_4_alkali_mg_cyclone',
-    'Mg': 'stage_4_alkali_mg_cyclone',
+    'Na': NA_COLLECTOR_STAGE_KEY,
+    'K': K_TRAP_STAGE_KEY,
+    'Mg': NA_COLLECTOR_STAGE_KEY,
 }
 
 CONDENSATION_COPRODUCT_STAGE: dict[str, str] = {
@@ -96,10 +156,10 @@ PRODUCT_DESTINATIONS: dict[str, dict[str, str]] = {
         'Si': 'metal_phase_si',
         'Ti': 'metal_phase_ti',
         'Al': 'metal_phase_al',
-        'Mg': 'stage_4_alkali_mg_cyclone',
+        'Mg': NA_COLLECTOR_STAGE_KEY,
         'Ca': 'metal_phase_ca',
-        'Na': 'stage_4_alkali_mg_cyclone',
-        'K': 'stage_4_alkali_mg_cyclone',
+        'Na': NA_COLLECTOR_STAGE_KEY,
+        'K': K_TRAP_STAGE_KEY,
     },
 }
 
@@ -119,19 +179,63 @@ def designated_stage_number(species: str) -> int | None:
 
 
 def accepted_species_for_stage_number(stage_number: int) -> frozenset[str]:
-    """Species that may land in a stage without counting as impurity."""
+    """Species that may land in a stage without counting as impurity.
 
+    A sub-stage key that shares this number is not accepted here. K is
+    designated to the K trap, so stage 4's accepted set is Na and Mg.
+    """
+
+    canonical = STAGE_KEY_BY_NUMBER.get(stage_number)
     accepted = {
         species
         for species, destination in DESIGNATED_STAGE.items()
         if stage_number_for_destination(destination) == stage_number
+        and (canonical is None or destination == canonical)
     }
     accepted.update(
         species
         for species, destination in CONDENSATION_COPRODUCT_STAGE.items()
         if stage_number_for_destination(destination) == stage_number
+        and (canonical is None or destination == canonical)
     )
     return frozenset(accepted)
+
+
+def accepted_species_for_stage_key(stage_key: str) -> frozenset[str]:
+    """Accepted species for one stage key, including a sub-stage key."""
+
+    number = STAGE_NUMBER_BY_KEY.get(stage_key)
+    if (
+        number is not None
+        and STAGE_KEY_BY_NUMBER.get(number) == stage_key
+    ):
+        return accepted_species_for_stage_number(number)
+    accepted = {
+        species
+        for species, destination in DESIGNATED_STAGE.items()
+        if destination == stage_key
+    }
+    accepted.update(
+        species
+        for species, destination in CONDENSATION_COPRODUCT_STAGE.items()
+        if destination == stage_key
+    )
+    return frozenset(accepted)
+
+
+def species_accepted_on_stage(stage: object, species: str) -> bool:
+    """True when this stage object, not merely its number, accepts species."""
+
+    key = getattr(stage, 'stage_key', '') or ''
+    if key:
+        if DESIGNATED_STAGE.get(species) == key:
+            return True
+        if CONDENSATION_COPRODUCT_STAGE.get(species) == key:
+            return True
+        if key == STAGE_KEY_BY_NUMBER.get(int(stage.stage_number)):
+            return is_designated_for_stage(species, int(stage.stage_number))
+        return False
+    return is_designated_for_stage(species, int(stage.stage_number))
 
 
 def coproduct_species_for_stage_number(stage_number: int) -> frozenset[str]:
@@ -148,6 +252,47 @@ def target_species_for_stage_number(stage_number: int) -> list[str]:
     """Primary target species for public stage definitions."""
 
     return list(STAGE_TARGET_SPECIES.get(stage_number, ()))
+
+
+def target_species_for_stage_key(stage_key: str) -> list[str]:
+    """Primary targets for a stage key. Sub-stage keys are not the integer map."""
+
+    if stage_key in STAGE_TARGET_SPECIES_BY_KEY:
+        return list(STAGE_TARGET_SPECIES_BY_KEY[stage_key])
+    number = STAGE_NUMBER_BY_KEY.get(stage_key)
+    if number is not None and STAGE_KEY_BY_NUMBER.get(number) == stage_key:
+        return target_species_for_stage_number(number)
+    return []
+
+
+def stage_list_index_for_destination(train: object, destination: str | None) -> int | None:
+    """List index of the stage object for a destination key.
+
+    Public stage numbers stay 0-7. The K trap shares number 4 and is
+    appended after stage 7, so its list index is not its stage number.
+    Metal-phase destinations are not condenser stages.
+    """
+
+    if not destination or not str(destination).startswith('stage_'):
+        return None
+    stages = getattr(train, 'stages', ())
+    for index, stage in enumerate(stages):
+        if stage_key_for_stage(
+            stage,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=True,
+        ) == destination:
+            return index
+    number = stage_number_for_destination(destination)
+    if number is None:
+        return None
+    for index, stage in enumerate(stages):
+        if (
+            int(stage.stage_number) == number
+            and int(getattr(stage, 'sub_order', 0) or 0) == 0
+        ):
+            return index
+    return None
 
 
 def product_destination(recipe: str, species: str) -> str | None:

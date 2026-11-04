@@ -190,6 +190,12 @@ CODE_INPUTS = (
 #     green ba62a746d (3dd98193c, studio-3) changed 0 files under data/.
 #     This acknowledges STORE outputs only; the scoring change (237 residual
 #     records, 94 new numeric candidates) is covered by the commits' tests.
+#   1a4b42f53: t-1217 removes the uncertified condensation capture-budget
+#     regularizer and its two provenance rows from
+#     data/literature/vacuum_pyrolysis_sticking.yaml. No migrate path reads those
+#     rows into a store record: the battery pregate's full regeneration at the
+#     candidate merged onto green a8daa610f (7b61b78de, studio-2, engines live)
+#     changed 0 tracked or untracked paths.
 #   554fd0e07, b746bcf30, 3a27c5abd: t-1275 cell oxygen balance for every
 #     engine (d-142). These pass the requested oxygen to the alphaMELTS
 #     activity call in generators/bench.py, solve the vapour oxygen balance
@@ -263,6 +269,9 @@ CODE_INPUTS = (
 #     initial_charge_only. Regen on this tree (battery_migrate exit 1,
 #     observations 128946, queue 88695, hard issues 3278) left every store
 #     file byte-identical.
+#   f1ddf0822: conflicting identity-equal transition temperatures
+#     are flagged in simulator/battery/validate.py only. The commit
+#     does not touch migrate.py, battery_migrate.py, or data/.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "19f472447", "67678d3d4", "0c5b7486a",
     "f53dcec23", "826f5848e", "bff436549", "25796706a", "8adec237c", "9196346ee",
@@ -278,6 +287,7 @@ STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "23df83343", "2bd2918e6", "34132a932",
     "8d90cc936",
     "f522e152c", "da3640753", "e84b44277",
+    "1a4b42f53",
     "554fd0e07", "b746bcf30", "3a27c5abd",
     "23bee5e7b", "8c154cdb0", "ed246fcb7", "62224868f",
     "2e69a5faa", "4f9402dea", "31bb956c5", "cdd49ec85",

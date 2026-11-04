@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator.account_ids import TERMINAL_DRAIN_TAP_ACCOUNT
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.condensation import _LENNARD_JONES_PARAMS
 from simulator.cost_energy import is_unavailable_quantity
@@ -298,6 +299,19 @@ def test_product_class_marks_refused_channel_with_saved_capture_partial():
 
 def test_classifier_marks_refused_only_class_unavailable(two_hour_run, monkeypatch):
     monkeypatch.setattr(two_hour_run, "product_ledger", lambda: {})
+    original_project_account_kg = two_hour_run.atom_ledger.project_account_kg
+
+    def project_without_tapped_metal(account):
+        if account == TERMINAL_DRAIN_TAP_ACCOUNT:
+            return {}
+        return original_project_account_kg(account)
+
+    monkeypatch.setattr(
+        two_hour_run.atom_ledger,
+        "project_account_kg",
+        project_without_tapped_metal,
+    )
+    monkeypatch.setattr(two_hour_run, "_stage_collection_kg_by_source", {})
     products = classify_products(two_hour_run)
     assert products["ingots_metals"]["status"] == "unavailable"
     assert products["ingots_metals"]["class_total_kg"] is None
