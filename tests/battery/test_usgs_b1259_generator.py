@@ -636,38 +636,98 @@ def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
     }
 
 
-def test_name_index_replacement_must_match_printed_formula_weight() -> None:
-    for record_id, formula, formula_mass, formula_weight, refused in (
+def test_formula_weight_rejects_bad_replacements_and_pins_removals() -> None:
+    # First count is the green baseline's stored rows; second is its already
+    # refused rows. The candidate refuses both sets when the printed formula
+    # cannot be reconciled with the source's gram formula weight.
+    for record_id, printed_formula, formula_weight, green_stored, green_refused in (
         (
             "b1259-ht-0185-merwinite",
-            "Ca3Mg(Si04)2",
-            Decimal("369.219"),
+            "Ca3Mg(SiO4)2",
             Decimal("328.719"),
-            73,
+            72,
+            1,
         ),
         (
             "b1259-ht-0146-salammoniac",
-            "NH4C1",
-            Decimal("30.050"),
+            "NH4Cl",
             Decimal("53.491"),
-            25,
+            15,
+            10,
+        ),
+        (
+            "b1259-ht-0184-grcssular",
+            "Ca3Al2Si3O12",
+            Decimal("450.454"),
+            73,
+            3,
+        ),
+        (
+            "b1259-298k-0315-adularia",
+            "KAlSi3O8",
+            Decimal("278.337"),
+            4,
+            0,
+        ),
+        (
+            "b1259-298k-0279-ferberite",
+            "FeWO4",
+            Decimal("303.695"),
+            1,
+            0,
+        ),
+        (
+            "b1259-298k-0171-po-aqueous-ion",
+            "PO4",
+            Decimal("94.971"),
+            2,
+            0,
+        ),
+        (
+            "b1259-298k-0177-so-aqueous-ion",
+            "SO3",
+            Decimal("80.062"),
+            2,
+            0,
         ),
     ):
         record = _load(record_id)
         resolution = generator._resolve_formula(record)
         generated = generator.generate_record(record)
 
-        calculated_mass = generator._formula_mass(formula)
-        assert calculated_mass is not None
-        assert abs(calculated_mass - formula_mass) < Decimal("0.001")
-        assert abs(formula_mass - formula_weight) > Decimal("0.01")
+        printed_mass = generator._formula_mass(printed_formula)
+        assert printed_mass is not None
+        assert abs(printed_mass - formula_weight) < Decimal("0.03")
         assert resolution.formula is None
         assert resolution.reason is not None
         assert generator.FORMULA_UNRESOLVED_REASON_PREFIX in resolution.reason
-        assert formula in resolution.reason
         assert generated.observations == ()
         assert generated.report["cell_accounting"]["stored"] == 0
-        assert generated.report["cell_accounting"]["refused"] == refused
+        assert generated.report["cell_accounting"]["refused"] == (
+            green_stored + green_refused
+        )
+
+    for record_id, rejected_formula, rejected_mass, formula_weight in (
+        (
+            "b1259-ht-0185-merwinite",
+            "Ca3Mg(Si04)2",
+            Decimal("369.219"),
+            Decimal("328.719"),
+        ),
+        (
+            "b1259-ht-0146-salammoniac",
+            "NH4C1",
+            Decimal("30.050"),
+            Decimal("53.491"),
+        ),
+    ):
+        record = _load(record_id)
+        resolution = generator._resolve_formula(record)
+        calculated_mass = generator._formula_mass(rejected_formula)
+        assert calculated_mass is not None
+        assert abs(calculated_mass - rejected_mass) < Decimal("0.001")
+        assert abs(rejected_mass - formula_weight) > Decimal("0.01")
+        assert rejected_formula in (resolution.reason or "")
 
     for record_id, formula in (
         ("b1259-ht-0128-perovskite", "CaTiO3"),

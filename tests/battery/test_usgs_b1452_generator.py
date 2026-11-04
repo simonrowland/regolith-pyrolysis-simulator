@@ -59,6 +59,10 @@ HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
 B1452_FORMULA_UNRESOLVED_HT = 47
 B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
+# Green-to-tip additions for the 298 K and high-temperature terbium tables.
+B1452_TB_298K_OBSERVATIONS = 8
+B1452_TB_0202_OBSERVATIONS = 34
+B1452_TB_0203_OBSERVATIONS = 27
 # Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
 B1452_STORE_STORED = 15224
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
@@ -315,6 +319,48 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
         and "blank-formula-weight terbium formula line" in row["reason"]
     ]
     assert len(excluded) == 2
+
+    for formula, formula_weight in (
+        ("TbO1.714", Decimal("186.348")),
+        ("TbO1.812", Decimal("187.916")),
+    ):
+        formula_observations = [
+            observation
+            for observation in generated.observations
+            if observation.identity.species.formula == formula
+        ]
+        assert len(formula_observations) == 4
+        calculated_mass = generator._formula_mass(formula)
+        assert calculated_mass is not None
+        assert abs(calculated_mass - formula_weight) < Decimal("0.001")
+    assert sum(
+        observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+        for observation in generated.observations
+    ) == B1452_TB_298K_OBSERVATIONS
+
+    for record_id, formula, formula_weight, expected_count in (
+        (
+            "robie-hemingway-fisher-1978-usgs-b1452-0202",
+            "TbO1.714",
+            Decimal("186.348"),
+            B1452_TB_0202_OBSERVATIONS,
+        ),
+        (
+            "robie-hemingway-fisher-1978-usgs-b1452-0203",
+            "TbO1.812",
+            Decimal("187.916"),
+            B1452_TB_0203_OBSERVATIONS,
+        ),
+    ):
+        ht = _generation(record_id)
+        assert len(ht.observations) == expected_count
+        formulas = {observation.identity.species.formula for observation in ht.observations}
+        assert formulas == {formula}
+        printed_weight = Decimal(_load(record_id)["formula_weight"]["as_published"])
+        assert printed_weight == formula_weight
+        calculated_mass = generator._formula_mass(formula)
+        assert calculated_mass is not None
+        assert abs(calculated_mass - printed_weight) < Decimal("0.001")
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
