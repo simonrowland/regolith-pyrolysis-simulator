@@ -26,6 +26,10 @@ from simulator.battery.enums import (
     ValenceValueForm,
     ValueKind,
 )
+from simulator.battery.input_provenance import (
+    SCORED_PHASE_ANALYSIS,
+    composition_with_provenance,
+)
 from simulator.battery.identity import (
     Identity,
     IdentityRefusal,
@@ -338,8 +342,11 @@ def test_jugo_2010_table4_values_and_conditions_match_render():
         and row.identity.composition is not None
         and row.identity.composition.is_value
         and row.identity.composition.value
-        == wt_pct_to_mole_fraction(
-            row.point_conditions["composition"].state.value
+        == composition_with_provenance(
+            wt_pct_to_mole_fraction(
+                row.point_conditions["composition"].state.value
+            ),
+            SCORED_PHASE_ANALYSIS,
         )
         and row.identity.total_pressure_Pa is not None
         and row.identity.total_pressure_Pa.is_value
@@ -1080,7 +1087,9 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
             "FeOT": float(feot),
         }
         composition = migrated_row.identity.composition.value
-        assert composition == wt_pct_to_mole_fraction(closed)
+        assert composition == composition_with_provenance(
+            wt_pct_to_mole_fraction(closed), SCORED_PHASE_ANALYSIS
+        )
         mole_amounts = {
             oxide: fraction * oxide_molar_mass(oxide)
             for oxide, fraction in composition.components
@@ -1101,14 +1110,17 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
         for row in rows
         if "jayasuriya_2004_rt_1pct" in row.observation_id
     )
-    assert low_fe.identity.composition.value == wt_pct_to_mole_fraction(
-        {
-            "SiO2": Decimal("50.47"),
-            "Al2O3": Decimal("15.12"),
-            "MgO": Decimal("10.46"),
-            "CaO": Decimal("23.94"),
-            "Fe2O3": Decimal("1.0"),
-        }
+    assert low_fe.identity.composition.value == composition_with_provenance(
+        wt_pct_to_mole_fraction(
+            {
+                "SiO2": Decimal("50.47"),
+                "Al2O3": Decimal("15.12"),
+                "MgO": Decimal("10.46"),
+                "CaO": Decimal("23.94"),
+                "Fe2O3": Decimal("1.0"),
+            }
+        ),
+        SCORED_PHASE_ANALYSIS,
     )
     d60 = [
         row
@@ -1117,7 +1129,8 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     ]
     assert len(d60) == 2
     assert all(
-        row.identity.total_pressure_Pa.is_unknown
+        row.identity.total_pressure_Pa.is_value
+        and row.identity.total_pressure_Pa.value == Decimal("1100000000")
         and row.point_conditions["total_pressure_Pa"].state.value.point
         == Decimal("1100000000")
         for row in d60
