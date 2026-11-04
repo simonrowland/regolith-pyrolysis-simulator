@@ -655,6 +655,74 @@ def test_ambiguous_feot_mass_loss_child_keeps_green_unknown_identity(
     )
 
 
+def test_negative_equilibrium_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_wt_pct": {"SiO2": "101", "MgO": "-1"},
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green rejects negative oxide amounts and replaces this parent's identity
+    # with the row's typed refusal.
+    assert "negative or non-finite amount" in (
+        identity_composition.reason or ""
+    )
+
+
+def test_ambiguous_feot_activity_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "activity"
+    values.pop("component_amount")
+    values["activity"] = "0.2"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "activity": "0.2",
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "FeO": "25",
+                "FeOT": "25",
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green replaces the valid parent with its preexisting ambiguous-FeOT
+    # refusal for activity rows too.
+    assert "ambiguous total iron components: FeOT with FeO" in (
+        identity_composition.reason or ""
+    )
+
+
 def test_partial_mass_map_refusal_preserves_equal_valued_mole_datum(
     tmp_path: Path,
 ) -> None:

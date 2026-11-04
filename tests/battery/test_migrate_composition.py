@@ -5755,18 +5755,134 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
-def test_inline_chloride_above_dropped_limit_is_refused() -> None:
-    printed = {"MgO": Decimal("99"), "Cl": Decimal("1")}
-
+@pytest.mark.parametrize(
+    ("case", "wt", "closure_context", "declared", "green_accepts"),
+    (
+        pytest.param(
+            "missing-major",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            None,
+            None,
+            True,
+            id="missing-major",
+        ),
+        pytest.param(
+            "partial-94.9",
+            {"SiO2": "50", "MgO": "44.9"},
+            None,
+            None,
+            True,
+            id="partial-kept-total",
+        ),
+        pytest.param(
+            "over-limit-102.1",
+            {"SiO2": "60", "MgO": "42.1"},
+            None,
+            None,
+            True,
+            id="over-limit-kept-total",
+        ),
+        pytest.param(
+            "thomas-wood-chloride",
+            {"MgO": "99"},
+            {
+                "composition_wt_pct": {"MgO": "99"},
+                "Cl_wt_pct": "1.0",
+            },
+            {"MgO": "99"},
+            True,
+            id="accepted-chloride-sibling",
+        ),
+        pytest.param(
+            "taniguchi-metal-iron",
+            {"Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
+            {
+                "composition_mass_percent": {
+                    "T.Fe": "1.0",
+                    "CaO": "39.9",
+                    "Al2O3": "59.6",
+                }
+            },
+            {"T.Fe": "1.0", "CaO": "39.9", "Al2O3": "59.6"},
+            True,
+            id="accepted-metal-iron",
+        ),
+        pytest.param(
+            "unknown-token",
+            {"SiO2": "60", "MgO": "39"},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "60",
+                    "MgO": "39",
+                    "XxO": "1",
+                }
+            },
+            {"SiO2": "60", "MgO": "39", "XxO": "1"},
+            False,
+            id="green-refused-unknown-token",
+        ),
+        pytest.param(
+            "negative-unknown-token",
+            {"SiO2": "60", "MgO": "39"},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "60",
+                    "MgO": "39",
+                    "XxO": "-1",
+                }
+            },
+            {"SiO2": "60", "MgO": "39", "XxO": "-1"},
+            False,
+            id="green-refused-invalid-dropped-amount",
+        ),
+        pytest.param(
+            "negative-oxide",
+            {"SiO2": "101", "MgO": "-1"},
+            None,
+            None,
+            False,
+            id="green-refused-negative-oxide",
+        ),
+        pytest.param(
+            "non-finite",
+            {"SiO2": Decimal("NaN"), "MgO": "50"},
+            None,
+            None,
+            False,
+            id="green-refused-non-finite",
+        ),
+        pytest.param(
+            "ambiguous-feot",
+            {"SiO2": "50", "FeO": "20", "FeOT": "30"},
+            None,
+            None,
+            False,
+            id="green-refused-ambiguous-feot",
+        ),
+    ),
+)
+def test_mass_closure_refusal_flag_matches_green_acceptance(
+    case: str,
+    wt: dict[str, object],
+    closure_context: object,
+    declared: dict[str, object] | None,
+    green_accepts: bool,
+) -> None:
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
-        printed,
-        closure_context=printed,
-        declared_component_map=printed,
+        {
+            name: as_decimal(amount) if isinstance(amount, str) else amount
+            for name, amount in wt.items()
+        },
+        closure_context=closure_context,
+        declared_component_map=declared,
     )
 
-    assert converted is None
-    assert refusal is not None
-    assert "Cl=1 wt%" in refusal.reason
+    assert converted is None, case
+    assert refusal is not None, case
+    # This table is pinned to 0418c0fd9's measured converter outcomes: it
+    # accepted missing/partial/over-limit totals and the Cl/T.Fe row shapes,
+    # while refusing XxO, negative/non-finite oxides, and ambiguous FeOT.
+    assert refusal.closure_refusal is green_accepts, (case, refusal)
 
 
 def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:

@@ -1579,6 +1579,45 @@ class _CompositionRefusal:
     closure_refusal: bool = False
 
 
+def _green_accepts_mass_percent_map(
+    wt: Mapping[str, Decimal],
+    declared_maps: Sequence[Mapping[str, Any] | None],
+) -> bool:
+    """Whether the Green converter accepted the printed map's component cells."""
+
+    component_names: set[str] = set()
+    original_maps = [item for item in declared_maps if item is not None]
+    for component_map in original_maps or [wt]:
+        if component_map is None:
+            continue
+        for raw_name, raw_amount in component_map.items():
+            name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
+            if (
+                str(raw_name) in _WALK_SKIP_KEYS
+                or str(raw_name) == "locator"
+                or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+                or _is_composition_condition_key(name)
+            ):
+                continue
+            kind, amount = _classify_composition_cell(raw_amount)
+            if kind == "blank":
+                continue
+            if kind != "number" or amount is None or amount < 0:
+                return False
+            if (
+                str(raw_name).strip() not in _COMPOSITION_COMPONENTS
+                and _kume_formula_unit_oxide(str(raw_name).strip()) is None
+                and name not in _COMPOSITION_COMPONENTS
+                and _kume_formula_unit_oxide(name) is None
+            ):
+                return False
+            component_names.add(name)
+    return not (
+        "FeOT" in component_names
+        and component_names.intersection({"FeO", "Fe2O3"})
+    )
+
+
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
@@ -4894,6 +4933,19 @@ def _wt_percent_conversion_or_refusal(
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> tuple[Composition | None, _CompositionRefusal | None]:
     try:
+        declared_maps = [declared_component_map]
+        declared_from_context = _declared_printed_composition_map(closure_context)
+        if (
+            declared_from_context is not None
+            and declared_from_context is not declared_component_map
+        ):
+            declared_maps.append(declared_from_context)
+        source_map = _printed_composition_source_map(closure_context)
+        if source_map is not None and all(
+            source_map is not item for item in declared_maps
+        ):
+            declared_maps.append(source_map)
+
         missing_major = tuple(
             dict.fromkeys(
                 (
@@ -4905,6 +4957,8 @@ def _wt_percent_conversion_or_refusal(
             )
         )
         if missing_major:
+            # Green skipped blank major cells and converted the remaining map;
+            # the m1 missing-major refusal is new.
             reason = "missing major oxides: " + ", ".join(missing_major)
             try:
                 kept_wt = {
@@ -4928,20 +4982,9 @@ def _wt_percent_conversion_or_refusal(
                 )
             ):
                 reason += "; " + closure_error
-            raise _MassPercentClosureError(reason)
-
-        declared_maps = [declared_component_map]
-        declared_from_context = _declared_printed_composition_map(closure_context)
-        if (
-            declared_from_context is not None
-            and declared_from_context is not declared_component_map
-        ):
-            declared_maps.append(declared_from_context)
-        source_map = _printed_composition_source_map(closure_context)
-        if source_map is not None and all(
-            source_map is not item for item in declared_maps
-        ):
-            declared_maps.append(source_map)
+            if _green_accepts_mass_percent_map(wt, declared_maps):
+                raise _MassPercentClosureError(reason)
+            raise ValueError(reason)
         for component_map in declared_maps:
             if component_map is None:
                 continue
@@ -4992,17 +5035,24 @@ def _wt_percent_conversion_or_refusal(
         )
         dropped_mass = sum(dropped.values(), Decimal("0"))
         if any(not amount.is_finite() or amount < 0 for amount in dropped.values()):
-            raise _MassPercentClosureError(
+            # Green already refused unsupported numeric components.
+            raise ValueError(
                 "unsupported printed component has a negative or non-finite amount"
             )
         if dropped_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
             details = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
-            raise _MassPercentClosureError(
+            reason = (
                 "partial analysis contains unsupported component(s) above "
                 f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}"
             )
+            # Green accepted Thomas-Wood's Cl sibling and Taniguchi's T.Fe
+            # alias, but rejected an unknown XxO map cell. Only the former
+            # are new m1 closure refusals.
+            if _green_accepts_mass_percent_map(wt, declared_maps):
+                raise _MassPercentClosureError(reason)
+            raise ValueError(reason)
 
         oxide_wt = _oxide_mass_percent_components(wt)
         volatile_wt = _printed_volatile_mass_percent(wt, closure_context)
@@ -5015,7 +5065,16 @@ def _wt_percent_conversion_or_refusal(
 
         closure_error = _percent_composition_closure_error(closure_wt, "mass")
         if closure_error is not None:
-            raise _MassPercentClosureError(closure_error)
+            if closure_error.startswith(
+                (
+                    "mass-percent composition is a partial analysis:",
+                    "mass-percent composition exceeds the accepted kept-sum limit:",
+                )
+            ) and _green_accepts_mass_percent_map(wt, declared_maps):
+                # Green converted partial and over-limit totals; m1 refuses them.
+                raise _MassPercentClosureError(closure_error)
+            # Green already rejected negative and non-finite oxide amounts.
+            raise ValueError(closure_error)
 
         converted = _mole_fraction_from_wt_percent_components(oxide_wt)
         return converted, None
@@ -23198,7 +23257,8 @@ class Migrator:
                 )
             )
             and not (
-                q_token_point
+                point_mass_closure_refused
+                and q_token_point
                 in {
                     Quantity.ACTIVITY,
                     Quantity.ACTIVITY_COEFFICIENT,
