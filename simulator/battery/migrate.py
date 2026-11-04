@@ -9954,6 +9954,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "estimate_from_glass_Cp_only",
         "value",
     ),
+    Quantity.PARTIAL_MOLAR_ENTHALPY: ("value",),
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: ("present_work_kcal_mol",),
     Quantity.ENTROPY_OF_FUSION: (
         "delta_S_fus_J_mol-1_K-1",
@@ -10474,6 +10475,7 @@ def _convert_compilation_amount(
             Quantity.H_MINUS_H298,
             Quantity.ENTHALPY_OF_FUSION,
             Quantity.ENTROPY_OF_FUSION,
+            Quantity.PARTIAL_MOLAR_ENTHALPY,
             Quantity.DELTA_FH,
             Quantity.DELTA_FG,
         }:
@@ -10485,13 +10487,19 @@ def _convert_compilation_amount(
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
     if quantity in FUSION_QUANTITIES:
         token = token.split(";", 1)[0]
+    if (
+        quantity in FUSION_QUANTITIES
+        or quantity is Quantity.PARTIAL_MOLAR_ENTHALPY
+    ):
         token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
+    if quantity in FUSION_QUANTITIES:
         token = token.replace("k−1", "/k").replace("k-1", "/k")
     energy = quantity in {
         Quantity.H_MINUS_H298,
         Quantity.DELTA_FH,
         Quantity.DELTA_FG,
         Quantity.ENTHALPY_OF_FUSION,
+        Quantity.PARTIAL_MOLAR_ENTHALPY,
     } or quantity in VAPORIZATION_ENTHALPIES
     heat = quantity in {Quantity.CP, Quantity.S, Quantity.ENTROPY_OF_FUSION}
     if not energy and not heat:
