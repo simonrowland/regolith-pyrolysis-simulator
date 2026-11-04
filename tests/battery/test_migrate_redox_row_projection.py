@@ -348,7 +348,7 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         assert point["composition"].locator.table == "S-2"
 
 
-def test_aithala_s1_uncertainties_quote_figure1_error_bar_level() -> None:
+def test_aithala_s1_uncertainties_keep_printed_cells_without_inferred_level() -> None:
     extract = yaml.safe_load(AITHALA.read_text(encoding="utf-8"))
     rows = [
         item
@@ -357,11 +357,11 @@ def test_aithala_s1_uncertainties_quote_figure1_error_bar_level() -> None:
         and item.get("values", {}).get("quantity") == "fe3_fe2_ratio"
     ]
     assert len(rows) == 16
-    for row in rows:
-        uncertainty = row["uncertainty"]["Fe3_over_FeT"]
-        assert '"error bars represent 2σ"' in uncertainty
-        assert "Fig. 1 caption, published p. 20" in uncertainty
-        assert "Table S-1 does not label the cell ± level" in uncertainty
+    assert all("Fig. 1" not in row["uncertainty"]["Fe3_over_FeT"] for row in rows)
+    vf271 = next(row for row in rows if row["values"]["sample_id"] == "VF271")
+    assert vf271["uncertainty"]["Fe3_over_FeT"] == (
+        "±0.019 (as printed; confidence level not specified in Table S-1)"
+    )
 
 
 def test_aithala_vf_composition_join_uses_the_printed_sample_id(tmp_path: Path) -> None:
