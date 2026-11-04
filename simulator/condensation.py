@@ -18,7 +18,7 @@ Train topology (metals train, active C2A onward):
              admits species whose routing temperature sits in the
              default 1400-1600°C band (Ti at 1500°C in
              ``CONDENSATION_TEMPS_C``).
-    Stage 1  Fe condenser (1150°C wall) — designated Fe stage. This
+    Stage 1  Fe condenser (1100°C wall) — designated Fe stage. This
              module does not model Fe phase or a sump. Equal band
              endpoints are that wall. Elemental Fe melts at 1538°C
              (1811 K), above this wall.
@@ -54,7 +54,7 @@ Key physics:
     routing stays the designated-stage registry.
 
 The Fe → SiO separation (Stage 1 → Stage 3):
-    Default Stage 1 wall is 1150°C; Stage 3 is 900-1200°C
+    Default Stage 1 wall is 1100°C; Stage 3 is 900-1200°C
     (``CondensationTrain.create_default``). Whether vapor lands on a
     stage is the wall saturation pressure on that band, not a species
     allow-list. SiO's designated product stage remains Stage 3.
@@ -892,7 +892,10 @@ def _fe_condensation_edge_hold(
     # assuming alpha_c = alpha_e at that same interface and temperature. The
     # record stores their ln(alpha) = a - b/T fit as alpha = A*exp(-B/T), with
     # A = exp(a) and B = b. A has no units and B/T is K/K, so alpha is
-    # dimensionless; the Stage-1 midpoint (1523.15 K) gives 0.878. The downward
+    # dimensionless. An in-band check at 1523.15 K gives 0.878170956. That
+    # temperature is not the Stage-1 wall. The equal-endpoint wall is 1100 C
+    # (1373.15 K), 69.85 K below the certified floor 1443 K, where the
+    # continued curve is A*exp(-1127/1373.15) = 0.809984123. The downward
     # Arrhenius limit is zero, contrary to Tatsumi et al.'s direct ~0.8 growth
     # coefficient at 688 K (the fit gives ~0.36), so outside the certified band
     # this resolver holds the nearest measured edge and flags it.
