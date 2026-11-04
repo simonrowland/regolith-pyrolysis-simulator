@@ -119,6 +119,9 @@ def test_seen_warning_still_raises_when_warning_filter_changes_to_error(
     caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
 
     with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("ignore", UserWarning)
+        engine_local_config.warn_once_with_summary(key, message)
+        assert engine_local_config._WARNING_REPEAT_COUNTS == {}
         warnings.simplefilter("default", UserWarning)
         engine_local_config.warn_once_with_summary(key, message)
         warnings.simplefilter("error", UserWarning)
