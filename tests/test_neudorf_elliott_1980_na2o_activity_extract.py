@@ -8,7 +8,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Polymorph, ReferenceStateConvention, ValueKind
+from simulator.battery.enums import (
+    Phase,
+    Polymorph,
+    ReferenceStateConvention,
+    ValueKind,
+)
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
 
@@ -254,9 +259,23 @@ def _assert_extracted_table_cells(document: dict) -> None:
         assert interpolated["quantity"] == "activity"
         assert interpolated["admission_status"] == "typed_refusal"
         assert interpolated["method_class"] == "author_derived"
+        interpolated_observation = observations[
+            f"{base}_interpolated_log_a_star_na2o"
+        ]
+        assert interpolated_observation["standard_state_as_printed"] == (
+            "The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure."
+        )
+        reference = interpolated_observation["standard_state"]
+        assert reference["state"]["tag"] == "value"
+        assert reference["state"]["value"] == {
+            **NA2O_LIQUID_STANDARD_STATE,
+            "reference_pressure_bar": "1.01325",
+        }
+        assert reference["inferred"] is False
+        assert reference["locator"]["published_page"] == 608
+        assert "Lin and Elliott [24]" in reference["note"]
         assert (
-            observations[f"{base}_interpolated_log_a_star_na2o"]["method_class"]
-            == "author_derived"
+            interpolated_observation["method_class"] == "author_derived"
         )
         assert "evidence_class" not in interpolated
         assert interpolated["column_as_printed"] == "Interpolated (†) as printed in the Table IV footnote"
@@ -471,6 +490,12 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
         interpolated = migrated[interpolated_id]
         assert interpolated.value.kind is ValueKind.UNAVAILABLE
         assert interpolated.evidence.class_.is_unknown
+        assert interpolated.identity.reference_state.is_value
+        reference_state = interpolated.identity.reference_state.value
+        assert reference_state.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference_state.endmember.formula == "Na2O"
+        assert reference_state.endmember.phase.value is Phase.L
+        assert reference_state.reference_pressure_bar == Decimal("1.01325")
         _assert_migrated_conditions(
             interpolated,
             temperature_K="1343.15",
@@ -480,6 +505,10 @@ def test_isolated_migration_preserves_identity_with_zero_hard_issues(tmp_path: P
             calculated = migrated[f"neudorf_elliott_1980_table4_row{index}_calculated_log_a_star_na2o"]
             assert calculated.value.kind is ValueKind.UNAVAILABLE
             assert calculated.evidence.class_.is_unknown
+            assert calculated.identity.reference_state.is_value
+            assert calculated.identity.reference_state.value.convention is (
+                ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+            )
             _assert_migrated_conditions(
                 calculated,
                 temperature_K="1343.15",

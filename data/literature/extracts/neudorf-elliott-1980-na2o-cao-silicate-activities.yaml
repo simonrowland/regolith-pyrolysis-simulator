@@ -710,6 +710,33 @@ species:
         note: row 1; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: &neudorf_na2o_reference_state
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            component_basis: Na2O
+            endmember:
+              formula: Na2O
+              phase:
+                tag: value
+                value: l
+              polymorph:
+                tag: not_applicable
+                reason: not crystal
+              charge:
+                tag: value
+                value: 0
+            reference_pressure_bar: '1.01325'
+        inferred: false
+        note: >-
+          Published page 608 defines the standard as pure liquid Na2O at 1 atm.
+          Lin and Elliott [24] provide the Na2O-WO3 reference-melt partial Gibbs
+          function in Eq. [5], GM(Na2O),(tung) = -95.10 - 347.2 NWO3 kJ at
+          1200 K. This is for the reference melt; the paper does not identify a
+          separate Gibbs function or table for pure liquid Na2O.
+        locator: *id004
       values:
         log_a_star_as_printed: '8.82'
         printed_log_form_as_published: log a*Na2O
@@ -718,7 +745,6 @@ species:
         NCaO_as_printed: '0.00'
         NNa_plus_as_printed: '1.00'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -768,6 +794,8 @@ species:
         note: row 2; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '8.93'
         printed_log_form_as_published: log a*Na2O
@@ -776,7 +804,6 @@ species:
         NCaO_as_printed: '0.02'
         NNa_plus_as_printed: '0.971'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -817,6 +844,8 @@ species:
         note: row 2; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '8.89'
         printed_log_form_as_published: log a*Na2O
@@ -825,7 +854,6 @@ species:
         NCaO_as_printed: '0.02'
         NNa_plus_as_printed: '0.971'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -850,6 +878,8 @@ species:
         note: row 3; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.05'
         printed_log_form_as_published: log a*Na2O
@@ -858,7 +888,6 @@ species:
         NCaO_as_printed: '0.04'
         NNa_plus_as_printed: '0.939'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -899,6 +928,8 @@ species:
         note: row 3; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.00'
         printed_log_form_as_published: log a*Na2O
@@ -907,7 +938,6 @@ species:
         NCaO_as_printed: '0.04'
         NNa_plus_as_printed: '0.939'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -932,6 +962,8 @@ species:
         note: row 4; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.16'
         printed_log_form_as_published: log a*Na2O
@@ -940,7 +972,6 @@ species:
         NCaO_as_printed: '0.06'
         NNa_plus_as_printed: '0.906'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -981,6 +1012,8 @@ species:
         note: row 4; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.14'
         printed_log_form_as_published: log a*Na2O
@@ -989,7 +1022,6 @@ species:
         NCaO_as_printed: '0.06'
         NNa_plus_as_printed: '0.906'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1014,6 +1046,8 @@ species:
         note: row 5; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.29'
         printed_log_form_as_published: log a*Na2O
@@ -1022,7 +1056,6 @@ species:
         NCaO_as_printed: '0.08'
         NNa_plus_as_printed: '0.871'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1063,6 +1096,8 @@ species:
         note: row 5; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.27'
         printed_log_form_as_published: log a*Na2O
@@ -1071,7 +1106,6 @@ species:
         NCaO_as_printed: '0.08'
         NNa_plus_as_printed: '0.871'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1096,6 +1130,8 @@ species:
         note: row 6; calculated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.41'
         printed_log_form_as_published: log a*Na2O
@@ -1104,7 +1140,6 @@ species:
         NCaO_as_printed: '0.10'
         NNa_plus_as_printed: '0.833'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
@@ -1145,6 +1180,8 @@ species:
         note: row 6; interpolated log a*Na2O
       phase: l
       units: dimensionless
+      standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+      standard_state: *neudorf_na2o_reference_state
       values:
         log_a_star_as_printed: '9.41'
         printed_log_form_as_published: log a*Na2O
@@ -1153,7 +1190,6 @@ species:
         NCaO_as_printed: '0.10'
         NNa_plus_as_printed: '0.833'
         table_reference_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
-        standard_state_as_printed: 'Table IV footnote: * Relative to pure solid silica (tridymite).'
         quantity: activity
         method_class: author_derived
         admission_status: typed_refusal
