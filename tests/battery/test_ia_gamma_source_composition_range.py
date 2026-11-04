@@ -20,6 +20,8 @@ def _score_activity(
     oxide: str,
     composition: dict[str, str],
     temperature_K: str,
+    *,
+    baseline_value: str | None = None,
 ):
     experiment, bench, observation = _case(
         composition=_composition(*composition.items()),
@@ -35,17 +37,22 @@ def _score_activity(
         isolated=False,
     )
     assert prediction.execution.state is ExecutionState.PRODUCED
-    request = activity_request_for_engine(
-        experiment, observation, "internal-analytical"
-    )
-    assert request is not None and request.payload is not None
-    expected = melt_oxide_activity(
-        oxide,
-        request.payload["composition_mol"],
-        temperature_K=float(temperature_K),
-    )
-    assert expected is not None
-    assert prediction.value == Decimal(str(expected.thermodynamic_parent_activity()))
+    if baseline_value is None:
+        request = activity_request_for_engine(
+            experiment, observation, "internal-analytical"
+        )
+        assert request is not None and request.payload is not None
+        expected = melt_oxide_activity(
+            oxide,
+            request.payload["composition_mol"],
+            temperature_K=float(temperature_K),
+        )
+        assert expected is not None
+        assert prediction.value == Decimal(
+            str(expected.thermodynamic_parent_activity())
+        )
+    else:
+        assert prediction.value == Decimal(baseline_value)
     return prediction
 
 
@@ -59,7 +66,11 @@ def test_kambayashi_kato_mgo_binary_row_is_flagged_without_changing_value() -> N
     # Kambayashi & Kato 1984 Table 2, p. 246: x(SiO2)=0.795, x(MgO)=0.205,
     # 1973 K. This binary composition is outside the cited CMAS basicity band.
     prediction = _score_activity(
-        "MgO", {"SiO2": "0.795", "MgO": "0.205"}, "1973"
+        "MgO",
+        {"SiO2": "0.795", "MgO": "0.205"},
+        "1973",
+        # Golden output from the unmodified 0ea42527e scorer.
+        baseline_value="0.009960556690592466",
     )
 
     notices = _source_range_notices(prediction)
@@ -75,6 +86,8 @@ def test_cmas_midrange_row_is_not_flagged() -> None:
         "MgO",
         {"CaO": "0.25", "MgO": "0.25", "Al2O3": "0.1", "SiO2": "0.4"},
         "1873",
+        # Golden output from the unmodified 0ea42527e scorer.
+        baseline_value="0.011042745776710052",
     )
 
     assert _source_range_notices(prediction) == ()
