@@ -629,7 +629,7 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
 
     assert math.sqrt(4.0 * throat_area_m2 / math.pi) == pytest.approx(0.12)
     assert model.pipe_diameter_m == pytest.approx(0.12)
-    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.236, abs=0.0)
+    assert model.stage_area_m2("fe_stage1") == pytest.approx(0.2828, abs=0.0)
     assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
     assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
@@ -808,8 +808,8 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     assert surface_geometry["source_class"] == "engineering-default"
     by_stage = surface_geometry["stage_area_ratio_provenance_by_stage"]
     fe_source = by_stage["fe_stage1"]["source"]
-    assert fe_source.startswith("owner-ruling-d137:")
-    assert "0.236 m2" in fe_source
+    assert fe_source.startswith("owner-ruling-d335:")
+    assert "0.2828 m2" in fe_source
     assert "provisional" not in fe_source
     for key, area_text in (
         ("alkali_stage4", "0.051 m2"),

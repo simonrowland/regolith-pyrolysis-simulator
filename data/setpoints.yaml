@@ -1152,10 +1152,12 @@ condensation_train:
 
     stage_1_fe_condenser:
       label: "Fe Condenser"
-      # Owner ruling d-137 (2026-10-29): parallel-plate collector, 10 mm gap,
-      # wall 1150 C. Wall >= 1100 C keeps SiO off the Fe tap. Equal endpoints
-      # are the wall temperature the capture law uses (band midpoint).
-      temp_range_C: [1150, 1150]
+      # Owner ruling d-335 (2026-11-03), "quench plus vortex", Stage-1 Fe.
+      # Equal endpoints are the wall the capture law uses (band midpoint).
+      # Source: condesign Option 1,
+      # docs-private/research/2026-11-03-condenser-design/condesign-report.md
+      # Area and hydraulic diameter stay on condenser_geometry.
+      temp_range_C: [1100, 1100]
       coating: "MZO (MgO-ZrO2)"
       max_service_T_C: 1450
       product: "liquid Fe draining to sump"
@@ -1238,14 +1240,21 @@ condenser_geometry:
   # at or above throat area and expose conservative baffle/cyclone surface
   # multipliers for later per-stage Kn/coating work.
   stage_area_ratios:
-    fe_stage1: 20.866981427604056
+    # Premise: d-335 Option 1 sets the Stage-1 plate to 0.2828 m2 on the
+    # shipped throat. Hydraulic diameter stays 0.020 m below.
+    # Algebra: ratio = 0.2828 m2 / initial_throat_area_m2,
+    # initial_throat_area_m2 = pi*(0.06 m)^2 = 0.011309733552923255 m2,
+    # ratio = 25.005009947993337.
+    # Unit check: m2/m2 is dimensionless, and the product is 0.2828 m2.
+    # Limit: ratio 1 would be the throat itself.
+    fe_stage1: 25.005009947993337
     cr_stage2: 4.5
     sio_stage3: 6.0
     alkali_stage4: 4.5093900542703675
     k_stage4b: 5.658842421045168
     terminal: 2.0
   stage_area_ratio_sources:
-    fe_stage1: "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window"
+    fe_stage1: "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md"
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
     alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
