@@ -227,6 +227,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
                 ("Al2O3", 0.0, 0.45),
                 ("SiO2", 0.0, 0.95),
             ),
+            source_temperature_isotherm_K=1873.15,
         ),
     ),
     "Al2O3": MeltOxideActivityCoefficient(
@@ -317,6 +318,7 @@ MELT_OXIDE_ACTIVITY_COEFFICIENTS: dict[str, MeltOxideActivityCoefficient] = {
                 ("Al2O3", 0.0, 0.45),
                 ("SiO2", 0.0, 0.95),
             ),
+            source_temperature_isotherm_K=1873.15,
         ),
     ),
     "MnO": MeltOxideActivityCoefficient(
