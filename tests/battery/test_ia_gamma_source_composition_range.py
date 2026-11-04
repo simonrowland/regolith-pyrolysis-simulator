@@ -74,6 +74,19 @@ def _source_range_notices(prediction):
     )
 
 
+def _direct_range_notice(
+    oxide: str, composition: dict[str, str], temperature_K: str
+) -> str:
+    activity = melt_oxide_activity(
+        oxide,
+        {name: float(amount) for name, amount in composition.items()},
+        temperature_K=float(temperature_K),
+    )
+    assert activity is not None
+    assert activity.source_composition_range_notice is not None
+    return activity.source_composition_range_notice
+
+
 def test_kambayashi_kato_mgo_binary_row_is_flagged_without_changing_value() -> None:
     extract_path = (
         Path(__file__).resolve().parents[2]
@@ -132,22 +145,19 @@ def test_unrecorded_source_composition_range_is_still_flagged() -> None:
 
 
 def test_mno_mass_percent_limit_is_enforced() -> None:
-    prediction = _score_activity(
+    reason = _direct_range_notice(
         "MnO",
         {"MnO": "0.8", "CaO": "0.1", "SiO2": "0.1"},
         "1873",
     )
 
-    notices = _source_range_notices(prediction)
-    assert len(notices) == 1
-    reason = notices[0].reason
     assert "oxide=MnO" in reason
     assert "MnO <9.6 mass %" in reason
     assert "Ohta & Suito 1995" in reason
 
 
 def test_feto_mass_percent_limit_is_enforced() -> None:
-    prediction = _score_activity(
+    reason = _direct_range_notice(
         "MnO",
         {
             "CaO": "0.4",
@@ -159,16 +169,13 @@ def test_feto_mass_percent_limit_is_enforced() -> None:
         "1873",
     )
 
-    notices = _source_range_notices(prediction)
-    assert len(notices) == 1
-    reason = notices[0].reason
     assert "oxide=MnO" in reason
-    assert "FetO <3 mass %" in reason
+    assert "FetO (<3 mass %)" in reason
     assert "Ohta & Suito 1995" in reason
 
 
 def test_single_isotherm_source_names_source_and_row_temperatures() -> None:
-    prediction = _score_activity(
+    reason = _direct_range_notice(
         "MnO",
         {
             "CaO": "0.4",
@@ -180,9 +187,6 @@ def test_single_isotherm_source_names_source_and_row_temperatures() -> None:
         "1600",
     )
 
-    notices = _source_range_notices(prediction)
-    assert len(notices) == 1
-    reason = notices[0].reason
     assert "source_isotherm=1873 K" in reason
     assert "row_temperature=1600 K" in reason
     assert "Ohta & Suito 1995" in reason
@@ -293,15 +297,12 @@ def test_p2o5_primary_composition_range_is_unrecorded() -> None:
 
 
 def test_chromium_source_isotherm_is_enforced_with_correct_table_page() -> None:
-    prediction = _score_activity(
+    reason = _direct_range_notice(
         "Cr2O3",
         {"CaO": "0.4", "SiO2": "0.5", "Cr2O3": "0.1"},
         "1200",
     )
 
-    notices = _source_range_notices(prediction)
-    assert len(notices) == 1
-    reason = notices[0].reason
     assert "source_isotherm=1773.15 K" in reason
     assert "row_temperature=1200 K" in reason
     assert "Pretorius & Muan 1992 Table II p. 1366" in reason
