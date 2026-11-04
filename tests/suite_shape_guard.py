@@ -133,6 +133,13 @@ HEAVY_ROSTER = frozenset({
     ("tests/test_yield_root_cause.py",
      "test_c5_targeted_feo_full_track_reduces_target_after_low_temperature"
      "_hours"),
+    # Owner-ratified d-319 (2026-11-03): the headless full-run budget may rise
+    # as the battery store grows, with the measured cost and margin recorded.
+    # d-137 split the headless test; its web phase measured 241.8-260.9 s
+    # serial and 300.3 s under the contended gate on studio-3, so 400 s (the
+    # justification at the mark). It stays nightly in the serial chain.
+    ("tests/test_web_functional_qa.py",
+     "test_headless_full_run_ledgers_and_product_story_web"),
 })
 
 # b-586: these campaign-length yield nodes must stay out of the PR tier. They
