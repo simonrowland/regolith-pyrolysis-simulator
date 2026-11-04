@@ -485,6 +485,10 @@ def _refuse_on_liquid_standard_failures(
                 "invalid_input": True,
                 "category": 2,
                 "standard_failures": failures,
+                "liquid_standard_flags": [
+                    flag.as_dict() | {"reason": flag.reason}
+                    for flag in assessment.flags
+                ],
             },
         )
 

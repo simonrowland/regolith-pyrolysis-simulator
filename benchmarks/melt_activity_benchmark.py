@@ -508,6 +508,9 @@ class ImccEngine:
                 reason=_reason_line(exc),
                 details={
                     "liquid_standard_refusal": dict(exc.diagnostics),
+                    "liquid_standard_flags": list(
+                        exc.diagnostics.get("liquid_standard_flags", ())
+                    ),
                 },
             )
         except (

@@ -6670,7 +6670,11 @@ def _openimcc_liquid_standard_notices(
         Notice(
             kind=NoticeKind.ENGINE_MODEL_CAVEAT,
             affected_quantities=(quantity,),
-            reason=flag.reason,
+            reason=(
+                str(flag["reason"])
+                if isinstance(flag, Mapping)
+                else flag.reason
+            ),
             origin="openimcc.check_pack_standards",
         )
         for flag in flags
@@ -6697,6 +6701,7 @@ def _score_openimcc_liquid_standard_assessment(
             include_redox=include_redox,
         )
     except OpenImccCompositionPolicyRefusal as exc:
+        flags = tuple(exc.diagnostics.get("liquid_standard_flags", ()))
         return _OpenImccLiquidStandardAssessment(
             refusal_reason=RefusalReason.METRIC_DOMAIN,
             refusal_detail={
@@ -6704,8 +6709,10 @@ def _score_openimcc_liquid_standard_assessment(
                 "category": exc.diagnostics.get("category", 2),
                 "invalid_input": exc.diagnostics.get("invalid_input", True),
                 "standard_failures": exc.diagnostics.get("standard_failures", ()),
+                "liquid_standard_flags": flags,
             },
-            notices=(),
+            notices=_openimcc_liquid_standard_notices(flags, quantity),
+            flags=flags,
         )
     return _OpenImccLiquidStandardAssessment(
         refusal_reason=None,
@@ -6754,6 +6761,7 @@ def _openimcc_standard_refusal_prediction(
         lineage_complete=False,
         refusal_reason=assessment.refusal_reason,
         refusal_detail=assessment.refusal_detail,
+        notices=assessment.notices,
         identity=reference.identity,
     )
 
@@ -6867,6 +6875,10 @@ def _predict_distin_closed_feo_activity(
                 "reason": str(exc),
                 **exc.diagnostics,
             },
+            _openimcc_liquid_standard_notices(
+                exc.diagnostics.get("liquid_standard_flags", ()),
+                Quantity.ACTIVITY,
+            ),
         )
     except openimcc.ImccRefusal as exc:
         return refused(
@@ -7121,6 +7133,10 @@ def _predict_fe_redox(
                     "reason": str(exc),
                     **exc.diagnostics,
                 },
+                notices=_openimcc_liquid_standard_notices(
+                    exc.diagnostics.get("liquid_standard_flags", ()),
+                    Quantity.FE3_FE2_RATIO,
+                ),
             )
         except openimcc.ImccRefusal as exc:
             return refused(
@@ -9049,6 +9065,7 @@ def _predict_mass_loss_with_residue(
                 lineage_complete=False,
                 refusal_reason=standard_assessment.refusal_reason,
                 refusal_detail=standard_assessment.refusal_detail,
+                notices=standard_assessment.notices,
                 identity=identity,
             )
         standard_notices = standard_assessment.notices
@@ -10420,7 +10437,7 @@ def _predict_with_engine(
                     call_evidence=f"openimcc_liquid_reference_check:{name}",
                 ),
                 authority=Authority.REFUSED,
-                notices=tuple(input_notices),
+                notices=(*input_notices, *standard_assessment.notices),
                 coefficient_sources=sources,
                 lineage_complete=False,
                 refusal_reason=standard_assessment.refusal_reason,
