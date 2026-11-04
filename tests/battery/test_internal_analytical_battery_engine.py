@@ -419,7 +419,23 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                         ),
                         band="[298.15, 3600] K",
                         authority=Authority.BRIDGE,
-                    )
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "d144_fusion_conversion|oxide=CaO|temperature_K=1873|"
+                            "authority=bridge|reason=JANAF tabulates the liquid phase "
+                            "below its solid-liquid Gibbs crossing; this is JANAF's "
+                            "metastable (supercooled) liquid branch|"
+                            "certified_band_K=[298.15, 3600]"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band="[298.15, 3600] K",
+                        authority=Authority.BRIDGE,
+                    ),
                 }
             ),
         ),
@@ -452,7 +468,23 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                         ),
                         band="[298.15, 4000] K",
                         authority=Authority.BRIDGE,
-                    )
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
+                            "authority=bridge|reason=JANAF tabulates the liquid phase "
+                            "below its solid-liquid Gibbs crossing; this is JANAF's "
+                            "metastable (supercooled) liquid branch|"
+                            "certified_band_K=[298.15, 4000]"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band="[298.15, 4000] K",
+                        authority=Authority.BRIDGE,
+                    ),
                 }
             ),
         ),
