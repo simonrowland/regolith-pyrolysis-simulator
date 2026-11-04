@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ctypes
 import json
+import logging
 import os
 import sqlite3
 import subprocess
@@ -134,6 +135,37 @@ def test_warn_legacy_once_is_single_shot() -> None:
         warn_legacy_once("test-warn-legacy-once", "legacy once")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
     assert len(caught) == 1
+
+
+def test_warn_once_with_summary_keeps_first_warning_and_counts_repeats(
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "_WARNING_REPEAT_COUNTS",
+        {},
+        raising=False,
+    )
+    key = "test.engine.warning"
+    message = "native fallback warning with detail"
+    caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        for _ in range(50):
+            engine_local_config.warn_once_with_summary(key, message)
+
+    assert len(caught) == 1
+    assert str(caught[0].message) == message
+
+    engine_local_config._flush_warning_repeat_summaries()
+
+    assert [record.getMessage() for record in caplog.records] == [
+        "test.engine.warning: 49 repeats suppressed"
+    ]
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(
