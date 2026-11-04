@@ -490,6 +490,55 @@ def test_compilation_census_isolates_each_ia_row_with_cpu_timer(
     )
 
 
+def test_compile_residual_keeps_custom_predictor_keyword_contract(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.battery.score as score_module
+    from simulator.battery.records import Execution
+    from simulator.battery.validity import GateOutcome
+
+    experiment = F.tabulation_experiment()
+    observation = F.observation(
+        "custom-score-predictor",
+        experiment.experiment_id,
+        _na2o_liquid(Quantity.CP),
+        Decimal("10"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    context = _context(
+        observation,
+        experiments={experiment.experiment_id: experiment},
+    )
+    monkeypatch.setattr(
+        score_module, "run_validity_gates", lambda *args, **kwargs: GateOutcome(True)
+    )
+    received: list[str] = []
+
+    def fixed_signature_predictor(engine, point, *, handles, experiment):
+        received.append(point.observation_id)
+        return EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=Execution(ExecutionState.NOT_PROBED),
+            coefficient_sources=score_module.ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            identity=point.identity,
+        )
+
+    monkeypatch.setattr(
+        score_module, "predict_with_engine", fixed_signature_predictor
+    )
+    score_module.compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        handles={},
+    )
+
+    assert received == [observation.observation_id]
+
+
 def test_compilation_no_band_label_uses_source_band_owners_reason() -> None:
     from simulator.battery.score import (
         _compilation_band_value_fields,
