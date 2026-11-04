@@ -12,6 +12,7 @@ real MAGEMin binary runs end to end when one is built locally.
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import subprocess
@@ -3378,6 +3379,70 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     assert result.diagnostics["magemin_solver_status"] == 0
     assert result.diagnostics["magemin_native_phase"]
     assert result.diagnostics["magemin_iterations"] > 0
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_kume_305_mgo_activity_is_on_periclase_reference(request):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    result = backend.equilibrate(
+        1599.85,
+        composition_kg={
+            "SiO2": 34.6,
+            "CaO": 19.6,
+            "Al2O3": 39.0,
+            "MgO": 6.8,
+        },
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        native_activity_formula="MgO",
+        call_timeout_s=20.0,
+    )
+
+    assert result.status == "ok", result.warnings
+    assert any(name.lower().startswith("liq") for name in result.phases_present)
+    measured_activity = 0.327  # Kume 2000 Table 4, sample 305.
+    predicted_activity = result.activity_coefficients["MgO"]
+    residual_dex = math.log10(predicted_activity / measured_activity)
+    assert abs(residual_dex) < 1.0, (predicted_activity, residual_dex)
+
+
+@pytest.mark.skipif(
+    _LIVE_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_periclase_saturated_melt_has_unit_mgo_activity(request):
+    backend = MAGEMinBackend()
+    request.addfinalizer(backend.close)
+    assert backend.initialize({"binary_path": str(_LIVE_MAGEMIN_BINARY)})
+
+    result = backend.equilibrate(
+        1599.85,
+        composition_kg={
+            "MgO": 50.0,
+            "SiO2": 25.0,
+            "CaO": 15.0,
+            "Al2O3": 10.0,
+        },
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        native_activity_formula="MgO",
+        call_timeout_s=20.0,
+    )
+
+    assert result.status == "ok", result.warnings
+    assert any(name.lower().startswith("liq") for name in result.phases_present)
+    assert any(name.lower() == "fper" for name in result.phases_present)
+    predicted_activity = result.activity_coefficients["MgO"]
+    # A coexisting liquid and periclase endmember have equal chemical
+    # potentials. 0.1 dex (factor 1.26) covers the printed precision and
+    # residual minimization error while still distinguishing the raw ~1e-21.
+    assert abs(math.log10(predicted_activity)) <= 0.1
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(

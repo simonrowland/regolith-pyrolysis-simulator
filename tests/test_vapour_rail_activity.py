@@ -90,6 +90,17 @@ def test_activity_from_mu_hand_evaluation():
     assert activity_from_chemical_potentials(mu, mu0, T) == pytest.approx(expected)
 
 
+def test_activity_from_mu_kume_1873k_float_hex_golden():
+    """Pin the current resolver output before sharing it with MAGEMin."""
+
+    activity = activity_from_chemical_potentials(
+        -757_503.25,
+        -737_191.95,
+        1873.0,
+    )
+    assert activity.hex() == "0x1.15e289c0fd42dp-2"
+
+
 def test_monotonicity_proof_sign_of_exponent():
     assert prove_pressure_monotone_nondecreasing_in_activity(1.0) is True
     assert prove_pressure_monotone_nondecreasing_in_activity(0.0) is True
