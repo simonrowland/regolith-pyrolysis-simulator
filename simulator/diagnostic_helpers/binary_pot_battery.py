@@ -3282,7 +3282,6 @@ def _internal_analytical_vapor_pressure_adapter(
             )
 
     imcc_notices = [*oxygen_notices]
-    imcc_notices.extend(core_flags)
     vapor_authority = core_diagnostic.get("vapor_pressure_authority")
     authority_status = (
         str(vapor_authority.get("status") or "unknown")
@@ -3331,12 +3330,14 @@ def _internal_analytical_vapor_pressure_adapter(
             }
         )
     parent_activity_by_component: dict[str, tuple[str, float] | None] = {}
-    for provenance in dict(
+    fusion_certified_band: dict[str, tuple[float, float]] | None = None
+    fusion_extrapolated = False
+    for numerator_provenance in dict(
         core_diagnostic.get("vapor_pressure_numerator_provenance") or {}
     ).values():
-        if not isinstance(provenance, Mapping):
+        if not isinstance(numerator_provenance, Mapping):
             continue
-        component = provenance.get("melt_oxide_component")
+        component = numerator_provenance.get("melt_oxide_component")
         if not isinstance(component, str) or not component:
             continue
         if component not in parent_activity_by_component:
@@ -3350,6 +3351,42 @@ def _internal_analytical_vapor_pressure_adapter(
                     oxide_activity is not None
                     and oxide_activity.single_cation_component == component
                 ):
+                    if (
+                        oxide_activity.authority_status
+                        in {"d144_fusion_bridge", "d144_fusion_extrapolated"}
+                        and oxide_activity.valid_range_K is not None
+                    ):
+                        low, high = oxide_activity.valid_range_K
+                        fusion_authority = (
+                            AUTHORITY_EXTRAPOLATED
+                            if oxide_activity.authority_status
+                            == "d144_fusion_extrapolated"
+                            else "bridge"
+                        )
+                        core_flags.append(
+                            {
+                                "kind": (
+                                    "out_of_certified_band"
+                                    if fusion_authority == AUTHORITY_EXTRAPOLATED
+                                    else "fallback"
+                                ),
+                                "authority": fusion_authority,
+                                "reason": (
+                                    oxide_activity.warning
+                                    or "d144_fusion_conversion domain verdict"
+                                ),
+                                "band": f"[{low:g}, {high:g}] K",
+                                "certified_band": {
+                                    "temperature_K": (low, high)
+                                },
+                            }
+                        )
+                        if fusion_certified_band is None:
+                            fusion_certified_band = {
+                                "temperature_K": (low, high)
+                            }
+                        if fusion_authority == AUTHORITY_EXTRAPOLATED:
+                            fusion_extrapolated = True
                     resolved = (
                         parent_formula,
                         oxide_activity.thermodynamic_parent_activity(),
@@ -3361,6 +3398,15 @@ def _internal_analytical_vapor_pressure_adapter(
         resolved = parent_activity_by_component[component]
         if resolved is not None:
             activities[resolved[0]] = resolved[1]
+
+    imcc_notices.extend(core_flags)
+    if fusion_certified_band is not None:
+        diagnostics["certified_band"] = fusion_certified_band
+    if fusion_extrapolated:
+        diagnostics["authority"] = AUTHORITY_EXTRAPOLATED
+    diagnostics["vapor_pressure_backend_status_reason"] = json.dumps(
+        provenance, sort_keys=True, default=str, separators=(",", ":")
+    )
 
     return SimpleNamespace(
         status="ok",

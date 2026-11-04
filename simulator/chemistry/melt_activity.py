@@ -778,6 +778,7 @@ def melt_oxide_activity(
         )
 
     activity_authority_status = "temperature_not_supplied"
+    activity_valid_range_K = coeff.valid_range_K
     (
         gamma,
         _,
@@ -792,6 +793,17 @@ def melt_oxide_activity(
             parent, Decimal(str(resolved_temperature_K))
         )
     )
+    if (
+        resolved_temperature_K is not None
+        and fusion_domain_verdict is not None
+        and coeff.valid_range_K is None
+    ):
+        activity_authority_status = (
+            f"d144_fusion_{fusion_domain_verdict.authority.value}"
+        )
+        activity_valid_range_K = tuple(
+            float(bound) for bound in fusion_domain_verdict.certified_band_K
+        )
     if resolved_temperature_K is not None and coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
         if low <= resolved_temperature_K <= high:
@@ -822,7 +834,7 @@ def melt_oxide_activity(
             activity_warning,
             effective_gamma=table_gamma_effective(gamma, 0.0),
             temperature_K=resolved_temperature_K,
-            valid_range_K=coeff.valid_range_K,
+            valid_range_K=activity_valid_range_K,
             authority_status=activity_authority_status,
         )
 
@@ -838,7 +850,7 @@ def melt_oxide_activity(
         activity_warning,
         effective_gamma=effective_gamma,
         temperature_K=resolved_temperature_K,
-        valid_range_K=coeff.valid_range_K,
+        valid_range_K=activity_valid_range_K,
         authority_status=activity_authority_status,
     )
 

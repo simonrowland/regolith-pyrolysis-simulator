@@ -5489,7 +5489,6 @@ def cell_notices(
     cell: object,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
-        AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
     )
@@ -5500,8 +5499,16 @@ def cell_notices(
         if not isinstance(row, Mapping):
             continue
         kind = str(row.get("kind") or "")
+        try:
+            notice_authority = (
+                None
+                if row.get("authority") is None
+                else Authority(row.get("authority"))
+            )
+        except (TypeError, ValueError):
+            notice_authority = None
         if _row_out_of_certified_band(kind, row):
-            raw_band = row.get("certified_band") or row.get("band")
+            raw_band = row.get("band") or row.get("certified_band")
             band = str(raw_band or "")
             if kind == "openimcc_temperature_extrapolated" and isinstance(
                 raw_band, Mapping
@@ -5526,12 +5533,7 @@ def cell_notices(
                     reason=str(reason),
                     origin=f"engine:{engine.value}",
                     band=band,
-                    authority=(
-                        Authority.EXTRAPOLATED
-                        if kind == "openimcc_temperature_extrapolated"
-                        and row.get("authority") == AUTHORITY_EXTRAPOLATED
-                        else None
-                    ),
+                    authority=notice_authority,
                 )
             )
         elif kind == "floor_inversion":
@@ -5554,6 +5556,8 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                     source=row.get("from"),
                     destination=row.get("to"),
+                    band=(None if row.get("band") is None else str(row["band"])),
+                    authority=notice_authority,
                 )
             )
         elif kind == "fo2_oxygen_balance_effusion_solved":
@@ -9932,12 +9936,50 @@ def _predict_with_engine(
                     )
                 )
             certified_band = None
+            has_d144_fusion_domain = activity.authority_status in {
+                "d144_fusion_certified",
+                "d144_fusion_bridge",
+                "d144_fusion_extrapolated",
+            }
             if activity.valid_range_K is not None:
                 low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
                 certified_band = {
                     "temperature_K": (Decimal(str(low)), Decimal(str(high)))
                 }
-                if activity.authority_status == (
+                if activity.authority_status == "d144_fusion_extrapolated":
+                    authority = Authority.EXTRAPOLATED
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                            affected_quantities=(Quantity.ACTIVITY,),
+                            reason=(
+                                activity.warning
+                                or "JANAF fusion conversion uses terminal Gibbs chords"
+                            ),
+                            origin=(
+                                "simulator.chemistry.melt_activity.melt_oxide_activity"
+                            ),
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.EXTRAPOLATED,
+                        )
+                    )
+                elif activity.authority_status == "d144_fusion_bridge":
+                    notices.append(
+                        Notice(
+                            kind=NoticeKind.FALLBACK,
+                            affected_quantities=(Quantity.ACTIVITY,),
+                            reason=(
+                                activity.warning
+                                or "JANAF fusion conversion uses metastable liquid data"
+                            ),
+                            origin=(
+                                "simulator.chemistry.melt_activity.melt_oxide_activity"
+                            ),
+                            band=f"[{low:g}, {high:g}] K",
+                            authority=Authority.BRIDGE,
+                        )
+                    )
+                elif activity.authority_status == (
                     "out_of_gamma_domain_status_bearing_non_authoritative"
                 ):
                     authority = Authority.EXTRAPOLATED
@@ -9966,6 +10008,20 @@ def _predict_with_engine(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
                         authority=Authority.BRIDGE,
+                    )
+                )
+            if (
+                has_d144_fusion_domain
+                and activity.evidence_tier == "UNCERTIFIED"
+            ):
+                notices.append(
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason="melt_oxide_activity has no certified evidence tier",
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
                     )
                 )
             activity_sources = tuple(
