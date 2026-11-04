@@ -615,6 +615,83 @@ def test_refusing_engine_yields_typed_refusal_row_not_exception() -> None:
     assert timeout_cell.refusal_reason == REFUSAL_TIMEOUT
 
 
+def test_internal_analytical_outer_cap_refuses_a_hung_call_deterministically(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import threading
+
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    entered = threading.Event()
+    release = threading.Event()
+    real_thread = threading.Thread
+    threads: list[threading.Thread] = []
+    observed_join_timeouts: list[float] = []
+
+    class _DeadlineExpiredThread(real_thread):
+        def start(self) -> None:
+            super().start()
+            assert entered.wait(timeout=10.0)
+
+        def join(self, timeout: float | None = None) -> None:
+            if not observed_join_timeouts:
+                assert timeout is not None
+                observed_join_timeouts.append(float(timeout))
+                assert self.is_alive()
+                return
+            super().join(timeout=timeout)
+
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            threads.append(self)
+
+    class _HungInternalAnalyticalBackend:
+        def equilibrate(self, **_kwargs):
+            entered.set()
+            release.wait()
+
+    monkeypatch.setattr(battery.threading, "Thread", _DeadlineExpiredThread)
+    timeout_s = battery._ENGINE_OUTER_TIMEOUT_S["internal-analytical"]
+    handle = EngineHandle(
+        name="internal-analytical",
+        backend=_HungInternalAnalyticalBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    pot = BinaryPot(
+        pot_id="hung-internal-analytical",
+        kato_1993_table4_system=None,
+        why="deterministic timeout test",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+
+    try:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1600.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            isolated=False,
+        )
+        assert entered.is_set()
+        assert threads[0].is_alive()
+    finally:
+        release.set()
+        for thread in threads:
+            thread.join()
+
+    assert observed_join_timeouts == [timeout_s]
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_TIMEOUT
+    assert cell.engine_status == "TimeoutError"
+    assert cell.engine_reason == (
+        f"equilibrate exceeded hard timeout of {timeout_s:g}s"
+    )
+    assert timeout_s == 15.0
+
+
 def test_classify_out_of_domain_and_no_liquid() -> None:
     status, reason, engine_reason = classify_equilibrate_outcome(
         SimpleNamespace(
