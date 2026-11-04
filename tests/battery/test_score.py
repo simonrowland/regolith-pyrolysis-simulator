@@ -16603,10 +16603,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         if key in stolyarova_atomic_oxygen_pressures
     }
     assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
+    # d-342: Table Ib prints P_O as calculated from equilibrium (1). It is
+    # not an m/z 16 ion current corrected for O2 fragmentation, so the
+    # row stays quoted_attributed. The source-oxygen command is unchanged.
     assert all(
         observation.admission.status is AdmissionStatus.ADMITTED
         and observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
     # The reviewed source edits type these 1995 and 1996 calculated oxygen
@@ -16733,11 +16736,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         )
         for residual in model_derived_residuals
     )
-    # The nine authors' own atomic-oxygen reductions count as measured evidence;
-    # the remaining diagnostic references are excluded from the measured tier.
+    # d-342 leaves the nine Table Ib points quoted_attributed, outside
+    # MEASURED_EVIDENCE, so they carry the same measured-evidence exclusion
+    # as the other diagnostic references.
     assert all(
-        ("reference_measured_evidence" in residual.exclusions)
-        == (residual.reference not in stolyarova_atomic_oxygen_pressures)
+        "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
     )
     diagnostic_context = replace(

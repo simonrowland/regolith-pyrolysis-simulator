@@ -10211,6 +10211,7 @@ def test_scalar_activity_printed_forms_round_trip(
     assert observation.provenance == {
         "printed_value": printed_value,
         "printed_form": printed_form,
+        "printed_phase": "gas",
     }
 
 
@@ -19914,7 +19915,7 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
-def test_stolyarova_1991_atomic_oxygen_is_measured_reduced_with_author_relation(
+def test_stolyarova_1991_atomic_oxygen_is_quoted_from_equilibrium_1(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -19964,17 +19965,13 @@ def test_stolyarova_1991_atomic_oxygen_is_measured_reduced_with_author_relation(
         )
     )
     for obs in rows:
+        # quoted_attributed drops the equilibrium source derivation. The
+        # printed atm value still converts to Pa.
         assert obs.derivation is not None
-        assert obs.derivation.relation == (
-            "Atomic oxygen pressure calculated from measured WO2 and WO3 partial pressures using gas reaction (1)."
-        )
+        assert obs.derivation.relation == "atm_to_Pa"
         assert obs.derivation.output_unit == "Pa"
-        original = dict(obs.derivation.parameters)["original"]
-        assert original.inference is not None
-        assert original.inference.relation == "atm_to_Pa"
-        assert original.inference.output_unit == "Pa"
         assert obs.derived_from is None
-        assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         assert obs.evidence.attribution == (
             "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
         )
