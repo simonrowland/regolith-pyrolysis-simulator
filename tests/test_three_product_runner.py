@@ -50,6 +50,7 @@ def test_run_returns_classification_dict():
         'glass',
         'captured_volatiles',
         'process_inventory_spent_reductant',
+        'alkali_cartridge_solid_residue',
     }
     assert canonical_buckets <= result.keys()
     assert set(result.keys()) == canonical_buckets | additive_buckets

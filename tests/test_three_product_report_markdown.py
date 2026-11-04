@@ -453,6 +453,37 @@ def test_below_noise_floor_renders_as_dash():
 # 6. Output is a single newline-terminated string
 # ---------------------------------------------------------------------------
 
+def test_residue_section_renders_only_when_the_class_holds_mass():
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL
+
+    empty = format_three_product_markdown(_empty_classification())
+    assert ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL not in empty
+
+    zero = _empty_classification()
+    zero['alkali_cartridge_solid_residue'] = {
+        'label': ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+        'kg_by_species': {'Fe': 4.0},
+        'class_total_kg': 0.0,
+    }
+    assert ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL not in (
+        format_three_product_markdown(zero)
+    )
+
+    held = _empty_classification()
+    held['alkali_cartridge_solid_residue'] = {
+        'label': ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL,
+        'kg_by_species': {'Fe': 4.0, 'SiO2': 3.0},
+        'class_total_kg': 7.0,
+        'note': 'Mixed condensate captured on the Stage-4 freeze-out cartridge.',
+    }
+    report = format_three_product_markdown(held)
+    assert f"## {ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL}" in report
+    assert "**Total**: 7.000 kg" in report
+    assert "**Fe**: 4.000 kg" in report
+    assert "**SiO2**: 3.000 kg" in report
+    assert "Mixed condensate captured on the Stage-4 freeze-out cartridge." in report
+
+
 def test_output_is_string_terminated_by_single_newline():
     """The report ends with exactly one trailing newline (file-write-
     friendly)."""

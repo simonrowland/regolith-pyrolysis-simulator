@@ -584,6 +584,29 @@
     );
   }
 
+  function renderCartridgeResidue(classification) {
+    if (!isRecord(classification) || !own(classification, "alkali_cartridge_solid_residue")) {
+      return "";
+    }
+    const title = "Stage-4 cartridge solid residue (unseparated)";
+    const subtitle = "Mixed condensate captured on the freeze-out cartridge. Not a separated metal product.";
+    const bucket = bucketRecord(classification, "alkali_cartridge_solid_residue");
+    if (bucket.unavailable) {
+      return cardShell("cartridge-residue", "sec-p11-card--wide", title, subtitle,
+        pendingBlock("Cartridge residue unavailable", "classification.alkali_cartridge_solid_residue is explicitly null; no kilogram capture is shown."));
+    }
+    if (bucket.malformed) {
+      return cardShell("cartridge-residue", "sec-p11-card--wide", title, subtitle,
+        pendingBlock("Cartridge residue malformed", "classification.alkali_cartridge_solid_residue is present but is not an object."));
+    }
+    const row = bucket.value;
+    const heading = typeof row.label === "string" && row.label.trim() ? row.label.trim() : title;
+    return cardShell("cartridge-residue", "sec-p11-card--wide", heading, subtitle,
+      kgRow(row, "class_total_kg", "Cartridge residue total · kg", "flagged-unqualified-capture") +
+      speciesList(row, "kg_by_species", "No residue species emitted.")
+    );
+  }
+
   function renderInventory(classification) {
     const unclassified = bucketRecord(classification, "unclassified");
     const spent = bucketRecord(classification, "process_inventory_spent_reductant");
@@ -733,6 +756,7 @@
       `${renderMixedGlass(classification)}${renderRump(classification)}` +
       `</div>` +
       renderVolatiles(classification) +
+      renderCartridgeResidue(classification) +
       renderInventory(classification) +
       renderTaxonomy(envelope.terminal) +
       renderMarkdown(envelope);
