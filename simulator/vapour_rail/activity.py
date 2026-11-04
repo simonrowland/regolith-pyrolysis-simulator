@@ -904,9 +904,13 @@ def henrian_unknown_gamma_upper_bound(
             evidence_tier=MELT_OXIDE_IDEAL_ASSERTION_TIER,
         )
 
+    # This Henrian bound policy has no temperature; a solid-reference gamma
+    # refuses before a fusion-domain conversion verdict can be produced.
     try:
-        gamma_anchor, reference_warning = _melt_oxide_gamma_for_activity(
-            coeff.parent_oxide, coeff.gamma, None
+        gamma_anchor, reference_warning, _ = (
+            _melt_oxide_gamma_for_activity(
+                coeff.parent_oxide, coeff.gamma, None
+            )
         )
     except ValueError as exc:
         if "temperature_K required" not in str(exc):

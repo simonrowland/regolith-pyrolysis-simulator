@@ -27,6 +27,7 @@ import re
 import sys
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -4668,10 +4669,12 @@ def _evaluate_activity(
             else None
         )
         try:
-            actual, reference_warning = _melt_oxide_gamma_for_activity(
-                parent_oxide,
-                coefficient.gamma,
-                T_mid_for_activity,
+            actual, reference_warning, fusion_domain_verdict = (
+                _melt_oxide_gamma_for_activity(
+                    parent_oxide,
+                    coefficient.gamma,
+                    T_mid_for_activity,
+                )
             )
         except ValueError as exc:
             if "temperature_K required" not in str(exc):
@@ -4683,9 +4686,20 @@ def _evaluate_activity(
                 expected=expected,
                 observable=observable_kind,
             )
-        if reference_warning:
-            runtime["melt_oxide_activity_warning"] = reference_warning
-            assumption_gaps.append(reference_warning)
+        activity_warnings = [
+            warning for warning in (reference_warning,) if warning
+        ]
+        if fusion_domain_verdict is not None and T_mid_for_activity is not None:
+            fusion_warning = fusion_domain_verdict.warning_text(
+                parent_oxide, Decimal(str(T_mid_for_activity))
+            )
+            if fusion_warning:
+                activity_warnings.append(fusion_warning)
+        if activity_warnings:
+            runtime["melt_oxide_activity_warning"] = "; ".join(
+                activity_warnings
+            )
+            assumption_gaps.extend(activity_warnings)
         runtime["citation"] = coefficient.citation
         runtime["engine_gamma"] = actual
         runtime["condition_gaps"] = list(dict.fromkeys(assumption_gaps))

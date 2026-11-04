@@ -81,6 +81,7 @@ from simulator.reference_data.janaf_fusion import (
     _D144_SINGLE_POLYMORPH_TABLES,
     _FUSION_TABLES,
     JANAF_R_J_PER_MOL_K,
+    _complete_fusion_overlap_nodes,
     _fusion_crossing_temperature,
     _checked_fusion_table_rows,
     _fusion_gibbs_difference_from_points,
@@ -3097,12 +3098,15 @@ def _janaf_fusion_energy_for_pair(
     crystal_table = solid_table
     crystal, crystal_sha = _fusion_table_points(solid_table)
     liquid, liquid_sha = _fusion_table_points(liquid_table)
-    tm = _fusion_crossing_temperature(
+    _complete_fusion_overlap_nodes(
         oxide,
         crystal_table,
         liquid_table,
-        target_temperature_K=temperature_K,
+        crystal,
+        liquid,
+        temperature_K,
     )
+    tm = _fusion_crossing_temperature(oxide, crystal_table, liquid_table)
 
     def difference(t: Decimal) -> Decimal:
         return _fusion_gibbs_difference_from_points(crystal, liquid, t)
