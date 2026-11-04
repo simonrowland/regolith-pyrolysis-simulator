@@ -79,12 +79,7 @@ def _canonical_runtime_campaign_overrides(
     canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
         {str(campaign): dict(fields) for campaign, fields in source.items()}
     )
-    for campaign, fields in canonical.items():
-        if "carrier_gas" in fields:
-            CampaignManager._refuse_unknown_override_fields(
-                campaign,
-                {"carrier_gas": fields["carrier_gas"]},
-            )
+    CampaignManager.validate_runtime_campaign_overrides(canonical)
     return canonical
 
 
@@ -717,16 +712,36 @@ class SimSession:
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
             else:
-                finite_value = _finite_float(
-                    value,
-                    f"campaign_override {campaign_name}.{field_name}",
-                )
-                sim.campaign_mgr._refuse_unknown_override_fields(
-                    campaign_name,
-                    {field_name: value},
-                )
-                if field_name == "pO2_mbar" and finite_value < 0.0:
-                    raise ValueError("pO2_mbar must be non-negative")
+                if field_name in {"p_total_mbar", "pO2_mbar"}:
+                    candidate = {field_name: value}
+                    sim.campaign_mgr._refuse_unknown_override_fields(
+                        campaign_name,
+                        candidate,
+                    )
+                    effective_total = None
+                    if field_name == "pO2_mbar":
+                        effective_total = (
+                            sim.campaign_mgr.runtime_po2_ceiling_mbar(
+                                campaign_name,
+                                live_campaign_name=sim.melt.campaign.name,
+                                live_p_total_mbar=sim.melt.p_total_mbar,
+                            )
+                        )
+                    sim.campaign_mgr._validate_runtime_pressure_overrides(
+                        campaign_name,
+                        candidate,
+                        effective_p_total_mbar=effective_total,
+                    )
+                    finite_value = float(value)
+                else:
+                    finite_value = _finite_float(
+                        value,
+                        f"campaign_override {campaign_name}.{field_name}",
+                    )
+                    sim.campaign_mgr._refuse_unknown_override_fields(
+                        campaign_name,
+                        {field_name: value},
+                    )
                 target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = finite_value
             if field_name == "pO2_mbar" and sim.melt.campaign.name == campaign_name:
@@ -749,10 +764,6 @@ class SimSession:
                 # requesting controlled-O2).
                 new_pO2 = finite_value
                 sim.melt.pO2_mbar = new_pO2
-                sim.melt.p_total_mbar = max(
-                    sim.melt.p_total_mbar,
-                    sim.melt.pO2_mbar,
-                )
                 if new_pO2 > 0.0:
                     from simulator.state import Atmosphere
                     sim.melt.atmosphere = Atmosphere.CONTROLLED_O2

@@ -62,6 +62,7 @@ from simulator.state import (
     StirState,
     clamp_stir_factor,
     clamp_stir_state,
+    partial_pressure_exceeds_total,
 )
 
 C2A_STAGED_DEPLETION_FLUX_DECAY_FRACTION_FLOOR = 0.01
@@ -150,6 +151,16 @@ class CampaignSetpointMissingRefusal(ValueError):
         super().__init__(
             f'{self.reason}: {detail}' if detail else self.reason
         )
+
+
+def _runtime_pressure_override_refusal(
+    reason_code: str,
+    path: str,
+    detail: str,
+) -> ValueError:
+    error = ValueError(f'{reason_code}: {path} {detail}')
+    error.reason_code = reason_code
+    return error
 
 
 class CampaignHoldTargetRefusal(ValueError):
@@ -800,6 +811,103 @@ class CampaignManager:
         canonical = cls._canonicalize_runtime_carrier_overrides(overrides)
         for campaign_name, fields in canonical.items():
             cls._refuse_unknown_override_fields(str(campaign_name), fields)
+            cls._validate_runtime_pressure_overrides(campaign_name, fields)
+
+    @classmethod
+    def _validate_runtime_pressure_overrides(
+        cls,
+        campaign_name: str,
+        fields: Mapping[str, object],
+        *,
+        effective_p_total_mbar: object | None = None,
+    ) -> None:
+        # The 5–15 mbar band belongs to recipe search bounds, not runtime physics.
+        for field_name in ('p_total_mbar', 'pO2_mbar'):
+            if field_name not in fields:
+                continue
+            raw_value = fields[field_name]
+            path = f'runtime_campaign_overrides.{campaign_name}.{field_name}'
+            reason_prefix = f'runtime_campaign_{field_name}'
+            if not is_declared_real_scalar(raw_value):
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_not_numeric', path, 'must be numeric'
+                )
+            value = float(raw_value)
+            if not math.isfinite(value):
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_nonfinite', path, 'must be finite'
+                )
+            if field_name == 'p_total_mbar' and value <= 0.0:
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_nonpositive', path, 'must be > 0'
+                )
+            if field_name == 'pO2_mbar' and value < 0.0:
+                raise _runtime_pressure_override_refusal(
+                    f'{reason_prefix}_negative', path, 'must be >= 0'
+                )
+        if 'pO2_mbar' not in fields:
+            return
+        pO2_mbar = float(fields['pO2_mbar'])
+        if 'p_total_mbar' in fields:
+            p_total_mbar = float(fields['p_total_mbar'])
+        elif effective_p_total_mbar is None:
+            return
+        else:
+            total_path = (
+                f'runtime_campaign_overrides.{campaign_name}.p_total_mbar'
+            )
+            if not is_declared_real_scalar(effective_p_total_mbar):
+                raise _runtime_pressure_override_refusal(
+                    'runtime_campaign_p_total_mbar_not_numeric',
+                    total_path,
+                    'must be numeric',
+                )
+            p_total_mbar = float(effective_p_total_mbar)
+            if not math.isfinite(p_total_mbar):
+                raise _runtime_pressure_override_refusal(
+                    'runtime_campaign_p_total_mbar_nonfinite',
+                    total_path,
+                    'must be finite',
+                )
+        if partial_pressure_exceeds_total(pO2_mbar, p_total_mbar):
+            raise _runtime_pressure_override_refusal(
+                'runtime_campaign_pO2_mbar_exceeds_total',
+                f'runtime_campaign_overrides.{campaign_name}.pO2_mbar',
+                (
+                    'must be <= p_total_mbar '
+                    f'({p_total_mbar:.12g} mbar); '
+                    'oxygen partial pressure cannot exceed total pressure'
+                ),
+            )
+
+    def runtime_po2_ceiling_mbar(
+        self,
+        campaign_name: str,
+        *,
+        live_campaign_name: str | None,
+        live_p_total_mbar: object,
+    ) -> object:
+        """Total a stored pO2 override is refused against.
+
+        The live melt total is the ceiling only for the campaign already
+        in force. Session adjust stores a p_total override without
+        writing the melt, so that stored total is not the live ceiling.
+        A future campaign uses its stored p_total override, then the
+        configured total.
+        """
+        if live_campaign_name == campaign_name:
+            return live_p_total_mbar
+        stored = self.overrides.get(campaign_name, {})
+        if isinstance(stored, Mapping) and 'p_total_mbar' in stored:
+            return stored['p_total_mbar']
+        phases = self._campaign_phases_for_override_key(campaign_name)
+        if not phases:
+            return None
+        return self._pressure_config_float(
+            phases[0],
+            'p_total_mbar',
+            'p_total_mbar_default',
+        )
 
     @classmethod
     def _refuse_unknown_override_fields(
@@ -1878,8 +1986,11 @@ class CampaignManager:
             melt.p_total_mbar = self._pressure_config_float(
                 campaign, 'p_total_mbar', 'p_total_mbar_default')
 
-        # Apply runtime overrides (pO₂, stir_factor)
+        # Apply runtime overrides (total pressure, pO₂, stir_factor)
         ovr = self._campaign_overrides(campaign)
+        self._validate_runtime_pressure_overrides(campaign.name, ovr)
+        if 'p_total_mbar' in ovr:
+            melt.p_total_mbar = float(ovr['p_total_mbar'])
         if 'pO2_mbar' in ovr:
             # 0.5.4 W5 milestone-review P1 (codex /challenge
             # 2026-05-28): mirror the active-path atmosphere switch
@@ -1901,15 +2012,8 @@ class CampaignManager:
             # active-path fix.  ``pO2_mbar == 0`` leaves atmosphere
             # alone (operator clearing the setpoint, NOT requesting
             # controlled-O2).
-            raw_override_pO2 = ovr['pO2_mbar']
-            if not is_declared_real_scalar(
-                raw_override_pO2,
-                allow_numeric_str=True,
-            ):
-                raise ValueError("C2A pO2_mbar override must be numeric")
-            override_pO2 = float(raw_override_pO2)
+            override_pO2 = float(ovr['pO2_mbar'])
             melt.pO2_mbar = override_pO2
-            melt.p_total_mbar = max(melt.p_total_mbar, melt.pO2_mbar)
             if override_pO2 > 0.0:
                 melt.atmosphere = Atmosphere.CONTROLLED_O2
         self.apply_lab_schedule_controls(melt, campaign, sample_time_h=0.0)

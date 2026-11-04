@@ -2054,6 +2054,9 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, object]]:
             if field_key == 'carrier_gas':
                 clean_fields[field_key] = field_value
                 continue
+            if field_key in {'p_total_mbar', 'pO2_mbar'}:
+                clean_fields[field_key] = field_value
+                continue
             clean_value = _coerce_bounded_float(
                 field_value,
                 field=f'runtime_campaign_overrides.{campaign_name}.{field_key}',

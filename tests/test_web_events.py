@@ -3230,13 +3230,15 @@ def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatc
             raise ValueError("pressure validation failed")
 
         monkeypatch.setattr(melt, "validate_melt_pressures", reject_pressure_state)
+        # 0.5 mbar is under C0's 1 mbar total, so the pressure owner
+        # admits it. The monkeypatched melt check is what fails.
         client.emit(
             "adjust_parameter",
             {
                 "param": "campaign_override",
                 "campaign": campaign_name,
                 "field": "pO2_mbar",
-                "value": 1.5,
+                "value": 0.5,
             },
         )
         statuses = [
@@ -3250,6 +3252,111 @@ def test_adjust_campaign_override_rolls_back_after_validation_failure(monkeypatc
         assert statuses[-1]["status"] == "error"
         assert "pressure validation failed" in statuses[-1]["message"]
         assert all(item["status"] != "parameter_adjusted" for item in statuses)
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
+def _adjustment_statuses(client) -> list[dict]:
+    return [
+        event["args"][0]
+        for event in client.get_received()
+        if event["name"] == "simulation_status"
+    ]
+
+
+def test_c4_po2_select_above_total_is_an_adjustment_error(monkeypatch):
+    """Disclosure pO2 options 1/5/50 mbar exceed C4's 0.2 mbar total.
+
+    The select emits campaign_override only. The socket error status is
+    what simulator-socket.js writes to #status-text. parameter_adjusted
+    must not be emitted, and neither pressure may move.
+    """
+    _force_socketio_internal_analytical(monkeypatch)
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        client.get_received()
+        sid = (set(_simulations) - before).pop()
+        state, _ = _current_simulation_state(sid)
+        sim = state["session"].simulator
+        melt = sim.melt
+        c0_pressures = (melt.pO2_mbar, melt.p_total_mbar)
+
+        client.get_received()
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C4",
+                "field": "pO2_mbar",
+                "value": 50.0,
+            },
+        )
+        statuses = _adjustment_statuses(client)
+        assert statuses[-1]["status"] == "error"
+        assert "runtime_campaign_pO2_mbar_exceeds_total" in statuses[-1]["message"]
+        assert "0.2" in statuses[-1]["message"]
+        assert all(item["status"] != "parameter_adjusted" for item in statuses)
+        assert (melt.pO2_mbar, melt.p_total_mbar) == c0_pressures
+        assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C4", {})
+
+        sim.start_campaign(CampaignPhase.C4)
+        assert melt.campaign == CampaignPhase.C4
+        assert melt.p_total_mbar == pytest.approx(0.2)
+        active_pressures = (melt.pO2_mbar, melt.p_total_mbar)
+        active_overrides = copy.deepcopy(sim.campaign_mgr.overrides)
+
+        for value in (1.0, 5.0, 50.0):
+            client.get_received()
+            client.emit(
+                "adjust_parameter",
+                {
+                    "param": "campaign_override",
+                    "campaign": "C4",
+                    "field": "pO2_mbar",
+                    "value": value,
+                },
+            )
+            statuses = _adjustment_statuses(client)
+            assert statuses[-1]["status"] == "error"
+            assert (
+                "runtime_campaign_pO2_mbar_exceeds_total"
+                in statuses[-1]["message"]
+            )
+            assert all(item["status"] != "parameter_adjusted" for item in statuses)
+            assert (melt.pO2_mbar, melt.p_total_mbar) == active_pressures
+            assert sim.campaign_mgr.overrides == active_overrides
+
+        client.get_received()
+        client.emit(
+            "adjust_parameter",
+            {
+                "param": "campaign_override",
+                "campaign": "C4",
+                "field": "pO2_mbar",
+                "value": 0.2,
+            },
+        )
+        statuses = _adjustment_statuses(client)
+        assert statuses[-1]["status"] == "parameter_adjusted"
+        assert melt.pO2_mbar == pytest.approx(0.2)
+        assert melt.p_total_mbar == pytest.approx(0.2)
+        assert sim.campaign_mgr.overrides["C4"]["pO2_mbar"] == pytest.approx(0.2)
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:

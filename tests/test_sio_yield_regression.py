@@ -99,8 +99,8 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 
     max(0.0, -1.0) is 0.0, which was written to melt.pO2_mbar and the
     C2A override and switched atmosphere to CONTROLLED_O2. The web path
-    already refuses pO2 < 0; this CLI/runner path must agree. inf is not
-    laundered by max(0, inf).
+    already refuses pO2 < 0; this CLI/runner path must agree. A valid
+    pO2 under the live total applies and does not raise that total.
     """
     from simulator.state import Atmosphere
 
@@ -118,15 +118,67 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
         _current_melt_redox_fO2_log=lambda: -8.0,
         _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
     )
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError) as exc_info:
         _apply_sio_wall_sweep_controls(sim, pO2_mbar=-1.0)
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_negative"
     assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.p_total_mbar == pytest.approx(10.0)
     assert sim.melt.atmosphere == "PN2_SWEEP"
     assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
 
     _apply_sio_wall_sweep_controls(sim, pO2_mbar=1.0)
     assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.p_total_mbar == pytest.approx(10.0)
     assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+
+
+def test_sio_wall_sweep_refuses_nonfinite_po2_and_po2_above_total() -> None:
+    """NaN passes `value < 0`. pO2 above the live total used to raise it.
+
+    Both are refusals from the runtime pressure owner. A pO2 equal to
+    the total still applies and does not change p_total.
+    """
+    from simulator.state import Atmosphere
+
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(
+            temperature_C=1450.0,
+            pO2_mbar=0.2,
+            p_total_mbar=0.2,
+            atmosphere="PN2_SWEEP",
+        ),
+        overhead=SimpleNamespace(composition={}),
+        _condensation_model=None,
+        _configure_overhead_headspace=lambda _campaign: None,
+        _current_melt_redox_fO2_log=lambda: -8.0,
+        _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
+    )
+
+    for value in (float("nan"), float("inf")):
+        with pytest.raises(ValueError) as exc_info:
+            _apply_sio_wall_sweep_controls(sim, pO2_mbar=value)
+        assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_nonfinite"
+        assert sim.melt.pO2_mbar == pytest.approx(0.2)
+        assert sim.melt.p_total_mbar == pytest.approx(0.2)
+        assert sim.melt.atmosphere == "PN2_SWEEP"
+        assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+    with pytest.raises(ValueError) as exc_info:
+        _apply_sio_wall_sweep_controls(sim, pO2_mbar=1.0)
+    assert exc_info.value.reason_code == (
+        "runtime_campaign_pO2_mbar_exceeds_total"
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(0.2)
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+    _apply_sio_wall_sweep_controls(sim, pO2_mbar=0.2)
+    assert sim.melt.pO2_mbar == pytest.approx(0.2)
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(0.2)
+
 
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
