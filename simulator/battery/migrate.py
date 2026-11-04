@@ -20789,13 +20789,26 @@ class Migrator:
                         charge=species.charge,
                     )
             printed_species = raw_item.get("species_as_printed")
-            printed_species_formula = (
-                _reference_formula_token(
-                    re.sub(r"\s*\(g\)\s*$", "", printed_species)
-                )
+            printed_species_text = (
+                re.sub(r"\s*\(g\)\s*$", "", printed_species)
                 if isinstance(printed_species, str)
                 else None
             )
+            printed_species_formula = (
+                _reference_formula_token(printed_species_text)
+                if printed_species_text is not None
+                else None
+            )
+            if printed_species_formula is None and printed_species_text is not None:
+                activity_label = re.fullmatch(
+                    rf"({_REFERENCE_FORMULA})\s+Activity(?:\[[^\]]+\])?",
+                    printed_species_text.strip(),
+                    re.IGNORECASE,
+                )
+                if activity_label is not None:
+                    printed_species_formula = _reference_formula_token(
+                        activity_label.group(1)
+                    )
             if isinstance(printed_species, str) and printed_species.strip() and (
                 use_printed_point_species
                 or raw_item.get("species_as_printed") is not None

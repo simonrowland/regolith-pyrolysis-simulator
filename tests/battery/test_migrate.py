@@ -15897,6 +15897,35 @@ def test_nonformula_point_species_as_printed_keeps_formula_unknown(
     assert observation.identity.species.formula == "unknown"
 
 
+def test_species_formula_with_printed_activity_annotation_is_used(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [
+                {
+                    "T_K": 1200.0,
+                    "p_Pa": 2.0,
+                    "species_as_printed": "Na2O Activity[c]",
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+
+    observation = next(
+        observation
+        for observation in result.observations.values()
+        if quantity_token(observation.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "Na2O"
+
+
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
     extracts_src = REPO_ROOT / "data" / "literature" / "extracts"
     names = [
