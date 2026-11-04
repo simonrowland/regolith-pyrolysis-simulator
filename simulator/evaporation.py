@@ -898,6 +898,10 @@ class _HeadspaceSeriesReplay:
         '_renewal_source',
         '_gas_on',
         '_fe_molar',
+        '_conductance',
+        '_flux_from_resistances',
+        '_default_renewal',
+        '_default_renewal_source',
     )
 
     def __init__(self, host: Any, **kwargs: Any) -> None:
@@ -924,6 +928,7 @@ class _HeadspaceSeriesReplay:
             _coerce_alpha_by_species,
             _evaluate_alpha_control,
             _finite_float,
+            _series_flux_and_alpha_from_resistances,
             _series_resistance_evaporation_flux_kg_m2_s,
             _unmeasured_alpha_fallback_permitted,
         )
@@ -1088,7 +1093,119 @@ class _HeadspaceSeriesReplay:
             _renewal_source=renewal_source,
             _gas_on=gas_on,
             _fe_molar=float(molar_masses.get('Fe', 0.0) or 0.0),
+            _conductance={},
+            _flux_from_resistances=_series_flux_and_alpha_from_resistances,
+            _default_renewal=DEFAULT_MELT_SURFACE_RENEWAL_BASE_KG_S_M2_PA,
+            _default_renewal_source=DEFAULT_MELT_SURFACE_RENEWAL_SOURCE,
         )
+
+    def _series_flux_kg_s_m2(
+        self,
+        *,
+        species: str,
+        p_eq: float,
+        p_bulk: float,
+        molar: float,
+        alpha: float,
+        knudsen: float | None,
+        overhead_pa: float,
+        gas_on: bool,
+        renewal: float,
+        renewal_source: str,
+    ) -> float:
+        """Series flux for one probe, reusing resistances at this overhead.
+
+        Resistances are fixed for the hour once species, alpha, Knudsen
+        number, overhead pressure, and the gas-resistance switch are fixed.
+        The first positive-drive evaluation stores them. Later bulk partials
+        only change ``P_eq - P_bulk``, through the series owner's flux tail.
+        A reference evaluation whose flux is not that tail is not reused.
+        """
+
+        key = (
+            species,
+            molar,
+            alpha,
+            knudsen,
+            overhead_pa,
+            gas_on,
+            renewal,
+            renewal_source,
+        )
+        cached = self._conductance.get(key)
+        if cached is None:
+            reference = self._series(
+                species=species,
+                P_eq_pa=p_eq,
+                P_bulk_pa=0.0,
+                T_surface_K=self._t_k,
+                molar_mass_kg_mol=molar,
+                alpha_i=alpha,
+                knudsen_number=knudsen,
+                pipe_diameter_m=self._pipe_m,
+                overhead_pressure_pa=overhead_pa,
+                axial_stir_factor=self._axial,
+                radial_stir_factor=self._radial,
+                cold_skull_envelope=self._cold_skull,
+                carrier_gas=self._carrier,
+                T_gas_K=self._t_gas_k,
+                melt_resistance_enabled=False,
+                gas_resistance_enabled=gas_on,
+                extrapolate_continuum=False,
+                melt_surface_renewal_base_kg_s_m2_pa=renewal,
+                melt_surface_renewal_source=renewal_source,
+            )
+            predicted, _alpha = self._flux_from_resistances(
+                p_eq,
+                reference.r_interface,
+                reference.r_gas,
+                reference.r_melt,
+                reference.k_hk_kg_s_m2_pa,
+                alpha,
+            )
+            if predicted == reference.flux_kg_s_m2:
+                cached = (
+                    reference.r_interface,
+                    reference.r_gas,
+                    reference.r_melt,
+                    reference.k_hk_kg_s_m2_pa,
+                )
+            else:
+                cached = False
+            self._conductance[key] = cached
+        if cached is False:
+            solved = self._series(
+                species=species,
+                P_eq_pa=p_eq,
+                P_bulk_pa=p_bulk,
+                T_surface_K=self._t_k,
+                molar_mass_kg_mol=molar,
+                alpha_i=alpha,
+                knudsen_number=knudsen,
+                pipe_diameter_m=self._pipe_m,
+                overhead_pressure_pa=overhead_pa,
+                axial_stir_factor=self._axial,
+                radial_stir_factor=self._radial,
+                cold_skull_envelope=self._cold_skull,
+                carrier_gas=self._carrier,
+                T_gas_K=self._t_gas_k,
+                melt_resistance_enabled=False,
+                gas_resistance_enabled=gas_on,
+                extrapolate_continuum=False,
+                melt_surface_renewal_base_kg_s_m2_pa=renewal,
+                melt_surface_renewal_source=renewal_source,
+            )
+            return solved.flux_kg_s_m2
+        r_interface, r_gas, r_melt, k_hk = cached
+        flux, _alpha = self._flux_from_resistances(
+            p_eq - p_bulk,
+            r_interface,
+            r_gas,
+            r_melt,
+            k_hk,
+            alpha,
+        )
+        return flux
 
     def species_kg_hr(
         self,
@@ -1123,10 +1240,13 @@ class _HeadspaceSeriesReplay:
         fe_cap = None
         if residual is not None:
             fe_cap = max(0.0, float(residual)) * self._fe_molar
-        series = self._series
         area = self._area
         factor = self._factor
         config_error = self._config_error
+        renewal = self._renewal
+        renewal_source = self._renewal_source
+        default_renewal = self._default_renewal
+        default_renewal_source = self._default_renewal_source
         rates: dict[str, float] = {}
         for (
             species,
@@ -1148,52 +1268,37 @@ class _HeadspaceSeriesReplay:
             if p_eq <= p_bulk:
                 continue
             if gate_unmeasured:
-                baseline = series(
+                baseline_flux = self._series_flux_kg_s_m2(
                     species=species,
-                    P_eq_pa=p_eq,
-                    P_bulk_pa=p_bulk,
-                    T_surface_K=self._t_k,
-                    molar_mass_kg_mol=molar,
-                    alpha_i=1.0,
-                    knudsen_number=math.inf,
-                    pipe_diameter_m=self._pipe_m,
-                    overhead_pressure_pa=overhead_pa,
-                    axial_stir_factor=self._axial,
-                    radial_stir_factor=self._radial,
-                    cold_skull_envelope=self._cold_skull,
-                    carrier_gas=self._carrier,
-                    T_gas_K=self._t_gas_k,
-                    gas_resistance_enabled=False,
-                    melt_resistance_enabled=False,
+                    p_eq=p_eq,
+                    p_bulk=p_bulk,
+                    molar=molar,
+                    alpha=1.0,
+                    knudsen=math.inf,
+                    overhead_pa=overhead_pa,
+                    gas_on=False,
+                    renewal=default_renewal,
+                    renewal_source=default_renewal_source,
                 )
-                baseline_rate = (baseline.flux_kg_s_m2 * area) * 3600.0
+                baseline_rate = (baseline_flux * area) * 3600.0
                 if available > 1.0e-12 and baseline_rate > self._nontrivial:
                     continue
             try:
-                solved = series(
+                solved_flux = self._series_flux_kg_s_m2(
                     species=species,
-                    P_eq_pa=p_eq,
-                    P_bulk_pa=p_bulk,
-                    T_surface_K=self._t_k,
-                    molar_mass_kg_mol=molar,
-                    alpha_i=alpha,
-                    knudsen_number=knudsen,
-                    pipe_diameter_m=self._pipe_m,
-                    overhead_pressure_pa=overhead_pa,
-                    axial_stir_factor=self._axial,
-                    radial_stir_factor=self._radial,
-                    cold_skull_envelope=self._cold_skull,
-                    carrier_gas=self._carrier,
-                    T_gas_K=self._t_gas_k,
-                    melt_resistance_enabled=False,
-                    gas_resistance_enabled=uses_gas,
-                    extrapolate_continuum=False,
-                    melt_surface_renewal_base_kg_s_m2_pa=self._renewal,
-                    melt_surface_renewal_source=self._renewal_source,
+                    p_eq=p_eq,
+                    p_bulk=p_bulk,
+                    molar=molar,
+                    alpha=alpha,
+                    knudsen=knudsen,
+                    overhead_pa=overhead_pa,
+                    gas_on=uses_gas,
+                    renewal=renewal,
+                    renewal_source=renewal_source,
                 )
             except config_error:
                 continue
-            rate = (solved.flux_kg_s_m2 * area) * 3600.0
+            rate = (solved_flux * area) * 3600.0
             if rate <= 0.0:
                 continue
             gated = float(rate) * factor
@@ -5107,13 +5212,13 @@ class EvaporationMixin:
             evap_flux.species_kg_hr,
             dt_hr=dt_hr,
             phase_scalar=phase_scalar,
-            cleaned_melt_kg=self.atom_ledger.kg_by_account(
+            cleaned_melt_kg=self._account_kg_during_headspace_probe(
                 'process.cleaned_melt'
             ),
             available_o2_kg=float(
-                self.atom_ledger.kg_by_account('process.overhead_gas').get(
-                    'O2', 0.0
-                )
+                self._account_kg_during_headspace_probe(
+                    'process.overhead_gas'
+                ).get('O2', 0.0)
             ),
             min_rate_kg_hr=min_rate_kg_hr,
         )
@@ -5130,6 +5235,24 @@ class EvaporationMixin:
         )
         smoothed.update_totals()
         return smoothed
+
+    def _account_kg_during_headspace_probe(self, account: str) -> dict[str, float]:
+        """Ledger kg for one account, cached while a headspace solve is open.
+
+        The solve's probes change gas partials only. Cleaned-melt and
+        overhead inventories stay fixed, so each account's kg projection
+        is one dict for the hour. Outside the solve the cache is absent
+        and every call reads the ledger.
+        """
+
+        reuse = getattr(self, "_headspace_probe_reuse", None)
+        key = ("account_kg", account)
+        if isinstance(reuse, dict) and key in reuse:
+            return reuse[key]
+        projected = self.atom_ledger.kg_by_account(account)
+        if isinstance(reuse, dict):
+            reuse[key] = projected
+        return projected
 
     def _analytic_evaporation_depletion_rates(
         self,
@@ -6131,6 +6254,32 @@ class EvaporationMixin:
         return converted
 
     def _evaporation_stoich(self, species: str, sp_data: dict):
+        # The catalog row does not change during a headspace solve. Atom
+        # validation is a pure function of that row, so the first successful
+        # result is reused for the rest of the hour.
+        reuse = getattr(self, "_headspace_probe_reuse", None)
+        cache = None
+        if isinstance(reuse, dict):
+            cache = reuse.setdefault("_stoich", {})
+            hit = cache.get(species)
+            if hit is not None:
+                return {
+                    'parent_oxide': hit[0],
+                    'oxide_per_product_kg': hit[1],
+                    'O2_per_product_kg': hit[2],
+                    'oxygen_destination': hit[3],
+                }
+
+        def remember(result: dict) -> dict:
+            if cache is not None:
+                cache[species] = (
+                    result['parent_oxide'],
+                    result['oxide_per_product_kg'],
+                    result['O2_per_product_kg'],
+                    result['oxygen_destination'],
+                )
+            return result
+
         parent_oxide = sp_data.get('parent_oxide', '')
         if not parent_oxide:
             raise AccountingError(
@@ -6176,12 +6325,12 @@ class EvaporationMixin:
                 oxide_per_product,
                 O2_per_product,
             )
-            return {
+            return remember({
                 'parent_oxide': parent_oxide,
                 'oxide_per_product_kg': oxide_per_product,
                 'O2_per_product_kg': O2_per_product,
                 'oxygen_destination': sp_data.get('oxygen_destination'),
-            }
+            })
 
         implied = OXIDE_TO_METAL.get(parent_oxide, ('', 0, 0))[0]
         if species != implied:
@@ -6215,12 +6364,12 @@ class EvaporationMixin:
             oxide_per_product,
             O2_per_product,
         )
-        return {
+        return remember({
             'parent_oxide': parent_oxide,
             'oxide_per_product_kg': oxide_per_product,
             'O2_per_product_kg': O2_per_product,
             'oxygen_destination': sp_data.get('oxygen_destination'),
-        }
+        })
 
     def _validate_evaporation_stoich_atoms(
         self,
