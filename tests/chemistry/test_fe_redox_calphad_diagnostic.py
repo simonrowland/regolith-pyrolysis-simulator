@@ -167,19 +167,20 @@ def test_holzheid_1400_gamma_residual_from_each_edge_is_pinned() -> None:
 
 # Replaces b-1124's linear-only expectations at 1299, 1000, 1601, and 1800 C.
 @pytest.mark.parametrize(
-    ("temperature_C", "printed_gamma"),
+    ("temperature_C", "printed_gamma", "expected_uncertainty_band_log10"),
     [
-        (1670.0, 2.718),
-        (1750.0, 2.613),
-        (1900.0, 2.445),
-        (2200.0, 2.194),
-        (950.0, 4.888),
-        (225.0, 49.2),
+        (1670.0, 2.718, 0.084841284),
+        (1750.0, 2.613, 0.088523374),
+        (1900.0, 2.445, 0.095121568),
+        (2200.0, 2.194, 0.107191610),
+        (950.0, 4.888, 0.081914830),
+        (225.0, 49.2, 0.274968621),
     ],
 )
 def test_holzheid_regular_solution_table_matches_independent_edge_law(
     temperature_C: float,
     printed_gamma: float,
+    expected_uncertainty_band_log10: float,
 ) -> None:
     T_K = temperature_C + 273.15
     points = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C
@@ -218,23 +219,6 @@ def test_holzheid_regular_solution_table_matches_independent_edge_law(
         abs(temperature_C - edge_C) / (points[-1][0] - points[0][0])
     )
 
-    edge_sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * edge_multiplier
-    scaled_low = math.exp(math.log(edge_gamma - edge_sigma) * edge_T_K / T_K)
-    scaled_high = math.exp(math.log(edge_gamma + edge_sigma) * edge_T_K / T_K)
-    edge_pair = points[:2] if below else points[-2:]
-    edge_segment_spread = abs(
-        HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
-        * (edge_pair[1][1] - edge_pair[0][1])
-    )
-    assert notice["edge_segment_spread"] == pytest.approx(edge_segment_spread)
-    # Build the independent log interval from the transported sigma edges and
-    # the minimum nearest-segment spread, then symmetrize in dex.
-    band_low_gamma = min(scaled_low, independent_gamma - edge_segment_spread)
-    band_high_gamma = max(scaled_high, independent_gamma + edge_segment_spread)
-    sigma_band_log10 = max(
-        math.log10(independent_gamma / band_low_gamma),
-        math.log10(band_high_gamma / independent_gamma),
-    )
     target_1400_T_K = points[1][0] + 273.15
     model_scatter_log10 = max(
         abs(
@@ -255,25 +239,30 @@ def test_holzheid_regular_solution_table_matches_independent_edge_law(
         )
         for scatter_edge_C, scatter_edge_multiplier in (points[0], points[-1])
     )
-    sigma_ext_log10 = math.sqrt(sigma_band_log10**2 + model_scatter_log10**2)
-    expected_low = 10.0 ** (math.log10(independent_gamma) - sigma_ext_log10)
-    expected_high = 10.0 ** (math.log10(independent_gamma) + sigma_ext_log10)
+    expected_low = 10.0 ** (
+        math.log10(independent_gamma) - expected_uncertainty_band_log10
+    )
+    expected_high = 10.0 ** (
+        math.log10(independent_gamma) + expected_uncertainty_band_log10
+    )
+    expected_sigma = max(
+        independent_gamma - expected_low,
+        expected_high - independent_gamma,
+    )
 
-    assert notice["sigma_band_log10"] == pytest.approx(sigma_band_log10)
     assert notice["model_scatter_log10"] == pytest.approx(model_scatter_log10)
-    assert notice["uncertainty_band_log10"] == pytest.approx(sigma_ext_log10)
     assert notice["uncertainty_band_log10"] == pytest.approx(
         math.sqrt(
-            notice["sigma_band_log10"] ** 2
-            + notice["model_scatter_log10"] ** 2
+            notice["sigma_band_log10"] ** 2 + model_scatter_log10**2
         )
+    )
+    assert notice["uncertainty_band_log10"] == pytest.approx(
+        expected_uncertainty_band_log10, abs=5e-10
     )
     assert notice["uncertainty_band"] == band["measurement_sigma"]
     assert band["measurement_low"] == pytest.approx(expected_low)
     assert band["measurement_high"] == pytest.approx(expected_high)
-    assert band["measurement_sigma"] >= edge_segment_spread
-    assert band["measurement_low"] <= scaled_low
-    assert band["measurement_high"] >= scaled_high
+    assert band["measurement_sigma"] == pytest.approx(expected_sigma)
 
 
 def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():

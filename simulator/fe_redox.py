@@ -515,15 +515,18 @@ def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
             HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL
             * (edge_points[1][1] - edge_points[0][1])
         )
-        # The existing band width is in gamma units. Convert its symmetric
-        # edge-scaled limits and segment spread to dex using the larger log
-        # distance to either boundary, then add model scatter in quadrature.
-        # Convert the expanded dex interval back to gamma values.
-        band_low = min(scaled_low, central - edge_segment_spread)
-        band_high = max(scaled_high, central + edge_segment_spread)
+        # The reviewed band uses one symmetric half-width in gamma units,
+        # preserving both transported sigma edges and the nearest segment
+        # spread. Convert that interval to dex using its larger log distance,
+        # then add measured model scatter in quadrature.
+        sigma_band = max(
+            central - scaled_low,
+            scaled_high - central,
+            edge_segment_spread,
+        )
         sigma_band_log10 = max(
-            math.log10(central / band_low),
-            math.log10(band_high / central),
+            math.log10(central / (central - sigma_band)),
+            math.log10((central + sigma_band) / central),
         )
         target_1400_T_K = points[1][0] + 273.15
         printed_1400_multiplier = points[1][1]
