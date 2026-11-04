@@ -1836,6 +1836,70 @@ def test_exploded_activity_child_renormalizes_high_mass_percent_composition(
     assert condition.locator.page == 3
 
 
+def test_exploded_children_recompute_renormalization_notice_after_closure(
+    tmp_path: Path,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "composition_wt_pct": {"SiO2": "55", "MgO": "49"},
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "composition_wt_pct": {"SiO2": "56", "MgO": "50"},
+                    },
+                    {
+                        "T_K": 1573,
+                        "gamma": "0.4",
+                        "composition_wt_pct": {"SiO2": "55", "MgO": "48"},
+                    },
+                ],
+            },
+        }
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    children = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=")
+    ]
+    refused = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1473")
+    )
+    admitted = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1573")
+    )
+
+    assert refused.identity.composition is not None
+    assert refused.identity.composition.is_unknown
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+        for notice in refused.notices
+    )
+    admitted_notices = [
+        notice
+        for notice in admitted.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+    assert len(admitted_notices) == 1
+    assert admitted_notices[0].original == Decimal("103")
+
+
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
     tmp_path: Path,
 ) -> None:
@@ -2228,6 +2292,34 @@ def test_b1128_mass_percent_migration_renormalizes_kept_map() -> None:
         }
     )
     assert wt_pct_to_mole_fraction(state.value.as_map()) == expected_moles
+
+
+def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
+    printed = {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("47"),
+        "H2O": Decimal("7"),
+    }
+    state = migrate_module._mass_percent_composition_state(
+        printed, basis="printed_oxides", closure_context=printed
+    )
+    notice = migrate_module._mass_percent_renormalization_notice(
+        printed,
+        closure_context=printed,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        origin="fixture",
+        admitted=state.is_value,
+    )
+
+    assert state.is_value
+    assert state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert migrate_module._mass_percent_kept_total(
+        printed, closure_context=printed
+    ) == Decimal("104")
+    assert notice is not None
+    assert notice.original == Decimal("104")
+    assert notice.band == "95-102 wt% kept oxide total"
+    assert notice.affected_quantities == (Quantity.ACTIVITY_COEFFICIENT,)
 
 
 def test_refused_high_kept_total_has_no_projection_notice() -> None:

@@ -11,7 +11,12 @@ import pytest
 import yaml
 
 from simulator.battery.enums import EvidenceClass, NoticeKind, Phase, Quantity, ValueKind
-from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    _mass_percent_composition_state,
+    wt_pct_to_mole_fraction,
+)
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -474,6 +479,51 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         assert "ReferenceStateConvention" in source["values"]["standard_state_schema_gap"]
 
     assert renormalized_admissions == 33
+
+    # Printed row 4A/35 totals S=102.3; each mass value is hand-derived as 100*w_i/S.
+    printed = {
+        "SiO2": Decimal("28.3"),
+        "TiO2": Decimal("12.1"),
+        "Al2O3": Decimal("6.7"),
+        "FeO": Decimal("51.2"),
+        "CaO": Decimal("4.0"),
+        "K2O": Decimal("0.0"),
+    }
+    normalized = _mass_percent_composition_state(
+        printed, basis="printed_oxides"
+    ).value.as_map()
+    assert normalized == {
+        "SiO2": Decimal("27.66373411534701857282502444"),
+        "TiO2": Decimal("11.82795698924731182795698925"),
+        "Al2O3": Decimal("6.549364613880742913000977517"),
+        "FeO": Decimal("50.04887585532746823069403715"),
+        "CaO": Decimal("3.910068426197458455522971652"),
+        "K2O": Decimal("0"),
+    }
+    molar_masses = {
+        "SiO2": Decimal("60.083"),
+        "TiO2": Decimal("79.865"),
+        "Al2O3": Decimal("101.960077"),
+        "FeO": Decimal("71.844"),
+        "CaO": Decimal("56.077"),
+        "K2O": Decimal("94.1956"),
+    }
+    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
+    total_moles = sum(moles.values(), Decimal("0"))
+    independent_mole_fractions = {
+        name: amount / total_moles for name, amount in moles.items()
+    }
+    pinned_renormalized = observations[
+        f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r35"
+    ]
+    actual_mole_fractions = dict(
+        pinned_renormalized.identity.composition.value.components
+    )
+    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert all(
+        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
+        for name, expected in independent_mole_fractions.items()
+    )
 
     # Render-backed locators from both printed tables reach migrated values.
     first = observations[f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r01"]

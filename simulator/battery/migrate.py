@@ -1539,6 +1539,8 @@ def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
 def _percent_composition_closure_error(
     components: Mapping[str, Decimal],
     basis: str,
+    *,
+    closure_context: object = None,
 ) -> str | None:
     amounts = tuple(
         amount
@@ -1547,7 +1549,11 @@ def _percent_composition_closure_error(
     )
     if any(not amount.is_finite() or amount < 0 for amount in amounts):
         return f"{basis}-percent composition contains a negative or non-finite amount"
-    total = _mass_percent_kept_total(components)
+    total = (
+        _mass_percent_kept_total(components, closure_context=closure_context)
+        if basis == "mass"
+        else sum(amounts, Decimal("0"))
+    )
     rounding_bound = sum(
         (
             Decimal("0.5").scaleb(amount.as_tuple().exponent)
@@ -1571,12 +1577,36 @@ def _percent_composition_closure_error(
     return None
 
 
-def _mass_percent_kept_total(components: Mapping[str, Decimal]) -> Decimal:
-    return sum(
-        (amount for name, amount in components.items()
-         if str(name).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS),
-        Decimal("0"),
+def _mass_percent_kept_total(
+    components: Mapping[str, Decimal], *, closure_context: object = None
+) -> Decimal:
+    """Return S from the oxide, volatile, and same-row closure analytes."""
+
+    source_map = _printed_composition_source_map(closure_context)
+    analysis = source_map if source_map is not None else components
+    try:
+        kept = _oxide_mass_percent_components(analysis)
+    except ValueError as exc:
+        if "ambiguous total iron components" not in str(exc):
+            raise
+        return sum(components.values(), Decimal("0"))
+    kept.update(_printed_volatile_mass_percent(analysis, closure_context))
+    for name, amount in _printed_composition_closure_components(
+        closure_context
+    ).items():
+        if name not in kept:
+            kept[name] = amount
+    dropped = _unrecognized_printed_chemical_components(
+        components,
+        closure_context,
+        declared_component_map=_declared_printed_composition_map(
+            closure_context
+        ),
     )
+    if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+        for name, amount in dropped.items():
+            kept.setdefault(name, amount)
+    return sum(kept.values(), Decimal("0"))
 
 
 def _mass_percent_printed_from_plain(
@@ -4607,13 +4637,16 @@ def _composition_projection_notice(
 def _mass_percent_renormalization_notice(
     wt: Mapping[str, Decimal] | None,
     *,
+    closure_context: object = None,
     quantity: Quantity | None,
     origin: str,
     admitted: bool,
 ) -> Notice | None:
     if not admitted or quantity is None:
         return None
-    kept_total = _mass_percent_kept_total(_oxide_mass_percent_components(wt or {}))
+    kept_total = _mass_percent_kept_total(
+        wt or {}, closure_context=closure_context
+    )
     if not _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
         return None
     return _hold_reason_notice(
@@ -4936,7 +4969,7 @@ def _wt_percent_conversion_or_refusal(
                     if name not in kept_wt:
                         kept_wt[name] = amount
                 closure_error = _percent_composition_closure_error(
-                    kept_wt, "mass"
+                    kept_wt, "mass", closure_context=closure_context
                 )
             except (ArithmeticError, ValueError):
                 closure_error = None
@@ -5024,16 +5057,19 @@ def _wt_percent_conversion_or_refusal(
             )
 
         oxide_wt = _oxide_mass_percent_components(wt)
-        volatile_wt = _printed_volatile_mass_percent(wt, closure_context)
-        closure_wt = {**oxide_wt, **volatile_wt}
+        closure_wt = {
+            **oxide_wt,
+            **_printed_volatile_mass_percent(wt, closure_context),
+        }
         for name, amount in _printed_composition_closure_components(
             closure_context
         ).items():
             if name not in closure_wt:
                 closure_wt[name] = amount
-
         errors: list[str] = []
-        closure_error = _percent_composition_closure_error(closure_wt, "mass")
+        closure_error = _percent_composition_closure_error(
+            closure_wt, "mass", closure_context=closure_context
+        )
         if closure_error is not None:
             errors.append(closure_error)
         if errors:
@@ -5147,17 +5183,9 @@ def _printed_mass_percent_map_refusal(
             return True, refusal
         return True, None
 
-    closure_amounts = {
-        name: amount
-        for name, amount in wt.items()
-        if _volatile_closure_component(
-            _mass_percent_component_key(name)[0]
-        ) is None
-    }
-    closure_amounts.update(
-        _printed_volatile_mass_percent(raw, closure_context)
+    return True, _percent_composition_closure_error(
+        wt, "mass", closure_context=closure_context
     )
-    return True, _percent_composition_closure_error(closure_amounts, "mass")
 
 
 def _wt_percent_conversion_or_raise(
@@ -5218,7 +5246,7 @@ def _mass_percent_composition_state(
     ):
         return State.of(replace(converted, basis=basis))
     oxide_wt = _oxide_mass_percent_components(wt)
-    kept_total = _mass_percent_kept_total(oxide_wt)
+    kept_total = _mass_percent_kept_total(wt, closure_context=closure_context)
     if _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
         oxide_wt = {
             name: amount * Decimal("100") / kept_total
@@ -21424,8 +21452,14 @@ class Migrator:
             notice_wt = projected_oxide_map or initial_oxide_map
             if not notice_wt and q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
                 notice_wt = _printed_composition_source_map(phase_closure_context)
+        notice_closure_context = (
+            phase_closure_context
+            if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+            else projected_closure_context
+        )
         renormalization_notice = _mass_percent_renormalization_notice(
             notice_wt,
+            closure_context=notice_closure_context,
             quantity=q_token,
             origin=obs_id,
             admitted=admitted,
@@ -24146,7 +24180,14 @@ class Migrator:
                     identity = replace(
                         identity, total_pressure_Pa=State.of(pressure)
                     )
-        child_notices = list(notices)
+        child_notices = [
+            notice
+            for notice in notices
+            if not (
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == "95-102 wt% kept oxide total"
+            )
+        ]
         projection_notice = _composition_projection_notice(
             point_oxide_map,
             closure_context=point_composition_context,
@@ -24163,23 +24204,6 @@ class Migrator:
             for notice in child_notices
         ):
             child_notices.append(projection_notice)
-        renormalization_notice = _mass_percent_renormalization_notice(
-            point_oxide_map,
-            quantity=q_token_point,
-            origin=point_id,
-            admitted=(
-                not point_composition_refusal
-                and residual is not None
-                and residual.state.is_value
-            ),
-        )
-        if renormalization_notice is not None and not any(
-            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-            and notice.band == renormalization_notice.band
-            and notice.original == renormalization_notice.original
-            for notice in child_notices
-        ):
-            child_notices.append(renormalization_notice)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
@@ -24206,6 +24230,27 @@ class Migrator:
                 identity,
                 composition=State.unknown(malformed_composition_amount),
             )
+        final_composition = identity.composition
+        renormalization_notice = _mass_percent_renormalization_notice(
+            point_oxide_map,
+            closure_context=point_composition_context,
+            quantity=q_token_point,
+            origin=point_id,
+            admitted=(
+                not point_composition_refusal
+                and residual is not None
+                and residual.state.is_value
+                and final_composition is not None
+                and final_composition.is_value
+            ),
+        )
+        if renormalization_notice is not None and not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.band == renormalization_notice.band
+            and notice.original == renormalization_notice.original
+            for notice in child_notices
+        ):
+            child_notices.append(renormalization_notice)
         parent_hold_notice = _hold_reason_notice(
             parent_reason,
             quantity=q_token_point,

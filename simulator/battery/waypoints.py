@@ -10,6 +10,8 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _MASS_PERCENT_MAXIMUM_KEPT_SUM,
+    _MASS_PERCENT_RENORMALIZE_ABOVE,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
     _mass_percent_kept_total,
@@ -532,13 +534,14 @@ def charge_moles_by_species(
             charge_scale: Decimal | None = None
             if is_mass_percent:
                 kept_total = _mass_percent_kept_total(
-                    {
-                        species: wt_pct
-                        for species, wt_pct in numeric.items()
-                        if _molar_mass_kg_mol(species) is not None
-                    }
+                    numeric,
+                    closure_context={"printed_composition": source_map},
                 )
-                if Decimal("102") < kept_total <= Decimal("105"):
+                if (
+                    _MASS_PERCENT_RENORMALIZE_ABOVE
+                    < kept_total
+                    <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+                ):
                     charge_scale = Decimal("100") / kept_total
             for species, wt_pct in numeric.items():
                 molar_mass = _molar_mass_kg_mol(species)
@@ -562,6 +565,7 @@ def charge_moles_by_species(
                     # n_i=m*w_i/(100*M_i); renormalize with w_i'=100*w_i/S.
                     # At S=104, w_i' applies the factor 100/104=0.9615.
                     # Units: kg/(kg/mol)=mol.
+                    # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
                     ranked(
                         species,
                         Waypoint(

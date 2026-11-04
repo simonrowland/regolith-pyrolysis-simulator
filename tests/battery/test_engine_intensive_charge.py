@@ -471,6 +471,55 @@ def test_charge_renormalizes_104_wt_percent_map_and_refuses_above_105():
     assert refused.absence.reason is GapReason.MISSING_EVIDENCE
 
 
+def test_charge_uses_migration_kept_total_for_trace_feot_and_volatiles():
+    experiment, bench, _observation = case()
+
+    def charge_for(components):
+        sample = replace(
+            experiment.sample,
+            initial_composition=None,
+            mass_kg=f.located(Value.point_of("0.001")),
+            printed_composition=f.located(components),
+        )
+        return charge_moles_by_species(replace(experiment, sample=sample), bench)
+
+    trace = charge_for(
+        {"SiO2": D("50"), "MgO": D("52"), "Fe": D("0.4")}
+    )
+    assert set(trace.by_species) == {"SiO2", "MgO", "Fe"}
+    for species, wt_percent, molar_mass in (
+        ("SiO2", D("50"), D("0.060083")),
+        ("MgO", D("52"), D("0.040304")),
+        ("Fe", D("0.4"), D("0.055845")),
+    ):
+        waypoint = trace[species].selected
+        assert waypoint is not None
+        expected = D("0.001") * wt_percent / D("100") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(float(expected), rel=1e-12)
+
+    feot = charge_for({"SiO2": D("50"), "FeOT": D("54")})
+    assert set(feot.by_species) == {"SiO2"}
+    feot_silica = feot["SiO2"].selected
+    assert feot_silica is not None
+    expected_feot_silica = D("0.001") * D("50") / D("104") / D("0.060083")
+    assert float(feot_silica.value.point) == pytest.approx(
+        float(expected_feot_silica), rel=1e-12
+    )
+
+    volatile = charge_for(
+        {"SiO2": D("50"), "MgO": D("47"), "H2O": D("7")}
+    )
+    for species, wt_percent, molar_mass in (
+        ("SiO2", D("50"), D("0.060083")),
+        ("MgO", D("47"), D("0.040304")),
+        ("H2O", D("7"), D("0.018015")),
+    ):
+        waypoint = volatile[species].selected
+        assert waypoint is not None
+        expected = D("0.001") * wt_percent / D("104") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(float(expected), rel=1e-12)
+
+
 def test_charge_refuses_duplicate_normalized_mass_percent_species():
     experiment, bench, _observation = case()
     experiment = replace(

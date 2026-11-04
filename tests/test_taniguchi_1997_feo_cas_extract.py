@@ -9,7 +9,12 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import NoticeKind
-from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
+from simulator.battery.migrate import (
+    Migrator,
+    REPO_ROOT,
+    _mass_percent_composition_state,
+    wt_pct_to_mole_fraction,
+)
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -262,3 +267,36 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             assert iron is not None
             assert f"Fe={iron} wt%" in observation.identity.composition.reason
     assert renormalized_rows == 4
+    # Sample 406 has S=102.35 after its 0.102 wt% Fe trace is dropped.
+    printed = {
+        "Fe": Decimal("0.102"),
+        "CaO": Decimal("38.5"),
+        "Al2O3": Decimal("57.5"),
+        "CaF2": Decimal("6.35"),
+    }
+    normalized_state = _mass_percent_composition_state(
+        printed, basis="printed_oxides", closure_context=printed
+    )
+    assert normalized_state.is_value
+    normalized = normalized_state.value.as_map()
+    assert normalized == {
+        "CaO": Decimal("37.61602344894968246213971666"),
+        "Al2O3": Decimal("56.17977528089887640449438202"),
+        "CaF2": Decimal("6.204201270151441133365901319"),
+    }
+    molar_masses = {
+        "CaO": Decimal("56.077000000000005"),
+        "Al2O3": Decimal("101.960077"),
+        "CaF2": Decimal("78.074806326"),
+    }
+    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
+    total_moles = sum(moles.values(), Decimal("0"))
+    independent_mole_fractions = {
+        name: amount / total_moles for name, amount in moles.items()
+    }
+    actual_mole_fractions = wt_pct_to_mole_fraction(normalized).as_map()
+    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert all(
+        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
+        for name, expected in independent_mole_fractions.items()
+    )

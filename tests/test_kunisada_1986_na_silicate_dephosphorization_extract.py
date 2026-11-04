@@ -11,6 +11,7 @@ import yaml
 from simulator.battery.enums import NoticeKind, Phase, PhaseRole, Quantity, ValueKind
 from simulator.battery.migrate import (
     _percent_composition_closure_error,
+    _mass_percent_composition_state,
     wt_pct_to_mole_fraction,
 )
 from tests.battery.factories import migrate_one_extract
@@ -277,6 +278,58 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             row.experiment_id == experiment_id and row.identity.composition.is_value
             for row in phase_rows
         )
+
+    # Flux-e printed cells total S=102.15; these are hand-derived 100*w_i/S values.
+    printed = {
+        "Na2O": Decimal("40.9"),
+        "SiO2": Decimal("39.5"),
+        "T.Fe": Decimal("2.3"),
+        "MgO": Decimal("17.5"),
+        "P2O5": Decimal("1.95"),
+    }
+    normalized = _mass_percent_composition_state(
+        printed, basis="printed_oxides"
+    ).value.as_map()
+    assert normalized == {
+        "Na2O": Decimal("40.03915810083210964268232991"),
+        "SiO2": Decimal("38.66862457170827214880078316"),
+        "T.Fe": Decimal("2.251590797846304454233969652"),
+        "MgO": Decimal("17.13166911404796867351933431"),
+        "P2O5": Decimal("1.908957415565345080763582966"),
+    }
+    molar_masses = {
+        "Na2O": Decimal("61.978538560000004"),
+        "SiO2": Decimal("60.083"),
+        "T.Fe": Decimal("55.845"),
+        "MgO": Decimal("40.304"),
+        "P2O5": Decimal("141.942523996"),
+    }
+    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
+    total_moles = sum(moles.values(), Decimal("0"))
+    independent_mole_fractions = {
+        name: amount / total_moles for name, amount in moles.items()
+    }
+    pinned_flux_e = next(
+        row
+        for row in phase_rows
+        if any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.original == Decimal("102.15")
+            and notice.band == "95-102 wt% kept oxide total"
+            for notice in row.notices
+        )
+    )
+    actual_composition = pinned_flux_e.identity.composition.value
+    actual_mole_fractions = (
+        wt_pct_to_mole_fraction(actual_composition.as_map()).as_map()
+        if actual_composition.amount_basis.value == "mass_percent"
+        else actual_composition.as_map()
+    )
+    assert set(actual_mole_fractions) == set(independent_mole_fractions)
+    assert all(
+        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
+        for name, expected in independent_mole_fractions.items()
+    )
 
     contexts = [
         context
