@@ -5,6 +5,8 @@ from __future__ import annotations
 from decimal import Decimal
 from pathlib import Path
 
+import yaml
+
 from simulator.battery.enums import NoticeKind
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
@@ -19,6 +21,7 @@ AITHALA_ALLF_RUNS = {
     "aithala-2026-2000-120",
     "aithala-2026-2100-30",
 }
+JAYASURIYA = REPO / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
 def _migrate(path: Path):
@@ -243,4 +246,33 @@ def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
             for notice in row.notices
         )
         for row in sossi_rows
+    )
+
+
+def test_jayasuriya_redox_rows_project_the_printed_bar_frame() -> None:
+    extract = yaml.safe_load(JAYASURIYA.read_text(encoding="utf-8"))
+    points = [
+        point
+        for observation in extract["species"]["Fe"]["observations"]
+        for point in observation["values"]["points"]
+    ]
+    assert len(points) == 38
+    assert all(
+        point["point_conditions"]["fO2_log"]["units"] == "log10(bar)"
+        for point in points
+    )
+
+    result = _migrate(JAYASURIYA)
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "jayasuriya-2004-iron-mossbauer"
+    ]
+    assert len(rows) == len(points)
+    assert all(row.identity.temperature_K.is_value for row in rows)
+    assert all(row.identity.fO2_Pa.is_value for row in rows)
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["fO2_log"].state.is_value
+        for row in rows
     )
