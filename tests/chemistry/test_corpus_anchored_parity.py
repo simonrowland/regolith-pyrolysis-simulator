@@ -600,9 +600,9 @@ def _grid_25_test_cases():
 # fail toward "not passing" (so out-of-range builtin Antoine anchors
 # for SiO / O2 / SiO2 do not pull the count below the gate).
 
-# VR-5 external domain (DESIGN-REV5 §4.2.1): 1350–1950 K inclusive.
-# Was 2400 K historically; the 2026-07-31 probe proved silent fabrication
-# outside the admitted envelope, so the corpus gate must match the adapter.
+# VR-5 certified cohort (DESIGN-REV5 §4.2.1): 1350–1950 K inclusive.
+# The corpus score stays inside this evidence band; the runtime adapter can
+# evaluate finite out-of-band temperatures and flags those predictions.
 VAPOROCK_MIN_VALID_T_K = 1350.0
 VAPOROCK_MAX_VALID_T_K = 1950.0
 
@@ -851,12 +851,12 @@ KNOWN_NONCONVERGED_ANCHOR_MAX_ERROR = {
     "grid-25:lunar_mare_basalt_12022_proxy@1900K:Na": 3.2,
 }
 
-# VR-5 (2026-07-31): external domain gate tightened VapoRock to 1350–1950 K
+# VR-5 (2026-07-31): the certified scoring cohort is 1350–1950 K
 # (was 2400 K corpus ceiling). The single 2000 K Na anchor
 # (grid-25:vf2013_mars_2000_na@2000K:Na) moves from pass → out_of_range,
-# so the in-domain pass baseline drops 21 → 20. Not an engine residual
-# regression — the cell is correctly refused as outside the admitted
-# envelope (probe: silent fabrication beyond it).
+# so the in-domain pass baseline drops 21 → 20. This is excluded from the
+# literature-parity score as extrapolation; the runtime adapter can return a
+# flagged prediction for it.
 GRID_25_V3_PASS_BASELINE = 20
 GRID_25_V3_ORIGINAL_ACCEPTANCE_TARGET = 18
 
@@ -1061,7 +1061,7 @@ GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
     "grid-25-sio:cj2015@1900K:SiO": (
         "model-spread-within-envelope", 0.25049547025978586,
     ),
-    # VR-5: T ceiling 1950 K — 2000 K is out-of-engine-T-range (was live).
+    # Certified-cohort filter: the 2000 K anchor is outside the scored band.
     "grid-25-sio:cj2015@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:sf2004@1700K:SiO": (
         "model-spread-within-envelope", 0.9269341194554767,
@@ -1078,7 +1078,7 @@ GRID_25_SIO_RUNTIME_DRIFT_TRIPWIRE = {
     "grid-25-sio:sof2018-mineru@1873K:SiO": (
         "pass", 0.13230855453336143,
     ),
-    # VR-5: 1973 K is above the 1950 K external domain ceiling.
+    # Certified-cohort filter: 1973 K is above the scored band.
     "grid-25-sio:sof2018-mineru@1973K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@2000K:SiO": ("out-of-engine-T-range", None),
     "grid-25-sio:vf2013-bse@2500K:SiO": ("out-of-engine-T-range", None),
@@ -1414,7 +1414,7 @@ _CJ_PRESSURE_RUNTIME_DRIFT_TRIPWIRE = {
     ("Ir", 1900, "Fe"): ("model-spread-within-envelope", 0.9023568639218107),
     ("Ir", 1900, "Mg"): ("model-spread-within-envelope", 0.9959124657587983),
     ("Ir", 1900, "SiO"): ("model-spread-within-envelope", 0.2510644934192934),
-    # VR-5: 2000 K is above the 1950 K external domain ceiling.
+    # Certified-cohort filter: these 2000 K anchors are outside the scored band.
     ("Ir", 2000, "Fe"): ("out-of-engine-range", None),
     ("Ir", 2000, "Mg"): ("out-of-engine-range", None),
     ("Ir", 2000, "SiO"): ("out-of-engine-range", None),
@@ -1729,7 +1729,7 @@ def test_cj_olivine_kems_pressure_runtime_drift_tripwire(
     status = entry["status"]
     assert status in _CJ_OLIVINE_ALLOWED_STATUSES
     assert status == expected_status, anchor.anchor_id
-    # VR-5 OOR re-pins use error_decades=None (same shape as SiO tripwire).
+    # Out-of-cohort pins use error_decades=None (same shape as SiO tripwire).
     if expected_error is None:
         assert entry["error_decades"] is None, anchor.anchor_id
     else:
