@@ -3351,21 +3351,6 @@ def fusion_comparison_reference(
                 reference,
                 notices=union_notices(reference.notices, (d144_notice,)),
             )
-        if formula == "MgO":
-            notice = Notice(
-                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                affected_quantities=(Quantity.ACTIVITY,),
-                reason=RefusalReason.ENGINE_ACTIVITY_STANDARD_STATE_UNCERTIFIED.value,
-                origin=reference.observation_id,
-                band=(
-                    "MAGEMin MgO activity standard state is uncertified; adapter mapping "
-                    "engines/magemin/domain.py:28-30; direct native-field parser "
-                    "simulator/melt_backend/magemin.py:3502-3516; see b-1123"
-                ),
-            )
-            reference = replace(
-                reference, notices=union_notices(reference.notices, (notice,))
-            )
         magemin_target_polymorph = Polymorph(native[1])
         magemin_source_polymorph = (
             resolved_polymorph
@@ -5906,6 +5891,60 @@ def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
+    )
+
+
+def _magemin_activity_equilibrium_notice(
+    identity: Identity,
+    phase_mode_rows: Sequence[Sequence[object]],
+    *,
+    origin: str,
+) -> Notice | None:
+    """Flag a MAGEMin assemblage that is not one liquid for a liquid row."""
+
+    if (
+        quantity_token(identity) is not Quantity.ACTIVITY
+        or identity.species is None
+        or phase_token(identity.species) is not Phase.L
+        or not phase_mode_rows
+    ):
+        return None
+
+    liquid_instances = 0
+    non_liquid_present = False
+    for row in phase_mode_rows:
+        if not isinstance(row, (list, tuple)) or len(row) != 2:
+            return None
+        name, raw_mode = row
+        try:
+            mode = float(raw_mode)
+        except (TypeError, ValueError, OverflowError):
+            return None
+        if not math.isfinite(mode):
+            return None
+        # Treat modes at or below the existing 1e-4 cutoff as rounding noise.
+        if mode <= 1.0e-4:
+            continue
+        if str(name).strip().lower().startswith("liq"):
+            liquid_instances += 1
+        else:
+            non_liquid_present = True
+
+    if not non_liquid_present and liquid_instances == 1:
+        return None
+    diagnostics = json.dumps(
+        {"phase_mode_rows": [list(row) for row in phase_mode_rows]},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=(
+            "engine_equilibrium_not_single_liquid; "
+            f"diagnostics={diagnostics}"
+        ),
+        origin=origin,
     )
 
 
@@ -11057,6 +11096,24 @@ def _predict_with_engine(
             requested_composition=requested,
             version=engine_version,
         )
+    if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
+        phase_mode_rows = next(
+            (
+                row.get("phase_mode_rows")
+                for row in getattr(cell, "notices", None) or ()
+                if isinstance(row, Mapping)
+                and row.get("kind") == "magemin_native_phase_modes"
+            ),
+            None,
+        )
+        if isinstance(phase_mode_rows, (list, tuple)):
+            assemblage_notice = _magemin_activity_equilibrium_notice(
+                identity,
+                phase_mode_rows,
+                origin="engine:magemin",
+            )
+            if assemblage_notice is not None:
+                notices = union_notices(notices, (assemblage_notice,))
     if (
         engine is Engine.THERMOENGINE
         and quantity is Quantity.ACTIVITY

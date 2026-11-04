@@ -1806,6 +1806,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'magemin_native_mode': (
                     raw.get('native_mode') if isinstance(raw, Mapping) else None
                 ),
+                'magemin_native_phase_mode_rows': (
+                    raw.get('native_phase_mode_rows')
+                    if isinstance(raw, Mapping)
+                    else None
+                ),
                 'magemin_iterations': (
                     raw.get('iterations') if isinstance(raw, Mapping) else None
                 ),
@@ -3224,6 +3229,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'solver_status': stdout_metadata.get('solver_status'),
                 'native_phase': stdout_metadata.get('phase_names'),
                 'native_mode': stdout_metadata.get('mode_fractions'),
+                'native_phase_mode_rows': stdout_metadata.get('phase_mode_rows'),
                 'iterations': self._parse_subprocess_iterations(
                     completed.stdout or ''
                 ),
@@ -3500,6 +3506,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     f'MAGEMin Mode token for {name!r} is invalid: {raw!r}'
                 )
             parsed_modes.append((name, fraction))
+        if metadata is not None:
+            metadata['phase_mode_rows'] = tuple(
+                (name, fraction)
+                for name, fraction in parsed_modes
+                if name.lower() not in MAGEMinBackend._BUFFER_CHOICES
+            )
         mode_total = sum(fraction for _, fraction in parsed_modes)
         if not math.isclose(mode_total, 1.0, rel_tol=0.0, abs_tol=1.0e-4):
             if mode_total < 1.0:

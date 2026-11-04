@@ -357,7 +357,7 @@ def test_d144_converts_kume_cao_and_mgo_and_refuses_the_other_solids(
     )
 
 
-def test_magemin_mgo_activity_refuses_uncertified_native_standard_state(
+def test_magemin_mgo_activity_scores_on_certified_periclase_standard_state(
     tmp_path: Path,
 ) -> None:
     from tests.battery.test_migrate import _migrate_real_extract
@@ -446,23 +446,20 @@ def test_magemin_mgo_activity_refuses_uncertified_native_standard_state(
         context=context,
         prediction=magemin_prediction,
     )
-    assert magemin_residual.status is ResidualStatus.REFUSED
-    assert magemin_residual.numeric is None
-    assert magemin_residual.refusal is not None
-    assert magemin_residual.refusal.reason.value == (
-        "engine_activity_standard_state_uncertified"
-    )
-    assert magemin_residual.refusal.detail["reason"] == (
-        "engine_activity_standard_state_uncertified"
-    )
-    refusal_notice = next(
+    assert magemin_residual.numeric is not None
+    assert magemin_residual.numeric.value == 0
+    assert magemin_residual.refusal is None
+    d144_notice = next(
         notice
         for notice in magemin_residual.notices
-        if notice.reason == "engine_activity_standard_state_uncertified"
+        if notice.reason == "single_polymorph_identity_d144"
     )
-    assert "engines/magemin/domain.py:28-30" in refusal_notice.band
-    assert "simulator/melt_backend/magemin.py:3502-3516" in refusal_notice.band
-    assert "b-1123" in refusal_notice.band
+    assert d144_notice.authority is Authority.CERTIFIED
+    assert "Mg-008" in d144_notice.band
+    assert not any(
+        notice.reason == "engine_activity_standard_state_uncertified"
+        for notice in magemin_residual.notices
+    )
 
 
 def test_magemin_mgo_missing_temperature_keeps_fusion_input_refusal(

@@ -1170,6 +1170,15 @@ def engine_flags_from_result(
         band = row.get("certified_band")
         if isinstance(band, Mapping):
             certified_band = dict(band)
+
+    magemin_phase_mode_rows = diagnostics.get(
+        "magemin_native_phase_mode_rows"
+    )
+    if isinstance(magemin_phase_mode_rows, (list, tuple)):
+        notices.append({
+            "kind": "magemin_native_phase_modes",
+            "phase_mode_rows": _plain_data(magemin_phase_mode_rows),
+        })
     if authority is None and diagnostics.get("authority"):
         authority = str(diagnostics["authority"])
     if certified_band is None and isinstance(

@@ -24,7 +24,8 @@ from simulator.state import OXIDE_SPECIES
 
 # Adapter-normalized melt activities and their declared standard states.
 # MAGEMin's documentation declares aMgO on periclase, but 1.9.6's raw row
-# matches exp(Gamma_MgO / RT) without the pure-phase reference (Kume 305:
+# matches exp(Gamma_MgO / RT) without the pure-phase reference (the activity
+# calculation/output path is in upstream src/toolkit.c:2006 and :2017; Kume 305:
 # Gamma=-757.503252 kJ/mol, aMgO=7.496084e-22, implied R=8.3144 J/mol/K).
 # Read Gamma:MgO and subtract periclase gbase to normalize it. SiO2's aSiO2
 # row is already on quartz. Other formulas have no native activity/reference
