@@ -159,7 +159,8 @@ def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
     migrator = Migrator(root=ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
-    assert not migrator.result.validation.hard_issues
+    issues = migrator.result.validation.hard_issues
+    assert not issues
 
     rows = {
         row.observation_id.split("::", 1)[-1]: row
@@ -180,6 +181,7 @@ def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
         "witthohn_2000_na2o_fig5_figure_only",
         "witthohn_2000_k2o_fig6_model_figure_only",
     }
+    quoted_activity_ids = activity_ids - {"witthohn_2000_k2o_fig6_model_figure_only"}
     assert {key for key, row in rows.items() if row.identity.quantity.value.value == "p_partial"} == pressure_ids
     assert {key for key, row in rows.items() if row.identity.quantity.value.value == "activity"} == activity_ids
     assert all(
@@ -188,8 +190,25 @@ def test_isolated_migration_has_no_scored_observations_or_hard_issues() -> None:
     )
     assert all(
         rows[key].evidence.class_.value.value == "quoted_attributed"
-        for key in activity_ids
+        for key in quoted_activity_ids
     )
+    fig6 = rows["witthohn_2000_k2o_fig6_model_figure_only"]
+    assert fig6.evidence.class_.value.value == "model_derived"
+    fig6_source = next(
+        row
+        for row in extract["species"]["K2O"]["observations"]
+        if row["observation_id"] == "witthohn_2000_k2o_fig6_model_figure_only"
+    )
+    derivation = fig6_source["values"]["derivation"]
+    assert derivation["raw_inputs"]["state"] == {"tag": "value", "value": "not_printed"}
+    assert derivation["method"]["locator"] == {
+        "page": 10,
+        "section": "Phase equilibrium modelling",
+    }
+    assert derivation["references"] == [
+        "Bale et al. (1996), F*A*C*T 2.1 User Manual.",
+        "Pelton and Blander (1984, 1986), modified quasi-chemical model.",
+    ]
     assert all(rows[key].identity.species.phase.value.value == "l" for key in activity_ids)
 
     expected_locators = {

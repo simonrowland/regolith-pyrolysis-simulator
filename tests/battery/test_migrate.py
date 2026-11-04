@@ -2314,7 +2314,6 @@ def test_shornikov_2015_extract_migrates_model_derived_provenance(
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04",
         "shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04",
-        "shornikov_2015_feo_cr_prose",
     }
 
     for observation in model_rows.values():
@@ -13163,9 +13162,10 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     assert table3.derivation is not None
     assert "exchange reaction (3) and Eq. (4)" in table3.derivation.relation
     assert table3.derivation.inputs == table3.derived_from
-    assert table4.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-    assert table4.derived_from is None
-    assert table4.derivation is None
+    assert table4.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    assert table4.derivation is not None
+    assert "exchange relation (Eqs. 1-6" in table4.derivation.relation
+    assert table4.derivation.inputs == table4.derived_from
 
     source = REPO_ROOT / "data" / "literature" / "extracts" / name
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
@@ -13177,8 +13177,7 @@ def test_kume_tables3_and4_derivation_evidence_fresh_migration_and_mutations(
     }
     rows[table3_id].pop("derivation")
     mutated_table4 = rows[table4_id]
-    mutated_table4["values"]["method_class"] = "measured_reduced"
-    mutated_table4["values"]["evidence_class"] = "measured_reduced"
+    mutated_table4.pop("derivation")
     mutated_table4["derived_from"] = ["missing-parent"]
     mutated = migrate(_write_min_tree(tmp_path / "mutated", extract), write=False)
     issues = {
@@ -19797,7 +19796,7 @@ def test_stolyarova_1995_oxygen_routes_keep_typed_reactions_without_invented_par
     for rows in (eqn1_rows, eqn2_rows, o2_rows):
         assert all(
             obs.evidence.class_.is_value
-            and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+            and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
             for obs in rows
         )
 
@@ -19912,7 +19911,7 @@ def test_stolyarova_1991_printed_compositions_reach_migrated_observations(
     assert all(obs.identity.total_pressure_Pa.is_unknown for obs in pressure_rows)
 
 
-def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
+def test_stolyarova_1991_atomic_oxygen_is_measured_reduced_with_author_relation(
     tmp_path: Path,
 ) -> None:
     result = _migrate_real_extract(
@@ -19963,11 +19962,19 @@ def test_stolyarova_1991_atomic_oxygen_is_quoted_attributed_with_relation(
     )
     for obs in rows:
         assert obs.derivation is not None
-        assert obs.derivation.relation == "atm_to_Pa"
-        assert "WO3" not in obs.derivation.relation
+        assert obs.derivation.relation == (
+            "Atomic oxygen pressure calculated from measured WO2 and WO3 partial pressures using gas reaction (1)."
+        )
+        assert obs.derivation.output_unit == "Pa"
+        original = dict(obs.derivation.parameters)["original"]
+        assert original.inference is not None
+        assert original.inference.relation == "atm_to_Pa"
+        assert original.inference.output_unit == "Pa"
         assert obs.derived_from is None
-        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        assert obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert obs.evidence.attribution == (
+            "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
+        )
 
 
 def test_stolyarova_1991_composition_map_mutation_removes_identity(

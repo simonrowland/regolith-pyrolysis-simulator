@@ -972,16 +972,20 @@ def test_approximate_buffer_phrase_is_not_a_point(tmp_path: Path) -> None:
     assert "not a point offset" in oxygen.reason
 
 
-def test_lu_2026_diw_converts_on_the_notice_and_leaves_fo2_not_applicable() -> None:
+def test_lu_2026_diw_converts_into_absolute_fo2_and_discloses_calibration() -> None:
     result = _migrated("lu-2026-mercury-sulfur-liquidus.yaml")
     observation = _one(result, "lu26_mer10_3gpa_a22_1675c_02_s_in_glass")
     oxygen = observation.identity.fO2_Pa
-    assert oxygen is not None and oxygen.is_not_applicable
+    # t-1619 / d-324: the printed ΔIW now populates the absolute identity.
+    assert oxygen is not None and oxygen.is_value
     assert "fO2_Pa" not in (observation.point_conditions or {})
     evaluation = evaluate_buffer(
         "IW",
         Decimal("1948.15"),
         pressure_bar=Decimal(30000),
+    )
+    assert oxygen.value == _log_fO2_to_pa(
+        evaluation.log10_fO2_bar + Decimal("-6.5")
     )
     notices = [
         notice

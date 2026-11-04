@@ -99,6 +99,34 @@ def test_table_ia_per_cell_uncertainties_migrate_with_source_unit_and_locator(
     assert result.validation is not None
     assert not result.validation.hard_issues
 
+    oxygen_id = "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium"
+    oxygen = _series_by_id(document, oxygen_id)
+    assert oxygen["values"]["method_class"] == "measured_reduced"
+    assert oxygen["values"]["evidence_class"] == "measured_reduced"
+    assert oxygen["values"]["method_as_printed"] == "Calculated from equilibrium (1)"
+    assert oxygen["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert oxygen["derivation"]["raw_inputs"]["locator"]["table"] == "Ib"
+    assert oxygen["derivation"]["raw_inputs"]["locator"]["equation"] == "[1]"
+    oxygen_points = oxygen["values"]["points"]
+    migrated_oxygen = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(f"{SOURCE_ID}::{oxygen_id}::")
+    ]
+    assert len(migrated_oxygen) == len(oxygen_points) == 9
+    for point in oxygen_points:
+        condition = point["point_conditions"]["composition"]
+        assert condition["state"]["tag"] == "value"
+        assert condition["locator"]["table"] == "Ib"
+        observation = _migrated_point(
+            result, oxygen_id, point["SiO2_mole_fraction_as_printed"]
+        )
+        assert observation.identity.temperature_K.value == Decimal("1933")
+        assert observation.locator is not None and observation.locator.table == "Ib"
+        assert dict(observation.identity.composition.value.components)["SiO2"] == Decimal(
+            point["SiO2_mole_fraction_as_printed"]
+        )
+
     pins = (
         (
             "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",

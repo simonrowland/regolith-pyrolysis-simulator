@@ -34,6 +34,8 @@ The caption does not say formation from the elements or from the oxides. That se
 
 Published page 1353 quotes Barin et al. [50] fusion enthalpies of 50.21 kJ/mol at 1249 K (metasilicate) and 41.00 kJ/mol at 1318 K (disilicate), and says those [50] functions have low accuracy. They are context. The adopted numbers are the Table 2 calorimetry values 8.79 and 10.67. The same page's "about 35 kJ/mol" and "about 15 and 25 kJ/mol" are differences between curves, not a printed enthalpy at one composition, so they were not stored.
 
+SC-456 review of the 11 Table 2 hits: the five printed fusion entropies (7.04, 8.10, 19.09, 10.96, and 7.35 J/(mol K)) are `model_derived`. The caption says the Table 2 formation data were evaluated in this work from earlier data [20, 21, 51–53], and the conclusion calls Table 2 a calculation result. The paper does not print a numerical relation for these entropy values or itemize the cited raw inputs per value. The six transition/decomposition temperatures (1249, 1318, 1043, 1362, 1147, and 1081 K) remain `quoted_attributed` because the caption attributes the table to earlier data [20, 21, 51–53]. This disagrees with the sweep's measured proposal for all six temperatures; no row is represented as this paper's direct measurement.
+
 ## Fig. 2 panel (a), series 4, this work at 1400 K
 
 Seven open stars, one at each printed melt composition except 100 mol% GeO2 (no ink at the right-hand frame).

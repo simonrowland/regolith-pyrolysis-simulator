@@ -72,6 +72,7 @@ _FE2O3_MASS = Decimal("159.69")
 _STARTING_PHRASE = (
     "starting material",
     "starting composition",
+    "starting charge",
 )
 # Word boundaries. "unbatched" and "nominally" are not a printed start.
 _STARTING_WORD = re.compile(r"\b(?:batched|nominal)\b", re.IGNORECASE)

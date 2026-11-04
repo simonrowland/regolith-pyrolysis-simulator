@@ -304,6 +304,58 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
             _assert_ohta_suito_1995_review_pins(extract)
 
 
+def test_kume_2000_solid_reference_does_not_infer_unprinted_polymorph() -> None:
+    from simulator.battery.enums import Phase
+
+    source = EXTRACTS / "kume-2000-cao-activities.yaml"
+    extract = yaml.load(source.read_text(), Loader=_DuplicateRejectingLoader)
+    targets = [
+        row
+        for formula in ("CaO", "MgO")
+        for row in extract["species"][formula]["observations"]
+        if row.get("type") == "activity_coefficient"
+        and "activity" in (row.get("values") or {})
+        and row["values"].get("method_class") == "measured_reduced"
+        and row["values"]["activity"] > 0
+    ]
+    assert len(targets) == 126
+    for row in targets:
+        endmember = row["standard_state"]["state"]["value"]["endmember"]
+        assert endmember["phase"] == {"tag": "value", "value": "cr"}
+        assert endmember["polymorph"] == {
+            "tag": "unknown",
+            "reason": "polymorph_not_stated_in_paper",
+        }
+        assert "(s)" in row["locator"]["note"]
+
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT,
+        source,
+        index={
+            source.stem: {
+                **extract["source"],
+                "source_id": source.stem,
+            }
+        },
+        aliases={},
+    )
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert not migrator.result.validation.hard_issues
+    migrated = {
+        row.observation_id.rsplit("::", 1)[-1]: row
+        for row in migrator.result.observations.values()
+    }
+    for row in targets:
+        reference_state = migrated[row["observation_id"]].identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        endmember = reference_state.value.endmember
+        assert endmember.phase.is_value
+        assert endmember.phase.value is Phase.CR
+        assert endmember.polymorph.is_unknown
+        assert endmember.polymorph.reason == "polymorph_not_stated_in_paper"
+
+
 def _assert_sato_1973_table_pins(extract: dict) -> None:
     bench = extract["benches"][0]
     assert bench["temperature_measurement"]["increments"]["state"]["value"] == (
@@ -2874,10 +2926,10 @@ def test_stolyarova_pressure_identities_survive_migration(tmp_path: Path):
         "kems-053-stolyarova-1991.yaml",
         "stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium",
     )
-    assert atomic_source["values"]["method_class"] == "quoted_attributed"
-    assert atomic_source["values"]["evidence_class"] == "quoted_attributed"
+    assert atomic_source["values"]["method_class"] == "measured_reduced"
+    assert atomic_source["values"]["evidence_class"] == "measured_reduced"
     assert atomic_source["values"]["attribution"] == (
-        "Stolyarova et al. (1991), Table Ib, Eq. [1]"
+        "Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated."
     )
     assert atomic_source["reaction_as_printed"] == "(WO3)(g) = (WO2)(g) + (O)(g)"
     assert "reservoir" not in atomic_source
@@ -7071,3 +7123,146 @@ def test_sanders_1977_table_cells_conditions_and_eq13_migrate_with_mutation_pin(
     )
     with pytest.raises(AssertionError):
         assert_migration(mutated)
+
+
+_SC456_SOURCE_IDS = (
+    "shornikov-2011-cao-mgo-alumina-melts",
+    "banya-hino-takezoe-1985-na-fe-silicate-redox",
+    "liu-2023-chromium-oxide-activity",
+    "visscher-fegley-2013-debris-disks",
+    "gca-366-210-berry-2024",
+    "shornikov-2023-cai-melt-evaporation",
+    "yakovlev-2024-cai-vaporization",
+    "matsuzaki-1997-feo-tio2-sio2-activities",
+    "yamaguchi-1984-na2o-activity-sodium-beta-alumina",
+    "no27-fegley-cameron-1987-epsl",
+    "johnston-1965-sodium-disilicate-redox",
+    "charnoz-2023-hydrogen-magma-ocean",
+    "shornikov-2023-mgo-phosphate-melts",
+    "mogul-2023-pioneer-venus-co2-icarus",
+    "kems-050-gorokhov-1977",
+    "centolanzi-1966-tektite-vapour-pressure",
+)
+
+
+@pytest.mark.parametrize("source_id", _SC456_SOURCE_IDS, ids=_SC456_SOURCE_IDS)
+def test_sc456_assigned_extract_migrates_without_hard_issues(source_id: str) -> None:
+    """Keep each SC-456 source independently migratable after evidence relabels."""
+    source = EXTRACTS / f"{source_id}.yaml"
+    migrator = battery_migrate.Migrator(REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(source)
+    migrator.finalize()
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+
+
+@pytest.mark.parametrize(
+    "source_id",
+    [
+        pytest.param("shornikov-2016-cao-mgo-silicate", id="shornikov-2016-cao-mgo-silicate"),
+        pytest.param("fujisawa-1994-na-sn-carbonate-thermodynamics", id="fujisawa-1994-na-sn-carbonate-thermodynamics"),
+        pytest.param("kunisada-1986-na-silicate-dephosphorization", id="kunisada-1986-na-silicate-dephosphorization"),
+        pytest.param("shornikov-2025-ca-al-inclusion-thermodynamics", id="shornikov-2025-ca-al-inclusion-thermodynamics"),
+        pytest.param("beerkens-2003-sulfate-decomposition-na2o-activity", id="beerkens-2003-sulfate-decomposition-na2o-activity"),
+        pytest.param("shornikov-2017-spinel-evaporation", id="shornikov-2017-spinel-evaporation"),
+        pytest.param("willenborg-2006-alkali-removal-thermodynamics", id="willenborg-2006-alkali-removal-thermodynamics"),
+        pytest.param("majzlan-2021-magnesium-silicate-glass-cp", id="majzlan-2021-magnesium-silicate-glass-cp"),
+        pytest.param("wang-2017-sodium-stannate-formation-emf", id="wang-2017-sodium-stannate-formation-emf"),
+        pytest.param("nasa-tm-2024-simulant-guide", id="nasa-tm-2024-simulant-guide"),
+        pytest.param("jacquet-2026-alkali-recondensation", id="jacquet-2026-alkali-recondensation"),
+        pytest.param("cardiff-2007-vacuum-pyrolysis-gsfc", id="cardiff-2007-vacuum-pyrolysis-gsfc"),
+        pytest.param("shornikov-2023-calcium-phosphate", id="shornikov-2023-calcium-phosphate"),
+        pytest.param("masuda-tanaka-1979-vacuum-condensates", id="masuda-tanaka-1979-vacuum-condensates"),
+        pytest.param("kems-035-sauerborn-2005", id="kems-035-sauerborn-2005"),
+        pytest.param("baborak-2023-alkali-silicate-levitation-evaporation", id="baborak-2023-alkali-silicate-levitation-evaporation"),
+    ],
+)
+def test_sc456_assigned_extract_migrates_in_isolation(source_id: str) -> None:
+    extract_path = EXTRACTS / f"{source_id}.yaml"
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    migrator = battery_factories.migrate_one_extract(
+        REPO_ROOT, extract_path, index=None, aliases={}
+    )
+    migrator.finalize()
+
+    assert migrator.result.validation is not None
+    source_rows = {
+        row["observation_id"]
+        for species in document["species"].values()
+        for row in species.get("observations", [])
+    }
+    migrated_rows = migrator.result.observations
+    for observation_id in source_rows:
+        base_id = f"{source_id}::{observation_id}"
+        migrated_ids = [
+            key
+            for key in migrated_rows
+                if key == base_id or key.startswith(f"{base_id}::")
+        ]
+        assert migrated_ids, observation_id
+
+    for species in document["species"].values():
+        for row in species.get("observations", []):
+            source_conditions = row.get("point_conditions") or {}
+            if not source_conditions:
+                continue
+            base_id = f"{source_id}::{row['observation_id']}"
+            migrated_id = next(
+                key
+                for key in migrated_rows
+                if key == base_id or key.startswith(f"{base_id}::")
+            )
+            observation = migrated_rows[migrated_id]
+            assert observation.point_conditions is not None
+            printed_temperature_c = row.get("values", {}).get("T_C")
+            if printed_temperature_c is not None:
+                assert observation.identity.temperature_K.is_value
+            for name, condition in source_conditions.items():
+                migrated_name = "temperature_K" if name == "temperature_C" else name
+                migrated_condition = observation.point_conditions.get(migrated_name)
+                if name in {"temperature_C", "temperature_K"}:
+                    assert migrated_condition is not None
+                    assert migrated_condition.locator is not None
+                elif condition.get("locator") and migrated_condition is not None:
+                    assert migrated_condition.locator is not None
+                if (
+                    condition.get("state")
+                    and migrated_condition is not None
+                    and name != "composition"
+                ):
+                    assert migrated_condition.state.tag.value == condition["state"]["tag"]
+    assert not migrator.result.registry_issues
+    assert not migrator.result.validation.hard_issues
+def test_kroger_fingas_1935_alkali_silicate_equilibria_method_and_temperatures():
+    from simulator.battery.enums import MethodToken
+
+    source = EXTRACTS / "kroger-fingas-1935-alkali-silicate-equilibria.yaml"
+    migrator = battery_factories.migrate_one_extract(REPO_ROOT, source)
+    migrator.finalize()
+    result = migrator.result
+
+    method_experiment_ids = {
+        "kroger_fingas_1935_manometric_reaction_pressures",
+        "kroger_fingas_1935_k2co3_vacuum_pressure",
+    }
+    pressure_rows = tuple(
+        observation
+        for observation in result.observations.values()
+        if observation.experiment_id.rsplit("::", 1)[-1] in method_experiment_ids
+    )
+    assert len(pressure_rows) == 189
+    assert result.validation.hard_issues == ()
+
+    for observation in pressure_rows:
+        experiment = result.experiments[observation.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.STATIC_EQUILIBRIUM
+
+        assert observation.identity.temperature_K.is_value
+        conditions = observation.point_conditions
+        assert conditions is not None
+        for key in ("T_C", "temperature_K"):
+            condition = conditions[key]
+            assert condition.state.is_value
+            assert condition.locator is not None
+            assert condition.locator.table is not None

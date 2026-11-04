@@ -1,0 +1,173 @@
+source_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+source:
+  citation: Dai, W., Seetharaman, S. & Staffansson, L.-I. (1984). A thermodynamic study of the system Fe-Na-O. Scandinavian Journal of Metallurgy 13(1), 32-38.
+  year: 1984
+extraction:
+  method: MinerU tables and markdown plus independent Tesseract OCR; tables and flagged cells checked against page renders.
+  date: '2026-11-03'
+  worker: w1103cw4-ds84
+review_status: draft
+source_read_order:
+- MinerU table HTML and markdown, plus non-table prose
+- Independent Tesseract OCR text
+- PDF page renders for disagreements, incomplete reads, and table row/column assignment
+source_locator_basis: Absolute PDF page and printed table label; body row is an ordinal where the source has no printed row number.
+tables:
+- page: 3
+  table_index: 1
+  type: gibbs_table
+  quantity: delta_fG and typed-refused reaction Gibbs-energy functions
+  unit: J/mol; T in K
+  rows: 11
+  render_verified:
+  - row: 4
+    column: 2
+    text: '-559460 + 264.14T'
+    reason: Tesseract OCR fused/misread the leading coefficient; PDF page 3 render confirms the stored Table I cell.
+  columns:
+  - column: 1
+    printed_header: Reaction
+    mapping: Product species and phase are assigned per printed reaction row.
+  - column: 2
+    printed_header: Gibbs energy function (600-1300 K)
+    mapping: Three element-formation functions use delta_fG; other reaction and phase-transition functions are retained with descriptive quantity labels and typed refusal.
+  conditions: Table header prints 600-1300 K; no numeric fO2 or total pressure is stated for the quoted rows.
+  method_class: quoted_attributed; reference [15]
+- page: 4
+  table_index: 2
+  type: heat_capacity_and_heat_content_series
+  quantity: typed-refused calorimetric heat evolution, reported averages, and enthalpy of mixing
+  unit: J/mol
+  rows: 12
+  columns:
+  - column: 1
+    printed_header: Substance
+    mapping: Row-wise sample formula; phase cr.
+  - column: 2
+    printed_header: Heat Evolution (J/mol)
+    mapping: Printed acid-solution calorimetry readings; descriptive heat-of-solution quantity; measured_direct.
+  - column: 3
+    printed_header: Average Value (J/mol)
+    mapping: Authors' reported average and uncertainty; measured_reduced from the located readings.
+  - column: 4
+    printed_header: Enthalpy of Mixing (J/mol)
+    mapping: Authors' reported mixing enthalpy and uncertainty; measured_reduced from the located averages.
+  conditions: Prose states 40 °C for the present calorimetry; no numeric fO2 or total pressure is stated.
+  render_verified:
+  - row: 4
+    column: 3
+    text: 79638 (±210)
+    reason: Render confirms combined mean and uncertainty cell; compare cannot match the attached uncertainty text.
+  - row: 7
+    column: 3
+    text: 347159 (±670)
+    reason: Render confirms combined mean and uncertainty cell; compare cannot match the attached uncertainty text.
+  - row: 11
+    column: 3
+    text: 307691 (±2850)
+    reason: Render confirms combined mean and uncertainty cell; the reported mean is retained despite its discrepancy with the four printed readings.
+  - row: 11
+    column: 4
+    text: -119106 (±3730)
+    reason: Render confirms combined enthalpy-of-mixing value and uncertainty cell.
+  - row: 13
+    column: 3
+    text: 625968 (±8210)
+    reason: Render confirms combined mean and uncertainty cell.
+  - row: 13
+    column: 4
+    text: -147988 (±8210)
+    reason: Render confirms combined enthalpy-of-mixing value and uncertainty cell.
+- page: 5
+  table_index: 3
+  type: gibbs_table
+  quantity: typed-refused Gibbs energy of formation from component oxides
+  unit: J/mol; T in K
+  rows: 3
+  columns:
+  - column: 1
+    printed_header: Reaction
+    mapping: Product compound and phase cr, row-wise.
+  - column: 2
+    printed_header: ΔG° (J/mol)
+    mapping: Gibbs energy of formation from component oxides; descriptive quantity label and typed refusal. Row 1 is measured_reduced from the EMF cell; rows 2-3 are model_derived Temkin estimates.
+  conditions: No table-wide bounded temperature interval or numeric total pressure is printed. Row 1 uses a commercial-air EMF measurement; equations (31) and (33) list method inputs at 1075 K and 904 K.
+- page: 5
+  table_index: 4
+  type: gibbs_table
+  quantity: delta_fG
+  unit: J/mol; T in K
+  rows: 3
+  columns:
+  - column: 1
+    printed_header: Reaction
+    mapping: Product compound and phase cr, row-wise.
+  - column: 2
+    printed_header: ΔG° (J/mol)
+    mapping: Gibbs energy of formation from elements; delta_fG, coefficient function retained with unavailable point value. Row 1 is measured_reduced; rows 2-3 are model_derived.
+  conditions: No bounded temperature interval, numeric fO2, or total pressure is stated for these functions.
+  derivation_inputs: Element-formation rows use their Table III value, Table I solid oxide formation functions, and Table I sodium vaporization where the reaction uses Na(g). Table IV rows 2-3 use Table I row 6, Na(l) + O2(g) -> Na2O(s), plus Table I row 2 for FeO(s).
+- page: 5
+  table_index: 5
+  type: gibbs_table
+  quantity: typed-refused reaction Gibbs-energy functions
+  unit: J/mol; T in K
+  rows: 9
+  columns:
+  - column: 1
+    printed_header: Reactions
+    mapping: Reaction product formula and phase cr, row-wise.
+  - column: 2
+    printed_header: ΔG° = A + BT (J/mol)
+    mapping: Reaction Gibbs-energy function; descriptive quantity label and typed refusal. Row 1 is measured_reduced; rows 2-9 are model_derived.
+  conditions: No bounded temperature interval, numeric fO2, or total pressure is stated for these functions.
+- page: 6
+  table_index: 6
+  type: partial_pressure
+  quantity: typed-refused combined logarithmic partial-pressure relations
+  unit: log(P) relation; pressure reference not stated
+  rows: 11
+  columns:
+  - column: 1
+    printed_header: Phases
+    mapping: Printed gas and condensed-phase assemblage; product species is Na or O2 per printed relation.
+  - column: 2
+    printed_header: Functions of the Partial Pressures
+    mapping: Combined logarithmic pressure relation; descriptive quantity label and typed refusal; model_derived.
+  conditions: No bounded temperature interval, pressure reference, numeric fO2, or total pressure is stated.
+- page: 6
+  table_index: 7
+  type: partial_pressure
+  quantity: typed-refused logarithmic partial-pressure values
+  unit: log(P); pressure reference not stated
+  rows: 5
+  columns:
+  - column: 1
+    printed_header: Phases
+    mapping: Printed invariant phase assemblage; gas species is O2 or Na, phase g.
+  - column: 2
+    printed_header: 873 K log(PO2)
+    mapping: Oxygen log-pressure; descriptive quantity label and typed refusal; model_derived.
+  - column: 3
+    printed_header: 873 K log(PNa)
+    mapping: Sodium log-pressure; descriptive quantity label and typed refusal; model_derived.
+  - column: 4
+    printed_header: 1173 K log(PO2)
+    mapping: Oxygen log-pressure, populated only for phase row 1; descriptive quantity label and typed refusal; model_derived.
+  - column: 5
+    printed_header: 1173 K log(PNa)
+    mapping: Sodium log-pressure, populated only for phase row 1; descriptive quantity label and typed refusal; model_derived.
+  conditions: Temperatures 873 K and 1173 K are printed. Log-pressure reference is unstated; no conversion or assumed total pressure is added.
+  render_verified:
+  - {row: 3, column: 2, text: '-25.27', reason: Render resolves MinerU/Tesseract disagreement; Tesseract reads -25.21.}
+  - {row: 3, column: 3, text: '-7.14', reason: Render confirms the 873 K sodium pressure cell.}
+  - {row: 3, column: 4, text: '-19.6', reason: Render confirms the 1173 K oxygen pressure cell.}
+  - {row: 3, column: 5, text: '-1.24', reason: Render confirms the 1173 K sodium pressure cell.}
+  - {row: 4, column: 2, text: '-29.85', reason: Render confirms the 873 K oxygen pressure cell.}
+  - {row: 4, column: 3, text: '-2.56', reason: Render confirms the 873 K sodium pressure cell.}
+  - {row: 5, column: 2, text: '-29.95', reason: Render confirms the 873 K oxygen pressure cell.}
+  - {row: 5, column: 3, text: '-2.50', reason: Render confirms the 873 K sodium pressure cell.}
+  - {row: 6, column: 2, text: '-29.69', reason: Render confirms the 873 K oxygen pressure cell.}
+  - {row: 6, column: 3, text: '-2.56', reason: Render confirms the 873 K sodium pressure cell.}
+  - {row: 7, column: 2, text: '-32.55', reason: Render confirms the 873 K oxygen pressure cell.}
+  - {row: 7, column: 3, text: '-1.53', reason: Render confirms the 873 K sodium pressure cell.}

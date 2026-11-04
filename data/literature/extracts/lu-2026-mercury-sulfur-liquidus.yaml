@@ -833,12 +833,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A22
         value: 6.0
         value_as_published: 6*
         T_C: 1675
         T_C_as_printed: '1675'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS, FeMgS
@@ -891,12 +896,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id001
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -911,6 +914,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS, FeMgS
+          locator: *id001
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id001
         starting_silicate_composition_as_published:
           state:
@@ -992,12 +1000,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A23
         value: 6.79
         value_as_published: 6.79*
         T_C: 1700
         T_C_as_printed: '1700'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS, FeMgS
@@ -1050,12 +1063,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id003
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1070,6 +1081,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS, FeMgS
+          locator: *id003
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id003
         starting_silicate_composition_as_published:
           state:
@@ -1151,12 +1167,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A12
         value: 3.46
         value_as_published: '3.46'
         T_C: 1700
         T_C_as_printed: '1700'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -1209,12 +1230,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id005
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1229,6 +1248,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id005
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id005
         starting_silicate_composition_as_published:
           state:
@@ -1310,12 +1334,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A13
         value: 3.86
         value_as_published: '3.86'
         T_C: 1725
         T_C_as_printed: '1725'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -1368,12 +1397,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id007
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1388,6 +1415,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id007
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id007
         starting_silicate_composition_as_published:
           state:
@@ -1469,12 +1501,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A052
         value: 1.35
         value_as_published: '1.35'
         T_C: 1750
         T_C_as_printed: '1750'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '46'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -1527,12 +1564,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id009
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1547,6 +1582,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id009
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id009
         starting_silicate_composition_as_published:
           state:
@@ -1628,12 +1668,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A052
         value: 1.46
         value_as_published: '1.46'
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -1686,12 +1731,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.2
           locator: *id011
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1706,6 +1749,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id011
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id011
         starting_silicate_composition_as_published:
           state:
@@ -1787,12 +1835,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A02
         value: 0.0
         value_as_published: '0'
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '40'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -1845,12 +1898,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.8
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.8
           locator: *id013
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -1865,6 +1916,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id013
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id013
         starting_silicate_composition_as_published:
           state:
@@ -1946,12 +2002,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a22
         value: 5.31
         value_as_published: 5.31*
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -2004,12 +2065,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id015
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2024,6 +2083,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id015
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id015
         starting_silicate_composition_as_published:
           state:
@@ -2105,12 +2169,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a23
         value: 5.77
         value_as_published: 5.77*
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -2163,12 +2232,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.6
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.6
           locator: *id017
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2183,6 +2250,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id017
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id017
         starting_silicate_composition_as_published:
           state:
@@ -2264,12 +2336,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a12
         value: 2.95
         value_as_published: '2.95'
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -2322,12 +2399,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id019
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2342,6 +2417,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id019
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id019
         starting_silicate_composition_as_published:
           state:
@@ -2423,12 +2503,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a13
         value: 3.7
         value_as_published: '3.7'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -2481,12 +2566,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id021
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2501,6 +2584,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id021
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id021
         starting_silicate_composition_as_published:
           state:
@@ -2582,12 +2670,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a051
         value: 1.68
         value_as_published: '1.68'
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (62), Ens (38), Fo**, FeSi
@@ -2640,12 +2733,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.4
           locator: *id023
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2660,6 +2751,11 @@ species:
           state:
             tag: value
             value: Gl (62), Ens (38), Fo**, FeSi
+          locator: *id023
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id023
         starting_silicate_composition_as_published:
           state:
@@ -2741,12 +2837,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a052
         value: 1.52
         value_as_published: '1.52'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -2799,12 +2900,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.4
           locator: *id025
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2819,6 +2918,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id025
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id025
         starting_silicate_composition_as_published:
           state:
@@ -2900,12 +3004,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a053
         value: 1.17
         value_as_published: '1.17'
         T_C: 1875
         T_C_as_printed: '1875'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -2958,12 +3067,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.2
           locator: *id027
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -2978,6 +3085,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id027
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id027
         starting_silicate_composition_as_published:
           state:
@@ -3059,12 +3171,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a01
         value: 0.0
         value_as_published: '0'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (67), Ens (33), Fo**, FeSi
@@ -3117,12 +3234,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.9
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.9
           locator: *id029
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3137,6 +3252,11 @@ species:
           state:
             tag: value
             value: Gl (67), Ens (33), Fo**, FeSi
+          locator: *id029
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id029
         starting_silicate_composition_as_published:
           state:
@@ -3218,12 +3338,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a02
         value: 0.0
         value_as_published: '0'
         T_C: 1875
         T_C_as_printed: '1875'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '50'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -3276,12 +3401,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id031
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3296,6 +3419,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id031
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id031
         starting_silicate_composition_as_published:
           state:
@@ -3377,12 +3505,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a03
         value: 0.0
         value_as_published: '0'
         T_C: 1900
         T_C_as_printed: '1900'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '40'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -3435,12 +3568,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id033
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3455,6 +3586,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id033
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id033
         starting_silicate_composition_as_published:
           state:
@@ -3536,12 +3672,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B23
         value: 5.9
         value_as_published: 5.9*
         T_C: 1700
         T_C_as_printed: '1700'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS, FeMgS
@@ -3594,12 +3735,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.1
           locator: *id035
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3614,6 +3753,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS, FeMgS
+          locator: *id035
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id035
         starting_silicate_composition_as_published:
           state:
@@ -3695,12 +3839,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B13
         value: 5.5
         value_as_published: '5.5'
         T_C: 1725
         T_C_as_printed: '1725'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -3753,12 +3902,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id037
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3773,6 +3920,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id037
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id037
         starting_silicate_composition_as_published:
           state:
@@ -3854,12 +4006,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B14
         value: 4.89
         value_as_published: 4.89*
         T_C: 1750
         T_C_as_printed: '1750'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -3912,12 +4069,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −5.8
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -5.8
           locator: *id039
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -3932,6 +4087,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id039
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id039
         starting_silicate_composition_as_published:
           state:
@@ -4013,12 +4173,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B054
         value: 2.25
         value_as_published: '2.25'
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -4071,12 +4236,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id041
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4091,6 +4254,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id041
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id041
         starting_silicate_composition_as_published:
           state:
@@ -4172,12 +4340,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B055
         value: 1.99
         value_as_published: '1.99'
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -4230,12 +4403,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id043
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4250,6 +4421,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id043
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id043
         starting_silicate_composition_as_published:
           state:
@@ -4331,12 +4507,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B07
         value: 0.0
         value_as_published: '0'
         T_C: 1900
         T_C_as_printed: '1900'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -4389,12 +4570,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.1
           locator: *id045
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4409,6 +4588,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id045
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id045
         starting_silicate_composition_as_published:
           state:
@@ -4490,12 +4674,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b23
         value: 5.21
         value_as_published: 5.21*
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -4548,12 +4737,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −5.9
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -5.9
           locator: *id047
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4568,6 +4755,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id047
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id047
         starting_silicate_composition_as_published:
           state:
@@ -4649,12 +4841,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b24
         value: 5.95
         value_as_published: 5.95*
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -4707,12 +4904,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.2
           locator: *id049
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4727,6 +4922,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id049
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id049
         starting_silicate_composition_as_published:
           state:
@@ -4808,12 +5008,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b14
         value: 4.57
         value_as_published: 4.57*
         T_C: 1870
         T_C_as_printed: '1870'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl, FeSi, FeS
@@ -4866,12 +5071,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.3
           locator: *id051
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -4886,6 +5089,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi, FeS
+          locator: *id051
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id051
         starting_silicate_composition_as_published:
           state:
@@ -4967,12 +5175,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b054
         value: 2.19
         value_as_published: '2.19'
         T_C: 1900
         T_C_as_printed: '1900'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -5025,12 +5238,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id053
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5045,6 +5256,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id053
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id053
         starting_silicate_composition_as_published:
           state:
@@ -5126,12 +5342,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b055
         value: 1.87
         value_as_published: '1.87'
         T_C: 1925
         T_C_as_printed: '1925'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl, FeSi
@@ -5184,12 +5405,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id055
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5204,6 +5423,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id055
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id055
         starting_silicate_composition_as_published:
           state:
@@ -5285,12 +5509,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b05
         value: 0.0
         value_as_published: '0'
         T_C: 1975
         T_C_as_printed: '1975'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -5343,12 +5572,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.2
           locator: *id057
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5363,6 +5590,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id057
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id057
         starting_silicate_composition_as_published:
           state:
@@ -5444,12 +5676,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b06
         value: 0.0
         value_as_published: '0'
         T_C: 2000
         T_C_as_printed: '2000'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl, FeSi
@@ -5502,12 +5739,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.4
           locator: *id059
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5522,6 +5757,11 @@ species:
           state:
             tag: value
             value: Gl, FeSi
+          locator: *id059
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id059
         starting_silicate_composition_as_published:
           state:
@@ -5740,12 +5980,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A21
         value: 6.26
         value_as_published: 6.26*
         T_C: 1650
         T_C_as_printed: '1650'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (83), Ens (17), FeSi, FeS, FeMgS
@@ -5798,12 +6043,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id063
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5818,6 +6061,11 @@ species:
           state:
             tag: value
             value: Gl (83), Ens (17), FeSi, FeS, FeMgS
+          locator: *id063
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id063
         starting_silicate_composition_as_published:
           state:
@@ -5899,12 +6147,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A11
         value: 4.82
         value_as_published: '4.82'
         T_C: 1675
         T_C_as_printed: '1675'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (92), Ens (8), FeSi
@@ -5957,12 +6210,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.4
           locator: *id065
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -5977,6 +6228,11 @@ species:
           state:
             tag: value
             value: Gl (92), Ens (8), FeSi
+          locator: *id065
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id065
         starting_silicate_composition_as_published:
           state:
@@ -6058,12 +6314,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a21
         value: 5.88
         value_as_published: 5.88*
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (79), Ens (21), FeSi, FeS
@@ -6116,12 +6377,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id067
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -6136,6 +6395,11 @@ species:
           state:
             tag: value
             value: Gl (79), Ens (21), FeSi, FeS
+          locator: *id067
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id067
         starting_silicate_composition_as_published:
           state:
@@ -6217,12 +6481,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: a11
         value: 4.41
         value_as_published: '4.41'
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (66), Ens (34), FeSi
@@ -6275,12 +6544,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.5
           locator: *id069
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -6295,6 +6562,11 @@ species:
           state:
             tag: value
             value: Gl (66), Ens (34), FeSi
+          locator: *id069
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id069
         starting_silicate_composition_as_published:
           state:
@@ -6658,12 +6930,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A051
         value: 1.44
         value_as_published: '1.44'
         T_C: 1725
         T_C_as_printed: '1725'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (99), Fo (<1), FeSi
@@ -6716,12 +6993,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.4
           locator: *id075
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -6736,6 +7011,11 @@ species:
           state:
             tag: value
             value: Gl (99), Fo (<1), FeSi
+          locator: *id075
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id075
         starting_silicate_composition_as_published:
           state:
@@ -6817,12 +7097,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: A01
         value: 0.0
         value_as_published: '0'
         T_C: 1750
         T_C_as_printed: '1750'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (99), Fo (<1), FeSi
@@ -6875,12 +7160,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.8
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.8
           locator: *id077
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -6895,6 +7178,11 @@ species:
           state:
             tag: value
             value: Gl (99), Fo (<1), FeSi
+          locator: *id077
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id077
         starting_silicate_composition_as_published:
           state:
@@ -6976,12 +7264,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B21
         value: 6.36
         value_as_published: 6.36*
         T_C: 1650
         T_C_as_printed: '1650'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (76), Fo (24), FeSi, FeS, FeMgS
@@ -7034,12 +7327,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.5
           locator: *id079
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7054,6 +7345,11 @@ species:
           state:
             tag: value
             value: Gl (76), Fo (24), FeSi, FeS, FeMgS
+          locator: *id079
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id079
         starting_silicate_composition_as_published:
           state:
@@ -7135,12 +7431,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B22
         value: 5.74
         value_as_published: 5.74*
         T_C: 1675
         T_C_as_printed: '1675'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (79), Fo (21), FeSi, FeS, FeMgS
@@ -7193,12 +7494,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.2
           locator: *id081
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7213,6 +7512,11 @@ species:
           state:
             tag: value
             value: Gl (79), Fo (21), FeSi, FeS, FeMgS
+          locator: *id081
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS, FeMgS'
           locator: *id081
         starting_silicate_composition_as_published:
           state:
@@ -7294,12 +7598,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B11
         value: 5.63
         value_as_published: '5.63'
         T_C: 1675
         T_C_as_printed: '1675'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (81), Fo (19), FeSi,
@@ -7352,12 +7661,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id083
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7372,6 +7679,11 @@ species:
           state:
             tag: value
             value: Gl (81), Fo (19), FeSi,
+          locator: *id083
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id083
         starting_silicate_composition_as_published:
           state:
@@ -7453,12 +7765,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B12
         value: 5.17
         value_as_published: '5.17'
         T_C: 1700
         T_C_as_printed: '1700'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (94), Fo (6), FeSi
@@ -7511,12 +7828,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id085
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7531,6 +7846,11 @@ species:
           state:
             tag: value
             value: Gl (94), Fo (6), FeSi
+          locator: *id085
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id085
         starting_silicate_composition_as_published:
           state:
@@ -7612,12 +7932,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B051
         value: 2.84
         value_as_published: '2.84'
         T_C: 1725
         T_C_as_printed: '1725'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (74), Fo (26), FeSi
@@ -7670,12 +7995,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.6
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.6
           locator: *id087
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7690,6 +8013,11 @@ species:
           state:
             tag: value
             value: Gl (74), Fo (26), FeSi
+          locator: *id087
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id087
         starting_silicate_composition_as_published:
           state:
@@ -7771,12 +8099,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B052
         value: 2.9
         value_as_published: '2.9'
         T_C: 1750
         T_C_as_printed: '1750'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '46'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (84), Fo (16), FeSi
@@ -7829,12 +8162,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.5
           locator: *id089
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -7849,6 +8180,11 @@ species:
           state:
             tag: value
             value: Gl (84), Fo (16), FeSi
+          locator: *id089
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id089
         starting_silicate_composition_as_published:
           state:
@@ -7930,12 +8266,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B052
         value: 2.3
         value_as_published: '2.3'
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (90), Fo (10), FeSi
@@ -7988,12 +8329,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.4
           locator: *id091
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8008,6 +8347,11 @@ species:
           state:
             tag: value
             value: Gl (90), Fo (10), FeSi
+          locator: *id091
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id091
         starting_silicate_composition_as_published:
           state:
@@ -8089,12 +8433,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B01
         value: 0.0
         value_as_published: '0'
         T_C: 1750
         T_C_as_printed: '1750'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (63), Fo (37), FeSi
@@ -8147,12 +8496,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.9
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.9
           locator: *id093
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8167,6 +8514,11 @@ species:
           state:
             tag: value
             value: Gl (63), Fo (37), FeSi
+          locator: *id093
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id093
         starting_silicate_composition_as_published:
           state:
@@ -8248,12 +8600,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B02
         value: 0.0
         value_as_published: '0'
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '40'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (73), Fo (27), FeSi
@@ -8306,12 +8663,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id095
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8326,6 +8681,11 @@ species:
           state:
             tag: value
             value: Gl (73), Fo (27), FeSi
+          locator: *id095
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id095
         starting_silicate_composition_as_published:
           state:
@@ -8407,12 +8767,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B03
         value: 0.0
         value_as_published: '0'
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (77), Fo (23), FeSi
@@ -8465,12 +8830,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.8
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.8
           locator: *id097
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8485,6 +8848,11 @@ species:
           state:
             tag: value
             value: Gl (77), Fo (23), FeSi
+          locator: *id097
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id097
         starting_silicate_composition_as_published:
           state:
@@ -8566,12 +8934,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B04
         value: 0.0
         value_as_published: '0'
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (85), Fo (15), FeSi
@@ -8624,12 +8997,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id099
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8644,6 +9015,11 @@ species:
           state:
             tag: value
             value: Gl (85), Fo (15), FeSi
+          locator: *id099
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id099
         starting_silicate_composition_as_published:
           state:
@@ -8725,12 +9101,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B05
         value: 0.0
         value_as_published: '0'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (98), Fo (2), FeSi
@@ -8783,12 +9164,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.6
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.6
           locator: *id101
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8803,6 +9182,11 @@ species:
           state:
             tag: value
             value: Gl (98), Fo (2), FeSi
+          locator: *id101
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id101
         starting_silicate_composition_as_published:
           state:
@@ -8884,12 +9268,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: B06
         value: 0.0
         value_as_published: '0'
         T_C: 1875
         T_C_as_printed: '1875'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (99), Fo (<1), FeSi
@@ -8942,12 +9331,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.3
           locator: *id103
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -8962,6 +9349,11 @@ species:
           state:
             tag: value
             value: Gl (99), Fo (<1), FeSi
+          locator: *id103
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id103
         starting_silicate_composition_as_published:
           state:
@@ -9043,12 +9435,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b21
         value: 5.75
         value_as_published: 5.75*
         T_C: 1775
         T_C_as_printed: '1775'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (86), Fo (14), FeSi, FeS
@@ -9101,12 +9498,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id105
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9121,6 +9516,11 @@ species:
           state:
             tag: value
             value: Gl (86), Fo (14), FeSi, FeS
+          locator: *id105
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id105
         starting_silicate_composition_as_published:
           state:
@@ -9202,12 +9602,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b22
         value: 5.16
         value_as_published: 5.16*
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.2 FeS
         phase_assemblage_as_published: Gl (88), Fo (12), FeSi, FeS
@@ -9260,12 +9665,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.2
           locator: *id107
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9280,6 +9683,11 @@ species:
           state:
             tag: value
             value: Gl (88), Fo (12), FeSi, FeS
+          locator: *id107
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id107
         starting_silicate_composition_as_published:
           state:
@@ -9361,12 +9769,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b11
         value: 5.22
         value_as_published: '5.22'
         T_C: 1800
         T_C_as_printed: '1800'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (82), Fo (18), FeSi
@@ -9419,12 +9832,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.0
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.0
           locator: *id109
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9439,6 +9850,11 @@ species:
           state:
             tag: value
             value: Gl (82), Fo (18), FeSi
+          locator: *id109
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id109
         starting_silicate_composition_as_published:
           state:
@@ -9520,12 +9936,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b12
         value: 4.99
         value_as_published: 4.99*
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (88), Fo (12), FeSi, FeS
@@ -9578,12 +9999,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id111
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9598,6 +10017,11 @@ species:
           state:
             tag: value
             value: Gl (88), Fo (12), FeSi, FeS
+          locator: *id111
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id111
         starting_silicate_composition_as_published:
           state:
@@ -9679,12 +10103,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b13
         value: 4.19
         value_as_published: 4.19*
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.1 FeS
         phase_assemblage_as_published: Gl (93), Fo (7), FeSi, FeS
@@ -9737,12 +10166,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.1
           locator: *id113
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9757,6 +10184,11 @@ species:
           state:
             tag: value
             value: Gl (93), Fo (7), FeSi, FeS
+          locator: *id113
+        sulfide_phase_as_published:
+          state:
+            tag: value
+            value: 'FeS'
           locator: *id113
         starting_silicate_composition_as_published:
           state:
@@ -9838,12 +10270,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b051
         value: 2.58
         value_as_published: '2.58'
         T_C: 1825
         T_C_as_printed: '1825'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (75), Fo (25), FeSi
@@ -9896,12 +10333,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.5
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.5
           locator: *id115
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -9916,6 +10351,11 @@ species:
           state:
             tag: value
             value: Gl (75), Fo (25), FeSi
+          locator: *id115
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id115
         starting_silicate_composition_as_published:
           state:
@@ -9997,12 +10437,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b052
         value: 2.53
         value_as_published: '2.53'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (87), Fo (13), FeSi
@@ -10055,12 +10500,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.3
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.3
           locator: *id117
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10075,6 +10518,11 @@ species:
           state:
             tag: value
             value: Gl (87), Fo (13), FeSi
+          locator: *id117
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id117
         starting_silicate_composition_as_published:
           state:
@@ -10156,12 +10604,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b053
         value: 1.88
         value_as_published: '1.88'
         T_C: 1875
         T_C_as_printed: '1875'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '60'
         source_as_published: 0.05 FeS
         phase_assemblage_as_published: Gl (99), Fo (<1), FeSi
@@ -10214,12 +10667,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.2
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.2
           locator: *id119
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10234,6 +10685,11 @@ species:
           state:
             tag: value
             value: Gl (99), Fo (<1), FeSi
+          locator: *id119
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id119
         starting_silicate_composition_as_published:
           state:
@@ -10315,12 +10771,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b01
         value: 0.0
         value_as_published: '0'
         T_C: 1850
         T_C_as_printed: '1850'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '30'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (68), Fo (32), FeSi
@@ -10373,12 +10834,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −7.1
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -7.1
           locator: *id121
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10393,6 +10852,11 @@ species:
           state:
             tag: value
             value: Gl (68), Fo (32), FeSi
+          locator: *id121
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id121
         starting_silicate_composition_as_published:
           state:
@@ -10474,12 +10938,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b02
         value: 0.0
         value_as_published: '0'
         T_C: 1875
         T_C_as_printed: '1875'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '50'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (81), Fo (19), FeSi
@@ -10532,12 +11001,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.9
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.9
           locator: *id123
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10552,6 +11019,11 @@ species:
           state:
             tag: value
             value: Gl (81), Fo (19), FeSi
+          locator: *id123
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id123
         starting_silicate_composition_as_published:
           state:
@@ -10633,12 +11105,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b03
         value: 0.0
         value_as_published: '0'
         T_C: 1900
         T_C_as_printed: '1900'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '40'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (85), Fo (15), FeSi
@@ -10691,12 +11168,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.7
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.7
           locator: *id125
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10711,6 +11186,11 @@ species:
           state:
             tag: value
             value: Gl (85), Fo (15), FeSi
+          locator: *id125
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id125
         starting_silicate_composition_as_published:
           state:
@@ -10792,12 +11272,17 @@ species:
         evidence_class: measured_direct
         formula: S
         component_as_published: S
+        phase_label: melt
+        phase_label_as_printed: Gl
+        basis: wt_percent
         basis_as_published: S content in silicate melt (Gl), wt.%
         sample_id: b04
         value: 0.0
         value_as_published: '0'
         T_C: 1950
         T_C_as_printed: '1950'
+        oxygen_buffer_as_published: iron-wüstite (IW)
+        fO2_delta_IW_method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
         duration_min_as_printed: '20'
         source_as_published: 0.14 Fe
         phase_assemblage_as_published: Gl (94), Fo (6), FeSi
@@ -10850,12 +11335,10 @@ species:
         fO2_delta_IW:
           state:
             tag: value
-            value:
-              delta_as_published: −6.4
-              reference_buffer: iron-wüstite (IW)
-              column_as_published: ΔIW(Si-SiO2)
-              method_as_published: calculated from Si-SiO2 equilibrium according to Cartier et al. (2014)
+            value: -6.4
           locator: *id127
+          units: delta_IW
+          reference_buffer_as_published: iron-wüstite (IW)
         system_as_published:
           state:
             tag: value
@@ -10870,6 +11353,11 @@ species:
           state:
             tag: value
             value: Gl (94), Fo (6), FeSi
+          locator: *id127
+        sulfide_phase_as_published:
+          state:
+            tag: unknown
+            reason: no sulfide phase is listed in the Table 2 experimental-phases cell for this run
           locator: *id127
         starting_silicate_composition_as_published:
           state:

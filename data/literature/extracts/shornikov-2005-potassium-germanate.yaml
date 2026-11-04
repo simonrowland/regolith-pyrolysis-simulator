@@ -3477,7 +3477,7 @@ species:
         value: '1249'
         T_K: '1249'
         property_kind: melting_point
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: K2O·SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -3532,12 +3532,12 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: quoted_attributed
+        method_class: model_derived
         value: '7.04'
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1249'
-        attribution: Table 2.
+        attribution: "Authors' calculation in Table 2 from earlier data [20, 21, 51–53]."
         compound_as_printed: K2O·SiO2
         per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
@@ -3550,6 +3550,25 @@ species:
               kind: point
               point: '1249'
           locator: *id025
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: "The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each fusion entropy."
+        method:
+          state: {tag: value, value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+        references:
+        - "[20, 21, 51–53]"
     - observation_id: ge_2005_t2_K2O_SiO2_melt_dfH
       type: gibbs_table
       locator: &id026
@@ -3701,7 +3720,7 @@ species:
         value: '1318'
         T_K: '1318'
         property_kind: melting_point
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: K2O·2SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -3756,12 +3775,12 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: quoted_attributed
+        method_class: model_derived
         value: '8.10'
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1318'
-        attribution: Table 2.
+        attribution: "Authors' calculation in Table 2 from earlier data [20, 21, 51–53]."
         compound_as_printed: K2O·2SiO2
         per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
@@ -3774,6 +3793,25 @@ species:
               kind: point
               point: '1318'
           locator: *id030
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: "The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each fusion entropy."
+        method:
+          state: {tag: value, value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+        references:
+        - "[20, 21, 51–53]"
     - observation_id: ge_2005_t2_K2O_2SiO2_melt_dfH
       type: gibbs_table
       locator: &id031
@@ -3925,7 +3963,7 @@ species:
         value: '1043'
         T_K: '1043'
         property_kind: melting_point
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: K2O·4SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -4010,7 +4048,7 @@ species:
         value: '1362'
         T_K: '1362'
         property_kind: melting_point
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: Na2O·SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -4065,12 +4103,12 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: quoted_attributed
+        method_class: model_derived
         value: '19.09'
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1362'
-        attribution: Table 2.
+        attribution: "Authors' calculation in Table 2 from earlier data [20, 21, 51–53]."
         compound_as_printed: Na2O·SiO2
         per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
@@ -4083,6 +4121,25 @@ species:
               kind: point
               point: '1362'
           locator: *id037
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: "The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each fusion entropy."
+        method:
+          state: {tag: value, value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+        references:
+        - "[20, 21, 51–53]"
     - observation_id: ge_2005_t2_Na2O_SiO2_melt_dfH
       type: gibbs_table
       locator: &id038
@@ -4214,7 +4271,7 @@ species:
         value: '1147'
         T_K: '1147'
         property_kind: melting_point
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: Na2O·2SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -4269,12 +4326,12 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: quoted_attributed
+        method_class: model_derived
         value: '10.96'
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1147'
-        attribution: Table 2.
+        attribution: "Authors' calculation in Table 2 from earlier data [20, 21, 51–53]."
         compound_as_printed: Na2O·2SiO2
         per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
@@ -4287,6 +4344,25 @@ species:
               kind: point
               point: '1147'
           locator: *id042
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: "The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each fusion entropy."
+        method:
+          state: {tag: value, value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+        references:
+        - "[20, 21, 51–53]"
     - observation_id: ge_2005_t2_Na2O_2SiO2_melt_dfH
       type: gibbs_table
       locator: &id043
@@ -4418,7 +4494,7 @@ species:
         value: '1081'
         T_K: '1081'
         property_kind: decomposition_temperature
-        attribution: Table 2.
+        attribution: "Table 2 caption: earlier data [20, 21, 51–53]."
         compound_as_printed: 3Na2O·8SiO2
         phase_basis: The column is the melting temperature of the named compound, except 1081* which the
           footnote calls a decomposition temperature. The solid that transforms is crystalline.
@@ -4474,12 +4550,12 @@ species:
       units: J/mol K
       values:
         quantity: entropy_of_fusion
-        method_class: quoted_attributed
+        method_class: model_derived
         value: '7.35'
         units_as_printed: J/(mol K)
         units_note: 'Table 2 prints J/(mol K). Stored as J/mol K, the same unit.'
         T_K: '1081'
-        attribution: Table 2.
+        attribution: "Authors' calculation in Table 2 from earlier data [20, 21, 51–53]."
         compound_as_printed: 3Na2O·8SiO2
         per_as_printed: 'Table 2 column headers print kJ/mol and J/(mol K). Published page 1351 describes the melt-formation enthalpy as per mole of the appropriate compound. The stored basis is mol_species.'
       phase: cr
@@ -4492,6 +4568,25 @@ species:
               kind: point
               point: '1081'
           locator: *id047
+      derivation:
+        relation: "Table 2 calculation reported by the authors; the numerical relation is not printed."
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+            note: "The paper cites earlier data [20, 21, 51–53] collectively and does not identify exact raw input rows for each fusion entropy."
+        method:
+          state: {tag: value, value: "Calculation results in Table 2, evaluated in this work from earlier data [20, 21, 51–53]."}
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 1354
+            section: Conclusions
+        references:
+        - "[20, 21, 51–53]"
     - observation_id: ge_2005_t2_3Na2O_8SiO2_melt_dfH
       type: gibbs_table
       locator: &id048

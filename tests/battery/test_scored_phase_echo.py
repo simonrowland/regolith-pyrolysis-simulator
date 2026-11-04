@@ -743,13 +743,14 @@ def test_kunisada_final_slag_refuses_before_the_basis_gate(
     assert prediction.refusal_reason is not RefusalReason.COEFFICIENT_BASIS_MISMATCH
 
 
-def test_kim_2014_row_has_no_composition_stamp() -> None:
+def test_kim_2014_measured_v_row_is_stamped_as_phase_analysis() -> None:
     observation, _experiment_row = _observation(
         "kim-2014-carbon-fe-v-mo-ni.yaml",
         "kim_2014_carbon_fe_v_mo_ni_p003_t01_r02_c02",
     )
     composition = observation.identity.composition
-    assert composition is None or not composition.is_value
+    assert composition is not None and composition.is_value
+    assert composition.value.input_provenance == "scored_phase_analysis"
 
 
 def test_gorojovsky_starting_bulk_passes_the_guard() -> None:
@@ -797,23 +798,14 @@ def test_gorojovsky_crystal_bearing_products_score_with_the_liquid_notice(
     )
 
 
-def test_kc91_table3_final_refuses_same_run_initial_melt(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _block_equilibrate(monkeypatch)
-    observation, experiment = _observation(
+def test_kc91_table3_final_refuses_same_run_initial_melt() -> None:
+    observation, _experiment = _observation(
         "kress-carmichael-1991-iron-redox-calibration.yaml",
         "kc91_t3_0011_0014_final_SiO2",
     )
     composition = observation.identity.composition
-    assert composition is not None and composition.is_value
-    assert composition.value.input_provenance == "same_run_initial_analysed_melt"
-    names = {name for name, _amount in composition.value.components}
-    assert "SiO2" in names
-    assert "Fe2O3" in names
-    prediction = _predict(observation, observation.identity, experiment)
-    assert prediction.refusal_reason is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
-    assert prediction.refusal_detail["detail"] == "input_is_same_run_analysed_melt"
+    assert composition is not None and composition.is_unknown
+    assert composition.reason == "input_is_same_run_analysed_melt"
 
 
 def test_t1593_mixture_token_passes_the_guard(tmp_path: Path) -> None:

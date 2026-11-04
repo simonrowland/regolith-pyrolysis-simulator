@@ -1,0 +1,140 @@
+source_id: seetharaman-2013-cr-thin-film-volatilization
+scope: >-
+  New Seetharaman et al. 2013 extract. Prioritize measured Cr loss and whole-sample mass change, retain every printed table row, quote the prior-work CrO3 pressure estimate with attribution, and leave unlabelled plotted values undigitized.
+source_order:
+  - MinerU table HTML and markdown
+  - born-digital pdftotext-layout
+  - 600 dpi PDF page render for table layout, flagged cells, prose checks, and figure legend verification
+supplement: No supporting binary supplement was present.
+fidelity_samples:
+  - path: species.Cr.observations[seetharaman2013_prose_cr_loss_2h_oxygen].values.component_amount_as_published
+    value: '0.27'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_2h_argon].values.component_amount_as_published
+    value: '1,62'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_4h_air].values.component_amount_as_published
+    value: '1,25'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_6h_oxygen].values.component_amount_as_published
+    value: '0.04'
+    locator:
+      page: 6
+      figure: '9'
+  - path: species.Cr.observations[seetharaman2013_figure9_cr_24h_oxygen].values.component_amount_as_published
+    value: '0,02'
+    locator:
+      page: 6
+      figure: '9'
+table_audit:
+  - table: I
+    page: 3
+    caption: Purity of the Chemicals Used, Weight Percent
+    printed_body_rows: 6
+    stored_body_rows: 6
+    disposition: All reagent rows retained as method context, not slag measurement data.
+    machine_reads: MinerU and pdftotext agree on all six purity cells, including the mixed text-and-number SiO2 purity cell.
+    qa: Digit agreement 0.800; the only flagged value cell is the printed “99 (reagent grade)” SiO2 purity. Formula subscripts in row labels are not numeric data.
+    render_check: 600 dpi render confirms the six row assignments, all purity cells, and the reagent-grade parenthetical.
+  - table: II
+    page: 3
+    caption: Alumina-saturated synthetic slag, basicity CaO/SiO2 set to 1
+    printed_body_rows: 1
+    stored_body_rows: 1
+    disposition: Starting slag composition retained as method context.
+    machine_reads: MinerU and pdftotext agree on all five mass-percent cells.
+    qa: Digit agreement 1.000.
+    render_check: 600 dpi render confirms the header order Al2O3, CaO, SiO2, MgO, Cr2O3 and the sole body row.
+  - table: III
+    page: 3
+    caption: Amounts of condensed phases in slag in air according to FACTSAGE
+    printed_body_rows: 3
+    stored_body_rows: 3
+    disposition: All model-derived phase amounts retained as context; not measured Cr loss.
+    machine_reads: MinerU and pdftotext agree on the nine amount cells and three temperature headers.
+    qa: Digit agreement 0.833; the reported mismatch is in numeric subscripts of the CaMg2Al16O27_Solid phase label, not in a numeric amount cell. MinerU marks the empty leading header cell and formula label as nonnumeric layout cells.
+    render_check: 600 dpi render confirms phase-row assignments, temperature columns, and all nine amount cells.
+  - table: IV
+    page: 5
+    caption: WDS analysis after 24 h at 1873 K in oxygen, atomic percent
+    printed_body_rows: 2
+    stored_body_rows: 2
+    disposition: All printed cells retained in the table transcription. The two Cr cells also have structured typed-refused observations with at.% unchanged and component_amount unavailable.
+    machine_reads: MinerU and pdftotext agree on all twelve elemental cells.
+    qa: Digit agreement 1.000.
+    render_check: 600 dpi render confirms the Spinel and Matrix row assignments and the O, Mg, Al, Si, Ca, Cr column order.
+    overlap: The exact WDS rows also appear in Albertsson (2013), Table 20; this is the same study, not independent replication.
+draft_comparison:
+  result_rows: 0
+  disposition: >-
+    The compare tool emits no point comparisons because all seven structured at.% Cr observations have component_amount null under the controller's typed-refusal ruling. All printed Table I-IV cells remain in the extract context and are covered by the cell audit and independent table pins.
+figure_audit:
+  - figure: '1'
+    page: 2
+    disposition: FACTSAGE model curve for CrO3(g) partial pressure versus temperature; no plot values digitized. Its printed pO2 is model input, not an experimental condition.
+  - figure: '2'
+    page: 4
+    disposition: TGA dimensionless whole-sample mass-loss curves at 1873 K; 0.5 mm O2, 1.0 mm Air, and 0.5 mm Air legend assignments preserved; no curve points digitized.
+  - figure: '3'
+    page: 4
+    disposition: Before/after sample photograph; caption conditions retained, no numeric image data.
+  - figure: '4'
+    page: 4
+    disposition: SEM micrograph after 24 h at 1873 K in oxygen; no quantitative cells read from the image.
+  - figure: '5'
+    page: 5
+    disposition: Average Cr at.% versus temperature after 6 h in oxygen at 0.5 mm; plotted values left as figure-only data.
+  - figure: '6'
+    page: 5
+    disposition: Average Cr at.% after 2 and 6 h in oxygen; legend mapping retained and plotted values left undigitized.
+  - figure: '7'
+    page: 5
+    disposition: Dimensionless TGA mass-loss curves at 1873 K for 2 h and 0.5 mm; gas legend mapping retained and curve points left undigitized.
+  - figure: '8'
+    page: 5
+    disposition: Polished sample surface photograph after 2 h at 1673 K; no quantitative data extracted.
+  - figure: '9'
+    page: 6
+    disposition: Average Cr at.% at 1873 K; legend colors and condition labels retained. Printed bar labels are transcribed as measured values, while no unlabelled bar height is digitized.
+figure_read_candidates:
+  - Figure 1: FACTSAGE CrO3 pressure curve numeric points.
+  - Figure 2: dimensionless whole-sample mass-loss versus time points.
+  - Figure 5: average Cr content versus temperature points.
+  - Figure 6: average Cr content versus temperature for 2 h and 6 h points.
+  - Figure 7: dimensionless whole-sample mass-loss versus time points.
+condition_audit:
+  - Main TGA experiment atmospheres are identified as air, pure oxygen, and argon; numerical experimental pO2 is not reported.
+  - Figure 1 reports pO2 = 9 × 10^4 Pa only as a FACTSAGE model condition.
+  - The paper reports no experimental total pressure; gas flow is not pressure.
+  - Film slices are 0.5 and 1.0 mm in the methods. Figure 6 and Figure 9 do not specify specimen thickness; those records leave it unstated.
+  - Table IV captions oxygen; no numerical pO2 or total pressure is assigned to its rows.
+  - Table IV's Matrix is described as a glassy phase. The table itself labels the row Matrix; the adjacent prose provides the glass identification.
+  - A prose sentence says the argon rate for the “0.5 m” sample exceeds the air rate for a 1 mm sample while referring to Figure 2. Rendered Figure 2 labels 0.5 mm O2, 1.0 mm Air, and 0.5 mm Air. Preserve both sources and do not resolve the mismatch.
+schema_audit:
+  - Candidate at.% quantity: simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION is exact for a measured elemental component amount; simulator/battery/migrate.py::QUANTITY_ALIASES maps component_amount to it, and tools/validate_literature_extracts.py::OBSERVATION_TYPES admits concentration_series.
+  - Controller ruling: retain each Cr number exactly as printed with units at.%, and make the migration unavailable with component_amount null and admission_status typed_refusal plus a reason. simulator/battery/migrate.py::_convert_compilation_amount passes component_amount unchanged for equilibrium_phase_composition, and simulator/battery/migrate.py::select_declared_source does not apply percent_to_fraction to this quantity; sending the raw number as component_amount would therefore migrate 0.27 at.% as a 0.27 mole fraction. No division or converted twin is stored.
+  - simulator/battery/enums.py::PHASE_BASIS_TOKENS includes mole_fraction but no atomic_percent token. The printed phase name Spinel is retained separately; phase_label slag represents its host slag role, while Matrix is identified as glass from adjacent prose.
+  - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION is whole-sample mass loss, simulator/battery/enums.py::Quantity.MASS_LOSS_RATE is absolute mass/time, simulator/battery/enums.py::Quantity.YIELD_FRACTION is a yield fraction, and simulator/battery/enums.py::Quantity.DISTRIBUTION_RATIO is a phase ratio; none means Cr-specific loss or a ratio of mass-loss rates.
+  - Existing overlapping at.% source: data/literature/extracts/albertsson-2013-cr-slag-thesis.yaml, context row albertsson2013_table20_wds_phase_compositions.
+evidence_audit:
+  - Table IV WDS elemental values are author measurements, measured_direct; no reduction equation is printed for the cell values.
+  - The quoted 0.1 Pa CrO3 pressure is attributed to Okretic et al. [7], not a present-work measurement.
+  - Figures 2 and 7 are TGA whole-sample mass-change measurements, not Cr-specific loss; plotted data stay in figure_record.
+  - The prose “about 0.4 times” rate comparison is an author_estimate summary of plotted measurements; the underlying numeric curve points remain excluded.
+  - The “about 50 pct” and “zero value” statements are author_estimate summaries of Figure 5, with source wording retained; no plotted point is substituted.
+  - Figure 9's printed 0.27 at.% 2h O2 bar label and the matching prose statement refer to one WDS result, represented once. No Cr-loss percentage was calculated from the initial and remaining concentrations.
+  - Related Cr-specific volatilization precedent: Khedim and Abdelouhab (2011) retains a calculated Cr2O3 loss in context because its supporting measured inputs cannot be stored; it does not supply an exact quantity token for this paper's at.% Cr result.
+migration_expectation:
+  observation_records: 7
+  hard_issues: 0
+  unavailable_values: 7
+  typed_refusal_admissions: 7
+  context_records: 19
+  identity_axes: >-
+    All seven Cr observations bind temperature and the Table II starting composition. Total pressure and numeric fO2 are unknown because the source prints neither; each gas label is retained as printed.

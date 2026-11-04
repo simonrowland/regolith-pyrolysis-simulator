@@ -1734,13 +1734,32 @@ species:
       experiment: stolyarova-1991-w-cell
       regime: kems_effusion
       units: atm as printed (P_O · 10^10)
+      derivation:
+        relation: Atomic oxygen pressure calculated from measured WO2 and WO3 partial pressures using gas reaction (1).
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 2
+            published_page: 3711
+            pdf_page_index: 1
+            table: Ib
+            equation: '[1]'
+            note: Table Ib labels P_O as calculated from equilibrium (1); numerical WO2 and WO3 input pressures are not tabulated.
+        method:
+          state: {tag: value, value: KEMS partial-pressure measurement followed by the equilibrium (1) reduction.}
+          locator:
+            page: 2
+            published_page: 3711
+            pdf_page_index: 1
+            table: Ib
+            equation: '[1]'
       values:
         system_class: silicate_melt
         quantity: partial_pressure
         gas_species: O
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: Stolyarova et al. (1991), Table Ib, Eq. [1]
+        method_class: measured_reduced
+        evidence_class: measured_reduced
+        attribution: Authors' atomic-oxygen pressure reduction from KEMS measurements using the printed equilibrium relation (1); WO2 and WO3 inputs are not tabulated.
         admission_status: admitted
         method: calculated-from-equilibrium-1
         method_as_printed: Calculated from equilibrium (1)

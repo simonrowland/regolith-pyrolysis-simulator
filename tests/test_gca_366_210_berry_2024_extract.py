@@ -29,15 +29,35 @@ def _assert_render_pins(document: dict) -> None:
         ("berry_2024_AD_Qz_table2_fit_quoted", 10, "AD+Qz", "0.674"),
     )
     for observation_id, row_number, column, expected in pins:
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "measured_reduced"
+        assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+        assert row["derivation"]["method"]["locator"]["equation"] == "2, 3"
         point = next(
             point
-            for point in rows[observation_id]["values"]["points"]
+            for point in row["values"]["points"]
             if point["locator"].get("row") == row_number
             and point["locator"].get("column") == column
         )
         assert point["locator"]["page"] == 214
         assert point["locator"]["table"] == "2"
         assert str(point["value"]) == expected
+
+    dash_rows = {
+        row["observation_id"]: row
+        for row in observations
+        if row["observation_id"] in {
+            "berry_2024_AD_En_table2_dash",
+            "berry_2024_AD_Qz_table2_dash",
+        }
+    }
+    assert set(dash_rows) == {
+        "berry_2024_AD_En_table2_dash",
+        "berry_2024_AD_Qz_table2_dash",
+    }
+    for row in dash_rows.values():
+        assert row["values"]["method_class"] == "quoted_attributed"
+        assert row["values"]["points"][0]["value"] == "–"
 
 
 def _migrate():
@@ -110,7 +130,12 @@ def test_berry_render_pins_and_all_table2_rows_reach_v2() -> None:
         assert observation.identity.temperature_K.value == Decimal("1673.15")
         assert observation.identity.species.phase.is_value
         assert observation.identity.species.phase.value is Phase.L
-        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        expected_class = (
+            EvidenceClass.MEASURED_REDUCED
+            if observation.value.kind is ValueKind.POINT
+            else EvidenceClass.QUOTED_ATTRIBUTED
+        )
+        assert observation.evidence.class_.value is expected_class
         assert observation.read_from == f"pdf:{SOURCE_ID}"
         assert observation.identity.valence_basis.is_value
         assert observation.identity.valence_basis.value.value_form.value == "fraction"
@@ -150,3 +175,10 @@ def test_berry_page_render_pin_rejects_a_changed_cell() -> None:
     point["value"] = "0.020"
     with pytest.raises(AssertionError):
         _assert_render_pins(document)
+
+    mutated_class = deepcopy(_source_document())
+    mutated_class["species"]["Ti"]["observations"][0]["values"][
+        "method_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_class)

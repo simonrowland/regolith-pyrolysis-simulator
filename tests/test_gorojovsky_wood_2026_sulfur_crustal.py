@@ -28,6 +28,19 @@ RENDER_PINS = (
     ("t3-r057-k2o", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, Decimal("3.3")),
 )
 
+# Table 2's quenched-glass values, read from the rendered page independently.
+T2_R003_PRODUCT_GLASS_COMPOSITION = [
+    ["SiO2", "62.2"],
+    ["TiO2", "1.2"],
+    ["Al2O3", "22.5"],
+    ["FeO", "0.08"],
+    ["MnO", "0.12"],
+    ["MgO", "0.92"],
+    ["CaO", "5.2"],
+    ["Na2O", "7.3"],
+    ["K2O", "1.6"],
+]
+
 
 def _source_doc() -> dict:
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
@@ -103,10 +116,47 @@ def test_table_rows_migrate_and_pin_render_cells(tmp_path: Path) -> None:
         assert printed_oxygen.state.value == Decimal(raw["values"]["point_conditions"]["fO2_log"]["state"]["value"])
         assert printed_oxygen.locator is not None
         sample = experiment_by_id[raw["experiment"]].get("sample", {})
-        if "printed_composition" in sample:
-            assert observation.identity.composition.is_value, raw_id
-        else:
-            assert observation.identity.composition.is_unknown, raw_id
+        printed_composition = sample.get("printed_composition")
+        if (
+            observation.identity.quantity.is_value
+            and observation.identity.quantity.value
+            is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            if (
+                isinstance(printed_composition, dict)
+                and printed_composition["state"]["tag"] == "value"
+            ):
+                assert observation.identity.composition.is_value, raw_id
+            else:
+                assert observation.identity.composition.is_unknown, raw_id
+
+    full_product_glass = experiment_by_id["t2-r003"]["sample"]["printed_composition"]
+    assert full_product_glass["state"]["value"]["amount_basis"] == "mass_percent"
+    assert full_product_glass["state"]["value"]["components"] == (
+        T2_R003_PRODUCT_GLASS_COMPOSITION
+    )
+    assert full_product_glass["locator"]["table"] == "2"
+    assert full_product_glass["locator"]["page"] == 40
+    t2_r003_rows = [
+        row
+        for row in phase_rows
+        if row.experiment_id == _row(result, "t2-r003-sio2").experiment_id
+    ]
+    assert t2_r003_rows
+    assert all(row.identity.composition.is_value for row in t2_r003_rows)
+
+    partial_product_glass = experiment_by_id["t2-r001"]["sample"]["printed_composition"]
+    assert partial_product_glass["state"] == {
+        "tag": "unknown",
+        "reason": "Table 2 prints a dash for MnO; complete product-glass composition unavailable.",
+    }
+    t2_r001_rows = [
+        row
+        for row in phase_rows
+        if row.experiment_id == _row(result, "t2-r001-sio2").experiment_id
+    ]
+    assert t2_r001_rows
+    assert all(row.identity.composition.is_unknown for row in t2_r001_rows)
 
     for suffix, quantity, expected in RENDER_PINS:
         observation = _row(result, suffix)

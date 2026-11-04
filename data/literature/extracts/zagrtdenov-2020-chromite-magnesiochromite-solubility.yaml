@@ -10289,7 +10289,11 @@ species:
         note: Introduction literature comparison; values are attributed in the text to the cited prior studies.
       units: Chromium concentration ppm, temperature °C, and oxygen fugacity log fO2, as printed.
       values:
-        method_class: quoted_attributed
+        method_class: quoted_unattributed
+        attribution_note: >-
+          The text names sources for the 50 ppm, 9800 ppm, and natural-melt ranges,
+          but names no source for the ~1220 ppm basaltic-melt example; no attribution
+          is inferred for that value.
         values_as_printed:
         - chromium: 50 ppm
           temperature: 1150 °C
@@ -10302,7 +10306,7 @@ species:
         - chromium: ~1220 ppm Cr
           temperature: 1350 °C
           buffer: FMQ
-          attribution: basaltic melt example in the paper introduction
+          attribution: No source is named for this example in the paper.
         - chromium: 20 to 700 ppm
           phase: natural basaltic to boninitic melts
           attribution: Gale et al. (2013)

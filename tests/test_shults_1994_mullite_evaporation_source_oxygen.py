@@ -11,6 +11,21 @@ EXTRACT_NAME = "shults-1994-mullite-evaporation.yaml"
 EXTRACT = ROOT / "data/literature/extracts" / EXTRACT_NAME
 
 
+def test_related_source_audit_context_stays_unchanged() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    relationship = next(
+        row
+        for container in document["species"].values()
+        for row in container.get("context", [])
+        if row["observation_id"]
+        == "shults_1994_source_relationship_to_existing_mullite_extract"
+    )
+    assert relationship["type"] == "source_relationship"
+    assert relationship["values"]["method_class"] == "quoted_attributed"
+    assert relationship["values"]["related_source_id"] == "shornikov-1994-mullite-kems"
+    assert "attribution" not in relationship["values"]
+
+
 def test_located_table2_oxygen_condition_survives_migration(tmp_path):
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     source_points = {

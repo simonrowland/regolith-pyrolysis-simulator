@@ -226,6 +226,36 @@ def test_deferred_figures_have_metadata_but_no_numeric_points() -> None:
     assert all(locator["table"] == "2" and locator["page"] == 106 for locator in secondary)
 
 
+def test_figure5_and_figure6_comparison_curves_remain_contextual_literature_data() -> None:
+    document = _document()
+    figures = {
+        record["observation_id"]: record
+        for block in document["species"].values()
+        for record in block.get("context", [])
+        if record.get("type") == "figure_record"
+    }
+    expected_series = {
+        "hastie_1980_appb_fig5_initial_volatiles": {
+            5: "K2CO3(l)",
+            6: "KAlO2(s)",
+        },
+        "hastie_1980_appb_fig6_K_pressure_temperature": {
+            3: "K2SO4(l)",
+            4: "K2CO3(l)",
+            5: "KAlO2(s)",
+            6: "K2O·9Al2O3−Al2O3(s)",
+        },
+    }
+    for observation_id, indexed_names in expected_series.items():
+        figure = figures[observation_id]
+        assert figure["values"]["method_class"] == "figure_only"
+        for index, expected_name in indexed_names.items():
+            series = figure["values"]["series"][index]
+            assert series["name"] == expected_name
+            assert series["evidence_class"] == "quoted_attributed"
+            assert series["marker_count"] == 0
+
+
 def test_k2o_activity_coefficient_uses_inferred_liquid_reference() -> None:
     document = _document()
     record = next(

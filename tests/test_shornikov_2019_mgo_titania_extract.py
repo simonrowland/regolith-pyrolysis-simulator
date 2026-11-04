@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import AdmissionStatus, ValueKind
@@ -14,6 +16,18 @@ from simulator.battery.migrate import Migrator
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/shornikov-2019-mgo-titania-melts.yaml"
 SOURCE_ID = "shornikov-2019-mgo-titania-melts"
+
+
+def _assert_sc456_model_class(row: dict) -> None:
+    assert row["values"]["method_class"] == "model_derived"
+    assert row["derivation"]["method"]["locator"]["section"] == (
+        "Thermodynamic properties of the MgO–TiO2 melts"
+    )
+    assert row["derivation"]["references"] == [
+        "Glushko et al. (1978–1982)",
+        "Bale et al. (2016)",
+    ]
+    assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
 
 
 def test_render_pins_and_isolated_migration_preserve_every_temperature():
@@ -30,6 +44,14 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     ]
     figure_rows = [row for _, row in observations if row["locator"].get("figure")]
     assert len(table_rows) == 42
+    model_table_rows = [row for row in table_rows if row["locator"].get("table") == "2"]
+    assert len(model_table_rows) == 20
+    assert all(row["values"]["method_class"] == "model_derived" for row in model_table_rows)
+    _assert_sc456_model_class(model_table_rows[0])
+    flipped = deepcopy(model_table_rows[0])
+    flipped["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_model_class(flipped)
     assert len(figure_rows) == 16
     assert len(observations) == 63
 
@@ -146,6 +168,7 @@ def test_render_pins_and_isolated_migration_preserve_every_temperature():
     assert sum(row.admission.status is AdmissionStatus.ADMITTED for row in migrated) == 22
     assert sum(row.admission.status is AdmissionStatus.REJECTED for row in migrated) == 41
     assert not result.registry_issues
+    assert result.validation is not None
     assert not result.validation.hard_issues
 
     for row in migrated:

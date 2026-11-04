@@ -772,10 +772,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -806,10 +832,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table10_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.
@@ -1695,10 +1735,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -1729,10 +1795,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table12_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table12_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.
@@ -3828,10 +3908,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -3862,10 +3968,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table14_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table14_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.
@@ -5216,10 +5336,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -5250,10 +5396,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table16_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table16_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.
@@ -5763,10 +5923,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -5797,10 +5983,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table18_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table18_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.
@@ -6296,10 +6496,36 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Extrapolated entropy contribution reported in Table 25.
+      derived_from:
+      - kelley_1953_table10_cp
+      - kelley_1953_table12_cp
+      - kelley_1953_table14_cp
+      - kelley_1953_table16_cp
+      - kelley_1953_table18_cp
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Low-temperature entropy contribution extrapolated by comparison with the fitted hypothetical standard-substance heat-capacity curve."
+        method:
+          state:
+            tag: value
+            value: "The 0–51 K extrapolation used a comparison procedure involving a hypothetical standard substance; its heat-capacity curve was fitted with Debye and Einstein functions, following Kelley, Parks, and Huffman."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        references:
+        - "Kelley, Parks, and Huffman (1929), J. Phys. Chem. 33, 1802."
+        inputs:
+        - kelley_1953_table10_cp
+        - kelley_1953_table12_cp
+        - kelley_1953_table14_cp
+        - kelley_1953_table16_cp
+        - kelley_1953_table18_cp
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S51_extrapolated_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed extrapolated S°51 contribution, not absolute S;
           the schema has no exact token for this component.
@@ -6330,10 +6556,24 @@ species:
       units: cal/mol/K
       per: mol_species
       method_as_published: Measured entropy increment reported in Table 25.
+      derived_from:
+      - kelley_1953_table20_cp
+      derivation:
+        relation: "Simpson-rule integration of the measured heat-capacity curve against ln T from 51 K to 298.16 K."
+        method:
+          state:
+            tag: value
+            value: "The measured entropy increments from 51 K to 298.16 K were obtained by Simpson-rule integration of plots of heat capacity against ln T."
+          locator:
+            page: 10
+            pdf_page_index: 9
+            published_page: 5210
+            section: "ENTROPIES AT 298.16° K."
+        inputs:
+        - kelley_1953_table20_cp
       values:
         quantity: entropy_S298_16_minus_S51_measured_component
-        method_class: quoted_attributed
-        attribution: Kelley et al. (1953), Table 25.
+        method_class: measured_reduced
         schema_gap: Quantity.S (simulator/battery/enums.py:93) is absolute molar entropy.
           This is only the printed measured S°298.16−S°51 contribution, not absolute
           S; the schema has no exact token for this component.

@@ -5711,6 +5711,9 @@ def _printed_oxide_map_locator(values: object) -> Locator | None:
 
     if not isinstance(values, Mapping):
         return None
+    composition_locator = values.get("composition_locator")
+    if isinstance(composition_locator, Mapping):
+        return locator_from_mapping(composition_locator)
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
         raw = values.get(key)
         if isinstance(raw, Mapping) and raw.get("locator") not in (None, ""):
@@ -5884,6 +5887,11 @@ def _finalize_input_provenance(
     composition = state.value
     if not isinstance(composition, Composition):
         return
+    if map_locator is None:
+        located_composition = (point_conditions or {}).get("composition")
+        condition_locator = getattr(located_composition, "locator", None)
+        if isinstance(condition_locator, Locator):
+            map_locator = condition_locator
     if composition.proxy_flag == "composition_from_sample_catalog":
         return
     if composition.basis in {
