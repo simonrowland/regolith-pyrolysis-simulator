@@ -9,6 +9,7 @@ import signal
 import resource
 import subprocess
 import sys
+import threading
 import time
 from functools import partial
 from pathlib import Path
@@ -689,7 +690,7 @@ def test_internal_analytical_outer_cap_refuses_a_hung_call_deterministically(
     assert cell.engine_reason == (
         f"equilibrate exceeded hard timeout of {timeout_s:g}s"
     )
-    assert timeout_s == 15.0
+    assert timeout_s == 120.0
 
 
 def test_classify_out_of_domain_and_no_liquid() -> None:
@@ -2617,6 +2618,126 @@ def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
         arm=request["arm"],
     )
     return cell.as_payload()
+
+
+class _InternalAnalyticalBudgetBackend:
+    def __init__(self, mode: str) -> None:
+        self.mode = mode
+
+    def equilibrate(self, **_kwargs):
+        if self.mode == "cpu_hang":
+            while True:
+                pass
+        if self.mode == "blocked_hang":
+            threading.Event().wait()
+        if self.mode == "short_compute":
+            cpu_deadline = time.process_time() + 0.025
+            while time.process_time() < cpu_deadline:
+                pass
+        from simulator.melt_backend.base import EquilibriumResult
+
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 50.0}},
+        )
+
+
+def _internal_analytical_budget_bootstrap(_engine: str, *, mode: str):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._INTERNAL_ANALYTICAL_CPU_BUDGET_S = 0.1
+    handle = battery.EngineHandle(
+        name="internal-analytical",
+        backend=_InternalAnalyticalBudgetBackend(mode),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    return battery._IsolatedCellEngine(handle), "internal-analytical-budget-test"
+
+
+def _install_internal_analytical_budget_worker(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    mode: str,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(_internal_analytical_budget_bootstrap, mode=mode),
+    )
+    monkeypatch.setattr(
+        battery, "_INTERNAL_ANALYTICAL_CPU_BUDGET_S", 0.1, raising=False
+    )
+    return battery
+
+
+def test_internal_analytical_cpu_budget_refuses_a_cpu_hung_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_internal_analytical_budget_worker(
+        monkeypatch, mode="cpu_hang"
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-cpu-budget",
+            engine="internal-analytical",
+            timeout_s=1.0,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_TIMEOUT
+    assert cell.engine_status == "TimeoutError"
+    assert cell.engine_reason == "equilibrate exceeded hard CPU budget of 0.1s"
+
+
+def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_internal_analytical_budget_worker(
+        monkeypatch, mode="blocked_hang"
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-wall-budget",
+            engine="internal-analytical",
+            timeout_s=0.1,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_TIMEOUT
+    assert cell.engine_status == "TimeoutError"
+    assert cell.engine_reason == "equilibrate exceeded hard timeout of 0.1s"
+
+
+def test_internal_analytical_compute_within_budget_survives_short_wall_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_internal_analytical_budget_worker(
+        monkeypatch, mode="short_compute"
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-short-wall-cap",
+            engine="internal-analytical",
+            timeout_s=1.0,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert cell.status == "ok", cell.engine_reason
+    assert cell.refusal_reason is None
 
 
 def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):

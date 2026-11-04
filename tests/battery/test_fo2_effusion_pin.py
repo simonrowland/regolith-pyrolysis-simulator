@@ -63,7 +63,7 @@ def test_costa_and_stolyarova_effusion_numbers_match_shared_closure() -> None:
             observation,
             experiment=experiment,
             bench=bench,
-            isolated=False,
+            isolated=engine is Engine.INTERNAL_ANALYTICAL,
         )
         assert prediction.refusal_reason is None, prediction.refusal_detail
         assert prediction.value == value
