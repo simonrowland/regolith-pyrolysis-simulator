@@ -733,7 +733,7 @@ def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
     # wall_temperature_C sets the interstage wall, not the condenser's stage
-    # setpoints. Stage 1 stays at the shipped 1150 C (1423.15 K), just below
+    # setpoints. Stage 1 stays at the shipped 1100 C (1373.15 K), below
     # the Tachibana band; its production-resolved Arrhenius value is flagged
     # out of domain, and transfer to this collector remains an inference.
     assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
