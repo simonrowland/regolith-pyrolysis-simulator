@@ -483,6 +483,7 @@ def test_charge_uses_migration_kept_total_for_trace_feot_and_volatiles():
         )
         return charge_moles_by_species(replace(experiment, sample=sample), bench)
 
+    # This pins charge admission to migration's kept-S guard, retaining Fe's route.
     trace = charge_for(
         {"SiO2": D("50"), "MgO": D("52"), "Fe": D("0.4")}
     )

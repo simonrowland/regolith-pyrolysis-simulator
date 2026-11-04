@@ -1854,12 +1854,21 @@ def test_exploded_children_recompute_renormalization_notice_after_closure(
                     {
                         "T_K": 1473,
                         "gamma": "0.5",
-                        "composition_wt_pct": {"SiO2": "56", "MgO": "50"},
                     },
                     {
                         "T_K": 1573,
                         "gamma": "0.4",
+                        "composition_wt_pct": {"SiO2": "56", "MgO": "50"},
+                    },
+                    {
+                        "T_K": 1673,
+                        "gamma": "0.3",
                         "composition_wt_pct": {"SiO2": "55", "MgO": "48"},
+                    },
+                    {
+                        "T_K": 1773,
+                        "gamma": "0.2",
+                        "composition_wt_pct": {"SiO2": "52", "MgO": "48"},
                     },
                 ],
             },
@@ -1872,16 +1881,37 @@ def test_exploded_children_recompute_renormalization_notice_after_closure(
         for observation_id, observation in result.observations.items()
         if observation_id.startswith("fixture-source::na_psat::T=")
     ]
-    refused = next(
+    inherited = next(
         child
         for child in children
         if child.identity.temperature_K.value == Decimal("1473")
     )
-    admitted = next(
+    refused = next(
         child
         for child in children
         if child.identity.temperature_K.value == Decimal("1573")
     )
+    admitted = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1673")
+    )
+    normalized = next(
+        child
+        for child in children
+        if child.identity.temperature_K.value == Decimal("1773")
+    )
+
+    assert inherited.identity.composition is not None
+    assert inherited.identity.composition.is_value
+    inherited_notices = [
+        notice
+        for notice in inherited.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    ]
+    assert len(inherited_notices) == 1
+    assert inherited_notices[0].original == Decimal("104")
 
     assert refused.identity.composition is not None
     assert refused.identity.composition.is_unknown
@@ -1898,6 +1928,13 @@ def test_exploded_children_recompute_renormalization_notice_after_closure(
     ]
     assert len(admitted_notices) == 1
     assert admitted_notices[0].original == Decimal("103")
+    assert normalized.identity.composition is not None
+    assert normalized.identity.composition.is_value
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+        for notice in normalized.notices
+    )
 
 
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(

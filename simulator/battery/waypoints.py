@@ -533,6 +533,7 @@ def charge_moles_by_species(
                     continue
             charge_scale: Decimal | None = None
             if is_mass_percent:
+                # Shared d-336 item 1 kept S aligns charge and migration admission.
                 kept_total = _mass_percent_kept_total(
                     numeric,
                     closure_context={"printed_composition": source_map},

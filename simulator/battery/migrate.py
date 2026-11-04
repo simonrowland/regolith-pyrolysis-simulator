@@ -22770,6 +22770,7 @@ class Migrator:
         value_sel: SourceSelection | None = None
         point_oxide_map: dict[str, Decimal] | None = None
         point_map_declared = False
+        point_map_explicit = False
         point_composition_refusal: list[str] = []
         point_composition_located: Located[Composition] | None = None
         point_printed_composition: Located[Mapping[str, Any]] | None = None
@@ -24184,7 +24185,8 @@ class Migrator:
             notice
             for notice in notices
             if not (
-                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                point_map_explicit
+                and notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
                 and notice.band == "95-102 wt% kept oxide total"
             )
         ]
@@ -24231,18 +24233,22 @@ class Migrator:
                 composition=State.unknown(malformed_composition_amount),
             )
         final_composition = identity.composition
-        renormalization_notice = _mass_percent_renormalization_notice(
-            point_oxide_map,
-            closure_context=point_composition_context,
-            quantity=q_token_point,
-            origin=point_id,
-            admitted=(
-                not point_composition_refusal
-                and residual is not None
-                and residual.state.is_value
-                and final_composition is not None
-                and final_composition.is_value
-            ),
+        renormalization_notice = (
+            _mass_percent_renormalization_notice(
+                point_oxide_map,
+                closure_context=point_composition_context,
+                quantity=q_token_point,
+                origin=point_id,
+                admitted=(
+                    not point_composition_refusal
+                    and residual is not None
+                    and residual.state.is_value
+                    and final_composition is not None
+                    and final_composition.is_value
+                ),
+            )
+            if point_map_explicit
+            else None
         )
         if renormalization_notice is not None and not any(
             notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
