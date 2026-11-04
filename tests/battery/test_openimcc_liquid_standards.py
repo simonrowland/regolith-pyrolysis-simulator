@@ -54,7 +54,7 @@ def test_sf04_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
         {"K2O": 1.0, "SiO2": 1.0},
     )
 
-    assert not assessment.flags
+    assert assessment.flags
     assert any(
         failure.kind == "mismatch"
         and failure.oxide == "K2O"
