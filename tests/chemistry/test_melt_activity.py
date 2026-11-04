@@ -102,6 +102,44 @@ def test_solid_reference_gamma_predicts_above_janaf_range() -> None:
 
     assert activity is not None
     assert activity.activity > 0.0
+    assert activity.fusion_domain_verdict.authority.value == "extrapolated"
+    assert "terminal Gibbs chord" in activity.fusion_domain_verdict.reason
+    assert "authority=extrapolated" in activity.warning
+    assert "certified_band_K=[298.15, 4000]" in activity.warning
+
+
+def test_solid_reference_gamma_flags_janaf_metastable_liquid_below_fusion() -> None:
+    temperature_K = 418.15
+    activity = melt_oxide_activity(
+        "MgO",
+        {"MgO": 1.0, "SiO2": 4.0},
+        temperature_K=temperature_K,
+    )
+
+    assert activity is not None
+    assert activity.fusion_domain_verdict.authority.value == "bridge"
+    assert "metastable (supercooled) liquid" in activity.fusion_domain_verdict.reason
+    assert "authority=bridge" in activity.warning
+    assert "certified_band_K=[298.15, 4000]" in activity.warning
+    expected_delta_g = janaf_fusion_energy(
+        "MgO", Decimal("418.15")
+    ).delta_g_fus_kJ_per_mol
+    expected_gamma = MELT_OXIDE_ACTIVITY_COEFFICIENTS["MgO"].gamma * math.exp(
+        -float(expected_delta_g) / (8.31446261815324e-3 * temperature_K)
+    )
+    assert activity.gamma == pytest.approx(expected_gamma)
+
+
+def test_solid_reference_gamma_has_no_notice_above_janaf_fusion_temperature() -> None:
+    activity = melt_oxide_activity(
+        "MgO",
+        {"MgO": 1.0, "SiO2": 4.0},
+        temperature_K=3500.0,
+    )
+
+    assert activity is not None
+    assert activity.fusion_domain_verdict.authority.value == "certified"
+    assert activity.warning is None
 
 
 @pytest.mark.parametrize("parent", ["CaO", "MgO"])
