@@ -19,6 +19,10 @@ from simulator.chemistry.melt_activity import (
     table_gamma_effective,
 )
 from simulator.battery.generators.janaf import janaf_fusion_energy
+from simulator.reference_data.janaf_fusion import (
+    FusionDomainAuthority,
+    _d144_fusion_conversion,
+)
 
 
 # Sossi & Fegley 2018 Table 2 printed envelopes, as transcribed in
@@ -102,10 +106,11 @@ def test_solid_reference_gamma_predicts_above_janaf_range() -> None:
 
     assert activity is not None
     assert activity.activity > 0.0
-    assert activity.fusion_domain_verdict.authority.value == "extrapolated"
-    assert "terminal Gibbs chord" in activity.fusion_domain_verdict.reason
+    assert activity.warning is not None
+    assert "terminal Gibbs chord" in activity.warning
     assert "authority=extrapolated" in activity.warning
     assert "certified_band_K=[298.15, 4000]" in activity.warning
+    assert activity.provenance()["melt_oxide_activity_warning"] == activity.warning
 
 
 def test_solid_reference_gamma_flags_janaf_metastable_liquid_below_fusion() -> None:
@@ -117,8 +122,8 @@ def test_solid_reference_gamma_flags_janaf_metastable_liquid_below_fusion() -> N
     )
 
     assert activity is not None
-    assert activity.fusion_domain_verdict.authority.value == "bridge"
-    assert "metastable (supercooled) liquid" in activity.fusion_domain_verdict.reason
+    assert activity.warning is not None
+    assert "metastable (supercooled) liquid" in activity.warning
     assert "authority=bridge" in activity.warning
     assert "certified_band_K=[298.15, 4000]" in activity.warning
     expected_delta_g = janaf_fusion_energy(
@@ -138,8 +143,18 @@ def test_solid_reference_gamma_has_no_notice_above_janaf_fusion_temperature() ->
     )
 
     assert activity is not None
-    assert activity.fusion_domain_verdict.authority.value == "certified"
     assert activity.warning is None
+
+
+def test_d144_fusion_owner_returns_typed_domain_verdict() -> None:
+    conversion = _d144_fusion_conversion("MgO", Decimal("418.15"))
+
+    assert conversion.domain_verdict.authority is FusionDomainAuthority.BRIDGE
+    assert conversion.domain_verdict.certified_band_K == (
+        Decimal("298.15"),
+        Decimal("4000.0"),
+    )
+    assert "metastable (supercooled) liquid" in conversion.domain_verdict.reason
 
 
 @pytest.mark.parametrize("parent", ["CaO", "MgO"])
