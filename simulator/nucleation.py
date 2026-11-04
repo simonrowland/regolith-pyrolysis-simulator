@@ -183,6 +183,25 @@ def _partial_pressure_Pa(value: object) -> float:
     return pressure
 
 
+def _saturation_pressure_scale(value: object) -> float:
+    """Multiplier on the owner's P_sat before S = p / P_sat.
+
+    1.0 is the owner pressure. Multiplication by 1.0 leaves a finite
+    float unchanged, so the default path is the unscaled evaluation.
+    """
+
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise NucleationInputError(
+            "saturation_pressure_scale must be a finite positive number"
+        )
+    scale = float(value)
+    if not math.isfinite(scale) or scale <= 0.0:
+        raise NucleationInputError(
+            "saturation_pressure_scale must be a finite positive number"
+        )
+    return scale
+
+
 def _unevaluable(
     species: str,
     temperature_K: float,
@@ -421,18 +440,26 @@ def nucleation_rate(
     species: str,
     temperature_K: float,
     p_species_Pa: float,
+    *,
+    saturation_pressure_scale: float = 1.0,
 ) -> NucleationRate:
     """Classical homogeneous nucleation rate at one temperature and partial pressure.
 
     The derivation, units, and the water and sodium sanity comparisons are
     in the module docstring. This function does not invent a density or a
     surface tension. A species without those sourced inputs is unevaluable.
+
+    ``saturation_pressure_scale`` multiplies the owner's saturation pressure
+    before S = p / P_sat. The stored ``saturation_pressure_Pa`` is that
+    scaled pressure. The default scale is 1. A scaled pressure that is not
+    finite and positive is unevaluable.
     """
 
     if not isinstance(species, str) or not species.strip():
         raise NucleationInputError("species must be a non-empty string")
     temperature = _temperature_K(temperature_K)
     pressure = _partial_pressure_Pa(p_species_Pa)
+    scale = _saturation_pressure_scale(saturation_pressure_scale)
     try:
         row = nucleation_liquid_data()["species"].get(species)
     except (OSError, ValueError, TypeError) as exc:
@@ -474,6 +501,14 @@ def nucleation_rate(
             temperature,
             pressure,
             "saturation pressure is not a finite positive number",
+        )
+    saturation_pressure = saturation_pressure * scale
+    if saturation_pressure <= 0.0 or not math.isfinite(saturation_pressure):
+        return _unevaluable(
+            species,
+            temperature,
+            pressure,
+            "scaled saturation pressure is not a finite positive number",
         )
 
     ratio = pressure / saturation_pressure

@@ -112,6 +112,37 @@ def test_sodium_lunar_partial_fog_boundary() -> None:
     assert fog_capture_code(bulk_250c) is None
 
 
+def test_sodium_250c_handbook_lower_saturation_pressure_crosses() -> None:
+    """A 25% lower P_sat at 250 C and 5.89 Pa crosses 1e6. The nominal rate does not.
+
+    The 1.25e6 comparison is the t1605 review's evaluation of this owner
+    at scale 0.75, not a second copy of the Becker-Doring expression.
+    """
+
+    temperature_K = 250.0 + CELSIUS_TO_KELVIN_OFFSET
+    nominal = nucleation_rate("Na", temperature_K, _P_NA_PA)
+    same = nucleation_rate("Na", temperature_K, _P_NA_PA, saturation_pressure_scale=1.0)
+    lowered = nucleation_rate(
+        "Na",
+        temperature_K,
+        _P_NA_PA,
+        saturation_pressure_scale=0.75,
+    )
+
+    assert same.rate_m3_s == nominal.rate_m3_s
+    assert same.saturation_pressure_Pa == nominal.saturation_pressure_Pa
+    assert nominal.saturation_pressure_Pa is not None
+    assert lowered.saturation_pressure_Pa == pytest.approx(nominal.saturation_pressure_Pa * 0.75)
+    assert lowered.rate_m3_s == pytest.approx(1.25e6, rel=0.05)
+    assert fog_capture_code(nominal) is None
+    assert fog_capture_code(lowered) == NOTICE_FOG
+
+    with pytest.raises(NucleationInputError):
+        nucleation_rate("Na", temperature_K, _P_NA_PA, saturation_pressure_scale=0.0)
+    with pytest.raises(NucleationInputError):
+        nucleation_rate("Na", temperature_K, _P_NA_PA, saturation_pressure_scale=float("nan"))
+
+
 def test_threshold_is_strictly_greater_than_1e6() -> None:
     evaluated = NucleationRate(
         status="evaluated",

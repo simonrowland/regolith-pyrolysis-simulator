@@ -103,6 +103,31 @@ def test_cold_stage_flags_sodium_and_keeps_eta() -> None:
         assert NOTICE_FOG not in str(entry)
 
 
+_HANDBOOK_CAUTION = (
+    "fog clear at nominal P_sat; extrapolated, within the handbook caution of the threshold"
+)
+
+
+def test_sodium_collector_forwards_extrapolated_saturation_and_the_caution() -> None:
+    """250 C Na is clear at nominal P_sat. A 25% lower P_sat crosses 1e6."""
+
+    model, _route = _route_alkali()
+    collector = _notices(model, "Na", 4, 0)[0]
+    trap = _notices(model, "Na", 4, 1)[0]
+
+    assert collector["code"] is None
+    assert collector["J_m3_s"] <= FOG_RATE_THRESHOLD_M3_S
+    assert collector["saturation_authority"] == "extrapolated"
+    assert "Browning-Potter" in collector["saturation_notice"]
+    assert "400-600 K" in collector["saturation_notice"]
+    assert _HANDBOOK_CAUTION in collector["saturation_notice"]
+
+    assert trap["code"] == NOTICE_FOG
+    assert trap["saturation_authority"] == "extrapolated"
+    assert trap["saturation_notice"]
+    assert _HANDBOOK_CAUTION not in trap["saturation_notice"]
+
+
 def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
     model, _route = _route_alkali()
     trap = _notices(model, "K", 4, 1)
@@ -111,6 +136,8 @@ def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
     assert trap[0]["J_m3_s"] is None
     assert trap[0]["eta_role"] is None
     assert trap[0]["eta_molecular"] is not None
+    assert trap[0]["saturation_authority"] is None
+    assert trap[0]["saturation_notice"] is None
 
 
 def test_reset_clears_fog_history() -> None:
