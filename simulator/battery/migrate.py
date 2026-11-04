@@ -1532,6 +1532,21 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     return dict(pairs)
 
 
+def _total_iron_printed_as_element_only(
+    components: Mapping[str, Decimal],
+) -> bool:
+    names = {_mass_percent_component_key(str(name))[0] for name in components}
+    has_total_iron_element = any(
+        (component := _COMPOSITION_COMPONENTS.get(name)) is not None
+        and component[0] == "Fe"
+        and component[1] == "T.Fe"
+        for name in names
+    )
+    return has_total_iron_element and not names.intersection(
+        {"FeO", "Fe2O3", "FeOT"}
+    )
+
+
 def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MOLE_PERCENT)
 
@@ -1571,6 +1586,19 @@ def _percent_composition_closure_error(
             return (
                 "mass-percent composition exceeds the accepted kept-sum limit: "
                 f"sum={total} wt% is above {_MASS_PERCENT_MAXIMUM_KEPT_SUM} wt%"
+            )
+        if (
+            total > _MASS_PERCENT_RENORMALIZE_ABOVE
+            and _total_iron_printed_as_element_only(components)
+        ):
+            # Kunisada flux-e has S=102.15 with 2.3 wt% T.Fe as Fe; treating
+            # it as FeO shifts S by 2.3 * (71.844 / 55.845 - 1) ~= 0.66 to
+            # 102.81, so renormalisation would depend on the unruled valence.
+            return (
+                "mass-percent composition exceeds the accepted kept-sum limit: "
+                f"sum={total} wt% is above {_MASS_PERCENT_RENORMALIZE_ABOVE} wt%; "
+                "total iron printed as element: renormalisation depends on the "
+                "iron valence convention, pending an owner ruling"
             )
     elif abs(total - Decimal("100")) > rounding_bound:
         return f"{basis}-percent composition does not close to 100 (sum={total})"
@@ -1742,11 +1770,13 @@ def _composition_located_from_plain(
         )
     wt = _mass_percent_components(body)
     if wt is not None and any(_is_mass_percent_oxide_component(name) for name in wt):
+        serialized_inference = None
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
         else:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
+            serialized_inference = source.inference
         try:
             declared_component_map = _declared_printed_composition_map(payload)
             composition_context = (
@@ -1762,11 +1792,33 @@ def _composition_located_from_plain(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
+        if (
+            serialized_inference is not None
+            and isinstance(body, Mapping)
+            and _enum(AmountBasis, body.get("amount_basis"))
+            is AmountBasis.MASS_PERCENT
+        ):
+            raw_components = body.get("components")
+            items = (
+                tuple(raw_components.items())
+                if isinstance(raw_components, Mapping)
+                else tuple(raw_components)
+                if isinstance(raw_components, (list, tuple))
+                else ()
+            )
+            composition = replace(
+                composition,
+                components=tuple(
+                    (str(name), as_decimal(amount)) for name, amount in items
+                ),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
         accepted_wt = _oxide_mass_percent_components(wt)
         return Located(
             State.of(composition),
             locator=locator,
-            inference=_mass_percent_composition_derivation(
+            inference=serialized_inference
+            or _mass_percent_composition_derivation(
                 accepted_wt,
                 locator,
                 closure_context=composition_context,

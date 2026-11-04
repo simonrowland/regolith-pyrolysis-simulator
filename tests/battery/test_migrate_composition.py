@@ -2331,6 +2331,25 @@ def test_b1128_mass_percent_migration_renormalizes_kept_map() -> None:
     assert wt_pct_to_mole_fraction(state.value.as_map()) == expected_moles
 
 
+def test_b1128_renormalization_inference_survives_store_round_trip() -> None:
+    written = migrate_module._mass_percent_composition_located(
+        {"SiO2": Decimal("55"), "MgO": Decimal("49")},
+        basis="printed_oxides",
+        locator=None,
+    )
+    serialized = to_plain(written)
+    loaded = migrate_module._point_condition_from_plain(
+        serialized, key="composition"
+    )
+
+    assert loaded == written
+    assert loaded.inference is not None
+    assert (
+        "renormalized to 100 wt% from kept oxide total S=104 wt% (d-336 item 2)"
+        in loaded.inference.inputs
+    )
+
+
 def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
     printed = {
         "SiO2": Decimal("50"),
@@ -2874,6 +2893,13 @@ _INDEPENDENT_KEPT_COMPONENTS = {
     "TiO2",
 }
 
+_INDEPENDENT_TOTAL_IRON_ELEMENT_KEYS = {
+    "t.fe",
+    "tfe",
+    "total fe",
+    "total iron",
+}
+
 
 def _independent_kept_oxide_total(cells: object) -> Decimal | None:
     if not isinstance(cells, dict):
@@ -2889,6 +2915,15 @@ def _independent_kept_oxide_total(cells: object) -> Decimal | None:
         if amount.is_finite() and amount >= 0:
             total += amount
     return total
+
+
+def _independent_total_iron_element_only(cells: object) -> bool:
+    if not isinstance(cells, dict):
+        return False
+    names = {str(name).strip().casefold() for name in cells}
+    return bool(names & _INDEPENDENT_TOTAL_IRON_ELEMENT_KEYS) and not bool(
+        names & {"feo", "fe2o3", "feot", "feo_t", "feo*"}
+    )
 
 
 def _printed_cells_for_source_row(row: dict, experiments: dict) -> object:
@@ -2917,6 +2952,7 @@ def test_renormalization_notice_follows_composition_across_source_stores() -> No
         "taniguchi-1997-feo-cas.yaml",
     )
     band = "95-102 wt% kept oxide total"
+    kunisada_flux_eh_refusals = 0
 
     for name in extract_names:
         extract_path = REPO_ROOT / "data/literature/extracts" / name
@@ -2953,6 +2989,7 @@ def test_renormalization_notice_follows_composition_across_source_stores() -> No
             assert source_row is not None, observation.observation_id
             cells = _printed_cells_for_source_row(source_row, experiments)
             kept_total = _independent_kept_oxide_total(cells)
+            elemental_total_iron = _independent_total_iron_element_only(cells)
             composition = observation.identity.composition
             admitted_composition = composition is not None and composition.is_value
             if admitted_composition:
@@ -2967,11 +3004,46 @@ def test_renormalization_notice_follows_composition_across_source_stores() -> No
                 admitted_composition
                 and kept_total is not None
                 and Decimal("102") < kept_total <= Decimal("105")
+                and not elemental_total_iron
             )
             assert len(notices) == int(should_notice), observation.observation_id
             if should_notice:
                 assert len(notices) == 1
                 assert notices[0].original == kept_total
+            source_experiment = str(source_row.get("experiment") or "")
+            if (
+                source_id == "kunisada-1986-na-silicate-dephosphorization"
+                and source_experiment
+                in {
+                    "kunisada-1986-na2co3-flux-e",
+                    "kunisada-1986-na2co3-flux-h",
+                }
+                and composition is not None
+                and elemental_total_iron
+                and kept_total is not None
+                and Decimal("102") < kept_total <= Decimal("105")
+            ):
+                kunisada_flux_eh_refusals += 1
+                assert composition is not None and composition.is_unknown
+                assert (
+                    "total iron printed as element: renormalisation depends on "
+                    "the iron valence convention, pending an owner ruling"
+                    in composition.reason
+                )
+            loaded = migrate_module.observation_from_plain(to_plain(observation))
+            loaded_notices = _renormalization_notices(loaded)
+            assert len(loaded_notices) == int(should_notice), observation.observation_id
+            if should_notice:
+                assert loaded_notices[0].original == kept_total
+                composition = (loaded.point_conditions or {}).get("composition")
+                assert isinstance(composition, Located)
+                assert composition.inference is not None
+                assert (
+                    "renormalized to 100 wt% from kept oxide total "
+                    f"S={kept_total} wt% (d-336 item 2)"
+                    in composition.inference.inputs
+                ), observation.observation_id
+    assert kunisada_flux_eh_refusals == 16
 
 
 def test_initial_charge_mass_loss_map_refuses_blank_suffixed_major_oxide() -> None:

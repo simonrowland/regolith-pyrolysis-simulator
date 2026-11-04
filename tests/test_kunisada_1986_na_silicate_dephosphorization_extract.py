@@ -11,7 +11,6 @@ import yaml
 from simulator.battery.enums import NoticeKind, Phase, PhaseRole, Quantity, ValueKind
 from simulator.battery.migrate import (
     _percent_composition_closure_error,
-    _mass_percent_composition_state,
     wt_pct_to_mole_fraction,
 )
 from tests.battery.factories import migrate_one_extract
@@ -134,8 +133,8 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert set(migrated) == expected_ids
     assert len(migrated) == 278
     assert len(migrator.result.validation.hard_issues) == 0
-    # b-1128 resolves the composition-axis gap for 16 flux-e/flux-h rows.
-    assert len(migrator.result.validation.issues) == 618
+    # The unruled T.Fe valence convention leaves 16 flux-e/flux-h rows refused.
+    assert len(migrator.result.validation.issues) == 634
     assert {issue.reason.value for issue in migrator.result.validation.issues} == {
         "identity_incomplete"
     }
@@ -217,7 +216,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
         and experiment_closure_errors[source_row["experiment"]] is None
     }
-    assert len(expected_closed_rows) == 24
+    assert len(expected_closed_rows) == 8
     assert {
         row.observation_id
         for row in phase_rows
@@ -268,7 +267,37 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert closure_error is not None
             assert closure_error in reason
             assert "unsupported component(s)" not in reason
-    assert renormalized_rows == 16
+    assert renormalized_rows == 0
+    elemental_iron_refusal = (
+        "total iron printed as element: renormalisation depends on the iron "
+        "valence convention, pending an owner ruling"
+    )
+    for flux, total in (("e", "102.15"), ("h", "104.70")):
+        experiment_id = f"kunisada-1986-na2co3-flux-{flux}"
+        closure_error = experiment_closure_errors[experiment_id]
+        assert closure_error is not None
+        assert f"sum={total} wt% is above 102 wt%" in closure_error
+        assert elemental_iron_refusal in closure_error
+        refused_rows = [
+            row
+            for row in phase_rows
+            if source_rows[row.observation_id.split("::", 1)[1]][1]["experiment"]
+            == experiment_id
+        ]
+        assert len(refused_rows) == 8
+        assert all(row.identity.composition.is_unknown for row in refused_rows)
+        assert all(
+            elemental_iron_refusal in (row.identity.composition.reason or "")
+            for row in refused_rows
+        )
+        assert all(
+            not any(
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == "95-102 wt% kept oxide total"
+                for notice in row.notices
+            )
+            for row in refused_rows
+        )
     for flux, total in (("f", "105.14"), ("g", "105.50")):
         experiment_id = f"kunisada-1986-na2co3-flux-{flux}"
         closure_error = experiment_closure_errors[experiment_id]
@@ -278,58 +307,6 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             row.experiment_id == experiment_id and row.identity.composition.is_value
             for row in phase_rows
         )
-
-    # Flux-e printed cells total S=102.15; these are hand-derived 100*w_i/S values.
-    printed = {
-        "Na2O": Decimal("40.9"),
-        "SiO2": Decimal("39.5"),
-        "T.Fe": Decimal("2.3"),
-        "MgO": Decimal("17.5"),
-        "P2O5": Decimal("1.95"),
-    }
-    normalized = _mass_percent_composition_state(
-        printed, basis="printed_oxides"
-    ).value.as_map()
-    assert normalized == {
-        "Na2O": Decimal("40.03915810083210964268232991"),
-        "SiO2": Decimal("38.66862457170827214880078316"),
-        "T.Fe": Decimal("2.251590797846304454233969652"),
-        "MgO": Decimal("17.13166911404796867351933431"),
-        "P2O5": Decimal("1.908957415565345080763582966"),
-    }
-    molar_masses = {
-        "Na2O": Decimal("61.978538560000004"),
-        "SiO2": Decimal("60.083"),
-        "T.Fe": Decimal("55.845"),
-        "MgO": Decimal("40.304"),
-        "P2O5": Decimal("141.942523996"),
-    }
-    moles = {name: amount / molar_masses[name] for name, amount in normalized.items()}
-    total_moles = sum(moles.values(), Decimal("0"))
-    independent_mole_fractions = {
-        name: amount / total_moles for name, amount in moles.items()
-    }
-    pinned_flux_e = next(
-        row
-        for row in phase_rows
-        if any(
-            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-            and notice.original == Decimal("102.15")
-            and notice.band == "95-102 wt% kept oxide total"
-            for notice in row.notices
-        )
-    )
-    actual_composition = pinned_flux_e.identity.composition.value
-    actual_mole_fractions = (
-        wt_pct_to_mole_fraction(actual_composition.as_map()).as_map()
-        if actual_composition.amount_basis.value == "mass_percent"
-        else actual_composition.as_map()
-    )
-    assert set(actual_mole_fractions) == set(independent_mole_fractions)
-    assert all(
-        abs(actual_mole_fractions[name] - expected) < Decimal("1e-12")
-        for name, expected in independent_mole_fractions.items()
-    )
 
     contexts = [
         context
