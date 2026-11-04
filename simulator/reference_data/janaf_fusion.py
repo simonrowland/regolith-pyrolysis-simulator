@@ -200,7 +200,7 @@ def _complete_fusion_overlap_nodes(
     liquid_table_id: str,
     solid_points: tuple[tuple[Decimal, Decimal], ...],
     liquid_points: tuple[tuple[Decimal, Decimal], ...],
-    temperature_K: Decimal,
+    temperature_K: Decimal | None,
 ) -> tuple[
     tuple[Decimal, ...],
     tuple[Decimal, ...],
@@ -234,19 +234,74 @@ def _complete_fusion_overlap_nodes(
         raise ValueError(
             f"{oxide}: JANAF tables have fewer than two complete overlap nodes"
         )
-    for table_id, points, missing in (
+    if temperature_K is not None:
+        for table_id, points, missing in (
+            (solid_table_id, solid_points, solid_missing),
+            (liquid_table_id, liquid_points, liquid_missing),
+        ):
+            missing_node = _missing_node_for_interpolation(
+                points, missing, temperature_K
+            )
+            if missing_node is not None:
+                raise ValueError(
+                    f"{table_id}: needed JANAF formation Gibbs row missing at "
+                    f"{missing_node} K for interpolation at {temperature_K} K"
+                )
+    return tuple(overlap), solid_missing, liquid_missing
+
+
+def _fusion_crossing_temperature(
+    oxide: str,
+    solid_table_id: str,
+    liquid_table_id: str,
+    *,
+    target_temperature_K: Decimal | None = None,
+) -> Decimal:
+    """Resolve the unique solid/liquid Gibbs crossing from JANAF nodes."""
+
+    solid_points, _solid_digest = _fusion_table_points(solid_table_id)
+    liquid_points, _liquid_digest = _fusion_table_points(liquid_table_id)
+    overlap, solid_missing, liquid_missing = _complete_fusion_overlap_nodes(
+        oxide,
+        solid_table_id,
+        liquid_table_id,
+        solid_points,
+        liquid_points,
+        target_temperature_K,
+    )
+
+    def difference(temperature_K: Decimal) -> Decimal:
+        return _fusion_gibbs_difference_from_points(
+            solid_points, liquid_points, temperature_K
+        )
+
+    crossings: list[Decimal] = []
+    for left, right in zip(overlap, overlap[1:]):
+        d_left, d_right = difference(left), difference(right)
+        if d_left == 0:
+            crossings.append(left)
+        elif d_left * d_right < 0:
+            crossings.append(
+                left - d_left * (right - left) / (d_right - d_left)
+            )
+    if overlap and difference(overlap[-1]) == 0:
+        crossings.append(overlap[-1])
+    if len(crossings) != 1:
+        raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
+    crossing = crossings[0]
+    for table_id, points, missing_nodes in (
         (solid_table_id, solid_points, solid_missing),
         (liquid_table_id, liquid_points, liquid_missing),
     ):
         missing_node = _missing_node_for_interpolation(
-            points, missing, temperature_K
+            points, missing_nodes, crossing
         )
         if missing_node is not None:
             raise ValueError(
                 f"{table_id}: needed JANAF formation Gibbs row missing at "
-                f"{missing_node} K for interpolation at {temperature_K} K"
+                f"{missing_node} K for interpolation at {crossing} K"
             )
-    return tuple(overlap), solid_missing, liquid_missing
+    return crossing
 
 
 def _interpolate_table_points(
@@ -255,6 +310,16 @@ def _interpolate_table_points(
     *,
     extrapolate: bool = False,
 ) -> Decimal:
+    # Inside a table, linear interpolation uses JANAF's tabulated G values,
+    # including the heat-capacity contribution already accumulated between
+    # nodes. For a temperature outside a table, the terminal chord is
+    # continued: G_ext(T) = G1 + m(T-T1), where m=(G2-G1)/(T2-T1) has units
+    # kJ mol^-1 K^-1. Since dG/dT=-S, this fixes S; H=G+TS=G-T(dG/dT) is
+    # also constant, so Cp=dH/dT=0 on that continuation. When both phase
+    # values are in-table, ΔG is the interpolated G_liquid-G_solid, not the
+    # constant-ΔH_fus approximation ΔH_fus(1-T/T_fus). For MgO at 4500 K,
+    # the solid uses its 3900-4000 K terminal chord while the liquid remains
+    # in-table at its 4400-4500 K interval.
     if temperature_K < points[0][0]:
         if not extrapolate:
             raise ValueError(f"{temperature_K} K is outside the JANAF table range")

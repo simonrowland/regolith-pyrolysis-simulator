@@ -81,7 +81,7 @@ from simulator.reference_data.janaf_fusion import (
     _D144_SINGLE_POLYMORPH_TABLES,
     _FUSION_TABLES,
     JANAF_R_J_PER_MOL_K,
-    _complete_fusion_overlap_nodes,
+    _fusion_crossing_temperature,
     _checked_fusion_table_rows,
     _fusion_gibbs_difference_from_points,
     _fusion_table_points,
@@ -3097,40 +3097,15 @@ def _janaf_fusion_energy_for_pair(
     crystal_table = solid_table
     crystal, crystal_sha = _fusion_table_points(solid_table)
     liquid, liquid_sha = _fusion_table_points(liquid_table)
-    overlap, crystal_missing, liquid_missing = _complete_fusion_overlap_nodes(
+    tm = _fusion_crossing_temperature(
         oxide,
         crystal_table,
         liquid_table,
-        crystal,
-        liquid,
-        temperature_K,
+        target_temperature_K=temperature_K,
     )
 
     def difference(t: Decimal) -> Decimal:
         return _fusion_gibbs_difference_from_points(crystal, liquid, t)
-
-    crossings: list[Decimal] = []
-    for left, right in zip(overlap, overlap[1:]):
-        d_left, d_right = difference(left), difference(right)
-        if d_left == 0:
-            crossings.append(left)
-        elif d_left * d_right < 0:
-            crossings.append(left - d_left * (right - left) / (d_right - d_left))
-    if overlap and difference(overlap[-1]) == 0:
-        crossings.append(overlap[-1])
-    if len(crossings) != 1:
-        raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
-    tm = crossings[0]
-    for table_id, points, missing_nodes in (
-        (crystal_table, crystal, crystal_missing),
-        (liquid_table, liquid, liquid_missing),
-    ):
-        missing_node = _missing_node_for_interpolation(points, missing_nodes, tm)
-        if missing_node is not None:
-            raise ValueError(
-                f"{table_id}: needed JANAF formation Gibbs row missing at "
-                f"{missing_node} K for interpolation at {tm} K"
-            )
     try:
         delta_g = difference(temperature_K)
     except ValueError as exc:
