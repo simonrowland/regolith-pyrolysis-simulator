@@ -1792,40 +1792,32 @@ def _composition_located_from_plain(
                 State.unknown(f"mass-percent composition is not usable: {exc}"),
                 locator=locator,
             )
-        if (
-            serialized_inference is not None
-            and isinstance(body, Mapping)
-            and _enum(AmountBasis, body.get("amount_basis"))
-            is AmountBasis.MASS_PERCENT
-        ):
-            raw_components = body.get("components")
-            items = (
-                tuple(raw_components.items())
-                if isinstance(raw_components, Mapping)
-                else tuple(raw_components)
-                if isinstance(raw_components, (list, tuple))
-                else ()
-            )
-            composition = replace(
-                composition,
-                components=tuple(
-                    (str(name), as_decimal(amount)) for name, amount in items
-                ),
-                amount_basis=AmountBasis.MASS_PERCENT,
-            )
         accepted_wt = _oxide_mass_percent_components(wt)
+        derivation = _mass_percent_composition_derivation(
+            accepted_wt,
+            locator,
+            closure_context=composition_context,
+            source_note=_wt_percent_derivation_source_note(
+                wt, payload, declared_component_map=declared_component_map
+            ),
+        )
+        renormalization_input = next(
+            (
+                item
+                for item in (serialized_inference.inputs if serialized_inference else ())
+                if item.startswith("renormalized to 100 wt% from kept oxide total S=")
+            ),
+            None,
+        )
+        if renormalization_input and renormalization_input not in derivation.inputs:
+            derivation = replace(
+                derivation,
+                inputs=(*derivation.inputs, renormalization_input),
+            )
         return Located(
             State.of(composition),
             locator=locator,
-            inference=serialized_inference
-            or _mass_percent_composition_derivation(
-                accepted_wt,
-                locator,
-                closure_context=composition_context,
-                source_note=_wt_percent_derivation_source_note(
-                    wt, payload, declared_component_map=declared_component_map
-                ),
-            ),
+            inference=derivation,
         )
     if (
         isinstance(body, Mapping)

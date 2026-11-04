@@ -2331,23 +2331,84 @@ def test_b1128_mass_percent_migration_renormalizes_kept_map() -> None:
     assert wt_pct_to_mole_fraction(state.value.as_map()) == expected_moles
 
 
-def test_b1128_renormalization_inference_survives_store_round_trip() -> None:
+@pytest.mark.parametrize(
+    "basis", ("printed_oxides", "printed_phase_composition")
+)
+def test_b1128_renormalization_input_is_additive_to_base_store_load(
+    basis: str,
+) -> None:
     written = migrate_module._mass_percent_composition_located(
         {"SiO2": Decimal("55"), "MgO": Decimal("49")},
-        basis="printed_oxides",
+        basis=basis,
         locator=None,
     )
     serialized = to_plain(written)
+    assert isinstance(serialized, dict)
+    # The base loader ignored serialized inference and recomputed this derivation.
+    base_payload = {
+        key: value for key, value in serialized.items() if key != "inference"
+    }
+    base_loaded = migrate_module._point_condition_from_plain(
+        base_payload, key="composition"
+    )
     loaded = migrate_module._point_condition_from_plain(
         serialized, key="composition"
     )
 
-    assert loaded == written
+    assert loaded.state == base_loaded.state
+    assert loaded.locator == base_loaded.locator
     assert loaded.inference is not None
-    assert (
-        "renormalized to 100 wt% from kept oxide total S=104 wt% (d-336 item 2)"
-        in loaded.inference.inputs
+    assert base_loaded.inference is not None
+    renormalization_input = (
+        "renormalized to 100 wt% from kept oxide total S=104 wt% "
+        "(d-336 item 2)"
     )
+    assert renormalization_input not in base_loaded.inference.inputs
+    assert loaded.inference == replace(
+        base_loaded.inference,
+        inputs=(*base_loaded.inference.inputs, renormalization_input),
+    )
+    assert (
+        renormalization_input in loaded.inference.inputs
+    )
+
+
+def test_b1128_taniguchi_407_composition_load_matches_base() -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data/literature/extracts/taniguchi-1997-feo-cas.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
+    migrator._migrate_extract(extract_path)
+    migrator.finalize()
+    observation = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "taniguchi_1997_table5_sample_407_slag_fe_composition"
+        )
+    )
+    written = (observation.point_conditions or {})["composition"]
+    serialized = to_plain(written)
+    assert isinstance(serialized, dict)
+    # Removing inference reproduces the base loader's output for this payload.
+    base_payload = {
+        key: value for key, value in serialized.items() if key != "inference"
+    }
+
+    base_loaded = migrate_module._point_condition_from_plain(
+        base_payload, key="composition"
+    )
+    loaded = migrate_module._point_condition_from_plain(
+        serialized, key="composition"
+    )
+
+    assert loaded == base_loaded
+    assert loaded.state.is_value
+    assert loaded.state.value.basis == "printed_oxides"
+    assert loaded.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert loaded.state.value.components == base_loaded.state.value.components
+    assert loaded.inference == base_loaded.inference
 
 
 def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
