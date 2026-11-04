@@ -4167,8 +4167,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4895009524106284805844326169'
+        - - TiO2
+          - '0.003822986248140935283133425317'
+        - - Al2O3
+          - '0.06526859285063845066951491693'
+        - - FeO
+          - '0.1382486708594797285960842922'
+        - - MgO
+          - '0.1825849173383728639551549278'
+        - - CaO
+          - '0.0852263214882976195445279367'
+        - - Na2O
+          - '0.03297582457060355790615207288'
+        - - K2O
+          - '0.000264601636757222592560500909'
+        - - P2O5
+          - '0.00210713259708114086843930996'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -4204,6 +4225,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -4228,6 +4254,207 @@ observations:
         table: S-1
         note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4895009524106284805844326169'
+          - - TiO2
+            - '0.003822986248140935283133425317'
+          - - Al2O3
+            - '0.06526859285063845066951491693'
+          - - FeO
+            - '0.1382486708594797285960842922'
+          - - MgO
+            - '0.1825849173383728639551549278'
+          - - CaO
+            - '0.0852263214882976195445279367'
+          - - Na2O
+            - '0.03297582457060355790615207288'
+          - - K2O
+            - '0.000264601636757222592560500909'
+          - - P2O5
+            - '0.00210713259708114086843930996'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.2'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.68'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '15.94'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.81'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.67'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.48'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -4605,8 +4832,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4895009524106284805844326169'
+        - - TiO2
+          - '0.003822986248140935283133425317'
+        - - Al2O3
+          - '0.06526859285063845066951491693'
+        - - FeO
+          - '0.1382486708594797285960842922'
+        - - MgO
+          - '0.1825849173383728639551549278'
+        - - CaO
+          - '0.0852263214882976195445279367'
+        - - Na2O
+          - '0.03297582457060355790615207288'
+        - - K2O
+          - '0.000264601636757222592560500909'
+        - - P2O5
+          - '0.00210713259708114086843930996'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -4643,6 +4891,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -4669,6 +4922,207 @@ observations:
         note: XANES determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4895009524106284805844326169'
+          - - TiO2
+            - '0.003822986248140935283133425317'
+          - - Al2O3
+            - '0.06526859285063845066951491693'
+          - - FeO
+            - '0.1382486708594797285960842922'
+          - - MgO
+            - '0.1825849173383728639551549278'
+          - - CaO
+            - '0.0852263214882976195445279367'
+          - - Na2O
+            - '0.03297582457060355790615207288'
+          - - K2O
+            - '0.000264601636757222592560500909'
+          - - P2O5
+            - '0.00210713259708114086843930996'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.2'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.68'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '15.94'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.81'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.67'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.28'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.48'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -4742,8 +5196,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5245081072901997975997563397'
+        - - TiO2
+          - '0.00419529848960424422581498839'
+        - - Al2O3
+          - '0.06073317537668280642325521842'
+        - - FeO
+          - '0.1231557301060266555481996569'
+        - - MgO
+          - '0.1795047735244711017105353846'
+        - - CaO
+          - '0.07579340212845116094525468882'
+        - - Na2O
+          - '0.03053402872138699618884524666'
+        - - K2O
+          - '0.0003952266629489216116897109699'
+        - - P2O5
+          - '0.001180257700228315746648765291'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -4779,6 +5254,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -4803,6 +5283,207 @@ observations:
         table: S-1
         note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5245081072901997975997563397'
+          - - TiO2
+            - '0.00419529848960424422581498839'
+          - - Al2O3
+            - '0.06073317537668280642325521842'
+          - - FeO
+            - '0.1231557301060266555481996569'
+          - - MgO
+            - '0.1795047735244711017105353846'
+          - - CaO
+            - '0.07579340212845116094525468882'
+          - - Na2O
+            - '0.03053402872138699618884524666'
+          - - K2O
+            - '0.0003952266629489216116897109699'
+          - - P2O5
+            - '0.001180257700228315746648765291'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '50.79'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.54'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.98'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '14.26'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11.66'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '6.85'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.05'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.06'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5180,8 +5861,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4957743177608446779433803735'
+        - - TiO2
+          - '0.0038082413905910919103438971'
+        - - Al2O3
+          - '0.0666605433547340385130926673'
+        - - FeO
+          - '0.1290758453967095906768819179'
+        - - MgO
+          - '0.1909670414735010697881422738'
+        - - CaO
+          - '0.08489761249269158122120346422'
+        - - Na2O
+          - '0.02724033583285695474114706454'
+        - - K2O
+          - '0.0003953716439368642749805836183'
+        - - P2O5
+          - '0.001180690654134130930827757466'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -5217,6 +5919,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5241,6 +5948,207 @@ observations:
         table: S-1
         note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4957743177608446779433803735'
+          - - TiO2
+            - '0.0038082413905910919103438971'
+          - - Al2O3
+            - '0.0666605433547340385130926673'
+          - - FeO
+            - '0.1290758453967095906768819179'
+          - - MgO
+            - '0.1909670414735010697881422738'
+          - - CaO
+            - '0.08489761249269158122120346422'
+          - - Na2O
+            - '0.02724033583285695474114706454'
+          - - K2O
+            - '0.0003953716439368642749805836183'
+          - - P2O5
+            - '0.001180690654134130930827757466'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.99'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.95'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '14.94'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.67'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.72'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.06'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5618,8 +6526,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4957743177608446779433803735'
+        - - TiO2
+          - '0.0038082413905910919103438971'
+        - - Al2O3
+          - '0.0666605433547340385130926673'
+        - - FeO
+          - '0.1290758453967095906768819179'
+        - - MgO
+          - '0.1909670414735010697881422738'
+        - - CaO
+          - '0.08489761249269158122120346422'
+        - - Na2O
+          - '0.02724033583285695474114706454'
+        - - K2O
+          - '0.0003953716439368642749805836183'
+        - - P2O5
+          - '0.001180690654134130930827757466'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -5656,6 +6585,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5682,6 +6616,207 @@ observations:
         note: XANES determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4957743177608446779433803735'
+          - - TiO2
+            - '0.0038082413905910919103438971'
+          - - Al2O3
+            - '0.0666605433547340385130926673'
+          - - FeO
+            - '0.1290758453967095906768819179'
+          - - MgO
+            - '0.1909670414735010697881422738'
+          - - CaO
+            - '0.08489761249269158122120346422'
+          - - Na2O
+            - '0.02724033583285695474114706454'
+          - - K2O
+            - '0.0003953716439368642749805836183'
+          - - P2O5
+            - '0.001180690654134130930827757466'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.99'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '10.95'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '14.94'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.4'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.67'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '2.72'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.06'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.27'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -5755,8 +6890,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4938318964572528374218662907'
+        - - TiO2
+          - '0.004028083085086552583763602962'
+        - - Al2O3
+          - '0.06698699421264715366541064553'
+        - - FeO
+          - '0.128047775057223502247950309'
+        - - MgO
+          - '0.190798321935460614699979305'
+        - - CaO
+          - '0.08450756150618281729324809008'
+        - - Na2O
+          - '0.02994549494297973997635807815'
+        - - K2O
+          - '0.000328390783472857708712059871'
+        - - P2O5
+          - '0.001525482019693924402711619'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -5792,6 +6948,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -5816,6 +6977,207 @@ observations:
         table: S-1
         note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4938318964572528374218662907'
+          - - TiO2
+            - '0.004028083085086552583763602962'
+          - - Al2O3
+            - '0.06698699421264715366541064553'
+          - - FeO
+            - '0.128047775057223502247950309'
+          - - MgO
+            - '0.190798321935460614699979305'
+          - - CaO
+            - '0.08450756150618281729324809008'
+          - - Na2O
+            - '0.02994549494297973997635807815'
+          - - K2O
+            - '0.000328390783472857708712059871'
+          - - P2O5
+            - '0.001525482019693924402711619'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.96'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.52'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '14.87'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.43'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.66'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.35'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6193,8 +7555,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4938318964572528374218662907'
+        - - TiO2
+          - '0.004028083085086552583763602962'
+        - - Al2O3
+          - '0.06698699421264715366541064553'
+        - - FeO
+          - '0.128047775057223502247950309'
+        - - MgO
+          - '0.190798321935460614699979305'
+        - - CaO
+          - '0.08450756150618281729324809008'
+        - - Na2O
+          - '0.02994549494297973997635807815'
+        - - K2O
+          - '0.000328390783472857708712059871'
+        - - P2O5
+          - '0.001525482019693924402711619'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -6231,6 +7614,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -6257,6 +7645,207 @@ observations:
         note: XANES determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4938318964572528374218662907'
+          - - TiO2
+            - '0.004028083085086552583763602962'
+          - - Al2O3
+            - '0.06698699421264715366541064553'
+          - - FeO
+            - '0.128047775057223502247950309'
+          - - MgO
+            - '0.190798321935460614699979305'
+          - - CaO
+            - '0.08450756150618281729324809008'
+          - - Na2O
+            - '0.02994549494297973997635807815'
+          - - K2O
+            - '0.000328390783472857708712059871'
+          - - P2O5
+            - '0.001525482019693924402711619'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.96'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.52'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '14.87'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.43'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.66'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.35'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6677,8 +8266,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5296255046462380743561924404'
+        - - TiO2
+          - '0.003864607023340723822267621519'
+        - - Al2O3
+          - '0.07053222772787030121528746696'
+        - - FeO
+          - '0.1037071253778637152817053995'
+        - - MgO
+          - '0.1684753493008225480706351488'
+        - - CaO
+          - '0.09158627273666455930732657055'
+        - - Na2O
+          - '0.0305765776530648852591348912'
+        - - K2O
+          - '0.0003276658781504729605898827468'
+        - - P2O5
+          - '0.00130466965598471972686057798'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -6715,6 +8325,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -6745,6 +8360,245 @@ observations:
           glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition''s
           liquidus (SI-3, PDF p. 9). Table S-3 (PDF p. 15, SI-9) prints 0.816 ± 0.022 (S-1: ±0.019); this is the same measurement
           and not a second observation.'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5296255046462380743561924404'
+          - - TiO2
+            - '0.003864607023340723822267621519'
+          - - Al2O3
+            - '0.07053222772787030121528746696'
+          - - FeO
+            - '0.1037071253778637152817053995'
+          - - MgO
+            - '0.1684753493008225480706351488'
+          - - CaO
+            - '0.09158627273666455930732657055'
+          - - Na2O
+            - '0.0305765776530648852591348912'
+          - - K2O
+            - '0.0003276658781504729605898827468'
+          - - P2O5
+            - '0.00130466965598471972686057798'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+          crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published in
+          Aithala, Lange & Hirschmann (2026).
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.55'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.5'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.65'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '12.07'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '11'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '8.32'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.07'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.05'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.3'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially
+                crystallised and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published
+                in Aithala, Lange & Hirschmann (2026).
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -6820,8 +8674,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4915094147312984327142161017'
+        - - TiO2
+          - '0.003780996061330669918325352391'
+        - - Al2O3
+          - '0.06745290850136875523692345435'
+        - - FeO
+          - '0.1290101775669885731308679066'
+        - - MgO
+          - '0.1908240355678684312377784589'
+        - - CaO
+          - '0.08527929284552361736415903548'
+        - - Na2O
+          - '0.03042613136113250091319169898'
+        - - K2O
+          - '0.0004579668726385368819578686246'
+        - - P2O5
+          - '0.001259076491850482602580123203'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -6857,6 +8732,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -6881,6 +8761,207 @@ observations:
         table: S-1
         note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4915094147312984327142161017'
+          - - TiO2
+            - '0.003780996061330669918325352391'
+          - - Al2O3
+            - '0.06745290850136875523692345435'
+          - - FeO
+            - '0.1290101775669885731308679066'
+          - - MgO
+            - '0.1908240355678684312377784589'
+          - - CaO
+            - '0.08527929284552361736415903548'
+          - - Na2O
+            - '0.03042613136113250091319169898'
+          - - K2O
+            - '0.0004579668726385368819578686246'
+          - - P2O5
+            - '0.001259076491850482602580123203'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.92'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.16'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '15.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.48'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.76'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.06'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.29'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value
@@ -7258,8 +9339,29 @@ observations:
       tag: not_applicable
       reason: profile fe3_fe2_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4915094147312984327142161017'
+        - - TiO2
+          - '0.003780996061330669918325352391'
+        - - Al2O3
+          - '0.06745290850136875523692345435'
+        - - FeO
+          - '0.1290101775669885731308679066'
+        - - MgO
+          - '0.1908240355678684312377784589'
+        - - CaO
+          - '0.08527929284552361736415903548'
+        - - Na2O
+          - '0.03042613136113250091319169898'
+        - - K2O
+          - '0.0004579668726385368819578686246'
+        - - P2O5
+          - '0.001259076491850482602580123203'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: value
       value: '20892.96130854039483122233736'
@@ -7296,6 +9398,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: total_iron_reported_as_feo
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: FeOT (total iron) treated as FeO for conversion; printed key FeOT
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_xanes
   - kind: admission_defaulted
     affected_quantities:
     - fe3_fe2_ratio
@@ -7322,6 +9429,207 @@ observations:
         note: XANES determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4915094147312984327142161017'
+          - - TiO2
+            - '0.003780996061330669918325352391'
+          - - Al2O3
+            - '0.06745290850136875523692345435'
+          - - FeO
+            - '0.1290101775669885731308679066'
+          - - MgO
+            - '0.1908240355678684312377784589'
+          - - CaO
+            - '0.08527929284552361736415903548'
+          - - Na2O
+            - '0.03042613136113250091319169898'
+          - - K2O
+            - '0.0004579668726385368819578686246'
+          - - P2O5
+            - '0.001259076491850482602580123203'
+          amount_basis: mole_fraction
+      locator:
+        page: 14
+        published_page: SI-8
+        table: S-2
+        note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        - FeOT (total iron) treated as FeO; printed key FeOT
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '47.92'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_TiO2_wt_pct
+          - state:
+              tag: value
+              value: '0.49'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_TiO2_g_mol
+          - state:
+              tag: value
+              value: '79.865'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '11.16'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_FeOT_wt_pct
+          - state:
+              tag: value
+              value: '15.04'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_FeOT_g_mol
+          - state:
+              tag: value
+              value: '71.844'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '12.48'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '7.76'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_Na2O_wt_pct
+          - state:
+              tag: value
+              value: '3.06'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_Na2O_g_mol
+          - state:
+              tag: value
+              value: '61.978538560000004'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_K2O_wt_pct
+          - state:
+              tag: value
+              value: '0.07'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_K2O_g_mol
+          - state:
+              tag: value
+              value: '94.1956'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - original_P2O5_wt_pct
+          - state:
+              tag: value
+              value: '0.29'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        - - M_P2O5_g_mol
+          - state:
+              tag: value
+              value: '141.942523996'
+            locator:
+              page: 14
+              published_page: SI-8
+              table: S-2
+              note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+        output_unit: mole_fraction
+        references: []
     fO2_log:
       state:
         tag: value

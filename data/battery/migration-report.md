@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 89572
-records out (observations): 179594
+rows in: 89571
+records out (observations): 179531
 works: 756
 experiments: 6874
-queue size: 120608
+queue size: 120477
 identical-payload dedupe aliases: 342
 metadata files: 50
 index sources: 754
@@ -208,11 +208,11 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
 | formulas | 1625 | 22022 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15689 (mismatch) |
+| absent_admissions | 3511 | 15688 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2921 (mismatch) |
-| system_like_phases | 1065 | 3811 (mismatch) |
-| missing_phases | 237 | 1357 (mismatch) |
+| system_like_phases | 1065 | 3809 (mismatch) |
+| missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -19346,7 +19346,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/kramer-1991-glass-basicity-gas-solubility.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/krawczynski-grove-2012-high-ti-lunar-melts.yaml` | 0 | 0 | 1 |
-| `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 3 | 127 | 134 |
+| `data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml` | 2 | 64 | 3 |
 | `data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml` | 260 | 260 | 52 |
 | `data/literature/extracts/kress-carmichael-1991-iron-redox-calibration.yaml` | 881 | 881 | 884 |
 | `data/literature/extracts/kroger-fingas-1935-alkali-silicate-equilibria.yaml` | 17 | 194 | 25 |
@@ -19854,8 +19854,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 297004
+advisory issues: 297057
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 297004 |
+| `identity_incomplete` | 297057 |
