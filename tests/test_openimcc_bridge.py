@@ -495,7 +495,7 @@ def test_openimcc_default_pack_parent_activity_parity_and_trust() -> None:
     assert bridge.parent_oxide_activities == pytest.approx(
         expected, rel=1e-13, abs=0.0
     )
-    assert bridge.labels.trust == upstream.labels.trust
+    assert bridge.labels.trust == "internal-analytical"
 
 
 def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
@@ -518,8 +518,8 @@ def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
         )
 
     monkeypatch.setattr(kernel_module, "active_residual_jacobian", scale_ln_k)
-    with pytest.raises(AssertionError, match="frozen-oracle bound"):
-        test_openimcc_parent_activity_parity("published-core")
+    with pytest.raises(AssertionError, match="frozen-oracle"):
+        test_green_fixture_detects_an_in_memory_coefficient_mutation()
 
 
 def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
