@@ -498,6 +498,39 @@ def _zero_series_evaporation_flux(
     )
 
 
+def _series_flux_and_alpha_from_resistances(
+    delta_p_pa: float,
+    r_interface: float,
+    r_gas: float,
+    r_melt: float,
+    k_hk_kg_s_m2_pa: float,
+    alpha_intrinsic: float,
+) -> tuple[float, float]:
+    """Flux and effective alpha from resistances already evaluated.
+
+    Premise: interface, gas, and melt resistances do not depend on the
+    bulk partial. The driving pressure ``delta_p_pa`` is
+    ``max(0, P_eq - P_bulk)``. Algebra: ``k = 1 / (R_i + R_g + R_m)``,
+    ``J = delta_p_pa * k``, ``alpha_eff = k / k_hk``. A non-finite J or
+    alpha_eff is stored as zero, then J is clamped at zero and alpha_eff
+    is clamped to ``[0, alpha_intrinsic]``. Unit: Pa * kg s^-1 m^-2 Pa^-1
+    = kg/(m^2 s). Limiting case: delta_p_pa of 0 leaves J at 0 while the
+    resistances stay those of the positive-drive evaluation.
+    """
+
+    denominator = r_interface + r_gas + r_melt
+    k_total_kg_s_m2_pa = 1.0 / denominator
+    flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
+    alpha_effective = k_total_kg_s_m2_pa / k_hk_kg_s_m2_pa
+    if not math.isfinite(flux_kg_s_m2) or not math.isfinite(alpha_effective):
+        flux_kg_s_m2 = 0.0
+        alpha_effective = 0.0
+    return (
+        max(0.0, flux_kg_s_m2),
+        max(0.0, min(alpha_intrinsic, alpha_effective)),
+    )
+
+
 def _series_resistance_evaporation_flux_kg_m2_s(
     species: str,
     P_eq_pa: float,
@@ -752,17 +785,19 @@ def _series_resistance_evaporation_flux_kg_m2_s(
             transport_length_m=diameter_m,
         )
 
-    k_total_kg_s_m2_pa = 1.0 / denominator
-    flux_kg_s_m2 = delta_p_pa * k_total_kg_s_m2_pa
-    alpha_effective = k_total_kg_s_m2_pa / k_hk_kg_s_m2_pa
-    if not math.isfinite(flux_kg_s_m2) or not math.isfinite(alpha_effective):
-        flux_kg_s_m2 = 0.0
-        alpha_effective = 0.0
+    flux_kg_s_m2, alpha_effective = _series_flux_and_alpha_from_resistances(
+        delta_p_pa,
+        r_interface,
+        r_gas,
+        r_melt,
+        k_hk_kg_s_m2_pa,
+        alpha_intrinsic,
+    )
 
     return SeriesEvaporationFlux(
-        flux_kg_s_m2=max(0.0, flux_kg_s_m2),
+        flux_kg_s_m2=flux_kg_s_m2,
         alpha_intrinsic=alpha_intrinsic,
-        alpha_effective=max(0.0, min(alpha_intrinsic, alpha_effective)),
+        alpha_effective=alpha_effective,
         k_hk_kg_s_m2_pa=k_hk_kg_s_m2_pa,
         r_interface=r_interface,
         r_gas=r_gas,

@@ -9,6 +9,7 @@ import pytest
 from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
     EvaporationFluxConfigurationError,
+    _series_flux_and_alpha_from_resistances,
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -494,3 +495,13 @@ def test_series_flux_hex_and_resistances_ignore_p_bulk_when_driven():
     assert vacuum.r_gas == partial.r_gas
     assert vacuum.r_melt == partial.r_melt
     assert vacuum.k_hk_kg_s_m2_pa == partial.k_hk_kg_s_m2_pa
+    flux, alpha = _series_flux_and_alpha_from_resistances(
+        _SIO_VISCOUS["P_eq_pa"] - 123.456789,
+        vacuum.r_interface,
+        vacuum.r_gas,
+        vacuum.r_melt,
+        vacuum.k_hk_kg_s_m2_pa,
+        _SIO_VISCOUS["alpha_i"],
+    )
+    assert flux.hex() == partial.flux_kg_s_m2.hex()
+    assert alpha.hex() == partial.alpha_effective.hex()
