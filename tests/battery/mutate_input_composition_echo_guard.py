@@ -1,4 +1,4 @@
-"""Show that deleting the echo guard turns the Bonnand major-oxide test red.
+"""Show that deleting the echo guard turns the Borisov 2004 test red.
 
 Inserts ``return None`` as the first line of ``input_composition_echo_detail``
 and restores the file afterwards. Run from a checkout with the seat on
@@ -47,7 +47,7 @@ def _run() -> int:
 def main() -> int:
     green = _run()
     if green != 0:
-        print(f"Bonnand test was already red ({green})", file=sys.stderr)
+        print(f"Borisov 2004 test was already red ({green})", file=sys.stderr)
         return green
     original = TARGET.read_text(encoding="utf-8")
     if NEEDLE not in original:
@@ -57,7 +57,7 @@ def main() -> int:
     try:
         red = _run()
         if red == 0:
-            print("mutation did not turn the Bonnand test red", file=sys.stderr)
+            print("mutation did not turn the Borisov 2004 test red", file=sys.stderr)
             return 1
     finally:
         TARGET.write_text(original, encoding="utf-8")
