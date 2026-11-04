@@ -165,12 +165,11 @@ def test_warn_once_with_summary_emits_every_call_and_counts_repeats(
 
     assert len(caught) == 50
     assert {str(item.message) for item in caught} == {message}
+    assert engine_local_config._WARNING_REPEAT_COUNTS == {key: 1}
 
     engine_local_config._flush_warning_repeat_summaries()
 
-    assert [record.getMessage() for record in caplog.records] == [
-        "test.engine.warning: 49 repeats suppressed"
-    ]
+    assert caplog.records == []
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(

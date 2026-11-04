@@ -109,7 +109,9 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
         "pO2_outside_evaluator_band" in message
         for message in warning_messages
     )
-    assert all("1e-31" not in message for message in warning_messages)
+    assert all("pO2_bar_used" in message for message in warning_messages)
+    assert any("1e-31" in message for message in warning_messages)
+    assert any("1000.0" in message for message in warning_messages)
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
