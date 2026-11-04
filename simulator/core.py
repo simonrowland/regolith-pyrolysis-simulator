@@ -8874,6 +8874,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         )
         self._melt_redox_gate_authority_tick_hour = None
+        # load_batch sets melt.hour back to 0. A retained curve from the
+        # previous batch is keyed by that same hour, and the domain reads
+        # it ahead of the pin. Drop it with the pin. None is not a curve:
+        # a missing retain is "not established", not below-liquidus.
+        self._liquid_feo_resolved_curve_hour = None
+        self._liquid_feo_resolved_curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
         self._poisoned_hour = None
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
