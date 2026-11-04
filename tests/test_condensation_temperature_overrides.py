@@ -38,6 +38,8 @@ from simulator.condensation import (
     apply_setpoints_condensation_temperature_overrides,
     restore_condensation_temperature_overrides,
 )
+from simulator.condensation_routing import K_TRAP_SUB_ORDER
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, PA_PER_MBAR
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
@@ -672,7 +674,7 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
         return model.route(
             EvaporationFlux(species_kg_hr={"Ca": 1.0}, total_kg_hr=1.0),
             MeltState(temperature_C=1700.0),
-        )
+        ), train
 
     custom_vapor_pressures = {
         "metals": {
@@ -684,13 +686,76 @@ def test_custom_vapor_pressure_bundle_reaches_condensation_route_with_fallback()
     }
     custom_vapor_pressures["metals"]["Ca"]["pure_component_antoine"]["A"] += 8.0
 
-    default_route = route_calcium()
-    custom_route = route_calcium(custom_vapor_pressures)
+    default_route, default_train = route_calcium()
+    custom_route, custom_train = route_calcium(custom_vapor_pressures)
 
     default_stage4 = default_route.condensed_by_stage_species[4]["Ca"]
-    custom_stage4 = custom_route.condensed_by_stage_species.get(4, {}).get("Ca", 0.0)
-    # Raising the owning wall saturation curve reduces supersaturation.
-    assert custom_stage4 < default_stage4
+    custom_stage4 = custom_route.condensed_by_stage_species[4]["Ca"]
+    # Public stage 4 sums two visits. pure_component_antoine.A is the
+    # collector curve (sub_order 0, band set above). The K trap is a
+    # second visit at the same stage number, and it selects the low-T
+    # compatibility Antoine, which this A += 8 edit does not touch.
+    # Premise: one reversible wall captures at most
+    # f_eq = 1 - P_sat(T_wall)/p_in of the stream that reaches it.
+    # The trap band is isothermal, so that is its whole ceiling. The
+    # compatibility form is log10(P/Pa) = 11.238 - 9520/T (C = 0).
+    # Algebra at the shipped 40 C wall: T = 40 + 273.15 = 313.15 K,
+    # 9520/313.15 = 30.400766, log10(P/Pa) = 11.238 - 30.400766
+    # = -19.162766, P_sat = 6.874e-20 Pa. The configured inlet is
+    # 1 mbar = 100 Pa, so P_sat/p_in = 6.874e-22. The collector leaves
+    # only a few percent of the feed, and the trap's local partial is
+    # that fraction of 100 Pa. Even at 0.3 Pa, P_sat/p_local is
+    # ~2e-19. Unit check: B*R*ln(10) = 182.26 kJ/mol, the Ca note
+    # dH_vap ~ 182.3 kJ/mol, and P_sat/p_in is dimensionless.
+    # float64 ulp(1) is 2.22e-16; both ratios sit below ulp(1)/2, so
+    # f_eq rounds to 1. Limiting case: a wall far below Ca's 1484 C
+    # boil has P_sat/p_in -> 0 and f_eq -> 1, the whole stream. The
+    # trap therefore takes whatever the collector left, and both
+    # stage-number totals equal the inlet. The collector visit is
+    # warmer, so its ceiling is below 1 and still falls when that A
+    # rises; that visit is the wiring check.
+    inlet_kg_hr = 1.0
+    p_in_pa = 1.0 * PA_PER_MBAR
+    collector = default_train.stages[4]
+    assert collector.sub_order == 0
+    trap = next(
+        stage
+        for stage in default_train.stages
+        if stage.stage_number == collector.stage_number
+        and stage.sub_order == K_TRAP_SUB_ORDER
+    )
+    assert trap.temp_range_C == next(
+        stage.temp_range_C
+        for stage in custom_train.stages
+        if stage.stage_number == collector.stage_number
+        and stage.sub_order == K_TRAP_SUB_ORDER
+    )
+    lo_c, hi_c = trap.temp_range_C
+    assert lo_c == hi_c
+    t_wall_k = lo_c + CELSIUS_TO_KELVIN_OFFSET
+
+    def trap_ceiling(vapor_pressure_data):
+        p_sat_pa = condensation_module._antoine_psat_pa(
+            "Ca",
+            t_wall_k,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        return 1.0 - p_sat_pa / p_in_pa
+
+    default_ceiling = trap_ceiling(None)
+    custom_ceiling = trap_ceiling(custom_vapor_pressures)
+    assert default_ceiling == 1.0
+    assert custom_ceiling == 1.0
+    assert default_stage4 == inlet_kg_hr * default_ceiling
+    assert custom_stage4 == inlet_kg_hr * custom_ceiling
+    collector_identity = (collector.stage_number, collector.sub_order)
+    default_collector = default_route.capture_kg_by_stage_identity[
+        collector_identity
+    ]["Ca"]
+    custom_collector = custom_route.capture_kg_by_stage_identity[
+        collector_identity
+    ]["Ca"]
+    assert custom_collector < default_collector
 
     with pytest.raises(condensation_module.WallSaturationPressureRefusal) as default:
         condensation_module._antoine_psat_pa("SiO", 1700.0)
