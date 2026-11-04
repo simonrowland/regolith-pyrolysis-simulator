@@ -2032,18 +2032,284 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
     )
 
 
+# d-338. A printed pure solid with no polymorph is scored as the crystal
+# stable at T in the JANAF tables this owner already uses. The margin is the
+# solid-solid stability-identity change only. The crystal/liquid crossing
+# stays on the fusion path: above it there is no solid to infer, and a point
+# below it is still that solid. SiO2 at 1973 K is about 21 K under the JANAF
+# cristobalite/liquid crossing and is still beta-cristobalite; putting melting
+# inside this window would refuse that printed solid.
+REFERENCE_POLYMORPH_INFERENCE_MARGIN_K = Decimal(25)
+REFERENCE_POLYMORPH_INFERRED_REASON = "reference_polymorph_inferred_stable_phase"
+REFERENCE_SOLID_INFERRED_REASON = "reference_solid_inferred"
+REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON = (
+    "reference_polymorph_near_phase_transition"
+)
+REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON = (
+    "reference_polymorph_quench_or_metastable_stated"
+)
+REFERENCE_POLYMORPH_ABOVE_MELTING_REASON = "reference_polymorph_above_melting"
+_REFERENCE_POLYMORPH_REFUSAL_REASONS = frozenset(
+    {
+        "fusion_source_reference_phase_unprinted",
+        REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
+        REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
+        REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+    }
+)
+_QUENCH_OR_METASTABLE_WORD = re.compile(
+    r"\b(?:quench(?:ed|ing)?|metastable)\b",
+    re.IGNORECASE,
+)
+_QUENCH_NEGATION = re.compile(
+    r"\b(?:no|not|without|never|neither|nor)\b"
+    r"|\bdoes not\b|\bdo not\b|\bis not\b|\bisn't\b",
+    re.IGNORECASE,
+)
+_INFERRED_SOLID_REASON = re.compile(
+    r"\bsolid\b.{0,80}\binferred\b|\binferred\b.{0,40}\bsolid\b",
+    re.IGNORECASE,
+)
+
+
+def _polymorph_reason_states_quench_or_metastable(reason: str) -> bool:
+    """Quench or metastable stated for this reference polymorph, not a negation."""
+
+    for match in _QUENCH_OR_METASTABLE_WORD.finditer(reason):
+        window = reason[max(0, match.start() - 40) : match.start()]
+        if _QUENCH_NEGATION.search(window):
+            continue
+        return True
+    return False
+
+
+def _omitted_reason_states_inferred_solid(reason: str) -> bool:
+    """The solid itself, not only its polymorph, was inferred.
+
+    ``standard_state.inferred`` does not survive migration onto
+    ``Identity.reference_state``. The polymorph omission reason is the text
+    the scorer still has. Secondary evidence is that statement. A source that
+    only says the polymorph was not named does not match.
+    """
+
+    if "secondary evidence" in reason.casefold():
+        return True
+    return _INFERRED_SOLID_REASON.search(reason) is not None
+
+
+def _reference_polymorph_notice(
+    reference: Observation,
+    *,
+    kind: NoticeKind,
+    reason: str,
+    band: str,
+    authority: Authority | None = None,
+    certification: str | None = None,
+) -> Notice:
+    return Notice(
+        kind=kind,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=reason,
+        origin=reference.observation_id,
+        band=band,
+        authority=authority,
+        certification=certification,
+    )
+
+
+def _decide_omitted_reference_polymorph(
+    reference: Observation,
+    identity: Identity,
+    standard_state: StandardState,
+    formula: str,
+    temperature_K: Decimal,
+) -> tuple[Observation | None, Notice | None]:
+    """Infer the stable JANAF crystal for a printed, unnamed pure solid.
+
+    Returns ``(updated reference, None)`` when the row may convert, or
+    ``(None, refusal)`` when inference is refused. The stored record is not
+    written; ``updated`` is the working observation whose polymorph is the
+    inferred crystal so the named fusion path can run. A refusal is typed
+    and carries no converted value.
+    """
+
+    from simulator.battery.generators.janaf import (
+        JANAFFusionPolymorphUnavailable,
+        _FUSION_TABLES,
+        _janaf_fusion_energy_for_pair,
+        _janaf_stable_crystal_set,
+        janaf_solid_stability_transitions,
+    )
+
+    polymorph_state = standard_state.endmember.polymorph
+    assert polymorph_state is not None
+    reason_text = polymorph_state.reason or ""
+    if _polymorph_reason_states_quench_or_metastable(reason_text):
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
+            band="source states a quench or a metastable reference phase",
+        )
+
+    def missing(detail: str) -> Notice:
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            reason=f"fusion conversion missing input for {formula}: {detail}",
+            band=f"JANAF fusion data for {formula}: {detail}",
+        )
+
+    try:
+        stability = _janaf_stable_crystal_set(formula, temperature_K)
+    except JANAFFusionPolymorphUnavailable as exc:
+        return None, missing(f"incomplete JANAF stability candidate set: {exc}")
+
+    try:
+        _default_solid, liquid_table = _FUSION_TABLES[formula]
+    except KeyError:
+        return None, missing(f"no JANAF fusion table pair for {formula}")
+
+    try:
+        fusion = _janaf_fusion_energy_for_pair(
+            formula,
+            stability.selected.table_id,
+            liquid_table,
+            temperature_K,
+        )
+    except (ValueError, JANAFFusionPolymorphUnavailable) as exc:
+        return None, missing(str(exc))
+
+    if temperature_K >= fusion.melting_temperature_K:
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+            band=(
+                f"T={temperature_K} K >= JANAF T_fus="
+                f"{fusion.melting_temperature_K} K; "
+                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+            ),
+        )
+
+    try:
+        transitions = janaf_solid_stability_transitions(formula)
+    except JANAFFusionPolymorphUnavailable as exc:
+        return None, missing(f"incomplete JANAF stability candidate set: {exc}")
+    near = [
+        item
+        for item in transitions
+        if abs(temperature_K - item.temperature_K)
+        <= REFERENCE_POLYMORPH_INFERENCE_MARGIN_K
+    ]
+    if near:
+        nearest = min(
+            near, key=lambda item: abs(temperature_K - item.temperature_K)
+        )
+        return None, _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
+            band=(
+                f"T={temperature_K} K is within "
+                f"{REFERENCE_POLYMORPH_INFERENCE_MARGIN_K} K of the JANAF "
+                f"solid-solid transition at {nearest.temperature_K} K "
+                f"({nearest.stable_below.polymorph.value}"
+                f"/{nearest.stable_above.polymorph.value})"
+            ),
+        )
+
+    selected = stability.selected
+    # Premise: the source named a pure solid oxide and no polymorph. The
+    # comparison standard is the crystal with the lowest formation G in this
+    # JANAF table at T.
+    # Algebra: the next polymorph differs by dG = G_next - G_stable. At equal
+    # chemical potential, G + RT ln(a) is unchanged, so
+    # d log10(a) = dG / (R T ln 10) and
+    # sizing_dex = |G_stable - G_next| * 1000 / (R T ln 10).
+    # Units: (kJ/mol) * (1000 J/kJ) / ((J/(mol·K)) * K) = dimensionless dex.
+    # Sanity: cristobalite versus tridymite near 1950 K is about 0.01 dex.
+    # JANAF has no tridymite table, so the nearest tabulated alternative is
+    # whatever crystal this table actually carries. "not sized" when it has
+    # no second polymorph.
+    if not stability.alternatives:
+        sizing_dex = "not sized"
+    else:
+        nearest_alternative = min(
+            stability.alternatives,
+            key=lambda item: abs(
+                item.gibbs_kJ_per_mol - selected.gibbs_kJ_per_mol
+            ),
+        )
+        sizing_dex = str(
+            abs(nearest_alternative.gibbs_kJ_per_mol - selected.gibbs_kJ_per_mol)
+            * Decimal(1000)
+            / _rt_ln_10_j_per_mol_K(temperature_K)
+        )
+    payload = {
+        "phase": selected.polymorph.value,
+        "sizing_dex": sizing_dex,
+        "table_id": selected.table_id,
+    }
+    notices = [
+        _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            reason=(
+                f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
+                + json.dumps(payload, sort_keys=True)
+            ),
+            band=(
+                f"JANAF stable polymorph {selected.polymorph.value} "
+                f"table {selected.table_id}"
+            ),
+            authority=Authority.CERTIFIED,
+            certification=(
+                "NIST-JANAF solid formation Gibbs energies compared at T"
+            ),
+        )
+    ]
+    if _omitted_reason_states_inferred_solid(reason_text):
+        notices.append(
+            _reference_polymorph_notice(
+                reference,
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                reason=REFERENCE_SOLID_INFERRED_REASON,
+                band="solid reference is inferred secondary evidence",
+                authority=Authority.CERTIFIED,
+                certification=(
+                    "source omission reason states the solid itself was inferred"
+                ),
+            )
+        )
+    endmember = replace(
+        standard_state.endmember, polymorph=State.of(selected.polymorph)
+    )
+    updated = replace(
+        reference,
+        identity=replace(
+            identity,
+            reference_state=State.of(replace(standard_state, endmember=endmember)),
+        ),
+        notices=union_notices(reference.notices, tuple(notices)),
+    )
+    return updated, None
+
+
 def _fusion_energy_when_polymorph_absent(
     reference: Observation,
     formula: str,
     temperature_K: Decimal,
 ) -> tuple[Observation, object, Notice | None, Notice | None]:
-    """JANAF fusion for a pure-solid identity that never named a polymorph.
+    """JANAF fusion for a pure-solid identity that never set the polymorph axis.
 
-    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``
-    and is refused before this runs (d-165). ``polymorph is None`` is the
-    melt-activity benchmark's pure-solid standard: the stable JANAF crystal at
-    T supplies the fusion pair, and a stability-bound notice records the
-    inference. Returns ``(reference, fusion, refusal, inference)``. A refusal
+    A migrated source that omits the polymorph is ``PolymorphRejectionKind.OMITTED``.
+    d-338 decides that record in ``_decide_omitted_reference_polymorph`` before
+    this runs. ``polymorph is None`` is the melt-activity benchmark's pure-solid
+    standard: the stable JANAF crystal at T supplies the fusion pair, and a
+    stability-bound notice records the inference. That notice is not the d-338
+    flag. This copy stays because the benchmark never printed an omitted
+    polymorph. Returns ``(reference, fusion, refusal, inference)``. A refusal
     notice means the value must stay on the solid number.
     """
 
@@ -2247,6 +2513,55 @@ def _janaf_fusion_energy_for_reference(
         else polymorph
     )
     solid_table, liquid_table = _fusion_table_pair(formula, janaf_polymorph)
+    return _janaf_fusion_energy_for_pair(
+        formula, solid_table, liquid_table, temperature_K
+    )
+
+
+def _inferred_reference_polymorph(notices: Sequence[Notice]) -> Polymorph | None:
+    """Polymorph d-338 wrote onto the working comparison, if it did."""
+
+    prefix = f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
+    for notice in notices:
+        if not notice.reason.startswith(prefix):
+            continue
+        payload = json.loads(notice.reason[len(prefix) :])
+        phase = payload.get("phase")
+        if not isinstance(phase, str):
+            return None
+        return Polymorph(phase)
+    return None
+
+
+def _janaf_fusion_energy_for_scored_reference(
+    source_reference: Observation,
+    comparison_reference: Observation,
+    temperature_K: Decimal,
+):
+    """Fusion pair for the band.
+
+    The stored row still says the polymorph is unknown. When this owner
+    inferred one, the conversion notice names that crystal and the band must
+    use the same pair. A named source keeps ``_janaf_fusion_energy_for_reference``.
+    """
+
+    phase = _inferred_reference_polymorph(comparison_reference.notices)
+    if phase is None:
+        return _janaf_fusion_energy_for_reference(source_reference, temperature_K)
+    identity = source_reference.identity
+    if not isinstance(identity, Identity) or identity.reference_state is None:
+        from simulator.battery.generators.janaf import JANAFFusionPolymorphUnavailable
+
+        raise JANAFFusionPolymorphUnavailable(
+            "source reference polymorph is not stated"
+        )
+    formula = identity.reference_state.value.endmember.formula
+    from simulator.battery.generators.janaf import (
+        _fusion_table_pair,
+        _janaf_fusion_energy_for_pair,
+    )
+
+    solid_table, liquid_table = _fusion_table_pair(formula, phase)
     return _janaf_fusion_energy_for_pair(
         formula, solid_table, liquid_table, temperature_K
     )
@@ -3052,23 +3367,30 @@ def fusion_comparison_reference(
         janaf_fusion_energy,
     )
 
-    # d-165: a source that records the solid but not its polymorph stays on the
-    # printed number. polymorph is None is not that record — the melt-activity
-    # benchmark's pure-solid identity never set the axis, and the stable JANAF
-    # crystal still converts it onto the liquid basis.
+    # d-338: a printed pure solid that names no polymorph takes the JANAF
+    # crystal stable at T. polymorph is None is not that record — the
+    # melt-activity benchmark's pure-solid identity never set the axis, and
+    # ``_fusion_energy_when_polymorph_absent`` still converts it.
     if (
         observed_reference_phase is Phase.CR
         and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
     ):
-        notice = Notice(
-            kind=NoticeKind.INPUT_OMITTED,
-            affected_quantities=(Quantity.ACTIVITY,),
-            reason="fusion_source_reference_phase_unprinted",
-            origin=reference.observation_id,
-            band="JANAF fusion conversion requires the source-named solid polymorph",
+        updated, refusal = _decide_omitted_reference_polymorph(
+            reference, identity, standard_state, formula, temperature_K
         )
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+        if refusal is not None:
+            return replace(
+                reference, notices=union_notices(reference.notices, (refusal,))
+            )
+        assert updated is not None
+        reference = updated
+        identity = updated.identity
+        assert (
+            identity.reference_state is not None
+            and identity.reference_state.is_value
+        )
+        standard_state = identity.reference_state.value
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
@@ -11767,15 +12089,15 @@ def compile_residual(
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
 
-    unprinted_reference_phase = next(
+    reference_polymorph_refusal = next(
         (
             notice
             for notice in notices
-            if notice.reason == "fusion_source_reference_phase_unprinted"
+            if notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
         ),
         None,
     )
-    if unprinted_reference_phase is not None:
+    if reference_polymorph_refusal is not None:
         if (
             engine is Engine.INTERNAL_ANALYTICAL
             and experiment is not None
@@ -11786,7 +12108,7 @@ def compile_residual(
                 {
                     "reason": RefusalReason.METHOD_UNKNOWN.value,
                     "method_reason": experiment.method.reason,
-                    "secondary_reasons": [unprinted_reference_phase.reason],
+                    "secondary_reasons": [reference_polymorph_refusal.reason],
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
                 exclusions=("experiment_method_known", "source_polymorph_printed"),
@@ -11797,7 +12119,7 @@ def compile_residual(
             return _refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {
-                    "reason": unprinted_reference_phase.reason,
+                    "reason": reference_polymorph_refusal.reason,
                     "formula": formula,
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
@@ -12127,7 +12449,7 @@ def compile_residual(
             ),
         )
 
-    if unprinted_reference_phase is not None:
+    if reference_polymorph_refusal is not None:
         if (
             prediction.execution.state is not ExecutionState.PRODUCED
             or prediction.value is None
@@ -12143,7 +12465,7 @@ def compile_residual(
                 secondary_reasons = (secondary_reasons,)
             detail["secondary_reasons"] = list(
                 dict.fromkeys(
-                    (*secondary_reasons, unprinted_reference_phase.reason)
+                    (*secondary_reasons, reference_polymorph_refusal.reason)
                 )
             )
             return _refused(
@@ -12157,7 +12479,7 @@ def compile_residual(
             return _refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {
-                    "reason": unprinted_reference_phase.reason,
+                    "reason": reference_polymorph_refusal.reason,
                     "formula": formula,
                 },
                 execution=Execution(state=ExecutionState.NOT_PROBED),
@@ -12422,7 +12744,7 @@ def compile_residual(
             notices = union_notices(notices, (printed.notice,))
 
         source_phase_missing = any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
             for notice in reference.notices
         )
         fusion_conversion = any(
@@ -12430,11 +12752,17 @@ def compile_residual(
         )
         if source_phase_missing:
             fusion_band_refusal = {
-                "reason": "fusion_source_reference_phase_unprinted"
+                "reason": next(
+                    notice.reason
+                    for notice in reference.notices
+                    if notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
+                )
             }
         elif fusion_conversion:
             assert T is not None
-            fusion_energy = _janaf_fusion_energy_for_reference(source_reference, T)
+            fusion_energy = _janaf_fusion_energy_for_scored_reference(
+                source_reference, reference, T
+            )
             if fusion_energy.sigma_delta_g_fus_kJ_per_mol is None:
                 fusion_band_refusal = {
                     "reason": "conversion_uncertainty_unprinted",
