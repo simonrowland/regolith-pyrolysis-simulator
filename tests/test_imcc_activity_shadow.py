@@ -175,6 +175,13 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
         row["imcc_activity"] is not None
         for row in shadow["activities_by_oxide"].values()
     )
+    assert any(
+        notice.get("row_key") == "K2SiO3"
+        and notice.get("kind") == "openimcc_liquid_standard_flag"
+        and notice.get("basis")
+        and notice.get("citation")
+        for notice in shadow["notices"]
+    )
 
 
 def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) -> None:

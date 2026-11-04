@@ -430,6 +430,16 @@ def prescribed_pressure_engine(monkeypatch, fig3_source, request):
     package = ModuleType("openimcc")
     package.load_gas_datapack = lambda: object()
     monkeypatch.setitem(sys.modules, "openimcc", package)
+    monkeypatch.setattr(
+        score_module,
+        "_score_openimcc_liquid_standard_assessment",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            refusal_reason=None,
+            refusal_detail={},
+            notices=(),
+            flags=(),
+        ),
+    )
 
     def gas_channels(*_):
         channels = [("Mg", ("MgO", 1.0, -0.5)), ("O2", (request.param, 0.0, 1.0))]
@@ -590,6 +600,106 @@ def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch)
     assert bound["inventory_bound_kg_by_parent"] == {}
     assert bound["preheat_bound_kg"] > 0.0
     assert bound["joint_arm_loss_kg_non_gating"] is not None
+
+
+def test_mass_loss_residue_result_carries_liquid_standard_flags(
+    monkeypatch, fig3_source, r11_inputs,
+):
+    import openimcc
+
+    import simulator.battery.residue as residue
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.melt_backend.openimcc_bridge import (
+        check_liquid_reference_standards,
+    )
+
+    _row, experiment = r11_inputs
+    flag = check_liquid_reference_standards({"K2O": 1.0, "SiO2": 1.0})[0]
+    state = SimpleNamespace(
+        parent_oxide_activities={"K2O": 1.0, "SiO2": 1.0},
+        parent_oxides=("K2O", "SiO2"),
+        flags=(),
+        extrapolated=False,
+        pack_model_id="default",
+        pack_version="test",
+        pack_digest="test",
+        openimcc_version="test",
+        liquid_standard_flags=(flag,),
+    )
+    channels = (
+        ("K", ("K2O", 1.0, -0.5)),
+        ("O2", (None, 0.0, 1.0)),
+    )
+    monkeypatch.setattr(
+        residue, "_initial_oxide_wt_percent", lambda _sample: {"K2O": 50.0, "SiO2": 50.0}
+    )
+    monkeypatch.setattr(
+        residue, "_mass_loss_sourced_alphas", lambda *_args: {}
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_area_inputs",
+        lambda *_args: (1e-4, 1e-4, 0.0),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_thermal_segments",
+        lambda *_args: (1173.15, 1.0, ((2073.15, 1.0),)),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_evaluate_openimcc_isolated",
+        lambda _evaluate, *, timeout_s, **_kwargs: state,
+    )
+    monkeypatch.setattr(openimcc, "load_gas_datapack", lambda: object())
+    monkeypatch.setattr(
+        openimcc, "evaluate_gas", lambda *_args, **_kwargs: {"K": 1e-12, "O2": 1e-12}
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_openimcc_gas_channels_and_omission_notices",
+        lambda *_args: (channels, ()),
+    )
+    monkeypatch.setattr(
+        residue,
+        "_mass_loss_corner_bounds",
+        lambda *_args, **_kwargs: (
+            {},
+            {
+                "inventory_capped_channels": [],
+                "pO2_low_bar": 1e-6,
+                "pO2_high_bar": 1e-6,
+            },
+        ),
+    )
+
+    def integrate(inventory, _channels, pressure_model, **kwargs):
+        pressure_model(inventory, -6.0)
+        on_step = kwargs.get("on_step")
+        if on_step is not None:
+            on_step(
+                inventory,
+                _channels,
+                kwargs["initial_area_m2"],
+                kwargs["duration_s"],
+            )
+        return SimpleNamespace(
+            refusal=None,
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+        )
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate)
+
+    result = residue.predict_mass_loss_fraction(
+        "openimcc",
+        experiment,
+        temperature_K=2073.15,
+        source_document=fig3_source,
+        observation=_row,
+    )
+
+    assert result.liquid_standard_flags == (flag,)
 
 
 def test_pressure_ceiling_uses_net_flux_and_preserves_equilibrium_guard(fig3_source):

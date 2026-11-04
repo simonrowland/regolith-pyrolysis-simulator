@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import openimcc
+import pytest
 from openimcc.redox_pack import load_redox_pack
 
 from simulator.battery.enums import (
@@ -18,6 +19,18 @@ from simulator.battery import score
 from simulator.melt_backend import openimcc_bridge
 from simulator.melt_backend.openimcc_bridge import _load_pack
 from simulator.melt_backend.openimcc_liquid_standards import assess_liquid_standards
+
+
+def _raise_openimcc_policy_refusal(**_kwargs: Any) -> None:
+    raise openimcc_bridge.OpenImccCompositionPolicyRefusal(
+        "openimcc_liquid_standard_refused",
+        "invalid_input; fail_closed_category=2; oxide=K2O",
+        diagnostics={
+            "invalid_input": True,
+            "category": 2,
+            "standard_failures": [{"oxide": "K2O", "kind": "mismatch"}],
+        },
+    )
 
 
 def _default_composition() -> dict[str, float]:
@@ -189,6 +202,21 @@ def test_openimcc_residue_result_carries_liquid_standard_notices(
 
     assert prediction.value == Decimal("0.1")
     assert any("row=K2SiO3;" in notice.reason for notice in prediction.notices)
+
+
+def test_isolated_residue_worker_preserves_typed_liquid_standard_refusal() -> None:
+    from simulator.battery.residue import _evaluate_openimcc_isolated
+
+    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as caught:
+        _evaluate_openimcc_isolated(
+            _raise_openimcc_policy_refusal, timeout_s=10.0
+        )
+
+    assert caught.value.code == "openimcc_liquid_standard_refused"
+    assert caught.value.diagnostics["category"] == 2
+    assert caught.value.diagnostics["standard_failures"] == [
+        {"oxide": "K2O", "kind": "mismatch"}
+    ]
 
 
 def test_hashimoto_residue_route_refuses_melt_pack_mismatch(

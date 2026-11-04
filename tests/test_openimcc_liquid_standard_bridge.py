@@ -202,3 +202,24 @@ def test_default_bridge_returns_only_composition_dependent_flag_records() -> Non
         for record in absent_silica.flags
         if record.kind == "reference-unknown"
     }
+
+
+def test_binary_pot_backend_exposes_liquid_standard_flags_in_notices() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    backend = _OpenImccBatteryBackend("openimcc")
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": 1.0, "SiO2": 1.0},
+    )
+
+    notices = result.diagnostics["imcc_notices"]
+    assert any(
+        notice.get("row_key") == "K2SiO3"
+        and notice.get("kind") == "openimcc_liquid_standard_flag"
+        and "basis" in notice
+        and "citation" in notice
+        for notice in notices
+    )

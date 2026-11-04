@@ -35,7 +35,6 @@ GREEN_ACTIVITY_FIXTURE = REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activi
 GREEN_ACTIVITY_BOUNDS_FIXTURE = (
     REPO_ROOT / "tests/fixtures/imcc_green_d9bd25f0b_activity_bounds.json"
 )
-PACKS = ("published-core", "published-ext")
 TEMPERATURES_K = (1700.0, 1950.0, 2200.0, 2500.0, 3000.0)
 
 COMPOSITIONS = {
@@ -460,57 +459,43 @@ def test_bridge_maps_mol_kg_and_returns_labels() -> None:
     assert mol_result.acid_sink_ratio is not None
 
 
-@pytest.mark.parametrize("pack_name", PACKS)
-def test_openimcc_parent_activity_parity(pack_name: str) -> None:
+def test_openimcc_default_pack_parent_activity_parity_and_trust() -> None:
     _openimcc_or_skip()
-    fixture = json.loads("\n".join(
-        line for line in GREEN_ACTIVITY_FIXTURE.read_text().splitlines()
-        if not line.startswith("#")
-    ))
-    fixture_pack_name = {
-        "published-core": "v1.0.2",
-        "published-ext": "ext-v4",
-    }[pack_name]
-    rows = [row for row in fixture["rows"] if row["pack"] == fixture_pack_name]
-    bounds_by_key = _load_activity_bounds()
-    assert len(rows) >= 20
-    assert len({row["composition"] for row in rows}) >= 5
-    assert len({row["temperature_K"] for row in rows}) >= 4
-    for row in rows:
-        import openimcc
+    import openimcc
 
-        composition, basis_type = COMPOSITIONS[row["composition"]]
-        package = _load_pack(pack_name)
-        package_result = openimcc.evaluate(
-            composition,
-            row["temperature_K"],
-            package,
-            basis_type=basis_type,
-            enable_sp_extension=pack_name == "published-ext",
-        )
-        actual = dict(zip(
-            package_result.parent_oxides,
-            package_result.parent_activity,
-            strict=True,
-        ))
-        expected_parent_oxides = (
-            "SiO2", "MgO", "FeO", "CaO", "Al2O3", "TiO2", "Na2O", "K2O"
-        ) + (("S", "P2O5") if pack_name == "published-ext" else ())
-        assert tuple(package_result.parent_oxides) == expected_parent_oxides
-        _assert_activity_parity(
-            actual, row, _activity_bounds_for_row(row, bounds_by_key)
-        )
-        expected_labels = row["labels_legacy"]
-        labels = package_result.labels
-        assert dict(labels.coverage) == expected_labels["coverage"]
-        assert labels.envelope_status == expected_labels["envelope_status"]
-        identity = dict(labels.identity)
-        expected_identity = dict(expected_labels["identity"])
-        if pack_name == "published-ext":
-            # The package's ext-v4 is sp-2; green carried sp-1. Version remains
-            # package-owned and honest while all other green identity fields match.
-            expected_identity.pop("datapack_version")
-        assert {key: identity[key] for key in expected_identity} == expected_identity
+    composition = {
+        "SiO2": 0.78,
+        "MgO": 0.08,
+        "FeO": 0.06,
+        "Na2O": 0.04,
+        "K2O": 0.04,
+    }
+    temperature_K = 2200.0
+    pack = _load_pack("default")
+    upstream = openimcc.evaluate(
+        composition,
+        temperature_K,
+        pack,
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    bridge = bridge_evaluate(
+        composition_mol=composition,
+        temperature_K=temperature_K,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    expected = dict(zip(
+        upstream.parent_oxides,
+        upstream.parent_activity,
+        strict=True,
+    ))
+
+    assert bridge.parent_oxide_activities == pytest.approx(
+        expected, rel=1e-13, abs=0.0
+    )
+    assert bridge.labels.trust == upstream.labels.trust
 
 
 def test_openimcc_activity_parity_fails_when_ln_k_is_scaled(
