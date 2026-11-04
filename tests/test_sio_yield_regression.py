@@ -773,8 +773,10 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     assert notice["source_class"] == "status_bearing_material_alpha"
     assert "cited_hkl_accommodation" in notice["source_classes"]
     assert "uncertified_na_analogy_default" in notice["source_classes"]
-    assert "Mg" in notice["species"]
-    assert notice["alpha_s_by_species"]["Mg"] == pytest.approx(0.2)
+    # d-144 (5b5d2a080) shifts the one-hour melt composition enough that Mg
+    # no longer contributes to this wall-sticking notice.
+    assert notice["species"] == ["Fe", "K", "Mn", "Na"]
+    assert "Mg" not in notice["alpha_s_by_species"]
     assert (
         notice["grounding_target"]
         == "data/literature/vacuum_pyrolysis_sticking.yaml"
