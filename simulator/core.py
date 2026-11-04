@@ -187,6 +187,40 @@ class _RefusalSnapshotInsertedMapping:
         memo.clear()
 
 
+def _share_append_only_refusal_history(
+    history: Any,
+    memo: Dict[int, Any],
+    *,
+    mutable_tail: int,
+    freeze_committed: bool,
+) -> None:
+    """Share an append-only list with the hour-start refusal snapshot.
+
+    Operating history freezes each newly committed row once, walking
+    backward until a ``MappingProxyType``, because later hours must not
+    alias a nested dict in a committed row. Fog, stage-bulk, and cold-spot
+    rows stay plain dicts: product readers consume those objects, and
+    replacing them with proxies changes the ledger digest. Their lists are
+    still shared. The snapshot is taken at hour start, and the only in-hour
+    rewrite is a tail truncation back to a length at or after that start.
+    ``load_batch`` slice-assigns cold spots outside this window.
+    """
+
+    if not isinstance(history, list):
+        return
+    if freeze_committed:
+        from simulator.trace import _freeze_value
+
+        last_committed = len(history) - mutable_tail - 1
+        for index in range(last_committed, -1, -1):
+            if isinstance(history[index], MappingProxyType):
+                break
+            history[index] = _freeze_value(history[index])
+    memo[id(history)] = _RefusalSnapshotHistoryPrefix(
+        history, memo, mutable_tail=mutable_tail,
+    )
+
+
 def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     """Replace internal history views with the detached rollback payload."""
 
@@ -195,9 +229,15 @@ def _materialize_refusal_snapshot_history(state: Mapping[str, Any]) -> None:
     if isinstance(history, _RefusalSnapshotHistoryPrefix):
         record.snapshots = history.materialize()
     model = state.get('_condensation_model')
-    history = getattr(model, 'operating_history', None)
-    if isinstance(history, _RefusalSnapshotHistoryPrefix):
-        model.operating_history = history.materialize()
+    for name in (
+        'operating_history',
+        'vapour_fog_history',
+        'stage_bulk_gas_history',
+        'cold_spot_history',
+    ):
+        history = getattr(model, name, None)
+        if isinstance(history, _RefusalSnapshotHistoryPrefix):
+            setattr(model, name, history.materialize())
     inserted = state.get('_yield_disposition_ledger_snapshots')
     if isinstance(inserted, _RefusalSnapshotInsertedMapping):
         state['_yield_disposition_ledger_snapshots'] = inserted.materialize()
@@ -15402,23 +15442,28 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 record_snapshots,
                 memo,
             )
-        operating_history = getattr(
-            getattr(self, '_condensation_model', None), 'operating_history', None,
-        )
-        if defer_committed_history and isinstance(operating_history, list):
-            from simulator.trace import _freeze_value
-
-            # Only the tail may change. Freeze each newly committed row once,
-            # detaching nested aliases; stop at the already frozen prefix. Thus
-            # ordinary hourly append costs O(1) rows, and prefix writes refuse
-            # instead of contaminating a later terminal-refusal rollback.
-            for index in range(len(operating_history) - 2, -1, -1):
-                if isinstance(operating_history[index], MappingProxyType):
-                    break
-                operating_history[index] = _freeze_value(operating_history[index])
-            memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
-                operating_history, memo, mutable_tail=1,
+        if defer_committed_history:
+            condensation_model = getattr(self, '_condensation_model', None)
+            # Operating history edits its last row. The other three lists are
+            # append-only for the hour, so the whole list committed at hour
+            # start is shared instead of deep-copied.
+            _share_append_only_refusal_history(
+                getattr(condensation_model, 'operating_history', None),
+                memo,
+                mutable_tail=1,
+                freeze_committed=True,
             )
+            for history_name in (
+                'vapour_fog_history',
+                'stage_bulk_gas_history',
+                'cold_spot_history',
+            ):
+                _share_append_only_refusal_history(
+                    getattr(condensation_model, history_name, None),
+                    memo,
+                    mutable_tail=0,
+                    freeze_committed=False,
+                )
         yield_rows = getattr(
             self, '_yield_disposition_ledger_snapshots', None,
         )
@@ -15528,12 +15573,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 defer_committed_history=True,
             )
         )
+        snapshot_model = terminal_refusal_state.get('_condensation_model')
         terminal_refusal_histories = (
             getattr(terminal_refusal_state.get('record'), 'snapshots', None),
-            getattr(
-                terminal_refusal_state.get('_condensation_model'),
-                'operating_history', None,
-            ),
+            getattr(snapshot_model, 'operating_history', None),
+            getattr(snapshot_model, 'vapour_fog_history', None),
+            getattr(snapshot_model, 'stage_bulk_gas_history', None),
+            getattr(snapshot_model, 'cold_spot_history', None),
             terminal_refusal_state.get('_yield_disposition_ledger_snapshots'),
         )
         try:

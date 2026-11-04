@@ -26,6 +26,10 @@ def _record_wall_pressure_notice(
     segment: str,
     record: Mapping[str, Any],
 ) -> None:
+    # A rejected stage-3 mass probe must not mutate the accumulated notice.
+    # The landed route records the same refusal on its own publication.
+    if getattr(model, "_suppress_wall_pressure_notices", False):
+        return
     records = model.last_sticking_alpha_provenance_notice.setdefault(kind, {}).setdefault(species, {})
     if any(
         existing == record for key, existing in records.items()
