@@ -5045,6 +5045,87 @@ def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> 
             ), (panel, row.get("observation_id"), identity_x0)
 
 
+def test_markova_1984_live_mass_loss_identity_uses_its_own_panel_initial_charge() -> None:
+    extract = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "kems-026-markova-1984.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    observation = migrator.result.observations[
+        "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
+        "::mass_loss_fraction::T=2156.15:h=e9110f31a14b"
+    ]
+
+    starting_charge = observation.point_conditions["starting_composition"]
+    assert starting_charge.state.is_value
+    assert sum(
+        (as_decimal(amount) for amount in starting_charge.state.value.values()),
+        Decimal("0"),
+    ) == Decimal("100.01")
+    identity_composition = observation.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert identity_composition.value == wt_pct_to_mole_fraction(
+        starting_charge.state.value
+    )
+
+    residual = observation.point_conditions["composition"]
+    assert residual.state.is_unknown
+    assert "kept sum=91.43 wt%" in (residual.state.reason or "")
+
+
+def test_taniguchi_1997_live_sample_401_slag_drops_fe_with_notice() -> None:
+    extract = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "taniguchi-1997-feo-cas.yaml"
+    )
+    migrator = Migrator(root=REPO_ROOT)
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    observation_ids = (
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_fe_composition",
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_cao_composition",
+        "taniguchi-1997-feo-cas::taniguchi_1997_table5_sample_401_slag_al2o3_composition",
+    )
+    for observation_id in observation_ids:
+        observation = migrator.result.observations[observation_id]
+        composition = observation.identity.composition
+        assert composition is not None and composition.is_value
+        assert composition.value.basis == "printed_phase_composition"
+        assert composition.value.amount_basis is AmountBasis.MASS_PERCENT
+        assert dict(composition.value.components) == {
+            "CaO": Decimal("39.9"),
+            "Al2O3": Decimal("59.6"),
+        }
+
+        experiment = migrator.result.experiments[observation.experiment_id]
+        printed = experiment.sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        assert printed.state.value == {
+            "Fe": "0.435",
+            "CaO": "39.9",
+            "Al2O3": "59.6",
+        }
+        projected = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(projected) == 1
+        assert projected[0].dropped == ("Fe",)
+        assert projected[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+            "99.935"
+        )
+
+
 def test_markova_1983_initial_charge_maps_reach_their_own_rows(
     tmp_path: Path,
 ) -> None:

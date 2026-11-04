@@ -19867,7 +19867,8 @@ class Migrator:
                 source_composition,
                 closure_context=composition_closure_context,
             )
-            if isinstance(source_composition_state, Mapping)
+            if composition_axis_required
+            and isinstance(source_composition_state, Mapping)
             and source_composition_state.get("tag") == StateTag.UNKNOWN.value
             else None
         )
@@ -21378,6 +21379,30 @@ class Migrator:
                     located_composition = Located(
                         composition_state, locator=printed.locator
                     )
+                carried_projection_notice = None
+                if (
+                    composition_state.is_value
+                    and printed is not None
+                    and printed.state.is_value
+                    and isinstance(printed.state.value, Mapping)
+                ):
+                    carried_projection_notice = _composition_projection_notice(
+                        printed.state.value,
+                        closure_context=phase_closure_context,
+                        quantity=(
+                            q_token
+                            if isinstance(q_token, Quantity)
+                            else None
+                        ),
+                        origin=obs_id,
+                        declared_component_map=printed.state.value,
+                    )
+                projection_notice = carried_projection_notice
+                projection_notices = (
+                    ()
+                    if carried_projection_notice is None
+                    else (carried_projection_notice,)
+                )
                 ident_kwargs["composition"] = composition_state
                 point_conditions = {
                     **(point_conditions or {}),
@@ -23108,7 +23133,10 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if point_composition_refusal:
+        if point_composition_refusal and not (
+            q_token_point is Quantity.MASS_LOSS_FRACTION
+            and getattr(ident_kwargs.get("composition"), "is_value", False)
+        ):
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(point_composition_refusal)
             )
