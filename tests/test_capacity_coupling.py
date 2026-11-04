@@ -1055,19 +1055,23 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # contribution. A paired one-step run with DeltaGfus=0 gives
     # 0.06423670196107581 kg/hr; enabling d-144 lowers non-phosphorus head
     # rate to 0.06422943778094445 kg/hr (-7.26418e-6 kg/hr, -0.011309%).
-    # The Studio failure was in the analytical-ceiling status roster, not
-    # this head-rate pin; production emits each status only above 1e-12 kg/hr.
-    # The pre-gate evaporation diagnostic retains CaO_gas at about
-    # 1.88e-13 kg/hr. At 1673.15 K d-144 scales CaO activity by 0.06790255,
-    # leaving this rate below evaporation.py's 1e-12 kg/hr emission gate.
-    pre_gate_rates = sim._last_evaporation_flux_diagnostic[
+    # The series-resistance calculation gates its final transported rate
+    # (J * surface area), after d-144 has reduced CaO activity. The
+    # Mac-Studio-256-3, gate config, receipts b1119rcptf3/f4, measured
+    # 3.71455597341169e-13 kg/hr at 1673.15 K, below both the engine's
+    # 1e-12 cutoff and half of it, so CaO_gas must not enter the emitted flux
+    # or ceiling roster.
+    below_threshold_rates = sim._last_evaporation_flux_diagnostic[
+        "below_threshold_evaporation_flux"
+    ]["fluxes_kg_hr"]
+    cao_gas_rate_kg_hr = float(below_threshold_rates["CaO_gas"])
+    assert cao_gas_rate_kg_hr == pytest.approx(
+        3.71455597341169e-13, rel=0.05, abs=0.0
+    )
+    assert cao_gas_rate_kg_hr < 1e-12 / 2
+    assert "CaO_gas" not in sim._last_evaporation_flux_diagnostic[
         "evaporation_flux_kg_hr"
     ]
-    cao_gas_rate_kg_hr = float(pre_gate_rates.get("CaO_gas", 0.0))
-    assert cao_gas_rate_kg_hr == pytest.approx(1.88e-13, rel=0.05)
-    assert (cao_gas_rate_kg_hr > 1e-12) == (
-        "CaO_gas" in snapshot.evap_flux.species_kg_hr
-    )
     assert "CaO_gas" not in snapshot.evap_flux.species_kg_hr
     assert "CaO_gas" not in snapshot.evap_flux.alpha_authority_status_by_species
     ceiling_flux_species = {"Ca", "TiO", "TiO2_gas"}
@@ -1139,7 +1143,9 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         "condense_Ca",
     ):
         assert required in ca_ti_reasons, required
-    assert {"evaporate_CaO_gas", "condense_CaO_gas"}.isdisjoint(ca_ti_reasons)
+    assert {"evaporate_CaO_gas", "condense_CaO_gas"}.isdisjoint(
+        ca_ti_reasons
+    )
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
