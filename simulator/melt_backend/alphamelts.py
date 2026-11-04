@@ -66,6 +66,10 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.chemistry.melt_activity import (
+    R_J_PER_MOL_K,
+    _activity_from_validated_chemical_potentials,
+)
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     resolve_alphamelts_python_api_model,
@@ -110,7 +114,6 @@ from simulator.melt_backend.liquidus import (
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
-    GAS_CONSTANT,
     PA_PER_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -1031,9 +1034,7 @@ PETTHERMOTOOLS_NON_PHASE_KEYS = {
     'oxide_mu', 'standard_chemical_potentials', 'pure_chemical_potentials',
     'reference_chemical_potentials', 'mu0', 'mu0_oxides', 'oxide_mu0',
 }
-# Single-sourced from the physical_constants leaf (SC-CONST pass-B); byte-identical
-# to the prior local literal (8.31446261815324).
-GAS_CONSTANT_J_PER_MOL_K = GAS_CONSTANT
+GAS_CONSTANT_J_PER_MOL_K = R_J_PER_MOL_K
 ACTIVITY_KEYS_BY_VAPOR_SPECIES = {
     'Na': ('Na', 'Na2O', 'NaAlSi3O8'),
     'K': ('K', 'K2O', 'KAlSi3O8'),
@@ -1172,7 +1173,12 @@ def activity_from_chem_potential(mu: float, mu0: float, T_K: float) -> float:
         raise ValueError('chemical potentials and temperature must be finite')
     if T_val <= 0.0:
         raise ValueError('temperature must be positive')
-    return math.exp((mu_val - mu0_val) / (GAS_CONSTANT_J_PER_MOL_K * T_val))
+    return _activity_from_validated_chemical_potentials(
+        mu_val,
+        mu0_val,
+        T_val,
+        enforce_representable_range=False,
+    )
 
 
 class _MELTSBackendSupport(MeltBackend):

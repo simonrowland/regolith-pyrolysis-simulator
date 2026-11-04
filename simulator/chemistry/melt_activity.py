@@ -150,6 +150,30 @@ reference_state_provenance: dict[
 }
 
 
+def _activity_from_validated_chemical_potentials(
+    mu_J_per_mol: float,
+    mu0_J_per_mol: float,
+    temperature_K: float,
+    *,
+    enforce_representable_range: bool,
+) -> float:
+    """Apply the shared exponent after a caller has validated its inputs."""
+
+    argument = (mu_J_per_mol - mu0_J_per_mol) / (R_J_PER_MOL_K * temperature_K)
+    if enforce_representable_range:
+        if not math.isfinite(argument):
+            raise ValueError("activity exponent is non-finite")
+        # Guard extreme underflow/overflow into a typed failure rather than 0/inf.
+        if argument < -700.0 or argument > 700.0:
+            raise ValueError("activity exponent outside representable range")
+    activity = math.exp(argument)
+    if enforce_representable_range and (
+        not math.isfinite(activity) or activity <= 0.0
+    ):
+        raise ValueError("activity must be finite and positive")
+    return activity
+
+
 def activity_from_chemical_potentials(
     mu_J_per_mol: float,
     mu0_J_per_mol: float,
@@ -188,16 +212,12 @@ def activity_from_chemical_potentials(
     temperature_K = float(temperature_K)
     if not math.isfinite(temperature_K) or temperature_K <= 0.0:
         raise ValueError("temperature_K must be finite and positive")
-    argument = (mu_J_per_mol - mu0_J_per_mol) / (R_J_PER_MOL_K * temperature_K)
-    if not math.isfinite(argument):
-        raise ValueError("activity exponent is non-finite")
-    # Guard extreme underflow/overflow into a typed failure rather than 0/inf.
-    if argument < -700.0 or argument > 700.0:
-        raise ValueError("activity exponent outside representable range")
-    activity = math.exp(argument)
-    if not math.isfinite(activity) or activity <= 0.0:
-        raise ValueError("activity must be finite and positive")
-    return activity
+    return _activity_from_validated_chemical_potentials(
+        mu_J_per_mol,
+        mu0_J_per_mol,
+        temperature_K,
+        enforce_representable_range=True,
+    )
 
 
 # provenance: gamma_alkali_melt_activity
