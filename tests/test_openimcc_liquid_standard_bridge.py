@@ -85,7 +85,7 @@ def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
 def test_openimcc_source_error_from_solve_is_not_swallowed(
     monkeypatch: Any,
 ) -> None:
-    error_type = openimcc.gas.ImccGasUnrecognizedSourceError
+    error_type = import_module("openimcc.gas").ImccGasUnrecognizedSourceError
 
     def fail_solve(*_args: Any, **_kwargs: Any) -> None:
         raise error_type("solve-time source failure")
@@ -103,7 +103,7 @@ def test_unrecognized_active_source_is_a_dependent_reference_unknown_flag(
 ) -> None:
     from types import SimpleNamespace
 
-    gas = openimcc.gas
+    gas = import_module("openimcc.gas")
     oxide_df = gas.load_gas_datapack().oxide_df.copy()
     oxide_df.loc["MgO(l)", "Ref"] = "LAM1987"
     monkeypatch.setattr(
@@ -125,6 +125,149 @@ def test_unrecognized_active_source_is_a_dependent_reference_unknown_flag(
         in flag.reason
         for flag in mg_flags
     )
+
+
+def test_unrecognized_mgo_source_does_not_block_prediction(monkeypatch: Any) -> None:
+    from types import SimpleNamespace
+
+    gas = import_module("openimcc.gas")
+    composition = _default_composition()
+    packaged = openimcc_bridge.evaluate(
+        composition_mol=composition,
+        temperature_K=1800.0,
+    )
+    oxide_df = gas.load_gas_datapack().oxide_df.copy()
+    oxide_df.loc["MgO(l)", "Ref"] = "LAM1987"
+    monkeypatch.setattr(
+        gas,
+        "load_gas_datapack",
+        lambda: SimpleNamespace(oxide_df=oxide_df),
+    )
+
+    result = openimcc_bridge.evaluate(
+        composition_mol=composition,
+        temperature_K=1800.0,
+    )
+
+    assert result.parent_oxide_activities
+    assert all(
+        result.parent_oxide_activities[oxide]
+        == packaged.parent_oxide_activities[oxide]
+        for oxide in result.parent_oxide_activities.keys() & packaged.parent_oxide_activities.keys()
+        if oxide != "MgO"
+    )
+    assert any(
+        flag.kind == "reference-unknown"
+        and flag.oxide == "MgO"
+        and flag.row_key
+        and "printed Ref: LAM1987" in flag.citation
+        for flag in result.liquid_standard_flags
+    )
+
+
+@pytest.mark.parametrize(
+    ("module", "attribute"),
+    (
+        (import_module("openimcc.gas"), "_condensate_source_table_id"),
+        (import_module("openimcc.standards"), "active_liquid_standards"),
+    ),
+    ids=("source-resolver", "active-standards"),
+)
+def test_unrecognized_source_recovery_fails_loudly_if_openimcc_hook_moves(
+    monkeypatch: Any,
+    module: Any,
+    attribute: str,
+) -> None:
+    monkeypatch.delattr(module, attribute)
+
+    with pytest.raises(AttributeError, match=attribute):
+        openimcc_bridge.check_liquid_reference_standards(_default_composition())
+
+
+@pytest.mark.parametrize("full_melt", (False, True), ids=("K2O-SiO2", "full-melt"))
+def test_scored_openimcc_liquid_standard_flags_are_translated_once(
+    full_melt: bool,
+) -> None:
+    from decimal import Decimal
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import (
+        AdmissionStatus,
+        AmountBasis,
+        Engine,
+        EvidenceClass,
+        Phase,
+        Quantity,
+        UncertaintyKind,
+        ValueKind,
+    )
+    from simulator.battery.identity import Identity
+    from simulator.battery.records import (
+        Admission,
+        Composition,
+        Evidence,
+        Observation,
+        Species,
+        Uncertainty,
+        Value,
+    )
+    from simulator.battery.score import _predict_with_engine
+    from simulator.state_types import State
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    composition = (
+        _default_composition() if full_melt else {"K2O": 1.0, "SiO2": 1.0}
+    )
+    identity = Identity(
+        quantity=Quantity.P_PARTIAL,
+        species=Species("K", Phase.G),
+        temperature_K=State.of(Decimal("1800")),
+        total_pressure_Pa=State.of(Decimal("101325")),
+        fO2_Pa=State.of(Decimal("1e-6")),
+        composition=State.of(
+            Composition(
+                "oxides",
+                tuple(
+                    (oxide, Decimal(str(amount)))
+                    for oxide, amount in composition.items()
+                ),
+                AmountBasis.MOLE_FRACTION,
+            )
+        ),
+    )
+    observation = Observation(
+        observation_id="liquid-standard-notice-count",
+        experiment_id="liquid-standard-notice-count",
+        identity=identity,
+        value=Value(ValueKind.POINT, point=Decimal("1e-6")),
+        uncertainty=Uncertainty(UncertaintyKind.NONE),
+        evidence=Evidence(State.of(EvidenceClass.MEASURED_DIRECT)),
+        admission=Admission(AdmissionStatus.ADMITTED, "test"),
+        notices=(),
+    )
+    backend = _OpenImccBatteryBackend("openimcc")
+    handle = SimpleNamespace(
+        name=Engine.OPENIMCC.value,
+        available=True,
+        backend=backend,
+        identity=backend._identity,
+    )
+
+    prediction = _predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        handles={Engine.OPENIMCC.value: handle},
+    )
+
+    assert prediction.value is not None, prediction.refusal_detail
+    standard_notices = [
+        notice
+        for notice in prediction.notices
+        if notice.reason.startswith("openimcc_liquid_standard;")
+    ]
+    assert len(standard_notices) == (10 if full_melt else 3)
 
 
 def test_redox_bridge_refuses_melt_pack_mismatch(monkeypatch: Any) -> None:
