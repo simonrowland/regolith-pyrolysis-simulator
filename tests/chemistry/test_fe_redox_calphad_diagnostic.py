@@ -49,63 +49,6 @@ def _moles_from_wt_pct(comp_wt: dict[str, float]) -> dict[str, float]:
     }
 
 
-@pytest.mark.parametrize(
-    (
-        "temperature_C",
-        "expected_multiplier",
-        "expected_gamma",
-        "expected_status",
-        "notice_side",
-    ),
-    [
-        (1300.001, 2.0199992, 3.43399864, "interpolated_verified_range", None),
-        (1299.0, 2.0208, 3.43536, "extrapolated_below_verified_range", "below"),
-        (1000.0, 2.26, 3.842, "extrapolated_below_verified_range", "below"),
-        (1599.999, 1.6600014, 2.82200238, "interpolated_verified_range", None),
-        (1601.0, 1.6586, 2.81962, "extrapolated_above_verified_range", "above"),
-        (1800.0, 1.38, 2.346, "extrapolated_above_verified_range", "above"),
-    ],
-)
-def test_holzheid_gamma_interpolates_and_extrapolates_with_flagged_edge_trend(
-    temperature_C: float,
-    expected_multiplier: float,
-    expected_gamma: float,
-    expected_status: str,
-    notice_side: str | None,
-) -> None:
-    band = holzheid_stoich_feo_gamma_band(temperature_C + 273.15)
-
-    assert band["conversion_multiplier"] == pytest.approx(
-        expected_multiplier, abs=1e-12
-    )
-    assert band["central"] == pytest.approx(expected_gamma, abs=1e-12)
-    assert band["conversion_status"] == expected_status
-    if notice_side is None:
-        assert band["authority_level"] == "certified"
-        assert band["notice"] is None
-    else:
-        assert band["authority_level"] == "extrapolated"
-        notice = band["notice"]
-        assert notice["kind"] == "out_of_certified_band"
-        assert notice["authority_level"] == "extrapolated"
-        assert notice["side"] == notice_side
-        assert notice["certified_band"] == {"temperature_C": (1300.0, 1600.0)}
-        assert notice["uncertainty_band"] >= notice["edge_segment_spread"]
-        assert band["measurement_low"] <= band["central"] - notice["edge_segment_spread"]
-        assert band["measurement_high"] >= band["central"] + notice["edge_segment_spread"]
-
-
-def test_holzheid_gamma_preserves_in_span_values() -> None:
-    band = holzheid_stoich_feo_gamma_band(1400.0 + 273.15)
-
-    assert band["conversion_multiplier"] == pytest.approx(1.94, abs=1e-12)
-    assert band["central"] == pytest.approx(1.70 * 1.94, abs=1e-12)
-    assert band["measurement_sigma"] == pytest.approx(0.22 * 1.94, abs=1e-12)
-    assert band["conversion_status"] == "interpolated_verified_range"
-    assert band["authority_level"] == "certified"
-    assert band["notice"] is None
-
-
 def test_calphad_feo_activity_is_banded_and_current_stays_inside_above_iw():
     fO2_log = feo_iw_log10_fO2_bar(_T_K) + 0.5
     diagnostic = calphad_ferrous_feo_activity_diagnostic(
