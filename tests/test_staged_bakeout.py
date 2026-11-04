@@ -288,9 +288,10 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # extrapolation; net +0.0097%), then 82599cf81 (-0.17%), 03616bb20
     # (-0.98%), and b99fc004f (-32%). D066's package change is separate:
     # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
-    # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). These pins
-    # are rerun from the current 62d9d561a green.
-    assert staged_silica == pytest.approx(0.06888507997517511, rel=1e-9)
+    # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). Studio pin
+    # report keys staged_silica_kg and staged_product_sio_kg pin the silicon
+    # disproportionation products collected by the designated Stage 3 trap.
+    assert staged_silica == pytest.approx(0.06888502853569947, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
     assert staged_sio_stage["Fe"] > 0.0
@@ -298,7 +299,7 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
-    assert pins["staged_product_sio_kg"] == pytest.approx(0.0076796816652895455)
+    assert pins["staged_product_sio_kg"] == pytest.approx(0.007679675934123098)
 
 
 def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
