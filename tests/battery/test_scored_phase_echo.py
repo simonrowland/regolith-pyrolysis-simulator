@@ -909,6 +909,47 @@ def test_batched_and_nominal_match_as_words() -> None:
     )
 
 
+def test_sossi_quench_glass_phase_is_single_melt_evidence() -> None:
+    """The phase field 'quenched peridotite glass' is the analysed melt.
+
+    The notice carries that field and the printed quench sentence. The
+    quench-crystal regex does not match either string on its own.
+    """
+
+    from simulator.battery.input_provenance import (
+        analysed_melt_decision,
+        collect_run_texts,
+    )
+    from simulator.battery.identity import quantity_token
+
+    observation, experiment = _observation(
+        "sossi-2020-magma-ocean-redox.yaml",
+        "sossi_2020_per_f_o2_1_xanes",
+    )
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value.input_provenance == "scored_phase_analysis"
+    assert (observation.provenance or {}).get("printed_phase") == (
+        "quenched peridotite glass"
+    )
+    decision = analysed_melt_decision(
+        provenance=composition.value.input_provenance,
+        quantity=quantity_token(observation.identity),
+        formula=observation.identity.species.formula,
+        phase_role=None,
+        texts=collect_run_texts(experiment, observation),
+        point_conditions=observation.point_conditions,
+    )
+    assert decision.action == "rewrite"
+    assert decision.evidence_reason == "single_melt_evidence_quench_glass"
+    assert decision.quote is not None
+    assert "observation.phase: quenched peridotite glass" in decision.quote
+    assert (
+        "experiment.thermal_schedule.cooling_or_quench: "
+        "Laser switched off; reported cooling rate approximately 800 °C/s"
+    ) in decision.quote
+
+
 def test_pt_loop_hyphen_and_quench_crystals_are_not_crystal_bearing() -> None:
     sampled = printed_single_melt_evidence(
         (("sample.characterization", "The melt was sampled on a Pt-loop."),)

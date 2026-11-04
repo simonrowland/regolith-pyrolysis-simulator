@@ -344,7 +344,9 @@ def collect_run_texts(
 
     sample_state_note and quench_statement are not copied onto the migrated
     observation, so they are not read here. A second copy of those fields
-    would be a different writer.
+    would be a different writer. The phase field is ``provenance.printed_phase``
+    and is read on its own: the generic provenance loop skips that key, so
+    deleting this read drops the phase words.
     """
 
     texts: list[tuple[str, str]] = []
@@ -353,6 +355,19 @@ def collect_run_texts(
         for name in ("form", "characterization", "pretreatment", "container"):
             texts.extend(_located_strings(getattr(sample, name, None), f"sample.{name}"))
         texts.extend(_located_strings(experiment.locator, "experiment.locator"))
+        schedule = experiment.thermal_schedule
+        if schedule is not None:
+            texts.extend(
+                _located_strings(
+                    schedule.method, "experiment.thermal_schedule.method"
+                )
+            )
+            texts.extend(
+                _located_strings(
+                    schedule.cooling_or_quench,
+                    "experiment.thermal_schedule.cooling_or_quench",
+                )
+            )
     if observation is not None:
         texts.extend(_located_strings(observation.locator, "observation.locator"))
         if point_conditions is None:
@@ -360,7 +375,12 @@ def collect_run_texts(
         if derivation_relation is None and observation.derivation is not None:
             derivation_relation = observation.derivation.relation
         provenance = observation.provenance or {}
+        printed_phase = provenance.get("printed_phase")
+        if isinstance(printed_phase, str) and printed_phase.strip():
+            texts.append(("observation.phase", printed_phase.strip()))
         for key, value in provenance.items():
+            if key == "printed_phase":
+                continue
             if isinstance(value, str) and value.strip():
                 texts.append((f"provenance.{key}", value.strip()))
     elif locator is not None:
@@ -422,13 +442,39 @@ def printed_single_melt_evidence(
         match = _CRYSTAL_BEARING.search(text)
         if match is not None:
             return MeltEvidence("crystalline", quote=f"{label}: {_clip(text)}")
+    phase_hit: tuple[str, str] | None = None
+    quench_sentence: tuple[str, str] | None = None
+    crystal_hit: tuple[str, str] | None = None
     for label, text in blobs:
-        if _ANALYZED_QUENCH_IS_LIQUID.search(text) or _QUENCH_CRYSTAL.search(text):
-            return MeltEvidence(
-                "positive_quench",
-                notice_reason="single_melt_evidence_quench_glass",
-                quote=f"{label}: {_clip(text)}",
-            )
+        if crystal_hit is None and (
+            _ANALYZED_QUENCH_IS_LIQUID.search(text) or _QUENCH_CRYSTAL.search(text)
+        ):
+            crystal_hit = (label, text)
+        if phase_hit is None and printed_quench_glass_phase(text):
+            phase_hit = (label, text)
+        if label.endswith("cooling_or_quench"):
+            quench_sentence = (label, text)
+        elif (
+            quench_sentence is None
+            and label.endswith("thermal_schedule.method")
+            and _QUENCH_WORD.search(text)
+        ):
+            quench_sentence = (label, text)
+    if phase_hit is not None:
+        parts = [f"{phase_hit[0]}: {_clip(phase_hit[1])}"]
+        if quench_sentence is not None and quench_sentence[0] != phase_hit[0]:
+            parts.append(f"{quench_sentence[0]}: {_clip(quench_sentence[1])}")
+        return MeltEvidence(
+            "positive_quench",
+            notice_reason="single_melt_evidence_quench_glass",
+            quote="; ".join(parts),
+        )
+    if crystal_hit is not None:
+        return MeltEvidence(
+            "positive_quench",
+            notice_reason="single_melt_evidence_quench_glass",
+            quote=f"{crystal_hit[0]}: {_clip(crystal_hit[1])}",
+        )
     for label, text in blobs:
         if _SAMPLED.search(text) and _FROM_THE_LIQUID.search(text):
             return MeltEvidence(

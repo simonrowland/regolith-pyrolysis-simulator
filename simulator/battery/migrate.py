@@ -909,6 +909,23 @@ def parse_declared_amount(value: object) -> Decimal:
         raise ValueError(f"malformed declared amount: {value!r}") from exc
 
 
+def _provenance_with_printed_phase(
+    provenance: Mapping[str, Any] | None,
+    phase_raw: object,
+) -> Mapping[str, Any] | None:
+    """Keep the printed phase words the evidence reader has to see.
+
+    ``State.of(Phase)`` drops them. ``printed_phase`` is the observation's
+    phase field, not ``measured_sample_phase`` (that key is the P_SAT sample).
+    """
+
+    if not isinstance(phase_raw, str) or not phase_raw.strip():
+        return provenance
+    selected = dict(provenance or {})
+    selected["printed_phase"] = " ".join(phase_raw.split())
+    return selected
+
+
 def _provenance_from_extract(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
@@ -21118,6 +21135,9 @@ class Migrator:
             obs, values, provenance, quantity=q_token
         )
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
+        observation_provenance = _provenance_with_printed_phase(
+            observation_provenance, phase_raw
+        )
         phase_provenance: str | None = None
         sample_source_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
