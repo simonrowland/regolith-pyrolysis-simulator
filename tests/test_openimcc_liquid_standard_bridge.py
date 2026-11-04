@@ -24,7 +24,7 @@ def _liquid_standard_owner() -> Any:
     return import_module(module_name)
 
 
-def test_shared_owner_reports_sf04_k2o_mismatch_without_keying_on_ids() -> None:
+def test_shared_owner_reports_sf04_k2o_mismatch_with_disclosures() -> None:
     owner_module = _liquid_standard_owner()
     assert owner_module is not None, "shared OpenIMCC liquid-standard owner is missing"
     if owner_module is None:
@@ -41,7 +41,7 @@ def test_shared_owner_reports_sf04_k2o_mismatch_without_keying_on_ids() -> None:
         {"K2O": 1.0, "SiO2": 1.0},
     )
 
-    assert not assessment.flags
+    assert assessment.flags
     assert any(
         item.kind == "mismatch"
         and item.oxide == "K2O"
