@@ -5854,12 +5854,48 @@ class _MELTSBackendSupport(MeltBackend):
         if result.status != 'ok' or not pressures:
             detail = '; '.join(result.warnings) if result.warnings else (
                 f'status={result.status}, empty vapor_pressures_Pa')
+            result_status = str(result.status)
+            result_diagnostics = getattr(result, 'diagnostics', None)
+            diagnostics = (
+                result_diagnostics
+                if isinstance(result_diagnostics, Mapping)
+                else {}
+            )
+            backend_reason = diagnostics.get('backend_status_reason')
+            engine_exception = diagnostics.get('engine_exception')
+            if (
+                result_status == 'out_of_domain'
+                and isinstance(backend_reason, str)
+                and backend_reason
+            ):
+                reason_class = f'{result_status}:{backend_reason}'
+            elif (
+                result_status == 'not_converged'
+                and isinstance(engine_exception, str)
+                and engine_exception
+            ):
+                reason_class = f'nonconvergence:{engine_exception}'
+            else:
+                reason_class = {
+                    'not_converged': 'nonconvergence',
+                    'non_authoritative': 'non_authoritative',
+                    'unavailable': 'unavailable',
+                    'out_of_domain': 'out_of_domain',
+                    'ok': 'empty_pressures',
+                }.get(result_status, 'unusable_status')
             from simulator.engine_local_config import warn_once_with_summary
 
+            logger.debug(
+                'VapoRock fallback details for %s: status=%s; %s',
+                reason_class,
+                result.status,
+                detail,
+            )
             warn_once_with_summary(
-                'simulator.melt_backend.alphamelts.vaporock_fallback',
+                'simulator.melt_backend.alphamelts.vaporock_fallback:'
+                f'{reason_class}',
                 'VapoRock returned no usable vapor pressures '
-                f'({detail}); using activity x Antoine fallback rows '
+                f'(reason={reason_class}); using activity x Antoine fallback rows '
                 '(fit_target=pure_component_psat is a fit target, not a '
                 'first-principles evidence class; pseudo rows are backsolved '
                 'VapoRock curve-fits).',

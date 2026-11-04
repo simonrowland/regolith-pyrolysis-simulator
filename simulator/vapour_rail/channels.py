@@ -54,6 +54,7 @@ Ownership invariants (design §3) — hard boundaries:
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from enum import Enum
@@ -70,6 +71,8 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Channel vocabulary (design §4)
@@ -843,10 +846,12 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
     if notice is not None:
         from simulator.engine_local_config import warn_once_with_summary
 
+        logger.debug("Physical pO2 evaluation notice: %s", notice)
         warn_once_with_summary(
             'simulator.vapour_rail.channels.validate_physical_pO2_bar:'
             f'{notice["reason"]}',
-            str(notice),
+            f'{notice["reason"]}: physical pO2 is outside the MELT '
+            'dissociation evaluator band; extrapolating without clamping.',
             stacklevel=2,
         )
     return oxygen

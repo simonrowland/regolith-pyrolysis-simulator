@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 import warnings
 from types import SimpleNamespace
 
@@ -61,7 +62,9 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
             activities={"K2O": 0.5},
         )
 
-    globals().pop("__warningregistry__", None)
+    sys.modules[AlphaMELTSBackend.__module__].__dict__.pop(
+        "__warningregistry__", None
+    )
     with warnings.catch_warnings(record=True) as before_warnings:
         warnings.simplefilter("always")
         before = [project() for _ in range(50)]
@@ -71,7 +74,9 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
     monkeypatch.setattr(engine_local_config, "warn_once_with_summary", dedupe)
     caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
     with warnings.catch_warnings(record=True) as after_warnings:
-        globals().pop("__warningregistry__", None)
+        sys.modules[AlphaMELTSBackend.__module__].__dict__.pop(
+            "__warningregistry__", None
+        )
         warnings.simplefilter("default")
         after = [project() for _ in range(50)]
 
@@ -84,7 +89,7 @@ def test_vaporock_fallback_dedupe_keeps_result_and_counts_fifty_calls(
     engine_local_config._flush_warning_repeat_summaries()
 
     assert [record.getMessage() for record in caplog.records] == [
-        "simulator.melt_backend.alphamelts.vaporock_fallback: "
+        "simulator.melt_backend.alphamelts.vaporock_fallback:nonconvergence: "
         "49 repeats suppressed"
     ]
 
@@ -121,17 +126,20 @@ def test_vaporock_fallback_warning_is_deduped_per_reason_class(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from engines.domain_reason import OutOfDomainReason
+
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
 
-    def fallback(status: str, detail: str):
+    def fallback(reason_code: str, detail: str):
         backend = AlphaMELTSBackend()
         backend._vaporock_helper = SimpleNamespace(
             is_available=lambda: True,
             equilibrate=lambda **_kwargs: SimpleNamespace(
-                status=status,
+                status="out_of_domain",
                 vapor_pressures_Pa={},
                 warnings=(detail,),
+                diagnostics={"backend_status_reason": reason_code},
             ),
         )
         backend._vapor_pressure_table = {
@@ -149,29 +157,39 @@ def test_vaporock_fallback_warning_is_deduped_per_reason_class(
             activities={"K2O": 0.5},
         )
 
-    globals().pop("__warningregistry__", None)
+    sys.modules[AlphaMELTSBackend.__module__].__dict__.pop(
+        "__warningregistry__", None
+    )
     calls = (
-        ("not_converged", "first detail at 1600 K"),
-        ("not_converged", "different detail at 1700 K"),
-        ("non_authoritative", "third detail at 1800 K"),
-        ("non_authoritative", "fourth detail at 1900 K"),
+        (OutOfDomainReason.TEMPERATURE_RANGE.value, "first detail at 1600 K"),
+        (OutOfDomainReason.TEMPERATURE_RANGE.value, "different detail at 1700 K"),
+        (OutOfDomainReason.LIQUID_STATE.value, "third detail at 1800 K"),
+        (OutOfDomainReason.LIQUID_STATE.value, "fourth detail at 1900 K"),
     )
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("default")
-        for status, detail in calls:
-            fallback(status, detail)
+        for reason_code, detail in calls:
+            fallback(reason_code, detail)
 
     assert len(caught) == 2
     messages = [str(item.message) for item in caught]
-    assert any("nonconvergence" in message for message in messages)
-    assert any("non_authoritative" in message for message in messages)
+    assert any(
+        f"out_of_domain:{OutOfDomainReason.TEMPERATURE_RANGE.value}" in message
+        for message in messages
+    )
+    assert any(
+        f"out_of_domain:{OutOfDomainReason.LIQUID_STATE.value}" in message
+        for message in messages
+    )
     assert all("1600 K" not in message for message in messages)
     engine_local_config._flush_warning_repeat_summaries()
     assert sorted(record.getMessage() for record in caplog.records) == [
         "simulator.melt_backend.alphamelts.vaporock_fallback:"
-        "non_authoritative: 1 repeats suppressed",
+        f"out_of_domain:{OutOfDomainReason.LIQUID_STATE.value}: "
+        "1 repeats suppressed",
         "simulator.melt_backend.alphamelts.vaporock_fallback:"
-        "nonconvergence: 1 repeats suppressed",
+        f"out_of_domain:{OutOfDomainReason.TEMPERATURE_RANGE.value}: "
+        "1 repeats suppressed",
     ]
 
 
@@ -225,7 +243,7 @@ def test_warning_dedupe_keeps_pressure_results_and_notices_unchanged(
         warnings.simplefilter("always")
         after = [project() for _ in range(2)]
 
-    assert len(after_warnings) == 3
+    assert len(after_warnings) == len(before_warnings)
     assert any(
         "pO2_outside_evaluator_band" in str(item.message)
         for item in after_warnings

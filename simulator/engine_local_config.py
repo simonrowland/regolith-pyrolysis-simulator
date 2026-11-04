@@ -945,32 +945,29 @@ def warn_once_with_summary(
     category: type[Warning] = UserWarning,
     stacklevel: int = 2,
 ) -> bool:
-    """Emit one full warning per key and count repeats for the exit summary."""
+    """Warn on every call and tally occurrences for the process summary.
+
+    Python's warning filters own emission policy so ``pytest.warns`` and
+    warnings-as-errors see every call. Callers must keep warning text stable
+    for each key; the default warning filter suppresses repeated output.
+    """
     warning_key = str(key)
     with _WARNING_REPEAT_LOCK:
-        if warning_key in _WARNING_REPEAT_COUNTS:
-            _WARNING_REPEAT_COUNTS[warning_key] += 1
-            return False
-        # Keep warnings-as-errors behavior: register the key only after the
-        # first warning has passed through Python's configured filters.
-        warnings.warn(
-            message,
-            category,
-            stacklevel=stacklevel + 1,
-        )
-        _WARNING_REPEAT_COUNTS[warning_key] = 0
-    return True
+        previous_count = _WARNING_REPEAT_COUNTS.get(warning_key, 0)
+        _WARNING_REPEAT_COUNTS[warning_key] = previous_count + 1
+    warnings.warn(message, category, stacklevel=stacklevel)
+    return previous_count == 0
 
 
 def _flush_warning_repeat_summaries() -> None:
     with _WARNING_REPEAT_LOCK:
         summaries = tuple(
-            (key, count)
+            (key, count - 1)
             for key, count in sorted(_WARNING_REPEAT_COUNTS.items())
-            if count
+            if count > 1
         )
-        for key, _count in summaries:
-            _WARNING_REPEAT_COUNTS[key] = 0
+        for key in _WARNING_REPEAT_COUNTS:
+            _WARNING_REPEAT_COUNTS[key] = 1
     for key, count in summaries:
         logger.warning("%s: %d repeats suppressed", key, count)
 
@@ -983,7 +980,7 @@ def warn_legacy_once(engine: str, message: str) -> None:
     if warn_once_with_summary(
         f"legacy_engine_identity:{key}",
         message,
-        stacklevel=2,
+        stacklevel=3,
     ):
         logger.warning(message)
 

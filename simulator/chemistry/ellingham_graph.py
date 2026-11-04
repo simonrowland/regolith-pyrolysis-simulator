@@ -10,6 +10,7 @@ or equilibrium paths.
 
 from __future__ import annotations
 
+import logging
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -36,6 +37,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 GAS_CONSTANT_J_PER_MOL_K = 8.31446
 CELSIUS_TO_KELVIN_OFFSET = 273.15
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+logger = logging.getLogger(__name__)
 
 # Same evaporation floor used by BuiltinVaporPressureProvider.
 EVOLUTION_PRESSURE_FLOOR_PA = 1e-15
@@ -323,11 +325,17 @@ def effective_equilibrium_pressure_Pa(
         if evaluation.out_of_range:
             from simulator.engine_local_config import warn_once_with_summary
 
+            logger.debug(
+                "%s melt-source reaction continued at %.6g K: %s",
+                species,
+                T_K,
+                evaluation.status,
+            )
             warn_once_with_summary(
                 'simulator.chemistry.ellingham_graph:'
                 f'{species}:{evaluation.status}',
-                f"{species} melt-source reaction: {evaluation.status} "
-                f"at {T_K:g} K",
+                f"{species} melt-source reaction: {evaluation.status}; "
+                "using conservative continuation outside the certified range",
                 stacklevel=2,
             )
         return evaluation.pressure_pa
