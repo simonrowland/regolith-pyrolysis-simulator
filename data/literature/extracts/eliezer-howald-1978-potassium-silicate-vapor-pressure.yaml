@@ -471,7 +471,41 @@ species:
         published_page: 1025
         section: Thermodynamic properties of tridymite
       phase: cr
-      standard_state: KO0.5(s), as printed
+      standard_state_as_printed: >-
+        "If the entropy of solution of KO0.5 is approximately ideal and R1 =
+        -36 kcal mol-1, the solubility of KO0.5 in tridymite at 1743 K
+        (activity of KO0.5(s) = 0.7157 × 10^-6) will be a mole fraction of
+        about 0.0234."
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: KO0.5
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: >-
+                  Table III identifies KO0.5 as crystalline but the source
+                  does not name a KO0.5 polymorph.
+            component_basis: KO0.5
+        inferred: false
+        note: >-
+          The activity is printed for KO0.5(s); Table III on published page
+          1023 lists KO0.5(c) as a pure material with thermodynamic functions.
+          The paper names no specific polymorph.
+        locator:
+          page: 5
+          pdf_page_index: 4
+          published_page: 1025
+          section: Thermodynamic properties of tridymite
+      derived_from:
+      - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table3_standard_state_context
+      - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
+      - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_tridymite_solubility_context
       units: dimensionless
       point_conditions:
         temperature_K:
@@ -519,7 +553,31 @@ species:
             section: Thermodynamic properties of tridymite
       values:
         quantity: activity
-        method_class: author_derived
+        method_class: model_derived
+        derivation:
+          relation: >-
+            The authors use their Redlich-Kister thermodynamic relations for
+            liquid KO0.5-SiO2 and the tridymite-saturated liquid, then state
+            the solid KO0.5 activity using the ideal entropy of solution and
+            R1 = -36 kcal mol-1.
+          inputs:
+          - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table3_standard_state_context
+          - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
+          - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_tridymite_solubility_context
+          method:
+            state:
+              tag: value
+              value: >-
+                Calculate activities of solid KO0.5 in tridymite-saturated
+                liquid; apply the approximately ideal entropy of solution and
+                R1 = -36 kcal mol-1.
+            locator:
+              page: 5
+              pdf_page_index: 4
+              published_page: 1025
+              section: Thermodynamic properties of tridymite
+              equation: 'activity KO0.5(s) = 0.7157 × 10^-6'
+          output_unit: dimensionless
         activity: '0.7157e-6'
         activity_as_printed: 0.7157 × 10^-6
         T_K: '1743'
@@ -662,6 +720,9 @@ species:
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
+        method_as_printed: >-
+          "Log γ2 is known at several temperatures and compositions from
+          the phase diagram measurements."
         attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
         gamma: '0.0212'
         printed_form: log10
@@ -729,6 +790,9 @@ species:
       values:
         quantity: activity_coefficient
         method_class: quoted_attributed
+        method_as_printed: >-
+          "Log γ2 is known at several temperatures and compositions from
+          the phase diagram measurements."
         attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
         gamma: '0.0459'
         printed_form: log10
@@ -794,6 +858,9 @@ species:
       values:
         quantity: activity
         method_class: quoted_attributed
+        method_as_printed: >-
+          "Log γ2 is known at several temperatures and compositions from
+          the phase diagram measurements."
         attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
         activity: '0.94293'
         printed_symbol_as_published: K
@@ -859,6 +926,9 @@ species:
       values:
         quantity: activity
         method_class: quoted_attributed
+        method_as_printed: >-
+          "Log γ2 is known at several temperatures and compositions from
+          the phase diagram measurements."
         attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
         activity: '0.78139'
         printed_symbol_as_published: K
@@ -877,6 +947,8 @@ species:
         section: Enthalpy data
       phase: l
       units: log10 activity coefficient as printed
+      derived_from:
+      - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
       point_conditions:
         temperature_K:
           state:
@@ -923,7 +995,25 @@ species:
             section: Enthalpy data
       values:
         quantity: activity_coefficient
-        method_class: author_derived
+        method_class: model_derived
+        derivation:
+          relation: >-
+            The authors use their log gamma1 composition function at 1784 K
+            to derive log gamma2 = -0.012 at X = 0.293 by Gibbs-Duhem
+            integration.
+          inputs:
+          - eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
+          method:
+            state:
+              tag: value
+              value: Gibbs-Duhem integration of the authors' log gamma1 composition function.
+            locator:
+              page: 3
+              pdf_page_index: 2
+              published_page: 1023
+              section: Enthalpy data
+              equation: 'log gamma2 = -0.012 at X = 0.293'
+          output_unit: dimensionless
         gamma: '-0.012'
         printed_form: log10
         component_as_printed: SiO2
