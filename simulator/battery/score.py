@@ -11593,6 +11593,19 @@ def compile_residual(
             candidate,
         )
 
+    if (
+        prediction is not None
+        and prediction.refusal_reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and prediction.refusal_detail.get("reason") == "duplicate_of"
+    ):
+        return _refused(
+            RefusalReason.REFERENTIAL_INTEGRITY,
+            prediction.refusal_detail,
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+            exclusions=("duplicate_of",),
+        )
+
     if _is_quantity_not_predicted(quantity):
         return _refused(
             RefusalReason.UNSUPPORTED,
@@ -12818,6 +12831,59 @@ def _is_compilation_thermo_reference(
     )
 
 
+def _has_duplicate_observation_link(observation: Observation) -> bool:
+    provenance = observation.provenance
+    return (
+        isinstance(provenance, Mapping)
+        and "duplicate_of_observation_id" in provenance
+    )
+
+
+def _duplicate_observation_refusal_detail(
+    context: ScoreContext, observation: Observation
+) -> dict[str, object]:
+    provenance = observation.provenance
+    assert isinstance(provenance, Mapping)
+    target = provenance["duplicate_of_observation_id"]
+    detail: dict[str, object] = {
+        "reason": "duplicate_of",
+        "primary_observation_id": target,
+    }
+    if not isinstance(target, str) or not target.strip():
+        detail["resolution"] = "primary_id_invalid"
+        return detail
+
+    target = target.strip()
+    primary = context.observations.get(target)
+    if primary is None and observation.source_id:
+        primary = context.observations.get(f"{observation.source_id}::{target}")
+    if primary is None and "::" not in target:
+        matches = [
+            candidate
+            for candidate in context.observations.values()
+            if candidate.observation_id.endswith(f"::{target}")
+        ]
+        if len(matches) == 1:
+            primary = matches[0]
+        elif matches:
+            detail["resolution"] = "primary_ambiguous"
+            detail["primary_matches"] = sorted(
+                candidate.observation_id for candidate in matches
+            )
+            return detail
+    if primary is None:
+        detail["resolution"] = "primary_missing"
+        return detail
+
+    detail["primary_observation_id"] = primary.observation_id
+    if primary.admission.status is not AdmissionStatus.ADMITTED:
+        detail["resolution"] = "primary_not_admitted"
+        detail["primary_admission_status"] = primary.admission.status.value
+    else:
+        detail["resolution"] = "excluded"
+    return detail
+
+
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     """Admitted or pending comparison evidence; class labels do not gate scoring.
 
@@ -12833,6 +12899,8 @@ def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
     for obs in context.observations.values():
         ev = obs.evidence.class_
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
+            continue
+        if _has_duplicate_observation_link(obs):
             continue
         origin = getattr(context, "origins", {}).get(obs.observation_id)
         if is_internal_consistency(origin):
@@ -12928,9 +12996,9 @@ def _score_store_with_decisions(
     provided_handles = dict(handles or {})
     resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
+    seen = {o.observation_id for o in refs}
     fusion_diagnostic_ids: set[str] = set()
     if include_diagnostics:
-        seen = {o.observation_id for o in refs}
         for obs in diagnostic_references(context):
             if obs.observation_id not in seen:
                 refs.append(obs)
@@ -12949,6 +13017,10 @@ def _score_store_with_decisions(
             if obs.observation_id not in seen:
                 refs.append(obs)
                 seen.add(obs.observation_id)
+    for obs in context.observations.values():
+        if _has_duplicate_observation_link(obs) and obs.observation_id not in seen:
+            refs.append(obs)
+            seen.add(obs.observation_id)
     if measured_only:
         refs = [
             obs for obs in refs
@@ -13022,6 +13094,11 @@ def _score_store_with_decisions(
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
                 origin = origins.get(obs.observation_id)
+                duplicate_detail = (
+                    _duplicate_observation_refusal_detail(context, obs)
+                    if _has_duplicate_observation_link(obs)
+                    else None
+                )
                 for point in _iter_compilation_series_cells(obs, origin):
                     point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
@@ -13076,7 +13153,8 @@ def _score_store_with_decisions(
                     for engine in engine_set:
                         prediction = None
                         if (
-                            diagnostic
+                            duplicate_detail is None
+                            and diagnostic
                             and point.observation_id not in fusion_diagnostic_ids
                             and predict is None
                             and not compilation_thermo
@@ -13092,7 +13170,8 @@ def _score_store_with_decisions(
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _HASHIMOTO_SOURCE_ID
@@ -13105,7 +13184,8 @@ def _score_store_with_decisions(
                                 residue_prediction_cache,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and point.source_id == _SOSSI_SOURCE_ID
@@ -13118,7 +13198,8 @@ def _score_store_with_decisions(
                                 residue_prediction_cache,
                             )
                         if (
-                            predict is None
+                            duplicate_detail is None
+                            and predict is None
                             and isinstance(point.identity, Identity)
                             and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
                             and experiment is not None and experiment.method.is_value
@@ -13126,6 +13207,24 @@ def _score_store_with_decisions(
                         ):
                             prediction = _knudsen_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
+                            )
+                        if duplicate_detail is not None:
+                            prediction = EnginePrediction(
+                                engine=engine,
+                                channel=ENGINE_CHANNELS[engine],
+                                execution=Execution(
+                                    state=ExecutionState.NOT_PROBED
+                                ),
+                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[
+                                    engine
+                                ],
+                                refusal_reason=RefusalReason.REFERENTIAL_INTEGRITY,
+                                refusal_detail=duplicate_detail,
+                                identity=(
+                                    point.identity
+                                    if isinstance(point.identity, Identity)
+                                    else None
+                                ),
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(
                             engine, point

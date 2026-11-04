@@ -18378,3 +18378,121 @@ def test_filtered_score_context_resolves_cross_source_validation_parent(
     assert filtered.hard_issues_by_observation.get(child_id) == (
         full.hard_issues_by_observation.get(child_id)
     )
+
+
+def _duplicate_of_score_fixture(
+    *,
+    duplicate_target: str | None = "primary",
+    primary_status: AdmissionStatus = AdmissionStatus.ADMITTED,
+    include_primary: bool = True,
+):
+    primary_id = "primary-source::primary"
+    twin_id = "secondary-source::twin"
+    experiment = F.tabulation_experiment()
+    identity = F.o2_identity()
+    primary = F.observation(
+        primary_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=primary_status,
+        source_id="primary-source",
+    )
+    twin = F.observation(
+        twin_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="secondary-source",
+    )
+    if duplicate_target is not None:
+        twin = replace(
+            twin,
+            provenance={"duplicate_of_observation_id": duplicate_target},
+        )
+    observations = (primary, twin) if include_primary else (twin,)
+    context = _context(
+        F.work(), experiment, *observations, review="reviewed"
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=lambda _engine, point, **_kwargs: _predict(
+            point.value.point, point.identity
+        ),
+    )
+    return context, residuals
+
+
+def test_duplicate_of_scores_one_twin_and_keeps_typed_primary_reference() -> None:
+    context, residuals = _duplicate_of_score_fixture()
+
+    assert "secondary-source::twin" not in {
+        observation.observation_id
+        for observation in score_mod.comparison_candidates(context)
+    }
+    by_reference = {row.reference: row for row in residuals}
+    assert set(by_reference) == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+    assert by_reference["primary-source::primary"].numeric is not None
+    twin = by_reference["secondary-source::twin"]
+    assert twin.numeric is None
+    assert twin.score_eligible is False
+    assert twin.refusal is not None
+    assert twin.refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert twin.refusal.detail == {
+        "reason": "duplicate_of",
+        "primary_observation_id": "primary-source::primary",
+        "resolution": "excluded",
+    }
+
+
+def test_identical_unlinked_observation_still_scores_independently() -> None:
+    _context_without_link, residuals = _duplicate_of_score_fixture(
+        duplicate_target=None
+    )
+
+    assert {row.reference for row in residuals if row.numeric is not None} == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+
+
+@pytest.mark.parametrize(
+    ("include_primary", "primary_status", "resolution"),
+    (
+        (False, AdmissionStatus.ADMITTED, "primary_missing"),
+        (True, AdmissionStatus.PENDING, "primary_not_admitted"),
+    ),
+)
+def test_duplicate_of_missing_or_unadmitted_primary_refuses_without_dropping(
+    include_primary: bool,
+    primary_status: AdmissionStatus,
+    resolution: str,
+) -> None:
+    _context_with_bad_link, residuals = _duplicate_of_score_fixture(
+        primary_status=primary_status,
+        include_primary=include_primary,
+    )
+
+    twins = [
+        row for row in residuals if row.reference == "secondary-source::twin"
+    ]
+    assert len(twins) == 1
+    assert twins[0].numeric is None
+    assert twins[0].refusal is not None
+    assert twins[0].refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    expected_detail = {
+        "reason": "duplicate_of",
+        "primary_observation_id": (
+            "primary" if resolution == "primary_missing" else "primary-source::primary"
+        ),
+        "resolution": resolution,
+    }
+    if resolution == "primary_not_admitted":
+        expected_detail["primary_admission_status"] = "pending"
+    assert twins[0].refusal.detail == expected_detail
