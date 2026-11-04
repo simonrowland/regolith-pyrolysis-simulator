@@ -1362,7 +1362,34 @@ def _ledger_mappings_from_trace(
         return None
     if not isinstance(products, Mapping) or not isinstance(rump, Mapping):
         return None
-    return products, rump
+    return _captured_product_kg(products, trace), rump
+
+
+def _captured_product_kg(
+    product_ledger_kg: Mapping[Any, Any],
+    trace: Any,
+) -> Mapping[Any, Any]:
+    """Separated product ledger plus cartridge-residue kilograms.
+
+    ``product_ledger_kg`` is separated products. The vapour-contract
+    numerator also counts ``process.alkali_cartridge_solid_residue``.
+    Those are different parcels of the same element, so the captured
+    kilogram is their sum. An empty residue map leaves the separated
+    ledger unchanged.
+    """
+    residue = getattr(trace, "alkali_cartridge_solid_residue_kg", None)
+    if not isinstance(residue, Mapping) or not residue:
+        return product_ledger_kg
+    captured: dict[str, float] = {
+        str(species): kg for species, kg in product_ledger_kg.items()
+    }
+    for species, kg in residue.items():
+        amount = float(kg)
+        if amount <= 0.0:
+            continue
+        key = str(species)
+        captured[key] = float(captured.get(key, 0.0) or 0.0) + amount
+    return captured
 
 
 def _assert_extraction_completeness_provenance_matches_ledger(
@@ -1441,7 +1468,10 @@ def _extraction_completeness_by_target_for_trace(
             tuple(str(target) for target in constraints.target_species),
         )
         return MappingProxyType({**provenance_results, **unavailable_results})
-    products = _required_mapping(trace, "product_ledger_kg")
+    products = _captured_product_kg(
+        _required_mapping(trace, "product_ledger_kg"),
+        trace,
+    )
     rump = _required_mapping(trace, "terminal_rump_by_species_kg")
     results = extraction_completeness_by_target(
         tuple(str(target) for target in constraints.target_species),
