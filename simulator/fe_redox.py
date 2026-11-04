@@ -468,34 +468,73 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def _linear_interpolate_or_clamp(
+def _linear_interpolate_or_extrapolate(
     points: tuple[tuple[float, float], ...],
     x: float,
 ) -> tuple[float, str]:
-    if x <= points[0][0]:
-        return points[0][1], 'clamped_below_verified_range'
-    if x >= points[-1][0]:
-        return points[-1][1], 'clamped_above_verified_range'
+    # Outside the data span, extend the nearest segment linearly in its
+    # interpolation variable (temperature_C); retain the out-of-band status.
+    if x < points[0][0]:
+        x0, y0 = points[0]
+        x1, y1 = points[1]
+        return y0 + (x - x0) * (y1 - y0) / (x1 - x0), (
+            'extrapolated_below_verified_range'
+        )
+    if x > points[-1][0]:
+        x0, y0 = points[-2]
+        x1, y1 = points[-1]
+        return y1 + (x - x1) * (y1 - y0) / (x1 - x0), (
+            'extrapolated_above_verified_range'
+        )
     for (x0, y0), (x1, y1) in zip(points, points[1:]):
         if x0 <= x <= x1:
             frac = (x - x0) / (x1 - x0)
             return y0 + frac * (y1 - y0), 'interpolated_verified_range'
-    return points[-1][1], 'clamped_above_verified_range'
+    return points[-1][1], 'interpolated_verified_range'
 
 
 def holzheid_stoich_feo_gamma_band(T_K: float) -> dict[str, object]:
     T_C = float(T_K) - 273.15
-    multiplier, status = _linear_interpolate_or_clamp(
+    multiplier, status = _linear_interpolate_or_extrapolate(
         HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C,
         T_C,
     )
     central = HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * multiplier
     sigma = HOLZHEID_FEO_GAMMA_WUSTITE_SIGMA * multiplier
+    notice = None
+    authority_level = 'certified'
+    if status != 'interpolated_verified_range':
+        authority_level = 'extrapolated'
+        below = status == 'extrapolated_below_verified_range'
+        edge = HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[:2] if below else (
+            HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-2:]
+        )
+        edge_segment_spread = abs(
+            HOLZHEID_FEO_GAMMA_WUSTITE_CENTRAL * (edge[1][1] - edge[0][1])
+        )
+        sigma = max(sigma, edge_segment_spread)
+        notice = {
+            'type': 'typed_notice',
+            'kind': 'out_of_certified_band',
+            'reason': 'Holzheid stoichiometric FeO gamma conversion extrapolated',
+            'authority_level': authority_level,
+            'side': 'below' if below else 'above',
+            'certified_band': {
+                'temperature_C': (
+                    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[0][0],
+                    HOLZHEID_STOICH_FEO_MULTIPLIER_BY_C[-1][0],
+                ),
+            },
+            'uncertainty_band': sigma,
+            'edge_segment_spread': edge_segment_spread,
+        }
     return {
         'basis': 'stoichiometric_FeO_l',
         'temperature_C': T_C,
         'conversion_multiplier': multiplier,
         'conversion_status': status,
+        'authority_level': authority_level,
+        'notice': notice,
         'central': central,
         'measurement_low': max(0.0, central - sigma),
         'measurement_high': central + sigma,
