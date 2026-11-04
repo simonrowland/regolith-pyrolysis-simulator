@@ -15,6 +15,13 @@ METAL_PHASE_ACCOUNTS = (
 TERMINAL_DRAIN_TAP_ACCOUNT = "terminal.drain_tap_material"
 EXTRACTED_METAL_PRODUCT_ACCOUNTS = (TERMINAL_DRAIN_TAP_ACCOUNT,)
 CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
+# Stage-4 alkali freeze-out cartridge. The hour-end balance of the
+# cartridge account is zero: liquid Na/K return to the train and solids
+# land on the residue account. Both back the stage projection.
+ALKALI_CARTRIDGE_ACCOUNT = "process.alkali_cartridge"
+ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT = (
+    "process.alkali_cartridge_solid_residue"
+)
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species
 # projects condensation-train, dedicated terminal chromium-product, or
@@ -22,6 +29,8 @@ CHROMIUM_CONDENSED_OXIDE_ACCOUNT = "terminal.chromium_condensed_oxide_stored"
 STAGE_COLLECTION_SOURCE_ACCOUNTS = (
     *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
 )
 # Only these ledger accounts always back the condenser-train UI projection.
@@ -29,6 +38,8 @@ STAGE_COLLECTION_SOURCE_ACCOUNTS = (
 # stage-routed ledger credits are classified independently at commit time.
 STAGE_COLLECTION_BACKING_ACCOUNTS = (
     "process.condensation_train",
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
 )
 OXYGEN_STAGE0_ACCOUNT = "terminal.oxygen_stage0_stored"

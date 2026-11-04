@@ -15,6 +15,7 @@ from typing import Any
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.condensation_routing import (
     COLLECTOR_STAGE_KEY_BY_NUMBER,
+    K_TRAP_STAGE_KEY,
     STAGE3_ROUTES,
     SUBSTAGE_COLLECTOR_KEYS,
 )
@@ -341,6 +342,44 @@ def resolve_substage_bands_C(
         )
         for key in SUBSTAGE_COLLECTOR_KEYS
     }
+
+
+def resolve_alkali_cartridge_melt_out_C(
+    setpoints: Mapping[str, Any] | None = None,
+) -> float | None:
+    """Configured melt-out temperature for the stage-4 alkali cartridge.
+
+    Absent, or an explicit null, means the swing holds the mass on the
+    train and the caller flags ``melt_out_temperature_missing``. A
+    present value must be finite and above absolute zero. This is not
+    a melting point.
+    """
+
+    stages, default_stages = _collector_stage_tables(
+        setpoints, require_complete=False,
+    )
+    stage = stages.get(K_TRAP_STAGE_KEY, {})
+    if isinstance(stage, Mapping) and "melt_out_temperature_C" in stage:
+        raw = stage.get("melt_out_temperature_C")
+    else:
+        default = default_stages.get(K_TRAP_STAGE_KEY, {})
+        if (
+            not isinstance(default, Mapping)
+            or "melt_out_temperature_C" not in default
+        ):
+            return None
+        raw = default.get("melt_out_temperature_C")
+    if raw is None:
+        return None
+    label = f"{K_TRAP_STAGE_KEY}.melt_out_temperature_C"
+    if not is_declared_real_scalar(raw, allow_numeric_str=True):
+        raise ValueError(f"{label} must be numeric")
+    value = float(raw)
+    if not math.isfinite(value) or value <= -CELSIUS_TO_KELVIN_OFFSET:
+        raise ValueError(
+            f"{label} must be finite and above absolute zero"
+        )
+    return value
 
 
 def _validate_collection_commands(setpoints: Mapping[str, Any]) -> None:

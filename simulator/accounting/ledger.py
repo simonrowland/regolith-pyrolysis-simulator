@@ -29,6 +29,8 @@ from simulator.accounting.lots import (
     allocate_pool_withdrawal,
 )
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT,
     SOLID_CHAR_CARBON_ACCOUNT,
@@ -74,6 +76,8 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "process.cleaned_melt",
     "process.c7_al_credit",
     "process.condensation_train",
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     "process.metal_phase",
     "process.metal_phase_bottom_pool",

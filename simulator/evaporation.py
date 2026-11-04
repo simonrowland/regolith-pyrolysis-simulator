@@ -5275,6 +5275,8 @@ class EvaporationMixin:
             if kg > 1e-12
         }
         from simulator.condensation_routing import (
+            K_TRAP_STAGE_NUMBER,
+            K_TRAP_SUB_ORDER,
             collection_stage_index,
             species_accepted_on_stage,
             stage_index_for_visit_identity,
@@ -5315,6 +5317,8 @@ class EvaporationMixin:
         identity_map = getattr(
             route_result, 'capture_kg_by_stage_identity', None,
         ) or {}
+        cartridge_booked: dict[str, float] = {}
+        cartridge_stage_idx: int | None = None
         if identity_map:
             # Visit identity splits two surfaces that share a stage number.
             # Stage 4 and the K trap both are number 4. Off-design mass on
@@ -5351,6 +5355,22 @@ class EvaporationMixin:
                     stage_idx,
                     stage_products,
                     not species_accepted_on_stage(stage, species),
+                )
+                if (
+                    stage_number == K_TRAP_STAGE_NUMBER
+                    and sub_order == K_TRAP_SUB_ORDER
+                ):
+                    cartridge_stage_idx = stage_idx
+                    for product, product_kg in stage_products.items():
+                        if product_kg > 1e-12:
+                            cartridge_booked[product] = (
+                                cartridge_booked.get(product, 0.0)
+                                + product_kg
+                            )
+            if cartridge_booked and cartridge_stage_idx is not None:
+                self._swing_alkali_freeze_out_cartridge(
+                    cartridge_stage_idx,
+                    cartridge_booked,
                 )
             if (
                 not reactive_booked
@@ -5395,6 +5415,60 @@ class EvaporationMixin:
                 > 0.0
             )
             book(stage_idx, stage_products, is_impurity)
+
+    def _swing_alkali_freeze_out_cartridge(
+        self,
+        stage_idx: int,
+        product_kg: Mapping[str, float],
+    ) -> None:
+        """One cartridge in service this hour, regenerated off-line.
+
+        The active cartridge accumulates this hour's condensate. Melt-out
+        returns liquid Na and K to the train the C3 transfer reads. Mg,
+        MgO, Ca, and every other product stay solid and leave the alkali
+        product. No swing-timing optimisation: the cartridge account is
+        empty again at the end of the hour.
+        """
+
+        from simulator.condensation import (
+            alkali_cartridge_swing_moves,
+            sodium_melting_temperature_K_from_row,
+        )
+
+        vapor = getattr(self, 'vapor_pressures', None)
+        metals = vapor.get('metals', {}) if isinstance(vapor, Mapping) else {}
+        sodium_row = metals.get('Na') if isinstance(metals, Mapping) else None
+        stage = self.train.stages[int(stage_idx)]
+        moves, notices = alkali_cartridge_swing_moves(
+            product_kg,
+            melt_out_temperature_C=getattr(
+                stage, 'melt_out_temperature_C', None,
+            ),
+            sodium_melting_temperature_K=(
+                sodium_melting_temperature_K_from_row(
+                    sodium_row if isinstance(sodium_row, Mapping) else None,
+                )
+            ),
+        )
+        self.last_alkali_cartridge_swing_notices = notices
+        for move in moves:
+            self._move_ledger_species(
+                move.name,
+                move.debit_account,
+                move.credit_account,
+                move.species,
+                move.kg,
+                reason=move.reason,
+                amalgamated_pool=move.species in {'Na', 'K', 'Mg'},
+            )
+            if move.retarget_source:
+                self._retarget_stage_collection_source(
+                    'process.condensation_train',
+                    move.credit_account,
+                    stage_idx,
+                    move.species,
+                    move.kg,
+                )
 
     def _update_melt_composition(self, evap_flux: EvaporationFlux):
         """Project the cleaned-melt account onto MeltState kg fields."""

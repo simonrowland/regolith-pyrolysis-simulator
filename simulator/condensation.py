@@ -30,7 +30,8 @@ Train topology (metals train, active C2A onward):
              the reactive Si/SiO2 product limit at or below the declared
              SiO routing temperature; unavailable inputs remain refusals.
              Stage-3 capture has no axial stirring suppression gate.
-    Stage 4  Na collector (250°C wall) — Na/Mg. K is stage 4b.
+    Stage 4  Na collector (250°C wall) — Na/Mg. The alkali freeze-out
+             cartridge is stage 4 sub_order 1 (key stage_4b_k_trap).
     Stage 5  Vortex dust filter (200-350°C) — entrained particle capture
     Stage 6  Turbine-compressor      — pressure regulation, pO₂ control
     Stage 7  Turbine outlet monitor — terminal ledger owns O2 storage
@@ -114,6 +115,8 @@ from simulator.transport_regime import (
     _minimum_pressure_pa_for_knudsen,
     _single_species_mean_free_path_m_unchecked,
     classify_knudsen_regime,
+    dynamic_viscosity_sutherland_pa_s,
+    single_species_mean_free_path_m,
 )
 from simulator.physical_constants import (
     AVOGADRO,
@@ -150,6 +153,8 @@ from simulator.lab_geometry import (
 )
 from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
+    K_TRAP_STAGE_NUMBER,
+    K_TRAP_SUB_ORDER,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
@@ -2439,6 +2444,10 @@ class CondensationRouteResult:
         default_factory=dict)
     stage3_reactive_alkali_by_species: Dict[str, Dict[str, Any]] = field(
         default_factory=dict)
+    # Stage-4 sub_order 1 only. One record per species that reached the
+    # alkali freeze-out cartridge: f_eq, NTU, vapour eta, aerosol eta.
+    cartridge_capture_by_species: Dict[str, Dict[str, Any]] = field(
+        default_factory=dict)
 
     def condensed_for_species(self, species: str) -> float:
         return sum(
@@ -2569,6 +2578,7 @@ class CondensationModel:
         self.stage_area_m2_by_stage: dict[str, float] = {}
         self.stage_hydraulic_diameter_m_by_stage: dict[str, float] = {}
         self.stage_area_geometry_provenance_notice: dict[str, Any] = {}
+        self.alkali_cartridge_geometry: dict[str, Any] = {}
         self.gas_temperature_C = float(wall_temperature_C)
         self.carrier_gas = DEFAULT_CARRIER_GAS
         # Induction-stirring intensity — recipe-controlled per
@@ -3103,6 +3113,9 @@ class CondensationModel:
 
         if not setpoints:
             return
+        self.alkali_cartridge_geometry = _alkali_cartridge_geometry_from_setpoints(
+            setpoints,
+        )
         self.upstream_hot_wall_min_C = _stage0_hot_wall_min_C_from_setpoints(
             setpoints,
             default_C=self.upstream_hot_wall_min_C,
@@ -3631,6 +3644,7 @@ class CondensationModel:
             str, Dict[str, float]] = {}
         self.last_wall_deposition_rate_shadow_candidate = {}
         vapour_fog_notices: list[dict[str, Any]] = []
+        cartridge_capture_by_species: dict[str, dict[str, Any]] = {}
         self._pending_vapour_fog_notice = vapour_fog_notices
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
@@ -4014,25 +4028,48 @@ class CondensationModel:
                         continue
                 eta: float | None = None
                 capture_refused = False
+                cartridge_record: dict[str, Any] | None = None
                 try:
-                    eta = self._condensation_efficiency(
-                        stage=stage, species=species, T_cond_C=route['T_cond_C'],
-                        residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
-                        available_kg=supply,
-                        inlet_partial_pressure_pa=partials.get(species),
-                        alpha_s_value=_required_record_alpha_s(
-                            alpha_record, species=species, site='stage_deposition',
-                        ),
-                        alpha_record=alpha_record,
-                        antoine_extrapolations=antoine_extrapolations,
-                        antoine_extrapolation_warnings=antoine_extrapolation_warnings,
-                        efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
-                        reactive_alkali_silica=reaction is not None,
-                        flowing_pressure_pa=(
-                            partials.get(species) if reaction is not None else None
-                        ),
-                        bulk_gas_inlet_K=stage_inlet_K,
-                    )
+                    if (
+                        int(stage.stage_number) == K_TRAP_STAGE_NUMBER
+                        and int(stage.sub_order) == K_TRAP_SUB_ORDER
+                    ):
+                        # This visit only. Every other stage keeps the HKL
+                        # series-resistance owner. The cartridge is an
+                        # equilibrium-wall exchanger, so alpha is not a
+                        # second factor on top of e-NTU.
+                        eta, cartridge_record = self._alkali_cartridge_vapour_capture(
+                            stage=stage,
+                            species=species,
+                            supply_kg_hr=supply,
+                            p_local_pa=partials.get(species),
+                            stage_ntu=stage_ntu,
+                            gas_inlet_K=stage_inlet_K,
+                            total_molar_flow_mol_s=stage_molar_flow_mol_s,
+                            total_pressure_pa=overhead_pressure_pa,
+                            antoine_extrapolations=antoine_extrapolations,
+                            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                            efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                        )
+                    else:
+                        eta = self._condensation_efficiency(
+                            stage=stage, species=species, T_cond_C=route['T_cond_C'],
+                            residence_s=self.residence_time_s.get(stage.stage_number, 1.0),
+                            available_kg=supply,
+                            inlet_partial_pressure_pa=partials.get(species),
+                            alpha_s_value=_required_record_alpha_s(
+                                alpha_record, species=species, site='stage_deposition',
+                            ),
+                            alpha_record=alpha_record,
+                            antoine_extrapolations=antoine_extrapolations,
+                            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+                            efficiency_outcomes=efficiency_outcomes_by_species.setdefault(species, []),
+                            reactive_alkali_silica=reaction is not None,
+                            flowing_pressure_pa=(
+                                partials.get(species) if reaction is not None else None
+                            ),
+                            bulk_gas_inlet_K=stage_inlet_K,
+                        )
                 except (WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
                     if isinstance(exc, DepositionInputRefusal) and exc.value is not None:
                         raise
@@ -4055,10 +4092,36 @@ class CondensationModel:
                         'refusal_type': type(exc).__name__,
                         **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
                     })
-                vapour_fog_notices.append(_stage_vapour_fog_notice(
-                    stage, species, melt, partials.get(species), eta, supply,
-                    bulk_temperature_K=stage_mean_K,
-                ))
+                if cartridge_record is not None and not capture_refused:
+                    notice = _stage_vapour_fog_notice(
+                        stage, species, melt, partials.get(species),
+                        cartridge_record['eta_vapour'], supply,
+                        bulk_temperature_K=stage_mean_K,
+                    )
+                    wall_fog = notice.get('wall_clearance_code') == NOTICE_FOG
+                    eta = cartridge_capture_fraction(
+                        cartridge_record['eta_vapour'],
+                        cartridge_record['f_eq'],
+                        cartridge_record.get('eta_aerosol'),
+                        wall_is_fog=wall_fog,
+                    )
+                    cartridge_record['eta'] = eta
+                    cartridge_record['wall_fog'] = wall_fog
+                    if (
+                        cartridge_record.get('eta_aerosol') is not None
+                        and not wall_fog
+                    ):
+                        cartridge_record['notices'] = (
+                            *cartridge_record['notices'],
+                            'aerosol_held_no_wall_fog',
+                        )
+                    cartridge_capture_by_species[species] = cartridge_record
+                    vapour_fog_notices.append(notice)
+                else:
+                    vapour_fog_notices.append(_stage_vapour_fog_notice(
+                        stage, species, melt, partials.get(species), eta, supply,
+                        bulk_temperature_K=stage_mean_K,
+                    ))
                 if capture_refused:
                     continue
                 deposit = supply * eta
@@ -4745,6 +4808,9 @@ class CondensationModel:
             stage_area_geometry_provenance_notice=copy.deepcopy(
                 geometry_notice
             ),
+            cartridge_capture_by_species=copy.deepcopy(
+                cartridge_capture_by_species
+            ),
         )
 
     def adjust_c2a_pressure_setpoint(
@@ -5127,6 +5193,158 @@ class CondensationModel:
             'uptake_mol': 0.0, 'oxygen_debit_mol': 0.0,
             'oxidant_limited': False,
         }
+
+    def _alkali_cartridge_vapour_capture(
+        self,
+        *,
+        stage: CondensationStage,
+        species: str,
+        supply_kg_hr: float,
+        p_local_pa: float | None,
+        stage_ntu: float,
+        gas_inlet_K: float,
+        total_molar_flow_mol_s: float,
+        total_pressure_pa: float,
+        antoine_extrapolations: MutableMapping[str, Dict[str, Any]] | None,
+        antoine_extrapolation_warnings: list[str] | None,
+        efficiency_outcomes: list[dict[str, Any]] | None,
+    ) -> tuple[float, dict[str, Any]]:
+        """Vapour e-NTU on the freeze-out cartridge, plus an aerosol flag.
+
+        The booked eta is still the vapour term here. ``route`` adds
+        impaction only to the fogged equilibrium remainder.
+        """
+
+        def _zero(reason: str, **detail: Any) -> tuple[float, dict[str, Any]]:
+            record = {
+                'f_eq': 0.0,
+                'ntu_heat': None,
+                'ntu_mass': 0.0,
+                'p_sat_pa': None,
+                'p_local_pa': p_local_pa,
+                'eta_vapour': 0.0,
+                'eta_aerosol': None,
+                'eta': 0.0,
+                'supply_kg_hr': float(supply_kg_hr),
+                'notices': (reason,),
+                'lewis_notice': None,
+            }
+            record.update(detail)
+            if efficiency_outcomes is not None:
+                efficiency_outcomes.append({
+                    'status': 'pass_through',
+                    'reason': reason,
+                    'output_status': 'status_bearing',
+                    'species': species,
+                    'stage_number': int(stage.stage_number),
+                    'sub_order': int(stage.sub_order),
+                    'eta': 0.0,
+                })
+            return 0.0, record
+
+        if p_local_pa is None:
+            raise DepositionInputRefusal(
+                'flowing_pressure_pa',
+                None,
+                'stage inlet partial pressure is required',
+            )
+        p_local = _deposition_finite_scalar('flowing_pressure_pa', p_local_pa)
+        if p_local < 0.0:
+            raise DepositionInputRefusal(
+                'flowing_pressure_pa', p_local, 'must be nonnegative',
+            )
+        if p_local == 0.0:
+            return _zero('nonpositive_local_pressure', p_local_pa=0.0)
+        area_m2 = self._stage_area_m2_for_stage(stage)
+        if area_m2 is None:
+            raise DepositionInputRefusal(
+                'stage_area_m2', None, 'collector area is required',
+            )
+        if area_m2 == 0.0:
+            return _zero('no_configured_capture_area')
+        wall_K = _stage_midpoint_temperature_K(stage)
+        # Same wall-saturation owner as the HKL stages. A refusal there
+        # raises, and route() keeps the parcel in the flow. Na's solid
+        # branch is inside that owner. Do not open a second Antoine path
+        # that would capture after the owner has refused.
+        saturation_diagnostic: dict[str, Any] = {}
+        _wall_deposition_driving_pressure_pa(
+            species,
+            p_local,
+            wall_K,
+            vapor_pressure_data=self.vapor_pressure_data,
+            antoine_extrapolations=antoine_extrapolations,
+            antoine_extrapolation_warnings=antoine_extrapolation_warnings,
+            diagnostic_out=saturation_diagnostic,
+        )
+        if saturation_diagnostic.get('wall_saturation_pressure_refused'):
+            raise WallSaturationPressureRefusal(
+                species,
+                wall_K,
+                saturation_diagnostic.get(
+                    'wall_saturation_pressure_refusal_reason',
+                    'saturation_pressure_unavailable',
+                ),
+            )
+        p_sat = saturation_diagnostic.get('wall_saturation_pressure_pa')
+        if p_sat is None or not math.isfinite(float(p_sat)):
+            raise DepositionInputRefusal(
+                'saturation_pressure_pa',
+                p_sat,
+                'no saturation pressure for this species',
+            )
+        notices: list[str] = []
+        if species == 'K':
+            row = _species_vapor_data(
+                species, vapor_pressure_data=self.vapor_pressure_data,
+            )
+            block = row.get('pure_component_saturation') if isinstance(row, Mapping) else None
+            if not isinstance(block, Mapping):
+                # d-019: no K solid branch exists. The liquid Antoine,
+                # already extrapolated by ``_antoine_psat_pa``, is the
+                # prediction. Do not invent a fusion correction.
+                notices.append('no_solid_branch_predict_and_flag')
+        f_eq = equilibrium_capture_fraction(float(p_sat), p_local)
+        lewis_notice = None
+        ntu_mass = 0.0
+        heat_ntu = float(stage_ntu)
+        if heat_ntu > 0.0:
+            film_K = _stage_film_temperature_K(gas_inlet_K, wall_K)
+            lewis, lewis_notice = _carrier_self_lewis_number(
+                _canonical_carrier_gas_key(self.carrier_gas),
+                film_K,
+                total_pressure_pa,
+            )
+            if not math.isfinite(lewis) or lewis <= 0.0:
+                raise DepositionInputRefusal(
+                    'lewis_number', lewis, 'must be positive',
+                )
+            ntu_mass = heat_ntu / (lewis ** (2.0 / 3.0))
+        eta_vapour = vapour_entu_capture_fraction(f_eq, ntu_mass)
+        eta_aerosol, aerosol_notices = _cartridge_aerosol_efficiency_or_notice(
+            self.alkali_cartridge_geometry,
+            gas_inlet_K=gas_inlet_K,
+            wall_K=wall_K,
+            total_molar_flow_mol_s=total_molar_flow_mol_s,
+            total_pressure_pa=total_pressure_pa,
+            pipe_diameter_m=self.pipe_diameter_m,
+            carrier_gas=self.carrier_gas,
+        )
+        notices.extend(aerosol_notices)
+        record = {
+            'f_eq': f_eq,
+            'ntu_heat': heat_ntu,
+            'ntu_mass': ntu_mass,
+            'p_sat_pa': float(p_sat),
+            'p_local_pa': p_local,
+            'eta_vapour': eta_vapour,
+            'eta_aerosol': eta_aerosol,
+            'eta': eta_vapour,
+            'supply_kg_hr': float(supply_kg_hr),
+            'notices': tuple(notices),
+            'lewis_notice': lewis_notice,
+        }
+        return eta_vapour, record
 
     def _condensation_efficiency(
         self,
@@ -6492,6 +6710,478 @@ def _stage_bulk_mean_temperature_K(
     if ntu == 0.0:
         return gas_inlet_K
     return wall_K + (gas_inlet_K - wall_K) * (1.0 - math.exp(-ntu)) / ntu
+
+
+# Optional condenser_geometry.alkali_freeze_out_cartridge keys. Absent
+# keys flag the aerosol term; they are not filled with a default.
+_ALKALI_CARTRIDGE_GEOMETRY_KEYS = (
+    'baffle_spacing_m',
+    'passage_count',
+    'droplet_diameter_m',
+    'droplet_density_kg_m3',
+)
+_ALKALI_TRAIN_ACCOUNT = 'process.condensation_train'
+
+
+def _alkali_cartridge_geometry_from_setpoints(
+    setpoints: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Read declared cartridge geometry. Missing keys stay missing."""
+
+    raw = (setpoints or {}).get('condenser_geometry', {}) or {}
+    if not isinstance(raw, Mapping):
+        return {}
+    block = raw.get('alkali_freeze_out_cartridge', {})
+    if not isinstance(block, Mapping):
+        return {}
+    return {
+        key: block[key]
+        for key in _ALKALI_CARTRIDGE_GEOMETRY_KEYS
+        if key in block
+    }
+
+
+def equilibrium_capture_fraction(p_sat_pa: float, p_local_pa: float) -> float:
+    """Equilibrium fraction of the local vapour a cold wall can hold.
+
+    Premise. A wall in equilibrium with its own condensate supports
+    P_sat(T_wall). The driving force left in the local gas is
+    p_local - P_sat.
+
+    Algebra. f_eq = (p_local - P_sat) / p_local = 1 - P_sat / p_local.
+
+    Units. Both pressures are pascals, so f_eq is dimensionless.
+
+    Limits. P_sat = 0 gives 1. P_sat >= p_local gives 0. p_local <= 0
+    has no fraction and returns 0; the caller does not invent a pressure.
+    """
+
+    if p_local_pa <= 0.0:
+        return 0.0
+    if p_sat_pa <= 0.0:
+        return 1.0
+    return max(0.0, 1.0 - p_sat_pa / p_local_pa)
+
+
+def vapour_entu_capture_fraction(f_eq: float, ntu_mass: float) -> float:
+    """Vapour capture on an isothermal equilibrium wall.
+
+    Premise. ``_stage_heat_exchanger_ntu`` returns the heat NTU,
+    Le_self^(2/3) * k_c * A / Q. The mass NTU of the same exchanger is
+    that heat NTU divided by Le_self^(2/3), which is k_c A / Q. The
+    Lewis number is the carrier self-Lewis owner, not a second formula.
+
+    Algebra. An isothermal wall exchanger has effectiveness
+    1 - exp(-NTU_m). The equilibrium capacity of the wall is f_eq, so
+    eta_v = f_eq * (1 - exp(-NTU_m)).
+
+    Units. f_eq and NTU are dimensionless, so eta_v is dimensionless.
+
+    Limits. NTU -> 0 gives 0. NTU -> infinity gives f_eq. f_eq = 0
+    gives 0. This is not multiplied by a sticking coefficient: that
+    factor belongs to the HKL series resistance, which this visit does
+    not use.
+    """
+
+    if f_eq <= 0.0 or ntu_mass <= 0.0:
+        return 0.0
+    if not math.isfinite(ntu_mass):
+        return max(0.0, min(1.0, f_eq))
+    return f_eq * (1.0 - math.exp(-ntu_mass))
+
+
+def cunningham_slip_correction(knudsen: float) -> float:
+    """Davies 1945 slip correction. Kn = 2 lambda / d_p.
+
+    C_c = 1 + Kn * (1.257 + 0.400 * exp(-1.10 / Kn)).
+    The three numbers are the Davies correlation, not cartridge geometry.
+
+    Limits. Kn = 0 is continuum and C_c = 1. Kn > 0 gives C_c > 1.
+    Kn -> infinity gives C_c -> infinity.
+    """
+
+    if knudsen < 0.0 or (not math.isfinite(knudsen) and not math.isinf(knudsen)):
+        raise ValueError('Knudsen number must be nonnegative')
+    if knudsen == 0.0:
+        return 1.0
+    if math.isinf(knudsen):
+        return math.inf
+    return 1.0 + knudsen * (1.257 + 0.400 * math.exp(-1.10 / knudsen))
+
+
+def stokes_number(
+    *,
+    droplet_diameter_m: float,
+    droplet_density_kg_m3: float,
+    gas_velocity_m_s: float,
+    baffle_spacing_m: float,
+    gas_viscosity_pa_s: float,
+    cunningham: float,
+) -> float:
+    """Inertial impaction Stokes number, St = tau * U / L.
+
+    Premise. Stokes drag on a sphere is 3 * pi * mu * d * v. The droplet
+    mass is rho * pi * d^3 / 6. The stopping time is mass / (3 * pi * mu * d).
+
+    Algebra. tau = rho * d^2 * C_c / (18 * mu). St = tau * U / L, where
+    L is the baffle spacing, the length of the turn.
+
+    Units. rho is kg/m^3, d is m, mu is Pa.s = kg/(m.s), so tau is s.
+    U is m/s and L is m, so St is dimensionless. The 18 is that drag
+    definition, not a fitted cartridge constant.
+
+    Limits. d -> 0, U -> 0, or L -> infinity gives St -> 0: the droplet
+    follows the gas. Large d or U gives St >> 1: the droplet cannot turn.
+    """
+
+    if baffle_spacing_m <= 0.0 or gas_viscosity_pa_s <= 0.0:
+        raise ValueError('baffle spacing and viscosity must be positive')
+    if droplet_diameter_m < 0.0 or droplet_density_kg_m3 < 0.0:
+        raise ValueError('droplet diameter and density must be nonnegative')
+    if cunningham < 0.0 or gas_velocity_m_s < 0.0:
+        raise ValueError('Cunningham and velocity must be nonnegative')
+    relaxation_s = (
+        droplet_density_kg_m3
+        * droplet_diameter_m ** 2
+        * cunningham
+        / (18.0 * gas_viscosity_pa_s)
+    )
+    return relaxation_s * gas_velocity_m_s / baffle_spacing_m
+
+
+def single_row_impaction_efficiency(stokes: float) -> float:
+    """Assumed single-row grade curve eta = St / (St + 1).
+
+    This is not a measured cartridge curve and it is not the cyclone
+    Lapple curve. It is the smallest curve with the required limits and
+    no extra fitted constant.
+
+    Limits. St -> 0 gives 0. St = 1 gives 1/2. St >> 1 gives 1.
+    """
+
+    if stokes <= 0.0:
+        return 0.0
+    if not math.isfinite(stokes):
+        return 1.0
+    return stokes / (stokes + 1.0)
+
+
+def baffle_impaction_efficiency(stokes: float, passages: int) -> float:
+    """n independent baffle rows. eta_n = 1 - (1 - eta_1)^n.
+
+    Passage count comes from the caller. One row is the single-row curve.
+    More rows can only raise capture. St -> 0 stays 0 for any finite n.
+    St >> 1 is already 1 on the first row.
+    """
+
+    if isinstance(passages, bool) or not isinstance(passages, int) or passages < 1:
+        raise ValueError('passage count must be a positive integer')
+    eta_one = single_row_impaction_efficiency(stokes)
+    if passages == 1 or eta_one <= 0.0 or eta_one >= 1.0:
+        return eta_one
+    return 1.0 - (1.0 - eta_one) ** passages
+
+
+def cartridge_aerosol_efficiency(
+    *,
+    droplet_diameter_m: float,
+    droplet_density_kg_m3: float,
+    baffle_spacing_m: float,
+    passage_count: int,
+    gas_velocity_m_s: float,
+    gas_viscosity_pa_s: float,
+    mean_free_path_m: float,
+) -> float:
+    """Stokes impaction with Cunningham slip at the local mean free path."""
+
+    if droplet_diameter_m <= 0.0:
+        raise ValueError('droplet diameter must be positive')
+    if mean_free_path_m < 0.0:
+        raise ValueError('mean free path must be nonnegative')
+    knudsen = 2.0 * mean_free_path_m / droplet_diameter_m
+    slip = cunningham_slip_correction(knudsen)
+    stokes = stokes_number(
+        droplet_diameter_m=droplet_diameter_m,
+        droplet_density_kg_m3=droplet_density_kg_m3,
+        gas_velocity_m_s=gas_velocity_m_s,
+        baffle_spacing_m=baffle_spacing_m,
+        gas_viscosity_pa_s=gas_viscosity_pa_s,
+        cunningham=slip,
+    )
+    return baffle_impaction_efficiency(stokes, passage_count)
+
+
+def cartridge_capture_fraction(
+    eta_vapour: float,
+    f_eq: float,
+    eta_aerosol: float | None,
+    *,
+    wall_is_fog: bool,
+) -> float:
+    """Book aerosol only on the equilibrium remainder, and only in fog.
+
+    Premise. The vapour exchanger already removed eta_v of the inlet.
+    Droplets can form only from vapour the wall has not taken, and only
+    up to the equilibrium ceiling. Adding the impaction efficiency on
+    top of eta_v would capture the same vapour twice.
+
+    Algebra. eta = eta_v + (f_eq - eta_v) * eta_imp when the wall fog
+    code says the molecular eta is not the capture. Otherwise eta = eta_v.
+
+    Units. All three factors are dimensionless.
+
+    Limits. No fog, or no evaluable impaction, leaves eta_v. eta_imp = 0
+    leaves eta_v. eta_imp = 1 and fog gives f_eq, not eta_v + f_eq.
+    St -> 0 is eta_imp = 0. St >> 1 and fog reaches the ceiling and stops.
+    """
+
+    if eta_aerosol is None or not wall_is_fog:
+        return eta_vapour
+    remainder = f_eq - eta_vapour
+    if remainder <= 0.0 or eta_aerosol <= 0.0:
+        return eta_vapour
+    return eta_vapour + remainder * eta_aerosol
+
+
+def sodium_melting_temperature_K_from_row(
+    row: Mapping[str, Any] | None,
+) -> float | None:
+    """Na melting point from the solid-branch saturation owner, or None."""
+
+    from engines.builtin.sodium_saturation import sodium_saturation_block
+
+    block = sodium_saturation_block(row if isinstance(row, Mapping) else None)
+    if not isinstance(block, Mapping):
+        return None
+    try:
+        value = float(block.get('melting_temperature_K'))
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(value) or value <= 0.0:
+        return None
+    return value
+
+
+def alkali_cartridge_phase(
+    species: str,
+    melt_out_temperature_C: float | None,
+    *,
+    sodium_melting_temperature_K: float | None,
+) -> tuple[str, tuple[str, ...]]:
+    """Liquid or solid at the configured melt-out, or hold if a datum is missing.
+
+    Na is liquid only at or above the melting temperature on its
+    saturation block. K has no melting temperature in the vapour data:
+    predict-and-flag, and treat the configured melt-out as liquid.
+    Every other species stays solid. A missing melt-out holds the mass
+    on the train.
+    """
+
+    if melt_out_temperature_C is None:
+        return 'hold', ('melt_out_temperature_missing',)
+    melt_out_C = float(melt_out_temperature_C)
+    if not math.isfinite(melt_out_C):
+        return 'hold', ('melt_out_temperature_missing',)
+    if species == 'Na':
+        if sodium_melting_temperature_K is None:
+            return 'hold', ('sodium_melting_point_unavailable',)
+        melting_C = (
+            float(sodium_melting_temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+        )
+        if melt_out_C >= melting_C:
+            return 'liquid', ()
+        return 'solid', ()
+    if species == 'K':
+        return 'liquid', (
+            'potassium_melting_point_unavailable_owner_liquid_rule',
+        )
+    return 'solid', ()
+
+
+@dataclass(frozen=True)
+class AlkaliCartridgeSwingMove:
+    """One ledger hop of the same-hour cartridge swing."""
+
+    name: str
+    debit_account: str
+    credit_account: str
+    species: str
+    kg: float
+    reason: str
+    retarget_source: bool
+
+
+def alkali_cartridge_swing_moves(
+    product_kg: Mapping[str, float],
+    *,
+    melt_out_temperature_C: float | None,
+    sodium_melting_temperature_K: float | None,
+) -> tuple[tuple[AlkaliCartridgeSwingMove, ...], tuple[str, ...]]:
+    """Accumulate, then melt liquids back to the train and park solids.
+
+    The cartridge account receives every product and then gives it up
+    in the same hour. Liquid Na and K return to the train. Everything
+    else goes to the solid-residue account. A missing melt-out moves
+    nothing.
+    """
+
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    )
+
+    if melt_out_temperature_C is None:
+        return (), ('melt_out_temperature_missing',)
+    notices: list[str] = []
+    moves: list[AlkaliCartridgeSwingMove] = []
+    for species, raw_kg in product_kg.items():
+        kg = float(raw_kg)
+        if not math.isfinite(kg) or kg <= 0.0:
+            continue
+        phase, species_notices = alkali_cartridge_phase(
+            str(species),
+            melt_out_temperature_C,
+            sodium_melting_temperature_K=sodium_melting_temperature_K,
+        )
+        for notice in species_notices:
+            if notice not in notices:
+                notices.append(notice)
+        if phase == 'hold':
+            continue
+        moves.append(AlkaliCartridgeSwingMove(
+            name=f'alkali_cartridge_accumulate_{species}',
+            debit_account=_ALKALI_TRAIN_ACCOUNT,
+            credit_account=ALKALI_CARTRIDGE_ACCOUNT,
+            species=str(species),
+            kg=kg,
+            reason='alkali cartridge accumulates this hour of condensate',
+            retarget_source=False,
+        ))
+        if phase == 'liquid':
+            moves.append(AlkaliCartridgeSwingMove(
+                name=f'alkali_cartridge_melt_out_{species}',
+                debit_account=ALKALI_CARTRIDGE_ACCOUNT,
+                credit_account=_ALKALI_TRAIN_ACCOUNT,
+                species=str(species),
+                kg=kg,
+                reason='melt-out returns liquid alkali to the train',
+                retarget_source=False,
+            ))
+        else:
+            moves.append(AlkaliCartridgeSwingMove(
+                name=f'alkali_cartridge_solid_residue_{species}',
+                debit_account=ALKALI_CARTRIDGE_ACCOUNT,
+                credit_account=ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+                species=str(species),
+                kg=kg,
+                reason='melt-out leaves this solid off the alkali product',
+                retarget_source=True,
+            ))
+    return tuple(moves), tuple(notices)
+
+
+def _cartridge_aerosol_efficiency_or_notice(
+    geometry: Mapping[str, Any] | None,
+    *,
+    gas_inlet_K: float,
+    wall_K: float,
+    total_molar_flow_mol_s: float,
+    total_pressure_pa: float,
+    pipe_diameter_m: float,
+    carrier_gas: str,
+) -> tuple[float | None, tuple[str, ...]]:
+    """Impaction efficiency, or a flag when the geometry is not declared.
+
+    Velocity uses the throat area pi*(D/2)^2 from the pipe-diameter
+    setpoint and Q = n_dot * R * T_in / P. The baffle spacing is the
+    Stokes length, not a made-up passage width.
+    """
+
+    declared = dict(geometry or {})
+    missing = [
+        key for key in _ALKALI_CARTRIDGE_GEOMETRY_KEYS
+        if key not in declared or declared[key] is None
+    ]
+    if missing:
+        notices = [f'aerosol_unevaluable_missing_{key}' for key in missing]
+        if 'droplet_diameter_m' in missing:
+            notices.append(
+                'droplet_diameter_unmeasured_nafog_cooling_rate_not_selected'
+            )
+        return None, tuple(notices)
+    spacing_m = _deposition_finite_scalar(
+        'baffle_spacing_m', declared['baffle_spacing_m'],
+    )
+    diameter_m = _deposition_finite_scalar(
+        'droplet_diameter_m', declared['droplet_diameter_m'],
+    )
+    density = _deposition_finite_scalar(
+        'droplet_density_kg_m3', declared['droplet_density_kg_m3'],
+    )
+    if spacing_m <= 0.0 or diameter_m <= 0.0 or density <= 0.0:
+        raise DepositionInputRefusal(
+            'alkali_cartridge_geometry',
+            declared,
+            'spacing, droplet diameter and droplet density must be positive',
+        )
+    passages = declared['passage_count']
+    if isinstance(passages, bool) or not isinstance(passages, (int, float)):
+        raise DepositionInputRefusal(
+            'passage_count', passages, 'must be a positive integer',
+        )
+    if isinstance(passages, float) and not passages.is_integer():
+        raise DepositionInputRefusal(
+            'passage_count', passages, 'must be a positive integer',
+        )
+    passage_count = int(passages)
+    if passage_count < 1:
+        raise DepositionInputRefusal(
+            'passage_count', passages, 'must be a positive integer',
+        )
+    if not math.isfinite(total_pressure_pa) or total_pressure_pa <= 0.0:
+        return None, ('aerosol_unevaluable_no_pressure',)
+    throat_m = _deposition_finite_scalar('pipe_diameter_m', pipe_diameter_m)
+    if throat_m <= 0.0:
+        raise DepositionInputRefusal(
+            'pipe_diameter_m', throat_m, 'throat diameter must be positive',
+        )
+    flow_mol_s = _deposition_finite_scalar(
+        'n_total_mol_s', total_molar_flow_mol_s,
+    )
+    if flow_mol_s < 0.0:
+        raise DepositionInputRefusal(
+            'n_total_mol_s', flow_mol_s, 'must be nonnegative',
+        )
+    carrier_key = _canonical_carrier_gas_key(carrier_gas)
+    collision_m = COLLISION_DIAMETERS_M.get(carrier_key)
+    if collision_m is None:
+        raise DepositionInputRefusal(
+            'collision_diameter_m',
+            carrier_key,
+            'carrier has no collision diameter',
+        )
+    film_K = _stage_film_temperature_K(gas_inlet_K, wall_K)
+    # Existing air Sutherland owner. A carrier-specific viscosity is not
+    # in that function; this call does not invent one.
+    viscosity = dynamic_viscosity_sutherland_pa_s(film_K)
+    mean_free_path_m = single_species_mean_free_path_m(
+        total_pressure_pa, film_K, collision_m,
+    )
+    volumetric_m3_s = (
+        flow_mol_s * GAS_CONSTANT_J_MOL_K * gas_inlet_K / total_pressure_pa
+    )
+    throat_area_m2 = math.pi * (throat_m / 2.0) ** 2
+    velocity_m_s = volumetric_m3_s / throat_area_m2
+    eta = cartridge_aerosol_efficiency(
+        droplet_diameter_m=diameter_m,
+        droplet_density_kg_m3=density,
+        baffle_spacing_m=spacing_m,
+        passage_count=passage_count,
+        gas_velocity_m_s=velocity_m_s,
+        gas_viscosity_pa_s=viscosity,
+        mean_free_path_m=mean_free_path_m,
+    )
+    return eta, ('assumed_impaction_grade_curve',)
 
 
 def _stage_heat_exchanger_ntu(

@@ -12,6 +12,10 @@ from typing import Any, Callable
 from simulator.accounting.exceptions import OriginUnresolvedError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.accounting.lots import allocate_pool_withdrawal
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+)
 from simulator.accounting.queries import (
     TERMINAL_RUMP_REFRACTORY_OXIDES,
 )
@@ -43,6 +47,10 @@ _ACCOUNT_TO_BIN: Mapping[str, str] = {
     "process.cleaned_melt": "melt_retained",
     "process.c7_al_credit": "charge_unprocessed",
     "process.condensation_retained_holdup": "overhead_terminal_inventory",
+    # Same bin as the train. A new yield bin would be a schema bump.
+    # The census quotes the account ids, not this bin.
+    ALKALI_CARTRIDGE_ACCOUNT: "product_condensed",
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: "product_condensed",
     "process.metal_phase": "metal_phase_retained",
     "process.metal_phase_bottom_pool": "metal_phase_retained",
     "process.metal_phase_float_layer": "metal_phase_retained",

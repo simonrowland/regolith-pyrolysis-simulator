@@ -24,7 +24,11 @@ from simulator.condensation_routing import (
     target_species_for_stage_key,
     target_species_for_stage_number,
 )
-from simulator.config import resolve_collector_bands_C, resolve_substage_bands_C
+from simulator.config import (
+    resolve_alkali_cartridge_melt_out_C,
+    resolve_collector_bands_C,
+    resolve_substage_bands_C,
+)
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
@@ -709,6 +713,9 @@ class CondensationStage:
     # stage 4 and keeps stage_number 4. route() is the visit-order owner.
     sub_order: int = 0
     stage_key: str = ''
+    # Alkali freeze-out cartridge only. None means the swing does not
+    # move the hour's capture off the train.
+    melt_out_temperature_C: float | None = None
 
     def total_collected_kg(self) -> float:
         return sum(self.collected_kg.values())
@@ -838,7 +845,7 @@ class CondensationTrain:
     Stage 2: Cr oxide harvester (1100-1300°C)
     Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
     Stage 4: Na collector / alkali cyclone (250°C wall). Mg stays here.
-    Stage 4b: K cold trap (40°C wall), sub_order 1
+    Stage 4b: Alkali freeze-out cartridge (40°C wall), sub_order 1
     Stage 5: Vortex dust filter (200-350°C)
     Stage 6: Turbine/compressor — pressure regulation
     Stage 7: O₂ accumulator (~3 bar)
@@ -880,6 +887,7 @@ class CondensationTrain:
         """
         bands = resolve_collector_bands_C(setpoints)
         k_band = resolve_substage_bands_C(setpoints)[K_TRAP_STAGE_KEY]
+        melt_out_C = resolve_alkali_cartridge_melt_out_C(setpoints)
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
                               bands[0], []),
@@ -902,11 +910,12 @@ class CondensationTrain:
                               bands[6], []),
             CondensationStage(7, 'Turbine Outlet Monitor',
                               bands[7], []),
-            CondensationStage(4, 'K Cold Trap',
+            CondensationStage(4, 'Alkali freeze-out cartridge',
                               k_band,
                               target_species_for_stage_key(K_TRAP_STAGE_KEY),
                               sub_order=K_TRAP_SUB_ORDER,
-                              stage_key=K_TRAP_STAGE_KEY),
+                              stage_key=K_TRAP_STAGE_KEY,
+                              melt_out_temperature_C=melt_out_C),
         ]
         return CondensationTrain(stages=stages)
 

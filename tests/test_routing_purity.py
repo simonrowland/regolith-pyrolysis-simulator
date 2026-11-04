@@ -470,6 +470,15 @@ def test_na_at_the_k_trap_is_a_contaminant_and_mass_closes():
     host._record_stage_collection_source = (
         ExtractionMixin._record_stage_collection_source.__get__(host)
     )
+    host._retarget_stage_collection_source = (
+        ExtractionMixin._retarget_stage_collection_source.__get__(host)
+    )
+    host._swing_alkali_freeze_out_cartridge = (
+        EvaporationMixin._swing_alkali_freeze_out_cartridge.__get__(host)
+    )
+    host._move_ledger_species = lambda *args, **kwargs: 0.0
+    host._LEDGER_KG_TOL = 1e-12
+    host.vapor_pressures = {}
     for species in inlet:
         EvaporationMixin._project_condensed_stage_collection(
             host, route, species, route.condensed_for_species(species),
