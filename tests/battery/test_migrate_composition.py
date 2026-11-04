@@ -6708,3 +6708,97 @@ def test_lu_starting_trace_ppm_values_do_not_count_as_mass_percent_components() 
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
         assert observation.identity.composition.value == expected
+
+
+# Restored from green ce375cb5b: these pins still hold under the b-704 closure rule.
+def test_flemetakis_starting_glass_becomes_initial_charge_proxy(tmp_path) -> None:
+    source = "ta-flemetakis-2024.yaml"
+    source_path = REPO_ROOT / "data/literature/extracts" / source
+    document = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    source_row = next(
+        row
+        for species in document["species"].values()
+        for row in species["observations"]
+        if row["observation_id"] == "flemetakis_2024_starting_glass_composition"
+    )
+    assert source_row["values"]["composition_role"] == {
+        "value": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "locator": source_row["locator"],
+        "quote": source_row["quote"],
+    }
+
+    result = _migrate_real_extract(tmp_path, source)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.observation_id.endswith(
+            "flemetakis_2024_starting_glass_composition"
+        )
+    )
+    point_composition = (observation.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_value
+    assert isinstance(point_composition.state.value, Composition)
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+
+    initial = result.experiments[observation.experiment_id].sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert initial.locator is not None
+    assert initial.locator.section == "2.1 Starting material"
+    assert isinstance(initial.state.value, Composition)
+    assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert not migrate_module._initial_compositions_conflict(
+        initial, point_composition
+    )
+
+
+def test_hastie_typed_initial_charge_reaches_experiment_sample() -> None:
+    path = REPO_ROOT / "data/literature/extracts/kems-020-hastie-1981-nbsir.yaml"
+    document = yaml.safe_load(path.read_text(encoding="utf-8"))
+    observation = next(
+        item
+        for item in document["species"]["K2O"]["observations"]
+        if item["observation_id"] == "hastie_1981_fig11_k1_slag_k2o_gamma_digitized"
+    )
+    assert observation["values"]["composition_role"]["value"] == "initial_charge_only"
+    selected = sample_from_equipment(
+        None,
+        values=observation["values"],
+        locator=migrate_module.locator_from_mapping(observation["locator"]),
+    )
+    assert selected.initial_composition is not None
+
+    migrator = migrate_one_extract(REPO_ROOT, path)
+    migrator.finalize()
+    experiment = migrator.result.experiments[
+        "10.6028/nbs.ir.81-2279::experiment::hastie-1981-k1-kms"
+    ]
+
+    actual = experiment.sample.initial_composition
+    assert actual is not None and actual.state.is_value
+    assert dict(actual.state.value.components) == dict(
+        selected.initial_composition.state.value.components
+    )
+
+
+def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+    raw = {
+        "initial_composition": {
+            "locator": {"table": "2", "page": 14},
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "printed_oxides",
+                    "amount_basis": "mass_percent",
+                    "components": [["SiO2", "60"], ["Cl", "40"]],
+                },
+            },
+        }
+    }
+
+    sample = _sample_from_plain(raw)
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
