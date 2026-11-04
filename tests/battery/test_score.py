@@ -7473,7 +7473,7 @@ def test_paired_engine_rail_comparisons_include_all_shared_rows() -> None:
             "rail": Rail.VAPOUR.value,
             "reference": "shared",
             "candidate_request": {"engine": "vaporock"},
-            "numeric": {"operation": "dex", "value": "0.5"},
+            "numeric": {"operation": "dex", "value": "4"},
         },
         {
             "rail": Rail.VAPOUR.value,
@@ -7495,6 +7495,9 @@ def test_paired_engine_rail_comparisons_include_all_shared_rows() -> None:
         },
     ]
 
+    # Hand check: openimcc/VapoRock (4^2)=16, n=1, sqrt(16/1)=4;
+    # internal/VapoRock (4^2+4^2)=32, n=2, sqrt(32/2)=4;
+    # internal/ThermoEngine (2^2)=4, n=1, sqrt(4/1)=2.
     records = _paired_engine_rail_comparisons(
         rows,
         primary_engines=("openimcc", "internal-analytical"),
