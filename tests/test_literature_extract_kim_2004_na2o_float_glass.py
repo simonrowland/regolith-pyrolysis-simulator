@@ -38,6 +38,15 @@ EXPECTED_ACTIVITY = {
     "kim_2004_table3_glass_1370": ("3.19e-11", 4, "3"),
 }
 
+KIM_STANDARD_STATE_AS_PRINTED = (
+    "The activity of sodium oxide in the working melt, aNa2O(T), can be "
+    "evaluated from the Nernst equation as follows: log aNa2O(T) = "
+    "log aNa2O(R) + (1/2) log( P_O2(II) / P_O2(II) ) − 2FE/(2.303RT). "
+    "At 1 atm of oxygen pressure over both electrodes, the above equation "
+    "can be simplified as follows: log aNa2O(T) = "
+    "log aNa2O(R) − 2FE/(2.303RT)."
+)
+
 
 def _assert_kim_2004_pins(document: dict) -> None:
     rows = {
@@ -52,9 +61,7 @@ def _assert_kim_2004_pins(document: dict) -> None:
         assert point["activity"] == activity
         assert row["locator"]["page"] == page
         assert row["locator"]["table"] == table
-        assert row["standard_state_as_printed"].startswith(
-            "The activity of sodium oxide in the working melt, aNa2O(T), can be"
-        )
+        assert row["standard_state_as_printed"] == KIM_STANDARD_STATE_AS_PRINTED
         reference = row["standard_state"]
         assert reference["state"]["tag"] == "unknown"
         assert reference["inferred"] is False
@@ -79,6 +86,18 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         pass
     else:
         raise AssertionError("a changed render-pinned activity did not fail")
+    mutated_definition = deepcopy(document)
+    mutated_definition["species"]["Na2O"]["observations"][1][
+        "standard_state_as_printed"
+    ] = KIM_STANDARD_STATE_AS_PRINTED.replace(
+        "P_O2(II) / P_O2(II)", "P_O2(II) / P_O2(I)"
+    )
+    try:
+        _assert_kim_2004_pins(mutated_definition)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("a changed printed Nernst equation did not fail")
     mutated_reference = deepcopy(document)
     mutated_reference_row = next(
         row
