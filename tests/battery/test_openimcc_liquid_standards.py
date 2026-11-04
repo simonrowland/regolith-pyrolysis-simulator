@@ -86,16 +86,26 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     assert len(unknown_records & active_rows) == 3
     assert sum(record.kind == "non-source-basis" for record in records) == 3
 
-    assessment = resolve(
+    melt_assessment = resolve(
         _default_composition(),
         Quantity.ACTIVITY,
-        consumer="both",
+        consumer="melt",
         melt_pack=melt_pack,
         redox_pack=redox_pack,
     )
-    assert assessment.refusal_reason is None
+    redox_assessment = resolve(
+        _default_composition(),
+        Quantity.ACTIVITY,
+        consumer="redox",
+        melt_pack=melt_pack,
+        redox_pack=redox_pack,
+    )
+    assert melt_assessment.refusal_reason is None
+    assert redox_assessment.refusal_reason is None
 
-    facts = _notice_facts(assessment.notices)
+    facts = _notice_facts(
+        (*melt_assessment.notices, *redox_assessment.notices)
+    )
     unknown_rows = {
         fact.split("row=", 1)[1].split(";", 1)[0]
         for fact in facts
