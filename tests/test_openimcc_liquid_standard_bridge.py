@@ -82,6 +82,51 @@ def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
     assert "active=" in reason
 
 
+def test_openimcc_source_error_from_solve_is_not_swallowed(
+    monkeypatch: Any,
+) -> None:
+    error_type = openimcc.gas.ImccGasUnrecognizedSourceError
+
+    def fail_solve(*_args: Any, **_kwargs: Any) -> None:
+        raise error_type("solve-time source failure")
+
+    monkeypatch.setattr(openimcc_bridge._require_openimcc(), "evaluate", fail_solve)
+    with pytest.raises(error_type, match="solve-time source failure"):
+        openimcc_bridge.evaluate(
+            composition_mol={"K2O": 1.0, "SiO2": 1.0},
+            temperature_K=1800.0,
+        )
+
+
+def test_unrecognized_active_source_is_a_dependent_reference_unknown_flag(
+    monkeypatch: Any,
+) -> None:
+    from types import SimpleNamespace
+
+    gas = openimcc.gas
+    oxide_df = gas.load_gas_datapack().oxide_df.copy()
+    oxide_df.loc["MgO(l)", "Ref"] = "LAM1987"
+    monkeypatch.setattr(
+        gas,
+        "load_gas_datapack",
+        lambda: SimpleNamespace(oxide_df=oxide_df),
+    )
+
+    flags = openimcc_bridge.check_liquid_reference_standards(
+        _default_composition()
+    )
+    mg_flags = [flag for flag in flags if flag.oxide == "MgO"]
+
+    assert mg_flags
+    assert all(flag.kind == "reference-unknown" for flag in mg_flags)
+    assert all(
+        "printed Ref: LAM1987" in flag.reason
+        and "active source not recognized by the openimcc 9f25dfe registry"
+        in flag.reason
+        for flag in mg_flags
+    )
+
+
 def test_redox_bridge_refuses_melt_pack_mismatch(monkeypatch: Any) -> None:
     evaluate_redox = getattr(openimcc_bridge, "evaluate_redox", None)
     assert callable(evaluate_redox), "OpenIMCC redox bridge entry point is missing"
