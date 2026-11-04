@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import NoticeKind, Quantity
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -139,7 +139,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
     assert set(migrated) == target_ids and len(migrated) == 130
     assert sum(row.value.kind.value == "point" for row in migrated.values()) == 130
     assert sum(row.value.kind.value == "unavailable" for row in migrated.values()) == 0
-    closure_refusals = 0
+    renormalized_admissions = 0
     for raw in source_rows:
         row = migrated[raw["observation_id"]]
         assert row.value.point == Decimal(raw["values"]["activity"])
@@ -170,13 +170,24 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             kept_sum = sum(printed_composition.values(), Decimal("0"))
             condition = row.point_conditions["composition"]
             if kept_sum > Decimal("102"):
-                closure_refusals += 1
-                assert condition.state.is_unknown
-                assert (
-                    "exceeds the accepted kept-sum limit"
-                    in condition.state.reason
+                renormalized_admissions += 1
+                assert kept_sum <= Decimal("105")
+                assert condition.state.is_value
+                expected_composition = wt_pct_to_mole_fraction(
+                    printed_composition
+                ).components
+                assert condition.state.value.components == expected_composition
+                assert row.identity.composition.value.components == expected_composition
+                notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                    and notice.band == "95-102 wt% kept oxide total"
                 )
-                assert row.identity.composition == condition.state
+                assert notice.band == "95-102 wt% kept oxide total"
+                assert notice.original == kept_sum
+                assert "renormalized to 100 wt%" in notice.reason
+                assert "d-336 item 2" in notice.reason
             else:
                 assert Decimal("95") <= kept_sum <= Decimal("102")
                 expected_composition = wt_pct_to_mole_fraction(
@@ -198,7 +209,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             assert row.identity.temperature_K.value == Decimal("1653.15")
         assert row.identity.total_pressure_Pa.is_unknown
     assert migrated["doyle_1988_quoted_activity_stoichiometric_liquid_feo_1_93"].value.point == Decimal("1.93")
-    assert closure_refusals == 16
+    assert renormalized_admissions == 16
     pinned = migrated["doyle_1988_activity_p004_t01_r4_c1"]
     assert pinned.identity.composition.value.components == (
         ("SiO2", Decimal("0.5029497309599392770874071368")),

@@ -8,8 +8,11 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, ValueKind
-from simulator.battery.migrate import _percent_composition_closure_error
+from simulator.battery.enums import NoticeKind, Phase, PhaseRole, Quantity, ValueKind
+from simulator.battery.migrate import (
+    _percent_composition_closure_error,
+    wt_pct_to_mole_fraction,
+)
 from tests.battery.factories import migrate_one_extract
 
 
@@ -130,7 +133,8 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert set(migrated) == expected_ids
     assert len(migrated) == 278
     assert len(migrator.result.validation.hard_issues) == 0
-    assert len(migrator.result.validation.issues) == 634
+    # b-1128 resolves the composition-axis gap for 16 flux-e/flux-h rows.
+    assert len(migrator.result.validation.issues) == 618
     assert {issue.reason.value for issue in migrator.result.validation.issues} == {
         "identity_incomplete"
     }
@@ -212,12 +216,13 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
         == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
         and experiment_closure_errors[source_row["experiment"]] is None
     }
-    assert len(expected_closed_rows) == 8
+    assert len(expected_closed_rows) == 24
     assert {
         row.observation_id
         for row in phase_rows
         if row.identity.composition.is_value
     } == expected_closed_rows
+    renormalized_rows = 0
     for row in phase_rows:
         source_row = source_rows[row.observation_id.split("::", 1)[1]][1]
         printed = experiment_printed_maps[source_row["experiment"]]
@@ -230,7 +235,31 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert row.identity.composition.is_value
             assert point_composition.is_value
             assert closure_error is None
-            assert printed_sum == Decimal("95.04")
+            assert Decimal("95") <= printed_sum <= Decimal("105")
+            if printed_sum > Decimal("102"):
+                renormalized_rows += 1
+                actual = row.identity.composition.value
+                if actual.amount_basis.value == "mass_percent":
+                    actual_moles = wt_pct_to_mole_fraction(actual.as_map())
+                else:
+                    actual_moles = actual
+                expected_moles = wt_pct_to_mole_fraction(
+                    {name: Decimal(amount) for name, amount in printed.items()}
+                )
+                assert set(actual_moles.as_map()) == set(expected_moles.as_map())
+                for species, expected_fraction in expected_moles.as_map().items():
+                    assert abs(
+                        actual_moles.as_map()[species] - expected_fraction
+                    ) < Decimal("1e-26")
+                notice = next(
+                    notice
+                    for notice in row.notices
+                    if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                    and notice.band == "95-102 wt% kept oxide total"
+                )
+                assert notice.original == printed_sum
+                assert "renormalized to 100 wt%" in notice.reason
+                assert "d-336 item 2" in notice.reason
         else:
             assert row.identity.composition.is_unknown
             assert point_composition.is_unknown
@@ -238,6 +267,16 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert closure_error is not None
             assert closure_error in reason
             assert "unsupported component(s)" not in reason
+    assert renormalized_rows == 16
+    for flux, total in (("f", "105.14"), ("g", "105.50")):
+        experiment_id = f"kunisada-1986-na2co3-flux-{flux}"
+        closure_error = experiment_closure_errors[experiment_id]
+        assert closure_error is not None
+        assert f"sum={total} wt% is above 105 wt%" in closure_error
+        assert not any(
+            row.experiment_id == experiment_id and row.identity.composition.is_value
+            for row in phase_rows
+        )
 
     contexts = [
         context

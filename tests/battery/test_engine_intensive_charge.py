@@ -97,7 +97,7 @@ def test_printed_wt_percent_outside_closure_refuses_even_with_derived_initial_co
         declared_component_map=scale_ten_map,
     )
     assert closure.is_unknown
-    assert "sum=1000 wt% is above 102 wt%" in closure.reason
+    assert "sum=1000 wt% is above 105 wt%" in closure.reason
 
     valid_requests = engine_point_requests(
         collect_consumer_inputs(scale_one, bench, observation)
@@ -395,6 +395,80 @@ def test_charge_keeps_verbatim_mass_percent_component_keys():
     charge = charge_moles_by_species(experiment, bench)
 
     assert list(charge.by_species) == ["MgO"]
+
+
+def test_charge_keeps_routes_for_ambiguous_feot_and_feo_map():
+    experiment, bench, _observation = case()
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            initial_composition=None,
+            mass_kg=f.located(Value.point_of("0.001")),
+            printed_composition=f.located(
+                {"SiO2": D("50"), "FeOT": D("20"), "FeO": D("30")}
+            ),
+        ),
+    )
+
+    charge = charge_moles_by_species(experiment, bench)
+
+    assert set(charge.by_species) == {"SiO2", "FeO"}
+    assert charge["SiO2"].selected is not None
+    assert charge["FeO"].selected is not None
+
+
+def test_charge_renormalizes_104_wt_percent_map_and_refuses_above_105():
+    experiment, bench, _observation = case()
+    sample = replace(
+        experiment.sample,
+        initial_composition=None,
+        mass_kg=f.located(Value.point_of("0.001")),
+        printed_composition=f.located(
+            {"MgO": D("40"), "SiO2": D("64"), "XxO": D("0.4")}
+        ),
+    )
+    charge = charge_moles_by_species(replace(experiment, sample=sample), bench)
+
+    assert set(charge.by_species) == {"MgO", "SiO2"}
+    expected = {
+        "MgO": D("0.001") * D("40") / D("104") / D("0.040304"),
+        "SiO2": D("0.001") * D("64") / D("104") / D("0.060083"),
+    }
+    for species, moles in expected.items():
+        assert charge[species].selected is not None
+        assert charge[species].selected.route == "mass_times_printed_wt_percent"
+        assert float(charge[species].selected.value.point) == pytest.approx(
+            float(moles), rel=1e-12
+        )
+
+    at_kept_limit = replace(
+        sample,
+        printed_composition=f.located({"MgO": D("40"), "SiO2": D("65")}),
+    )
+    limit_charge = charge_moles_by_species(
+        replace(experiment, sample=at_kept_limit), bench
+    )
+    assert set(limit_charge.by_species) == {"MgO", "SiO2"}
+    for species, wt_percent, molar_mass in (
+        ("MgO", D("40"), D("0.040304")),
+        ("SiO2", D("65"), D("0.060083")),
+    ):
+        waypoint = limit_charge[species].selected
+        assert waypoint is not None
+        expected_moles = D("0.001") * wt_percent / D("105") / molar_mass
+        assert float(waypoint.value.point) == pytest.approx(
+            float(expected_moles), rel=1e-12
+        )
+
+    over_limit = replace(
+        sample,
+        printed_composition=f.located({"MgO": D("50"), "SiO2": D("55.01")}),
+    )
+    refused = charge_moles_by_species(replace(experiment, sample=over_limit), bench)
+    assert not refused.by_species
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.MISSING_EVIDENCE
 
 
 def test_charge_refuses_duplicate_normalized_mass_percent_species():
