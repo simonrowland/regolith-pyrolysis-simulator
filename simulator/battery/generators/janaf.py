@@ -2596,10 +2596,18 @@ _FUSION_TABLES = {
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
+    # Cr-014 (cr) and Cr-015 (l). The printed CRYSTAL <--> LIQUID row is 2603 K.
+    "Cr2O3": ("Cr-014", "Cr-015"),
 }
 
 _JANAF_POLYMORPH_BY_TABLE = {
-    **{"Ca-027": Polymorph.LIME, "Mg-008": Polymorph.PERICLASE},
+    **{
+        "Ca-027": Polymorph.LIME,
+        "Mg-008": Polymorph.PERICLASE,
+        # Cr-014's title does not print a crystal qualifier, so the dictionary
+        # row that names hematite for Fe-030 does not exist for eskolaite.
+        "Cr-014": Polymorph.ESKOLAITE,
+    },
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
@@ -2940,12 +2948,17 @@ _FUSION_NODE_SET_SHA256 = {
     "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    # Cr-014 shares the 0–3000 K crystal node set; Cr-015 the 0–4500 K liquid set.
+    "Cr-014": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
+    # JANAF Cr-014/Cr-015 print CRYSTAL <--> LIQUID at 2603 K.
+    "Cr2O3": Decimal("2603"),
 }
 
 

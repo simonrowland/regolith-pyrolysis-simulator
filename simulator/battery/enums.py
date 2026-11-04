@@ -376,6 +376,9 @@ class Polymorph(StrEnum):
     MARCASITE = "marcasite"
     PYRITE = "pyrite"
     HEMATITE = "hematite"
+    # JANAF Cr-014 prints "Chromium Oxide" with no mineral qualifier.
+    # Eskolaite is that crystal, assigned the way lime and periclase are.
+    ESKOLAITE = "eskolaite"
     MAGNETITE = "magnetite"
     ANATASE = "anatase"
     RUTILE = "rutile"

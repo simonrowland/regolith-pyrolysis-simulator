@@ -130,7 +130,8 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         assert any(
             notice.reason.startswith(
                 'reference_polymorph_inferred_stable_phase:'
-                '{"phase": "lime", "sizing_dex": "not sized", "table_id": "Ca-027"}'
+                '{"comparison_phase": null, "comparison_table_id": null, '
+                '"phase": "lime", "sizing_dex": "not sized", "table_id": "Ca-027"}'
             )
             for notice in converted.notices
         )

@@ -6632,6 +6632,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6677,6 +6678,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             "reference_converted_via_fusion;probe",
         ),
         (
+            FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
+        ),
+        (
             FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
             NoticeKind.DERIVATION_USES_COMPILATION,
             "source_flagged_less_reliable:probe",
@@ -6719,6 +6725,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6744,6 +6751,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
+        ),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
         ),
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
@@ -6776,6 +6787,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
@@ -13636,6 +13648,8 @@ def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
 
     assert stable.alternatives == ()
     assert detail == {
+        "comparison_phase": None,
+        "comparison_table_id": None,
         "phase": stable.selected.polymorph.value,
         "sizing_dex": "not sized",
         "table_id": stable.selected.table_id,
@@ -13742,12 +13756,21 @@ def test_kume_2000_silica_unnamed_phase_infers_the_stable_crystal() -> None:
 
     assert comparison.value.point != reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
-    assert any(
-        notice.reason.startswith(
-            f'{REFERENCE_POLYMORPH_INFERRED_REASON}:{{"phase": "{stable.selected.polymorph.value}"'
-        )
-        for notice in comparison.notices
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
     )
+    detail = json.loads(notice.reason.split(":", 1)[1])
+    nearest = min(
+        stable.alternatives,
+        key=lambda item: abs(item.gibbs_kJ_per_mol - stable.selected.gibbs_kJ_per_mol),
+    )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert detail["comparison_phase"] == nearest.polymorph.value
+    assert detail["comparison_table_id"] == nearest.table_id
+    assert detail["janaf_tridymite"] == "absent"
     assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
@@ -13792,11 +13815,18 @@ def test_unnamed_source_phase_scores_with_the_inferred_polymorph_flag() -> None:
         prediction=_predict(converted.value.point, converted.identity),
     )
 
-    assert residual.status is not ResidualStatus.REFUSED
+    # Prediction is the converted liquid point, so the residual is zero.
+    # The row is still NO_BAND: the inference flag is a flagged stratum and
+    # the JANAF fusion sigma is unprinted.
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
     assert residual.numeric is not None
-    assert residual.refusal is None or residual.refusal.reason is not (
-        RefusalReason.IDENTITY_INCOMPLETE
-    )
+    assert residual.numeric.decision_band is None
+    assert residual.numeric.value == Decimal("0")
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
     assert candidate is not None
     assert any(
         notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
@@ -13864,7 +13894,7 @@ def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason == "reference_polymorph_above_melting"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in comparison.notices
     )
 
@@ -14703,7 +14733,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
         is Phase.CR
     )
     assert any(
-        notice.reason == "reference_polymorph_above_melting"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in before_comparison.notices
     )
     assert (

@@ -29,13 +29,15 @@ from simulator.battery.generators.janaf import (
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import State, phase_token
 from simulator.battery.score import (
-    REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+    FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON,
+    FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
     REFERENCE_POLYMORPH_INFERENCE_MARGIN_K,
     REFERENCE_POLYMORPH_INFERRED_REASON,
     REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
     REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
     REFERENCE_SOLID_INFERRED_REASON,
     _rt_ln_10_j_per_mol_K,
+    flagged_strata,
     fusion_comparison_reference,
 )
 from tests.battery import factories as F
@@ -46,7 +48,25 @@ ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS = ROOT / "data" / "literature" / "extracts"
 
 
-def _omitted_solid(formula: str, temperature: Decimal, reason: str, point: str = "0.3"):
+_SIO2_NOTICE_KEYS = {
+    "comparison_phase",
+    "comparison_table_id",
+    "janaf_tridymite",
+    "phase",
+    "sizing_dex",
+    "table_id",
+}
+
+
+def _omitted_solid(
+    formula: str,
+    temperature: Decimal,
+    reason: str,
+    point: str = "0.3",
+    *,
+    fO2_Pa: Decimal | None = None,
+    omit_fO2: bool = False,
+):
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -67,6 +87,10 @@ def _omitted_solid(formula: str, temperature: Decimal, reason: str, point: str =
             )
         ),
     )
+    if omit_fO2:
+        identity = replace(identity, fO2_Pa=State.unknown("fO2 not printed"))
+    elif fO2_Pa is not None:
+        identity = replace(identity, fO2_Pa=State.of(fO2_Pa))
     reference = F.observation(
         f"{formula}-omitted-{temperature}",
         experiment.experiment_id,
@@ -141,9 +165,18 @@ def test_inferred_phase_tracks_the_table_on_both_sides_of_the_transition() -> No
         reference = _omitted_solid("SiO2", temperature, "polymorph not named")
         comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
         _notice, detail = _inference(comparison)
-        assert set(detail) == {"phase", "table_id", "sizing_dex"}
+        nearest = min(
+            stable.alternatives,
+            key=lambda item: abs(
+                item.gibbs_kJ_per_mol - stable.selected.gibbs_kJ_per_mol
+            ),
+        )
+        assert set(detail) == _SIO2_NOTICE_KEYS
         assert detail["phase"] == stable.selected.polymorph.value
         assert detail["table_id"] == stable.selected.table_id
+        assert detail["comparison_phase"] == nearest.polymorph.value
+        assert detail["comparison_table_id"] == nearest.table_id
+        assert detail["janaf_tridymite"] == "absent"
         assert detail["sizing_dex"] == sizing
         assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
@@ -218,7 +251,7 @@ def test_unnamed_solid_above_its_melting_crossing_refuses_without_relabeling() -
     assert refused.value.point == above.value.point
     assert refused.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason == REFERENCE_POLYMORPH_ABOVE_MELTING_REASON
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in refused.notices
     )
 
@@ -312,7 +345,8 @@ def test_stolyarova_and_kambayashi_unnamed_silica_score_with_the_flag() -> None:
             )
             notice, detail = _inference(comparison)
             assert notice.kind.value == "derivation_uses_compilation"
-            assert set(detail) == {"phase", "table_id", "sizing_dex"}
+            assert set(detail) == _SIO2_NOTICE_KEYS
+            assert detail["janaf_tridymite"] == "absent"
             assert detail["phase"] == stable.selected.polymorph.value
             assert detail["table_id"] == stable.selected.table_id
             assert detail["sizing_dex"] == sizing
@@ -332,3 +366,171 @@ def test_stolyarova_and_kambayashi_unnamed_silica_score_with_the_flag() -> None:
                 is solid_inferred
             )
             assert observation.identity.reference_state.value.endmember.polymorph.is_unknown
+
+
+def test_sizing_at_1873_names_the_janaf_partner_with_literal_dex() -> None:
+    """Dex values are the printed JANAF gap, not a second copy of the formula.
+
+    SiO2 at 1873 K is cristobalite_high O-035 versus quartz O-037.
+    Al2O3 at 1873 K is corundum Al-096 versus delta Al-097.
+    JANAF has no tridymite table, and the silica notice says so.
+    """
+
+    silica = fusion_comparison_reference(
+        _omitted_solid("SiO2", Decimal("1873"), "polymorph not named"),
+        engine=Engine.OPENIMCC,
+    )
+    _notice, detail = _inference(silica)
+    assert detail["phase"] == "cristobalite_high"
+    assert detail["table_id"] == "O-035"
+    assert detail["comparison_phase"] == "quartz"
+    assert detail["comparison_table_id"] == "O-037"
+    assert detail["janaf_tridymite"] == "absent"
+    assert detail["sizing_dex"] == "0.03963421821224556086346039045"
+
+    alumina = fusion_comparison_reference(
+        _omitted_solid("Al2O3", Decimal("1873"), "polymorph not named"),
+        engine=Engine.OPENIMCC,
+    )
+    _notice, detail = _inference(alumina)
+    assert detail["phase"] == "corundum"
+    assert detail["table_id"] == "Al-096"
+    assert detail["comparison_phase"] == "delta"
+    assert detail["comparison_table_id"] == "Al-097"
+    assert "janaf_tridymite" not in detail
+    assert detail["sizing_dex"] == "0.1036086765831357903632982043"
+
+
+def test_alo1_5_squares_onto_corundum_before_the_fusion_shift() -> None:
+    """Removing the square leaves the printed 0.0253 as the solid activity."""
+
+    printed = Decimal("0.0253")
+    reference = _omitted_solid(
+        "AlO1.5", Decimal("1873"), "polymorph not named", point="0.0253"
+    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    _notice, detail = _inference(comparison)
+    assert detail["printed_formula"] == "AlO1.5"
+    assert detail["dimer_formula"] == "Al2O3"
+    assert detail["phase"] == "corundum"
+    assert detail["table_id"] == "Al-096"
+    assert Decimal(detail["dimer_solid_activity"]) == Decimal("0.00064009")
+    assert comparison.value.point == Decimal(
+        "0.0001883871712739844995859130963"
+    )
+    assert reference.value.point == printed
+    assert any(
+        "source_activity_solid=0.00064009" in notice.reason
+        for notice in comparison.notices
+    )
+
+
+def test_cro1_5_squares_onto_eskolaite() -> None:
+    reference = _omitted_solid(
+        "CrO1.5", Decimal("1873"), "polymorph not named", point="0.2"
+    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    _notice, detail = _inference(comparison)
+    assert detail["phase"] == "eskolaite"
+    assert detail["table_id"] == "Cr-014"
+    assert detail["dimer_formula"] == "Cr2O3"
+    assert Decimal(detail["dimer_solid_activity"]) == Decimal("0.04")
+    assert detail["sizing_dex"] == "not sized"
+    assert detail["comparison_phase"] is None
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert comparison.value.point == Decimal(
+        "0.004340183395386964107579969876"
+    )
+    assert any(
+        "source_activity_solid=0.04" in notice.reason
+        for notice in comparison.notices
+    )
+    assert reference.value.point == Decimal("0.2")
+
+
+def test_feo1_5_outside_the_hematite_field_refuses_typed() -> None:
+    """Deleting the fO2 comparison lets a reducing row proceed to Fe2O3."""
+
+    # Hayashi prints 10^-9 atm = 0.000101325 Pa. That is below the
+    # hematite-magnetite equilibrium at 1573 K.
+    printed = Decimal("0.000101325")
+    reference = _omitted_solid(
+        "FeO1.5",
+        Decimal("1573"),
+        "polymorph not named",
+        point="0.2",
+        fO2_Pa=printed,
+    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason == FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON
+    )
+    assert "Fe-030/Fe-032" in notice.band
+    assert "6 Fe2O3 = 4 Fe3O4 + O2" in notice.band
+    assert f"printed fO2={printed} Pa" in notice.band
+    assert not any(
+        item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        for item in comparison.notices
+    )
+
+    absent = _omitted_solid(
+        "FeO1.5",
+        Decimal("1573"),
+        "polymorph not named",
+        omit_fO2=True,
+    )
+    refused = fusion_comparison_reference(absent, engine=Engine.OPENIMCC)
+    assert refused.value.point == absent.value.point
+    assert any(
+        item.reason == FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON
+        and "printed fO2=absent" in item.band
+        for item in refused.notices
+    )
+
+
+def test_feo1_5_inside_the_hematite_field_still_needs_a_fusion_pair() -> None:
+    """1 bar is above the 1573 K equilibrium. Fe2O3 has no JANAF liquid table."""
+
+    reference = _omitted_solid(
+        "FeO1.5",
+        Decimal("1573"),
+        "polymorph not named",
+        fO2_Pa=Decimal("100000"),
+    )
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert not any(
+        item.reason == FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON
+        for item in comparison.notices
+    )
+    assert any(
+        "no JANAF fusion table pair for Fe2O3" in item.reason
+        for item in comparison.notices
+    )
+
+
+def test_inferred_polymorph_is_a_flagged_stratum_for_magemin() -> None:
+    """Dropping the stratum registration leaves this MAGEMin comparison unflagged."""
+
+    silica = fusion_comparison_reference(
+        _omitted_solid("SiO2", Decimal("1873"), "polymorph not named"),
+        engine=Engine.MAGEMIN,
+    )
+    assert FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED in flagged_strata(
+        silica.notices
+    )
+    assert silica.value.point == Decimal("0.2738337894904822878984987920")
+
+    lime = fusion_comparison_reference(
+        _omitted_solid("CaO", Decimal("1873"), "polymorph not named"),
+        engine=Engine.MAGEMIN,
+    )
+    assert FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED in flagged_strata(
+        lime.notices
+    )
+    assert lime.value.point == Decimal("0.3")
+    assert lime.identity.reference_state.value.endmember.phase.value is Phase.CR

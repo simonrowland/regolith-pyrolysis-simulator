@@ -515,6 +515,9 @@ FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
+FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
+    "reference_polymorph_inferred_stable_phase"
+)
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_APPROXIMATE_VALUE = "approximate-printed-value"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
@@ -1961,6 +1964,12 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
+        and reason.startswith(f"{FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED}:")
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED)
+    if any(
+        isinstance(reason, str)
         and reason.startswith(
             f"{FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE}:"
         )
@@ -2040,7 +2049,7 @@ def _source_polymorph_is_rejected(source_polymorph: State | None) -> bool:
 # cristobalite/liquid crossing and is still beta-cristobalite; putting melting
 # inside this window would refuse that printed solid.
 REFERENCE_POLYMORPH_INFERENCE_MARGIN_K = Decimal(25)
-REFERENCE_POLYMORPH_INFERRED_REASON = "reference_polymorph_inferred_stable_phase"
+REFERENCE_POLYMORPH_INFERRED_REASON = FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED
 REFERENCE_SOLID_INFERRED_REASON = "reference_solid_inferred"
 REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON = (
     "reference_polymorph_near_phase_transition"
@@ -2048,15 +2057,28 @@ REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON = (
 REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON = (
     "reference_polymorph_quench_or_metastable_stated"
 )
-REFERENCE_POLYMORPH_ABOVE_MELTING_REASON = "reference_polymorph_above_melting"
+REFERENCE_POLYMORPH_ABOVE_MELTING_REASON = "printed_solid_reference_above_melting"
+# FeO1.5 is hematite only above the hematite–magnetite equilibrium. The
+# token names that field; the notice band carries T, the printed fO2, and
+# the equilibrium fO2.
+FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON = "feo1_5_outside_hematite_stability_field"
 _REFERENCE_POLYMORPH_REFUSAL_REASONS = frozenset(
     {
         "fusion_source_reference_phase_unprinted",
         REFERENCE_POLYMORPH_NEAR_TRANSITION_REASON,
         REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
         REFERENCE_POLYMORPH_ABOVE_MELTING_REASON,
+        FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON,
     }
 )
+# a(MO1.5) = a(M2O3)^(1/2) on the dimer's crystal. NaO0.5 is not in this
+# map: the ruling names Al, Cr, and Fe only.
+_ONE_CATION_OXIDE_DIMER = {
+    "AlO1.5": "Al2O3",
+    "CrO1.5": "Cr2O3",
+    "FeO1.5": "Fe2O3",
+}
+_JANAF_BAR_PA = Decimal(100000)
 _QUENCH_OR_METASTABLE_WORD = re.compile(
     r"\b(?:quench(?:ed|ing)?|metastable)\b",
     re.IGNORECASE,
@@ -2117,6 +2139,75 @@ def _reference_polymorph_notice(
     )
 
 
+def _hematite_magnetite_equilibrium_fO2_Pa(temperature_K: Decimal) -> Decimal:
+    """Oxygen pressure where pure hematite and pure magnetite are in equilibrium.
+
+    Premise: hematite (JANAF Fe-030) is the pure Fe2O3 crystal, and the
+    adjacent oxide at lower fO2 is magnetite (Fe-032). Formation reactions
+    at 1 bar are 2 Fe + 3/2 O2 = Fe2O3 and 3 Fe + 2 O2 = Fe3O4, so
+    6 Fe2O3 = 4 Fe3O4 + O2.
+    Algebra: ΔG = 4 G(Fe-032) − 6 G(Fe-030), and fO2/bar = exp(−ΔG / RT).
+    Hematite is the stable pure oxide only when the printed fO2 is above
+    that value. The d-333 iron-saturation owner is the iron–liquid boundary,
+    not this one; both boundaries are read from the JANAF tables this scorer
+    already uses, not from a fixed 1735 K.
+    Units: G is J/mol and R is J/(mol·K), so the exponent is dimensionless
+    and fO2 is in bar. Multiply by 1e5 Pa/bar.
+    Sanity: the equilibrium is 1 bar near 1737 K and 0.21 bar (air) near
+    1657 K. A printed 10^-9 atm is far below either figure.
+    """
+
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+
+    delta_g_J = (
+        4 * _janaf_formation_gibbs_J("Fe-032", temperature_K)
+        - 6 * _janaf_formation_gibbs_J("Fe-030", temperature_K)
+    )
+    fO2_bar = (-delta_g_J / (JANAF_R_J_PER_MOL_K * temperature_K)).exp()
+    return fO2_bar * _JANAF_BAR_PA
+
+
+def _feo1_5_hematite_field_refusal(
+    reference: Observation,
+    identity: Identity,
+    temperature_K: Decimal,
+) -> Notice | None:
+    """Refuse FeO1.5 unless the printed fO2 is inside the hematite field."""
+
+    try:
+        equilibrium_Pa = _hematite_magnetite_equilibrium_fO2_Pa(temperature_K)
+    except (KeyError, ValueError) as exc:
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            reason=(
+                "fusion conversion missing input for FeO1.5: "
+                f"hematite-magnetite equilibrium unavailable: {exc}"
+            ),
+            band=f"JANAF Fe-030/Fe-032 equilibrium at {temperature_K} K: {exc}",
+        )
+    printed = identity.fO2_Pa
+    printed_Pa = (
+        Decimal(str(printed.value))
+        if printed is not None and printed.is_value and printed.value is not None
+        else None
+    )
+    if printed_Pa is None or printed_Pa <= equilibrium_Pa:
+        printed_text = "absent" if printed_Pa is None else f"{printed_Pa} Pa"
+        return _reference_polymorph_notice(
+            reference,
+            kind=NoticeKind.INPUT_OMITTED,
+            reason=FEO1_5_OUTSIDE_HEMATITE_FIELD_REASON,
+            band=(
+                "FeO1.5 maps to hematite only above the JANAF "
+                "hematite-magnetite equilibrium 6 Fe2O3 = 4 Fe3O4 + O2 "
+                f"(tables Fe-030/Fe-032); printed fO2={printed_text}; "
+                f"equilibrium fO2={equilibrium_Pa} Pa at T={temperature_K} K"
+            ),
+        )
+    return None
+
+
 def _decide_omitted_reference_polymorph(
     reference: Observation,
     identity: Identity,
@@ -2150,6 +2241,35 @@ def _decide_omitted_reference_polymorph(
             kind=NoticeKind.INPUT_OMITTED,
             reason=REFERENCE_POLYMORPH_QUENCH_OR_METASTABLE_REASON,
             band="source states a quench or a metastable reference phase",
+        )
+
+    # Premise: a printed one-cation solid references the dimer's crystal,
+    # a(MO1.5) = a(M2O3)^(1/2). Algebra: a(M2O3) = a(MO1.5)^2, then the
+    # dimer's JANAF fusion shift. Units: both activities are dimensionless.
+    # Sanity: Kume a(AlO1.5)=0.0253 squares to 0.00064009 on corundum.
+    # FeO1.5 is hematite only inside the Fe-030/Fe-032 fO2 field; otherwise
+    # the printed point is kept and the refusal names that field.
+    mapped_from: str | None = None
+    dimer = _ONE_CATION_OXIDE_DIMER.get(formula)
+    if dimer is not None:
+        if formula == "FeO1.5":
+            field_refusal = _feo1_5_hematite_field_refusal(
+                reference, identity, temperature_K
+            )
+            if field_refusal is not None:
+                return None, field_refusal
+        mapped_from = formula
+        formula = dimer
+        assert reference.value.point is not None
+        endmember = replace(standard_state.endmember, formula=formula)
+        standard_state = replace(
+            standard_state, endmember=endmember, component_basis=formula
+        )
+        identity = replace(identity, reference_state=State.of(standard_state))
+        reference = replace(
+            reference,
+            identity=identity,
+            value=replace(reference.value, point=reference.value.point ** 2),
         )
 
     def missing(detail: str) -> Notice:
@@ -2230,11 +2350,10 @@ def _decide_omitted_reference_polymorph(
     # Units: (kJ/mol) * (1000 J/kJ) / ((J/(mol·K)) * K) = dimensionless dex.
     # Sanity: cristobalite versus tridymite near 1950 K is about 0.01 dex.
     # JANAF has no tridymite table, so the nearest tabulated alternative is
-    # whatever crystal this table actually carries. "not sized" when it has
-    # no second polymorph.
-    if not stability.alternatives:
-        sizing_dex = "not sized"
-    else:
+    # whatever crystal this table actually carries. The notice names that
+    # partner. "not sized" when it has no second polymorph.
+    nearest_alternative = None
+    if stability.alternatives:
         nearest_alternative = min(
             stability.alternatives,
             key=lambda item: abs(
@@ -2246,11 +2365,27 @@ def _decide_omitted_reference_polymorph(
             * Decimal(1000)
             / _rt_ln_10_j_per_mol_K(temperature_K)
         )
+    else:
+        sizing_dex = "not sized"
     payload = {
+        "comparison_phase": (
+            None
+            if nearest_alternative is None
+            else nearest_alternative.polymorph.value
+        ),
+        "comparison_table_id": (
+            None if nearest_alternative is None else nearest_alternative.table_id
+        ),
         "phase": selected.polymorph.value,
         "sizing_dex": sizing_dex,
         "table_id": selected.table_id,
     }
+    if formula == "SiO2":
+        payload["janaf_tridymite"] = "absent"
+    if mapped_from is not None:
+        payload["dimer_formula"] = formula
+        payload["dimer_solid_activity"] = str(reference.value.point)
+        payload["printed_formula"] = mapped_from
     notices = [
         _reference_polymorph_notice(
             reference,
@@ -2556,6 +2691,15 @@ def _janaf_fusion_energy_for_scored_reference(
             "source reference polymorph is not stated"
         )
     formula = identity.reference_state.value.endmember.formula
+    comparison_identity = comparison_reference.identity
+    if (
+        isinstance(comparison_identity, Identity)
+        and comparison_identity.reference_state is not None
+        and comparison_identity.reference_state.is_value
+    ):
+        # A one-cation row is scored on the dimer crystal. The stored
+        # species stays as printed; the working endmember carries the dimer.
+        formula = comparison_identity.reference_state.value.endmember.formula
     from simulator.battery.generators.janaf import (
         _fusion_table_pair,
         _janaf_fusion_energy_for_pair,
@@ -3391,6 +3535,7 @@ def fusion_comparison_reference(
             and identity.reference_state.is_value
         )
         standard_state = identity.reference_state.value
+        formula = standard_state.endmember.formula
 
     magemin_target_polymorph: Polymorph | None = None
     magemin_source_polymorph: Polymorph | None = None
