@@ -11,6 +11,7 @@ EXTRACT = (
     ROOT
     / "data/literature/extracts/zaitsev-2000-sodium-silicate-thermodynamics.yaml"
 )
+PRIMARY_EXTRACT = ROOT / "data/literature/extracts/zaitsev-1999-na2o-sio2-pccp.yaml"
 
 
 def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
@@ -116,3 +117,69 @@ def test_zaitsev_2000_tables_4_and_6_migrate_with_binary_conditions_and_signs():
         printed_minus_delta_h = point["printed_minus_delta_H_kJ_per_mol"]
         assert observation.value.point == -Decimal(printed_minus_delta_h)
         assert observation.locator.page == 9
+
+
+def test_zaitsev_2000_reprint_links_72_admitted_1999_activity_cells():
+    from simulator.battery.enums import AdmissionStatus, Quantity
+
+    documents = {
+        path.stem: yaml.safe_load(path.read_text(encoding="utf-8"))
+        for path in (PRIMARY_EXTRACT, EXTRACT)
+    }
+    migrator = Migrator(
+        root=ROOT,
+        index={
+            source_id: dict(document["source"])
+            for source_id, document in documents.items()
+        },
+        aliases={},
+    )
+    for path in (PRIMARY_EXTRACT, EXTRACT):
+        migrator._migrate_extract(path)
+    migrator.finalize()
+
+    observations = migrator.result.observations
+    primary_ids = {
+        observation_id
+        for observation_id, observation in observations.items()
+        if observation.source_id == PRIMARY_EXTRACT.stem
+        and observation.admission.status is AdmissionStatus.ADMITTED
+    }
+    linked = {
+        observation.observation_id: observation.provenance[
+            "duplicate_of_observation_id"
+        ]
+        for observation in observations.values()
+        if (
+            observation.source_id == EXTRACT.stem
+            and isinstance(observation.provenance, dict)
+            and "duplicate_of_observation_id" in observation.provenance
+        )
+    }
+
+    assert len(linked) == 72
+    assert set(linked.values()) <= primary_ids
+    assert all(
+        observations[observation_id].identity.quantity.value is Quantity.ACTIVITY
+        for observation_id in linked
+    )
+    assert all(
+        observations[observation_id].admission.status is AdmissionStatus.ADMITTED
+        for observation_id in linked
+    )
+    assert all(
+        not point.get("duplicate_of_observation_id")
+        for observation in documents[EXTRACT.stem]["species"]["Na2O"][
+            "observations"
+        ]
+        if observation["observation_id"]
+        == "zaitsev_2000_table4_na2o_experimental_activity"
+        for point in observation["values"]["points"]
+        if point["row_as_printed"] in {"26", "27", "28", "29"}
+    )
+    assert all(
+        "duplicate_of_observation_id" not in (observation.provenance or {})
+        for observation in observations.values()
+        if observation.source_id == EXTRACT.stem
+        and observation.identity.quantity.value is not Quantity.ACTIVITY
+    )
