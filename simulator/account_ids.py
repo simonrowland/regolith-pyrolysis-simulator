@@ -22,6 +22,13 @@ ALKALI_CARTRIDGE_ACCOUNT = "process.alkali_cartridge"
 ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT = (
     "process.alkali_cartridge_solid_residue"
 )
+# classify_products owns this class. The key and label live here so
+# the yield notice and the cost ledger can name the same class without
+# importing the report module (that import would cycle).
+ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS = "alkali_cartridge_solid_residue"
+ALKALI_CARTRIDGE_SOLID_RESIDUE_LABEL = (
+    "Stage-4 cartridge solid residue (unseparated)"
+)
 # Writer sweep (2026-07-12): evaporation._project_condensed_stage_collection
 # projects condensation-train credits; extraction._project_condensed_species
 # projects condensation-train, dedicated terminal chromium-product, or

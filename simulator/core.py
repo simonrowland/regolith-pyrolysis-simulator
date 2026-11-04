@@ -13341,6 +13341,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.campaign_mgr.c0_remaining_budget_exit = None
             self.campaign_mgr.c0_forecast_adjustment_notices = []
             self._pending_c0_forecast_adjustment_notices = []
+            # Train alkali only. Solid Na left on the cartridge residue
+            # is excluded on purpose; this field is not total alkali capture.
             self._c0_start_train_alkali_kg = (
                 self._c0_nak_mass_kg_from_atom_moles(
                     self.atom_ledger.atom_moles_by_account(
@@ -14431,6 +14433,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.atom_ledger.atom_moles_by_account(account),
                 starting_mass_kg=alkali_feed_mass_kg,
             )
+        # Train alkali only. Solid Na left on the cartridge residue
+        # is excluded on purpose; this field is not total alkali capture.
         alkali_already_to_train_kg = max(
             0.0,
             self._c0_nak_mass_kg_from_atom_moles(

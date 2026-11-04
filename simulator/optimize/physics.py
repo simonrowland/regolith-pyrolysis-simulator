@@ -1772,7 +1772,7 @@ def _target_species_yield_payload(
         status = "not-applicable"
     elif result.yield_fraction is None:
         status = "insufficient-evidence"
-    return MappingProxyType({
+    payload = {
         "status": status,
         "conclusion": "reported" if has_denominator else status,
         "applicable": has_denominator,
@@ -1811,7 +1811,10 @@ def _target_species_yield_payload(
             else None
         ),
         "reason": result.reason,
-    })
+    }
+    if result.notices:
+        payload["notices"] = result.notices
+    return MappingProxyType(payload)
 
 
 def _target_species_yield_insufficient_payload(

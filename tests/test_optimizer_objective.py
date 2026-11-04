@@ -13,6 +13,7 @@ from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
 from simulator.optimize.evaluate import RunReference, ScoredResult, _run_reference
 from simulator.optimize.objective import (
+    _captured_products_mol,
     CAPTURED_PRODUCT_BOOKKEEPING_SPECIES_PATTERNS,
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
@@ -2747,6 +2748,45 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     assert "product_summary.target_species_yield_report" in target_yield["consumer"]
     assert target_yield["targets"]["K"]["status"] == "not-applicable"
     assert target_yield["targets"]["Fe"]["yield_fraction"] is not None
+
+
+def test_captured_products_mol_counts_residue_once() -> None:
+    from simulator.account_ids import (
+        ALKALI_CARTRIDGE_ACCOUNT,
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    )
+
+    accounts = {
+        "process.metal_phase": {"Fe": 0.1},
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT: {
+            "Fe": 0.2,
+            "SiO2": 0.3,
+            "MgO": 0.05,
+        },
+        ALKALI_CARTRIDGE_ACCOUNT: {"K": 0.04},
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT: {"Cr2O3": 0.4},
+        "terminal.oxygen_melt_offgas_vented_to_vacuum": {"O2": 1.0},
+        "process.cleaned_melt": {"MgO": 9.0},
+    }
+
+    class Ledger:
+        def mol_by_account(self):
+            return accounts
+
+        def project_account_mol(self, account):
+            return dict(accounts.get(account, {}))
+
+    captured = _captured_products_mol(
+        SimpleNamespace(simulator=SimpleNamespace(atom_ledger=Ledger()))
+    )
+
+    assert captured["Fe"] == pytest.approx(0.3)
+    assert captured["SiO2"] == pytest.approx(0.3)
+    assert captured["MgO"] == pytest.approx(0.05)
+    assert captured["K"] == pytest.approx(0.04)
+    assert captured["Cr2O3"] == pytest.approx(0.4)
+    assert "O2" not in captured
 
 
 def test_product_summary_preserves_high_t_melt_activity_notice() -> None:

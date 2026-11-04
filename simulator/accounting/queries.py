@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -73,6 +74,10 @@ PRODUCT_LEDGER_ACCOUNTS = (
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_TRAIN_ACCOUNT,
     "process.overhead_gas",
+    # Captured-species census. The flat map adds these kilograms once.
+    # It is not a clean-metal assignment: classify_products reports this
+    # account as its own class and does not fold it into ingots.
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
 )
 REAGENT_BOOKKEEPING_PRODUCT_PREFIXES = ("unspent_", "consumed_")
 REAGENT_BOOKKEEPING_PRODUCT_SUFFIX = "_reagent"
@@ -936,6 +941,13 @@ class AccountingQueries:
         return bound_kg
 
     def condensation_totals_with_terminal_oxygen(self) -> dict[str, float]:
+        """Live condenser-train inventory, plus stored melt-offgas oxygen.
+
+        The freeze-out swing returns liquid Na and K to this train and
+        parks every other solid on the cartridge residue. This reader
+        stays on the train: it is current train inventory, not the
+        residue census and not gross capture.
+        """
         totals = {
             species: float(kg)
             for species, kg in self.ledger.project_account_kg(

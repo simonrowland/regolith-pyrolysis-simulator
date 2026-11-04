@@ -10,7 +10,10 @@ from functools import wraps
 from types import MappingProxyType
 from typing import Any
 
-from simulator.account_ids import METAL_PHASE_ACCOUNTS
+from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+    METAL_PHASE_ACCOUNTS,
+)
 from simulator.accounting.completeness import (
     product_class_availability,
     product_class_target_species,
@@ -37,11 +40,15 @@ from simulator.scalar_boundary import is_declared_real_scalar
 VECTOR_TOLERANCE = 1e-12
 COST_LEDGER_SCHEMA_VERSION = "cost-ledger-v1"
 COST_POLICY_ID = "mass-allocation-default__reagent-full-cost-v1"
+# The residue is captured process inventory, so a credit stays on an
+# active lot under that account. It is not one of the metal-phase
+# accounts: residue Fe does not join process.metal_phase Fe.
 COST_BEARING_ACCOUNTS = frozenset({
     "process.reagent_inventory",
     *METAL_PHASE_ACCOUNTS,
     "process.condensation_train",
     "process.c7_al_credit",
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
 })
 MRE_ELECTRICAL_CAMPAIGNS = frozenset({"C5", "MRE_BASELINE"})
 _AUXILIARY_ELECTRICAL_BREAKDOWN_FIELDS = (
@@ -1504,12 +1511,21 @@ def _split_beneficiary_outputs(lots: tuple[Any, ...]) -> tuple[dict[Any, float],
 
 
 def _is_target_product_account(account: str) -> bool:
+    """Beneficiary product, as opposed to slag or a non-product coproduct.
+
+    The cartridge residue is its own captured product class, so reagent
+    cost may land on it. The lot key stays on the residue account and
+    is not merged into a metal-phase product.
+    """
     account = str(account)
     return (
         account in METAL_PHASE_ACCOUNTS
         or account == "process.condensation_train"
-        or account.startswith("terminal.")
-        and account not in {"terminal.slag"}
+        or account == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+        or (
+            account.startswith("terminal.")
+            and account not in {"terminal.slag"}
+        )
     )
 
 

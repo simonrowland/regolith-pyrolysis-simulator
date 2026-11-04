@@ -581,6 +581,7 @@ function renderProductLedgerPanel(payload) {
         if (appendAdvisorySection(content, 'Glass out', story.glass, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Oxygen out', story.oxygen, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Captured volatiles out', story.captured_volatiles, 'kg', true)) sections += 1;
+        if (appendAdvisorySection(content, 'Stage-4 cartridge solid residue (unseparated)', story.alkali_cartridge_solid_residue, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Refractory ceramic out', story.refractory_ceramic, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Terminal residue — incompletely extracted', story.terminal_residue, 'kg', true)) sections += 1;
         if (appendAdvisorySection(content, 'Escaped to vacuum', story.escaped_to_vacuum, 'kg', true)) sections += 1;
