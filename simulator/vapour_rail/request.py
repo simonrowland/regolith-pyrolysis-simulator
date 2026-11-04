@@ -309,6 +309,9 @@ class VapourResolveState:
         default_factory=lambda: MappingProxyType({})
     )
     imcc_activity_shadow_enabled: bool = False
+    # Liquid-state fact for the FeO shadow. Not vapour request identity:
+    # omitted from as_mapping so it cannot enter _state_fingerprint.
+    liquid_feo_domain: Any = None
 
     def __post_init__(self) -> None:
         if not isinstance(self.melt_activity_shadow_enabled, bool):

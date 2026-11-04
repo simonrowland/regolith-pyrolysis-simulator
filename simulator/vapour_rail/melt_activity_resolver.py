@@ -148,6 +148,7 @@ class MeltActivityQuery:
     composition_wt_pct: Mapping[str, float] = field(default_factory=dict)
     out_of_domain: bool = False
     continuation_ln_band: tuple[float, float] | None = None
+    liquid_feo_domain: Any = None
 
 
 @dataclass(frozen=True)
@@ -2324,12 +2325,14 @@ class MeltActivityResolver:
                 fO2_log=float(query.intrinsic_fO2_log10),
                 T_K=query.temperature_K,
                 pressure_bar=pressure_control,
+                liquid_domain=query.liquid_feo_domain,
             )
             diagnostic = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=query.composition_wt_pct,
                 fO2_log=float(query.intrinsic_fO2_log10),
                 T_K=query.temperature_K,
                 pressure_bar=pressure_control,
+                liquid_domain=query.liquid_feo_domain,
             )
         except (TypeError, ValueError) as exc:
             return self._refusal(
@@ -3005,6 +3008,7 @@ def build_shadow_for_vapour_batch(
         redox_model_id=redox_model_id,
         redox_model_digest=redox_model_digest,
         composition_wt_pct=composition_wt_pct,
+        liquid_feo_domain=getattr(state, "liquid_feo_domain", None),
     )
     fe_result = resolver.resolve_feo_shadow(fe_query)
     results["FeO"] = fe_result
