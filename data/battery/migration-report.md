@@ -4,7 +4,7 @@ rows in: 89572
 records out (observations): 179594
 works: 756
 experiments: 6874
-queue size: 120653
+queue size: 120608
 identical-payload dedupe aliases: 342
 metadata files: 50
 index sources: 754
@@ -19105,7 +19105,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/cacciatore-zajacz-2026-v-sc-oxybarometer.yaml` | 682 | 682 | 682 |
 | `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 15 | 33 |
 | `data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml` | 8 | 8 | 31 |
-| `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` | 120 | 120 | 150 |
+| `data/literature/extracts/charles-1967-alkali-silicate-activities.yaml` | 120 | 120 | 120 |
 | `data/literature/extracts/charnoz-2023-hydrogen-magma-ocean.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/chatain-2021-nacro2-thermodynamics.yaml` | 26 | 26 | 62 |
 | `data/literature/extracts/chaudary-1997-v-redox-binary-silicate.yaml` | 0 | 0 | 1 |
@@ -19146,7 +19146,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/doyle-1989-tio2-feo-activity-magma.yaml` | 167 | 167 | 334 |
 | `data/literature/extracts/drowart-1960-al2o3-kems.yaml` | 10 | 141 | 0 |
 | `data/literature/extracts/ehrt-2008-sn-redox-aluminosilicate.yaml` | 8 | 13 | 8 |
-| `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` | 17 | 17 | 51 |
+| `data/literature/extracts/eliezer-howald-1978-potassium-silicate-vapor-pressure.yaml` | 17 | 17 | 46 |
 | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml` | 24 | 381 | 24 |
 | `data/literature/extracts/ewing-1963-sodium-potassium-properties.yaml` | 1 | 43 | 1 |
@@ -19340,7 +19340,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kirschen-1999-si-ti-al-miscibility.yaml` | 51 | 51 | 8 |
 | `data/literature/extracts/kirschen-decapitani-1999-liquid-miscibility.yaml` | 576 | 576 | 110 |
 | `data/literature/extracts/klemme-2011-cobalt-nickel-titanate-carbonate-heat-capacity.yaml` | 14 | 827 | 22 |
-| `data/literature/extracts/kohsaka-1979-na2o-sio2-emf.yaml` | 95 | 95 | 180 |
+| `data/literature/extracts/kohsaka-1979-na2o-sio2-emf.yaml` | 95 | 95 | 170 |
 | `data/literature/extracts/konar-2018-alkali-cmas-thesis.yaml` | 25 | 25 | 64 |
 | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` | 4 | 56 | 64 |
 | `data/literature/extracts/kozhina-2000-na-glassforming-thermodynamics.yaml` | 0 | 0 | 1 |
