@@ -16511,9 +16511,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.admission.status is AdmissionStatus.ADMITTED
     }
     assert len(fresh_stolyarova_1996_pressures) == 55
+    # 606aedd6f relabelled these columns measured_reduced and the cell
+    # oxygen lineage became untyped. Table 2 footnote a and Eqs. (7)–(9)
+    # print calculated pressures; the ion-current inputs are not printed.
     assert all(
         observation.evidence.class_.is_value
-        and observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_1996_pressures.values()
     )
     stolyarova_atomic_oxygen_pressures = {
@@ -16612,9 +16615,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # The reviewed source edits type these 1995 and 1996 calculated oxygen
-    # pressure columns MEASURED_REDUCED. They are author reductions of KEMS
-    # measurements; the raw ion-current inputs are not printed.
+    # 1995 calculated oxygen stays measured_reduced. The 1996 Table 2
+    # columns are quoted_attributed: footnote a and Eqs. (7)–(9) calculate
+    # them, and the row ion currents are not printed.
     assert len(stolyarova_1995_derived_pressures) == 0
     assert len(stolyarova_1996_derived_pressures) == 0
     stolyarova_1995_measured_pressures = {
@@ -16635,7 +16638,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
     assert len(stolyarova_1995_measured_pressures) == 26
@@ -17002,16 +17005,18 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert all(
             observations[row.reference].evidence.class_.is_value
             and observations[row.reference].evidence.class_.value
-            is EvidenceClass.MEASURED_REDUCED
+            is EvidenceClass.QUOTED_ATTRIBUTED
             for row in stolyarova_1996_measured_rows
         )
+        # Quoted oxygen is outside MEASURED_EVIDENCE, so the apparatus gate
+        # (including effusion regime) does not apply. The rows still refuse
+        # identity_incomplete.
         assert {
             row.refusal.reason
             for row in stolyarova_1996_measured_rows
             if row.refusal is not None
         } == {
             RefusalReason.IDENTITY_INCOMPLETE,
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
         }
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
