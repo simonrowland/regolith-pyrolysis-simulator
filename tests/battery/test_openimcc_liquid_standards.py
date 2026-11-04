@@ -1,11 +1,21 @@
 from __future__ import annotations
 
+from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any, Callable
 
 import openimcc
 from openimcc.redox_pack import load_redox_pack
 
-from simulator.battery.enums import NoticeKind, Quantity, RefusalReason
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    NoticeKind,
+    Quantity,
+    RefusalReason,
+)
+from simulator.battery.records import Composition, State
+from simulator.battery import residue
 from simulator.battery import score
 from simulator.melt_backend.openimcc_bridge import _load_pack
 
@@ -59,7 +69,21 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
         record.kind in {"mismatch", "undeclared", "redox-mismatch"}
         for record in records
     )
-    assert sum(record.kind == "reference-unknown" for record in records) == 4
+    unknown_records = {
+        record.row_key
+        for record in records
+        if record.kind == "reference-unknown"
+    }
+    active_rows = set(melt_pack.kernel_datapack.reactions)
+    assert unknown_records == {
+        "K2SiO3",
+        "K2Si2O5",
+        "K2Si4O9",
+        "KCaAlSi2O7",
+    }
+    # KCaAlSi2O7 has a registry marker but is inactive in this loaded pack.
+    assert "KCaAlSi2O7" not in active_rows
+    assert len(unknown_records & active_rows) == 3
     assert sum(record.kind == "non-source-basis" for record in records) == 3
 
     assessment = resolve(
@@ -116,3 +140,42 @@ def test_missing_reaction_oxide_suppresses_that_rows_notice() -> None:
         for fact in _notice_facts(assessment.notices)
         if "kind=reference-unknown" in fact
     }
+
+
+def test_openimcc_residue_result_carries_liquid_standard_notices(
+    monkeypatch: Any,
+) -> None:
+    pack = _load_pack("default")
+    composition = Composition(
+        basis="mole_inventory",
+        components=tuple(
+            (oxide, Decimal("1")) for oxide in (*pack.parent_oxides, "MnO")
+        ),
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    experiment = SimpleNamespace(
+        sample=SimpleNamespace(
+            initial_composition=SimpleNamespace(state=State.of(composition))
+        )
+    )
+    observation = SimpleNamespace(source_id="liquid-standard-residue-test")
+    identity = SimpleNamespace(temperature_K=State.of(Decimal("1800")))
+    residue_result = SimpleNamespace(
+        engine_flags=(), engine_metadata={}, mass_loss_fraction=0.1
+    )
+    monkeypatch.setattr(score, "load_yaml", lambda _path: {})
+    monkeypatch.setattr(
+        residue, "predict_mass_loss_fraction", lambda *_args, **_kwargs: residue_result
+    )
+
+    prediction = score._predict_mass_loss_with_residue(
+        Engine.OPENIMCC,
+        identity,
+        "test-channel",
+        ("openimcc",),
+        experiment,
+        observation,
+    )
+
+    assert prediction.value == Decimal("0.1")
+    assert any("row=K2SiO3;" in notice.reason for notice in prediction.notices)
