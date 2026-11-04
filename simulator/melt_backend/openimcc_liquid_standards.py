@@ -3,13 +3,97 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+import importlib
 import math
+import threading
 from typing import Any
 
 
 _REFUSAL_KINDS = frozenset({"mismatch", "undeclared", "redox-mismatch"})
 _FLAG_KINDS = frozenset({"reference-unknown", "non-source-basis"})
+_SOURCE_LOOKUP_LOCK = threading.RLock()
+_UNRECOGNIZED_SOURCE = object()
+_UNRECOGNIZED_SOURCE_REASON = (
+    "active source not recognized by the openimcc 9f25dfe registry"
+)
+
+
+def _check_pack_standards(
+    openimcc: Any,
+    pack: object,
+    profile: str | None,
+    *,
+    redox_pack: object | None = None,
+) -> tuple[tuple[Any, ...], dict[str, str]]:
+    """Run OpenIMCC's checker while preserving unknown active-source oxides.
+
+    The registry helper walks the whole active table and aborts on its first
+    unrecognized source. During that classification call only, capture the
+    offending oxide and printed Ref at OpenIMCC's resolver primitive, let its
+    helper finish, then omit that oxide from the active map. The checker can
+    then classify its declaration as reference-unknown. The temporary hooks
+    are serialized and thread-scoped; solve calls run after they are restored.
+    """
+    gas = importlib.import_module("openimcc.gas")
+    standards = importlib.import_module("openimcc.standards")
+    unrecognized_sources: dict[str, str] = {}
+    lookup_thread = threading.get_ident()
+
+    with _SOURCE_LOOKUP_LOCK:
+        original_active_lookup = standards.active_liquid_standards
+        original_source_resolver = gas._condensate_source_table_id
+
+        def active_liquid_standards(profile_value: str | None = None):
+            if threading.get_ident() != lookup_thread:
+                return original_active_lookup(profile_value)
+
+            def resolve_source(
+                species: str,
+                phase: str,
+                source_ref: str,
+                oxide_df: Any,
+            ) -> str | object | None:
+                if threading.get_ident() != lookup_thread:
+                    return original_source_resolver(
+                        species, phase, source_ref, oxide_df
+                    )
+                try:
+                    return original_source_resolver(
+                        species, phase, source_ref, oxide_df
+                    )
+                except gas.ImccGasUnrecognizedSourceError:
+                    unrecognized_sources[str(species)] = str(source_ref)
+                    return _UNRECOGNIZED_SOURCE
+
+            gas._condensate_source_table_id = resolve_source
+            try:
+                active = dict(original_active_lookup(profile_value))
+            finally:
+                gas._condensate_source_table_id = original_source_resolver
+            for oxide in unrecognized_sources:
+                active.pop(oxide, None)
+            return active
+
+        standards.active_liquid_standards = active_liquid_standards
+        try:
+            records = openimcc.check_pack_standards(
+                pack,
+                profile,
+                redox_pack=redox_pack,
+            )
+        finally:
+            standards.active_liquid_standards = original_active_lookup
+            gas._condensate_source_table_id = original_source_resolver
+
+    normalized = tuple(
+        replace(record, kind="reference-unknown", active=None)
+        if record.oxide in unrecognized_sources
+        and record.kind in {"mismatch", "redox-mismatch"}
+        else record
+        for record in records
+    )
+    return normalized, unrecognized_sources
 
 
 @dataclass(frozen=True)
@@ -215,7 +299,9 @@ def assess_liquid_standards(
     """
     import openimcc
 
-    melt_records = tuple(openimcc.check_pack_standards(melt_pack, profile))
+    melt_records, unrecognized_sources = _check_pack_standards(
+        openimcc, melt_pack, profile
+    )
     if redox_pack is None:
         melt_rows = _melt_rows(melt_pack)
         records_by_pack = (
@@ -228,11 +314,13 @@ def assess_liquid_standards(
             ),
         )
     else:
-        all_records = tuple(
-            openimcc.check_pack_standards(
-                melt_pack, profile, redox_pack=redox_pack
-            )
+        all_records, redox_unrecognized_sources = _check_pack_standards(
+            openimcc,
+            melt_pack,
+            profile,
+            redox_pack=redox_pack,
         )
+        unrecognized_sources.update(redox_unrecognized_sources)
         redox_records = all_records[len(melt_records):]
         melt_rows = _melt_rows(melt_pack)
         redox_rows = _redox_rows(redox_pack)
@@ -303,6 +391,12 @@ def assess_liquid_standards(
                         or record.citation
                         or "unknown"
                     )
+                    source_ref = unrecognized_sources.get(record.oxide)
+                    if source_ref is not None:
+                        citation = (
+                            f"{citation}; {_UNRECOGNIZED_SOURCE_REASON}; "
+                            f"printed Ref: {source_ref}"
+                        )
                 else:
                     if (
                         effective.get(record.oxide) != record.standard_id
