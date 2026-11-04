@@ -8914,8 +8914,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     assert census.get("evaporation_rate", 0) == 0
     # Re-pinned after the loader-survival regeneration: Richter +50 measured
     # mass_loss_pct / 100 singleton series; mismatches remains 0.
-    # The same Ozawa 2012 extract adds 86 printed mass-loss fraction cells: 69->155.
-    assert census.get("mass_loss_fraction") == 155
+    # Ozawa 2012 Table 1 rows are flat observations after e0f1d52a7;
+    # _series_census counts only values.series, leaving the three series sources at 69.
+    assert census.get("mass_loss_fraction") == 69
     assert census.get("mass_loss_rate", 0) == 0
     # Re-pinned once for the reviewed Ueshima replacement: its Fe-Mo Table 4
     # adds 58 printed T_C points, routed as transition_temperature. The
@@ -9021,7 +9022,9 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8904, (n_numeric, census, n_unavailable)
+    # Ozawa 2012 Table 1's 86 rows are flat after e0f1d52a7, so
+    # _series_census excludes them from the numeric total: 8904 - 86 = 8818.
+    assert n_numeric == 8818, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
