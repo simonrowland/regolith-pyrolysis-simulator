@@ -15,6 +15,8 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
@@ -46,6 +48,8 @@ _REQUIRED_CONTRACT_FIELDS = (
 _VAPOR_TERMINAL_OFFGAS_ACCOUNT = "terminal.offgas"
 _VAPOR_PRODUCT_ACCOUNTS = (
     "process.condensation_train",
+    ALKALI_CARTRIDGE_ACCOUNT,
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     "process.overhead_gas",
     _VAPOR_TERMINAL_OFFGAS_ACCOUNT,
     "terminal.chromium_condensed_oxide_stored",

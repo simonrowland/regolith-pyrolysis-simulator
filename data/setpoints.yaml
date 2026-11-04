@@ -748,6 +748,8 @@ completion_contracts:
     mechanism: "vaporization"
     product_accounts: &vapor_product_accounts
       - "process.condensation_train"
+      - "process.alkali_cartridge"
+      - "process.alkali_cartridge_solid_residue"
       - "process.overhead_gas"
       - "terminal.chromium_condensed_oxide_stored"
     residual_accounts: &vapor_residual_accounts
@@ -1199,11 +1201,18 @@ condensation_train:
         K: [400, 500]
 
     stage_4b_k_trap:
-      label: "K Cold Trap"
+      label: "Alkali freeze-out cartridge"
       # Sub-stage of 4. route() visits it after the Na collector and before
-      # stage 5. Wall 40 C is below the K Antoine band (679-1033 K):
-      # predict-and-flag. Provisional on b-588 and b-599.
+      # stage 5. Wall 40 C is inside the 25-40 C freeze-out band and below
+      # the Na melting point. K has no solid-branch saturation owner:
+      # predict-and-flag (d-019). Melt-out returns liquid Na and K to the
+      # train the C3 transfer reads. Solids leave that product. One
+      # cartridge is in service for the hour and is regenerated off-line.
+      # No baffle spacing, passage count, droplet diameter, or droplet
+      # density is declared, so the aerosol term stays unevaluable.
+      # Provisional on b-588 and b-599.
       temp_range_C: [40, 40]
+      melt_out_temperature_C: 120
 
     stage_5_vortex_dust_filter:
       label: "Vortex Dust Filter"
@@ -1258,7 +1267,7 @@ condenser_geometry:
     cr_stage2: "engineering-default: removable Cr oxide cartridge sits between Fe condenser and SiO baffles with intermediate capture surface"
     sio_stage3: "engineering-default: removable SiO baffle cartridge needs the largest capture surface among named stages"
     alkali_stage4: "owner-ruling-d137: Na collector, area 0.051 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
-    k_stage4b: "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599"
+    k_stage4b: "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599"
     terminal: "engineering-default: terminal vent/capture area is not the constriction; keep >= throat for follow-on Kn diagnostics"
   # Capture-law gas-side length only. Parallel plates of gap g have
   # Dh = 2*g. The Stage-1 collector is a 10 mm gap, so Dh = 0.020 m.

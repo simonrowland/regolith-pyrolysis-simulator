@@ -5,6 +5,7 @@ import copy
 
 import pytest
 
+from simulator.account_ids import STAGE_COLLECTION_BACKING_ACCOUNTS
 from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     CondensationModel, CondensationRouteResult, DepositionInputRefusal, Stage3SilicaExposureRefusal,
@@ -367,8 +368,14 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
     assert not stage3.get('Na', 0.0) and not stage3.get('K', 0.0)
     for sp in ('Na', 'K', 'Na2O', 'K2O', 'Si', 'SiO2'):
         projected = sum(stage.collected_kg.get(sp, 0.0) for stage in sim.train.stages)
-        assert projected == pytest.approx(sim.atom_ledger.kg_by_account(
-            'process.condensation_train').get(sp, 0.0))
+        # collected_kg is the physical stage inventory. Liquid Na and K
+        # return to the train. Solids booked on the freeze-out cartridge
+        # move to the residue account, so the train alone is not the backing.
+        backed = sum(
+            sim.atom_ledger.kg_by_account(account).get(sp, 0.0)
+            for account in STAGE_COLLECTION_BACKING_ACCOUNTS
+        )
+        assert projected == pytest.approx(backed)
     if oxygen_mol:
         assert oxide_mol > 0.0
         assert stage_purity_report(sim.train)['stage_3_sio_zone']['purity_fraction'] < 1.0
