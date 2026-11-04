@@ -5864,11 +5864,16 @@ class _MELTSBackendSupport(MeltBackend):
             backend_reason = diagnostics.get('backend_status_reason')
             engine_exception = diagnostics.get('engine_exception')
             if (
-                result_status == 'out_of_domain'
+                result_status in {'out_of_domain', 'not_converged'}
                 and isinstance(backend_reason, str)
                 and backend_reason
             ):
-                reason_class = f'{result_status}:{backend_reason}'
+                reason_prefix = (
+                    'nonconvergence'
+                    if result_status == 'not_converged'
+                    else result_status
+                )
+                reason_class = f'{reason_prefix}:{backend_reason}'
             elif (
                 result_status == 'not_converged'
                 and isinstance(engine_exception, str)
@@ -5885,17 +5890,13 @@ class _MELTSBackendSupport(MeltBackend):
                 }.get(result_status, 'unusable_status')
             from simulator.engine_local_config import warn_once_with_summary
 
-            logger.debug(
-                'VapoRock fallback details for %s: status=%s; %s',
-                reason_class,
-                result.status,
-                detail,
-            )
             warn_once_with_summary(
                 'simulator.melt_backend.alphamelts.vaporock_fallback:'
                 f'{reason_class}',
                 'VapoRock returned no usable vapor pressures '
-                f'(reason={reason_class}); using activity x Antoine fallback rows '
+                f'(reason={reason_class}; status={result_status}; '
+                f'T={T_C:.6g} C; pressure={pressure_bar:.6g} bar; '
+                f'detail={detail}); using activity x Antoine fallback rows '
                 '(fit_target=pure_component_psat is a fit target, not a '
                 'first-principles evidence class; pseudo rows are backsolved '
                 'VapoRock curve-fits).',

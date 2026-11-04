@@ -325,17 +325,12 @@ def effective_equilibrium_pressure_Pa(
         if evaluation.out_of_range:
             from simulator.engine_local_config import warn_once_with_summary
 
-            logger.debug(
-                "%s melt-source reaction continued at %.6g K: %s",
-                species,
-                T_K,
-                evaluation.status,
-            )
             warn_once_with_summary(
                 'simulator.chemistry.ellingham_graph:'
                 f'{species}:{evaluation.status}',
                 f"{species} melt-source reaction: {evaluation.status}; "
-                "using conservative continuation outside the certified range",
+                f"continued at {T_K:.6g} K using conservative continuation "
+                "outside the certified range",
                 stacklevel=2,
             )
         return evaluation.pressure_pa

@@ -13,6 +13,7 @@ import re
 import shutil
 import socket
 import subprocess
+import sys
 import threading
 import tomllib
 import warnings
@@ -938,6 +939,34 @@ def is_legacy_cache_version(version: str) -> bool:
     return False
 
 
+def _effective_warning_action(
+    message: str,
+    category: type[Warning],
+    module: str,
+    lineno: int,
+) -> str:
+    """Return the first warnings.filterwarnings rule matching this warning."""
+    # Match warnings.warn_explicit: first matching message/category/module/line
+    # rule wins, and a line number of zero matches every line.
+    for (
+        action,
+        message_pattern,
+        filter_category,
+        module_pattern,
+        filter_lineno,
+    ) in warnings.filters:
+        if not issubclass(category, filter_category):
+            continue
+        if message_pattern is not None and message_pattern.match(message) is None:
+            continue
+        if module_pattern is not None and module_pattern.match(module) is None:
+            continue
+        if filter_lineno != 0 and filter_lineno != lineno:
+            continue
+        return action
+    return "default"
+
+
 def warn_once_with_summary(
     key: str,
     message: str,
@@ -945,18 +974,38 @@ def warn_once_with_summary(
     category: type[Warning] = UserWarning,
     stacklevel: int = 2,
 ) -> bool:
-    """Warn on every call and tally occurrences for the process summary.
+    """Emit according to the active filter and summarize process repeats.
 
-    Python's warning filters own emission policy so ``pytest.warns`` and
-    warnings-as-errors see every call. Callers must keep warning text stable
-    for each key; the default warning filter suppresses repeated output.
+    ``default``, ``once`` and ``module`` filters dedupe by the explicit key,
+    so changes to ``warnings.filters`` cannot invalidate the once registry and
+    re-flood scorer stderr. ``always`` and ``error`` still reach ``warn`` on
+    every call for tests and warnings-as-errors.
     """
     warning_key = str(key)
+    try:
+        warning_frame = sys._getframe(stacklevel - 1)
+    except ValueError:
+        warning_module = ""
+        warning_lineno = 0
+    else:
+        warning_module = str(warning_frame.f_globals.get("__name__", ""))
+        warning_lineno = warning_frame.f_lineno
+
     with _WARNING_REPEAT_LOCK:
         previous_count = _WARNING_REPEAT_COUNTS.get(warning_key, 0)
-        _WARNING_REPEAT_COUNTS[warning_key] = previous_count + 1
-    warnings.warn(message, category, stacklevel=stacklevel)
-    return previous_count == 0
+        action = _effective_warning_action(
+            message, category, warning_module, warning_lineno
+        )
+        if action == "ignore":
+            return False
+        if action in {"default", "once", "module"} and previous_count:
+            _WARNING_REPEAT_COUNTS[warning_key] = previous_count + 1
+            return False
+
+        warnings.warn(message, category, stacklevel=stacklevel)
+        if previous_count == 0:
+            _WARNING_REPEAT_COUNTS[warning_key] = 1
+        return previous_count == 0
 
 
 def _flush_warning_repeat_summaries() -> None:

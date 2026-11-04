@@ -846,12 +846,12 @@ def validate_physical_pO2_bar(pO2_bar: float) -> float:
     if notice is not None:
         from simulator.engine_local_config import warn_once_with_summary
 
-        logger.debug("Physical pO2 evaluation notice: %s", notice)
         warn_once_with_summary(
             'simulator.vapour_rail.channels.validate_physical_pO2_bar:'
             f'{notice["reason"]}',
-            f'{notice["reason"]}: physical pO2 is outside the MELT '
-            'dissociation evaluator band; extrapolating without clamping.',
+            f'Physical pO2 evaluation notice: {notice}; physical pO2 is '
+            'outside the MELT dissociation evaluator band; extrapolating '
+            'without clamping.',
             stacklevel=2,
         )
     return oxygen
