@@ -142,7 +142,7 @@ def test_warn_legacy_once_respects_always_filter() -> None:
     ]
 
 
-def test_warn_once_with_summary_emits_every_call_and_counts_repeats(
+def test_warn_once_with_summary_always_filter_emits_every_call(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
