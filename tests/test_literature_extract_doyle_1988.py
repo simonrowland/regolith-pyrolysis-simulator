@@ -139,6 +139,7 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
     assert set(migrated) == target_ids and len(migrated) == 130
     assert sum(row.value.kind.value == "point" for row in migrated.values()) == 130
     assert sum(row.value.kind.value == "unavailable" for row in migrated.values()) == 0
+    closure_refusals = 0
     for raw in source_rows:
         row = migrated[raw["observation_id"]]
         assert row.value.point == Decimal(raw["values"]["activity"])
@@ -163,21 +164,48 @@ def test_doyle_1988_isolated_migration_pins_every_numeric_row_and_conditions():
             assert row.identity.temperature_K.value == Decimal("1600")
             assert row.identity.fO2_Pa.is_value
             components = raw["point_conditions"]["composition"]["state"]["value"]["components"]
-            expected_composition = wt_pct_to_mole_fraction(
-                {name: Decimal(value) for name, value in components.items()}
-            ).components
-            assert row.point_conditions["composition"].state.value.components == expected_composition
-            assert row.identity.composition.is_value
-            assert row.identity.composition.value.components == expected_composition
+            printed_composition = {
+                name: Decimal(value) for name, value in components.items()
+            }
+            kept_sum = sum(printed_composition.values(), Decimal("0"))
+            condition = row.point_conditions["composition"]
+            if kept_sum > Decimal("102"):
+                closure_refusals += 1
+                assert condition.state.is_unknown
+                assert (
+                    "exceeds the accepted kept-sum limit"
+                    in condition.state.reason
+                )
+                assert row.identity.composition == condition.state
+            else:
+                assert Decimal("95") <= kept_sum <= Decimal("102")
+                expected_composition = wt_pct_to_mole_fraction(
+                    printed_composition
+                ).components
+                assert condition.state.value.components == expected_composition
+                assert row.identity.composition.is_value
+                assert row.identity.composition.value.components == expected_composition
         else:
             assert raw["values"]["standard_state_as_printed"] == "stoichiometric liquid FeO (STULL and PROPHET, 1971)"
             assert row.point_conditions["T_C"].state.value == Decimal("1380")
             assert row.point_conditions["fO2_log"].state.is_unknown
             assert row.identity.fO2_Pa.is_unknown
             assert row.identity.composition.is_unknown
+            assert (
+                row.identity.composition.reason
+                == "The quoted Fe-O liquid composition is not stated numerically."
+            )
             assert row.identity.temperature_K.value == Decimal("1653.15")
         assert row.identity.total_pressure_Pa.is_unknown
     assert migrated["doyle_1988_quoted_activity_stoichiometric_liquid_feo_1_93"].value.point == Decimal("1.93")
+    assert closure_refusals == 16
+    pinned = migrated["doyle_1988_activity_p004_t01_r4_c1"]
+    assert pinned.identity.composition.value.components == (
+        ("SiO2", Decimal("0.5029497309599392770874071368")),
+        ("Al2O3", Decimal("0.03728834454498900760855715041")),
+        ("FeO", Decimal("0.4352142821519382941830932491")),
+        ("CaO", Decimal("0.02454764234313342112094246387")),
+    )
     for row in [migrated[x["observation_id"]] for x in source_rows[:3]]:
         print("identity axes", row.observation_id, {axis: getattr(row.identity, axis) for axis in ("composition", "total_pressure_Pa", "fO2_Pa", "temperature_K")})
         assert row.identity.total_pressure_Pa.is_unknown

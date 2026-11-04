@@ -2,10 +2,9 @@
 
 Pins, committed before the reader change:
 
-* a series point that prints an oxide wt% map is promoted twice: the printed
-  map on ``point_conditions.printed_composition`` and a typed mole-fraction
-  ``Composition`` (with its wt%->mole derivation) on
-  ``point_conditions.composition``;
+* a series point that prints an oxide wt% map preserves it on
+  ``point_conditions.printed_composition`` and derives a typed composition
+  only when b-704 accepts the kept mass (otherwise it records the refusal);
 * the existing catalogue ``proxy_flag`` paths (the four ``proxy_flag`` hits
   under ``tests/``) keep their token and their catalogue notice;
 * a per-run composition marked as initial-charge-only is unknown, while its
@@ -89,19 +88,15 @@ def _fixture_points(tmp_path: Path, values_extra: dict | None = None):
     return points[0][1]
 
 
-def _assert_dual_promotion(conditions) -> Composition:
+def _assert_partial_analysis_refusal(conditions):
     printed = conditions["printed_composition"]
     assert isinstance(printed, Located) and printed.state.is_value
     assert len(printed.state.value) >= 2
     typed = conditions["composition"]
-    assert isinstance(typed, Located) and typed.state.is_value
-    composition = typed.state.value
-    assert isinstance(composition, Composition)
-    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
-    assert composition.basis == "printed_oxides"
-    assert typed.inference is not None
-    assert typed.inference.relation == "wt_pct_to_mole_fraction"
-    return composition
+    assert isinstance(typed, Located) and typed.state.is_unknown
+    # b-704 refuses this fixture's 90.42 wt% analysis below the 95 wt% floor.
+    assert "kept sum=90.42 wt% is below 95 wt%" in typed.state.reason
+    return typed.state
 
 
 def _assert_initial_charge_is_context(conditions):
@@ -114,9 +109,8 @@ def _assert_initial_charge_is_context(conditions):
     return typed.state
 
 
-def test_undeclared_point_oxide_map_dual_promotes_without_proxy_flag(tmp_path) -> None:
-    composition = _assert_dual_promotion(_fixture_points(tmp_path))
-    assert composition.proxy_flag is None
+def test_undeclared_partial_point_oxide_map_is_refused(tmp_path) -> None:
+    _assert_partial_analysis_refusal(_fixture_points(tmp_path))
 
 
 def test_declared_initial_charge_point_map_is_context_only(tmp_path) -> None:
@@ -147,7 +141,7 @@ def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
     result = migrate(root, write=False)
     points = _point_compositions(result, "fixture-source::fixture_series")
     assert len(points) == 1
-    assert _assert_dual_promotion(points[0][1]).proxy_flag is None
+    _assert_partial_analysis_refusal(points[0][1])
     assert any(
         "composition_role 'initial_charge' is not one of" in entry.why
         for entry in result.queue
