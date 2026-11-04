@@ -38,7 +38,7 @@ def _notice_facts(notices: tuple[Any, ...]) -> list[str]:
     return [notice.reason for notice in notices]
 
 
-def test_sf04_glushko_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
+def test_sf04_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
     resolve = _resolve_standards()
     assessment = resolve(
         {"K2O": 1.0, "SiO2": 1.0},
@@ -51,11 +51,36 @@ def test_sf04_glushko_k2o_mismatch_is_typed_fail_closed_refusal() -> None:
     assert assessment.refusal_reason is RefusalReason.METRIC_DOMAIN
     reason = str(assessment.refusal_detail["reason"])
     assert "oxide=K2O" in reason
-    assert "declared=FC87-Glushko-K2O" in reason
-    assert "active=K-012" in reason
     assert "pack=IMCC-SF04 1.0.2" in reason
     assert assessment.refusal_detail["category"] == 2
+    failures = assessment.refusal_detail["standard_failures"]
+    assert any(
+        failure["kind"] == "mismatch"
+        and failure["oxide"] == "K2O"
+        and failure["declared_standard_id"]
+        and failure["active_standard_id"]
+        and failure["declared_standard_id"] != failure["active_standard_id"]
+        for failure in failures
+    )
     assert assessment.notices == ()
+
+
+def test_redox_consumer_refuses_melt_pack_standard_mismatch() -> None:
+    assessment = _resolve_standards()(
+        {"K2O": 1.0, "SiO2": 1.0},
+        Quantity.FE3_FE2_RATIO,
+        consumer="redox",
+        melt_pack=_load_pack("published-core"),
+        redox_pack=load_redox_pack(),
+    )
+
+    assert assessment.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert assessment.refusal_detail["category"] == 2
+    failures = assessment.refusal_detail["standard_failures"]
+    assert any(
+        failure["kind"] == "mismatch" and failure["oxide"] == "K2O"
+        for failure in failures
+    )
 
 
 def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
@@ -103,9 +128,10 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     assert melt_assessment.refusal_reason is None
     assert redox_assessment.refusal_reason is None
 
-    facts = _notice_facts(
-        (*melt_assessment.notices, *redox_assessment.notices)
-    )
+    melt_facts = _notice_facts(melt_assessment.notices)
+    facts = _notice_facts(redox_assessment.notices)
+    assert len(melt_facts) == 10
+    assert set(melt_facts).issubset(facts)
     unknown_rows = {
         fact.split("row=", 1)[1].split(";", 1)[0]
         for fact in facts
@@ -199,3 +225,43 @@ def test_openimcc_residue_result_carries_liquid_standard_notices(
 
     assert prediction.value == Decimal("0.1")
     assert any("row=K2SiO3;" in notice.reason for notice in prediction.notices)
+
+
+def test_hashimoto_residue_route_refuses_melt_pack_mismatch(
+    monkeypatch: Any,
+) -> None:
+    mismatch_pack = _load_pack("published-core")
+    monkeypatch.setattr(
+        openimcc,
+        "load_datapack",
+        lambda *_args, **_kwargs: mismatch_pack,
+    )
+    composition = Composition(
+        basis="mole_inventory",
+        components=(("K2O", Decimal("1")), ("SiO2", Decimal("1"))),
+        amount_basis=AmountBasis.MOL_INVENTORY,
+    )
+    experiment_id = "hashimoto-test-run"
+    experiment = SimpleNamespace(
+        sample=SimpleNamespace(
+            initial_composition=SimpleNamespace(state=State.of(composition))
+        )
+    )
+    context = SimpleNamespace(
+        experiments={experiment_id: experiment},
+        observations={},
+    )
+    reference = SimpleNamespace(
+        source_id="kems-015-hashimoto-1983",
+        observation_id="hashimoto-test-row",
+        experiment_id=experiment_id,
+        identity=SimpleNamespace(),
+    )
+
+    prediction = score._hashimoto_residue_prediction(
+        context, reference, Engine.OPENIMCC, {}
+    )
+
+    assert prediction.refusal_reason is RefusalReason.METRIC_DOMAIN
+    assert prediction.refusal_detail["category"] == 2
+    assert "oxide=K2O" in str(prediction.refusal_detail["reason"])
