@@ -23,6 +23,7 @@ from simulator.battery.oxygen_balance import (
     _net_evaporation_pressure_Pa,
     _solve_vacuum_oxygen_balance,
 )
+from simulator.melt_backend.openimcc_liquid_standards import LiquidStandardFlag
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 
@@ -113,7 +114,10 @@ _OPENIMCC_WORKER_SHUTDOWN_JOIN_S = 1.0
 
 def _openimcc_evaluation_worker(connection, evaluate) -> None:
     try:
-        from simulator.melt_backend.openimcc_bridge import OpenImccBridgeResult
+        from simulator.melt_backend.openimcc_bridge import (
+            OpenImccBridgeResult,
+            OpenImccCompositionPolicyRefusal,
+        )
 
         connection.send(("ready",))
     except BaseException as exc:  # noqa: BLE001 - report startup failures to parent
@@ -134,7 +138,18 @@ def _openimcc_evaluation_worker(connection, evaluate) -> None:
             else:
                 connection.send((True, "value", result))
         except BaseException as exc:  # noqa: BLE001 - report worker failures to parent
-            connection.send((False, type(exc).__name__, str(exc)))
+            if isinstance(exc, OpenImccCompositionPolicyRefusal):
+                connection.send(
+                    (
+                        False,
+                        "OpenImccCompositionPolicyRefusal",
+                        exc.code,
+                        str(exc),
+                        dict(exc.diagnostics),
+                    )
+                )
+            else:
+                connection.send((False, type(exc).__name__, str(exc)))
     connection.close()
 
 
@@ -314,6 +329,26 @@ def _evaluate_openimcc_isolated(
                 except (KeyError, TypeError, ValueError) as exc:
                     raise ResidueEngineTransportError(str(exc)) from exc
             return payload
+        if (
+            len(response) == 5
+            and response[1] == "OpenImccCompositionPolicyRefusal"
+        ):
+            from simulator.melt_backend.openimcc_bridge import (
+                OpenImccCompositionPolicyRefusal,
+            )
+
+            _failed, _error_name, code, message, diagnostics = response
+            prefix = f"reason={code}: "
+            detail = (
+                str(message)[len(prefix):]
+                if str(message).startswith(prefix)
+                else str(message)
+            )
+            raise OpenImccCompositionPolicyRefusal(
+                str(code),
+                detail,
+                diagnostics=diagnostics,
+            )
         error_name, detail = response[1:]
         if error_name in {"PicklingError", "TypeError", "AttributeError"} and (
             "pickl" in str(detail).lower() or "serializ" in str(detail).lower()
@@ -368,6 +403,7 @@ class ResidueMassLossPrediction:
     mass_loss_fraction: float
     engine_flags: tuple[str, ...]
     engine_metadata: Mapping[str, str]
+    liquid_standard_flags: tuple[LiquidStandardFlag, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -1301,6 +1337,7 @@ def _make_residue_pressure_model(
     total_pressure_Pa: float,
     engine_metadata: dict[str, str],
     engine_flags: set[str],
+    liquid_standard_flags: dict[LiquidStandardFlag, None] | None = None,
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
@@ -1356,6 +1393,10 @@ def _make_residue_pressure_model(
                         reason=f"engine_timeout:openimcc:{caller.lower().replace(' ', '_')}",
                     ) from exc
                 engine_flags.update(str(flag) for flag in state.flags)
+                if liquid_standard_flags is not None:
+                    liquid_standard_flags.update(
+                        dict.fromkeys(state.liquid_standard_flags)
+                    )
                 if state.extrapolated:
                     engine_flags.add("openimcc_extrapolated")
                 engine_metadata.update(
@@ -1996,6 +2037,7 @@ def predict_knudsen_residue_composition(
                         "near-saturated molecular effusion; common orifice factor cancels")
                          for s, (parent, _, _) in gas_channels)
         flags, metadata = set(), {}
+        liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
 
         def pressure_model(inventory, logp, temperature_K):
             if temperature_K not in pressure_callbacks:
@@ -2003,6 +2045,7 @@ def predict_knudsen_residue_composition(
                     engine, gas_channels, gas_pack, temperature_K=temperature_K,
                     total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
                     engine_metadata=metadata, engine_flags=flags,
+                    liquid_standard_flags=liquid_standard_flags,
                     missing_channels_reason="residue_pressure_channels_missing",
                     caller="Knudsen residue prediction",
                 )
@@ -2029,6 +2072,7 @@ def predict_knudsen_residue_composition(
             "atom_closure_mol": dict(primary.atom_closure_mol),
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
+            "liquid_standard_flags": tuple(liquid_standard_flags),
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         _append_omission_notices(notices, pressure_callbacks)
@@ -2149,6 +2193,7 @@ def predict_mass_loss_fraction(
         experiment, float(temperature_K)
     )
     flags: set[str] = set()
+    liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
     metadata: dict[str, str] = {}
     flags.add(
         "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
@@ -2246,7 +2291,9 @@ def predict_mass_loss_fraction(
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
-            engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
+            engine_flags=flags,
+            liquid_standard_flags=liquid_standard_flags,
+            missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
         def measure(incoming, active_channels, area, duration):
@@ -2386,6 +2433,7 @@ def predict_mass_loss_fraction(
         return ResidueMassLossPrediction(
             mass_loss_fraction=point_loss_kg / sample_mass_kg,
             engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
+            liquid_standard_flags=tuple(liquid_standard_flags),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attach_omissions(exc)
@@ -2950,6 +2998,7 @@ def _predict_hashimoto_residue_cohort(
             raise ResidueInventoryRefusal("hashimoto_runtime_alpha_channels_missing")
 
         engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
+        liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
         pressure_model = _make_residue_pressure_model(
             engine,
             gas_channels,
@@ -2958,6 +3007,7 @@ def _predict_hashimoto_residue_cohort(
             total_pressure_Pa=total_pressure_Pa,
             engine_metadata=melt_pack_identity,
             engine_flags=set(),
+            liquid_standard_flags=liquid_standard_flags,
             missing_channels_reason="hashimoto_internal_analytical_channels_missing",
             caller="Hashimoto residue cohort",
             floor_inversion_diagnostics=(
@@ -3169,6 +3219,9 @@ def _predict_hashimoto_residue_cohort(
                     f"R1a engine-consistent alpha-weighted congruent vacuum oxygen balance ({engine})"
                 ),
                 "engine": engine,
+                "liquid_standard_flags": tuple(
+                    flag.as_dict() for flag in liquid_standard_flags
+                ),
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,
