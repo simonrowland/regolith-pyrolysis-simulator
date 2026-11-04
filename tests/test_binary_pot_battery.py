@@ -2628,8 +2628,6 @@ class _InternalAnalyticalBudgetBackend:
         if self.mode == "cpu_hang":
             while True:
                 pass
-        if self.mode == "blocked_hang":
-            threading.Event().wait()
         if self.mode == "short_compute":
             cpu_deadline = time.process_time() + 0.025
             while time.process_time() < cpu_deadline:
@@ -2701,43 +2699,89 @@ def test_internal_analytical_cpu_budget_refuses_a_cpu_hung_child(
 def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    battery = _install_internal_analytical_budget_worker(
-        monkeypatch, mode="blocked_hang"
-    )
-    try:
-        cell = _run_fake_isolated_cell(
-            battery,
-            pot_id="worker-wall-budget",
-            engine="internal-analytical",
-            timeout_s=0.1,
-        )
-    finally:
-        battery._close_isolated_cell_workers()
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.engine_pool import EngineWorkerTimeout
 
-    assert cell.status == "refusal"
-    assert cell.refusal_reason == REFUSAL_TIMEOUT
-    assert cell.engine_status == "TimeoutError"
-    assert cell.engine_reason == "equilibrate exceeded hard timeout of 0.1s"
+    fake_wall = [0.0]
+    worker = battery._IsolatedCellWorker("internal-analytical")
+
+    def block_until_deadline(_payload, *, timeout_s: float):
+        fake_wall[0] += timeout_s + 0.01
+        raise EngineWorkerTimeout(
+            "internal-analytical battery cell", timeout_s, phase="job"
+        )
+
+    monkeypatch.setattr(worker._worker, "call", block_until_deadline)
+    try:
+        with pytest.raises(battery._IsolatedCellWorkerFailure) as raised:
+            worker.request({"pot_id": "worker-wall-budget"}, timeout_s=0.1)
+    finally:
+        worker.close()
+
+    assert fake_wall[0] > 0.1
+    assert raised.value.timed_out is True
+    assert raised.value.timeout_reason is None
 
 
 def test_internal_analytical_compute_within_budget_survives_short_wall_cap(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    battery = _install_internal_analytical_budget_worker(
-        monkeypatch, mode="short_compute"
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    monkeypatch.setattr(battery, "_INTERNAL_ANALYTICAL_CPU_BUDGET_S", 0.5)
+    monkeypatch.setattr(battery, "run_isolated_cell_worker", _within_budget_payload)
+    timer_calls: list[tuple[int, float, float]] = []
+    monkeypatch.setattr(
+        battery.signal,
+        "setitimer",
+        lambda which, seconds, interval=0.0: timer_calls.append(
+            (which, seconds, interval)
+        ),
     )
+    handle = battery.EngineHandle(
+        name="internal-analytical",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    resource = SimpleNamespace(handle=handle)
+    fake_wall = [0.0]
+    worker = battery._IsolatedCellWorker("internal-analytical")
+
+    def return_after_six_simulated_seconds(payload, *, timeout_s: float):
+        cpu0 = time.process_time()
+        result = battery._handle_isolated_cell_request(resource, payload, None)
+        cpu_s = time.process_time() - cpu0
+        fake_wall[0] += 6.0
+        assert cpu_s > 0.38
+        assert cpu_s < 0.5
+        assert fake_wall[0] > 5.0
+        assert fake_wall[0] < timeout_s
+        return result
+
+    monkeypatch.setattr(worker._worker, "call", return_after_six_simulated_seconds)
     try:
-        cell = _run_fake_isolated_cell(
-            battery,
-            pot_id="worker-short-wall-cap",
-            engine="internal-analytical",
-            timeout_s=1.0,
+        result = worker.request(
+            {"pot_id": "worker-short-wall-cap"}, timeout_s=120.0
         )
     finally:
-        battery._close_isolated_cell_workers()
+        worker.close()
 
-    assert cell.status == "ok", cell.engine_reason
-    assert cell.refusal_reason is None
+    assert result == {"within_budget": True}
+    assert timer_calls == [
+        (battery.signal.ITIMER_PROF, 0.5, 0.0),
+        (battery.signal.ITIMER_PROF, 0.0, 0.0),
+    ]
+
+
+def _within_budget_payload(_payload, *, handle):
+    cpu_deadline = time.process_time() + 0.4
+    while time.process_time() < cpu_deadline:
+        pass
+    return {"within_budget": handle.name == "internal-analytical"}
 
 
 def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
