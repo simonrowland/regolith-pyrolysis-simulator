@@ -909,6 +909,72 @@ def test_batched_and_nominal_match_as_words() -> None:
     )
 
 
+def test_phase_as_analyzed_is_quench_glass_only() -> None:
+    """phase_as_analyzed is not scanned for the word analyzed.
+
+    Quenched glass stamps. Quenched copper whose strontium was analyzed
+    does not. That copper sentence in the ordinary phase text does stamp,
+    which is why this field stays on its own argument.
+    """
+
+    glass = "quenched glass by electron microprobe analysis"
+    metal = "quenched Cu metal; Sr analyzed by ICP-OES"
+    assert (
+        phase_map_provenance(None, None, analysed_phase_text=glass)
+        == "scored_phase_analysis"
+    )
+    assert phase_map_provenance(None, None, analysed_phase_text=metal) is None
+    assert (
+        phase_map_provenance(None, None, phase_text=metal) == "scored_phase_analysis"
+    )
+
+
+def test_migrated_kirschen_analysed_glass_keeps_the_stamp(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Table 1 phase_as_analyzed is quenched glass by electron microprobe.
+
+    The printed assemblage is ``Two liquids+crist``. CaO is a component of
+    that glass, so the echo guard refuses the scored composition.
+    """
+
+    _block_equilibrate(monkeypatch)
+    observation, experiment = _observation(
+        "kirschen-decapitani-1999-liquid-miscibility.yaml",
+        "kirschen_decapitani_1999_t1_stc_2_1_phase1_cao",
+    )
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value.input_provenance == "scored_phase_analysis"
+    prediction = _predict(observation, observation.identity, experiment)
+    assert (
+        prediction.refusal_reason
+        is RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS
+    )
+    assert prediction.refusal_detail["formula"] == "CaO"
+
+
+def test_migrated_terashima_analysed_copper_is_not_stamped() -> None:
+    """phase_as_analyzed names quenched copper and an ICP-OES analysis.
+
+    This row has no oxide map, so there is no composition to stamp. A map
+    that did exist would stay unset: the field is not an analysis-word hit.
+    """
+
+    observation, _experiment = _observation(
+        "terashima-2026-sro-slag-activity-preprint.yaml",
+        "terashima_2026_sro_t04_r02_c05",
+    )
+    composition = observation.identity.composition
+    assert composition is None or not composition.is_value or (
+        composition.value.input_provenance is None
+    )
+    point = (observation.point_conditions or {}).get("composition")
+    point_state = getattr(point, "state", None)
+    if point_state is not None and point_state.is_value:
+        assert point_state.value.input_provenance is None
+
+
 def test_sossi_quench_glass_phase_is_single_melt_evidence() -> None:
     """The phase field 'quenched peridotite glass' is the analysed melt.
 

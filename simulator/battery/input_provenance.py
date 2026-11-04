@@ -183,14 +183,17 @@ def phase_map_provenance(
     map_locator: Locator | None,
     row_locator: Locator | None,
     phase_text: str | None = None,
+    analysed_phase_text: str | None = None,
 ) -> str | None:
     """Classify a phase-row oxide map only from printed evidence.
 
     Gorojovsky Table 1 is a starting-material locator on the composition map.
     A final-slag or analysed-phase note is the analysis even when the tables
     differ. A printed phase of quenched glass is that run's analysed glass.
-    Bare glass, and a locator that does not say, leave provenance unset.
-    Component values are not read.
+    ``analysed_phase_text`` is the phase_as_analyzed field. It is quench-glass
+    evidence only: the analysis-word scan does not read it. Bare glass, and a
+    locator that does not say, leave provenance unset. Component values and
+    table notes are not read.
     """
 
     note = ""
@@ -211,7 +214,9 @@ def phase_map_provenance(
     folded = phase_text.casefold() if isinstance(phase_text, str) else ""
     if any(token in folded for token in _ANALYSIS_NOTE) or _ANALYSIS_WORD.search(folded):
         return SCORED_PHASE_ANALYSIS
-    if printed_quench_glass_phase(phase_text):
+    if printed_quench_glass_phase(phase_text) or printed_quench_glass_phase(
+        analysed_phase_text
+    ):
         return SCORED_PHASE_ANALYSIS
     return None
 

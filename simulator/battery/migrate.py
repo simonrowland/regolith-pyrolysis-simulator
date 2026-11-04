@@ -5892,6 +5892,7 @@ def _finalize_input_provenance(
     point_conditions: Mapping[str, Any] | None,
     derivation_relation: str | None = None,
     phase_text: str | None = None,
+    analysed_phase_text: str | None = None,
 ) -> None:
     """Stamp a token when printed evidence says so, then upgrade a d-323 candidate.
 
@@ -5934,7 +5935,10 @@ def _finalize_input_provenance(
             token = PRINTED_STARTING_BULK
         else:
             token = phase_map_provenance(
-                map_locator, row_locator, phase_text=phase_text
+                map_locator,
+                row_locator,
+                phase_text=phase_text,
+                analysed_phase_text=analysed_phase_text,
             )
         if token is not None:
             composition = composition_with_provenance(composition, token)
@@ -7501,11 +7505,26 @@ def _printed_field_text(raw: object) -> str | None:
     return None
 
 
+def _analysed_phase_text(*docs: object) -> str | None:
+    """Printed ``phase_as_analyzed``, for the quench-glass predicate only.
+
+    Not joined into the text the analysis-word scan reads. A metal phrase
+    that says an element was analyzed is not analysed glass.
+    """
+
+    parts: list[object] = []
+    for doc in docs:
+        if isinstance(doc, Mapping):
+            parts.append(doc.get("phase_as_analyzed"))
+    return _phase_evidence_text(*parts)
+
+
 def _phase_evidence_text(*candidates: object) -> str | None:
     """Printed phase strings the provenance classifier is allowed to read.
 
     ``phase`` is often a closed token (``l``, ``glass``). ``phase_as_measured``
-    keeps the printed words. Classification stays in ``phase_map_provenance``.
+    keeps the printed words. ``phase_as_analyzed`` is not one of these
+    strings. Classification stays in ``phase_map_provenance``.
     """
 
     parts: list[str] = []
@@ -23027,6 +23046,7 @@ class Migrator:
                 obs.get("phase_as_measured"),
                 values.get("phase_as_measured") if isinstance(values, Mapping) else None,
             ),
+            analysed_phase_text=_analysed_phase_text(obs, values),
         )
         identity = fill_identity(
             quantity,
@@ -24732,6 +24752,7 @@ class Migrator:
                 raw_item.get("phase_as_measured") if isinstance(raw_item, Mapping) else None,
                 raw_item.get("phase") if isinstance(raw_item, Mapping) else None,
             ),
+            analysed_phase_text=_analysed_phase_text(raw_item, parent_values),
         )
         identity = fill_identity(quantity, species, **ident_kwargs)
         converted: Derivation | None = None
