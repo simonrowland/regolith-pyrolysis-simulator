@@ -250,6 +250,10 @@ def _assert_extracted_table_cells(document: dict) -> None:
 
     for index, row in enumerate(TABLE_IV, start=1):
         base = f"neudorf_elliott_1980_table4_row{index}"
+        calculated = observations.get(f"{base}_calculated_log_a_star_na2o")
+        if calculated is not None:
+            assert calculated["values"]["method_class"] == "model_derived"
+            assert calculated["method_class"] == "model_derived"
         interpolated = observations[f"{base}_interpolated_log_a_star_na2o"]["values"]
         assert (
             interpolated["NNa2O_as_printed"],

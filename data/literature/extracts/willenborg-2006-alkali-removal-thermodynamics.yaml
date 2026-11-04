@@ -14,16 +14,10 @@ extraction:
     3–9 were not digitized (Figure 5 is calculated). The authors calculate
     Na2O activity from stoichiometric Na2O(l,s) vaporization, assume ideal gas
     behavior, neglect dimers, monoxides, and atomic oxygen, use pO2 = pNa/4,
-<<<<<<< HEAD
     and take Kp from the FACT pure-substance database. The source calls these
     measured activities and says they are calculated from determined KEMS
     partial pressures through Eq. 3, so they are measured_reduced. The pressure
     inputs for these points are not stored. The calibration
-=======
-    and take Kp from the FACT pure-substance database. The activity values
-    reduce measured partial pressures through Eq. 3, but the pressure inputs
-    for these points are not stored. The calibration
->>>>>>> 205a244ec
     constant was determined against pure silver partial pressure. The source
     does not report the KEMS run total pressure or oxygen fugacity; the
     apparatus vacuum statement is not assigned to the sample as a pressure.
@@ -82,7 +76,6 @@ species:
         values:
           quantity: activity
           method_class: measured_reduced
-<<<<<<< HEAD
           derivation:
             relation: >-
               Equation (3) reduces the determined KEMS sodium partial pressure
@@ -98,20 +91,7 @@ species:
                 section: Experimental Setup
                 equation: '3'
             output_unit: dimensionless
-=======
->>>>>>> 205a244ec
           admission_status: admitted
-          derivation:
-            relation: The authors reduced measured sodium partial pressures to Na2O activity using Eq. (3).
-            raw_inputs:
-              state: {tag: value, value: not_printed}
-              locator:
-                page: 3
-                published_page: 2595
-                pdf_page_index: 2
-                section: Results and Discussion
-                equation: '3'
-                note: Numeric partial-pressure inputs for the reported activities are not stored.
           activity: 5e-14
           approximate: true
           activity_as_published: about 5 × 10^-14
@@ -162,7 +142,6 @@ species:
         values:
           quantity: activity
           method_class: measured_reduced
-<<<<<<< HEAD
           derivation:
             relation: >-
               Equation (3) reduces the determined KEMS sodium partial pressure
@@ -178,20 +157,7 @@ species:
                 section: Experimental Setup
                 equation: '3'
             output_unit: dimensionless
-=======
->>>>>>> 205a244ec
           admission_status: admitted
-          derivation:
-            relation: The authors reduced measured sodium partial pressures to Na2O activity using Eq. (3).
-            raw_inputs:
-              state: {tag: value, value: not_printed}
-              locator:
-                page: 3
-                published_page: 2595
-                pdf_page_index: 2
-                section: Results and Discussion
-                equation: '3'
-                note: Numeric partial-pressure inputs for the reported activities are not stored.
           activity: 2e-13
           approximate: true
           activity_as_published: about 2 × 10^-13

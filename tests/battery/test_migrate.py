@@ -11875,8 +11875,8 @@ def test_stolyarova_table3_137_content_ids_and_reference_states_are_stable(
     ).hexdigest()
     # t-1353 stores the physical PDF page on locator.page, so the content-stable
     # point ids move. The Table 2-3 run conditions move the same :h= suffix.
-    # The reference states in this payload are unchanged.
-    assert digest == "294d6b5b3fba35da66634a64205243f9a774bf7db707dab8ef9d7b37bbfa3754"
+    # d-338 now resolves the SiO2 standard polymorph to high cristobalite.
+    assert digest == "1e5fd93f852bd4c9c65ae8a0454d8a40a4d04ee1b2ab37efbc25924dda5f403d"
 
 
 def test_schaefer_photochemical_lifetimes_retain_table4_rate_ancestry(
