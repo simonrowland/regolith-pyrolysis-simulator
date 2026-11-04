@@ -83,6 +83,24 @@ def test_kress_table1_redox_rows_project_printed_conditions() -> None:
         },
     }
     by_run = {str(row["experiment_id"]): row for row in source_rows}
+    run_101 = by_run["101"]
+    assert run_101["T_C"] == "1459"
+    assert run_101["log10_fO2"] == "-6.15"
+    assert run_101["oxide_wt_percent"] == {
+        "SiO2": "41.11",
+        "TiO2": "3.07",
+        "Al2O3": "14.36",
+        "Fe2O3": "2.06",
+        "Cr2O3": "0.02",
+        "FeO": "9.31",
+        "MnO": "0.41",
+        "MgO": "6.30",
+        "CaO": "18.02",
+        "Na2O": "1.42",
+        "K2O": "1.32",
+        "P2O5": "0.42",
+        "V2O3": "0.08",
+    }
     for run_id, expected in printed_cells.items():
         row = by_run[run_id]
         assert row["T_C"] == expected["T_C"]

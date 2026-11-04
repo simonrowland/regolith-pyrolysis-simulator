@@ -1358,6 +1358,9 @@ def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
     migrator = migrate_one_extract(root, extract)
     migrator.finalize()
     result = migrator.result
+    hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
+    assert hard_issue_details.count("derived observation requires derived_from") == 0
+    assert result.validation.hard_issues == ()
     context = ScoreContext(
         result.works,
         result.experiments,
