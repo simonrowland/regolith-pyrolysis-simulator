@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -147,6 +148,58 @@ def test_default_packs_allow_scoring_and_flag_only_active_rows() -> None:
     assert all(
         flag.standard_id and flag.basis and flag.citation
         for flag in redox_assessment.flags
+    )
+
+
+def test_sossi_cohort_result_carries_liquid_standard_flags(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import yaml
+
+    root = Path(__file__).resolve().parents[2]
+    source = yaml.safe_load(
+        (root / "data/literature/extracts/kems-012-sossi-2019.yaml").read_text()
+    )
+    experiment = source["experiments"][0]
+    experiment_id = experiment["experiment_id"]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+
+    monkeypatch.setattr(openimcc_bridge, "DEFAULT_BACKEND_PACK_NAME", "default")
+    monkeypatch.setattr(
+        residue,
+        "_evaluate_openimcc_isolated",
+        lambda evaluate, *, timeout_s, **kwargs: evaluate(**kwargs),
+    )
+    monkeypatch.setattr(
+        residue,
+        "integrate_residue_inventory",
+        lambda inventory, *_args, **_kwargs: SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        ),
+    )
+
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        yaml.safe_load((root / "data/vapor_pressures.yaml").read_text()),
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="sossi-liquid-standard-flags-test",
+        engine="openimcc",
+    )[0]
+
+    flags = prediction.provenance["liquid_standard_flags"]
+    assert any(
+        flag["kind"] == "non-source-basis"
+        and flag["oxide"] == "FeO"
+        and flag["row_key"] == "FeTiO3"
+        and flag["basis"]
+        and flag["citation"]
+        for flag in flags
     )
 
 
