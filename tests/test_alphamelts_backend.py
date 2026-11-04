@@ -6240,6 +6240,15 @@ def test_activity_from_chem_potential_matches_vaporock_convention(
     )
 
 
+def test_activity_from_chem_potential_float_hex_golden():
+    activity = activity_from_chem_potential(
+        -757_503.25,
+        -737_191.95,
+        1873.0,
+    )
+    assert activity.hex() == "0x1.15e289c0fd42dp-2"
+
+
 def test_activity_from_chem_potential_is_monotone_in_mu():
     low = activity_from_chem_potential(-1100.0, -1000.0, 1800.0)
     equal = activity_from_chem_potential(-1000.0, -1000.0, 1800.0)
