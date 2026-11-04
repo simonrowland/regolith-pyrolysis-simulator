@@ -5078,11 +5078,9 @@ def test_markova_1984_live_mass_loss_identity_uses_its_own_panel_initial_charge(
     assert "kept sum=91.43 wt%" in (residual.state.reason or "")
 
 
-@pytest.mark.xfail(
-    reason="projection notice derivation pending the b-1128 carried-composition mechanism",
-    strict=True,
-)
 def test_taniguchi_1997_live_sample_401_slag_drops_fe_with_notice() -> None:
+    # These rows carry composition from the sample panel, not a row-local map.
+    # The projection still needs a notice when that carried identity is emitted.
     extract = (
         REPO_ROOT
         / "data"

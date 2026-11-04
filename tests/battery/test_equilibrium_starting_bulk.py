@@ -527,14 +527,18 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     assert identity.reason == _BLANK_REASON
 
 
-def test_partial_equilibrium_phase_child_refusal_keeps_starting_bulk_identity(
+def test_partial_equilibrium_phase_child_refusal_keeps_parent_initial_charge(
     tmp_path: Path,
 ) -> None:
     document = _extract(_initial())
     values = document["species"]["Al2O3"]["observations"][0]["values"]
     values["quantity"] = "equilibrium_phase_composition"
     values.pop("component_amount")
-    values["composition_wt_pct"] = dict(_OXIDES)
+    parent_initial_charge = dict(_OXIDES)
+    parent_initial_charge["SiO2"] = "49.5"
+    parent_initial_charge["MgO"] = "10.6"
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = parent_initial_charge
     values["points"] = [
         {
             "T_C": 1030,
@@ -560,8 +564,79 @@ def test_partial_equilibrium_phase_child_refusal_keeps_starting_bulk_identity(
     child = children[0]
     identity_composition = child.identity.composition
     assert identity_composition is not None and identity_composition.is_value
-    assert identity_composition.value == _starting_mole_fraction()
+    # Without provenance, the distinct parent charge is lost when the sample-start equality is false.
+    expected_charge = wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
+    )
+    assert identity_composition.value.components == expected_charge.components
+    assert identity_composition.value.basis == expected_charge.basis
+    assert identity_composition.value.amount_basis is expected_charge.amount_basis
+    assert identity_composition.value.proxy_flag == "initial_charge_only"
 
     measured_composition = child.point_conditions["composition"]
     assert measured_composition.state.is_unknown
     assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
+
+
+def test_partial_child_refusal_applies_to_equal_measured_datum(tmp_path: Path) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    values["composition_role"] = "datum_state"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_mol": {"SiO2": "0.5", "Al2O3": "0.5"},
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(iter(result.observations.values()))
+    assert child.identity.composition is not None
+    # Without provenance, value equality masks this measured datum's refusal.
+    assert child.identity.composition.is_unknown
+    assert "kept sum=68.75 wt%" in (child.identity.composition.reason or "")
+
+
+def test_partial_pressure_refusal_keeps_starting_identity(tmp_path: Path) -> None:
+    document = _extract(_initial(), component="0.000001")
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values["quantity"] = "p_partial"
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.composition is not None
+    # Without the P_PARTIAL guard, its later point-map branch replaces the start.
+    assert observation.identity.composition.is_value
+    identity_value = observation.identity.composition.value
+    expected_start = _starting_mole_fraction()
+    assert identity_value.components == expected_start.components
+    assert identity_value.basis == expected_start.basis
+    assert identity_value.amount_basis is expected_start.amount_basis
+    assert identity_value.proxy_flag == "initial_charge_only"
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")

@@ -4594,6 +4594,78 @@ def _composition_projection_notice(
     )
 
 
+def _carried_composition_projection_notice(
+    composition: State[Composition] | None,
+    point_conditions: Mapping[str, Located[Any]] | None,
+    *,
+    printed_composition: Located[Any] | None = None,
+    quantity: Quantity | None,
+    origin: str,
+) -> Notice | None:
+    """Disclose a trace projection when the carried identity matches its print."""
+
+    if composition is None or not composition.is_value or quantity is None:
+        return None
+    carried = composition.value
+    printed = (point_conditions or {}).get("printed_composition")
+    if not isinstance(printed, Located) or not printed.state.is_value:
+        printed = printed_composition
+    if not isinstance(printed, Located) or not printed.state.is_value:
+        return None
+    printed_map = printed.state.value
+    if not isinstance(printed_map, Mapping):
+        return None
+    closure_context = {"printed_composition": printed_map}
+    try:
+        wt = _oxide_mass_percent_components(printed_map)
+    except (ArithmeticError, ValueError):
+        return None
+    if not wt or _missing_major_oxide_names(printed_map, printed_map):
+        return None
+    volatile = _printed_volatile_mass_percent(wt, closure_context)
+    closure_wt = {**wt, **volatile}
+    for name, amount in _printed_composition_closure_components(
+        closure_context
+    ).items():
+        if name not in closure_wt:
+            closure_wt[name] = amount
+    if _percent_composition_closure_error(closure_wt, "mass") is not None:
+        return None
+    projection_notice = _composition_projection_notice(
+        wt,
+        closure_context=closure_context,
+        quantity=quantity,
+        origin=origin,
+        declared_component_map=printed_map,
+    )
+    if projection_notice is None:
+        return None
+    if carried.amount_basis is AmountBasis.MASS_PERCENT:
+        if any(amount != 0 for amount in volatile.values()):
+            projected = replace(
+                _mole_fraction_from_wt_percent_components(wt), basis=carried.basis
+            )
+        else:
+            projected = Composition(
+                basis=carried.basis,
+                components=tuple(
+                    (str(name), as_decimal(amount))
+                    for name, amount in _oxide_mass_percent_components(wt).items()
+                ),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+    elif carried.amount_basis is AmountBasis.MOLE_FRACTION:
+        projected = _mole_fraction_from_wt_percent_components(wt)
+    else:
+        return None
+    if (
+        projected.components != carried.components
+        or projected.amount_basis is not carried.amount_basis
+    ):
+        return None
+    return projection_notice
+
+
 def _printed_volatile_mass_percent(*payloads: object) -> dict[str, Decimal]:
     """Read numeric volatile amounts attached to this composition row only."""
 
@@ -6331,7 +6403,7 @@ def _apply_equilibrium_starting_bulk(
     point_conditions: Mapping[str, Located[Any]] | None,
     *,
     origin: str,
-) -> tuple[Mapping[str, Located[Any]] | None, list[Notice]]:
+) -> tuple[Mapping[str, Located[Any]] | None, list[Notice], bool]:
     """Hand the printed starting bulk to an equilibrium phase row.
 
     Closed system, so the starting bulk is the system composition. The
@@ -6349,10 +6421,10 @@ def _apply_equilibrium_starting_bulk(
     """
 
     if experiment is None:
-        return point_conditions, []
+        return point_conditions, [], False
     initial = experiment.sample.initial_composition
     if initial is None:
-        return point_conditions, []
+        return point_conditions, [], False
     mass_percent_refusal = (
         initial.state.is_unknown
         and (initial.state.reason or "").startswith(
@@ -6365,11 +6437,11 @@ def _apply_equilibrium_starting_bulk(
         or initial.state.value.amount_basis
         not in {AmountBasis.MOLE_FRACTION, AmountBasis.MOL_INVENTORY}
     ):
-        return point_conditions, []
+        return point_conditions, [], False
     if _row_printed_composition_unknown(point_conditions):
-        return point_conditions, []
+        return point_conditions, [], False
     if _keeps_existing_composition(ident_kwargs.get("composition")):
-        return point_conditions, []
+        return point_conditions, [], False
     ident_kwargs["composition"] = initial.state
     existing_point = (point_conditions or {}).get("composition")
     if not (
@@ -6381,7 +6453,7 @@ def _apply_equilibrium_starting_bulk(
             "composition": initial,
         }
     if mass_percent_refusal:
-        return point_conditions, []
+        return point_conditions, [], True
     notices: list[Notice] = []
     causes = _open_system_starting_bulk_causes(experiment)
     if causes:
@@ -6435,7 +6507,7 @@ def _apply_equilibrium_starting_bulk(
         )
         if iron is not None:
             notices.append(iron)
-    return point_conditions, notices
+    return point_conditions, notices, True
 
 
 def _initial_charge_only_missing_composition(
@@ -20452,6 +20524,7 @@ class Migrator:
                 source_derivation,
             )
         evidence = legacy_admission_evidence(evidence, admission)
+        identity_composition_from_starting_material = False
         if source_composition_located is not None:
             # A source-declared point-condition composition is authoritative.
             # In particular, a typed refusal here cannot be replaced by a
@@ -20465,15 +20538,28 @@ class Migrator:
             )
         elif initial_composition is not None:
             ident_kwargs["composition"] = State.of(initial_composition)
+            identity_composition_from_starting_material = (
+                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            )
         elif catalogue_composition is not None:
             ident_kwargs["composition"] = catalogue_composition.state
+            identity_composition_from_starting_material = (
+                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            )
         elif composition_located is not None:
             ident_kwargs["composition"] = composition_located.state
+            identity_composition_from_starting_material = (
+                composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            )
         elif initial_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 initial_oxide_map,
                 closure_context=composition_closure_context,
                 declared_component_map=_named_printed_composition_map(values),
+            )
+            identity_composition_from_starting_material = (
+                composition_role_error is None
+                and composition_role != "datum_state"
             )
         elif isinstance(sample_composition, tuple):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
@@ -20482,6 +20568,10 @@ class Migrator:
                 declared_component_map=_named_printed_composition_map(
                     sample_composition[2]
                 ),
+            )
+            identity_composition_from_starting_material = (
+                composition_role_error is None
+                and composition_role != "datum_state"
             )
         elif composition_refusal:
             ident_kwargs["composition"] = State.unknown(
@@ -20863,8 +20953,10 @@ class Migrator:
         )
         if explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
+            identity_composition_from_starting_material = False
         elif explicit_composition_refusal is not None:
             ident_kwargs["composition"] = explicit_composition_refusal
+            identity_composition_from_starting_material = False
         elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
@@ -21101,6 +21193,7 @@ class Migrator:
                 and isinstance(located_composition.state.value, Composition)
             ):
                 ident_kwargs["composition"] = located_composition.state
+                identity_composition_from_starting_material = False
         if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
             printed_fO2 = _printed_fO2_identity_state(printed_oxygen)
             ident_kwargs["fO2_Pa"] = (
@@ -21314,13 +21407,17 @@ class Migrator:
                         "composition": located_composition,
                     }
                     ident_kwargs["composition"] = composition_state
-            point_conditions, starting_bulk_notices = (
+                    identity_composition_from_starting_material = False
+            point_conditions, starting_bulk_notices, starting_bulk_identity_set = (
                 _apply_equilibrium_starting_bulk(
                     experiment,
                     ident_kwargs,
                     point_conditions,
                     origin=obs_id,
                 )
+            )
+            identity_composition_from_starting_material |= (
+                starting_bulk_identity_set
             )
             initial = (
                 experiment.sample.initial_composition
@@ -21336,7 +21433,7 @@ class Migrator:
                 projection_notice is None
                 and initial is not None
                 and initial.state.is_value
-                and ident_kwargs.get("composition") == initial.state
+                and identity_composition_from_starting_material
                 and starting_printed is not None
                 and starting_printed.state.is_value
                 and isinstance(starting_printed.state.value, Mapping)
@@ -21368,6 +21465,7 @@ class Migrator:
                 if initial is not None and initial.state.is_unknown:
                     composition_state = initial.state
                     located_composition = initial
+                    identity_composition_from_starting_material = True
                 else:
                     # A valid printed start was closure-checked when converted.
                     # Only a phase vector left as the identity input needs its
@@ -21381,6 +21479,7 @@ class Migrator:
                     located_composition = Located(
                         composition_state, locator=printed.locator
                     )
+                    identity_composition_from_starting_material = False
                 ident_kwargs["composition"] = composition_state
                 point_conditions = {
                     **(point_conditions or {}),
@@ -21432,19 +21531,6 @@ class Migrator:
             item
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
-        )
-        experiment = self.result.experiments.get(experiment_id)
-        experiment_starting_composition = (
-            experiment.sample.initial_composition
-            if experiment is not None
-            else None
-        )
-        identity_composition_from_starting_material = (
-            experiment_starting_composition is not None
-            and experiment_starting_composition.state.is_value
-            and isinstance(experiment_starting_composition.state.value, Composition)
-            and ident_kwargs.get("composition")
-            == experiment_starting_composition.state
         )
         if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             fO2_condition = (point_conditions or {}).get("fO2_log")
@@ -21953,6 +22039,9 @@ class Migrator:
             # returned. Explicit row point_conditions overwrite inferred ones.
             before = self._count(source_key).observations_out
             point_identity_kwargs = dict(ident_kwargs)
+            point_identity_composition_from_starting_material = (
+                identity_composition_from_starting_material
+            )
             point_parent_conditions = point_conditions
             rowless_values = _values_without_row_lists(values)
             # Same declared-map rule as the parent probe. Without it a
@@ -21987,8 +22076,13 @@ class Migrator:
                             rowless_values
                         ),
                     )
+                    point_identity_composition_from_starting_material = (
+                        composition_role_error is None
+                        and composition_role != "datum_state"
+                    )
                 else:
                     point_identity_kwargs.pop("composition", None)
+                    point_identity_composition_from_starting_material = False
                 if point_parent_conditions:
                     point_parent_conditions = {
                         key: condition
@@ -22100,17 +22194,9 @@ class Migrator:
                             point_identity_kwargs if non_yield_points else ident_kwargs,
                         ),
                         identity_composition_from_starting_material=(
-                            identity_composition_from_starting_material
-                            and (
-                                point_identity_kwargs
-                                if non_yield_points
-                                else ident_kwargs
-                            ).get("composition")
-                            == (
-                                experiment_starting_composition.state
-                                if experiment_starting_composition is not None
-                                else None
-                            )
+                            point_identity_composition_from_starting_material
+                            if non_yield_points
+                            else identity_composition_from_starting_material
                         ),
                         evidence=evidence,
                         admission=admission,
@@ -22200,8 +22286,26 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
-        if projection_notice is not None:
-            observation_notices.append(projection_notice)
+        notice_experiment = self.result.experiments.get(experiment_id)
+        carried_projection_notice = _carried_composition_projection_notice(
+            identity.composition,
+            point_conditions,
+            printed_composition=(
+                notice_experiment.sample.printed_composition
+                if notice_experiment is not None
+                else None
+            ),
+            quantity=q_token if isinstance(q_token, Quantity) else None,
+            origin=obs_id,
+        )
+        for candidate_notice in (projection_notice, carried_projection_notice):
+            if candidate_notice is not None and not any(
+                notice.kind is NoticeKind.COMPOSITION_PROJECTED
+                and notice.dropped == candidate_notice.dropped
+                and notice.reason == candidate_notice.reason
+                for notice in observation_notices
+            ):
+                observation_notices.append(candidate_notice)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
@@ -23065,6 +23169,7 @@ class Migrator:
                 and point_composition_refusal
             ):
                 ident_kwargs["composition"] = point_catalogue.state
+                identity_composition_from_starting_material = False
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
             if not (
@@ -23072,6 +23177,7 @@ class Migrator:
                 and point_composition_refusal
             ):
                 ident_kwargs["composition"] = point_composition_located.state
+                identity_composition_from_starting_material = False
         elif q_token is Quantity.TRANSITION_TEMPERATURE:
             raw_point_conditions = (
                 raw_item.get("point_conditions")
@@ -23090,12 +23196,14 @@ class Migrator:
             if (
                 isinstance(located_composition, Located)
                 and located_composition.state.is_unknown
+                and not preserve_starting_identity_composition
                 and not (
                     isinstance(inherited_composition, State)
                     and inherited_composition.is_value
                 )
             ):
                 ident_kwargs["composition"] = located_composition.state
+                identity_composition_from_starting_material = False
         if (
             q_token is Quantity.TRANSITION_TEMPERATURE
             and isinstance(raw_item, Mapping)
@@ -23164,18 +23272,25 @@ class Migrator:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(point_composition_refusal)
             )
-        elif q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+            identity_composition_from_starting_material = False
+        elif (
+            q_token_point is Quantity.P_PARTIAL
+            and point_oxide_map
+            and not preserve_starting_identity_composition
+        ):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
+            identity_composition_from_starting_material = False
         elif (
             point_oxide_map
             and (
                 q_token_point in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
                 or source_id == "liu-2023-chromium-oxide-activity"
             )
+            and not preserve_starting_identity_composition
             and not (
                 ident_kwargs.get("composition") is not None
                 and ident_kwargs["composition"].is_value
@@ -23189,10 +23304,12 @@ class Migrator:
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
+            identity_composition_from_starting_material = False
         elif (
             point_oxide_map
             and q_token_point is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             and _initial_charge_row_kinds(raw_item)
+            and not preserve_starting_identity_composition
             and not getattr(ident_kwargs.get("composition"), "is_value", False)
         ):
             ident_kwargs["composition"] = _wt_percent_conversion_state(
@@ -23200,7 +23317,11 @@ class Migrator:
                 closure_context=raw_item,
                 declared_component_map=_named_printed_composition_map(raw_item),
             )
-        elif ident_kwargs.get("composition") is None:
+            identity_composition_from_starting_material = True
+        elif (
+            ident_kwargs.get("composition") is None
+            and not preserve_starting_identity_composition
+        ):
             composition_refusal: list[str] = []
             initial_map = (
                 _initial_oxide_map_from_values(
@@ -23219,10 +23340,12 @@ class Migrator:
                         parent_values
                     ),
                 )
+                identity_composition_from_starting_material = True
             elif composition_refusal:
                 ident_kwargs["composition"] = State.unknown(
                     composition_unknown_reason(composition_refusal)
                 )
+                identity_composition_from_starting_material = False
         if (
             q_token_point is Quantity.P_SAT
             and isinstance(raw_item, Mapping)
@@ -24169,13 +24292,27 @@ class Migrator:
             origin=point_id,
             declared_component_map=point_declared_component_map,
         )
-        if projection_notice is not None and not any(
-            notice.kind is NoticeKind.COMPOSITION_PROJECTED
-            and notice.dropped == projection_notice.dropped
-            and notice.reason == projection_notice.reason
-            for notice in child_notices
-        ):
-            child_notices.append(projection_notice)
+        carried_projection_notice = _carried_composition_projection_notice(
+            identity.composition,
+            point_conditions,
+            printed_composition=(
+                experiment.sample.printed_composition
+                if experiment is not None
+                else None
+            ),
+            quantity=(
+                q_token_point if isinstance(q_token_point, Quantity) else None
+            ),
+            origin=point_id,
+        )
+        for candidate_notice in (projection_notice, carried_projection_notice):
+            if candidate_notice is not None and not any(
+                notice.kind is NoticeKind.COMPOSITION_PROJECTED
+                and notice.dropped == candidate_notice.dropped
+                and notice.reason == candidate_notice.reason
+                for notice in child_notices
+            ):
+                child_notices.append(candidate_notice)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
