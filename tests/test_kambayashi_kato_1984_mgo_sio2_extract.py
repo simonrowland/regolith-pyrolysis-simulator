@@ -75,9 +75,14 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
                 assert endmember.phase.value.value == "cr"
                 assert endmember.polymorph.is_unknown
                 assert row["standard_state"]["inferred"] is False
-                assert "JANAF Thermochemical Tables [5] and Supplement [6]" in row[
-                    "standard_state"
-                ]["note"]
+                note = row["standard_state"]["note"]
+                assert "authors' Gibbs changes for reactions" in note
+                assert "(5) and (6) as −(55.7 ± 0.5) and −(35.5 ± 0.5)" in note
+                assert "JANAF values for those reactions are −60 and −33" in note
+                assert "authors report −(9.1 ± 0.5)" in note
+                assert "or −(1.1 ± 0.5)" in note
+                assert "−25 kJ mol−1 is the JANAF value for reaction (1)" in note
+                assert "JANAF Thermochemical Tables [5] and Supplement [6]" in note
             assert migrated.identity.temperature_K.is_value
             assert migrated.point_conditions is not None
             source_conditions = row["point_conditions"]
