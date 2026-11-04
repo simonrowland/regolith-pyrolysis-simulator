@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    Quantity,
     RefusalReason,
     ValueKind,
 )
@@ -1760,7 +1761,7 @@ def test_activity_row_without_numeric_point_keeps_explicit_point_composition(
     assert mutated_row.point_conditions["composition"].locator.table == "1"
 
 
-def test_exploded_activity_child_keeps_mass_percent_closure_refusal(
+def test_exploded_activity_child_renormalizes_high_mass_percent_composition(
     tmp_path: Path,
 ) -> None:
     extract = deepcopy(FIXTURE_EXTRACT)
@@ -1777,22 +1778,12 @@ def test_exploded_activity_child_keeps_mass_percent_closure_refusal(
                     {
                         "T_K": 1473,
                         "gamma": "0.5",
-                        "point_conditions": {
-                            "composition": {
-                                "state": {
-                                    "tag": "value",
-                                    "value": {
-                                        "basis": "printed_oxides",
-                                        "amount_basis": "mass_percent",
-                                        "components": [
-                                            ["SiO2", "55"],
-                                            ["MgO", "48"],
-                                        ],
-                                    },
-                                },
-                                "locator": {"table": "2", "page": 3},
-                            }
+                        "composition_wt_pct": {
+                            "SiO2": "55",
+                            "MgO": "47.8",
+                            "XxO": "0.2",
                         },
+                        "locator": {"table": "2", "page": 3},
                     }
                 ],
             },
@@ -1808,15 +1799,38 @@ def test_exploded_activity_child_keeps_mass_percent_closure_refusal(
     assert len(children) == 1
     child = children[0]
 
-    assert child.identity.composition is not None
-    assert child.identity.composition.is_unknown
-    assert child.identity.composition.reason.startswith(
-        "mass-percent composition is not usable:"
-    )
-    assert "sum=103 wt% is above 102 wt%" in child.identity.composition.reason
-    assert child.identity.composition.reason != "no composition mapped from source"
     condition = child.point_conditions["composition"]
-    assert condition.state == child.identity.composition
+    assert condition.state.is_value
+    composition = condition.state.value
+    expected = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("55"), "MgO": Decimal("47.8")}
+    )
+    actual = (
+        composition
+        if composition.amount_basis is AmountBasis.MOLE_FRACTION
+        else wt_pct_to_mole_fraction(composition.as_map())
+    )
+    assert actual == expected
+    projection_notice = next(
+        notice
+        for notice in child.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    )
+    assert projection_notice.dropped == ("XxO",)
+    renormalization_notice = next(
+        notice
+        for notice in child.notices
+        if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        and notice.band == "95-102 wt% kept oxide total"
+    )
+    assert renormalization_notice.original == Decimal("102.8")
+    assert renormalization_notice.affected_quantities == (
+        Quantity.ACTIVITY_COEFFICIENT,
+    )
+    assert "renormalized to 100 wt%" in renormalization_notice.reason
+    assert "d-336 item 2" in renormalization_notice.reason
+    assert result.validation is not None
+    assert not result.validation.hard_issues
     assert condition.locator is not None
     assert condition.locator.table == "2"
     assert condition.locator.page == 3
@@ -2179,16 +2193,71 @@ def test_mass_percent_map_with_small_assay_closure_error_converts() -> None:
 
 @pytest.mark.parametrize(
     ("total", "accepted"),
-    (("94.99", False), ("95", True), ("102", True), ("102.01", False)),
+    (
+        ("94.99", False),
+        ("95", True),
+        ("102", True),
+        ("102.01", True),
+        ("105", True),
+        ("105.01", False),
+    ),
 )
 def test_b704_kept_mass_acceptance_boundaries(total: str, accepted: bool) -> None:
-    # The ticket accepts kept mass from 95 through 102 wt%, inclusive.
+    # Kept mass from 95 through 105 wt% is accepted; totals above 102 normalize.
     half = Decimal(total) / Decimal("2")
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
         {"SiO2": half, "MgO": half}
     )
     assert (converted is not None) is accepted
     assert (refusal is None) is accepted
+
+
+def test_b1128_mass_percent_migration_renormalizes_kept_map() -> None:
+    printed = {"SiO2": Decimal("40"), "MgO": Decimal("64")}
+    state = migrate_module._mass_percent_composition_state(
+        printed, basis="printed_phase_composition"
+    )
+
+    assert state.is_value
+    assert state.value.amount_basis is AmountBasis.MASS_PERCENT
+    assert sum(state.value.as_map().values(), Decimal("0")) == Decimal("100")
+    expected_moles = wt_pct_to_mole_fraction(
+        {
+            name: amount * Decimal("100") / Decimal("104")
+            for name, amount in printed.items()
+        }
+    )
+    assert wt_pct_to_mole_fraction(state.value.as_map()) == expected_moles
+
+
+def test_refused_high_kept_total_has_no_projection_notice() -> None:
+    printed = {
+        "SiO2": Decimal("40"),
+        "MgO": Decimal("64"),
+        "XxO": Decimal("1"),
+    }
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        printed,
+        closure_context=printed,
+        declared_component_map=printed,
+    )
+
+    assert converted is None
+    assert refusal is not None
+    notice = migrate_module._composition_projection_notice(
+        printed,
+        closure_context=printed,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        origin="fixture",
+        declared_component_map=printed,
+    )
+    assert notice is None
+    assert migrate_module._mass_percent_renormalization_notice(
+        printed,
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        origin="fixture",
+        admitted=False,
+    ) is None
 
 
 @pytest.mark.parametrize(

@@ -1062,6 +1062,7 @@ def _hold_reason_notice(
     quantity: Quantity | None,
     origin: str,
     band: object = None,
+    original: Decimal | None = None,
     include_misprint: bool = True,
 ) -> Notice | None:
     if not isinstance(quantity, Quantity) or not reason:
@@ -1083,6 +1084,7 @@ def _hold_reason_notice(
         reason=reason,
         origin=origin,
         band=str(band) if kind is NoticeKind.OUT_OF_CERTIFIED_BAND and band else None,
+        original=original,
     )
 
 
@@ -1545,7 +1547,7 @@ def _percent_composition_closure_error(
     )
     if any(not amount.is_finite() or amount < 0 for amount in amounts):
         return f"{basis}-percent composition contains a negative or non-finite amount"
-    total = sum(amounts, Decimal("0"))
+    total = _mass_percent_kept_total(components)
     rounding_bound = sum(
         (
             Decimal("0.5").scaleb(amount.as_tuple().exponent)
@@ -1567,6 +1569,14 @@ def _percent_composition_closure_error(
     elif abs(total - Decimal("100")) > rounding_bound:
         return f"{basis}-percent composition does not close to 100 (sum={total})"
     return None
+
+
+def _mass_percent_kept_total(components: Mapping[str, Decimal]) -> Decimal:
+    return sum(
+        (amount for name, amount in components.items()
+         if str(name).strip().casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS),
+        Decimal("0"),
+    )
 
 
 def _mass_percent_printed_from_plain(
@@ -4165,11 +4175,11 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
 _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
-# b-704's 2026-10-04 sweep found a natural gap between 92.35 and 96.86 wt%;
-# near-complete assays from 98 through 102 were ordinary, so accept kept mass
-# from 95 through 102 wt% and tolerate no more than 0.5 wt% of dropped traces.
+# Accept kept mass from 95 through 105 wt%; totals above 102 are renormalized
+# to 100 wt%, and no more than 0.5 wt% of dropped traces are tolerated.
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
-_MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("102")
+_MASS_PERCENT_RENORMALIZE_ABOVE = Decimal("102")
+_MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("105")
 _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("0.5")
 _PRINTED_FORMULA_TOKEN = r"(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?|\.\d+)?)+"
 _PRINTED_FORMULA_COMPONENT_RE = re.compile(rf"^{_PRINTED_FORMULA_TOKEN}$")
@@ -4591,6 +4601,28 @@ def _composition_projection_notice(
         origin=origin,
         dropped=tuple(dropped),
         dropped_mass_fraction=dropped_mass / printed_total,
+    )
+
+
+def _mass_percent_renormalization_notice(
+    wt: Mapping[str, Decimal] | None,
+    *,
+    quantity: Quantity | None,
+    origin: str,
+    admitted: bool,
+) -> Notice | None:
+    if not admitted or quantity is None:
+        return None
+    kept_total = _mass_percent_kept_total(_oxide_mass_percent_components(wt or {}))
+    if not _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
+        return None
+    return _hold_reason_notice(
+        "out_of_certified_band: mass-percent analysis with kept oxide total="
+        f"{kept_total} wt% was renormalized to 100 wt% per d-336 item 2",
+        quantity=quantity,
+        origin=origin,
+        band="95-102 wt% kept oxide total",
+        original=kept_total,
     )
 
 
@@ -5185,12 +5217,19 @@ def _mass_percent_composition_state(
         for amount in _printed_volatile_mass_percent(wt, closure_context).values()
     ):
         return State.of(replace(converted, basis=basis))
+    oxide_wt = _oxide_mass_percent_components(wt)
+    kept_total = _mass_percent_kept_total(oxide_wt)
+    if _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
+        oxide_wt = {
+            name: amount * Decimal("100") / kept_total
+            for name, amount in oxide_wt.items()
+        }
     return State.of(
         Composition(
             basis=basis,
             components=tuple(
                 (str(name), as_decimal(amount))
-                for name, amount in _oxide_mass_percent_components(wt).items()
+                for name, amount in oxide_wt.items()
             ),
             amount_basis=AmountBasis.MASS_PERCENT,
         )
@@ -21378,6 +21417,21 @@ class Migrator:
                     **(point_conditions or {}),
                     "composition": located_composition,
                 }
+        composition_state = ident_kwargs.get("composition")
+        admitted = isinstance(composition_state, State) and composition_state.is_value
+        notice_wt = _mass_percent_components(source_composition)
+        if source_composition is None:
+            notice_wt = projected_oxide_map or initial_oxide_map
+            if not notice_wt and q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+                notice_wt = _printed_composition_source_map(phase_closure_context)
+        renormalization_notice = _mass_percent_renormalization_notice(
+            notice_wt,
+            quantity=q_token,
+            origin=obs_id,
+            admitted=admitted,
+        )
+        if renormalization_notice is not None:
+            projection_notices += (renormalization_notice,)
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -22157,8 +22211,7 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
-        if projection_notice is not None:
-            observation_notices.append(projection_notice)
+        observation_notices.extend(projection_notices)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
@@ -24110,6 +24163,23 @@ class Migrator:
             for notice in child_notices
         ):
             child_notices.append(projection_notice)
+        renormalization_notice = _mass_percent_renormalization_notice(
+            point_oxide_map,
+            quantity=q_token_point,
+            origin=point_id,
+            admitted=(
+                not point_composition_refusal
+                and residual is not None
+                and residual.state.is_value
+            ),
+        )
+        if renormalization_notice is not None and not any(
+            notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+            and notice.band == renormalization_notice.band
+            and notice.original == renormalization_notice.original
+            for notice in child_notices
+        ):
+            child_notices.append(renormalization_notice)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,

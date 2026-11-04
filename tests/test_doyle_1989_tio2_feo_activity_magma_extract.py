@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from tools.validate_literature_extracts import validate_extract_document
@@ -394,8 +394,8 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
     assert all(row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for row in observations.values())
     assert all(row.identity.reference_state is None or row.identity.reference_state.is_unknown for row in observations.values())
     assert all(row.identity.total_pressure_Pa.is_unknown for row in observations.values())
-    assert sum(row.identity.composition.is_value for row in observations.values()) == 134
-    closure_refusals = 0
+    assert sum(row.identity.composition.is_value for row in observations.values()) == 167
+    renormalized_admissions = 0
     assert all(row.identity.temperature_K.value == Decimal("1600") for row in observations.values())
     assert not [row for row in observations.values() if row.identity.quantity.is_unknown]
     assert not [row for row in observations.values() if row.identity.species.phase.is_unknown]
@@ -447,13 +447,22 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         kept_sum = sum(printed_composition.values(), Decimal("0"))
         composition_condition = migrated.point_conditions["composition"]
         if kept_sum > Decimal("102"):
-            closure_refusals += 1
-            assert composition_condition.state.is_unknown
-            assert (
-                "exceeds the accepted kept-sum limit"
-                in composition_condition.state.reason
+            renormalized_admissions += 1
+            assert kept_sum <= Decimal("105")
+            assert composition_condition.state.is_value
+            expected_composition = wt_pct_to_mole_fraction(printed_composition)
+            assert identity.composition.value == expected_composition
+            assert composition_condition.state.value == expected_composition
+            notice = next(
+                notice
+                for notice in migrated.notices
+                if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == "95-102 wt% kept oxide total"
             )
-            assert identity.composition == composition_condition.state
+            assert notice.band == "95-102 wt% kept oxide total"
+            assert notice.original == kept_sum
+            assert "renormalized to 100 wt%" in notice.reason
+            assert "d-336 item 2" in notice.reason
         else:
             assert Decimal("95") <= kept_sum <= Decimal("102")
             expected_composition = wt_pct_to_mole_fraction(printed_composition)
@@ -464,7 +473,7 @@ def test_isolated_migration_binds_all_activity_values_and_conditions() -> None:
         assert source["standard_state"] == "molten Fe0.947O"
         assert "ReferenceStateConvention" in source["values"]["standard_state_schema_gap"]
 
-    assert closure_refusals == 33
+    assert renormalized_admissions == 33
 
     # Render-backed locators from both printed tables reach migrated values.
     first = observations[f"{SOURCE_ID}::doyle_1989_table1a_fig4a_r01"]

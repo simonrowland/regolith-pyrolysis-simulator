@@ -8,7 +8,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import Migrator, REPO_ROOT
+from simulator.battery.enums import NoticeKind
+from simulator.battery.migrate import Migrator, REPO_ROOT, wt_pct_to_mole_fraction
 from tools.validate_literature_extracts import validate_extract_document
 
 
@@ -200,10 +201,10 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         for observation in observations
         if observation.identity.composition.is_unknown
     ]
-    # b-704 refuses the partial/non-oxide assays and any composition above
-    # the allowed kept-sum window; only 31 complete maps remain usable.
-    assert len(accepted_compositions) == 31
-    assert len(refused_compositions) == 110
+    # b-704 refusals remain for partial/non-oxide assays; b-1128 admits the
+    # four 102.35 wt% kept-oxide maps after renormalization.
+    assert len(accepted_compositions) == 35
+    assert len(refused_compositions) == 106
     assert all(
         "mass-percent composition is not usable:" in item.identity.composition.reason
         and (
@@ -213,6 +214,7 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         )
         for item in refused_compositions
     )
+    renormalized_rows = 0
     for observation in observations:
         experiment = migrator.result.experiments[observation.experiment_id]
         printed_map = experiment.sample.printed_composition.state.value
@@ -224,9 +226,34 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
         # 0.5 wt% dropped-component threshold from an otherwise closed assay.
         if expected.get("Fe", Decimal("0")) <= Decimal("0.5"):
             expected.pop("Fe", None)
+        kept_total = sum(expected.values(), Decimal("0"))
+        printed_oxides = dict(expected)
+        if Decimal("102") < kept_total <= Decimal("105"):
+            scale = Decimal("100") / kept_total
+            expected = {name: amount * scale for name, amount in expected.items()}
         if observation.identity.composition.is_value:
             assert observation.identity.composition.value.amount_basis.value == "mass_percent"
             assert observation.identity.composition.value.as_map() == expected
+            if kept_total > Decimal("102"):
+                renormalized_rows += 1
+                expected_moles = wt_pct_to_mole_fraction(printed_oxides)
+                actual_moles = wt_pct_to_mole_fraction(
+                    observation.identity.composition.value.as_map()
+                )
+                assert set(actual_moles.as_map()) == set(expected_moles.as_map())
+                for species, expected_fraction in expected_moles.as_map().items():
+                    assert abs(
+                        actual_moles.as_map()[species] - expected_fraction
+                    ) < Decimal("1e-26")
+                notice = next(
+                    notice
+                    for notice in observation.notices
+                    if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                    and notice.band == "95-102 wt% kept oxide total"
+                )
+                assert notice.original == kept_total
+                assert "renormalized to 100 wt%" in notice.reason
+                assert "d-336 item 2" in notice.reason
         elif (
             "unsupported component(s) above 0.5 wt%"
             in observation.identity.composition.reason
@@ -234,3 +261,4 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
             iron = printed_map.get("T.Fe", printed_map.get("Fe"))
             assert iron is not None
             assert f"Fe={iron} wt%" in observation.identity.composition.reason
+    assert renormalized_rows == 4
