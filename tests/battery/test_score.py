@@ -15633,6 +15633,137 @@ def test_magemin_nonfinite_native_activity_is_one_typed_unavailable_prediction(
     assert notice.authority is Authority.EXTRAPOLATED
 
 
+def test_magemin_kume_activity_prediction_keeps_value_and_assemblage_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.generators import bench as bench_module
+    from simulator.diagnostic_helpers import binary_pot_battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "kume-2000-sample-305-mgo",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.327"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id="kume-2000-cao-activities",
+    )
+    phase_mode_rows = (
+        ("fsp", 0.145370),
+        ("cpx", 0.100640),
+        ("liq", 0.335110),
+        ("liq", 0.190820),
+        ("cor", 0.228060),
+    )
+    monkeypatch.setattr(
+        bench_module,
+        "activity_request_for_engine",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            payload={
+                "composition_mol": {
+                    "SiO2": Decimal("0.52"),
+                    "CaO": Decimal("0.19"),
+                    "Al2O3": Decimal("0.23"),
+                    "MgO": Decimal("0.06"),
+                }
+            }
+        ),
+    )
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            melt_activities={"MgO": 0.271372},
+            gas_partial_pressures_Pa={},
+            liquid_fraction=0.526,
+            wall_s=0.01,
+            engine_status="ok",
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            notices=[
+                {
+                    "kind": "magemin_native_phase_modes",
+                    "phase_mode_rows": phase_mode_rows,
+                }
+            ],
+            authority=None,
+            certified_band=None,
+        ),
+    )
+    handle = EngineHandle("magemin", object(), True, None, False, False)
+
+    prediction = predict_with_engine(
+        Engine.MAGEMIN,
+        reference,
+        handles={"magemin": handle},
+        experiment=experiment,
+        isolated=False,
+    )
+
+    assert prediction.value == Decimal("0.271372")
+    notice = next(
+        item
+        for item in prediction.notices
+        if item.reason.startswith("engine_equilibrium_not_single_liquid")
+    )
+    assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    marker, _, payload = notice.reason.partition("diagnostics=")
+    assert marker == "engine_equilibrium_not_single_liquid; "
+    assert json.loads(payload) == {
+        "phase_mode_rows": [list(row) for row in phase_mode_rows],
+    }
+
+
+@pytest.mark.parametrize(
+    ("observation_phase", "phase_mode_rows", "has_notice"),
+    [
+        (Phase.L, (("liq", 1.0),), False),
+        (Phase.CR, (("liq", 0.56966), ("fper", 0.43032)), False),
+        (Phase.L, (("liq", 0.99995), ("fper", 0.00005)), False),
+        (Phase.L, (("liq", 0.75), ("fsp", 0.25)), True),
+        (Phase.L, (("liq", 0.5), ("liq", 0.5)), True),
+    ],
+)
+def test_magemin_assemblage_notice_is_scoped_to_single_liquid_observations(
+    observation_phase: Phase,
+    phase_mode_rows: tuple[tuple[str, float], ...],
+    has_notice: bool,
+) -> None:
+    identity = F.activity_identity(
+        formula="MgO",
+        T_K=Decimal("1873"),
+        endmember_phase=Phase.CR,
+        component_basis="MgO",
+    )
+    identity = replace(
+        identity,
+        species=replace(identity.species, phase=State.of(observation_phase)),
+    )
+
+    notice = score_mod._magemin_activity_equilibrium_notice(
+        identity,
+        phase_mode_rows,
+        origin="engine:magemin",
+    )
+
+    assert (notice is not None) is has_notice
+
+
 @pytest.mark.parametrize(
     ("cell_refusal", "engine_status", "reason", "refusal_reason"),
     [

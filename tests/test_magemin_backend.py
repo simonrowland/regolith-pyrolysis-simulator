@@ -114,6 +114,25 @@ System activity:
     }
 
 
+def test_magemin_stdout_metadata_keeps_duplicate_phase_mode_rows():
+    backend = MAGEMinBackend()
+    metadata = {}
+    backend._parse_subprocess_stdout(
+        "Status : 0 [success]\n"
+        "Phase : fsp cpx liq liq cor\n"
+        "Mode  : 0.145370 0.100640 0.335110 0.190820 0.228060\n",
+        metadata=metadata,
+    )
+
+    assert metadata["phase_mode_rows"] == (
+        ("fsp", 0.145370),
+        ("cpx", 0.100640),
+        ("liq", 0.335110),
+        ("liq", 0.190820),
+        ("cor", 0.228060),
+    )
+
+
 @pytest.fixture(scope="module")
 def _preexisting_magemin_pool():
     pool = _RegisteredMageminPool()
@@ -3445,6 +3464,7 @@ def test_magemin_live_kume_305_mgo_activity_is_on_periclase_reference(request):
     assert any(name.lower().startswith("liq") for name in result.phases_present)
     measured_activity = 0.327  # Kume 2000 Table 4, sample 305.
     predicted_activity = result.activity_coefficients["MgO"]
+    assert predicted_activity == pytest.approx(0.271372, rel=1.0e-5)
     residual_dex = math.log10(predicted_activity / measured_activity)
     assert abs(residual_dex) < 1.0, (predicted_activity, residual_dex)
 
@@ -3476,10 +3496,12 @@ def test_magemin_live_periclase_saturated_melt_has_unit_mgo_activity(request):
     assert any(name.lower().startswith("liq") for name in result.phases_present)
     assert any(name.lower() == "fper" for name in result.phases_present)
     predicted_activity = result.activity_coefficients["MgO"]
-    # A coexisting liquid and periclase endmember have equal chemical
-    # potentials. 0.1 dex (factor 1.26) covers the printed precision and
-    # residual minimization error while still distinguishing the raw ~1e-21.
-    assert abs(math.log10(predicted_activity)) <= 0.1
+    # MAGEMin prints xMg=0.99984 in fper, so the ideal periclase activity
+    # gives |log10(a)|=6.95e-5 dex. Gamma and G0_per each round to
+    # 5e-6 kJ/mol (combined 0.01 J/mol, 2.8e-7 dex at 1873 K); the fper
+    # G-hyperplane distance is 1.120549e-6 J/mol (3.2e-11 dex). Their sum
+    # is below 6.98e-5 dex, so 7e-5 is a narrow bound for this live case.
+    assert abs(math.log10(predicted_activity)) <= 7.0e-5
 
 
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
