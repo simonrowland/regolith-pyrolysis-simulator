@@ -6,7 +6,7 @@ import pytest
 
 from simulator import condensation
 from simulator.condensation_routing import NA_COLLECTOR_STAGE_KEY
-from simulator.state import EvaporationFlux, MeltState
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from tests.test_condensation_input_refusals import _configured_model
 
 
@@ -675,6 +675,105 @@ def test_mass_transfer_denominator_stays_at_bulk_temperature():
     )
     assert flux == pytest.approx(at_bulk_denominator, rel=1e-12)
     assert flux != pytest.approx(at_film_denominator, rel=1e-4)
+
+
+def test_isothermal_wall_outlet_limits():
+    """NTU = 0 holds the inlet. NTU = ln(2) leaves half the approach. Large NTU reaches the wall."""
+
+    assert condensation._stage_bulk_outlet_temperature_K(1000.0, 400.0, 0.0) == 1000.0
+    assert condensation._stage_bulk_mean_temperature_K(1000.0, 400.0, 0.0) == 1000.0
+    outlet = condensation._stage_bulk_outlet_temperature_K(1000.0, 400.0, math.log(2.0))
+    mean = condensation._stage_bulk_mean_temperature_K(1000.0, 400.0, math.log(2.0))
+    assert outlet == pytest.approx(700.0)
+    assert 1000.0 > mean > outlet
+    hot_wall = condensation._stage_bulk_outlet_temperature_K(400.0, 1000.0, math.log(2.0))
+    assert hot_wall == pytest.approx(700.0)
+    assert condensation._stage_bulk_outlet_temperature_K(
+        1800.0, 1373.15, 20.0,
+    ) == pytest.approx(1373.15, abs=1.0e-3)
+
+
+def test_heat_exchanger_ntu_cancels_pressure_and_is_zero_without_flow_or_area():
+    common = dict(
+        area_m2=0.2828,
+        hydraulic_diameter_m=0.020,
+        gas_inlet_K=1800.0,
+        wall_K=1373.15,
+        total_molar_flow_mol_s=0.01,
+        sherwood=3.66,
+        carrier_gas="N2",
+    )
+    low = condensation._stage_heat_exchanger_ntu(total_pressure_pa=500.0, **common)
+    high = condensation._stage_heat_exchanger_ntu(total_pressure_pa=2000.0, **common)
+    assert low > 1.0
+    assert high == pytest.approx(low, rel=1.0e-9)
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **{**common, "area_m2": 0.0},
+    ) == 0.0
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=500.0, **{**common, "total_molar_flow_mol_s": 0.0},
+    ) == 0.0
+    assert condensation._stage_heat_exchanger_ntu(
+        total_pressure_pa=0.0, **common,
+    ) == 0.0
+
+
+def test_stage1_cools_toward_its_wall_and_a_hot_duct_does_not_reheat():
+    model = condensation.CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Na": 0.0589, "K": 0.0589},
+        gas_temperature_C=1600.0,
+        stage_area_m2_by_stage={
+            "fe_stage1": 0.2828,
+            "cr_stage2": 1.0e-3,
+            "alkali_stage4": 1.0e-3,
+            "k_stage4b": 1.0e-3,
+            "terminal": 1.0e-3,
+            "5": 1.0e-3,
+            "6": 1.0e-3,
+        },
+        stage_hydraulic_diameter_m_by_stage={"fe_stage1": 0.020},
+        pipe_segment_temperatures_C={
+            segment.name: 1650.0 for segment in model.pipe_segments
+        },
+    )
+    model.route(
+        EvaporationFlux(
+            species_kg_hr={"Na": 0.01, "K": 0.01},
+            total_kg_hr=0.02,
+        ),
+        MeltState(temperature_C=1600.0, hour=6, campaign_hour=6),
+    )
+    rows = model.last_stage_bulk_gas
+    train_inlet_K = 1600.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    hot_duct_K = 1650.0 + condensation.CELSIUS_TO_KELVIN_OFFSET
+    assert rows[0]["stage_number"] == 0
+    assert rows[0]["ntu"] == 0.0
+    assert rows[0]["T_in_K"] == pytest.approx(train_inlet_K)
+    assert rows[0]["T_out_K"] == pytest.approx(train_inlet_K)
+    for earlier, later in zip(rows, rows[1:]):
+        assert later["T_in_K"] == earlier["T_out_K"]
+    stage1 = next(row for row in rows if row["stage_number"] == 1)
+    assert stage1["ntu"] > 1.0
+    assert stage1["T_wall_K"] == pytest.approx(_fe_stage_wall_K(model))
+    assert abs(stage1["T_out_K"] - stage1["T_wall_K"]) < (
+        abs(stage1["T_in_K"] - stage1["T_wall_K"]) * 0.5
+    )
+    for row in rows:
+        assert row["T_in_K"] != pytest.approx(hot_duct_K)
+        assert row["T_out_K"] != pytest.approx(hot_duct_K)
+        wall_K = row["T_in_K"] if row["T_wall_K"] is None else row["T_wall_K"]
+        assert row["T_out_K"] == pytest.approx(
+            condensation._stage_bulk_outlet_temperature_K(
+                row["T_in_K"], wall_K, row["ntu"],
+            )
+        )
+        assert row["T_bulk_mean_K"] == pytest.approx(
+            condensation._stage_bulk_mean_temperature_K(
+                row["T_in_K"], wall_K, row["ntu"],
+            )
+        )
 
 
 def test_film_temperature_refuses_a_non_positive_temperature():
