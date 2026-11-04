@@ -670,6 +670,7 @@ from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
+    _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -726,8 +727,8 @@ _VALID_DECISION_CHOICES = {
 }
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
 # Distinct from a resolved curve of None (gate read in progress). The FeO
-# domain reads only an authority the hour already established. It must not
-# start a liquidus solve.
+# domain reads a curve the hour already resolved. It must not start a
+# liquidus solve, and it must not treat a missing read as below.
 _LIQUID_FEO_GATE_NOT_ESTABLISHED = object()
 _MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN = 256
 DEGRADED_PATH_ENGAGEMENT_KEYS = (
@@ -5191,7 +5192,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(authority, Mapping)
             and isinstance(authority.get('curve'), Mapping)
         ):
-            return authority['curve']
+            # Replay, and a live record admission rejects, already have a
+            # liquidus. The redox pin cannot hold them: the resolver
+            # collapses that record to None, and None means no curve, which
+            # would mark a hot hour below the liquidus. Keep the curve for
+            # the FeO domain only.
+            curve = authority['curve']
+            self._liquid_feo_resolved_curve_hour = current_hour
+            self._liquid_feo_resolved_curve = curve
+            return curve
         return authority
 
     def _clear_melt_redox_gate_authority_for_completed_hour(
@@ -5645,8 +5654,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError("temperature_K must be finite and positive")
         T_C = T_K - 273.15
-        # The step establishes the gate before these callers. Read that pin.
-        # Do not dispatch a liquidus solve from inside the activity diagnostic.
+        # The step establishes the gate before these callers. Read the curve
+        # that call already resolved, or the redox pin. Do not dispatch a
+        # liquidus solve from inside the activity diagnostic.
         pinned_hour = getattr(
             self,
             "_melt_redox_gate_authority_tick_hour",
@@ -5657,11 +5667,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "_melt_redox_gate_authority_this_tick",
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
         )
+        retained_hour = getattr(self, "_liquid_feo_resolved_curve_hour", None)
+        retained = getattr(
+            self,
+            "_liquid_feo_resolved_curve",
+            _LIQUID_FEO_GATE_NOT_ESTABLISHED,
+        )
         try:
             hour = int(self.melt.hour)
         except (TypeError, ValueError, AttributeError):
             hour = None
         if (
+            hour is not None
+            and retained_hour == hour
+            and retained is not _LIQUID_FEO_GATE_NOT_ESTABLISHED
+        ):
+            curve = retained
+        elif (
             hour is None
             or pinned_hour != hour
             or pinned is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
@@ -5675,12 +5697,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
             # Same strict bound the redox gate uses when the silicate
             # liquidus is unavailable: liquid only above the floor.
+            # The object source names why the silicate liquidus is missing.
+            # The bound itself is the Kress91 calibration floor, and the
+            # analytical floor curve already cites that source.
             return LiquidFeODomain(
                 below_liquidus=not (T_C > floor_C),
                 temperature_K=T_K,
                 liquidus_T_C=floor_C,
                 solidus_T_C=floor_C,
-                source=str(curve.source),
+                source=_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
             )
         if curve is None:
             # The gate record is absent while the curve is still being

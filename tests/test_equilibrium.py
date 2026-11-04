@@ -16,6 +16,10 @@ from simulator.equilibrium import (
     EquilibriumMixin,
     _internal_analytical_control_refusal,
 )
+from simulator.evaporation import (
+    _KRESS91_FLOOR_OPEN_SIDE_C,
+    _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+)
 from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     LiquidFeODomain,
@@ -568,7 +572,8 @@ def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
     assert at_floor.below_liquidus is True
     assert at_floor.liquidus_T_C == floor_C
     assert at_floor.solidus_T_C == floor_C
-    assert at_floor.source == "none:liquidus_unavailable"
+    assert at_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert fallback.source == "none:liquidus_unavailable"
     above = PyrolysisSimulator.liquid_feo_domain_at(host, floor_C + 273.15 + 0.1)
     assert above.below_liquidus is False
 
@@ -600,6 +605,125 @@ def test_liquid_feo_domain_floor_fallback_and_unresolved_gate():
         1750.0 + 273.15,
     )
     assert not_established is None
+
+
+def _established_record_host(record):
+    """Real establish, resolver, and curve unwrap. Only the record is supplied."""
+
+    host = SimpleNamespace(
+        melt=SimpleNamespace(hour=1),
+        _melt_redox_liquidus_gate_record=lambda **_kwargs: record,
+    )
+    host._melt_redox_liquidus_gate_curve = (
+        PyrolysisSimulator._melt_redox_liquidus_gate_curve.__get__(host)
+    )
+    host._melt_redox_gate_record_is_admitted = (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted.__get__(host)
+    )
+    return host
+
+
+def test_replay_and_originless_live_curves_feed_the_liquid_feo_domain():
+    """A resolved curve admission will not pin still has a liquidus.
+
+    The redox resolver collapses both records to None. That None is not the
+    FeO domain: 225 C is below the curve, and a temperature above the curve
+    is not.
+    """
+
+    replay = {
+        "disposition": "replay",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "liquidus_T_C": 1700.0,
+            "solidus_T_C": 1050.0,
+        },
+    }
+    replay_host = _established_record_host(replay)
+    established = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            replay_host
+        )
+    )
+    assert established["liquidus_T_C"] == 1700.0
+    assert (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted(
+            replay_host, replay
+        )
+        is False
+    )
+    resolved = PyrolysisSimulator._resolved_melt_redox_gate_authority(
+        replay_host
+    )
+    assert resolved["liquidus_T_C"] == 1700.0
+    assert (
+        PyrolysisSimulator._resolved_melt_redox_gate_authority(
+            replay_host, replay
+        )
+        is None
+    )
+    assert getattr(
+        replay_host, "_melt_redox_gate_authority_tick_hour", None
+    ) is None
+    cold = PyrolysisSimulator.liquid_feo_domain_at(
+        replay_host, 225.0 + 273.15
+    )
+    assert cold.below_liquidus is True
+    assert cold.liquidus_T_C == 1700.0
+    assert cold.solidus_T_C == 1050.0
+    assert cold.source == "gate_liquid_fraction"
+    hot = PyrolysisSimulator.liquid_feo_domain_at(
+        replay_host, 1750.0 + 273.15
+    )
+    assert hot.below_liquidus is False
+    assert hot.liquidus_T_C == 1700.0
+    assert hot.source == "gate_liquid_fraction"
+
+    floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+    liquidus_T_C = floor_C + float(_KRESS91_FLOOR_OPEN_SIDE_C)
+    live = {
+        "disposition": "live",
+        "origin": None,
+        "repair_notices": [],
+        "curve": {
+            "source": _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+            "liquidus_T_C": liquidus_T_C,
+            "solidus_T_C": floor_C,
+        },
+    }
+    live_host = _established_record_host(live)
+    live_curve = (
+        PyrolysisSimulator._establish_melt_redox_gate_authority_for_current_hour(
+            live_host
+        )
+    )
+    assert live_curve["liquidus_T_C"] == pytest.approx(liquidus_T_C)
+    assert (
+        PyrolysisSimulator._melt_redox_gate_record_is_admitted(live_host, live)
+        is False
+    )
+    live_resolved = PyrolysisSimulator._resolved_melt_redox_gate_authority(
+        live_host
+    )
+    assert live_resolved["source"] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    assert (
+        PyrolysisSimulator._resolved_melt_redox_gate_authority(live_host, live)
+        is None
+    )
+    below_floor = PyrolysisSimulator.liquid_feo_domain_at(
+        live_host, 225.0 + 273.15
+    )
+    assert below_floor.below_liquidus is True
+    assert below_floor.liquidus_T_C == pytest.approx(liquidus_T_C)
+    assert below_floor.solidus_T_C == pytest.approx(floor_C)
+    assert below_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+    above_floor = PyrolysisSimulator.liquid_feo_domain_at(
+        live_host, 1750.0 + 273.15
+    )
+    assert above_floor.below_liquidus is False
+    assert above_floor.source == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
 
 
 def test_native_fe_saturation_carries_the_liquidus_notice_on_both_returns():
