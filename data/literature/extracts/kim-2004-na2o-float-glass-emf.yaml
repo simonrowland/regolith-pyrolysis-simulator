@@ -1095,7 +1095,27 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: &kim_na2o_activity_reference_state
+        state:
+          tag: unknown
+          reason: >-
+            The article defines the working activity by a Na2O-WO3 reference-melt
+            EMF but does not name a pure-endmember, Henrian or hypothetical
+            standard convention.
+        inferred: false
+        note: >-
+          The reference activity is attributed to Lin and Elliott [15] as
+          log aNa2O(R) = -2.64 - 11.73 × 10^3 T^-1. The article does not print
+          a separate Gibbs function or table for a pure-Na2O standard.
+        locator:
+          page: 3
+          published_page: 193
+          pdf_page_index: 2
+          section: Experimental
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1144,7 +1164,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1193,7 +1217,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1242,7 +1270,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1291,7 +1323,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1340,7 +1376,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1389,7 +1429,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1438,7 +1482,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1487,7 +1535,11 @@ species:
         page: 3
         table: '2'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1536,7 +1588,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1602,7 +1658,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1669,7 +1729,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1735,7 +1799,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1801,7 +1869,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1868,7 +1940,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -1934,7 +2010,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2000,7 +2080,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2067,7 +2151,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2133,7 +2221,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2199,7 +2291,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:
@@ -2266,7 +2362,11 @@ species:
         page: 4
         table: '3'
       phase: l
-      standard_state: 'Printed Nernst definition for the working melt: log aNa2O(T) = log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT); for 1 atm O2 at both electrodes, log aNa2O(T) = log aNa2O(R) − 2FE/(2.303RT). The reference value log aNa2O(R) = −2.64 − 11.73 × 10^3 T^-1 is attributed to Lin and Elliott [15]. Typed reference state remains unknown.'
+      standard_state_as_printed: >-
+        The activity of sodium oxide in the working melt, aNa2O(T), can be
+        evaluated from the Nernst equation as follows: log aNa2O(T) =
+        log aNa2O(R) + log[1/2 × PO2(II)/PO2(I)] − 2FE/(2.303RT).
+      standard_state: *kim_na2o_activity_reference_state
       units: dimensionless activity; EMF in mV
       values:
         oxygen_partial_pressure:

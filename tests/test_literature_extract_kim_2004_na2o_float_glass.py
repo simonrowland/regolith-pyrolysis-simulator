@@ -52,6 +52,20 @@ def _assert_kim_2004_pins(document: dict) -> None:
         assert point["activity"] == activity
         assert row["locator"]["page"] == page
         assert row["locator"]["table"] == table
+        assert row["standard_state_as_printed"].startswith(
+            "The activity of sodium oxide in the working melt, aNa2O(T), can be"
+        )
+        reference = row["standard_state"]
+        assert reference["state"]["tag"] == "unknown"
+        assert reference["inferred"] is False
+        assert reference["locator"]["published_page"] == 193
+        assert row["values"]["method_class"] == "measured_tabulated"
+        assert row["values"]["reference_electrode"] == (
+            "45.6 m/o Na2O–54.4 m/o WO3"
+        )
+        assert row["values"]["cell"] == (
+            "Pt, O2(1 atm)|(Na2O)R|Na+–β″-alumina|(Na2O)T|O2(1 atm), Pt"
+        )
 
 
 def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None:
@@ -65,6 +79,19 @@ def test_kim_2004_tables_migrate_with_render_pins_and_bound_conditions() -> None
         pass
     else:
         raise AssertionError("a changed render-pinned activity did not fail")
+    mutated_reference = deepcopy(document)
+    mutated_reference_row = next(
+        row
+        for row in mutated_reference["species"]["Na2O"]["observations"]
+        if row["observation_id"] == "kim_2004_table2_silicate_1268"
+    )
+    mutated_reference_row["standard_state"]["state"]["tag"] = "value"
+    try:
+        _assert_kim_2004_pins(mutated_reference)
+    except AssertionError:
+        pass
+    else:
+        raise AssertionError("a changed standard-state disposition did not fail")
 
     validation_errors = validate_extract_file(EXTRACT)
     assert validation_errors == []
