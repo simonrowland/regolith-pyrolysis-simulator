@@ -392,7 +392,7 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
         (
             "MgO",
             Decimal("1873"),
-            False,
+            True,
             frozenset(
                 {
                     Notice(
