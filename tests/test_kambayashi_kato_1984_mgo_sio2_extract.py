@@ -68,6 +68,16 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
             assert migrated.value.kind is ValueKind.POINT, row["observation_id"]
             assert migrated.value.point == Decimal(str(source_value))
             assert migrated.identity.species.formula == formula
+            if formula == "SiO2" and q is Quantity.ACTIVITY:
+                reference_state = migrated.identity.reference_state
+                assert reference_state.is_value
+                endmember = reference_state.value.endmember
+                assert endmember.phase.value.value == "cr"
+                assert endmember.polymorph.is_unknown
+                assert row["standard_state"]["inferred"] is False
+                assert "JANAF Thermochemical Tables [5] and Supplement [6]" in row[
+                    "standard_state"
+                ]["note"]
             assert migrated.identity.temperature_K.is_value
             assert migrated.point_conditions is not None
             source_conditions = row["point_conditions"]
