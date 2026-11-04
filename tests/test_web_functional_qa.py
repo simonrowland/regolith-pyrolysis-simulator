@@ -443,7 +443,8 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 #   green's combined headless test at ca283efba: 283.5, 289.3, 301.1 s;
 #   the full-tier gate (xdist 6, load ~55): 300.3 s, the contended maximum seen.
 # 400 s is 1.33x that contended maximum and 1.6x the serial median. It is a perf
-# bar, not a hang backstop: a real regression of about 50 % still fails it.
+# bar, not a hang backstop: it fails a regression of about 60 % over the serial
+# median, or about 33 % over the contended gate figure.
 HEADLESS_WEB_CPU_BUDGET_SECONDS = 400.0
 
 

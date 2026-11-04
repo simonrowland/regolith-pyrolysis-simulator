@@ -135,7 +135,7 @@ HEAVY_ROSTER = frozenset({
      "_hours"),
     # Owner-ratified d-319 (2026-11-03): the headless full-run budget may rise
     # as the battery store grows, with the measured cost and margin recorded.
-    # d-137 split the headless test; its web phase measured 241.8-260.9 s
+    # d5d44e064 split the headless test; its web phase measured 241.8-260.9 s
     # serial and 300.3 s under the contended gate on studio-3, so 400 s (the
     # justification at the mark). It stays nightly in the serial chain.
     ("tests/test_web_functional_qa.py",
