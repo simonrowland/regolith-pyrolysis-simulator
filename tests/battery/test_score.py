@@ -7437,7 +7437,7 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
     ]
 
 
-def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
+def test_paired_engine_rail_benchmarks_include_all_shared_comparisons() -> None:
     rows = [
         {
             "rail": Rail.VAPOUR.value,
@@ -7449,7 +7449,7 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
             "rail": Rail.VAPOUR.value,
             "reference": "internal-vaporock",
             "candidate_request": {"engine": "internal-analytical"},
-            "numeric": {"operation": "dex", "value": "4"},
+            "numeric": {"operation": "dex", "value": "3"},
         },
         {
             "rail": Rail.VAPOUR.value,
@@ -7508,27 +7508,44 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
     assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
         "rail": Rail.VAPOUR.value,
         "primary_engine": "openimcc",
-        "benchmark_engine": "vaporock",
-        "n": 1,
-        "primary_rms_dex": "1",
-        "benchmark_rms_dex": "0.5",
+        "comparisons": [
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "1",
+            },
+            {
+                "engine": "vaporock",
+                "n_shared": 1,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "1",
+            },
+        ],
     }
     assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
         "rail": Rail.VAPOUR.value,
         "primary_engine": "internal-analytical",
-        "benchmark_engine": "thermoengine",
-        "n": 1,
-        "primary_rms_dex": "3",
-        "benchmark_rms_dex": "2",
+        "comparisons": [
+            {
+                "engine": "vaporock",
+                "n_shared": 2,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "3",
+            },
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "3",
+            },
+        ],
     }
     for primary in ("openimcc", "internal-analytical"):
         assert by_key[(Rail.REDOX.value, primary)] == {
             "rail": Rail.REDOX.value,
             "primary_engine": primary,
-            "benchmark_engine": None,
-            "n": 0,
-            "primary_rms_dex": None,
-            "benchmark_rms_dex": None,
+            "comparisons": [],
         }
 
 

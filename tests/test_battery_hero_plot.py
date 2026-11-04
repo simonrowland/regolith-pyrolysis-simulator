@@ -442,7 +442,7 @@ def test_deck_renderer_emits_all_panels_and_missing_axis_labels(
                         "median_abs_dex": "0.1",
                     }
                 ],
-                "benchmarks": [],
+                "comparisons": [],
             }
         )
         + "\n",
@@ -532,7 +532,7 @@ def test_deck_sweet_spot_uses_same_colors_across_engine_panels(
         assert openimcc_color == pytest.approx(magemin_color)
 
 
-def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
+def test_polymerisation_deck_facets_points_by_species_and_keeps_comparisons(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -558,12 +558,16 @@ def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
             ("polymerisation", "openimcc"): {"n": 3},
             ("polymerisation", "internal-analytical"): {"n": 0},
         },
-        hero_deck_benchmarks={
+        hero_deck_comparisons={
             ("polymerisation", "openimcc"): {
-                "benchmark_engine": "vaporock",
-                "n": 2,
-                "primary_rms_dex": "0.1",
-                "benchmark_rms_dex": "0.2",
+                "comparisons": [
+                    {
+                        "engine": "vaporock",
+                        "n_shared": 2,
+                        "primary_rms_dex_on_shared": "0.1",
+                        "outside_rms_dex": "0.2",
+                    }
+                ],
             }
         },
     )
@@ -588,8 +592,9 @@ def test_polymerisation_deck_facets_points_by_species_and_keeps_benchmark(
     expected = tuple((facet,) for facet in ordered_facets)
     assert tuple(drawn_facets) == expected
     svg = Path(files["deck:polymerisation:svg"]).read_text(encoding="utf-8")
-    assert "Best comparison on chart rows" in svg
+    assert "Same-row comparisons on chart rows" in svg
     assert "vaporock" in svg
+    assert "n_shared=2" in svg
 
 
 def test_deck_legends_include_points_refusals_and_history_on_empty_axes(
@@ -637,14 +642,18 @@ def test_deck_legends_include_points_refusals_and_history_on_empty_axes(
                     },
                     {"rail": "redox", "engine": "thermoengine", "rms_dex": "0.4"},
                 ],
-                "benchmarks": [
+                "comparisons": [
                     {
                         "rail": rail,
                         "primary_engine": "openimcc",
-                        "benchmark_engine": "alphamelts",
-                        "primary_rms_dex": "0.2",
-                        "benchmark_rms_dex": "0.3",
-                        "n": 2,
+                        "comparisons": [
+                            {
+                                "engine": "alphamelts",
+                                "primary_rms_dex_on_shared": "0.2",
+                                "outside_rms_dex": "0.3",
+                                "n_shared": 2,
+                            }
+                        ],
                     }
                     for rail in ("vapour", "residue_composition", "redox")
                 ],
@@ -1465,7 +1474,7 @@ def test_non_observable_rows_are_separate_from_refusals_and_history(
         {"store": {"revision": "non-observable-test"}, "records": []},
         landing_sha="non-observable-test",
         commit_date="2026-10-19T00:00:00Z",
-        benchmarks=data.hero_benchmarks,
+        comparisons=data.hero_comparisons,
         diagnostics=data.hero_diagnostics,
         refusal_coverage=_refusal_coverage_from_summaries(data.summaries),
     )
@@ -1908,7 +1917,7 @@ def test_temperature_tick_labels_are_unique_at_three_significant_figures(
         plt.close(figure)
 
 
-def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
+def test_hero_flagged_points_are_hollow_and_comparisons_use_shared_rows(
     tmp_path: Path,
 ) -> None:
     residuals = tmp_path / "residuals.jsonl"
@@ -1918,9 +1927,12 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     for engine, experiment, value, authority in (
         ("internal-analytical", "shared", 3.0, "extrapolated"),
         ("internal-analytical", "internal-only", 100.0, "certified"),
+        ("internal-analytical", "second-shared", 3.0, "certified"),
         ("openimcc", "shared", 1.0, "certified"),
         ("openimcc", "comparison-only", 100.0, "certified"),
         ("thermoengine", "shared", 2.0, "certified"),
+        ("vaporock", "shared", 4.0, "certified"),
+        ("vaporock", "second-shared", 4.0, "certified"),
     ):
         row = _record(
             engine=engine,
@@ -1949,12 +1961,26 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     )
     data = read_scores(residuals, rails=HERO_RAILS)
 
-    benchmark = data.hero_benchmarks[("redox", "internal-analytical")]
-    assert benchmark["benchmark_engine"] == "thermoengine"
-    assert benchmark["n"] == 1
-    assert benchmark["primary_rms_dex"] == "3.0"
-    assert benchmark["benchmark_rms_dex"] == "2.0"
-    assert data.hero_benchmarks[("redox", "openimcc")]["benchmark_engine"] == "thermoengine"
+    comparisons = data.hero_comparisons[("redox", "internal-analytical")][
+        "comparisons"
+    ]
+    assert comparisons == [
+        {
+            "engine": "vaporock",
+            "n_shared": 2,
+            "outside_rms_dex": "4.0",
+            "primary_rms_dex_on_shared": "3.0",
+        },
+        {
+            "engine": "thermoengine",
+            "n_shared": 1,
+            "outside_rms_dex": "2.0",
+            "primary_rms_dex_on_shared": "3.0",
+        },
+    ]
+    assert data.hero_comparisons[("redox", "openimcc")]["comparisons"][0][
+        "engine"
+    ] == "thermoengine"
     assert data.hero_diagnostics[("redox", "internal-analytical")][
         "open_predict_and_flag_notice_counts_by_kind"
     ] == {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1}
@@ -1990,6 +2016,12 @@ def test_hero_flagged_points_are_hollow_and_benchmark_uses_shared_rows(
     finally:
         plt.close(figure)
 
+    files = render_hero_charts(data, tmp_path / "hero")
+    svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
+    assert "vaporock" in svg and "n_shared=2" in svg
+    assert "thermoengine" in svg and "n_shared=1" in svg
+    assert "benchmark" not in svg
+
 
 def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> None:
     history = tmp_path / "hero-history.jsonl"
@@ -2000,7 +2032,7 @@ def test_history_appends_without_rewriting_existing_bytes(tmp_path: Path) -> Non
         "store_sha": "new",
         "commit_date": "2026-10-18T10:27:53-04:00",
         "metrics": [],
-        "benchmarks": [],
+        "comparisons": [],
     }
 
     assert append_history(history, record)
@@ -2048,7 +2080,7 @@ def test_current_hero_summary_uses_input_metrics_when_history_is_stale(
                         "median_abs_dex": "0.01",
                     }
                 ],
-                "benchmarks": [],
+                "comparisons": [],
             },
             sort_keys=True,
         )
@@ -2096,22 +2128,16 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
         },
         landing_sha="green-test",
         commit_date="2026-10-18T10:27:53-04:00",
-        benchmarks={
+        comparisons={
             ("redox", "internal-analytical"): {
                 "rail": "redox",
                 "primary_engine": "internal-analytical",
-                "benchmark_engine": None,
-                "n": 0,
-                "primary_rms_dex": None,
-                "benchmark_rms_dex": None,
+                "comparisons": [],
             },
             ("redox", "openimcc"): {
                 "rail": "redox",
                 "primary_engine": "openimcc",
-                "benchmark_engine": None,
-                "n": 0,
-                "primary_rms_dex": None,
-                "benchmark_rms_dex": None,
+                "comparisons": [],
             },
         },
         diagnostics={
@@ -2135,12 +2161,12 @@ def test_history_schema_keeps_scorer_metrics_and_per_rail_counts() -> None:
     )
 
     assert record["kind"] == "battery_hero_history"
-    assert record["schema_version"] == 1
-    assert [entry["primary_engine"] for entry in record["benchmarks"]] == [
+    assert record["schema_version"] == 2
+    assert [entry["primary_engine"] for entry in record["comparisons"]] == [
         "internal-analytical",
         "openimcc",
     ]
-    assert all(entry["benchmark_engine"] is None for entry in record["benchmarks"])
+    assert all(entry["comparisons"] == [] for entry in record["comparisons"])
     metric = record["metrics"][0]
     assert metric["numeric_count"] == 7
     assert metric["rms_dex"] == "0.4"
@@ -2209,7 +2235,7 @@ def test_history_keeps_deck_rail_all_numeric_count() -> None:
         },
         landing_sha="green-test",
         commit_date="2026-10-18T10:27:53-04:00",
-        benchmarks={},
+        comparisons={},
         diagnostics={
             ("SiO_evolution", "openimcc"): {
                 "refused_count": 133,
@@ -2299,11 +2325,11 @@ def test_missing_comparison_engine_is_reported_as_unavailable(tmp_path: Path) ->
 
     data = read_scores(residuals, rails=HERO_RAILS)
     for engine in ("openimcc", "internal-analytical"):
-        assert data.hero_benchmarks[("redox", engine)]["benchmark_engine"] is None
+        assert data.hero_comparisons[("redox", engine)]["comparisons"] == []
 
     files = render_hero_charts(data, tmp_path / "rendered")
     svg = files["hero:redox:svg"].read_text(encoding="utf-8").casefold()
-    assert "benchmark unavailable" in svg
+    assert "no same-row comparisons" in svg
     vapour_svg = files["hero:vapour:svg"].read_text(encoding="utf-8").casefold()
     assert "all-numeric rms unavailable (n=0)" in vapour_svg
     assert "all-numeric rms unavailable dex (n=0)" not in vapour_svg
@@ -2460,7 +2486,7 @@ def test_hero_svg_and_png_are_byte_identical_for_the_same_input(tmp_path: Path) 
                         "median_abs_dex": "0.2",
                     }
                 ],
-                "benchmarks": [],
+                "comparisons": [],
             },
             sort_keys=True,
         )
@@ -2532,7 +2558,7 @@ def test_hero_legend_is_bounded_and_numeric_labels_use_three_significant_figures
                         "median_abs_dex": "0.30636297707166455257",
                     }
                 ],
-                "benchmarks": [],
+                "comparisons": [],
             },
             sort_keys=True,
         )
