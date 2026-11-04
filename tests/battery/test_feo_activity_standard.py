@@ -24,6 +24,7 @@ from simulator.battery.score import (
     ScoreContext,
     compile_residual,
     dumps_residual_line,
+    fusion_comparison_reference,
 )
 import simulator.battery.score as score_module
 from tests.battery import factories as F
@@ -50,6 +51,7 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 _DISTIN_GREEN_RESIDUAL_SHA256 = (
     "3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0"
 )
+_COLSON_SOURCE_ID = "colson-floden-haugen-2005-nio-feo-o2-activities"
 
 
 def _openimcc_sources(
@@ -264,6 +266,216 @@ def distin_migration():
         migrator._migrate_extract(root / "data/literature/extracts" / f"{name}.yaml")
     migrator.finalize()
     return migrator.result
+
+
+@pytest.fixture(scope="module")
+def doyle_migration():
+    root = Path(REPO_ROOT)
+    migrator = Migrator(root=root)
+    for name in (
+        "holzheid-1997-feo-nio-coo-activity-metal-saturated",
+        "doyle-1988-feo-activity-multicomponent-magma",
+    ):
+        migrator._migrate_extract(root / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    return migrator.result
+
+
+@pytest.fixture(scope="module")
+def colson_migration():
+    root = Path(REPO_ROOT)
+    migrator = Migrator(root=root)
+    migrator._migrate_extract(
+        root / "data/literature/extracts" / f"{_COLSON_SOURCE_ID}.yaml"
+    )
+    migrator.finalize()
+    return migrator.result
+
+
+@pytest.mark.parametrize(
+    ("engine", "sources"),
+    (
+        (Engine.INTERNAL_ANALYTICAL, ("nasa-cea-thermo",)),
+        (
+            Engine.OPENIMCC,
+            _openimcc_sources(
+                pack_version=_OPENIMCC_DEFAULT_VERSION,
+                pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
+                condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
+            ),
+        ),
+    ),
+)
+def test_doyle_residual_converts_observation_and_declared_prediction_once(
+    doyle_migration,
+    engine: Engine,
+    sources: tuple[str, ...],
+) -> None:
+    observation = next(
+        row
+        for row in doyle_migration.observations.values()
+        if row.source_id == "doyle-1988-feo-activity-multicomponent-magma"
+        and row.observation_id.endswith("doyle_1988_activity_p004_t01_r3_c1")
+    )
+    reference = fusion_comparison_reference(observation, engine=engine)
+    assert reference.value.point is not None
+    # Doyle p. 5 prints 0.339 at 1600 K. Independently interpolating
+    # Holzheid's 2.02 at 1300 C and 1.94 at 1400 C gives 1.9972105933;
+    # 0.339 × that ratio is 0.6770543911 on the JANAF Fe-019 reference.
+    assert reference.value.point.quantize(Decimal("0.000001")) == Decimal(
+        "0.677054"
+    )
+    assert any(
+        "Holzheid 1997 printed" in notice.reason
+        for notice in reference.notices
+    )
+
+    prediction = EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:doyle-feo-standard-residual",
+        ),
+        value=Decimal("0.500"),
+        unit="dimensionless",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=None,
+        version="test",
+    )
+    standard, refusal = score_module._resolve_feo_activity_standard(
+        engine, prediction.coefficient_sources
+    )
+    assert refusal is None
+    assert standard is not None
+    assert standard.offset_j_mol == Decimal(0)
+    canonical_prediction, refusal = score_module._canonicalize_feo_activity_prediction(
+        prediction, identity=reference.identity
+    )
+    assert refusal is None
+    assert canonical_prediction is not None
+    assert canonical_prediction.value is prediction.value
+
+    context = ScoreContext(
+        works=doyle_migration.works,
+        experiments=doyle_migration.experiments,
+        observations=doyle_migration.observations,
+        extract_review={observation.source_id: "reviewed"},
+        root=Path(REPO_ROOT),
+        hostname="test",
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        engine,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.operation.value == "dex"
+    # With the declared 0-offset prediction 0.500, log10(0.500/0.6770543911)
+    # is -0.13165355 dex from the printed activity and Holzheid anchors.
+    assert residual.numeric.value.quantize(Decimal("0.000001")) == Decimal(
+        "-0.131654"
+    )
+
+
+@pytest.mark.parametrize(
+    ("engine", "sources"),
+    (
+        (Engine.INTERNAL_ANALYTICAL, ("nasa-cea-thermo",)),
+        (
+            Engine.OPENIMCC,
+            _openimcc_sources(
+                pack_version=_OPENIMCC_DEFAULT_VERSION,
+                pack_digest=_OPENIMCC_DEFAULT_PACK_DIGEST,
+                condensate_digest=_JANAF_FE019_CONDENSATE_DIGEST,
+            ),
+        ),
+    ),
+)
+def test_colson_residual_converts_observation_and_declared_prediction_once(
+    colson_migration,
+    engine: Engine,
+    sources: tuple[str, ...],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    observation = next(
+        row
+        for row in colson_migration.observations.values()
+        if row.source_id == _COLSON_SOURCE_ID
+        and row.observation_id.endswith("p007_t03_r02_c04")
+    )
+    reference = fusion_comparison_reference(observation, engine=engine)
+    assert observation.value.point == Decimal("1.00")
+    assert reference.value.point is not None
+    # Table 3 prints gamma_FeO=1.00 for gg; Table 2 gives its 1579 C row.
+    # Holzheid's printed 1.94 at 1400 C and 1.66 at 1600 C give 1.6847248737.
+    assert reference.value.point.quantize(Decimal("0.000001")) == Decimal(
+        "1.684725"
+    )
+    assert any("Holzheid 1997 printed" in notice.reason for notice in reference.notices)
+
+    prediction = EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:colson-feo-standard-residual",
+        ),
+        value=Decimal("0.500"),
+        unit="dimensionless",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=None,
+        version="test",
+    )
+    standard, refusal = score_module._resolve_feo_activity_standard(
+        engine, prediction.coefficient_sources
+    )
+    assert refusal is None
+    assert standard is not None
+    assert standard.offset_j_mol == Decimal(0)
+
+    canonicalizer = score_module._canonicalize_feo_activity_prediction
+    canonicalized_identities = []
+
+    def record_canonicalization(prediction, *, identity=None):
+        canonicalized_identities.append(identity)
+        return canonicalizer(prediction, identity=identity)
+
+    monkeypatch.setattr(
+        score_module,
+        "_canonicalize_feo_activity_prediction",
+        record_canonicalization,
+    )
+    context = ScoreContext(
+        works=colson_migration.works,
+        experiments=colson_migration.experiments,
+        observations=colson_migration.observations,
+        extract_review={observation.source_id: "reviewed"},
+        root=Path(REPO_ROOT),
+        hostname="test",
+    )
+    residual, _candidate = compile_residual(
+        observation,
+        engine,
+        context=context,
+        prediction=prediction,
+        comparison_ids={observation.observation_id},
+    )
+
+    assert canonicalized_identities == [reference.identity]
+    assert residual.numeric is not None
+    assert residual.numeric.operation.value == "dex"
+    # log10(0.500 / (1.00 × 1.6847248737)) from the printed source values.
+    assert residual.numeric.value.quantize(Decimal("0.000001")) == Decimal(
+        "-0.527559"
+    )
 
 
 def test_distin_closed_redox_residual_line_matches_green_bytes(
