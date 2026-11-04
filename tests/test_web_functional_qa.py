@@ -11,6 +11,7 @@ import app as app_module
 import simulator.three_product_report as three_product_report
 import web.events as web_events
 from simulator.account_ids import (
+    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
@@ -403,6 +404,41 @@ def test_advisory_product_story_renders_partial_metadata() -> None:
     assert "includes estimated transport for SiO (status_bearing)" in text
 
 
+def test_advisory_product_list_omits_cartridge_residue() -> None:
+    """The Products heading is the flat separated ledger, not the residue class."""
+    payload = {
+        "product_story_status": "ok",
+        "product_story": {
+            "alkali_cartridge_solid_residue": {
+                "species_kg": {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+                "class_total_kg": 8.0,
+                "account": "process.alkali_cartridge_solid_residue",
+                "disposition": "captured_unseparated",
+            },
+        },
+        "products": {"Fe": 6.0, "Na": 2.0},
+    }
+    rendered = _render_product_story(
+        html=(
+            '<div id="product-ledger-state"></div>'
+            '<div id="product-ledger-content"></div>'
+        ),
+        payload=payload,
+    )
+    text = rendered["text"]["product-ledger-content"]
+    residue_text, products_text = text.split("Products", 1)
+    assert "Stage-4 cartridge solid residue (unseparated)" in residue_text
+    assert "Fe 4 kg" in residue_text
+    assert "SiO2 3 kg" in residue_text
+    assert "MgO 1 kg" in residue_text
+    assert "Fe: 6 kg" in products_text
+    assert "Na: 2 kg" in products_text
+    assert "Fe 4 kg" not in products_text
+    assert "SiO2" not in products_text
+    assert "MgO" not in products_text
+    assert "10" not in products_text
+
+
 def test_advisory_product_story_renders_available_estimated_transport() -> None:
     payload = {
         "product_story_status": "ok",
@@ -719,6 +755,13 @@ def test_headless_full_run_ledgers_and_product_story_web(
         for account in sim.atom_ledger.mol_by_account()
         if account == "process.wall_deposit"
         or account.startswith("process.wall_deposit_segment_")
+    )
+    # The flat product ledger omits the residue account. The story
+    # class still holds that mass, so closure names the account here.
+    source_total += sum(
+        sim.atom_ledger.project_account_kg(
+            ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+        ).values()
     )
     source_total += sum(rump.values())
     story_total = _story_total(
