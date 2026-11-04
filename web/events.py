@@ -1077,13 +1077,15 @@ def _persist_terminal(
     projector = state.get('runner_projector') if state is not None else None
     try:
         try:
-            runner_payload = _full_runner_payload(
-                session,
-                projector=projector,
-                status=status,
-                reason=reason,
-                error_message=error_message,
-                refusal_diagnostic=refusal_diagnostic,
+            runner_payload = _payload_detached_for_persistence(
+                _full_runner_payload(
+                    session,
+                    projector=projector,
+                    status=status,
+                    reason=reason,
+                    error_message=error_message,
+                    refusal_diagnostic=refusal_diagnostic,
+                )
             )
         except Exception as projection_exc:  # noqa: BLE001
             _safe_log(f'Full runner projection unavailable: {projection_exc}')
@@ -1114,7 +1116,7 @@ def _persist_terminal(
             if isinstance(run_metadata, dict):
                 run_metadata['seed'] = single_run['seed']
                 run_metadata['single_run'] = copy.deepcopy(dict(single_run))
-        _canonicalize_runner_backend_tokens(runner_payload)
+        runner_payload = _canonicalize_runner_backend_tokens(runner_payload)
         run_store = state.get('run_store') if state is not None else None
         if run_store is None:
             raise RuntimeError('run artifact store is unavailable')
@@ -1325,16 +1327,40 @@ def cancel_run_command(
     )
 
 
-def _canonicalize_runner_backend_tokens(value) -> None:
+def _canonicalize_runner_backend_tokens(value):
+    """Fold backend wire tokens, copying a node only when its text changes.
+
+    Unchanged nodes are the same object. Persist can therefore share the
+    cached projection's summary trees and still leave that cache byte-identical
+    to a second ``_full_runner_payload`` call.
+    """
+
     if isinstance(value, dict):
+        rebuilt = None
         for key, item in value.items():
             if key in _BACKEND_WIRE_TOKEN_FIELDS and isinstance(item, str):
-                value[key] = canonical_backend_name(item)
+                canonical = canonical_backend_name(item)
+                if canonical != item:
+                    if rebuilt is None:
+                        rebuilt = dict(value)
+                    rebuilt[key] = canonical
             else:
-                _canonicalize_runner_backend_tokens(item)
-    elif isinstance(value, list):
-        for item in value:
-            _canonicalize_runner_backend_tokens(item)
+                folded = _canonicalize_runner_backend_tokens(item)
+                if folded is not item:
+                    if rebuilt is None:
+                        rebuilt = dict(value)
+                    rebuilt[key] = folded
+        return value if rebuilt is None else rebuilt
+    if isinstance(value, list):
+        rebuilt = None
+        for index, item in enumerate(value):
+            folded = _canonicalize_runner_backend_tokens(item)
+            if folded is not item:
+                if rebuilt is None:
+                    rebuilt = list(value)
+                rebuilt[index] = folded
+        return value if rebuilt is None else rebuilt
+    return value
 
 
 def _schedule_viewerless_reclaim(socketio, sid: str, run_id: str) -> None:
@@ -3016,6 +3042,72 @@ def _recipe_snapshot_from_projector(projector) -> dict[str, object] | None:
     }
 
 
+def _runner_payload_reuse_key(
+    session,
+    projector,
+    *,
+    status: str,
+    reason: str,
+    error_message: str,
+    refusal_diagnostic: Mapping[str, object] | None,
+) -> tuple[object, ...]:
+    """Identity of a second ``_full_runner_payload`` call on an unchanged session.
+
+    The headless full run builds the document twice: ``_persist_terminal``
+    when the session is already complete, then the test after
+    ``simulation_complete``. Between those calls nothing advances, decides,
+    adjusts, or records an operator decision. Persist mutates a detached
+    copy of the returned dict, not this session. The build's own simulator
+    writes (sticking-authority reset, ``record.cost_rollup``) are functions
+    of that same unchanged state, so a second build returns the same
+    document. ``advance``, ``decide``, ``adjust``, and ``start`` drop the
+    cache, which is the state this key does not re-check.
+    """
+
+    sim = session.simulator
+    config = session._config
+    snapshots = getattr(getattr(sim, 'record', None), 'snapshots', ()) or ()
+    if refusal_diagnostic is None:
+        refusal_key: object = None
+    else:
+        refusal_key = json.dumps(
+            dict(refusal_diagnostic),
+            sort_keys=True,
+            default=str,
+        )
+    return (
+        status,
+        reason,
+        error_message,
+        refusal_key,
+        id(projector),
+        int(getattr(projector, 'hours', 0) or 0),
+        int(config.hours),
+        int(getattr(sim.melt, 'hour', 0)),
+        len(tuple(snapshots)),
+        len(session.per_hour_summaries()),
+        len(session.operator_decisions()),
+        id(getattr(projector, 'run_metadata_overrides', None)),
+        id(getattr(projector, 'setpoints_patch', None)),
+        bool(getattr(projector, 'include_wall_deposit_rate_diagnostics', False)),
+    )
+
+
+def _payload_detached_for_persistence(payload: dict[str, object]) -> dict[str, object]:
+    """Shallow copy of the containers persist mutates.
+
+    Nested summary trees stay shared. ``_canonicalize_runner_backend_tokens``
+    copies a node only when a backend token actually changes, so an unchanged
+    cached payload is not written.
+    """
+
+    detached = dict(payload)
+    metadata = payload.get('run_metadata')
+    if isinstance(metadata, dict):
+        detached['run_metadata'] = dict(metadata)
+    return detached
+
+
 def _full_runner_payload(
     session,
     *,
@@ -3058,6 +3150,19 @@ def _full_runner_payload(
     config = session._config
     if config is None:
         raise RuntimeError('web session has no runner configuration')
+    if projector is None:
+        raise RuntimeError('web session has no canonical runner projector')
+    reuse_key = _runner_payload_reuse_key(
+        session,
+        projector,
+        status=status,
+        reason=reason,
+        error_message=error_message,
+        refusal_diagnostic=refusal_diagnostic,
+    )
+    cached = getattr(session, '_runner_payload_cache', None)
+    if cached is not None and cached[0] == reuse_key:
+        return cached[1]
     execution = RunExecutor().execute_session(session, hours=0)
     execution = replace(
         execution,
@@ -3074,8 +3179,6 @@ def _full_runner_payload(
             else dict(execution.refusal_diagnostic or {})
         ),
     )
-    if projector is None:
-        raise RuntimeError('web session has no canonical runner projector')
     active_projector = copy.copy(projector)
     active_projector.hours = max(
         int(config.hours),
@@ -3085,6 +3188,7 @@ def _full_runner_payload(
     recipe_snapshot = _recipe_snapshot_from_projector(active_projector)
     if recipe_snapshot is not None:
         payload['recipe_snapshot'] = recipe_snapshot
+    session._runner_payload_cache = (reuse_key, payload)
     return payload
 
 

@@ -296,6 +296,17 @@ class SimSession:
         self._operator_decisions: list[dict[str, Any]] = []
         self._result_document: Mapping[str, Any] | None = None
         self._poisoned_error: RuntimeError | None = None
+        self._runner_payload_cache: tuple[Any, ...] | None = None
+
+    def _drop_runner_payload_cache(self) -> None:
+        """Forget a cached runner projection of this session.
+
+        ``web.events._full_runner_payload`` stores one projection while the
+        session state it read is still the state a second call would read.
+        ``advance``, ``decide``, ``adjust``, and ``start`` change that state.
+        """
+
+        self._runner_payload_cache = None
 
     @property
     def simulator(self) -> PyrolysisSimulator:
@@ -521,6 +532,7 @@ class SimSession:
         self._operator_decisions = []
         self._result_document = None
         self._poisoned_error = None
+        self._drop_runner_payload_cache()
 
         sim.start_campaign(campaign_phase)
         sim.validate_lab_surface_temperature_resolver()
@@ -529,6 +541,7 @@ class SimSession:
     def advance(self) -> StepResult:
         """Run exactly one policy-free simulator step."""
 
+        self._drop_runner_payload_cache()
         sim = self._require_sim()
         if self._poisoned_error is not None:
             raise RuntimeError("session is poisoned after projection failure") from (
@@ -563,6 +576,7 @@ class SimSession:
         return result
 
     def decide(self, choice: str) -> None:
+        self._drop_runner_payload_cache()
         sim = self._require_sim()
         if getattr(sim, "campaign_endpoint_refused", lambda: False)():
             raise RuntimeError(
@@ -584,6 +598,7 @@ class SimSession:
         return self._require_sim().pending_decision
 
     def adjust(self, param: str, value: Any, **kw: Any) -> None:
+        self._drop_runner_payload_cache()
         sim = self._require_sim()
         adjusted_c0_forecast_field: str | None = None
         if param == "stir_factor":
@@ -793,6 +808,7 @@ class SimSession:
         return list(self._operator_decisions)
 
     def _record_operator_decision(self, event: dict[str, Any]) -> None:
+        self._drop_runner_payload_cache()
         self._operator_decisions.append(event)
 
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
