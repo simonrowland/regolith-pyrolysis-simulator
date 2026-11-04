@@ -373,6 +373,21 @@ def test_default_published_imcc_pack_loads_through_real_configuration():
     assert engines[0]._load().version == "1.0.2"
 
 
+def _default_d066_imcc_benchmark_engine():
+    import openimcc
+    from pathlib import Path
+
+    pack_path = (
+        Path(openimcc.__file__).parent
+        / "data"
+        / "packs"
+        / "imcc-sf04-d066-v1.json"
+    )
+    return benchmark.ImccEngine(
+        "imcc-default-d066", pack_path, published=True
+    )
+
+
 def test_imcc_benchmark_uses_openimcc():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     engine = benchmark.build_engines(
@@ -381,9 +396,18 @@ def test_imcc_benchmark_uses_openimcc():
     engine._load()
     result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
 
-    assert result.status == "ok", result.reason
-    assert result.details["trust"] == "internal-analytical"
-    assert result.details["model_id"] == "IMCC-SF04"
+    assert result.status == "refused"
+    assert "oxide=K2O" in result.reason
+    assert "declared=FC87-Glushko-K2O" in result.reason
+    assert "active=K-012" in result.reason
+    assert result.details["liquid_standard_refusal"]["category"] == 2
+
+    passing = _default_d066_imcc_benchmark_engine().evaluate(
+        {"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9
+    )
+    assert passing.status == "ok", passing.reason
+    assert passing.details["trust"] == "internal-analytical"
+    assert passing.details["model_id"] == "IMCC-SF04-D066"
 
 
 def test_coverage_map_reports_silicate_band_miss_below_30_sio2():
@@ -2978,9 +3002,7 @@ def test_extrapolated_tier_carries_both_marks_together():
         **fixture,
         "points": [point for point in fixture["points"] if point["id"] in wanted],
     }
-    engines = benchmark.build_engines(
-        ("imcc-published",), fixture, alphamelts_timeout_s=1.0
-    )
+    engines = [_default_d066_imcc_benchmark_engine()]
 
     strict = benchmark.run_points(fixture, engines)
     assert {row["status"] for row in strict} == {"out_of_domain"}

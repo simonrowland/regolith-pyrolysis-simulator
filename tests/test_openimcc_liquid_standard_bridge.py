@@ -85,7 +85,9 @@ def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
 def test_openimcc_source_error_from_solve_is_not_swallowed(
     monkeypatch: Any,
 ) -> None:
-    error_type = import_module("openimcc.gas").ImccGasUnrecognizedSourceError
+    from openimcc import gas
+
+    error_type = gas.ImccGasUnrecognizedSourceError
 
     def fail_solve(*_args: Any, **_kwargs: Any) -> None:
         raise error_type("solve-time source failure")
@@ -102,8 +104,8 @@ def test_unrecognized_active_source_is_a_dependent_reference_unknown_flag(
     monkeypatch: Any,
 ) -> None:
     from types import SimpleNamespace
+    from openimcc import gas
 
-    gas = import_module("openimcc.gas")
     oxide_df = gas.load_gas_datapack().oxide_df.copy()
     oxide_df.loc["MgO(l)", "Ref"] = "LAM1987"
     monkeypatch.setattr(
@@ -129,8 +131,8 @@ def test_unrecognized_active_source_is_a_dependent_reference_unknown_flag(
 
 def test_unrecognized_mgo_source_does_not_block_prediction(monkeypatch: Any) -> None:
     from types import SimpleNamespace
+    from openimcc import gas
 
-    gas = import_module("openimcc.gas")
     composition = _default_composition()
     packaged = openimcc_bridge.evaluate(
         composition_mol=composition,
