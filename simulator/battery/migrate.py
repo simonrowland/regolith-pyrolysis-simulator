@@ -20796,12 +20796,14 @@ class Migrator:
                 if isinstance(printed_species, str)
                 else None
             )
-            if printed_species_formula is not None and (
+            if isinstance(printed_species, str) and printed_species.strip() and (
                 use_printed_point_species
                 or raw_item.get("species_as_printed") is not None
             ):
+                # A printed bulk descriptor or solid solution has no single
+                # formula to inherit from the parent species.
                 species = make_species(
-                    printed_species_formula,
+                    printed_species_formula or "unknown",
                     species.phase,
                     polymorph=species.polymorph,
                     charge=species.charge,
