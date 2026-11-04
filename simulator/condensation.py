@@ -2946,6 +2946,38 @@ class CondensationModel:
         self.lab_geometry = geometry
         return geometry
 
+    def _snapshot_published_sticking_notice(
+        self,
+        notice: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Detach the maps later hours write on the live notice.
+
+        ``_record_wall_pressure_notice`` does
+        ``setdefault(kind).setdefault(species)[segment] = ...`` and
+        ``_record_wall_deposit_delta`` assigns lineage values. History and
+        the route result keep this snapshot. Segment records are copied one
+        level; their nested values are not written after publish.
+        """
+        snapshot = dict(notice)
+        for key, nested in notice.items():
+            if not isinstance(nested, Mapping):
+                continue
+            copied: dict[Any, Any] = {}
+            for species, record in nested.items():
+                if not isinstance(record, Mapping):
+                    copied[species] = record
+                    continue
+                inner: dict[Any, Any] = {}
+                for inner_key, inner_value in record.items():
+                    inner[inner_key] = (
+                        dict(inner_value)
+                        if isinstance(inner_value, Mapping)
+                        else inner_value
+                    )
+                copied[species] = inner
+            snapshot[key] = copied
+        return snapshot
+
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
         """Route one flux batch with mutation-checked catalog reuse."""
         data = self.vapor_pressure_data
@@ -3014,8 +3046,11 @@ class CondensationModel:
         raw_carrier_authority = getattr(
             evap_flux, 'carrier_authority_by_species', {}
         )
+        # Channel records are read for the rest of the hour. Top-level dict
+        # so a later key replacement cannot write the flux's map; nested
+        # pressure, flux, and extra values are not written here.
         carrier_authority_by_species = {
-            str(species): copy.deepcopy(dict(record))
+            str(species): dict(record)
             for species, record in (
                 raw_carrier_authority.items()
                 if isinstance(raw_carrier_authority, Mapping)
@@ -3072,7 +3107,7 @@ class CondensationModel:
                 # The source predicate authorizes cleanup evaporation, while
                 # hot-train condensation remains inapplicable. Carry vapor
                 # through the declared offgas route; never promote a refusal.
-                cleanup_offgas_authorization[species] = copy.deepcopy(evidence)
+                cleanup_offgas_authorization[species] = dict(evidence)
                 promoted, reason = current_status, None
             carrier_authority_status_by_species[species] = promoted
             if reason is not None:
@@ -3083,8 +3118,8 @@ class CondensationModel:
                 'authoritative_for_condensation': (
                     status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
                 ),
-                'carrier_authority': copy.deepcopy(
-                    carrier_authority_by_species.get(species, {})
+                'carrier_authority': carrier_authority_by_species.get(
+                    species, {}
                 ),
             }
             for species, status in sorted(
@@ -3115,8 +3150,10 @@ class CondensationModel:
             vapor_pressure_data=self.vapor_pressure_data,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
         )
-        self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
-        self.cold_spot_history.append(copy.deepcopy(diagnostic))
+        # Fresh each call. The next hour replaces last_; nothing writes
+        # this diagnostic in place, so history keeps the same object.
+        self.last_cold_spot_diagnostic = diagnostic
+        self.cold_spot_history.append(diagnostic)
         cold_spot_warnings = tuple(diagnostic.get('warnings', ()))
         if self.operating_history:
             self.operating_history[-1]['cold_spot_warning_count'] = len(
@@ -3335,8 +3372,8 @@ class CondensationModel:
                     'mass_closure_error_kg_hr': abs(
                         float(rate_kg_hr) - retained_source_mass
                     ),
-                    'carrier_authority': copy.deepcopy(
-                        carrier_authority_by_species.get(species, {})
+                    'carrier_authority': carrier_authority_by_species.get(
+                        species, {}
                     ),
                 }
                 continue
@@ -3403,11 +3440,9 @@ class CondensationModel:
                 .setdefault(species, {})
             )
             for stage_number, record in stage_alpha_records_by_stage.items():
-                alpha_provenance[f'stage_{stage_number}'] = copy.deepcopy(
-                    record
-                )
+                alpha_provenance[f'stage_{stage_number}'] = dict(record)
             if capture_budget_alpha_record:
-                alpha_provenance['capture_budget'] = copy.deepcopy(
+                alpha_provenance['capture_budget'] = dict(
                     capture_budget_alpha_record
                 )
             capture_budget_kg = float(stage_route['capture_budget_kg'])
@@ -3483,11 +3518,15 @@ class CondensationModel:
             'alpha_s_provenance_by_species',
             {},
         )
-        accumulated_alpha_provenance = copy.deepcopy(
-            current_alpha_provenance
-            if isinstance(current_alpha_provenance, Mapping)
-            else {}
-        )
+        # setdefault writes this map. Copy the species level so that write
+        # cannot land on the notice's current provenance object.
+        accumulated_alpha_provenance: dict[Any, Any] = {}
+        if isinstance(current_alpha_provenance, Mapping):
+            for species, by_surface in current_alpha_provenance.items():
+                if isinstance(by_surface, Mapping):
+                    accumulated_alpha_provenance[species] = dict(by_surface)
+                else:
+                    accumulated_alpha_provenance[species] = by_surface
         prior_alpha_provenance = self.last_sticking_alpha_provenance_notice.get(
             'alpha_s_provenance_by_species',
             {},
@@ -3510,9 +3549,7 @@ class CondensationModel:
                         not isinstance(current_record, Mapping)
                         or _status_bearing_alpha_record(prior_record)
                     ):
-                        accumulated_by_surface[str(surface)] = copy.deepcopy(
-                            dict(prior_record)
-                        )
+                        accumulated_by_surface[str(surface)] = dict(prior_record)
         sticking_notice = dict(sticking_notice)
         sticking_notice['alpha_s_provenance_by_species'] = (
             accumulated_alpha_provenance
@@ -3524,7 +3561,7 @@ class CondensationModel:
                 continue
             record = carrier_authority_by_species.get(species)
             wall_carrier_authority_by_species[species] = (
-                copy.deepcopy(record)
+                record
                 if isinstance(record, Mapping)
                 else {
                     'species_id': species,
@@ -3543,7 +3580,7 @@ class CondensationModel:
             wall_carrier_authority_by_species.setdefault(
                 species,
                 (
-                    copy.deepcopy(dict(record))
+                    record
                     if isinstance(record, Mapping)
                     else {
                         'species_id': species,
@@ -3591,8 +3628,8 @@ class CondensationModel:
                             )
                         )
                     else:
-                        wall_carrier_authority_by_species[str(species)] = (
-                            copy.deepcopy(dict(prior_record))
+                        wall_carrier_authority_by_species[str(species)] = dict(
+                            prior_record
                         )
                 elif isinstance(current_record, Mapping):
                     wall_carrier_authority_by_species[str(species)] = (
@@ -3628,26 +3665,44 @@ class CondensationModel:
             'wall_saturation_pressure_extrapolations_by_species', {}
         )
         if extrapolations:
-            sticking_notice['wall_saturation_pressure_extrapolations_by_species'] = copy.deepcopy(extrapolations)
+            # Same map the next hour's pressure recorder setdefaults into.
+            # The publish snapshot below detaches history from that write.
+            sticking_notice['wall_saturation_pressure_extrapolations_by_species'] = extrapolations
         transport_notices = self.last_sticking_alpha_provenance_notice.get(
             'evaporation_transport_notices_by_species', {}
         )
         if transport_notices:
-            sticking_notice['evaporation_transport_notices_by_species'] = copy.deepcopy(transport_notices)
+            sticking_notice['evaporation_transport_notices_by_species'] = transport_notices
         prior_refusals = self.last_sticking_alpha_provenance_notice.get(
             'wall_saturation_pressure_refusals_by_species',
             {},
         )
         if isinstance(prior_refusals, Mapping):
-            accumulated_refusals = copy.deepcopy(dict(prior_refusals))
+            # refusal_type is written onto these records below. Copy the
+            # segment maps and the records so that write cannot land on
+            # the previous hour's notice.
+            accumulated_refusals: dict[Any, Any] = {}
+            for species, by_segment in prior_refusals.items():
+                if isinstance(by_segment, Mapping):
+                    accumulated_refusals[species] = {
+                        segment: (
+                            dict(record) if isinstance(record, Mapping) else record
+                        )
+                        for segment, record in by_segment.items()
+                    }
+                else:
+                    accumulated_refusals[species] = by_segment
             for species, by_segment in (
                 wall_saturation_pressure_refusals_by_species.items()
             ):
                 if not isinstance(by_segment, Mapping):
                     continue
-                accumulated_refusals.setdefault(str(species), {}).update(
-                    copy.deepcopy(dict(by_segment))
-                )
+                accumulated_refusals.setdefault(str(species), {}).update({
+                    segment: (
+                        dict(record) if isinstance(record, Mapping) else record
+                    )
+                    for segment, record in by_segment.items()
+                })
             wall_saturation_pressure_refusals_by_species = accumulated_refusals
         for by_segment in wall_saturation_pressure_refusals_by_species.values():
             if not isinstance(by_segment, Mapping):
@@ -3682,13 +3737,20 @@ class CondensationModel:
             sticking_notice['alpha_s_extrapolation_warnings'] = (
                 alpha_extrapolation_warnings
             )
-        self.last_sticking_alpha_provenance_notice = copy.deepcopy(
-            sticking_notice
+        # Live object: the next hour's wall-pressure recorder and deposit
+        # lineage writer mutate it before this hour's row is frozen.
+        # History and the route result keep a detached snapshot.
+        published_sticking_notice = (
+            self._snapshot_published_sticking_notice(sticking_notice)
+            if sticking_notice else {}
         )
-        if sticking_notice and self.operating_history:
+        self.last_sticking_alpha_provenance_notice = (
+            sticking_notice if sticking_notice else {}
+        )
+        if published_sticking_notice and self.operating_history:
             self.operating_history[-1][
                 'wall_sticking_alpha_provenance_notice'
-            ] = copy.deepcopy(sticking_notice)
+            ] = published_sticking_notice
 
         transport_notice: dict[str, Any] = {}
         if transport_parameter_notice_by_species:
@@ -3700,23 +3762,21 @@ class CondensationModel:
                 'carrier_gas': self.carrier_gas,
                 'output_status': 'status_bearing',
             }
-        self.last_transport_parameter_notice = copy.deepcopy(transport_notice)
+        self.last_transport_parameter_notice = transport_notice
         if transport_notice and self.operating_history:
             self.operating_history[-1][
                 'transport_parameter_notice'
-            ] = copy.deepcopy(transport_notice)
+            ] = transport_notice
 
         capture_notice = (
             dict(CAPTURE_BUDGET_REGULARIZER_NOTICE)
             if used_capture_budget_regularizer else {}
         )
-        self.last_capture_budget_regularizer_notice = copy.deepcopy(
-            capture_notice
-        )
+        self.last_capture_budget_regularizer_notice = capture_notice
         if capture_notice and self.operating_history:
             self.operating_history[-1][
                 'capture_budget_regularizer_notice'
-            ] = copy.deepcopy(capture_notice)
+            ] = capture_notice
 
         # VR-11 / B3: fold stage-local efficiency pass-through outcomes into
         # condensation_refusals_by_species so B2 consumers can see them.
@@ -3835,73 +3895,55 @@ class CondensationModel:
                 'mass_closure_error_kg_hr': authority[
                     'mass_closure_error_kg_hr'
                 ],
-                'carrier_authority': copy.deepcopy(
-                    authority.get('carrier_authority', {})
-                ),
+                'carrier_authority': authority.get('carrier_authority', {}),
             })
             condensation_refusals_by_species[species] = existing
 
-        self.last_condensation_refusals_by_species = copy.deepcopy(
+        # These maps are built for this hour and then replaced. Callers
+        # read them; the alkali state is replaced as a whole after return.
+        self.last_condensation_refusals_by_species = (
             condensation_refusals_by_species
         )
-        self.last_condensation_authority_by_species = copy.deepcopy(
+        self.last_condensation_authority_by_species = (
             condensation_authority_by_species
         )
         if self.operating_history:
             self.operating_history[-1][
                 'wall_deposition_rate_shadow_candidate'
-            ] = copy.deepcopy(
-                self.last_wall_deposition_rate_shadow_candidate
-            )
+            ] = self.last_wall_deposition_rate_shadow_candidate
             if condensation_refusals_by_species:
                 self.operating_history[-1][
                     'condensation_refusals_by_species'
-                ] = copy.deepcopy(condensation_refusals_by_species)
+                ] = condensation_refusals_by_species
 
         return CondensationRouteResult(
-            remaining_by_species=copy.deepcopy(remaining_by_species),
-            retained_in_source_by_species=copy.deepcopy(
-                retained_in_source_by_species
-            ),
-            condensed_by_stage_species=copy.deepcopy(
-                condensed_by_stage_species
-            ),
-            wall_deposit_by_species=copy.deepcopy(wall_deposit_by_species),
-            wall_deposit_by_segment_species=copy.deepcopy(
-                wall_deposit_by_segment_species
-            ),
-            wall_deposit_fraction_by_species=copy.deepcopy(
-                wall_deposit_fraction_by_species
-            ),
+            remaining_by_species=remaining_by_species,
+            retained_in_source_by_species=retained_in_source_by_species,
+            condensed_by_stage_species=condensed_by_stage_species,
+            wall_deposit_by_species=wall_deposit_by_species,
+            wall_deposit_by_segment_species=wall_deposit_by_segment_species,
+            wall_deposit_fraction_by_species=wall_deposit_fraction_by_species,
             wall_deposit_account_fractions_by_species=(
-                copy.deepcopy(wall_deposit_account_fractions_by_species)),
+                wall_deposit_account_fractions_by_species),
             wall_route_species_order=_wall_route_species_order(
                 evap_flux.species_kg_hr.keys()
             ),
-            wall_alkali_binding_diagnostic_state_by_segment=copy.deepcopy(
+            wall_alkali_binding_diagnostic_state_by_segment=(
                 self.wall_alkali_binding_diagnostic_state_by_account
             ),
-            impurity_by_stage_species=copy.deepcopy(
-                impurity_by_stage_species
-            ),
-            antoine_extrapolations=copy.deepcopy(antoine_extrapolations),
+            impurity_by_stage_species=impurity_by_stage_species,
+            antoine_extrapolations=antoine_extrapolations,
             antoine_extrapolation_warnings=tuple(
                 antoine_extrapolation_warnings),
-            cold_spot_warnings=copy.deepcopy(cold_spot_warnings),
-            knudsen_regime_diagnostic=copy.deepcopy(knudsen_diagnostic),
-            sticking_alpha_provenance_notice=copy.deepcopy(sticking_notice),
-            transport_parameter_notice=copy.deepcopy(transport_notice),
-            capture_budget_regularizer_notice=copy.deepcopy(capture_notice),
-            condensation_refusals_by_species=(
-                copy.deepcopy(condensation_refusals_by_species)),
-            carrier_authority_by_species=copy.deepcopy(
-                carrier_authority_by_species
-            ),
-            condensation_authority_by_species=(
-                copy.deepcopy(condensation_authority_by_species)),
-            stage_area_geometry_provenance_notice=copy.deepcopy(
-                geometry_notice
-            ),
+            cold_spot_warnings=cold_spot_warnings,
+            knudsen_regime_diagnostic=knudsen_diagnostic,
+            sticking_alpha_provenance_notice=published_sticking_notice,
+            transport_parameter_notice=transport_notice,
+            capture_budget_regularizer_notice=capture_notice,
+            condensation_refusals_by_species=condensation_refusals_by_species,
+            carrier_authority_by_species=carrier_authority_by_species,
+            condensation_authority_by_species=condensation_authority_by_species,
+            stage_area_geometry_provenance_notice=geometry_notice,
         )
 
     def adjust_c2a_pressure_setpoint(
@@ -4036,16 +4078,16 @@ class CondensationModel:
 
     def _enforce_knudsen_regime(self) -> dict[str, Any]:
         diagnostic = self._current_knudsen_diagnostic()
-        self.last_knudsen_regime_diagnostic = copy.deepcopy(diagnostic)
+        # The refusal exception copies its payload. The next hour replaces
+        # last_ and does not write this diagnostic.
+        self.last_knudsen_regime_diagnostic = diagnostic
         if diagnostic.get('status') == 'refused':
             raise KnudsenRegimeRefusal(diagnostic)
         warnings = tuple(diagnostic.get('warnings', ()))
         if warnings and self.operating_history:
             self.operating_history[-1]['knudsen_warnings'] = warnings
-            self.operating_history[-1]['knudsen_regime_diagnostic'] = (
-                copy.deepcopy(diagnostic)
-            )
-        return copy.deepcopy(diagnostic)
+            self.operating_history[-1]['knudsen_regime_diagnostic'] = diagnostic
+        return diagnostic
 
     def _wall_deposit_candidate_kg(
         self,
@@ -4985,19 +5027,11 @@ class _FrozenCatalogDict(dict):
         raise TypeError("condensation catalog payload is immutable")
 
     def __deepcopy__(self, memo):
-        clone = _FrozenCatalogDict()
-        memo[id(self)] = clone
-        dict.__init__(
-            clone,
-            (
-                (
-                    copy.deepcopy(key, memo),
-                    copy.deepcopy(value, memo),
-                )
-                for key, value in self.items()
-            ),
-        )
-        return clone
+        # Built only by _freeze_catalog_value: nested mappings and lists are
+        # frozen, tuples are frozen, and every other leaf is an immutable
+        # scalar. Mutation methods raise, so a copy cannot diverge.
+        memo[id(self)] = self
+        return self
 
     def __reduce__(self):
         return (_rebuild_frozen_catalog_dict, (tuple(self.items()),))
@@ -5043,13 +5077,9 @@ class _FrozenCatalogList(list):
         raise TypeError("condensation catalog payload is immutable")
 
     def __deepcopy__(self, memo):
-        clone = _FrozenCatalogList()
-        memo[id(self)] = clone
-        list.__init__(
-            clone,
-            (copy.deepcopy(value, memo) for value in self),
-        )
-        return clone
+        # Same freeze contract as _FrozenCatalogDict.
+        memo[id(self)] = self
+        return self
 
     def __reduce__(self):
         return (_rebuild_frozen_catalog_list, (tuple(self),))

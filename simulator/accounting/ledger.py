@@ -6,7 +6,6 @@ import math
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from copy import copy as shallow_copy
-from copy import deepcopy
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
@@ -447,7 +446,10 @@ class AtomLedger:
         }
 
     def gross_account_flow_events(self) -> tuple[dict[str, Any], ...]:
-        return tuple(deepcopy(self._gross_account_flow_events))
+        # Append-only: _record_gross_lot appends a new dict and never writes
+        # an existing event. The tuple freezes the length at this call.
+        # capture_ledger_snapshot copies the condensation rows it stores.
+        return tuple(self._gross_account_flow_events)
 
     def cumulative_origin_unattributed_atom_moles(self) -> dict[str, float]:
         return dict(self._cumulative_origin_unattributed_atom_moles)

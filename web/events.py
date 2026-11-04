@@ -718,31 +718,43 @@ _PER_HOUR_CARRIER_MAP_FIELDS = (
 )
 
 
+_PER_HOUR_OMITTED_FIELDS = frozenset(
+    _PER_HOUR_DETAIL_FIELDS + _PER_HOUR_CARRIER_MAP_FIELDS
+)
+_REDOX_SUMMARY_KEYS = (
+    'applied_terms_mol_o2_equiv_by_label',
+    'skipped_terms_mol_o2_equiv_by_label',
+    'net_mol_o2_equiv',
+    'delta_log10_fO2',
+    'ferric_divergence',
+    'source_campaign',
+    'source_hour',
+    'source_campaign_hour',
+)
+
+
 def _per_hour_summary_entry(
     summary: Mapping[str, object],
 ) -> dict[str, object]:
-    """Build the compact per-hour row shared by tick and history payloads."""
-    entry = copy.deepcopy(dict(summary))
-    for key in _PER_HOUR_DETAIL_FIELDS:
-        entry.pop(key, None)
-    for key in _PER_HOUR_CARRIER_MAP_FIELDS:
-        entry.pop(key, None)
+    """Build the compact per-hour row shared by tick and history payloads.
+
+    The row is a new top-level dict. Nested values stay shared with the
+    source summary: this projection only drops keys and replaces
+    ``redox_source_breakdown`` with a new dict of selected keys. Callers
+    read those values; they do not write them.
+    """
+    entry = {
+        key: value
+        for key, value in summary.items()
+        if key not in _PER_HOUR_OMITTED_FIELDS
+    }
     redox_breakdown = entry.get('redox_source_breakdown')
     if isinstance(redox_breakdown, Mapping):
         # The live redox panel consumes this projection; verbose diagnostics
         # remain available in the run capture and completion payload.
         entry['redox_source_breakdown'] = {
             key: redox_breakdown[key]
-            for key in (
-                'applied_terms_mol_o2_equiv_by_label',
-                'skipped_terms_mol_o2_equiv_by_label',
-                'net_mol_o2_equiv',
-                'delta_log10_fO2',
-                'ferric_divergence',
-                'source_campaign',
-                'source_hour',
-                'source_campaign_hour',
-            )
+            for key in _REDOX_SUMMARY_KEYS
             if key in redox_breakdown
         }
     return entry
@@ -924,14 +936,15 @@ def _record_last_recipe_capture(
         if state is None or state.get("run_id") != run_id:
             return
         if tick_data is not None:
+            # Top-level dicts only. The tick and the hour summary are built
+            # for this hour and then replaced; nested values are read, not
+            # written, by recipe save and the advisory detail reader.
             state["last_recipe_capture"] = {
-                "tick": copy.deepcopy(dict(tick_data)),
-                "per_hour_summary": copy.deepcopy(dict(per_hour_summary or {})),
+                "tick": dict(tick_data),
+                "per_hour_summary": dict(per_hour_summary or {}),
             }
         if completion_payload is not None:
-            state["last_completion_payload"] = copy.deepcopy(
-                dict(completion_payload)
-            )
+            state["last_completion_payload"] = dict(completion_payload)
 
 
 def _recipe_inputs_payload(
