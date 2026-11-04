@@ -111,7 +111,18 @@ def test_builtin_vapor_pressure_po2_slope_once(
                 temperature_C=temperature_C,
             )
         )
-        pressures.append(result.diagnostic["vapor_pressures_Pa"][species])
+        diagnostic = result.diagnostic
+        pressure = (diagnostic.get("vapor_pressures_Pa") or {}).get(species)
+        if pressure is None:
+            # The liquid-reference conversion can put Ca below the provider's
+            # reporting floor. Its omission record retains the computed value;
+            # use that receipt so this test still checks the pO2 exponent.
+            omission = (
+                diagnostic.get("below_reporting_threshold_omissions") or {}
+            ).get(species)
+            assert omission is not None, (species, diagnostic)
+            pressure = omission["computed_pressure_Pa"]
+        pressures.append(float(pressure))
 
     for observed in _slope(po2_levels, tuple(pressures)):
         assert observed == pytest.approx(expected_slope, abs=1.0e-9)

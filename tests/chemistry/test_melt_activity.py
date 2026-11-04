@@ -93,6 +93,17 @@ def test_solid_reference_gamma_converts_to_liquid_janaf_reference(
     assert activity.activity == pytest.approx(expected_gamma_l * 0.2)
 
 
+def test_solid_reference_gamma_predicts_above_janaf_range() -> None:
+    activity = melt_oxide_activity(
+        "MgO",
+        {"MgO": 1.0, "SiO2": 4.0},
+        temperature_K=4500.0,
+    )
+
+    assert activity is not None
+    assert activity.activity > 0.0
+
+
 @pytest.mark.parametrize("parent", ["CaO", "MgO"])
 def test_solid_reference_oxide_activity_requires_temperature(parent: str) -> None:
     with pytest.raises(ValueError, match="temperature_K required"):
