@@ -3614,11 +3614,14 @@ def _crash_cell_from_returncode(
             sig_name = signal.Signals(sig).name
         except ValueError:
             sig_name = f"signal {sig}"
+        from simulator.melt_backend.alphamelts import _crash_stderr_tail
+
+        tail = _crash_stderr_tail(stderr)
         status, refusal, engine_reason = (
             "refusal",
             REFUSAL_ENGINE_CRASH,
             f"{sig_name} (returncode {returncode})"
-            + (f": {stderr[-4000:]}" if stderr else ""),
+            + (f": {tail}" if tail else ""),
         )
         engine_status = REFUSAL_ENGINE_CRASH
         exit_signal = sig

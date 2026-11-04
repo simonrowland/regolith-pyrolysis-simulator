@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import math
 import os
 import time
@@ -120,18 +121,31 @@ def test_sigsegv_alphamelts_returns_composition_and_crash_point(tmp_path):
         ALPHAMELTS_REASON_SUBPROCESS_DIED
     )
     assert result.diagnostics['backend_failure_category'] == 'engine_crash'
-    assert result.diagnostics['subprocess_failure'] == {
-        'stage': 'alphamelts_subprocess_execute',
-        'command': [str(stub), '1'],
-        'returncode': -11,
-        'signal': 'SIGSEGV',
+    failure = result.diagnostics['subprocess_failure']
+    assert failure['stage'] == 'alphamelts_subprocess_execute'
+    assert failure['command'] == [str(stub), '1']
+    assert failure['returncode'] == -11
+    assert failure['signal'] == 'SIGSEGV'
+    assert set(failure) <= {
+        'stage',
+        'command',
+        'returncode',
+        'signal',
+        'stderr_tail',
+        'melts_sha256',
+        'melts_path',
     }
-    crash_point = result.diagnostics['out_of_domain_crash_point']
-    assert crash_point['stage'] == 'alphamelts_subprocess_execute'
-    assert crash_point['composition_mol_by_account'] == (
-        _composition_mol_by_account()
-    )
-    assert any('SIGSEGV' in warning for warning in result.warnings)
+    try:
+        crash_point = result.diagnostics['out_of_domain_crash_point']
+        assert crash_point['stage'] == 'alphamelts_subprocess_execute'
+        assert crash_point['composition_mol_by_account'] == (
+            _composition_mol_by_account()
+        )
+        assert any('SIGSEGV' in warning for warning in result.warnings)
+    finally:
+        retained = failure.get('melts_path')
+        if isinstance(retained, str):
+            Path(retained).unlink(missing_ok=True)
 
 
 def test_known_crashing_alkali_silica_binary_launches_without_fo2_path(tmp_path):
@@ -841,3 +855,231 @@ def test_qualification_band_miss_with_iron_still_launches(tmp_path):
     )
 
     assert marker.exists()
+
+
+# Last 4000 characters, the isolated-worker signal-death bound
+# (simulator/diagnostic_helpers/binary_pot_battery.py crash cell).
+_ISOLATED_WORKER_STDERR_TAIL_CHARS = 4000
+_CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
+
+
+def _aborting_stderr_backend(tmp_path: Path, stderr_text: str):
+    """Fake alphaMELTS: record input.melts, write stderr, die with SIGABRT."""
+    witness = tmp_path / 'witness.melts'
+    stub = tmp_path / 'alphamelts'
+    stub.write_text(
+        '#!/usr/bin/env python3\n'
+        'import os\n'
+        'import signal\n'
+        'import sys\n'
+        'from pathlib import Path\n'
+        'Path(os.environ["ALPHAMELTS_TEST_MELTS_WITNESS"]).write_bytes(\n'
+        '    Path("input.melts").read_bytes()\n'
+        ')\n'
+        'sys.stderr.write(os.environ["ALPHAMELTS_TEST_STDERR"])\n'
+        'sys.stderr.flush()\n'
+        'os.kill(os.getpid(), signal.SIGABRT)\n'
+    )
+    stub.chmod(0o755)
+    return _backend(stub, timeout_s=5.0), stub, witness
+
+
+def _run_aborting_stub(tmp_path: Path, monkeypatch, stderr_text: str):
+    backend, stub, witness = _aborting_stderr_backend(tmp_path, stderr_text)
+    monkeypatch.setenv('ALPHAMELTS_TEST_MELTS_WITNESS', str(witness))
+    monkeypatch.setenv('ALPHAMELTS_TEST_STDERR', stderr_text)
+    result = _run(backend)
+    return result, stub, witness
+
+
+def _assert_subprocess_died_values(result, stub: Path) -> dict:
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics['backend_status_reason'] == (
+        ALPHAMELTS_REASON_SUBPROCESS_DIED
+    )
+    assert result.diagnostics['backend_failure_category'] == 'engine_crash'
+    failure = result.diagnostics['subprocess_failure']
+    assert failure['stage'] == 'alphamelts_subprocess_execute'
+    assert failure['command'] == [str(stub), '1']
+    assert failure['returncode'] == -6
+    assert failure['signal'] == 'SIGABRT'
+    warning_text = '\n'.join(result.warnings)
+    assert 'SIGABRT (returncode -6)' in warning_text
+    assert 'TAILMARK' not in warning_text
+    return failure
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
+def test_negative_returncode_keeps_stderr_tail_and_melts_input(
+    tmp_path,
+    monkeypatch,
+    crash_input_root,
+):
+    """A signal death keeps a 4000-character stderr tail and the .melts input."""
+    stderr_text = 'prefix' + ('x' * 5000) + 'TAILMARK'
+    assert len(stderr_text) > _ISOLATED_WORKER_STDERR_TAIL_CHARS
+    retained_path = None
+    try:
+        result, stub, witness = _run_aborting_stub(
+            tmp_path,
+            monkeypatch,
+            stderr_text,
+        )
+        failure = _assert_subprocess_died_values(result, stub)
+        expected_tail = stderr_text[-_ISOLATED_WORKER_STDERR_TAIL_CHARS:]
+        assert failure['stderr_tail'] == expected_tail
+        assert len(failure['stderr_tail']) == _ISOLATED_WORKER_STDERR_TAIL_CHARS
+        assert 'prefix' not in failure['stderr_tail']
+        assert witness.is_file()
+        witness_bytes = witness.read_bytes()
+        digest = hashlib.sha256(witness_bytes).hexdigest()
+        assert failure['melts_sha256'] == digest
+        retained_path = Path(failure['melts_path'])
+        assert retained_path.is_file()
+        assert retained_path.read_bytes() == witness_bytes
+        assert retained_path.name == f'{digest}.melts'
+        assert retained_path.parent == (
+            crash_input_root / _CRASH_INPUT_DIR_NAME
+        )
+    finally:
+        if retained_path is not None:
+            retained_path.unlink(missing_ok=True)
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
+def test_melts_copy_failure_leaves_subprocess_died_refusal_unchanged(
+    tmp_path,
+    monkeypatch,
+):
+    """A failed .melts copy must not replace the signal-death refusal."""
+    real_mkdir = Path.mkdir
+
+    def refuse_crash_input_dir(self, *args, **kwargs):
+        if self.name == _CRASH_INPUT_DIR_NAME:
+            raise OSError(13, 'retention disabled')
+        return real_mkdir(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, 'mkdir', refuse_crash_input_dir)
+    stderr_text = 'aborted near the silica-poor corner TAILMARK\n'
+    assert len(stderr_text) < _ISOLATED_WORKER_STDERR_TAIL_CHARS
+    result, stub, _witness = _run_aborting_stub(
+        tmp_path,
+        monkeypatch,
+        stderr_text,
+    )
+    failure = _assert_subprocess_died_values(result, stub)
+    assert failure['stderr_tail'] == stderr_text
+    assert 'melts_sha256' not in failure
+    assert 'melts_path' not in failure
+    assert 'retention disabled' not in '\n'.join(result.warnings)
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='signal contract is POSIX')
+def test_crash_input_store_keeps_the_two_newest_of_three(
+    tmp_path,
+    monkeypatch,
+    crash_input_root,
+):
+    """A count cap drops the oldest retained input and leaves the refusal."""
+    import simulator.melt_backend.alphamelts as alphamelts
+
+    monkeypatch.setattr(
+        alphamelts,
+        '_ALPHAMELTS_CRASH_INPUT_MAX_FILES',
+        2,
+        raising=False,
+    )
+    stderr_text = 'bounded store\n'
+    backend, stub, witness = _aborting_stderr_backend(tmp_path, stderr_text)
+    monkeypatch.setenv('ALPHAMELTS_TEST_MELTS_WITNESS', str(witness))
+    monkeypatch.setenv('ALPHAMELTS_TEST_STDERR', stderr_text)
+    compositions = (
+        _melt({
+            'SiO2': 1.0, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+        _melt({
+            'SiO2': 1.1, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+        _melt({
+            'SiO2': 1.2, 'Al2O3': 0.2, 'FeO': 0.15,
+            'MgO': 0.2, 'CaO': 0.15, 'Na2O': 0.05,
+        }),
+    )
+    identities = []
+    digests = []
+    for index, composition in enumerate(compositions):
+        result = _run(backend, composition)
+        failure = _assert_subprocess_died_values(result, stub)
+        digest = failure['melts_sha256']
+        path = Path(failure['melts_path'])
+        assert path.is_file()
+        digests.append(digest)
+        identities.append((
+            result.status,
+            result.diagnostics['backend_status_reason'],
+            result.diagnostics['backend_failure_category'],
+            failure['stage'],
+            tuple(failure['command']),
+            failure['returncode'],
+            failure['signal'],
+            failure['stderr_tail'],
+        ))
+        if index < 2:
+            stamp = 1_700_000_000 + index
+            os.utime(path, (stamp, stamp))
+    assert identities[0] == identities[1] == identities[2]
+    assert len(set(digests)) == 3
+    remaining = {
+        path.name
+        for path in (crash_input_root / _CRASH_INPUT_DIR_NAME).glob('*.melts')
+    }
+    assert remaining == {f'{digests[1]}.melts', f'{digests[2]}.melts'}
+
+
+@pytest.mark.skipif(os.name != 'posix', reason='flock contract is POSIX')
+def test_crash_input_publish_and_prune_hold_exclusive_lock(
+    tmp_path,
+    monkeypatch,
+    crash_input_root,
+):
+    """Pruning runs while the crash-input store's exclusive lock is held."""
+    import fcntl
+
+    import simulator.melt_backend.alphamelts as alphamelts
+
+    source = tmp_path / 'input.melts'
+    source.write_bytes(b'crash input for lock regression\n')
+    directory = crash_input_root / _CRASH_INPUT_DIR_NAME
+    lock_path = directory / '.retention.lock'
+    real_prune = alphamelts._prune_crash_melt_inputs
+    observed = {}
+
+    def check_lock_then_prune(directory_arg, protected):
+        assert directory_arg == directory
+        with lock_path.open('a+b') as contender:
+            try:
+                fcntl.flock(
+                    contender.fileno(),
+                    fcntl.LOCK_EX | fcntl.LOCK_NB,
+                )
+            except BlockingIOError:
+                observed['held'] = True
+            else:
+                observed['held'] = False
+                fcntl.flock(contender.fileno(), fcntl.LOCK_UN)
+        real_prune(directory_arg, protected)
+
+    monkeypatch.setattr(
+        alphamelts,
+        '_prune_crash_melt_inputs',
+        check_lock_then_prune,
+    )
+    digest, retained = alphamelts._retain_crash_melts_input(source)
+
+    assert observed['held'] is True
+    assert lock_path.is_file()
+    assert not lock_path.match('*.melts')
+    assert Path(retained).name == f'{digest}.melts'
+    assert Path(retained).is_file()
