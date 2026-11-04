@@ -131,15 +131,18 @@ def test_config_absent_legacy_fallback_emits_warning(
     assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
 
 
-def test_warn_legacy_once_is_single_shot() -> None:
+def test_warn_legacy_once_respects_always_filter() -> None:
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
-    assert len(caught) == 1
+    assert [str(item.message) for item in caught] == [
+        "legacy once",
+        "legacy once",
+    ]
 
 
-def test_warn_once_with_summary_keeps_first_warning_and_counts_repeats(
+def test_warn_once_with_summary_emits_every_call_and_counts_repeats(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -160,8 +163,8 @@ def test_warn_once_with_summary_keeps_first_warning_and_counts_repeats(
         for _ in range(50):
             engine_local_config.warn_once_with_summary(key, message)
 
-    assert len(caught) == 1
-    assert str(caught[0].message) == message
+    assert len(caught) == 50
+    assert {str(item.message) for item in caught} == {message}
 
     engine_local_config._flush_warning_repeat_summaries()
 
