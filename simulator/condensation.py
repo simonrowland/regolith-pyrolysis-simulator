@@ -120,6 +120,14 @@ from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
     PA_PER_BAR,
 )
+from simulator.nucleation import (
+    ETA_ROLE_UPPER_BOUND,
+    NOTICE_FOG,
+    NOTICE_UNEVALUABLE,
+    NucleationInputError,
+    fog_capture_code,
+    nucleation_rate,
+)
 from simulator.accounting.queries import (
     wall_deposit_candidate_for_surface_kg as query_wall_deposit_candidate_for_surface_kg,
     wall_deposit_candidate_kg as query_wall_deposit_candidate_kg,
@@ -2321,6 +2329,11 @@ class CondensationModel:
         # VR-11 / B2: consumer-facing condensation refusal channel.
         self.last_condensation_refusals_by_species: dict[str, dict[str, Any]] = {}
         self.last_condensation_authority_by_species: dict[str, dict[str, Any]] = {}
+        # Fog is a flag on the molecular eta. It is not a condensation refusal
+        # and it is not copied onto operating_history or the route result.
+        self.last_vapour_fog_notice: list[dict[str, Any]] = []
+        self.vapour_fog_history: list[dict[str, Any]] = []
+        self._pending_vapour_fog_notice: list[dict[str, Any]] | None = None
         self.last_wall_deposition_rate_shadow_candidate: dict[
             str, dict[str, Any]
         ] = {}
@@ -2354,6 +2367,9 @@ class CondensationModel:
         self.last_condensation_refusals_by_species = {}
         self.last_stage3_route_diagnostic = {}
         self.last_condensation_authority_by_species = {}
+        self.last_vapour_fog_notice = []
+        self.vapour_fog_history = []
+        self._pending_vapour_fog_notice = None
 
     def configure_operating_conditions(
         self,
@@ -2878,7 +2894,9 @@ class CondensationModel:
             'retained_supply_projection': copy.deepcopy(self.retained_supply_projection)}
         self.last_stage3_route_diagnostic = diagnostic
         if route['stage3_route'] == 'divert':
-            return self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt)
+            self._commit_vapour_fog_notice()
+            return result
         if route['stage3_route'] != 'through':
             raise DepositionInputRefusal('stage3_route', route, 'unknown route')
         purities = {field: validate_stage3_purity(route.get(field,
@@ -2958,6 +2976,9 @@ class CondensationModel:
             diagnostic['findings'] = [finding]
             diagnostic['silica_exposed_to_alkali_findings'] = [finding]
             if self.hard_stage3_gate or unknown:
+                # The through-route above is a rejected proposal. Do not keep
+                # its fog notices; the divert re-route is the parcel that lands.
+                self._pending_vapour_fog_notice = None
                 self.cold_spot_history.append(copy.deepcopy(diagnostic))
                 raise Stage3SilicaExposureRefusal(diagnostic)
             self.last_sticking_alpha_provenance_notice = prior_sticking
@@ -2974,8 +2995,23 @@ class CondensationModel:
                 campaign_hour=melt.campaign_hour,
                 reason='alkali_purity_exceeded', resolved_stage3_route='divert')
             self.cold_spot_history.append(copy.deepcopy(diagnostic))
-            return self._route(evap_flux, melt)
-        return result if result is not None else self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt)
+            self._commit_vapour_fog_notice()
+            return result
+        if result is None:
+            result = self._route(evap_flux, melt)
+        self._commit_vapour_fog_notice()
+        return result
+
+    def _commit_vapour_fog_notice(self) -> None:
+        """Keep fog notices only for the route that is actually returned."""
+
+        notices = self._pending_vapour_fog_notice
+        self._pending_vapour_fog_notice = None
+        if notices is None:
+            return
+        self.last_vapour_fog_notice = list(notices)
+        self.vapour_fog_history.extend(notices)
 
     def _build_default_pipe_segments(
         self,
@@ -3246,6 +3282,8 @@ class CondensationModel:
         wall_deposit_account_fractions_by_species: Dict[
             str, Dict[str, float]] = {}
         self.last_wall_deposition_rate_shadow_candidate = {}
+        vapour_fog_notices: list[dict[str, Any]] = []
+        self._pending_vapour_fog_notice = vapour_fog_notices
         impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
@@ -3554,6 +3592,8 @@ class CondensationModel:
                     reactive_alkali[species] = reaction
                     if not reaction['favoured']:
                         continue
+                eta: float | None = None
+                capture_refused = False
                 try:
                     eta = self._condensation_efficiency(
                         stage=stage, species=species, T_cond_C=route['T_cond_C'],
@@ -3579,6 +3619,7 @@ class CondensationModel:
                     # evaporation authority or undo earlier measured capture.
                     # Keep the uncaptured parcel in flow, with eta unavailable;
                     # neither a fabricated saturation curve nor proven zero.
+                    capture_refused = True
                     condensation_authority_by_species[species].update({
                         'status': (
                             VAPOUR_CARRIER_AUTHORITY_MISSING
@@ -3593,6 +3634,10 @@ class CondensationModel:
                         'refusal_type': type(exc).__name__,
                         **({'parameter': exc.parameter} if isinstance(exc, DepositionInputRefusal) else {}),
                     })
+                vapour_fog_notices.append(_stage_vapour_fog_notice(
+                    stage, species, melt, partials.get(species), eta, supply,
+                ))
+                if capture_refused:
                     continue
                 deposit = supply * eta
                 if deposit > 1e-15:
@@ -5641,6 +5686,85 @@ def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
     if temperature_K <= 0.0:
         raise DepositionInputRefusal('T_surface_K', temperature_K, 'must be above absolute zero')
     return temperature_K
+
+
+def _stage_vapour_fog_notice(
+    stage: CondensationStage,
+    species: str,
+    melt: MeltState,
+    partial_pressure_Pa: float | None,
+    eta: float | None,
+    supply_kg_hr: float,
+) -> dict[str, Any]:
+    """Whether molecular wall capture is still a valid claim at this stage.
+
+    The rate is evaluated at the stage-band midpoint, which is this
+    stage's property temperature, and at the stage inlet partial
+    pressure. t-1604's film temperature is not used. ``_stage_film_temperature_K``
+    is only the diffusivity temperature: T_film = (T_gas,in + T_wall) / 2,
+    and T_gas,in is the train-wide bulk (``CondensationModel.gas_temperature_C``,
+    about the melt temperature). A 40 C wall and a 1450 C inlet put that
+    film near 1018 K. Sodium's saturation pressure there is tens of kPa,
+    so a few-pascal partial is undersaturated and the fog flag would
+    never fire. The nafog comparison is a stage bulk: 250 C gives
+    J ~ 187 m^-3 s^-1 at 5.89 Pa, and J exceeds 1e6 m^-3 s^-1 below
+    515 K. Those temperatures are the stage wall, not the melt. A
+    per-stage energy-balance bulk is not computed (t-1604b). A wide
+    band is represented by its midpoint only; the cold end of Stage 5
+    (200 C) is not a separate sample.
+
+    The returned eta is unchanged. When J exceeds the fog threshold the
+    notice marks that eta as an upper bound, not as the capture.
+    """
+
+    notice: dict[str, Any] = {
+        'code': NOTICE_UNEVALUABLE,
+        'stage_number': int(stage.stage_number),
+        'sub_order': int(stage.sub_order),
+        'stage_key': stage.stage_key,
+        'label': stage.label,
+        'species': species,
+        'hour': getattr(melt, 'hour', None),
+        'campaign_hour': getattr(melt, 'campaign_hour', None),
+        'T_K': None,
+        'temperature_basis': 'stage_midpoint',
+        'p_Pa': partial_pressure_Pa,
+        'J_m3_s': None,
+        'saturation_ratio': None,
+        'reason': None,
+        'eta_molecular': eta,
+        'eta_role': None,
+        'supply_kg_hr': supply_kg_hr,
+        'critical_cluster_molecules': None,
+        'property_notice': None,
+    }
+    try:
+        temperature_K = _stage_midpoint_temperature_K(stage)
+    except DepositionInputRefusal as exc:
+        notice['reason'] = str(exc)
+        return notice
+    notice['T_K'] = temperature_K
+    if partial_pressure_Pa is None:
+        notice['reason'] = 'stage inlet partial pressure is missing'
+        return notice
+    try:
+        result = nucleation_rate(species, temperature_K, partial_pressure_Pa)
+    except NucleationInputError as exc:
+        notice['reason'] = str(exc)
+        return notice
+    code = fog_capture_code(result)
+    notice.update({
+        'code': code,
+        'J_m3_s': result.rate_m3_s,
+        'saturation_ratio': result.saturation_ratio,
+        'reason': result.reason,
+        'critical_cluster_molecules': result.critical_cluster_molecules,
+        'property_notice': result.property_notice,
+        'p_Pa': result.partial_pressure_Pa,
+    })
+    if code == NOTICE_FOG and eta is not None:
+        notice['eta_role'] = ETA_ROLE_UPPER_BOUND
+    return notice
 
 
 def _stage_film_temperature_K(gas_inlet_K: float, wall_K: float) -> float:
