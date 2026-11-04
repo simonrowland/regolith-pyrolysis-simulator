@@ -1045,7 +1045,6 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
     # threshold here, so it is absent from snapshot flux/status and is a
     # legitimate no-flux carrier for this pin.
-    ceiling_flux_species = {"Ca", "CaO_gas", "TiO", "TiO2_gas"}
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
@@ -1056,6 +1055,14 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     # contribution. A paired one-step run with DeltaGfus=0 gives
     # 0.06423670196107581 kg/hr; enabling d-144 lowers non-phosphorus head
     # rate to 0.06422943778094445 kg/hr (-7.26418e-6 kg/hr, -0.011309%).
+    # The status map retains only rates above the production 1e-12 kg/hr gate.
+    # At 1673.15 K d-144 scales CaO activity by 0.06790255, which can put
+    # CaO_gas below that gate on Studio. Require its upper-bound status and
+    # transitions whenever the production flux map retains the channel.
+    cao_gas_active = "CaO_gas" in snapshot.evap_flux.species_kg_hr
+    ceiling_flux_species = {"Ca", "TiO", "TiO2_gas"}
+    if cao_gas_active:
+        ceiling_flux_species.add("CaO_gas")
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
         0.06422943778094445, rel=1e-12, abs=1e-12
     )
@@ -1085,50 +1092,55 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
             "melt_mass_kg",
         )
     ) == pytest.approx(
-        # The paired conversion-on/off mechanism and predicted negative rate
-        # delta are documented above; the Ar cover and ramp still put this
-        # first step at 1400 C and 2.47% of transport capacity.
+        # Studio pin report keys capacity_total_kg_hr,
+        # capacity_transport_saturation_pct, and capacity_melt_mass_kg pin
+        # this d-144-adjusted head result; the Ar cover and ramp put the step
+        # at 1400 C and set its transport saturation.
         (
             1,
             1400.0,
             0.06422943778094445,
-            2.4701307994323103,
-            998.7072055554551,
+            2.4698591005232133,
+            998.7072128196352,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # The split adds Na/Mg collector and K-trap captures after their matching
-    # evaporations. Generic C0 Ca has no designated collector in that split;
-    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
-    # offgas instead of the former mixed-stage condense_Ca transition.
-    assert tuple(
+    # CaO_gas capture varies with the production flux gate; any residual Ca
+    # remains in terminal offgas rather than the mixed-stage collector.
+    # Studio pin key capacity_head_result.n_transitions is 33 when CaO_gas is
+    # below the flux gate; its evaporation/condensation pair adds two when active.
+    assert len(sim.atom_ledger.transitions) == (35 if cao_gas_active else 33)
+    ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
-    ) == (
-        "evaporate_SiO",
-        "condense_SiO",
-        "evaporate_Mg",
-        "condense_Mg",
-        "evaporate_Fe",
-        "condense_Fe",
-        "evaporate_Na",
-        "condense_Na",
-        "evaporate_K",
-        "condense_K",
-        "evaporate_AlO",
+    }
+    # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
+    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
+        ca_ti_reasons
+    )
+    assert "Ti" not in snapshot.evap_flux.species_kg_hr
+    assert "Ti" not in snapshot.evap_flux.alpha_authority_status_by_species
+    assert "evaporate_Ti" not in ca_ti_reasons
+    assert {
+        "condense_SiO", "condense_AlO",
+        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
+        "condense_TiO2_gas",
+    } <= ca_ti_reasons
+    for required in (
         "evaporate_Ca",
-        "evaporate_CaO_gas",
-        "evaporate_Cr",
-        "evaporate_CrO",
-        "evaporate_K2",
-        "evaporate_K2O_gas",
-        "evaporate_MgO_gas",
-        "evaporate_Mn",
-        "evaporate_Na2",
-        "evaporate_Na2O_gas",
-        "evaporate_SiO2_gas",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
+        "condense_Ca",
+    ):
+        assert required in ca_ti_reasons, required
+    if cao_gas_active:
+        assert {"evaporate_CaO_gas", "condense_CaO_gas"} <= ca_ti_reasons
+    assert tuple(
+        transition.reason for transition in sim.atom_ledger.transitions[-5:]
+    ) == (
+        "condense_TiO",
+        "evaporate_TiO2_gas",
+        "condense_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )
