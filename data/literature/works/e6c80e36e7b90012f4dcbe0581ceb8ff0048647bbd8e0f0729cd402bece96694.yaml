@@ -204,6 +204,16 @@ experiments:
               note: 0.3 g sample, converted to kg.
         output_unit: kg
         references: []
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: partial analysis contains unsupported component(s) above 0.5 wt%:
+          Al=0.522 wt%'
+      locator:
+        page: 4
+        published_page: 1111
+        table: '4'
+        note: Sample 18; measured mass percent and mole fraction with ion counts tabulated at each temperature.
     characterization:
       state:
         tag: value

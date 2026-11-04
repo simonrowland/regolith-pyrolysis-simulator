@@ -34,7 +34,17 @@ experiments:
   method:
     tag: unknown
     reason: regime 'simulant_characterisation' is not a closed method token (kems_effusion alone is insufficient)
-  sample: {}
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0 wt% is
+          below 95 wt%'
+      locator:
+        published_page: 33
+        pdf_page_index: 43
+        table: '6'
+        section: 4.4 Chemistry
   conditions:
     temperature_K:
       state:

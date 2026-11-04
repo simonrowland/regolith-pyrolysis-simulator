@@ -6807,15 +6807,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.4994732037957466222829778465'
-        - - SiO2
-          - '0.5005267962042533777170221534'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=65.28 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_chemical_analysis_wt_percent'; refusing
@@ -6849,72 +6842,6 @@ observations:
     table: '1'
     note: row=Na2CaSiO4; column=measured analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.4994732037957466222829778465'
-          - - SiO2
-            - '0.5005267962042533777170221534'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2CaSiO4; column=measured analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '31.48'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=measured analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=measured analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '33.8'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=measured analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=measured analysis
-        output_unit: mole_fraction
-        references: []
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table1_theoretical_chemical_analysis
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -6934,15 +6861,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.4999914919546762707725102614'
-        - - SiO2
-          - '0.5000085080453237292274897384'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=65.21 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'theoretical_sample_composition_wt_percent'; refusing
@@ -6977,84 +6897,6 @@ observations:
     table: '1'
     note: row=Na2CaSiO4; column=theoretical analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.4999914919546762707725102614'
-          - - SiO2
-            - '0.5000085080453237292274897384'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2CaSiO4; column=theoretical analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '31.48'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=theoretical analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=theoretical analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '33.73'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=theoretical analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2CaSiO4; column=theoretical analysis
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '31.48'
-          SiO2: '33.73'
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2CaSiO4; column=theoretical analysis
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca1_table2_measured_outside_fit_range::T=1309.0:h=54959b8eac14
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -7318,15 +7160,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.5007148232514647750605948443'
-        - - SiO2
-          - '0.4992851767485352249394051556'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=78.95 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_chemical_analysis_wt_percent'; refusing
@@ -7360,72 +7195,6 @@ observations:
     table: '1'
     note: row=Na2Ca2Si2O7; column=measured analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.5007148232514647750605948443'
-          - - SiO2
-            - '0.4992851767485352249394051556'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si2O7; column=measured analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '38.17'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=measured analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=measured analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.78'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=measured analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=measured analysis
-        output_unit: mole_fraction
-        references: []
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table1_theoretical_chemical_analysis
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -7445,15 +7214,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.5000152007243309790041019927'
-        - - SiO2
-          - '0.4999847992756690209958980074'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=78.94 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'theoretical_sample_composition_wt_percent'; refusing
@@ -7488,84 +7250,6 @@ observations:
     table: '1'
     note: row=Na2Ca2Si2O7; column=theoretical analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.5000152007243309790041019927'
-          - - SiO2
-            - '0.4999847992756690209958980074'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si2O7; column=theoretical analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '38.11'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=theoretical analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=theoretical analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '40.83'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=theoretical analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si2O7; column=theoretical analysis
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '38.11'
-          SiO2: '40.83'
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si2O7; column=theoretical analysis
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca2_table2_measured::T=1001.3:h=64459c9ced29
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -17766,15 +17450,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.4000121049103840869384994115'
-        - - SiO2
-          - '0.5999878950896159130615005883'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=82.54 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_chemical_analysis_wt_percent'; refusing
@@ -17808,72 +17485,6 @@ observations:
     table: '1'
     note: row=Na2Ca2Si3O9; column=measured analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.4000121049103840869384994115'
-          - - SiO2
-            - '0.5999878950896159130615005883'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si3O9; column=measured analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '31.66'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=measured analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=measured analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.88'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=measured analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=measured analysis
-        output_unit: mole_fraction
-        references: []
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table1_theoretical_chemical_analysis
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -17893,15 +17504,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.4000306460026615204651506924'
-        - - SiO2
-          - '0.5999693539973384795348493074'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=82.51 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'theoretical_sample_composition_wt_percent'; refusing
@@ -17936,84 +17540,6 @@ observations:
     table: '1'
     note: row=Na2Ca2Si3O9; column=theoretical analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.4000306460026615204651506924'
-          - - SiO2
-            - '0.5999693539973384795348493074'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si3O9; column=theoretical analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '31.65'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=theoretical analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=theoretical analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.86'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=theoretical analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na2Ca2Si3O9; column=theoretical analysis
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '31.65'
-          SiO2: '50.86'
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na2Ca2Si3O9; column=theoretical analysis
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca3_table2_measured_outside_fit_range::T=1504.4:h=34a57912b8b7
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -18289,15 +17815,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.250100615195091362118052856'
-        - - SiO2
-          - '0.7498993848049086378819471444'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=65.59 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sample_chemical_analysis_wt_percent'; refusing
@@ -18331,72 +17850,6 @@ observations:
     table: '1'
     note: row=Na4CaSi3O9; column=measured analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.250100615195091362118052856'
-          - - SiO2
-            - '0.7498993848049086378819471444'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na4CaSi3O9; column=measured analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '15.57'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=measured analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=measured analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.02'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=measured analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=measured analysis
-        output_unit: mole_fraction
-        references: []
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table1_theoretical_chemical_analysis
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:
@@ -18416,15 +17869,8 @@ observations:
         tag: value
         value: 0
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - CaO
-          - '0.2499426622457665251553870154'
-        - - SiO2
-          - '0.7500573377542334748446129843'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is a partial analysis: kept sum=65.59 wt% is below 95 wt%'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'theoretical_sample_composition_wt_percent'; refusing
@@ -18459,84 +17905,6 @@ observations:
     table: '1'
     note: row=Na4CaSi3O9; column=theoretical analysis
   read_from: pdf:pankratz-1968-ri7201-sodium-calcium-silicates
-  point_conditions:
-    composition:
-      state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - CaO
-            - '0.2499426622457665251553870154'
-          - - SiO2
-            - '0.7500573377542334748446129843'
-          amount_basis: mole_fraction
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na4CaSi3O9; column=theoretical analysis
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '15.56'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=theoretical analysis
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=theoretical analysis
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.03'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=theoretical analysis
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 9
-              published_page: 2
-              pdf_page_index: 8
-              table: '1'
-              note: row=Na4CaSi3O9; column=theoretical analysis
-        output_unit: mole_fraction
-        references: []
-    printed_composition:
-      state:
-        tag: value
-        value:
-          CaO: '15.56'
-          SiO2: '50.03'
-      locator:
-        page: 9
-        published_page: 2
-        pdf_page_index: 8
-        table: '1'
-        note: row=Na4CaSi3O9; column=theoretical analysis
 - observation_id: pankratz-1968-ri7201-sodium-calcium-silicates::pank68_naca4_table2_measured::T=1008.3:h=d7bd1ca48a14
   experiment_id: 99f8c74225a81430d25461cf5819c013c76537e4e32f3f637ab3c74bb302bb09::pankratz-1968-ri7201-sodium-calcium-silicates
   identity:

@@ -37,6 +37,16 @@ experiments:
     tag: value
     value: quench_equilibration
   sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition is a partial analysis: kept sum=0 wt% is
+          below 95 wt%'
+      locator:
+        published_page: 6
+        pdf_page_index: 7
+        table: '2'
+        section: Experimental results
     printed_composition:
       state:
         tag: value

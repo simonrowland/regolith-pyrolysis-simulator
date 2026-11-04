@@ -10822,23 +10822,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3199356028267610280777281209'
-        - - TiO2
-          - '0.1029097728645655898059995138'
-        - - Al2O3
-          - '0.04463467668387448180471155062'
-        - - FeO
-          - '0.484068923097405234859913352'
-        - - CaO
-          - '0.04845102452739366545164746285'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.3
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -10913,157 +10899,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3199356028267610280777281209'
-          - - TiO2
-            - '0.1029097728645655898059995138'
-          - - Al2O3
-            - '0.04463467668387448180471155062'
-          - - FeO
-            - '0.484068923097405234859913352'
-          - - CaO
-            - '0.04845102452739366545164746285'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.3
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '28.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '12.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '51.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -11456,23 +11300,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3306462898875419777922224029'
-        - - TiO2
-          - '0.08999057196319119457254554152'
-        - - Al2O3
-          - '0.04455457350504348638283969772'
-        - - FeO
-          - '0.4888626958852746389254586631'
-        - - CaO
-          - '0.04594586875894870232693369484'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -11547,157 +11377,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3306462898875419777922224029'
-          - - TiO2
-            - '0.08999057196319119457254554152'
-          - - Al2O3
-            - '0.04455457350504348638283969772'
-          - - FeO
-            - '0.4888626958852746389254586631'
-          - - CaO
-            - '0.04594586875894870232693369484'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '29.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '10.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '51.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -11773,23 +11461,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.353305868402152827427562786'
-        - - TiO2
-          - '0.01910397856139073012261299779'
-        - - Al2O3
-          - '0.03838613080947562788133870027'
-        - - FeO
-          - '0.546617692621960280762638098'
-        - - CaO
-          - '0.04258632960502053380584741781'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -11864,157 +11538,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.353305868402152827427562786'
-          - - TiO2
-            - '0.01910397856139073012261299779'
-          - - Al2O3
-            - '0.03838613080947562788133870027'
-          - - FeO
-            - '0.546617692621960280762638098'
-          - - CaO
-            - '0.04258632960502053380584741781'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '32'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '2.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '59.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -12090,23 +11622,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3413657238338857828685046925'
-        - - TiO2
-          - '0.02584794390609039703585593671'
-        - - Al2O3
-          - '0.03853387298724985238722705312'
-        - - FeO
-          - '0.5515022215856785525290627269'
-        - - CaO
-          - '0.04275023768709541517934959038'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -12181,157 +11699,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3413657238338857828685046925'
-          - - TiO2
-            - '0.02584794390609039703585593671'
-          - - Al2O3
-            - '0.03853387298724985238722705312'
-          - - FeO
-            - '0.5515022215856785525290627269'
-          - - CaO
-            - '0.04275023768709541517934959038'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '30.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '3.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '59.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -13041,23 +12417,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3187805251960041531107674337'
-        - - TiO2
-          - '0.04459825893272223320545414707'
-        - - Al2O3
-          - '0.03888842800476234126352684283'
-        - - FeO
-          - '0.5593829318601710862692673966'
-        - - CaO
-          - '0.03834985600634018615098418008'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.7
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -13132,157 +12494,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3187805251960041531107674337'
-          - - TiO2
-            - '0.04459825893272223320545414707'
-          - - Al2O3
-            - '0.03888842800476234126352684283'
-          - - FeO
-            - '0.5593829318601710862692673966'
-          - - CaO
-            - '0.03834985600634018615098418008'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.7
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '28.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '59.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -13675,23 +12895,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3125444122276428451103356977'
-        - - TiO2
-          - '0.05497628798920909381162003517'
-        - - Al2O3
-          - '0.03908772633931293480058519713'
-        - - FeO
-          - '0.550026879938807116744408816'
-        - - CaO
-          - '0.04336469350502800953305025337'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.3
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -13766,157 +12972,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3125444122276428451103356977'
-          - - TiO2
-            - '0.05497628798920909381162003517'
-          - - Al2O3
-            - '0.03908772633931293480058519713'
-          - - FeO
-            - '0.550026879938807116744408816'
-          - - CaO
-            - '0.04336469350502800953305025337'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.3
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '27.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '6.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '58.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -13992,23 +13056,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3611569985602136669888210913'
-        - - TiO2
-          - '0.01170404069262674796610244121'
-        - - Al2O3
-          - '0.03994514147288309213494489298'
-        - - FeO
-          - '0.545521511112434956140682641'
-        - - CaO
-          - '0.04167230816184153676944893377'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -14083,157 +13133,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3611569985602136669888210913'
-          - - TiO2
-            - '0.01170404069262674796610244121'
-          - - Al2O3
-            - '0.03994514147288309213494489298'
-          - - FeO
-            - '0.545521511112434956140682641'
-          - - CaO
-            - '0.04167230816184153676944893377'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '32.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '1.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '58.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -14309,23 +13217,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.319014135086673099561851731'
-        - - TiO2
-          - '0.03846634963081116948809469323'
-        - - Al2O3
-          - '0.03602567889509221996638162156'
-        - - FeO
-          - '0.5707652262706112965217945531'
-        - - CaO
-          - '0.03572861011681221446187740047'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -14400,157 +13294,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.319014135086673099561851731'
-          - - TiO2
-            - '0.03846634963081116948809469323'
-          - - Al2O3
-            - '0.03602567889509221996638162156'
-          - - FeO
-            - '0.5707652262706112965217945531'
-          - - CaO
-            - '0.03572861011681221446187740047'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '28.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '61.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -14626,23 +13378,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3362271810759396009788572237'
-        - - TiO2
-          - '0.03266522070160786570628060947'
-        - - Al2O3
-          - '0.04002000753218608220361763183'
-        - - FeO
-          - '0.5493371793754731386782971068'
-        - - CaO
-          - '0.04175041131479331243294742817'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.7
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -14717,157 +13455,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3362271810759396009788572237'
-          - - TiO2
-            - '0.03266522070160786570628060947'
-          - - Al2O3
-            - '0.04002000753218608220361763183'
-          - - FeO
-            - '0.5493371793754731386782971068'
-          - - CaO
-            - '0.04175041131479331243294742817'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.7
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '30.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '3.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '59'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -15260,23 +13856,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.345013286604378113193822268'
-        - - TiO2
-          - '0.02344376023141566736208819533'
-        - - Al2O3
-          - '0.04066186277801820446844979006'
-        - - FeO
-          - '0.5491452648498270268046901693'
-        - - CaO
-          - '0.04173582553636098817094957769'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -15351,157 +13933,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.345013286604378113193822268'
-          - - TiO2
-            - '0.02344376023141566736208819533'
-          - - Al2O3
-            - '0.04066186277801820446844979006'
-          - - FeO
-            - '0.5491452648498270268046901693'
-          - - CaO
-            - '0.04173582553636098817094957769'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '31'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '2.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '59'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -15577,23 +14017,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2980464745402812438468363943'
-        - - TiO2
-          - '0.08168699086403307260634514821'
-        - - Al2O3
-          - '0.03917458586299700947619632833'
-        - - FeO
-          - '0.5383552425140861862682415937'
-        - - CaO
-          - '0.0427367062186024878023805355'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=104.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -15668,157 +14094,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2980464745402812438468363943'
-          - - TiO2
-            - '0.08168699086403307260634514821'
-          - - Al2O3
-            - '0.03917458586299700947619632833'
-          - - FeO
-            - '0.5383552425140861862682415937'
-          - - CaO
-            - '0.0427367062186024878023805355'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=104.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '26.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '9.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '58.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -15894,23 +14178,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.297824830807860303345666972'
-        - - TiO2
-          - '0.03188807863073662850183621799'
-        - - Al2O3
-          - '0.03878136656183655854434131101'
-        - - FeO
-          - '0.5848955110715214044657308554'
-        - - CaO
-          - '0.04661021292804510514242464362'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -15985,157 +14255,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.297824830807860303345666972'
-          - - TiO2
-            - '0.03188807863073662850183621799'
-          - - Al2O3
-            - '0.03878136656183655854434131101'
-          - - FeO
-            - '0.5848955110715214044657308554'
-          - - CaO
-            - '0.04661021292804510514242464362'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '26.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '3.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '62.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -16211,23 +14339,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3005608648896520887997170303'
-        - - TiO2
-          - '0.02521718007664648748762616609'
-        - - Al2O3
-          - '0.04016348977325823816157477958'
-        - - FeO
-          - '0.5933555133954916412558378729'
-        - - CaO
-          - '0.04070295186495154429524415115'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -16302,157 +14416,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3005608648896520887997170303'
-          - - TiO2
-            - '0.02521718007664648748762616609'
-          - - Al2O3
-            - '0.04016348977325823816157477958'
-          - - FeO
-            - '0.5933555133954916412558378729'
-          - - CaO
-            - '0.04070295186495154429524415115'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '26.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '63.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -16528,23 +14500,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2791770818348017173667267633'
-        - - TiO2
-          - '0.03927331864200197655133851532'
-        - - Al2O3
-          - '0.04346898178317866228527395008'
-        - - FeO
-          - '0.6064662251746201131428553188'
-        - - CaO
-          - '0.03161439256539753065380545214'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -16619,157 +14577,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2791770818348017173667267633'
-          - - TiO2
-            - '0.03927331864200197655133851532'
-          - - Al2O3
-            - '0.04346898178317866228527395008'
-          - - FeO
-            - '0.6064662251746201131428553188'
-          - - CaO
-            - '0.03161439256539753065380545214'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '24.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '63.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '2.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -16845,23 +14661,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2900563121358745241563957983'
-        - - TiO2
-          - '0.04313481148202355043803691822'
-        - - Al2O3
-          - '0.03378735893865410532922428524'
-        - - FeO
-          - '0.5932709445346324034231137664'
-        - - CaO
-          - '0.03975057290881541665322923203'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -16936,157 +14738,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2900563121358745241563957983'
-          - - TiO2
-            - '0.04313481148202355043803691822'
-          - - Al2O3
-            - '0.03378735893865410532922428524'
-          - - FeO
-            - '0.5932709445346324034231137664'
-          - - CaO
-            - '0.03975057290881541665322923203'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '25.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '63.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -17162,23 +14822,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3039292185319020442362176606'
-        - - TiO2
-          - '0.02010093047077632573522177543'
-        - - Al2O3
-          - '0.03608227817388365277208442339'
-        - - FeO
-          - '0.6005243558794723981671220377'
-        - - CaO
-          - '0.03936321694396557908935410303'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -17253,157 +14899,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3039292185319020442362176606'
-          - - TiO2
-            - '0.02010093047077632573522177543'
-          - - Al2O3
-            - '0.03608227817388365277208442339'
-          - - FeO
-            - '0.6005243558794723981671220377'
-          - - CaO
-            - '0.03936321694396557908935410303'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '27.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '2.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '64.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -17479,23 +14983,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2822557793149593159818155301'
-        - - TiO2
-          - '0.04586608879400777970000940661'
-        - - Al2O3
-          - '0.03858800111881754007556720479'
-        - - FeO
-          - '0.5957901223091376909597155835'
-        - - CaO
-          - '0.03750000846307767328289227444'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -17570,157 +15060,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2822557793149593159818155301'
-          - - TiO2
-            - '0.04586608879400777970000940661'
-          - - Al2O3
-            - '0.03858800111881754007556720479'
-          - - FeO
-            - '0.5957901223091376909597155835'
-          - - CaO
-            - '0.03750000846307767328289227444'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '25'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '5.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '63.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -17796,23 +15144,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3008532383018125219105614089'
-        - - TiO2
-          - '0.03436923743040454247617125689'
-        - - Al2O3
-          - '0.04005366081885951945213368057'
-        - - FeO
-          - '0.5805505997470393925888941825'
-        - - CaO
-          - '0.04417326370188402357223947128'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -17887,157 +15221,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3008532383018125219105614089'
-          - - TiO2
-            - '0.03436923743040454247617125689'
-          - - Al2O3
-            - '0.04005366081885951945213368057'
-          - - FeO
-            - '0.5805505997470393925888941825'
-          - - CaO
-            - '0.04417326370188402357223947128'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '27'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '62.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -18113,23 +15305,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2716844475480235552044843334'
-        - - TiO2
-          - '0.04769102720599148349149908196'
-        - - Al2O3
-          - '0.04402698305198094641024578528'
-        - - FeO
-          - '0.600210929451641063479005114'
-        - - CaO
-          - '0.03638661274236295141476568493'
-        - - K2O
-          - '0'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.6
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.000001096478196143185013143713606'
@@ -18204,157 +15382,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2716844475480235552044843334'
-          - - TiO2
-            - '0.04769102720599148349149908196'
-          - - Al2O3
-            - '0.04402698305198094641024578528'
-          - - FeO
-            - '0.600210929451641063479005114'
-          - - CaO
-            - '0.03638661274236295141476568493'
-          - - K2O
-            - '0'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.6
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '24'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '6.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '63.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -23185,23 +20221,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4323038253135460885635746698'
-        - - TiO2
-          - '0.07245950090398616022595812074'
-        - - Al2O3
-          - '0.07391647556396335775961083587'
-        - - FeO
-          - '0.3465489624625701024676647217'
-        - - CaO
-          - '0.06119821956283108290334987878'
-        - - K2O
-          - '0.01357301619310320807984177321'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000002691534803926915717399172407'
@@ -23276,157 +20298,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4323038253135460885635746698'
-          - - TiO2
-            - '0.07245950090398616022595812074'
-          - - Al2O3
-            - '0.07391647556396335775961083587'
-          - - FeO
-            - '0.3465489624625701024676647217'
-          - - CaO
-            - '0.06119821956283108290334987878'
-          - - K2O
-            - '0.01357301619310320807984177321'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '38.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '8.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '37'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '5.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -26672,23 +23552,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3980458006290798343153921907'
-        - - TiO2
-          - '0.04470701525293796645621530617'
-        - - Al2O3
-          - '0.06673405603919447949268273325'
-        - - FeO
-          - '0.4247799412481441664052545843'
-        - - CaO
-          - '0.05285964077686280299807547403'
-        - - K2O
-          - '0.0128735460537807503323797117'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -26763,157 +23629,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3980458006290798343153921907'
-          - - TiO2
-            - '0.04470701525293796645621530617'
-          - - Al2O3
-            - '0.06673405603919447949268273325'
-          - - FeO
-            - '0.4247799412481441664052545843'
-          - - CaO
-            - '0.05285964077686280299807547403'
-          - - K2O
-            - '0.0128735460537807503323797117'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '35.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '45.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -26989,23 +23713,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3384502449972573171913316991'
-        - - TiO2
-          - '0.09251138636651654005216883868'
-        - - Al2O3
-          - '0.06382139101811847047171384927'
-        - - FeO
-          - '0.4453245951933049280625058613'
-        - - CaO
-          - '0.05197672016556514624258379242'
-        - - K2O
-          - '0.00791566225923759797969595916'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.1
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -27080,157 +23790,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3384502449972573171913316991'
-          - - TiO2
-            - '0.09251138636651654005216883868'
-          - - Al2O3
-            - '0.06382139101811847047171384927'
-          - - FeO
-            - '0.4453245951933049280625058613'
-          - - CaO
-            - '0.05197672016556514624258379242'
-          - - K2O
-            - '0.00791566225923759797969595916'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.1
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '30'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '10.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '47.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -27623,23 +24191,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4066711141198782281145507559'
-        - - TiO2
-          - '0.04023340710681819720884178858'
-        - - Al2O3
-          - '0.06631217753436425238619357971'
-        - - FeO
-          - '0.4183674684342492816373505734'
-        - - CaO
-          - '0.05491299489056624951136833459'
-        - - K2O
-          - '0.01350283791412379114169496759'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.8
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -27714,157 +24268,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4066711141198782281145507559'
-          - - TiO2
-            - '0.04023340710681819720884178858'
-          - - Al2O3
-            - '0.06631217753436425238619357971'
-          - - FeO
-            - '0.4183674684342492816373505734'
-          - - CaO
-            - '0.05491299489056624951136833459'
-          - - K2O
-            - '0.01350283791412379114169496759'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.8
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '36.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '44.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -27940,23 +24352,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.4133469459387277285897912646'
-        - - TiO2
-          - '0.02605372448229136402891613669'
-        - - Al2O3
-          - '0.06583160804293004857784607828'
-        - - FeO
-          - '0.4307001663836835106647231751'
-        - - CaO
-          - '0.05266626536797662575489917221'
-        - - K2O
-          - '0.01140128978439072238382417291'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -28031,157 +24429,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.4133469459387277285897912646'
-          - - TiO2
-            - '0.02605372448229136402891613669'
-          - - Al2O3
-            - '0.06583160804293004857784607828'
-          - - FeO
-            - '0.4307001663836835106647231751'
-          - - CaO
-            - '0.05266626536797662575489917221'
-          - - K2O
-            - '0.01140128978439072238382417291'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.2
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '37'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '3.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '46.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -28257,23 +24513,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3308135093757141731787562695'
-        - - TiO2
-          - '0.06455417298134281782673535411'
-        - - Al2O3
-          - '0.06320634478771215700597473873'
-        - - FeO
-          - '0.4834445649930352391099751502'
-        - - CaO
-          - '0.04717881849980778397645096856'
-        - - K2O
-          - '0.01080258936238782890210751908'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -28348,157 +24590,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3308135093757141731787562695'
-          - - TiO2
-            - '0.06455417298134281782673535411'
-          - - Al2O3
-            - '0.06320634478771215700597473873'
-          - - FeO
-            - '0.4834445649930352391099751502'
-          - - CaO
-            - '0.04717881849980778397645096856'
-          - - K2O
-            - '0.01080258936238782890210751908'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.0
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '29.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '7.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '51.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '3.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -28574,23 +24674,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3826284594384775738217799772'
-        - - TiO2
-          - '0.04255234157461529561078647481'
-        - - Al2O3
-          - '0.06012671208801865477323771569'
-        - - FeO
-          - '0.4581906558352425321513601187'
-        - - CaO
-          - '0.04872017822627034239633685984'
-        - - K2O
-          - '0.007781652837375601246498853972'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -28665,157 +24751,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3826284594384775738217799772'
-          - - TiO2
-            - '0.04255234157461529561078647481'
-          - - Al2O3
-            - '0.06012671208801865477323771569'
-          - - FeO
-            - '0.4581906558352425321513601187'
-          - - CaO
-            - '0.04872017822627034239633685984'
-          - - K2O
-            - '0.007781652837375601246498853972'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=103.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '34.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '5.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '49.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -29208,23 +25152,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.351545155959776110085545298'
-        - - TiO2
-          - '0.07713705066816846979063040076'
-        - - Al2O3
-          - '0.06440501901419210151571272125'
-        - - FeO
-          - '0.4485331867654519504956801629'
-        - - CaO
-          - '0.05191128950428067108138343623'
-        - - K2O
-          - '0.006468298088130697031047981176'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.8
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -29299,157 +25229,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.351545155959776110085545298'
-          - - TiO2
-            - '0.07713705066816846979063040076'
-          - - Al2O3
-            - '0.06440501901419210151571272125'
-          - - FeO
-            - '0.4485331867654519504956801629'
-          - - CaO
-            - '0.05191128950428067108138343623'
-          - - K2O
-            - '0.006468298088130697031047981176'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.8
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '31.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '9.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '47.6'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -29525,23 +25313,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3256429572921998596691148571'
-        - - TiO2
-          - '0.09271944290215474787168788511'
-        - - Al2O3
-          - '0.06263232165345464877391511846'
-        - - FeO
-          - '0.4652382464799177215613438761'
-        - - CaO
-          - '0.05088213550895446475671230093'
-        - - K2O
-          - '0.00288489616331855736722596207'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -29616,157 +25390,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3256429572921998596691148571'
-          - - TiO2
-            - '0.09271944290215474787168788511'
-          - - Al2O3
-            - '0.06263232165345464877391511846'
-          - - FeO
-            - '0.4652382464799177215613438761'
-          - - CaO
-            - '0.05088213550895446475671230093'
-          - - K2O
-            - '0.00288489616331855736722596207'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '28.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '10.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '9.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '49.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -45375,23 +41007,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3575774403546358210661978005'
-        - - TiO2
-          - '0.0790694493480167003629756742'
-        - - Al2O3
-          - '0.0841506047127960918565269432'
-        - - FeO
-          - '0.4012695169720579046396119632'
-        - - CaO
-          - '0.05752948273228922051616593131'
-        - - K2O
-          - '0.02040350588020426155852168742'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -45466,157 +41084,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3575774403546358210661978005'
-          - - TiO2
-            - '0.0790694493480167003629756742'
-          - - Al2O3
-            - '0.0841506047127960918565269432'
-          - - FeO
-            - '0.4012695169720579046396119632'
-          - - CaO
-            - '0.05752948273228922051616593131'
-          - - K2O
-            - '0.02040350588020426155852168742'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '31.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '9.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '12.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '42'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '2.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -47594,23 +43070,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3118630518081530673681377002'
-        - - TiO2
-          - '0.1064865748884859007620385944'
-        - - Al2O3
-          - '0.08069805166872030916067971878'
-        - - FeO
-          - '0.4378921253590504744566136086'
-        - - CaO
-          - '0.0542517994425250546275573592'
-        - - K2O
-          - '0.008808396833065193624973019138'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000004786300923226383439220877393'
@@ -47685,157 +43147,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3118630518081530673681377002'
-          - - TiO2
-            - '0.1064865748884859007620385944'
-          - - Al2O3
-            - '0.08069805166872030916067971878'
-          - - FeO
-            - '0.4378921253590504744566136086'
-          - - CaO
-            - '0.0542517994425250546275573592'
-          - - K2O
-            - '0.008808396833065193624973019138'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.4
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '27.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '12.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '45.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '1.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -49813,23 +45133,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3178605784371540922553871298'
-        - - TiO2
-          - '0.06623350101751939122194479798'
-        - - Al2O3
-          - '0.07344121038965623052352296884'
-        - - FeO
-          - '0.4761922481148846883996186186'
-        - - CaO
-          - '0.05022761627375800158824594094'
-        - - K2O
-          - '0.01604484576702759601128054295'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -49904,157 +45210,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3178605784371540922553871298'
-          - - TiO2
-            - '0.06623350101751939122194479798'
-          - - Al2O3
-            - '0.07344121038965623052352296884'
-          - - FeO
-            - '0.4761922481148846883996186186'
-          - - CaO
-            - '0.05022761627375800158824594094'
-          - - K2O
-            - '0.01604484576702759601128054295'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.5
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '27.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '7.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '49.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '2.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -50447,23 +45611,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.3444825595859739345745212125'
-        - - TiO2
-          - '0.04119046048008147240728522364'
-        - - Al2O3
-          - '0.07528349513928524382687170355'
-        - - FeO
-          - '0.4722006716200044723448484508'
-        - - CaO
-          - '0.05010845250574729334965486758'
-        - - K2O
-          - '0.01673436066890758349681854188'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.1
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -50538,157 +45688,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.3444825595859739345745212125'
-          - - TiO2
-            - '0.04119046048008147240728522364'
-          - - Al2O3
-            - '0.07528349513928524382687170355'
-          - - FeO
-            - '0.4722006716200044723448484508'
-          - - CaO
-            - '0.05010845250574729334965486758'
-          - - K2O
-            - '0.01673436066890758349681854188'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.1
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '30.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '4.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '11.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '49.5'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4.1'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '2.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
@@ -52032,23 +47040,9 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: value
-      value:
-        basis: printed_oxides
-        components:
-        - - SiO2
-          - '0.2823080863279130004013377894'
-        - - TiO2
-          - '0.08426506377195321187018937995'
-        - - Al2O3
-          - '0.06937213235753063290857855213'
-        - - FeO
-          - '0.508509536713648707335102332'
-        - - CaO
-          - '0.04898388126054839803695668739'
-        - - K2O
-          - '0.006561299568406049447835259331'
-        amount_basis: mole_fraction
+      tag: unknown
+      reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+        wt% is above 102 wt%'
     fO2_Pa:
       tag: value
       value: '0.0000007585775750291837687537667467'
@@ -52123,157 +47117,15 @@ observations:
         note: 'caption: 1600±2 K'
     composition:
       state:
-        tag: value
-        value:
-          basis: printed_oxides
-          components:
-          - - SiO2
-            - '0.2823080863279130004013377894'
-          - - TiO2
-            - '0.08426506377195321187018937995'
-          - - Al2O3
-            - '0.06937213235753063290857855213'
-          - - FeO
-            - '0.508509536713648707335102332'
-          - - CaO
-            - '0.04898388126054839803695668739'
-          - - K2O
-            - '0.006561299568406049447835259331'
-          amount_basis: mole_fraction
+        tag: unknown
+        reason: 'mass-percent composition is not usable: mass-percent composition exceeds the accepted kept-sum limit: sum=102.9
+          wt% is above 102 wt%'
       locator:
         page: 4
         published_page: 2634
         pdf_page_index: 3
         table: 1A
         note: run-product glass composition
-      inference:
-        relation: wt_pct_to_mole_fraction
-        inputs:
-        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
-        - original_unit=wt_pct
-        parameters:
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '24.7'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_TiO2_wt_pct
-          - state:
-              tag: value
-              value: '9.8'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_TiO2_g_mol
-          - state:
-              tag: value
-              value: '79.865'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '10.3'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_FeO_wt_pct
-          - state:
-              tag: value
-              value: '53.2'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_FeO_g_mol
-          - state:
-              tag: value
-              value: '71.844'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '4'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - original_K2O_wt_pct
-          - state:
-              tag: value
-              value: '0.9'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        - - M_K2O_g_mol
-          - state:
-              tag: value
-              value: '94.1956'
-            locator:
-              page: 4
-              published_page: 2634
-              pdf_page_index: 3
-              table: 1A
-              note: run-product glass composition
-        output_unit: mole_fraction
-        references: []
     fO2_log:
       state:
         tag: value
