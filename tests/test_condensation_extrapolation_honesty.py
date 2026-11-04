@@ -59,6 +59,25 @@ def test_stage3_unavailable_psat_missing_flow_refuses():
         )
 
 
+def test_missing_collector_area_refuses_capture_quantity_without_aborting_route():
+    model = _stage3_unavailable_psat_model()
+    model.stage_area_m2_by_stage = {}
+    result = model.route(
+        EvaporationFlux(species_kg_hr={"SiO": 1.0}, total_kg_hr=1.0),
+        MeltState(temperature_C=1500.0),
+    )
+    refusal = result.condensation_refusals_by_species["SiO"]
+    assert refusal["status"] == "refused"
+    outcomes = refusal["stage_outcomes"]
+    missing_area = [item for item in outcomes
+                    if item.get("refusal_type") == "DepositionInputRefusal"]
+    assert missing_area
+    assert all(item["parameter"] == "stage_area_m2" and item["eta"] is None
+               for item in missing_area)
+    assert result.retained_in_source_by_species.get("SiO", 0.0) == 0.0
+    assert result.remaining_by_species["SiO"] == pytest.approx(1.0)
+
+
 @pytest.mark.parametrize("case", ["positive", "zero_flow", "zero_area"])
 def test_declared_non_sio_extension_preserves_physical_zeros(case):
     model = _stage3_unavailable_psat_model()
@@ -67,14 +86,19 @@ def test_declared_non_sio_extension_preserves_physical_zeros(case):
     if case == "zero_area":
         model.stage_area_m2_by_stage = {"4": 0.0}
     outcomes = []
-    eta = model._condensation_efficiency(
-        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-        available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
-    )
     if case == "positive":
-        assert 0.0 < eta <= 1.0
-        assert any(item["authority_level"] == "extrapolated" for item in outcomes)
+        # A source-reaction pressure is not a wall saturation curve. The
+        # removed numerical budget must not invent a positive capture.
+        with pytest.raises(condensation.WallSaturationPressureRefusal):
+            model._condensation_efficiency(
+                stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+                available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+            )
     else:
+        eta = model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0, efficiency_outcomes=outcomes,
+        )
         assert eta == 0.0
         assert any(item["status"] == "pass_through" for item in outcomes)
 
@@ -119,16 +143,16 @@ def test_declared_non_sio_extension_noncollector_has_topology_evidence(stage_num
     }
 
 
-def test_declared_non_sio_extension_explicit_noncollector_area_captures():
+def test_declared_non_sio_extension_area_does_not_supply_missing_wall_pressure():
     model = _stage3_unavailable_psat_model()
     model.wall_species_partial_pressures_pa = {"Na2": 100.0}
     model.stage_area_m2_by_stage = {"stage_5": 1.0}
     stage = next(stage for stage in model.train.stages if stage.stage_number == 5)
-    eta = model._condensation_efficiency(
-        stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
-        available_kg=1.0, alpha_s_value=1.0,
-    )
-    assert 0.0 < eta <= 1.0
+    with pytest.raises(condensation.WallSaturationPressureRefusal):
+        model._condensation_efficiency(
+            stage=stage, species="Na2", T_cond_C=1000.0, residence_s=1.0,
+            available_kg=1.0, alpha_s_value=1.0,
+        )
 
 
 def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
@@ -140,7 +164,7 @@ def test_declared_non_sio_extension_invalid_area_aborts_hour(monkeypatch):
     def missing_area(self, **kwargs):
         areas = self.stage_area_m2_by_stage
         if kwargs["species"] != "SiO":
-            self.stage_area_m2_by_stage = {}
+            self.stage_area_m2_by_stage = {str(kwargs["stage"].stage_number): -1.0}
         try:
             return original(self, **kwargs)
         finally:
@@ -545,7 +569,9 @@ def test_predict_flag_wall_history_keeps_both_source_band_misses():
 
 
 def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
-    out_context: dict[str, object] = {}
+    # Exercise an explicit scalar independently of the live Fe condensation fit.
+    spec = {"form": "scalar", "value": 0.02, "temperature_range_K": [1700, 1800]}
+    out_context: dict[str, object] = {"coefficient_spec": spec}
     out_value = condensation.alpha_s("Fe", 1600.0, out_context)
     out_eval = out_context["alpha_s_evaluation"]
 
@@ -560,7 +586,7 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     ]
     assert "[1700, 1800]" in out_eval["alpha_s_extrapolation_warning"]
 
-    in_context: dict[str, object] = {}
+    in_context: dict[str, object] = {"coefficient_spec": spec}
     in_value = condensation.alpha_s("Fe", 1750.0, in_context)
     in_eval = in_context["alpha_s_evaluation"]
 
@@ -570,41 +596,22 @@ def test_scalar_alpha_s_range_extrapolation_is_honest_without_value_change():
     assert "alpha_s_extrapolation_warning" not in in_eval
 
 
-def test_scalar_alpha_s_range_travels_through_stage_provenance():
-    stage = CondensationStage(
-        stage_number=1,
-        label="Fe below source range",
-        temp_range_C=(1326.85, 1326.85),
-        target_species=["Fe"],
+def test_fe_scalar_alpha_record_reports_source_extrapolation_notice():
+    value_ref = f"{condensation.STICKING_VALUE_REF_PREFIX}Fe.value"
+    record = condensation._alpha_record(
+        species="Fe",
+        entry={"value_ref": value_ref},
+        source=value_ref,
+        T_K=1523.15,
     )
-
-    record = condensation._stage_alpha_record(stage, "Fe")
-
-    assert record["alpha_s"].hex() == float(0.02).hex()
-    assert record["temperature_range_K"] == [1700, 1800]
-    assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
-    assert record["alpha_s_extrapolated"] is True
-    assert record["alpha_s_domain_status"] == "extrapolated"
-    assert record["output_status"] == "status_bearing"
-    assert "Fe alpha_s scalar coefficient extrapolated" in record[
-        "alpha_s_extrapolation_warning"
-    ]
-
-
-def test_fe_scalar_alpha_extrapolation_at_1523_15_k_has_source_notice():
-    record = condensation._sidecar_alpha_record("Fe", T_K=1523.15)
-
-    assert record["alpha_s"].hex() == float(0.02).hex()
-    assert record["alpha_s_domain_status"] == "extrapolated"
-    assert record["authority_level"] == "extrapolated"
-    assert record["alpha_s_physical_bound_engaged"] is False
-    assert record["output_status"] == "status_bearing"
     notice = record["alpha_s_extrapolation_notice"]
+
+    assert record["alpha_s"].hex() == float(0.02).hex()
+    assert record["value_ref"] == value_ref
     assert notice["certified_band_K"] == [1700.0, 1800.0]
     assert notice["temperature_used_K"] == 1523.15
     assert notice["distance_below_band_K"] == pytest.approx(176.85)
     assert notice["distance_above_band_K"] == 0.0
-    assert notice["authority_level"] == "extrapolated"
     assert notice["source_fit"] == {
         "form": "scalar",
         "value": 0.02,
@@ -616,7 +623,102 @@ def test_fe_scalar_alpha_extrapolation_at_1523_15_k_has_source_notice():
         "lower_exclusive": 0.0,
         "upper_inclusive": 1.0,
     }
+    assert record["material_source"] == value_ref
+    assert notice["authority_level"] == "extrapolated"
+    assert record["alpha_s_physical_bound_engaged"] is False
     assert notice["bound_engaged"] is False
+
+
+def test_fe_alpha_s_range_travels_through_stage_provenance():
+    stage = CondensationStage(
+        stage_number=1,
+        label="Fe below source range",
+        temp_range_C=(926.85, 926.85),
+        target_species=["Fe"],
+    )
+
+    record = condensation._stage_alpha_record(stage, "Fe")
+    wall = condensation._wall_alpha_record("Fe", T_K=1200.0)
+
+    assert record["alpha_s"] == pytest.approx(wall["alpha_s"])
+    assert record["temperature_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_temperature_below_valid_range"] is True
+    assert record["alpha_s_domain_status"] == "out_of_domain"
+    assert record["output_status"] == "status_bearing"
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert "Fe alpha_s arrhenius coefficient extrapolated" in record[
+        "alpha_s_extrapolation_warning"
+    ]
+
+
+def test_scalar_fe_alpha_extrapolation_survives_stage_provenance():
+    temperature_K = 1600.0
+    temperature_C = temperature_K - condensation.CELSIUS_TO_KELVIN_OFFSET
+    stage = CondensationStage(
+        stage_number=1,
+        label="Fe scalar below source range",
+        temp_range_C=(temperature_C, temperature_C),
+        target_species=["Fe"],
+    )
+    value_ref = f"{condensation.STICKING_VALUE_REF_PREFIX}Fe.value"
+    materials = {
+        "stages": {
+            "1": {"alpha_s_by_species": {"Fe": {"value_ref": value_ref}}}
+        }
+    }
+
+    record = condensation._stage_alpha_record(stage, "Fe", materials)
+
+    assert record["alpha_s"].hex() == float(0.02).hex()
+    assert record["temperature_range_K"] == [1700, 1800]
+    assert record["alpha_s_valid_range_K"] == [1700.0, 1800.0]
+    assert record["alpha_s_domain_status"] == "extrapolated"
+    assert record["alpha_s_extrapolated"] is True
+    assert record["output_status"] == "status_bearing"
+    assert "Fe alpha_s scalar coefficient extrapolated" in record[
+        "alpha_s_extrapolation_warning"
+    ]
+    assert record["stage_number"] == 1
+
+
+def test_fe_tachibana_alpha_domain_and_bounded_extrapolation_provenance():
+    value_ref = {"value_ref": condensation.STICKING_FE_CONDENSATION_VALUE_REF}
+    in_band_temperature_K = 1523.15
+    expected_in_band_alpha = condensation.alpha_s(
+        "Fe", in_band_temperature_K, {"entry": value_ref},
+    )
+    in_band_record = condensation._sidecar_alpha_record(
+        "Fe", T_K=in_band_temperature_K,
+    )
+
+    assert in_band_record["alpha_s"] == pytest.approx(expected_in_band_alpha)
+    assert in_band_record["alpha_s_extrapolated"] is False
+    assert in_band_record["alpha_s_domain_status"] == "in_domain"
+    assert "alpha_s_extrapolation_warning" not in in_band_record
+    assert "alpha_s_extrapolation_notice" not in in_band_record
+
+    out_of_band_temperature_K = 1423.15
+    expected_out_of_band_alpha = condensation.alpha_s(
+        "Fe", out_of_band_temperature_K, {"entry": value_ref},
+    )
+    out_of_band_record = condensation._sidecar_alpha_record(
+        "Fe", T_K=out_of_band_temperature_K,
+    )
+
+    assert out_of_band_record["alpha_s"] == pytest.approx(expected_out_of_band_alpha)
+    assert out_of_band_record["alpha_s_extrapolated"] is True
+    assert out_of_band_record["alpha_s_domain_status"] == "out_of_domain"
+    assert out_of_band_record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert out_of_band_record["alpha_s_authority_level"] == "extrapolated"
+    assert "Fe alpha_s arrhenius coefficient extrapolated" in out_of_band_record[
+        "alpha_s_extrapolation_warning"
+    ]
+    assert "[1443, 1633]" in out_of_band_record["alpha_s_extrapolation_warning"]
+    assert "Tachibana, Nagahara & Ozawa 2001" in out_of_band_record["alpha_s_cite"]
+    assert out_of_band_record["citation_status"] == "CITED"
+    assert "Tachibana, Nagahara & Ozawa 2001" in out_of_band_record["source"]
 
 
 def test_wall_antoine_applied_path_reports_extrapolation_without_value_change():

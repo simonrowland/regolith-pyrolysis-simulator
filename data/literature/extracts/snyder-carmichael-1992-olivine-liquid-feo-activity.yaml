@@ -1,0 +1,4565 @@
+schema_version: literature_extract.v1
+source_id: snyder-carmichael-1992-olivine-liquid-feo-activity
+source:
+  citation: Snyder, D. A. and Carmichael, I. S. E. (1992), “Olivine-liquid equilibria and the chemical activities
+    of FeO, NiO, Fe2O3, and MgO in natural basic melts,” Geochimica et Cosmochimica Acta 56, 303–318.
+  year: 1992
+  corpus_asset: raw/snyder-carmichael-1992-olivine-liquid-feo-activity/snyder-carmichael-1992-olivine-liquid-feo-activity.pdf
+extraction:
+  method: Machine-text transcription of Tables 2–6 and the experimental-procedure/reference-state statements,
+    using MinerU table drafts and pdftotext first; render checks are recorded in the companion audit. Table
+    4 activity values are the authors’ calculated liquid results, retained as printed without recomputation.
+  date: '2026-11-02'
+  worker: codex
+review_status: draft
+fidelity_samples:
+- species: FeO
+  observation_id: snyder_1992_table4_fe0_947o_activity_08-58
+  field: activity_as_printed
+  value: '0.53'
+  note: Table 4 first Fe0.947O activity cell; render checked.
+  locator:
+    page: 7
+    published_page: 309
+    pdf_page_index: 6
+    table: '4'
+    record: 08-58
+    note: a_Fe0.947O cell
+    table_row_number: 2
+    table_column_number: 5
+    phase: liquid
+- species: FeO
+  observation_id: snyder_1992_table4_fe0_947o_activity_83-58
+  field: activity_as_printed
+  value: '0.59'
+  note: Table 4 last Fe0.947O activity cell; render checked.
+  locator:
+    page: 7
+    published_page: 309
+    pdf_page_index: 6
+    table: '4'
+    record: 83-58
+    note: a_Fe0.947O cell
+    table_row_number: 15
+    table_column_number: 5
+    phase: liquid
+- species: FeO
+  observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-60
+  field: gamma_as_printed
+  value: '5.1'
+  note: Table 4 gamma_Fe0.947O interior cell; render checked.
+  locator:
+    page: 7
+    published_page: 309
+    pdf_page_index: 6
+    table: '4'
+    record: 48-60
+    note: gamma_Fe0.947O cell
+    table_row_number: 10
+    table_column_number: 8
+    phase: liquid
+- path: species.FeO.context[0].values.rows[10].run_products_as_printed
+  value: gl+ol¹
+  note: Table 2 run 48-59 phase cell and superscript footnote marker; render checked.
+  locator:
+    page: 3
+    published_page: 305
+    pdf_page_index: 2
+    table: '2'
+    record: 48-59
+    note: gl+ol¹; superscript footnote 1
+experiments:
+- experiment_id: snyder_1992_olivine_liquid_equilibrium_1_atm
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  method_as_printed: Olivine-liquid/alloy equilibrium; samples were quenched into water after run durations
+    of 91 to 332 h.
+  locator: &id001
+    page: 2
+    published_page: 304
+    pdf_page_index: 1
+    section: Experimental Procedures
+    note: All experiments conducted at one atmosphere pressure; CO/CO2 mixing, without printed gas ratio
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Temperature varies by run; Table 2 prints per-run values.
+      locator:
+        page: 3
+        published_page: 305
+        pdf_page_index: 2
+        table: '2'
+        note: Per-run temperature cells
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+      locator:
+        page: 2
+        published_page: 304
+        pdf_page_index: 1
+        section: Experimental Procedures
+        note: Experiments conducted at one atmosphere pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: The source says CO and CO2 were mixed but does not print their ratio.
+      locator: *id001
+    regime:
+      regime_class:
+        tag: unknown
+        reason: Not stated.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: CO and CO2 mixing; fugacity calculated from Deines et al. (1974); ratio not printed.
+      locator: *id001
+species:
+  FeO:
+    observations:
+    - observation_id: snyder_1992_table4_fe0_947o_activity_08-58
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 08-58
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 2
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: &id004
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Fe0.947O
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: unknown
+                reason: The source identifies solid Fe0.947O but does not name its polymorph.
+            component_basis: Fe0.947O
+        inferred: false
+        note: Table 4 states that activities are relative to a solid standard state at temperature. The text
+          says Fe0.947O was chosen rather than estimated stoichiometric FeO; the source does not name a polymorph.
+        locator: &id157
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '2'
+          note: Fe0.947O solid standard-state reaction and reference-state statement
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.53'
+        activity_as_printed: '0.53'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1395'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id005
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-11.15'
+        fO2_reference_pressure_as_printed: &id006
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+lc+pl+ol
+        alloy_composition_wt_pct_as_printed: &id007
+          Ni: '89.5'
+          Fe: '10.7'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id008
+          SiO2: '48.1'
+          TiO2: '1.58'
+          Al2O3: '15.5'
+          Fe2O3: '0.83'
+          FeO: '11.7'
+          MnO: '0.202'
+          NiO: '0.172'
+          MgO: '3.72'
+          CaO: '9.89'
+          Na2O: '1.95'
+          K2O: '4.46'
+        glass_composition_wt_pct_as_printed: &id009
+          SiO2: 48.1(4)
+          TiO2: 1.58(5)
+          Al2O3: 15.5(2)
+          Fe2O3: '0.83'
+          FeO: 11.7(1)
+          MnO: 0.202(15)
+          NiO: 0.172(13)
+          MgO: 3.72(10)
+          CaO: 9.89(13)
+          Na2O: 1.95(6)
+          K2O: 4.46(5)
+        glass_composition_sum_as_printed: '98.1'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id010
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id011
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 08-58-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id012
+          temperature_K: &id002
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 08-58
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id002
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id013
+        temperature_K:
+          state:
+            tag: value
+            value: '1395'
+          locator: &id003
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 08-58
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.15'
+          locator: *id003
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '48.1'
+              - - TiO2
+                - '1.58'
+              - - Al2O3
+                - '15.5'
+              - - Fe2O3
+                - '0.83'
+              - - FeO
+                - '11.7'
+              - - MnO
+                - '0.202'
+              - - NiO
+                - '0.172'
+              - - MgO
+                - '3.72'
+              - - CaO
+                - '9.89'
+              - - Na2O
+                - '1.95'
+              - - K2O
+                - '4.46'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 08-58-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_08-58
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 08-58
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 2
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '4.9'
+        gamma_as_printed: '4.9'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1395'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id005
+        fO2_log_as_printed: '-11.15'
+        fO2_reference_pressure_as_printed: *id006
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+lc+pl+ol
+        alloy_composition_wt_pct_as_printed: *id007
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id008
+        glass_composition_wt_pct_as_printed: *id009
+        glass_composition_sum_as_printed: '98.1'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id010
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id011
+        condition_locators: *id012
+      point_conditions: *id013
+    - observation_id: snyder_1992_table4_fe0_947o_activity_44-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 44-57
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 3
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.27'
+        activity_as_printed: '0.27'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id016
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: &id017
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl
+        alloy_composition_wt_pct_as_printed: &id018
+          Ni: '93.7'
+          Fe: '6.26'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id019
+          SiO2: '54.6'
+          TiO2: '1.01'
+          Al2O3: '16.7'
+          Fe2O3: '0.43'
+          FeO: '7.03'
+          MnO: '0.134'
+          NiO: '0.265'
+          MgO: '6.06'
+          CaO: '8.86'
+          Na2O: '2.92'
+          K2O: '1.23'
+        glass_composition_wt_pct_as_printed: &id020
+          SiO2: 54.6(7)
+          TiO2: 1.01(4)
+          Al2O3: 16.7(1)
+          Fe2O3: '0.43'
+          FeO: 7.03(7)
+          MnO: 0.134(13)
+          NiO: 0.265(22)
+          MgO: 6.06(16)
+          CaO: 8.86(11)
+          Na2O: 2.92(10)
+          K2O: 1.23(3)
+        glass_composition_sum_as_printed: '99.2'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id021
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id022
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 44-57-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id023
+          temperature_K: &id014
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-57
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id014
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id024
+        temperature_K:
+          state:
+            tag: value
+            value: '1461'
+          locator: &id015
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-57
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.29'
+          locator: *id015
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '54.6'
+              - - TiO2
+                - '1.01'
+              - - Al2O3
+                - '16.7'
+              - - Fe2O3
+                - '0.43'
+              - - FeO
+                - '7.03'
+              - - MnO
+                - '0.134'
+              - - NiO
+                - '0.265'
+              - - MgO
+                - '6.06'
+              - - CaO
+                - '8.86'
+              - - Na2O
+                - '2.92'
+              - - K2O
+                - '1.23'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-57-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_44-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 44-57
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 3
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '4.4'
+        gamma_as_printed: '4.4'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id016
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: *id017
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl
+        alloy_composition_wt_pct_as_printed: *id018
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id019
+        glass_composition_wt_pct_as_printed: *id020
+        glass_composition_sum_as_printed: '99.2'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id021
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id022
+        condition_locators: *id023
+      point_conditions: *id024
+    - observation_id: snyder_1992_table4_fe0_947o_activity_44-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 44-60
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 4
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.30'
+        activity_as_printed: '0.30'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id027
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: &id028
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl+ox
+        alloy_composition_wt_pct_as_printed: &id029
+          Ni: '94.8'
+          Fe: '4.61'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id030
+          SiO2: '54.2'
+          TiO2: '0.97'
+          Al2O3: '16.4'
+          Fe2O3: '0.50'
+          FeO: '6.73'
+          MnO: '0.135'
+          NiO: '0.375'
+          MgO: '6.27'
+          CaO: '9.07'
+          Na2O: '2.52'
+          K2O: '1.28'
+        glass_composition_wt_pct_as_printed: &id031
+          SiO2: 54.2(5)
+          TiO2: 0.97(4)
+          Al2O3: 16.4(2)
+          Fe2O3: '0.50'
+          FeO: 6.73(7)
+          MnO: 0.135(14)
+          NiO: 0.375(15)
+          MgO: 6.27(14)
+          CaO: 9.07(19)
+          Na2O: 2.52(11)
+          K2O: 1.28(2)
+        glass_composition_sum_as_printed: '98.5'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id032
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id033
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 44-60-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id034
+          temperature_K: &id025
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-60
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id025
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id035
+        temperature_K:
+          state:
+            tag: value
+            value: '1468'
+          locator: &id026
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-60
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.83'
+          locator: *id026
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '54.2'
+              - - TiO2
+                - '0.97'
+              - - Al2O3
+                - '16.4'
+              - - Fe2O3
+                - '0.50'
+              - - FeO
+                - '6.73'
+              - - MnO
+                - '0.135'
+              - - NiO
+                - '0.375'
+              - - MgO
+                - '6.27'
+              - - CaO
+                - '9.07'
+              - - Na2O
+                - '2.52'
+              - - K2O
+                - '1.28'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-60-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_44-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 44-60
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 4
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '5.1'
+        gamma_as_printed: '5.1'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id027
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: *id028
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl+ox
+        alloy_composition_wt_pct_as_printed: *id029
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id030
+        glass_composition_wt_pct_as_printed: *id031
+        glass_composition_sum_as_printed: '98.5'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id032
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id033
+        condition_locators: *id034
+      point_conditions: *id035
+    - observation_id: snyder_1992_table4_fe0_947o_activity_46-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 46-57
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 5
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.26'
+        activity_as_printed: '0.26'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id038
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: &id039
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id040
+          Ni: '94.2'
+          Fe: '6.16'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id041
+          SiO2: '52.9'
+          TiO2: '1.50'
+          Al2O3: '16.0'
+          Fe2O3: '0.47'
+          FeO: '7.21'
+          MnO: '0.120'
+          NiO: '0.352'
+          MgO: '5.94'
+          CaO: '9.03'
+          Na2O: '2.56'
+          K2O: '2.27'
+        glass_composition_wt_pct_as_printed: &id042
+          SiO2: 52.9(5)
+          TiO2: 1.50(5)
+          Al2O3: 16.0(1)
+          Fe2O3: '0.47'
+          FeO: 7.21(8)
+          MnO: 0.120(10)
+          NiO: 0.352(20)
+          MgO: 5.94(11)
+          CaO: 9.03(17)
+          Na2O: 2.56(7)
+          K2O: 2.27(3)
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id043
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id044
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 46-57-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id045
+          temperature_K: &id036
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-57
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id036
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id046
+        temperature_K:
+          state:
+            tag: value
+            value: '1461'
+          locator: &id037
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-57
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.29'
+          locator: *id037
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '52.9'
+              - - TiO2
+                - '1.50'
+              - - Al2O3
+                - '16.0'
+              - - Fe2O3
+                - '0.47'
+              - - FeO
+                - '7.21'
+              - - MnO
+                - '0.120'
+              - - NiO
+                - '0.352'
+              - - MgO
+                - '5.94'
+              - - CaO
+                - '9.03'
+              - - Na2O
+                - '2.56'
+              - - K2O
+                - '2.27'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 46-57-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_46-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 46-57
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 5
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '4.1'
+        gamma_as_printed: '4.1'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id038
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: *id039
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id040
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id041
+        glass_composition_wt_pct_as_printed: *id042
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id043
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id044
+        condition_locators: *id045
+      point_conditions: *id046
+    - observation_id: snyder_1992_table4_fe0_947o_activity_46-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 46-60
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 6
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.33'
+        activity_as_printed: '0.33'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id049
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: &id050
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id051
+          Ni: '95.6'
+          Fe: '5.06'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id052
+          SiO2: '53.7'
+          TiO2: '1.47'
+          Al2O3: '15.5'
+          Fe2O3: '0.57'
+          FeO: '7.03'
+          MnO: '0.113'
+          NiO: '0.427'
+          MgO: '5.96'
+          CaO: '8.99'
+          Na2O: '2.47'
+          K2O: '2.24'
+        glass_composition_wt_pct_as_printed: &id053
+          SiO2: 53.7(4)
+          TiO2: 1.47(3)
+          Al2O3: 15.5(1)
+          Fe2O3: '0.57'
+          FeO: 7.03(17)
+          MnO: 0.113(7)
+          NiO: 0.427(13)
+          MgO: 5.96(13)
+          CaO: 8.99(18)
+          Na2O: 2.47(7)
+          K2O: 2.24(3)
+        glass_composition_sum_as_printed: '98.4'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id054
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id055
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 46-60-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id056
+          temperature_K: &id047
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-60
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id047
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id057
+        temperature_K:
+          state:
+            tag: value
+            value: '1468'
+          locator: &id048
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-60
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.83'
+          locator: *id048
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '53.7'
+              - - TiO2
+                - '1.47'
+              - - Al2O3
+                - '15.5'
+              - - Fe2O3
+                - '0.57'
+              - - FeO
+                - '7.03'
+              - - MnO
+                - '0.113'
+              - - NiO
+                - '0.427'
+              - - MgO
+                - '5.96'
+              - - CaO
+                - '8.99'
+              - - Na2O
+                - '2.47'
+              - - K2O
+                - '2.24'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 46-60-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_46-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 46-60
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 6
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '5.3'
+        gamma_as_printed: '5.3'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id049
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: *id050
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id051
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id052
+        glass_composition_wt_pct_as_printed: *id053
+        glass_composition_sum_as_printed: '98.4'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id054
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id055
+        condition_locators: *id056
+      point_conditions: *id057
+    - observation_id: snyder_1992_table4_fe0_947o_activity_48-48
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-48
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 7
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.13'
+        activity_as_printed: '0.13'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1562'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id060
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-11.39'
+        fO2_reference_pressure_as_printed: &id061
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id062
+          Ni: '73.0'
+          Fe: '27.7'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id063
+          SiO2: '52.1'
+          TiO2: '1.86'
+          Al2O3: '13.3'
+          Fe2O3: '0.16'
+          FeO: '9.25'
+          MnO: '0.125'
+          NiO: '0.042'
+          MgO: '11.8'
+          CaO: '8.68'
+          Na2O: '0.39'
+          K2O: '1.38'
+        glass_composition_wt_pct_as_printed: &id064
+          SiO2: 52.1(5)
+          TiO2: 1.86(3)
+          Al2O3: 13.3(1)
+          Fe2O3: '0.16'
+          FeO: 9.25(7)
+          MnO: 0.125(6)
+          NiO: 0.042(8)
+          MgO: 11.8(2)
+          CaO: 8.68(15)
+          Na2O: 0.39(4)
+          K2O: 1.38(2)
+        glass_composition_sum_as_printed: '99.0'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id065
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id066
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 48-48-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id067
+          temperature_K: &id058
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-48
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id058
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id068
+        temperature_K:
+          state:
+            tag: value
+            value: '1562'
+          locator: &id059
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-48
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.39'
+          locator: *id059
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '52.1'
+              - - TiO2
+                - '1.86'
+              - - Al2O3
+                - '13.3'
+              - - Fe2O3
+                - '0.16'
+              - - FeO
+                - '9.25'
+              - - MnO
+                - '0.125'
+              - - NiO
+                - '0.042'
+              - - MgO
+                - '11.8'
+              - - CaO
+                - '8.68'
+              - - Na2O
+                - '0.39'
+              - - K2O
+                - '1.38'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-48-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-48
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-48
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 7
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '1.6'
+        gamma_as_printed: '1.6'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1562'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id060
+        fO2_log_as_printed: '-11.39'
+        fO2_reference_pressure_as_printed: *id061
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id062
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id063
+        glass_composition_wt_pct_as_printed: *id064
+        glass_composition_sum_as_printed: '99.0'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id065
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id066
+        condition_locators: *id067
+      point_conditions: *id068
+    - observation_id: snyder_1992_table4_fe0_947o_activity_48-56
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-56
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 8
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.13'
+        activity_as_printed: '0.13'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id071
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-10.36'
+        fO2_reference_pressure_as_printed: &id072
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id073
+          Ni: '89.3'
+          Fe: '10.7'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '15'
+        glass_composition_wt_pct: &id074
+          SiO2: '54.3'
+          TiO2: '1.93'
+          Al2O3: '13.3'
+          Fe2O3: '0.21'
+          FeO: '7.18'
+          MnO: '0.127'
+          NiO: '0.208'
+          MgO: '12.6'
+          CaO: '8.85'
+          Na2O: '0.24'
+          K2O: '0.91'
+        glass_composition_wt_pct_as_printed: &id075
+          SiO2: 54.3(6)
+          TiO2: 1.93(5)
+          Al2O3: 13.3(1)
+          Fe2O3: '0.21'
+          FeO: 7.18(12)
+          MnO: 0.127(7)
+          NiO: 0.208(26)
+          MgO: 12.6(2)
+          CaO: 8.85(18)
+          Na2O: 0.24(3)
+          K2O: 0.91(2)
+        glass_composition_sum_as_printed: '99.9'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id076
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id077
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 48-56-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id078
+          temperature_K: &id069
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-56
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id069
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id079
+        temperature_K:
+          state:
+            tag: value
+            value: '1559'
+          locator: &id070
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-56
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.36'
+          locator: *id070
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '54.3'
+              - - TiO2
+                - '1.93'
+              - - Al2O3
+                - '13.3'
+              - - Fe2O3
+                - '0.21'
+              - - FeO
+                - '7.18'
+              - - MnO
+                - '0.127'
+              - - NiO
+                - '0.208'
+              - - MgO
+                - '12.6'
+              - - CaO
+                - '8.85'
+              - - Na2O
+                - '0.24'
+              - - K2O
+                - '0.91'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-56-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-56
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-56
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 8
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '2.2'
+        gamma_as_printed: '2.2'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id071
+        fO2_log_as_printed: '-10.36'
+        fO2_reference_pressure_as_printed: *id072
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id073
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '15'
+        glass_composition_wt_pct: *id074
+        glass_composition_wt_pct_as_printed: *id075
+        glass_composition_sum_as_printed: '99.9'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id076
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id077
+        condition_locators: *id078
+      point_conditions: *id079
+    - observation_id: snyder_1992_table4_fe0_947o_activity_48-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-57
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 9
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.24'
+        activity_as_printed: '0.24'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id082
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: &id083
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+ox
+        alloy_composition_wt_pct_as_printed: &id084
+          Ni: '94.7'
+          Fe: '5.71'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id085
+          SiO2: '52.6'
+          TiO2: '2.17'
+          Al2O3: '15.2'
+          Fe2O3: '0.44'
+          FeO: '6.43'
+          MnO: '0.113'
+          NiO: '0.322'
+          MgO: '6.33'
+          CaO: '9.99'
+          Na2O: '1.84'
+          K2O: '2.87'
+        glass_composition_wt_pct_as_printed: &id086
+          SiO2: 52.6(5)
+          TiO2: 2.17(6)
+          Al2O3: 15.2(2)
+          Fe2O3: '0.44'
+          FeO: 6.43(13)
+          MnO: 0.113(12)
+          NiO: 0.322(31)
+          MgO: 6.33(7)
+          CaO: 9.99(19)
+          Na2O: 1.84(8)
+          K2O: 2.87(7)
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id087
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id088
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 48-57-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id089
+          temperature_K: &id080
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-57
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id080
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id090
+        temperature_K:
+          state:
+            tag: value
+            value: '1461'
+          locator: &id081
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-57
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.29'
+          locator: *id081
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '52.6'
+              - - TiO2
+                - '2.17'
+              - - Al2O3
+                - '15.2'
+              - - Fe2O3
+                - '0.44'
+              - - FeO
+                - '6.43'
+              - - MnO
+                - '0.113'
+              - - NiO
+                - '0.322'
+              - - MgO
+                - '6.33'
+              - - CaO
+                - '9.99'
+              - - Na2O
+                - '1.84'
+              - - K2O
+                - '2.87'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-57-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-57
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-57
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 9
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '4.3'
+        gamma_as_printed: '4.3'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1461'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id082
+        fO2_log_as_printed: '-10.29'
+        fO2_reference_pressure_as_printed: *id083
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+ox
+        alloy_composition_wt_pct_as_printed: *id084
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id085
+        glass_composition_wt_pct_as_printed: *id086
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id087
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id088
+        condition_locators: *id089
+      point_conditions: *id090
+    - observation_id: snyder_1992_table4_fe0_947o_activity_48-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-60
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 10
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.27'
+        activity_as_printed: '0.27'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id093
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: &id094
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+ox
+        alloy_composition_wt_pct_as_printed: &id095
+          Ni: '96.0'
+          Fe: '4.30'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id096
+          SiO2: '53.5'
+          TiO2: '2.20'
+          Al2O3: '14.6'
+          Fe2O3: '0.50'
+          FeO: '6.13'
+          MnO: '0.121'
+          NiO: '0.333'
+          MgO: '6.63'
+          CaO: '10.0'
+          Na2O: '1.55'
+          K2O: '2.57'
+        glass_composition_wt_pct_as_printed: &id097
+          SiO2: 53.5(6)
+          TiO2: 2.20(9)
+          Al2O3: 14.6(2)
+          Fe2O3: '0.50'
+          FeO: 6.13(18)
+          MnO: 0.121(9)
+          NiO: 0.333(21)
+          MgO: 6.63(27)
+          CaO: 10.0(3)
+          Na2O: 1.55(5)
+          K2O: 2.57(10)
+        glass_composition_sum_as_printed: '98.1'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id098
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id099
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 48-60-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id100
+          temperature_K: &id091
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-60
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id091
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id101
+        temperature_K:
+          state:
+            tag: value
+            value: '1468'
+          locator: &id092
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-60
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.83'
+          locator: *id092
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '53.5'
+              - - TiO2
+                - '2.20'
+              - - Al2O3
+                - '14.6'
+              - - Fe2O3
+                - '0.50'
+              - - FeO
+                - '6.13'
+              - - MnO
+                - '0.121'
+              - - NiO
+                - '0.333'
+              - - MgO
+                - '6.63'
+              - - CaO
+                - '10.0'
+              - - Na2O
+                - '1.55'
+              - - K2O
+                - '2.57'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-60-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-60
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-60
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 10
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '5.1'
+        gamma_as_printed: '5.1'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1468'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id093
+        fO2_log_as_printed: '-9.83'
+        fO2_reference_pressure_as_printed: *id094
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+ox
+        alloy_composition_wt_pct_as_printed: *id095
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id096
+        glass_composition_wt_pct_as_printed: *id097
+        glass_composition_sum_as_printed: '98.1'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id098
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id099
+        condition_locators: *id100
+      point_conditions: *id101
+    - observation_id: snyder_1992_table4_fe0_947o_activity_48-61a
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-61A
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 11
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.21'
+        activity_as_printed: '0.21'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id104
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.11'
+        fO2_reference_pressure_as_printed: &id105
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id106
+          Ni: '94.9'
+          Fe: '4.61'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '11'
+        glass_composition_wt_pct: &id107
+          SiO2: '52.4'
+          TiO2: '1.97'
+          Al2O3: '13.7'
+          Fe2O3: '0.45'
+          FeO: '7.04'
+          MnO: '0.126'
+          NiO: '0.637'
+          MgO: '10.2'
+          CaO: '9.02'
+          Na2O: '0.83'
+          K2O: '1.99'
+        glass_composition_wt_pct_as_printed: &id108
+          SiO2: 52.4(4)
+          TiO2: 1.97(6)
+          Al2O3: 13.7(2)
+          Fe2O3: '0.45'
+          FeO: 7.04(6)
+          MnO: 0.126(16)
+          NiO: 0.637(16)
+          MgO: 10.2(2)
+          CaO: 9.02(12)
+          Na2O: 0.83(7)
+          K2O: 1.99(4)
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id109
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id110
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 48-61A-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id111
+          temperature_K: &id102
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-61A
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id102
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id112
+        temperature_K:
+          state:
+            tag: value
+            value: '1559'
+          locator: &id103
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-61A
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.11'
+          locator: *id103
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '52.4'
+              - - TiO2
+                - '1.97'
+              - - Al2O3
+                - '13.7'
+              - - Fe2O3
+                - '0.45'
+              - - FeO
+                - '7.04'
+              - - MnO
+                - '0.126'
+              - - NiO
+                - '0.637'
+              - - MgO
+                - '10.2'
+              - - CaO
+                - '9.02'
+              - - Na2O
+                - '0.83'
+              - - K2O
+                - '1.99'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-61A-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_48-61a
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 48-61A
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 11
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '3.4'
+        gamma_as_printed: '3.4'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id104
+        fO2_log_as_printed: '-9.11'
+        fO2_reference_pressure_as_printed: *id105
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id106
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '11'
+        glass_composition_wt_pct: *id107
+        glass_composition_wt_pct_as_printed: *id108
+        glass_composition_sum_as_printed: '98.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id109
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id110
+        condition_locators: *id111
+      point_conditions: *id112
+    - observation_id: snyder_1992_table4_fe0_947o_activity_50-56
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 50-56
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 12
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.19'
+        activity_as_printed: '0.19'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id115
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-10.36'
+        fO2_reference_pressure_as_printed: &id116
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id117
+          Ni: '85.1'
+          Fe: '14.8'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '19'
+        glass_composition_wt_pct: &id118
+          SiO2: '45.4'
+          TiO2: '5.74'
+          Al2O3: '8.56'
+          Fe2O3: '0.45'
+          FeO: '11.4'
+          MnO: '0.210'
+          NiO: '0.204'
+          MgO: '12.7'
+          CaO: '14.4'
+          Na2O: '0.09'
+          K2O: '0.11'
+        glass_composition_wt_pct_as_printed: &id119
+          SiO2: 45.4(3)
+          TiO2: 5.74(7)
+          Al2O3: 8.56(12)
+          Fe2O3: '0.45'
+          FeO: 11.4(1)
+          MnO: 0.210(12)
+          NiO: 0.204(10)
+          MgO: 12.7(2)
+          CaO: 14.4(2)
+          Na2O: 0.09(3)
+          K2O: 0.11(1)
+        glass_composition_sum_as_printed: '99.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id120
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id121
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 50-56-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id122
+          temperature_K: &id113
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-56
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id113
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id123
+        temperature_K:
+          state:
+            tag: value
+            value: '1559'
+          locator: &id114
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-56
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-10.36'
+          locator: *id114
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.4'
+              - - TiO2
+                - '5.74'
+              - - Al2O3
+                - '8.56'
+              - - Fe2O3
+                - '0.45'
+              - - FeO
+                - '11.4'
+              - - MnO
+                - '0.210'
+              - - NiO
+                - '0.204'
+              - - MgO
+                - '12.7'
+              - - CaO
+                - '14.4'
+              - - Na2O
+                - '0.09'
+              - - K2O
+                - '0.11'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 50-56-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_50-56
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 50-56
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 12
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '2.0'
+        gamma_as_printed: '2.0'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id115
+        fO2_log_as_printed: '-10.36'
+        fO2_reference_pressure_as_printed: *id116
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id117
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '19'
+        glass_composition_wt_pct: *id118
+        glass_composition_wt_pct_as_printed: *id119
+        glass_composition_sum_as_printed: '99.3'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id120
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id121
+        condition_locators: *id122
+      point_conditions: *id123
+    - observation_id: snyder_1992_table4_fe0_947o_activity_50-61a
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 50-61A
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 13
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.25'
+        activity_as_printed: '0.25'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id126
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.11'
+        fO2_reference_pressure_as_printed: &id127
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id128
+          Ni: '94.2'
+          Fe: '5.61'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '12'
+        glass_composition_wt_pct: &id129
+          SiO2: '44.1'
+          TiO2: '5.73'
+          Al2O3: '8.58'
+          Fe2O3: '0.85'
+          FeO: '11.0'
+          MnO: '0.211'
+          NiO: '0.935'
+          MgO: '11.7'
+          CaO: '14.3'
+          Na2O: '0.20'
+          K2O: '0.29'
+        glass_composition_wt_pct_as_printed: &id130
+          SiO2: 44.1(4)
+          TiO2: 5.73(9)
+          Al2O3: 8.58(11)
+          Fe2O3: '0.85'
+          FeO: 11.0(1)
+          MnO: 0.211(13)
+          NiO: 0.935(13)
+          MgO: 11.7(2)
+          CaO: 14.3(1)
+          Na2O: 0.20(2)
+          K2O: 0.29(1)
+        glass_composition_sum_as_printed: '98.0'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id131
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id132
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 50-61A-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id133
+          temperature_K: &id124
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-61A
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id124
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id134
+        temperature_K:
+          state:
+            tag: value
+            value: '1559'
+          locator: &id125
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-61A
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.11'
+          locator: *id125
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '44.1'
+              - - TiO2
+                - '5.73'
+              - - Al2O3
+                - '8.58'
+              - - Fe2O3
+                - '0.85'
+              - - FeO
+                - '11.0'
+              - - MnO
+                - '0.211'
+              - - NiO
+                - '0.935'
+              - - MgO
+                - '11.7'
+              - - CaO
+                - '14.3'
+              - - Na2O
+                - '0.20'
+              - - K2O
+                - '0.29'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 50-61A-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_50-61a
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 50-61A
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 13
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '2.7'
+        gamma_as_printed: '2.7'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1559'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id126
+        fO2_log_as_printed: '-9.11'
+        fO2_reference_pressure_as_printed: *id127
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id128
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '12'
+        glass_composition_wt_pct: *id129
+        glass_composition_wt_pct_as_printed: *id130
+        glass_composition_sum_as_printed: '98.0'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id131
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id132
+        condition_locators: *id133
+      point_conditions: *id134
+    - observation_id: snyder_1992_table4_fe0_947o_activity_77-52
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 77-52
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 14
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.25'
+        activity_as_printed: '0.25'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1504'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id137
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-9.80'
+        fO2_reference_pressure_as_printed: &id138
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: &id139
+          Ni: '93.5'
+          Fe: '5.94'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id140
+          SiO2: '54.0'
+          TiO2: '1.85'
+          Al2O3: '13.9'
+          Fe2O3: '0.50'
+          FeO: '6.50'
+          MnO: '0.111'
+          NiO: '0.326'
+          MgO: '7.01'
+          CaO: '8.77'
+          Na2O: '2.06'
+          K2O: '4.76'
+        glass_composition_wt_pct_as_printed: &id141
+          SiO2: 54.0(8)
+          TiO2: 1.85(8)
+          Al2O3: 13.9(2)
+          Fe2O3: '0.50'
+          FeO: 6.50(22)
+          MnO: 0.111(12)
+          NiO: 0.326(19)
+          MgO: 7.01(29)
+          CaO: 8.77(43)
+          Na2O: 2.06(15)
+          K2O: 4.76(21)
+        glass_composition_sum_as_printed: '99.8'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id142
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id143
+          page: 4
+          published_page: 306
+          pdf_page_index: 3
+          table: '3'
+          record: 77-52-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id144
+          temperature_K: &id135
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 77-52
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id135
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id145
+        temperature_K:
+          state:
+            tag: value
+            value: '1504'
+          locator: &id136
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 77-52
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-9.80'
+          locator: *id136
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '54.0'
+              - - TiO2
+                - '1.85'
+              - - Al2O3
+                - '13.9'
+              - - Fe2O3
+                - '0.50'
+              - - FeO
+                - '6.50'
+              - - MnO
+                - '0.111'
+              - - NiO
+                - '0.326'
+              - - MgO
+                - '7.01'
+              - - CaO
+                - '8.77'
+              - - Na2O
+                - '2.06'
+              - - K2O
+                - '4.76'
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 77-52-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_77-52
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 77-52
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 14
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '4.5'
+        gamma_as_printed: '4.5'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1504'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id137
+        fO2_log_as_printed: '-9.80'
+        fO2_reference_pressure_as_printed: *id138
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol
+        alloy_composition_wt_pct_as_printed: *id139
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id140
+        glass_composition_wt_pct_as_printed: *id141
+        glass_composition_sum_as_printed: '99.8'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id142
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id143
+        condition_locators: *id144
+      point_conditions: *id145
+    - observation_id: snyder_1992_table4_fe0_947o_activity_83-58
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 83-58
+        note: Calculated Fe0.947O liquid activity cell
+        table_row_number: 15
+        table_column_number: 5
+        phase: liquid
+      units: dimensionless activity
+      standard_state: *id004
+      values:
+        quantity: activity
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_column_as_printed: a_Fe0.947O
+        activity: '0.59'
+        activity_as_printed: '0.59'
+        estimated_error_as_printed: Estimated errors in ln a_Fe0.947O are believed to be 20%.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1395'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: &id148
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Printed relation used to calculate liquid Fe0.947O activity
+        fO2_log_as_printed: '-11.15'
+        fO2_reference_pressure_as_printed: &id149
+          tag: absent
+          reason: Table 2 does not state a pressure reference; the task permits the migrator bar default for
+            these two-decimal values.
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl+ilm
+        alloy_composition_wt_pct_as_printed: &id150
+          Ni: '87.8'
+          Fe: '11.6'
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: &id151
+          SiO2: '45.7'
+          TiO2: '3.81'
+          Al2O3: '13.8'
+          Fe2O3: '1.05'
+          FeO: '18.2'
+          MnO: '0.234'
+          NiO: '0.262'
+          MgO: '3.69'
+          CaO: '7.52'
+          Na2O: '2.80'
+          K2O: '1.13'
+        glass_composition_wt_pct_as_printed: &id152
+          SiO2: 45.7(6)
+          TiO2: 3.81(9)
+          Al2O3: 13.8(2)
+          Fe2O3: '1.05'
+          FeO: 18.2(2)
+          MnO: 0.234(16)
+          NiO: 0.262(8)
+          MgO: 3.69(10)
+          CaO: 7.52(9)
+          Na2O: 2.80(9)
+          K2O: 1.13(2)
+        glass_composition_sum_as_printed: '98.2'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: &id153
+          page: 3
+          published_page: 305
+          pdf_page_index: 2
+          section: Experimental Procedures
+          note: The samples were quenched into water; preservation or alteration of glass redox state is not
+            stated.
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: &id154
+          page: 5
+          published_page: 307
+          pdf_page_index: 4
+          table: '3'
+          record: 83-58-gl
+          note: Post-run glass composition; entries are means with standard deviations in parentheses
+        condition_locators: &id155
+          temperature_K: &id146
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 83-58
+            note: Run temperature, log10 fO2, and alloy composition
+          fO2_log: *id146
+          total_pressure_Pa:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+      point_conditions: &id156
+        temperature_K:
+          state:
+            tag: value
+            value: '1395'
+          locator: &id147
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 83-58
+            note: Run condition row
+        fO2_log:
+          state:
+            tag: value
+            value: '-11.15'
+          locator: *id147
+        total_pressure_Pa:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '101325'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            section: Experimental Procedures
+            note: Experiments conducted at one atmosphere pressure
+        composition:
+          state:
+            tag: value
+            value:
+              basis: oxide weight percent as published
+              amount_basis: mass_percent
+              components:
+              - - SiO2
+                - '45.7'
+              - - TiO2
+                - '3.81'
+              - - Al2O3
+                - '13.8'
+              - - Fe2O3
+                - '1.05'
+              - - FeO
+                - '18.2'
+              - - MnO
+                - '0.234'
+              - - NiO
+                - '0.262'
+              - - MgO
+                - '3.69'
+              - - CaO
+                - '7.52'
+              - - Na2O
+                - '2.80'
+              - - K2O
+                - '1.13'
+          locator:
+            page: 5
+            published_page: 307
+            pdf_page_index: 4
+            table: '3'
+            record: 83-58-gl
+            note: Glass composition row
+    - observation_id: snyder_1992_table4_fe0_947o_activity_coefficient_83-58
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      locator:
+        page: 7
+        published_page: 309
+        pdf_page_index: 6
+        table: '4'
+        record: 83-58
+        note: Calculated gamma_Fe0.947O liquid activity-coefficient cell
+        table_row_number: 15
+        table_column_number: 8
+        phase: liquid
+      units: dimensionless activity coefficient
+      standard_state: *id004
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        admission_status: admitted
+        component_as_printed: Fe0.947O
+        activity_coefficient_column_as_printed: gamma_Fe0.947O
+        gamma: '3.5'
+        gamma_as_printed: '3.5'
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+        T_K: '1395'
+        equation_for_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2 / RT)
+        activity_equation_locator: *id148
+        fO2_log_as_printed: '-11.15'
+        fO2_reference_pressure_as_printed: *id149
+        fO2_uncertainty_as_printed: ±0.05 log10 units
+        temperature_uncertainty_as_printed: within 3 K
+        run_products_as_printed: gl+ol+pl+ilm
+        alloy_composition_wt_pct_as_printed: *id150
+        glass_analysis_phase_as_printed: gl=glass
+        glass_analysis_point_count_as_printed: '10'
+        glass_composition_wt_pct: *id151
+        glass_composition_wt_pct_as_printed: *id152
+        glass_composition_sum_as_printed: '98.2'
+        glass_composition_quench_state: not_stated
+        glass_composition_quench_locator: *id153
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991); all reported
+          analyses are post-run compositions.
+        composition_locator: *id154
+        condition_locators: *id155
+      point_conditions: *id156
+    - observation_id: snyder_1992_fe0_947o_ln_activity_multivariate_fit
+      experiment: snyder_1992_olivine_liquid_equilibrium_1_atm
+      type: activity_coefficient
+      phase: l
+      method_class: author_derived
+      admission_status: typed_refusal
+      locator:
+        page: 9
+        published_page: 311
+        pdf_page_index: 8
+        table: '5'
+        note: Equation (15) and Fe0.947O fit coefficients
+      units: natural-log activity equation coefficients as printed
+      standard_state: *id004
+      values:
+        quantity: ln_Fe0.947O_activity_multivariate_fit
+        method_class: author_derived
+        admission_status: typed_refusal
+        schema_gap: No exact observation quantity token represents the printed multivariate natural-log activity
+          fit. Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is a different activity-coefficient fit form;
+          no near-miss token was assigned. See simulator/battery/enums.py::Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+          simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and
+          tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+        equation_as_printed: ln a_i^liq = a + b/T + c log10 fO2 + Σ_i d_i ln X_i
+        fit_component_as_printed: Fe0.947O
+        coefficients_as_printed:
+          a:
+            value_as_printed: '-1.367'
+            standard_error_as_printed: '0.592'
+          b_K:
+            value_as_printed: '6176.'
+            standard_error_as_printed: '742.1'
+          c:
+            value_as_printed: '0.2128'
+            standard_error_as_printed: '0.0086'
+          d_TiO2:
+            value_as_printed: '-0.05926'
+            standard_error_as_printed: '0.0212'
+          d_FeO:
+            value_as_printed: '0.7433'
+            standard_error_as_printed: '0.0299'
+          d_Na2O+K2O:
+            value_as_printed: '0.1337'
+            standard_error_as_printed: '0.0253'
+          d_Fe2O3:
+            value:
+              tag: absent
+              reason: Blank Table 5 coefficient cell
+            standard_error:
+              tag: absent
+              reason: Blank Table 5 standard-error cell
+          d_MgO:
+            value:
+              tag: absent
+              reason: Blank Table 5 coefficient cell
+            standard_error:
+              tag: absent
+              reason: Blank Table 5 standard-error cell
+        regression_statistics_as_printed:
+          n: '74'
+          mean_deviation_percent: '4.34'
+          chi_squared: '0.70'
+          sum_squares_per_degree_of_freedom: '0.010'
+        domain_ranges_as_printed:
+          T_K:
+            minimum: '1395.'
+            maximum: '1579.'
+          log10_fO2:
+            minimum: '-14.50'
+            maximum: '-8.18'
+          XSiO2:
+            minimum: '0.4212'
+            maximum: '0.8328'
+          XTiO2:
+            minimum: '0.0024'
+            maximum: '0.0784'
+          XAl2O3:
+            minimum: '0.0508'
+            maximum: '0.1238'
+          XFe2O3:
+            minimum: '0.0003'
+            maximum: '0.0055'
+          XFeO:
+            minimum: '0.0080'
+            maximum: '0.2471'
+          XMgO:
+            minimum: '0.0063'
+            maximum: '0.1910'
+          XCaO:
+            minimum: '0.0159'
+            maximum: '0.1581'
+          XNa2O+K2O:
+            minimum: '0.0016'
+            maximum: '0.0599'
+        input_sources_as_printed: This study, Roeder (1974), and Campbell et al. (1979), as identified in the
+          Figure 4 caption.
+        derivation_note: Authors report their fitted equation and coefficients. Some source values and thermodynamic
+          inputs are not stored here; no derived_from parents are asserted.
+        standard_state_as_printed: solid standard state at temperature; Fe0.947O was chosen rather than estimated
+          stoichiometric FeO
+    context:
+    - observation_id: snyder_1992_table2_run_conditions_context
+      type: source_context
+      locator:
+        page: 3
+        published_page: 305
+        pdf_page_index: 2
+        table: '2'
+        note: Complete printed Table 2 run conditions and alloy compositions; 21 run rows.
+      units: T in K; log10 fO2 as printed; time in hours; Ni and Fe in weight percent.
+      values:
+        table_title_as_printed: Table 2. Run conditions and alloy compositions in weight percent.
+        fO2_pressure_reference_as_printed:
+          tag: absent
+          reason: No reference pressure is stated for log10 fO2.
+        temperature_uncertainty_as_printed: Reported temperatures are believed to be accurate to within 3 K.
+        fO2_uncertainty_as_printed: Oxygen fugacity is believed to be accurate to ±0.05 log10 units.
+        quench_statement_as_printed: After the run durations, the samples were quenched into water; no assertion
+          about redox preservation or alteration is made.
+        run_product_footnotes_as_printed:
+        - text_as_printed: "¹ The olivine in this sample contains inclusions of an Fe-Ti oxide."
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-59
+            note: Footnote attached to the gl+ol¹ run-products cell
+        electromotive_force_as_printed:
+          tag: absent
+          reason: The paper reports no EMF measurements.
+        rows:
+        - run_as_printed: 08-58
+          temperature_K_as_printed: '1395'
+          log10_fO2_as_printed: '-11.15'
+          time_hours_as_printed: '332.3'
+          run_products_as_printed: gl+lc+pl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '89.5'
+            Fe: '10.7'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 08-58
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 44-51
+          temperature_K_as_printed: '1562'
+          log10_fO2_as_printed: '-7.40'
+          time_hours_as_printed: '116.8'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-51
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 44-57
+          temperature_K_as_printed: '1461'
+          log10_fO2_as_printed: '-10.29'
+          time_hours_as_printed: '186.9'
+          run_products_as_printed: gl+ol+pl
+          alloy_composition_wt_pct_as_printed:
+            Ni: '93.7'
+            Fe: '6.26'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-57
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 44-60
+          temperature_K_as_printed: '1468'
+          log10_fO2_as_printed: '-9.83'
+          time_hours_as_printed: '307.5'
+          run_products_as_printed: gl+ol+pl+ox
+          alloy_composition_wt_pct_as_printed:
+            Ni: '94.8'
+            Fe: '4.61'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-60
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 44-64
+          temperature_K_as_printed: '1503'
+          log10_fO2_as_printed: '-7.97'
+          time_hours_as_printed: '265.7'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 44-64
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 46-57
+          temperature_K_as_printed: '1461'
+          log10_fO2_as_printed: '-10.29'
+          time_hours_as_printed: '186.9'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '94.2'
+            Fe: '6.16'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-57
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 46-60
+          temperature_K_as_printed: '1468'
+          log10_fO2_as_printed: '-9.83'
+          time_hours_as_printed: '307.5'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '95.6'
+            Fe: '5.06'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 46-60
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-48
+          temperature_K_as_printed: '1562'
+          log10_fO2_as_printed: '-11.39'
+          time_hours_as_printed: '96.7'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '73.0'
+            Fe: '27.7'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-48
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-56
+          temperature_K_as_printed: '1559'
+          log10_fO2_as_printed: '-10.36'
+          time_hours_as_printed: '192.5'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '89.3'
+            Fe: '10.7'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-56
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-57
+          temperature_K_as_printed: '1461'
+          log10_fO2_as_printed: '-10.29'
+          time_hours_as_printed: '186.9'
+          run_products_as_printed: gl+ol+ox
+          alloy_composition_wt_pct_as_printed:
+            Ni: '94.7'
+            Fe: '5.71'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-57
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-59
+          temperature_K_as_printed: '1557'
+          log10_fO2_as_printed: '-0.68'
+          time_hours_as_printed: '235.8'
+          run_products_as_printed: gl+ol¹
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-59
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-60
+          temperature_K_as_printed: '1468'
+          log10_fO2_as_printed: '-9.83'
+          time_hours_as_printed: '307.5'
+          run_products_as_printed: gl+ol+ox
+          alloy_composition_wt_pct_as_printed:
+            Ni: '96.0'
+            Fe: '4.30'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-60
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-61A
+          temperature_K_as_printed: '1559'
+          log10_fO2_as_printed: '-9.11'
+          time_hours_as_printed: '143.0'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '94.9'
+            Fe: '4.61'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-61A
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 48-64
+          temperature_K_as_printed: '1503'
+          log10_fO2_as_printed: '-7.97'
+          time_hours_as_printed: '265.7'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 48-64
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 50-56
+          temperature_K_as_printed: '1559'
+          log10_fO2_as_printed: '-10.36'
+          time_hours_as_printed: '192.5'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '85.1'
+            Fe: '14.8'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-56
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 50-59
+          temperature_K_as_printed: '1557'
+          log10_fO2_as_printed: '-0.68'
+          time_hours_as_printed: '235.8'
+          run_products_as_printed: gl+ol+ox
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-59
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 50-61A
+          temperature_K_as_printed: '1559'
+          log10_fO2_as_printed: '-9.11'
+          time_hours_as_printed: '143.0'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '94.2'
+            Fe: '5.61'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 50-61A
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 77-52
+          temperature_K_as_printed: '1504'
+          log10_fO2_as_printed: '-9.80'
+          time_hours_as_printed: '91.2'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni: '93.5'
+            Fe: '5.94'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 77-52
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 77-64
+          temperature_K_as_printed: '1503'
+          log10_fO2_as_printed: '-7.97'
+          time_hours_as_printed: '265.7'
+          run_products_as_printed: gl+ol
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 77-64
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 83-58
+          temperature_K_as_printed: '1395'
+          log10_fO2_as_printed: '-11.15'
+          time_hours_as_printed: '332.3'
+          run_products_as_printed: gl+ol+pl+ilm
+          alloy_composition_wt_pct_as_printed:
+            Ni: '87.8'
+            Fe: '11.6'
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 83-58
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+        - run_as_printed: 83-66
+          temperature_K_as_printed: '1395'
+          log10_fO2_as_printed: '-9.28'
+          time_hours_as_printed: '309.1'
+          run_products_as_printed: gl+ol+pl+tmt
+          alloy_composition_wt_pct_as_printed:
+            Ni:
+              tag: absent
+              reason: Table 2 cell is blank
+            Fe:
+              tag: absent
+              reason: Table 2 cell is blank
+          fO2_pressure_reference_as_printed:
+            tag: absent
+            reason: Table 2 does not state a pressure reference for log10 fO2
+          locator:
+            page: 3
+            published_page: 305
+            pdf_page_index: 2
+            table: '2'
+            record: 83-66
+            note: Run conditions, phase products, and Ni-Fe alloy composition
+    - observation_id: snyder_1992_feo_figure_read_candidates
+      type: figure_context
+      locator:
+        page: 10
+        published_page: 312
+        pdf_page_index: 9
+        figure: '3'
+        note: Figures 3–4 are not digitized in this extraction.
+      units: no figure-read numeric points stored
+      values:
+        quantity: figure_only_Fe0.947O_activity_and_activity_coefficient_plots
+        method_class: figure_only
+        digitisation: undigitised
+        figures:
+        - '3'
+        - 4(a)
+        description: Figure 3 contours RT ln gamma_Fe0.947O; Figure 4(a) compares predicted and measured ln
+          a_Fe0.947O. These are figure-read candidates and were not digitized.
+    - observation_id: snyder_1992_table1_starting_material_compositions_context
+      type: source_context
+      locator:
+        page: 2
+        published_page: 304
+        pdf_page_index: 1
+        table: '1'
+        note: Starting-material compositions; 7 specimen columns.
+      units: weight percent as printed
+      values:
+        table_title_as_printed: Table 1. Compositions of starting materials in weight percent.
+        oxide_columns_as_printed:
+        - SiO2
+        - TiO2
+        - Al2O3
+        - Fe2O3
+        - FeO
+        - MnO
+        - MgO
+        - CaO
+        - Na2O
+        - K2O
+        - P2O5
+        - H2O+
+        - Total
+        specimen_footnotes_as_printed:
+        - Specimen 94-8 from BALDRIDGE et al. (1981); see also SACK et al. (1987)
+        - Specimen Jor 44 from LUHR and CARMICHAEL (1985)
+        - Specimen Jor 46 from LUHR and CARMICHAEL (1985)
+        - Specimen 4-83C from WIEBE (1988)
+        rows:
+        - specimen_as_printed: 08¹
+          specimen_id_as_printed: 94-8
+          reference_as_printed: BALDRIDGE et al. (1981); see also SACK et al. (1987)
+          composition_wt_pct_as_printed:
+            SiO2: '47.84'
+            TiO2: '1.24'
+            Al2O3: '17.90'
+            Fe2O3: '1.88'
+            FeO: '6.21'
+            MnO: '0.17'
+            MgO: '3.87'
+            CaO: '8.68'
+            Na2O: '2.78'
+            K2O: '7.43'
+            P2O5: '0.92'
+            H2O+: '0.45'
+            Total: '99.37'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: 08¹
+            note: Starting-material composition column
+        - specimen_as_printed: 44²
+          specimen_id_as_printed: Jor 44
+          reference_as_printed: LUHR and CARMICHAEL (1985)
+          composition_wt_pct_as_printed:
+            SiO2: '52.10'
+            TiO2: '0.81'
+            Al2O3: '16.44'
+            Fe2O3: '1.56'
+            FeO: '6.05'
+            MnO: '0.14'
+            MgO: '9.29'
+            CaO: '8.46'
+            Na2O: '3.47'
+            K2O: '0.74'
+            P2O5: '0.14'
+            H2O+: '0.34'
+            Total: '99.54'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: 44²
+            note: Starting-material composition column
+        - specimen_as_printed: 46³
+          specimen_id_as_printed: Jor 46
+          reference_as_printed: LUHR and CARMICHAEL (1985)
+          composition_wt_pct_as_printed:
+            SiO2: '49.21'
+            TiO2: '1.33'
+            Al2O3: '14.19'
+            Fe2O3: '4.54'
+            FeO: '3.75'
+            MnO: '0.12'
+            MgO: '8.32'
+            CaO: '7.68'
+            Na2O: '4.59'
+            K2O: '2.82'
+            P2O5: '1.37'
+            H2O+: '0.19'
+            Total: '99.11'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: 46³
+            note: Starting-material composition column
+        - specimen_as_printed: '48'
+          specimen_id_as_printed: '48'
+          reference_as_printed:
+            tag: absent
+            reason: No source note printed for this specimen.
+          composition_wt_pct_as_printed:
+            SiO2: '49.23'
+            TiO2: '1.81'
+            Al2O3: '12.26'
+            Fe2O3: '5.39'
+            FeO: '2.72'
+            MnO: '0.13'
+            MgO: '11.85'
+            CaO: '8.24'
+            Na2O: '2.78'
+            K2O: '3.58'
+            P2O5: '1.02'
+            H2O+: '0.73'
+            Total: '99.74'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: '48'
+            note: Starting-material composition column
+        - specimen_as_printed: '50'
+          specimen_id_as_printed: '50'
+          reference_as_printed:
+            tag: absent
+            reason: No source note printed for this specimen.
+          composition_wt_pct_as_printed:
+            SiO2: '40.52'
+            TiO2: '5.28'
+            Al2O3: '8.17'
+            Fe2O3: '6.33'
+            FeO: '6.29'
+            MnO: '0.21'
+            MgO: '11.57'
+            CaO: '12.55'
+            Na2O: '2.50'
+            K2O: '3.75'
+            P2O5: '0.44'
+            H2O+: '1.31'
+            Total: '98.92'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: '50'
+            note: Starting-material composition column
+        - specimen_as_printed: '77'
+          specimen_id_as_printed: '77'
+          reference_as_printed:
+            tag: absent
+            reason: No source note printed for this specimen.
+          composition_wt_pct_as_printed:
+            SiO2: '50.76'
+            TiO2: '1.70'
+            Al2O3: '12.38'
+            Fe2O3: '3.94'
+            FeO: '3.02'
+            MnO: '0.10'
+            MgO: '8.89'
+            CaO: '7.60'
+            Na2O: '2.82'
+            K2O: '5.83'
+            P2O5: '1.28'
+            H2O+: '0.09'
+            Total: '98.41'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: '77'
+            note: Starting-material composition column
+        - specimen_as_printed: 83⁴
+          specimen_id_as_printed: 4-83C
+          reference_as_printed: WIEBE (1988)
+          composition_wt_pct_as_printed:
+            SiO2: '46.2'
+            TiO2: '3.83'
+            Al2O3: '13.4'
+            Fe2O3: '1.59'
+            FeO: '15.9'
+            MnO: '0.22'
+            MgO: '4.66'
+            CaO: '7.58'
+            Na2O: '3.56'
+            K2O: '1.03'
+            P2O5: '0.35'
+            H2O+: '1.16'
+            Total: '99.49'
+          locator:
+            page: 2
+            published_page: 304
+            pdf_page_index: 1
+            table: '1'
+            record: 83⁴
+            note: Starting-material composition column
+    - observation_id: snyder_1992_table3_glass_compositions_context
+      type: source_context
+      locator:
+        page: 4
+        published_page: 306
+        pdf_page_index: 3
+        table: '3'
+        note: All printed post-run glass compositions; Table 3 continued on PDF page 5.
+      units: weight percent as printed; parentheses contain standard deviations
+      values:
+        table_title_as_printed: Table 3. Analyses of run products.
+        printed_analysis_rows: 44
+        glass_analysis_rows: 21
+        composition_method_as_printed: Fe2O3 was calculated according to Kress and Carmichael (1991). All reported
+          analyses are post-run compositions.
+        rows:
+        - run_as_printed: 08-58-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 48.1(4)
+            TiO2: 1.58(5)
+            Al2O3: 15.5(2)
+            Fe2O3: '0.83'
+            FeO: 11.7(1)
+            MnO: 0.202(15)
+            NiO: 0.172(13)
+            MgO: 3.72(10)
+            CaO: 9.89(13)
+            Na2O: 1.95(6)
+            K2O: 4.46(5)
+          sum_as_printed: '98.1'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 08-58-gl
+            note: Glass analysis row
+        - run_as_printed: 44-51-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '11'
+          composition_wt_pct_as_printed:
+            SiO2: 51.4(6)
+            TiO2: 0.78(4)
+            Al2O3: 16.4(1)
+            Fe2O3: '1.19'
+            FeO: 7.10(15)
+            MnO: 0.122(11)
+            NiO: 1.40(2)
+            MgO: 8.30(7)
+            CaO: 8.39(17)
+            Na2O: 3.12(15)
+            K2O: 1.12(1)
+          sum_as_printed: '99.3'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-51-gl
+            note: Glass analysis row
+        - run_as_printed: 44-57-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 54.6(7)
+            TiO2: 1.01(4)
+            Al2O3: 16.7(1)
+            Fe2O3: '0.43'
+            FeO: 7.03(7)
+            MnO: 0.134(13)
+            NiO: 0.265(22)
+            MgO: 6.06(16)
+            CaO: 8.86(11)
+            Na2O: 2.92(10)
+            K2O: 1.23(3)
+          sum_as_printed: '99.2'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-57-gl
+            note: Glass analysis row
+        - run_as_printed: 44-60-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 54.2(5)
+            TiO2: 0.97(4)
+            Al2O3: 16.4(2)
+            Fe2O3: '0.50'
+            FeO: 6.73(7)
+            MnO: 0.135(14)
+            NiO: 0.375(15)
+            MgO: 6.27(14)
+            CaO: 9.07(19)
+            Na2O: 2.52(11)
+            K2O: 1.28(2)
+          sum_as_printed: '98.5'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-60-gl
+            note: Glass analysis row
+        - run_as_printed: 44-64-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 53.4(4)
+            TiO2: 0.85(3)
+            Al2O3: 17.5(3)
+            Fe2O3: '0.99'
+            FeO: 6.21(7)
+            MnO: 0.130(14)
+            NiO: 0.897(14)
+            MgO: 6.69(17)
+            CaO: 9.06(10)
+            Na2O: 2.56(13)
+            K2O: 1.18(2)
+          sum_as_printed: '99.5'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 44-64-gl
+            note: Glass analysis row
+        - run_as_printed: 46-57-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 52.9(5)
+            TiO2: 1.50(5)
+            Al2O3: 16.0(1)
+            Fe2O3: '0.47'
+            FeO: 7.21(8)
+            MnO: 0.120(10)
+            NiO: 0.352(20)
+            MgO: 5.94(11)
+            CaO: 9.03(17)
+            Na2O: 2.56(7)
+            K2O: 2.27(3)
+          sum_as_printed: '98.3'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 46-57-gl
+            note: Glass analysis row
+        - run_as_printed: 46-60-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 53.7(4)
+            TiO2: 1.47(3)
+            Al2O3: 15.5(1)
+            Fe2O3: '0.57'
+            FeO: 7.03(17)
+            MnO: 0.113(7)
+            NiO: 0.427(13)
+            MgO: 5.96(13)
+            CaO: 8.99(18)
+            Na2O: 2.47(7)
+            K2O: 2.24(3)
+          sum_as_printed: '98.4'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 46-60-gl
+            note: Glass analysis row
+        - run_as_printed: 48-48-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 52.1(5)
+            TiO2: 1.86(3)
+            Al2O3: 13.3(1)
+            Fe2O3: '0.16'
+            FeO: 9.25(7)
+            MnO: 0.125(6)
+            NiO: 0.042(8)
+            MgO: 11.8(2)
+            CaO: 8.68(15)
+            Na2O: 0.39(4)
+            K2O: 1.38(2)
+          sum_as_printed: '99.0'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-48-gl
+            note: Glass analysis row
+        - run_as_printed: 48-56-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '15'
+          composition_wt_pct_as_printed:
+            SiO2: 54.3(6)
+            TiO2: 1.93(5)
+            Al2O3: 13.3(1)
+            Fe2O3: '0.21'
+            FeO: 7.18(12)
+            MnO: 0.127(7)
+            NiO: 0.208(26)
+            MgO: 12.6(2)
+            CaO: 8.85(18)
+            Na2O: 0.24(3)
+            K2O: 0.91(2)
+          sum_as_printed: '99.9'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-56-gl
+            note: Glass analysis row
+        - run_as_printed: 48-57-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 52.6(5)
+            TiO2: 2.17(6)
+            Al2O3: 15.2(2)
+            Fe2O3: '0.44'
+            FeO: 6.43(13)
+            MnO: 0.113(12)
+            NiO: 0.322(31)
+            MgO: 6.33(7)
+            CaO: 9.99(19)
+            Na2O: 1.84(8)
+            K2O: 2.87(7)
+          sum_as_printed: '98.3'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-57-gl
+            note: Glass analysis row
+        - run_as_printed: 48-59-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 51.3(5)
+            TiO2: 1.86(7)
+            Al2O3: 12.7(1)
+            Fe2O3: '6.91'
+            FeO: 1.54(9)
+            MnO: 0.124(11)
+            NiO: 0.510(13)
+            MgO: 10.9(2)
+            CaO: 8.67(16)
+            Na2O: 1.87(8)
+            K2O: 1.92(4)
+          sum_as_printed: '98.3'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-59-gl
+            note: Glass analysis row
+        - run_as_printed: 48-60-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 53.5(6)
+            TiO2: 2.20(9)
+            Al2O3: 14.6(2)
+            Fe2O3: '0.50'
+            FeO: 6.13(18)
+            MnO: 0.121(9)
+            NiO: 0.333(21)
+            MgO: 6.63(27)
+            CaO: 10.0(3)
+            Na2O: 1.55(5)
+            K2O: 2.57(10)
+          sum_as_printed: '98.1'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-60-gl
+            note: Glass analysis row
+        - run_as_printed: 48-61A-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '11'
+          composition_wt_pct_as_printed:
+            SiO2: 52.4(4)
+            TiO2: 1.97(6)
+            Al2O3: 13.7(2)
+            Fe2O3: '0.45'
+            FeO: 7.04(6)
+            MnO: 0.126(16)
+            NiO: 0.637(16)
+            MgO: 10.2(2)
+            CaO: 9.02(12)
+            Na2O: 0.83(7)
+            K2O: 1.99(4)
+          sum_as_printed: '98.3'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-61A-gl
+            note: Glass analysis row
+        - run_as_printed: 48-64-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 52.3(6)
+            TiO2: 2.12(7)
+            Al2O3: 14.6(1)
+            Fe2O3: '1.08'
+            FeO: 6.12(7)
+            MnO: 0.118(11)
+            NiO: 0.602(32)
+            MgO: 7.19(17)
+            CaO: 9.70(16)
+            Na2O: 1.53(6)
+            K2O: 2.67(4)
+          sum_as_printed: '98.1'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 48-64-gl
+            note: Glass analysis row
+        - run_as_printed: 50-56-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '19'
+          composition_wt_pct_as_printed:
+            SiO2: 45.4(3)
+            TiO2: 5.74(7)
+            Al2O3: 8.56(12)
+            Fe2O3: '0.45'
+            FeO: 11.4(1)
+            MnO: 0.210(12)
+            NiO: 0.204(10)
+            MgO: 12.7(2)
+            CaO: 14.4(2)
+            Na2O: 0.09(3)
+            K2O: 0.11(1)
+          sum_as_printed: '99.3'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 50-56-gl
+            note: Glass analysis row
+        - run_as_printed: 50-59-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 42.9(3)
+            TiO2: 5.42(12)
+            Al2O3: 7.88(9)
+            Fe2O3: '11.3'
+            FeO: 2.39(16)
+            MnO: 0.188(18)
+            NiO: 0.928(12)
+            MgO: 13.0(2)
+            CaO: 13.6(1)
+            Na2O: 0.35(2)
+            K2O: 0.11(1)
+          sum_as_printed: '98.1'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 50-59-gl
+            note: Glass analysis row
+        - run_as_printed: 50-61A-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '12'
+          composition_wt_pct_as_printed:
+            SiO2: 44.1(4)
+            TiO2: 5.73(9)
+            Al2O3: 8.58(11)
+            Fe2O3: '0.85'
+            FeO: 11.0(1)
+            MnO: 0.211(13)
+            NiO: 0.935(13)
+            MgO: 11.7(2)
+            CaO: 14.3(1)
+            Na2O: 0.20(2)
+            K2O: 0.29(1)
+          sum_as_printed: '98.0'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 50-61A-gl
+            note: Glass analysis row
+        - run_as_printed: 77-52-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 54.0(8)
+            TiO2: 1.85(8)
+            Al2O3: 13.9(2)
+            Fe2O3: '0.50'
+            FeO: 6.50(22)
+            MnO: 0.111(12)
+            NiO: 0.326(19)
+            MgO: 7.01(29)
+            CaO: 8.77(43)
+            Na2O: 2.06(15)
+            K2O: 4.76(21)
+          sum_as_printed: '99.8'
+          linked_table4_feo_activity: true
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 77-52-gl
+            note: Glass analysis row
+        - run_as_printed: 77-64-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 53.8(6)
+            TiO2: 1.88(5)
+            Al2O3: 14.2(1)
+            Fe2O3: '1.07'
+            FeO: 5.61(10)
+            MnO: 0.107(12)
+            NiO: 0.715(37)
+            MgO: 6.08(13)
+            CaO: 8.85(23)
+            Na2O: 1.58(8)
+            K2O: 4.25(8)
+          sum_as_printed: '98.1'
+          linked_table4_feo_activity: false
+          locator:
+            page: 4
+            published_page: 306
+            pdf_page_index: 3
+            table: '3'
+            record: 77-64-gl
+            note: Glass analysis row
+        - run_as_printed: 83-58-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 45.7(6)
+            TiO2: 3.81(9)
+            Al2O3: 13.8(2)
+            Fe2O3: '1.05'
+            FeO: 18.2(2)
+            MnO: 0.234(16)
+            NiO: 0.262(8)
+            MgO: 3.69(10)
+            CaO: 7.52(9)
+            Na2O: 2.80(9)
+            K2O: 1.13(2)
+          sum_as_printed: '98.2'
+          linked_table4_feo_activity: true
+          locator:
+            page: 5
+            published_page: 307
+            pdf_page_index: 4
+            table: '3'
+            record: 83-58-gl
+            note: Table 3 continuation row
+        - run_as_printed: 83-66-gl
+          phase_as_printed: gl=glass
+          point_count_as_printed: '10'
+          composition_wt_pct_as_printed:
+            SiO2: 48.9(4)
+            TiO2: 3.46(7)
+            Al2O3: 13.1(2)
+            Fe2O3: '2.47'
+            FeO: 14.4(2)
+            MnO: 0.242(12)
+            NiO: 0.601(15)
+            MgO: 3.09(9)
+            CaO: 7.90(12)
+            Na2O: 3.35(12)
+            K2O: 1.25(4)
+          sum_as_printed: '98.8'
+          linked_table4_feo_activity: false
+          locator:
+            page: 5
+            published_page: 307
+            pdf_page_index: 4
+            table: '3'
+            record: 83-66-gl
+            note: Table 3 continuation row
+    - observation_id: snyder_1992_standard_state_statements_context
+      type: source_context
+      locator: *id157
+      units: verbatim statements and equations
+      values:
+        statements:
+        - statement_as_printed: For both reactions, we have used solid oxides as reference states.
+          locator:
+            page: 6
+            published_page: 308
+            pdf_page_index: 5
+            equation: '2'
+            note: Reference-state prose immediately following equations (1) and (2)
+        - statement_as_printed: Fe0.947O was chosen as a standard state rather than estimated values for stoichiometric
+            FeO because the latter yield ferrous iron activities in the melt which exceed unity (see e.g.,
+            DOYLE, 1988).
+          locator:
+            page: 6
+            published_page: 308
+            pdf_page_index: 5
+            equation: '2'
+            note: Explicit Fe0.947O versus stoichiometric FeO standard-state choice
+        - statement_as_printed: All activities are relative to a solid standard state at temperature.
+          locator:
+            page: 7
+            published_page: 309
+            pdf_page_index: 6
+            table: '4'
+            note: Table 4 caption
+        - statement_as_printed: Activity coefficients (γ’s) for NiO, FeO, MgO and Fe2O3 are for the liquid
+            phase and that of Lb (= NiSi1/2O2) is for olivine.
+          locator:
+            page: 7
+            published_page: 309
+            pdf_page_index: 6
+            table: '4'
+            note: Table 4 caption
+        - statement_as_printed: Relative to the uncertainty in ln a_Fe0.947O, ±20%, the difference between
+            ln a_FeO and ln a_Fe0.947O is quite small. Consequently, we have taken ln a_FeO ≈ ln a_Fe0.947O
+            in the subsequent calculations.
+          locator:
+            page: 6
+            published_page: 308
+            pdf_page_index: 5
+            note: Footnote on relation between stoichiometric FeO and Fe0.947O activities
+        equation_2_as_printed: 0.947Fe_alloy + 1/2 O2 = Fe0.947O_solid
+        equation_2_locator:
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '2'
+          note: Fe0.947O solid reference reaction
+        equation_4_for_liquid_activity_as_printed: a_Fe0.947O^liq = (a_Fe^alloy)^0.947 f_O2^(1/2) exp(-ΔG°_rxn,2
+          / RT)
+        equation_4_locator:
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          equation: '4'
+          note: Activity calculated from alloy activity, oxygen fugacity, and reaction free energy
+        table4_activity_error_as_printed: Estimated errors for the values of ln a_NiO and ln a_Fe0.947O are
+          believed to be 4% and 20%, respectively.
+        activity_error_locator:
+          page: 6
+          published_page: 308
+          pdf_page_index: 5
+          note: Reported estimated activity errors

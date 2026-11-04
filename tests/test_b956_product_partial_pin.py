@@ -37,7 +37,6 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
         "pure_silica_glass",
         "glass",
         "refractory_ceramic_rump",
-        "captured_volatiles",
     ):
         bucket = products[name]
         assert bucket["status"] == "partial"
@@ -61,6 +60,11 @@ def test_b858_lunar_c0_si_transport_refusal_keeps_computed_products_partial(
         assert isinstance(exclusion["upper_bound_kg"], (int, float))
         assert exclusion["upper_bound_kg"] > 0.0
         assert exclusion["upper_bound_basis"] == "conservative_ledger_bound"
+
+    # This run has no captured volatile mass, so its refused contribution
+    # cannot make that class partial. The computed classes above remain partial.
+    assert products["captured_volatiles"]["status"] == "unavailable"
+    assert products["captured_volatiles"]["class_total_kg"] is None
 
     silica = products["pure_silica_glass"]
     assert silica["stage_3_capture_kg"] > 0.0

@@ -16,8 +16,14 @@ from enum import Enum, auto
 from typing import Any, Dict, Iterable, List, Mapping, Tuple
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
-from simulator.condensation_routing import target_species_for_stage_number
-from simulator.config import resolve_collector_bands_C
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    K_TRAP_SUB_ORDER,
+    NA_COLLECTOR_STAGE_KEY,
+    target_species_for_stage_key,
+    target_species_for_stage_number,
+)
+from simulator.config import resolve_collector_bands_C, resolve_substage_bands_C
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe_errors import MalformedRecipeError
@@ -36,6 +42,26 @@ OXIDE_SPECIES = [
 ]
 
 PRESSURE_PARTIAL_TOTAL_TOL_MBAR = 1e-9
+
+
+def partial_pressure_exceeds_total(pO2_mbar: float, p_total_mbar: float) -> bool:
+    """Return whether pO2 is above p_total outside the shared tolerance.
+
+    Premise: a partial pressure cannot exceed the total. The comparison
+    needs a tolerance because configured pairs are often equal (C4 is
+    0.2 mbar and 0.2 mbar) and float subtraction of those equals is not
+    a physical excess.
+    Algebra: excess = pO2 - p_total. Admit the excess when it is at most
+    max(1e-9 mbar, 1e-12 * max(1 mbar, |pO2|, |p_total|)).
+    Unit check: every term is mbar. 1e-9 mbar is 1e-7 Pa.
+    Limiting case: an excess of 5e-10 mbar at 1 mbar total is admitted;
+    an excess of 0.1 mbar is not.
+    """
+    tolerance_mbar = max(
+        PRESSURE_PARTIAL_TOTAL_TOL_MBAR,
+        1e-12 * max(1.0, abs(pO2_mbar), abs(p_total_mbar)),
+    )
+    return (pO2_mbar - p_total_mbar) > tolerance_mbar
 
 # --- Metal products extracted from the melt ---
 # Each metal is obtained by reducing or evaporating its parent oxide.
@@ -659,16 +685,14 @@ class MeltState:
                 "melt_pressure_invalid_negative: "
                 f"pO2_mbar={pO2:.12g} p_total_mbar={p_total:.12g}"
             )
-        tolerance = max(
-            PRESSURE_PARTIAL_TOTAL_TOL_MBAR,
-            1e-12 * max(1.0, abs(pO2), abs(p_total)),
-        )
-        if pO2 - p_total > tolerance:
-            raise MalformedRecipeError(
+        if partial_pressure_exceeds_total(pO2, p_total):
+            error = MalformedRecipeError(
                 "melt_pressure_partial_exceeds_total: "
                 f"pO2_mbar={pO2:.12g} > p_total_mbar={p_total:.12g}; "
                 "oxygen partial pressure cannot exceed total pressure"
             )
+            error.reason_code = "melt_pressure_partial_exceeds_total"
+            raise error
 
     def composition_wt_pct(self) -> Dict[str, float]:
         """Current composition as weight percent."""
@@ -698,6 +722,10 @@ class CondensationStage:
     target_species: List[str]           # Primary species collected here
     collected_kg: Dict[str, float] = field(default_factory=dict)
     # Running total of each species condensed in this stage (kg)
+    # sub_order 0 is every public stage. The K trap is sub_order 1 of
+    # stage 4 and keeps stage_number 4. route() is the visit-order owner.
+    sub_order: int = 0
+    stage_key: str = ''
 
     def total_collected_kg(self) -> float:
         return sum(self.collected_kg.values())
@@ -818,13 +846,16 @@ class PipeSegment:
 @dataclass
 class CondensationTrain:
     """
-    The complete metals condensation train (8 stages, indexed 0-7).
+    The metals condensation train. Public stages are indexed 0-7.
+    The K trap is a sub-stage of 4, appended so stages[0]..stages[7]
+    stay those public stages. route() visits it after stage 4.
 
     Stage 0: Hot duct (>1400°C) — IR spectroscopy, no condensation
-    Stage 1: Fe condenser (1100-1400°C)
+    Stage 1: Fe condenser (1150°C wall)
     Stage 2: Cr oxide harvester (1100-1300°C)
     Stage 3: SiO zone (900-1200°C) — removable fused silica baffles
-    Stage 4: Alkali/Mg cyclone (350-700°C)
+    Stage 4: Na collector / alkali cyclone (250°C wall). Mg stays here.
+    Stage 4b: K cold trap (40°C wall), sub_order 1
     Stage 5: Vortex dust filter (200-350°C)
     Stage 6: Turbine/compressor — pressure regulation
     Stage 7: O₂ accumulator (~3 bar)
@@ -848,8 +879,14 @@ class CondensationTrain:
 
     @staticmethod
     def create_default(setpoints: Mapping[str, Any] | None = None) -> 'CondensationTrain':
-        """Build the standard 8-stage metals train from config-owned bands."""
+        """Build the metals train from config-owned bands.
+
+        Stages 0-7 stay at list indexes 0-7. The K trap is appended so
+        existing ``stages[n]`` readers keep the public stage. Visit order
+        is not this list; ``route()`` sorts by (stage_number, sub_order).
+        """
         bands = resolve_collector_bands_C(setpoints)
+        k_band = resolve_substage_bands_C(setpoints)[K_TRAP_STAGE_KEY]
         stages = [
             CondensationStage(0, 'Hot Duct (IR)',
                               bands[0], []),
@@ -864,13 +901,19 @@ class CondensationTrain:
                               target_species_for_stage_number(3)),
             CondensationStage(4, 'Alkali/Mg Cyclone',
                               bands[4],
-                              target_species_for_stage_number(4)),
+                              target_species_for_stage_number(4),
+                              stage_key=NA_COLLECTOR_STAGE_KEY),
             CondensationStage(5, 'Vortex Dust Filter',
                               bands[5], []),
             CondensationStage(6, 'Turbine-Compressor',
                               bands[6], []),
             CondensationStage(7, 'Turbine Outlet Monitor',
                               bands[7], []),
+            CondensationStage(4, 'K Cold Trap',
+                              k_band,
+                              target_species_for_stage_key(K_TRAP_STAGE_KEY),
+                              sub_order=K_TRAP_SUB_ORDER,
+                              stage_key=K_TRAP_STAGE_KEY),
         ]
         return CondensationTrain(stages=stages)
 

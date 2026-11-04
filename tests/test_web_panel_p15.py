@@ -855,9 +855,9 @@ def test_product_stripe_requires_positive_matching_emitted_species() -> None:
 
     accepted_cases = [
         ("stage_1_fe_condenser", "Fe", "Designed product route · Fe"),
-        ("stage_4_alkali_mg_cyclone", "Na", "Designed product route · Na / K / Mg"),
-        ("stage_4_alkali_mg_cyclone", "K", "Designed product route · Na / K / Mg"),
-        ("stage_4_alkali_mg_cyclone", "Mg", "Designed product route · Na / K / Mg"),
+        ("stage_4_alkali_mg_cyclone", "Na", "Designed product route · Na / Mg"),
+        ("stage_4b_k_trap", "K", "Designed product route · K"),
+        ("stage_4_alkali_mg_cyclone", "Mg", "Designed product route · Na / Mg"),
     ]
     for stage_key, species, route_label in accepted_cases:
         stages = _stage_purity()
@@ -917,7 +917,7 @@ def test_product_stripe_requires_positive_matching_emitted_species() -> None:
     assert "sec-p15-stage--product" not in foreign_stage
     assert "Designed product route · SiO / SiO₂ · collection not implied" in foreign_stage
     assert "sec-p15-stage--product" not in empty_alkali_stage
-    assert "Designed product route · Na / K / Mg · collection not implied" in empty_alkali_stage
+    assert "Designed product route · Na / Mg · collection not implied" in empty_alkali_stage
 
     # Zero / negative matching product species must not paint product stripe
     # (mutation: drop `&& designated[species] > 0`).

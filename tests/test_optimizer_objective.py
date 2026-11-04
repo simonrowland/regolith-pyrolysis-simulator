@@ -1910,10 +1910,12 @@ def test_pareto_front_keeps_nullable_objective_identity() -> None:
 
 
 class _FakeLedger:
+    # Keep the product summary fixture source-backed: tapped Fe is an ingot,
+    # while staged SiO and H2O come from the condensation account.
     def kg_by_account(self, account: str) -> dict[str, float]:
-        if account == "terminal.offgas":
-            return {"H2O": 5.0}
-        if account == "process.metal_phase":
+        if account == "process.condensation_train":
+            return {"SiO": 40.0, "H2O": 5.0}
+        if account == "terminal.drain_tap_material":
             return {"Fe": 50.0}
         return {}
 

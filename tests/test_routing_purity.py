@@ -1,4 +1,5 @@
 import math
+from types import SimpleNamespace
 
 import pytest
 
@@ -8,12 +9,17 @@ from simulator.condensation import (
     STAGE_PURITY_VERDICT_INDETERMINATE,
     STAGE_PURITY_VERDICT_PURE,
     stage_purity_report,
+    stage_visit_key,
 )
 from simulator.condensation_routing import (
+    DESIGNATED_STAGE,
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
     PRODUCT_DESTINATIONS,
     STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_number,
     product_stage_number,
+    stage_list_index_for_destination,
     target_species_for_stage_number,
 )
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
@@ -26,6 +32,16 @@ def test_default_train_targets_use_canonical_registry(stage_number):
     assert train.stages[stage_number].target_species == (
         target_species_for_stage_number(stage_number)
     )
+
+
+def test_stage_list_index_resolves_stage_keys_for_all_collector_bands():
+    train = CondensationTrain.create_default()
+
+    assert stage_list_index_for_destination(train, "stage_0_hot_duct") == 0
+    assert stage_list_index_for_destination(
+        train, "stage_5_vortex_dust_filter") == 5
+    assert stage_list_index_for_destination(
+        train, K_TRAP_STAGE_KEY) == 8
 
 
 @pytest.mark.parametrize(
@@ -87,6 +103,105 @@ def test_stage_purity_report_flags_non_designated_stage_landings():
     assert stage["verdict"] == "MIXED"
 
 
+def _populated_stage_four_purity_train(*, empty_keys=False):
+    na_key = "" if empty_keys else NA_COLLECTOR_STAGE_KEY
+    k_key = "" if empty_keys else K_TRAP_STAGE_KEY
+    return SimpleNamespace(
+        stages=[
+            SimpleNamespace(
+                stage_number=4,
+                sub_order=0,
+                stage_key=na_key,
+                label="Na/Mg collector",
+                collected_kg={"Na": 5.0, "Mg": 5.5},
+            ),
+            SimpleNamespace(
+                stage_number=4,
+                sub_order=1,
+                stage_key=k_key,
+                label="K trap",
+                collected_kg={"K": 9.0},
+            ),
+        ]
+    )
+
+
+def test_stage_purity_report_pins_explicit_stage_four_collectors():
+    report = stage_purity_report(_populated_stage_four_purity_train())
+
+    assert report == {
+        "stage_4_alkali_mg_cyclone": {
+            "stage_number": 4,
+            "label": "Na/Mg collector",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {"Mg": 5.5, "Na": 5.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 10.5,
+            "impurity_kg": 0.0,
+            "total_kg": 10.5,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"Mg": True, "Na": True},
+        },
+        "stage_4b_k_trap": {
+            "stage_number": 4,
+            "label": "K trap",
+            "accepted_species": ["K"],
+            "designated_species_kg": {"K": 9.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 9.0,
+            "impurity_kg": 0.0,
+            "total_kg": 9.0,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"K": True},
+        },
+    }
+
+
+def test_stage_purity_report_pins_empty_stage_four_collapse():
+    report = stage_purity_report(
+        _populated_stage_four_purity_train(empty_keys=True)
+    )
+
+    # The K trap contents previously overwrote the Na/Mg row for empty keys.
+    assert report == {
+        "stage_4_alkali_mg_cyclone": {
+            "stage_number": 4,
+            "label": "Na/Mg collector",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {"Mg": 5.5, "Na": 5.0},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {},
+            "designated_kg": 10.5,
+            "impurity_kg": 0.0,
+            "total_kg": 10.5,
+            "purity_fraction": 1.0,
+            "verdict": "PURE",
+            "warning": "",
+            "activity": {"Mg": True, "Na": True},
+        },
+        "stage_4b_k_trap": {
+            "stage_number": 4,
+            "label": "K trap",
+            "accepted_species": ["Mg", "Na"],
+            "designated_species_kg": {},
+            "coproduct_species_kg": {},
+            "impurity_species_kg": {"K": 9.0},
+            "designated_kg": 0.0,
+            "impurity_kg": 9.0,
+            "total_kg": 9.0,
+            "purity_fraction": 0.0,
+            "verdict": "CONTAMINATED",
+            "warning": "non-designated condensate present",
+        },
+    }
+
+
 def test_stage_purity_activity_uses_explicit_accepted_species_capture_state():
     train = CondensationTrain.create_default()
     train.stages[2].collected_kg.update({"Cr": 1.0, "Mn": 0.0})
@@ -115,8 +230,7 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     condensed = route.condensed_for_species("K")
     impurity = sum(
         species_kg.get("K", 0.0)
-        for stage_number, species_kg in route.impurity_by_stage_species.items()
-        if stage_number != 4
+        for species_kg in route.impurity_by_stage_species.values()
     )
 
     assert condensed > 0.0
@@ -126,12 +240,17 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
 
 
 def test_default_k_route_allocation_numeric_pin():
-    """Deterministic cb13f9f92 output pin, not a physics calibration target."""
+    """Pin the production band-integrated route, not a calibration target.
+
+    The c679673f5/85fedcb8e capture changes integrate each collector's
+    temperature band and saturation thresholds; the old midpoint pin had
+    more K reaching stage 6 and less captured at stage 5.
+    """
     model = CondensationModel(CondensationTrain.create_default())
     assert tuple(stage_purity_report(model.train)) == (
         'stage_0', 'stage_1_fe_condenser', 'stage_2_cr_oxide_harvest',
         'stage_3_sio_zone', 'stage_4_alkali_mg_cyclone',
-        'stage_5', 'stage_6', 'stage_7',
+        'stage_5', 'stage_6', 'stage_7', 'stage_4b_k_trap',
     )
     model.configure_operating_conditions(
         overhead_pressure_mbar=1.0,
@@ -143,12 +262,128 @@ def test_default_k_route_allocation_numeric_pin():
         MeltState(temperature_C=1650.0),
     )
     assert route.condensed_by_stage_species == {
-        4: {'K': 0.069231258147549},
-        5: {'K': 0.4481944627183763},
-        6: {'K': 0.0469400801551171},
+        K_TRAP_STAGE_KEY: {'K': 0.9999661577804508},
+        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
+        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
     }
-    assert route.remaining_by_species == {'K': 0.4356341989789576}
+    assert route.remaining_by_species == {'K': 4.3083272981466337e-13}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        5: {'K': 0.4481944627183763}, 6: {'K': 0.0469400801551171},
+        'stage_5_vortex_dust_filter': {'K': 3.344749012837271e-05},
+        'stage_6_turbine_compressor': {'K': 3.947289899573387e-07},
     }
+
+
+def _visit_labels(train: CondensationTrain) -> list[int | str]:
+    labels: list[int | str] = []
+    for stage in sorted(train.stages, key=stage_visit_key):
+        if stage.stage_number == 0 and stage.sub_order == 0:
+            continue
+        if stage.stage_key == K_TRAP_STAGE_KEY:
+            labels.append('4b')
+        else:
+            labels.append(stage.stage_number)
+    return labels
+
+
+def test_route_visits_k_trap_between_stage_4_and_stage_5():
+    """Visit order is route()'s (stage_number, sub_order) sort.
+
+    Stage 0 is walked first and is not part of the pinned product order.
+    Setting the trap's stage_number above 7 is the mutation that moves 4b
+    after stage 7; sub_order alone cannot, because (4, n) sorts before 5.
+    """
+
+    train = CondensationTrain.create_default()
+    assert [stage.stage_number for stage in train.stages[:8]] == list(range(8))
+    assert train.stages[8].stage_key == K_TRAP_STAGE_KEY
+    assert train.stages[8].sub_order == 1
+    assert _visit_labels(train) == [1, 2, 3, 4, '4b', 5, 6, 7]
+    assert sorted(train.stages, key=stage_visit_key)[0].stage_number == 0
+
+    trap = train.stages[8]
+    trap.stage_number = 8
+    swapped = _visit_labels(train)
+    assert swapped != [1, 2, 3, 4, '4b', 5, 6, 7]
+    assert swapped.index('4b') > swapped.index(7)
+
+
+def _extrapolated_record_at(route, species: str, temperature_K: float):
+    matches = [
+        (str(key), record)
+        for key, record in route.antoine_extrapolations.items()
+        if str(key).split('#', 1)[0] == species
+        and record.get('temperature_K') == temperature_K
+        and record.get('status') == 'extrapolated'
+    ]
+    assert len(matches) == 1, (species, temperature_K, list(route.antoine_extrapolations))
+    return matches[0]
+
+
+def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
+    """250 C and 40 C are below the Na and K Antoine bands.
+
+    The route still captures. The notice is the existing
+    ``_record_antoine_extrapolation`` record (reason
+    ``wall_saturation_pressure_out_of_validated_range``). At these two
+    walls ``require_antoine_source_certified_temperature`` does not raise,
+    so the ``#wall:`` key is not the record this route writes. Band
+    sampling adds unique extrapolation records before the same 523.15 K
+    and 313.15 K wall records, whose serial keys are now ``Na#67`` and
+    ``K#67``.
+    """
+
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=2.0,
+        species_partial_pressures_mbar={'Na': 1.0, 'K': 1.0},
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    route = model.route(
+        EvaporationFlux(species_kg_hr={'Na': 1.0, 'K': 1.0}, total_kg_hr=2.0),
+        MeltState(temperature_C=1650.0),
+    )
+
+    assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
+    assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['K'] > 0.0
+    assert 'Na' not in route.impurity_by_stage_species.get(
+        NA_COLLECTOR_STAGE_KEY, {})
+    assert 'K' not in route.impurity_by_stage_species.get(K_TRAP_STAGE_KEY, {})
+    na_key, na_record = _extrapolated_record_at(route, 'Na', 523.15)
+    k_key, k_record = _extrapolated_record_at(route, 'K', 313.15)
+    assert na_key == 'Na#67'
+    assert k_key == 'K#67'
+    assert 'Na#wall:523.15' not in route.antoine_extrapolations
+    assert 'K#wall:313.15' not in route.antoine_extrapolations
+    assert tuple(na_record['valid_range_K']) == (924.0, 1118.0)
+    assert tuple(k_record['valid_range_K']) == (679.4, 1033.0)
+    for record in (na_record, k_record):
+        assert record['authority_level'] == 'extrapolated'
+        assert record['reason'] == 'wall_saturation_pressure_out_of_validated_range'
+        assert record['status'] == 'extrapolated'
+    warnings = ' '.join(route.antoine_extrapolation_warnings)
+    assert 'valid_range_K [924, 1118] at 523.15 K' in warnings
+    assert 'valid_range_K [679.4, 1033] at 313.15 K' in warnings
+
+
+def test_k_moves_to_its_trap_and_other_stage_4_destinations_stay():
+    assert DESIGNATED_STAGE['K'] == K_TRAP_STAGE_KEY
+    assert DESIGNATED_STAGE['Na'] == NA_COLLECTOR_STAGE_KEY
+    assert DESIGNATED_STAGE['Mg'] == NA_COLLECTOR_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['C7']['Ca'] == NA_COLLECTOR_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['MRE']['Mg'] == NA_COLLECTOR_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['MRE']['Na'] == NA_COLLECTOR_STAGE_KEY
+    assert PRODUCT_DESTINATIONS['MRE']['K'] == K_TRAP_STAGE_KEY
+    # Public stage number stays 4. The trap is not a renumber of stages 5-7.
+    assert product_stage_number('MRE', 'K') == 4
+    assert product_stage_number('MRE', 'Na') == 4
+    assert target_species_for_stage_number(4) == ['Na', 'Mg']
+    train = CondensationTrain.create_default()
+    na = train.stages[4]
+    trap = train.stages[8]
+    assert na.temp_range_C == (250.0, 250.0)
+    assert trap.temp_range_C == (40.0, 40.0)
+    assert na.target_species == ['Na', 'Mg']
+    assert trap.target_species == ['K']

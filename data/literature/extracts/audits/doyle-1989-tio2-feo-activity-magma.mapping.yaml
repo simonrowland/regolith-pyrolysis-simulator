@@ -1,0 +1,46 @@
+source_id: doyle-1989-tio2-feo-activity-magma
+input_order:
+  - OCR-redo VLM table blocks and markdown
+  - OCR-redo exact pdftotext-layout cut
+  - 600 dpi render for cells and row/column layout where the text reads disagreed
+source_tables:
+  - printed_table: 1A
+    page: 4
+    panels:
+      - {panel: 4A, printed_rows: 58, values: {1: activity.a_FeO, 2: composition_wt_percent.SiO2, 3: composition_wt_percent.TiO2, 4: composition_wt_percent.Al2O3, 5: composition_wt_percent.FeO, 6: composition_wt_percent.CaO, 7: composition_wt_percent.K2O, 8: starting_material_FeO_relative}}
+      - {panel: 4B, printed_rows: 50, values: {1: activity.a_FeO, 2: composition_wt_percent.SiO2, 3: composition_wt_percent.TiO2, 4: composition_wt_percent.Al2O3, 5: composition_wt_percent.FeO, 6: composition_wt_percent.CaO, 7: composition_wt_percent.K2O, 8: starting_material_FeO_relative}}
+      - {panel: 4C, printed_rows: 59, values: {1: activity.a_FeO, 2: composition_wt_percent.SiO2, 3: composition_wt_percent.TiO2, 4: composition_wt_percent.Al2O3, 5: composition_wt_percent.FeO, 6: composition_wt_percent.CaO, 7: composition_wt_percent.K2O, 8: starting_material_FeO_relative}}
+    phase: l for activity; the row composition is the run-product glass
+    temperature_as_printed: 1600±2 K
+    standard_state_as_printed: molten Fe0.947O
+    activity_cell_suffix_as_printed: no suffix printed on any of the 167 a_FeO cells; Hi/Lo is the separate SM column
+    figure4_marker_caption: same a_FeO uses the same symbol; filled/open symbols identify initially FeO-richer/poorer starting materials
+  - printed_table: 1B
+    page: 6
+    printed_rows: 5
+    values:
+      1: activity_setpoint.a_FeO±uncertainty; context parent for Table 1A rows
+      2: negative_log10_fO2_as_printed; shared header ±0.02
+      3: CO2:H2:N2 gas-flow cells (merged across columns 3–5)
+    phase: l
+    temperature_as_printed: 1600±2 K
+    standard_state_as_printed: molten Fe0.947O
+    pressure_reference: unstated; use migrator bar default for two-decimal log values
+    join: exact printed a_FeO key only; Table 1A caption explicitly cross-references Table 1B
+    fO2_uncertainty: shared header ±0.02 applies to every Table 1B row and every exact-key joined Table 1A fO2 condition; confidence level not stated; central values unchanged
+  - printed_table: 2
+    page: 6
+    printed_rows: 9
+    values:
+      1: magma type
+      2: X_Matrix
+      3: X_SiO2^Matrix
+      4: X_TiO2^Matrix
+      5: X_(Na,K)AlO2^Matrix
+      6: X_Ca0.5AlO2^Matrix
+    disposition: table context with schema-gap explanation; not a measured physical-phase composition
+method_class:
+  table1a_activity: measured_reduced; derived_from the matching Table 1B setpoint context row through printed Eq. (8)
+  table1b_activity: retained as typed_context setpoint parents, not duplicate scored observations
+  standard_state: preserved verbatim; no exact ReferenceStateConvention token for molten Fe0.947O
+  table2: author recalculation preserved as table context; inputs are external rock analyses

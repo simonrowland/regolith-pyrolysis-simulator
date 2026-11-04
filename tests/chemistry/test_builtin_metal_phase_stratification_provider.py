@@ -231,6 +231,62 @@ def test_multi_hour_ode_preserves_prior_partition_across_staging_restore():
     assert _species_total(second_after, "Si") == pytest.approx(2.0, abs=1e-14)
 
 
+def test_restore_of_kg_roundtripped_si_pool_stays_non_negative():
+    """A full pool move must not debit the kg-roundtrip mol.
+
+    Lunar C5 bottom-pool Si was 6.404580102566052 mol when restore first
+    wrote -8.88e-16 mol. ``mol * M / M`` for that value exceeds ``mol``,
+    and the next hour's prior-pool guard then refuses Si.
+    """
+    from simulator.accounting.formulas import resolve_species_formula
+
+    molar_mass = resolve_species_formula("Si", {}).molar_mass_kg_per_mol()
+    mol = 6.404580102566052
+    assert mol * molar_mass / molar_mass > mol
+
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        METAL_BOTTOM_POOL_ACCOUNT, {"Si": mol}, material_origin="feedstock",
+    )
+    ledger.load_external_mol(
+        METAL_FLOAT_LAYER_ACCOUNT, {"Si": mol}, material_origin="feedstock",
+    )
+    provider = BuiltinMetalPhaseStratificationProvider()
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.METAL_PHASE_STRATIFICATION])
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    result = kernel.dispatch(
+        ChemistryIntent.METAL_PHASE_STRATIFICATION,
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        control_inputs={
+            "mode": "restore_staging",
+            "k_mix_per_hr": 0.0,
+            "dt_hr": 0.0,
+        },
+    )
+    assert result.transition is not None
+    kernel.commit_batch(
+        ChemistryIntent.METAL_PHASE_STRATIFICATION, result.transition,
+    )
+
+    total = 0.0
+    for account in (
+        METAL_PHASE_ACCOUNT,
+        METAL_BOTTOM_POOL_ACCOUNT,
+        METAL_FLOAT_LAYER_ACCOUNT,
+    ):
+        balances = ledger.mol_by_account(account)
+        for species, amount in balances.items():
+            assert amount >= 0.0, f"{account}[{species}]={amount}"
+        total += float(balances.get("Si", 0.0))
+    assert total == pytest.approx(2.0 * mol, abs=0.0)
+    assert ledger.mol_by_account(METAL_PHASE_ACCOUNT)["Si"] == pytest.approx(
+        2.0 * mol, abs=0.0,
+    )
+    ledger.assert_balanced()
+
+
 def test_pool_move_lands_only_through_kernel_commit_batch():
     ledger = AtomLedger()
     ledger.load_external_mol(METAL_PHASE_ACCOUNT, {"Fe": 1.0, "Si": 2.0}, material_origin="feedstock")

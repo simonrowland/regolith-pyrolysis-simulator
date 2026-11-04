@@ -116,6 +116,8 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    _phase_for_sample_description,
+    _phase_for_recorded_vapour_sample,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -1027,6 +1029,7 @@ SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
 SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
     "sample_phase_crystalline_vs_liquid_engine"
 )
+SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN = "liquid_model_vs_subsolidus_sample"
 
 
 def crystalline_sample_detail(
@@ -1071,22 +1074,37 @@ def melt_activity_sample_phase_refusal(
     )
 
 
-def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
-    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+def _experiment_sample_phase(
+    experiment: Experiment | None,
+    *,
+    include_characterization: bool = False,
+) -> Phase | None:
+    """Classify the recorded sample, optionally using its characterization.
 
-    The store does not carry a typed Phase on the experiment. A missing
-    form and untyped prose are None and stay on the scoring path.
+    The migration module owns the closed sample-phase vocabulary. The vapour
+    refusal keeps its existing form-only behavior; the additive domain notice
+    can also use a reviewed characterization when form is absent.
     """
 
     if experiment is None:
         return None
-    form = experiment.sample.form
-    if form is None or not form.state.is_value:
-        return None
-    value = form.state.value
-    if not isinstance(value, str):
-        return None
-    return phase_for_sample_form(value)
+    fields = [experiment.sample.form]
+    if include_characterization:
+        fields.append(experiment.sample.characterization)
+    for field in fields:
+        if field is None or not field.state.is_value:
+            continue
+        value = field.state.value
+        if not isinstance(value, str):
+            continue
+        phase = (
+            _phase_for_sample_description(value)
+            if include_characterization
+            else phase_for_sample_form(value)
+        )
+        if phase is not None:
+            return phase
+    return None
 
 
 def vapour_crystalline_sample_liquid_engine_refusal(
@@ -1134,6 +1152,57 @@ def vapour_crystalline_sample_liquid_engine_refusal(
             "compound": compound,
         }
     return detail
+
+
+def liquid_model_subsolidus_sample_notice(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+    measured_condensed_form: object = None,
+    measured_sample_phase: object = None,
+    origin: str,
+) -> Notice | None:
+    """Nonblocking notice for a liquid model scored against a solid sample.
+
+    ``ENGINE_MODEL_CAVEAT`` carries this reason because the existing domain
+    kinds add flagged strata, which would change headline membership. The
+    notice preserves the current prediction, status, and eligibility.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in _VAPOUR_EQUILIBRIUM:
+        return None
+    formula = identity.species.formula if identity.species is not None else ""
+    if rail_for_quantity(quantity, species_formula=formula) not in {
+        Rail.VAPOUR,
+        Rail.SIO_EVOLUTION,
+    }:
+        return None
+    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
+        measured_condensed_form,
+        measured_sample_phase,
+    )
+    if not row_phase_recorded:
+        sample_phase = _experiment_sample_phase(
+            experiment,
+            include_characterization=True,
+        )
+    sample_phase_detail = crystalline_sample_detail(
+        sample_phase,
+        quantity=quantity,
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+    )
+    if sample_phase_detail is None:
+        return None
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+        origin=origin,
+    )
 
 
 def _sample_phase_not_observable_prediction(
@@ -6113,6 +6182,8 @@ def _fe_redox_material(
             {"reason": "missing_input", "input": "composition"},
         )
     composition = composition_state.value
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -6121,6 +6192,10 @@ def _fe_redox_material(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        # predict_with_engine returns the typed row refusal.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
@@ -6313,17 +6388,30 @@ def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
 def _oxide_element_inventory(
     amounts: Mapping[str, object], *, amount_basis: AmountBasis
 ) -> dict[str, float]:
-    """Expand oxide amounts into element moles for the pinned openimcc solver."""
-    from simulator.accounting.formulas import parse_formula
+    """Expand oxide amounts into element moles for the pinned openimcc solver.
+
+    Atom counts are atoms_parse_formula_else_janaf. A mass-percent amount
+    is divided by oxide_molar_mass_g_mol, the same mass the weight map uses.
+    Both parsers failing raises UnparseableCompositionComponent.
+    """
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
     for oxide, amount in amounts.items():
-        formula = parse_formula(oxide, species=oxide)
+        name = str(oxide)
+        atoms = atoms_parse_formula_else_janaf(name)
+        if not atoms:
+            raise UnparseableCompositionComponent(name)
         formula_amount = float(amount)
         if amount_basis is AmountBasis.MASS_PERCENT:
-            formula_amount /= formula.molar_mass_g_mol
-        for element, atom_moles in formula.atom_moles(formula_amount).items():
-            inventory[element] = inventory.get(element, 0.0) + atom_moles
+            formula_amount /= oxide_molar_mass_g_mol(name)
+        for element, count in atoms:
+            inventory[element] = (
+                inventory.get(element, 0.0) + float(count) * formula_amount
+            )
     return inventory
 
 
@@ -6418,11 +6506,16 @@ def _predict_distin_closed_feo_activity(
             RefusalReason.IDENTITY_UNKNOWN,
             {"reason": "distin_closed_redox_temperature_missing"},
         )
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         inventory = _oxide_element_inventory(
             dict(composition.components),
             amount_basis=composition.amount_basis,
         )
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
             RefusalReason.INVALID_IDENTITY,
@@ -6643,11 +6736,16 @@ def _predict_fe_redox(
 
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
+        from simulator.accounting.exceptions import UnparseableCompositionComponent
+
         try:
             inventory = _oxide_element_inventory(
                 material.composition_wt,
                 amount_basis=AmountBasis.MASS_PERCENT,
             )
+        except UnparseableCompositionComponent:
+            # ValueError would relabel this invalid_redox_composition.
+            raise
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
                 RefusalReason.INVALID_IDENTITY,
@@ -8715,6 +8813,51 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _engine_prediction_or_unparseable_component(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> EnginePrediction:
+    """Return one prediction. One unparseable component refuses that row."""
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+        )
+    except UnparseableCompositionComponent as exc:
+        identity = (
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_SOURCE,
+            refusal_detail={
+                "reason": "unparseable_composition_component",
+                "component": exc.component,
+            },
+            identity=identity,
+        )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8728,7 +8871,7 @@ def predict_with_engine(
     """Dispatch one engine and close any handle opened for this call."""
 
     if isinstance(handles, dict):
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -8741,7 +8884,7 @@ def predict_with_engine(
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -11426,6 +11569,24 @@ def compile_residual(
         approximate_value_notices,
         _quench_notices(reference),
     )
+    liquid_sample_domain_notice = (
+        liquid_model_subsolidus_sample_notice(
+            identity,
+            engine=engine,
+            experiment=experiment,
+            measured_condensed_form=(
+                (reference.provenance or {}).get("measured_condensed_form")
+            ),
+            measured_sample_phase=(
+                (reference.provenance or {}).get("measured_sample_phase")
+            ),
+            origin=reference.observation_id,
+        )
+        if isinstance(identity, Identity)
+        else None
+    )
+    if liquid_sample_domain_notice is not None:
+        notices = union_notices(notices, (liquid_sample_domain_notice,))
     if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
         from simulator.battery.fo2_ladder import engine_intrinsic_fo2_notice
 

@@ -24,19 +24,14 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     assert generated.read_bytes() == MANIFEST.read_bytes()
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
-    # Regenerated on train/b154 after phase-separated chunks 1-2
-    # (9e3ace925, including 9367afbed). Three moved leaves:
-    # allowlist[100..102].bounds_source for condensation_train stages 4/5,
-    # 5/6, 6/7: state.py default-envelope text -> setpoints.yaml metals_train
-    # bands. payload_digest changes as a consequence. b-1008 Antoine
-    # (5a7334561) changes no vocabulary leaves.
-    # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
-    # allowlist but disables both for search; this changes conditional subspace
-    # dimensions and derived digests.
+    # d-137's Stage-4 split changes the stage_4_to_stage_5 wall-knob ceiling
+    # from 700 C to the 250 C Na/Mg collector. The generated vocabulary records
+    # that one bound change; the conditional subspace dimensions/digests stay
+    # unchanged.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "d9712e60baa51f93b8ad62fb4317697ab9fdda5d24f38bdea14f47d06661e811"
+        "f853466595b53df629694a03646189a0aa328596dc3c6af275f1ba9ed5ca82a9"
     )
-    assert digest == "afa70b858622d530fd2050d744827dbfd1ff58484edaf01f98a6b2438c558eb7"
+    assert digest == "a1a6038ca3f4f5f9f425b4dbbe66fb8349c5fd6f05d4dbf463e6428e940b345e"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
     paths = {row["path"] for row in payload["allowlist"]}
     forbidden_future_prefixes = (

@@ -1,0 +1,223 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  citation: Sugawara, T.; Shinoya, K.; Yoshida, S.; Matsuoka, J. (2011). Thermodynamic mixing properties of liquids in the
+    system Na2O-SiO2. Journal of Non-Crystalline Solids 357, 1390–1398.
+  source_ids:
+  - sugawara-2011-sodium-silicate-fusion-mixing
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: a6871422ff04f6033afef12c4593f2df76704e17
+    files:
+    - asset_id: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+      role: pdf
+      path: raw/sugawara-2011-sodium-silicate-fusion-mixing/sugawara-2011-sodium-silicate-fusion-mixing.pdf
+      sha256:
+        tag: value
+        value: 8252574c473bd69a4558f704027aecddb4882871d66281e47495a43f133a2ad5
+    - asset_id: pdftotext:sugawara-2011-sodium-silicate-fusion-mixing
+      role: pdftotext
+      path: text/sugawara-2011-sodium-silicate-fusion-mixing
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:sugawara-2011-sodium-silicate-fusion-mixing
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jnoncrysol.2010.09.064
+experiments:
+- experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=H_Mix^L
+- experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  kind: literature
+  method:
+    tag: value
+    value: dta_dsc
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+context:
+- observation_id: sugawara_2011_p4_weighted_mean_fan_reference
+  type: literature_reference
+  units: citation only; no input values tabulated in this extract
+  locator:
+    page: 4
+    published_page: 1393
+    paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  values:
+    reference_as_printed: Fan [10]
+    role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+  context_id: sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  species: Na2O
+- observation_id: sugawara_2011_p4_weighted_mean_naylor_reference
+  type: literature_reference
+  units: citation only; no input values tabulated in this extract
+  locator:
+    page: 4
+    published_page: 1393
+    paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  values:
+    reference_as_printed: Naylor [37]
+    role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+  context_id: sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  species: Na2O
+- observation_id: sugawara_2011_p4_weighted_mean_richet_reference
+  type: literature_reference
+  units: citation only; no input values tabulated in this extract
+  locator:
+    page: 4
+    published_page: 1393
+    paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  values:
+    reference_as_printed: Richet et al. [38]
+    role_as_printed: Input cited for the weighted mean of H_Mix at NS composition.
+  context_id: sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  species: Na2O
+- observation_id: sugawara_2011_t3_gibbs_mixing_coefficients
+  type: thermodynamic_model_parameters
+  locator:
+    page: 5
+    published_page: 1394
+    table: '3'
+    row: h2–h6 and s2–s6
+  phase: l
+  units: h_i in kJ/mol; s_i in J/K mol
+  values:
+    evidence_class: thermodynamic_model_parameter
+    method_class: model_derived
+    measurement_status: fitted_parameters_not_measured_values
+    model: Fifth-order polynomial model of Na2O–SiO2 liquid enthalpy and entropy of mixing, equations (8) and (9); partial
+      molar Gibbs energy and activity are calculated by equation (14).
+    system: Na2O-SiO2 liquid
+    fit_method_as_printed: Least-squares minimization of a weighted sum of squares for measured enthalpy, Na2O activity, liquidus
+      and immiscibility data.
+    fit_inputs_stored_as_observations:
+    - sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
+    - sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
+    - sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+    fit_inputs_not_digitized: Figure-only data in Figs. 2–6 are excluded by the figure-read rule.
+    confidence_level: not stated
+    parenthetical_error_as_printed: Number in parentheses is the probability error.
+    parameters:
+    - name: h2
+      value_as_published: −271.2
+      probability_error_as_published: '117.2'
+      full_value_as_published: −271.2 (117.2)
+      unit: kJ/mol
+      footnote_mark: b
+    - name: s2
+      value_as_published: −1947.0
+      probability_error_as_published: '161.6'
+      full_value_as_published: −1947.0 (161.6)
+      unit: J/K mol
+    - name: h3
+      value_as_published: '3991.5'
+      probability_error_as_published: '367.2'
+      full_value_as_published: 3991.5 (367.2)
+      unit: kJ/mol
+    - name: s3
+      value_as_published: '5972.7'
+      probability_error_as_published: '485.4'
+      full_value_as_published: 5972.7 (485.4)
+      unit: J/K mol
+    - name: h4
+      value_as_published: −6177.3
+      probability_error_as_published: '550.9'
+      full_value_as_published: −6177.3 (550.9)
+      unit: kJ/mol
+    - name: s4
+      value_as_published: −8320.5
+      probability_error_as_published: '707.1'
+      full_value_as_published: −8320.5 (707.1)
+      unit: J/K mol
+    - name: h5
+      value_as_published: '3920.7'
+      probability_error_as_published: '398.7'
+      full_value_as_published: 3920.7 (398.7)
+      unit: kJ/mol
+    - name: s5
+      value_as_published: '5468.3'
+      probability_error_as_published: '500.4'
+      full_value_as_published: 5468.3 (500.4)
+      unit: J/K mol
+    - name: h6
+      value_as_published: −932.8
+      probability_error_as_published: '112.0'
+      full_value_as_published: −932.8 (112.0)
+      unit: kJ/mol
+    - name: s6
+      value_as_published: −1392.9
+      probability_error_as_published: '138.1'
+      full_value_as_published: −1392.9 (138.1)
+      unit: J/K mol
+  context_id: sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+  work_id: 10.1016/j.jnoncrysol.2010.09.064
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  species: Na2O

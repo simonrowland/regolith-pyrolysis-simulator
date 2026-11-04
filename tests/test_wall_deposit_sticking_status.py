@@ -6,6 +6,7 @@ import pickle
 from types import SimpleNamespace
 
 import pytest
+import yaml
 
 from simulator.diagnostics import _coating_wall_deposit_selection
 
@@ -255,10 +256,84 @@ def _materials_with_liner_alpha(
     return materials
 
 
+@pytest.mark.parametrize("temperature_K", [1200.0, 1523.15])
+@pytest.mark.parametrize("entrypoint", ["stage", "wall"])
+@pytest.mark.parametrize(
+    "invalid_case",
+    [
+        "missing_A",
+        "nan_A",
+        "negative_A",
+        "zero_edge_hold",
+        "high_edge_hold",
+        "invalid_status",
+    ],
+)
+def test_fe_condensation_edge_hold_refuses_invalid_explicit_material_specs(
+    temperature_K: float,
+    entrypoint: str,
+    invalid_case: str,
+) -> None:
+    spec = copy.deepcopy(
+        condensation_module.STICKING_DATA["species"]["Fe"]["condensation"][
+            "value"
+        ]
+    )
+    if invalid_case == "missing_A":
+        del spec["A"]
+    elif invalid_case == "nan_A":
+        spec["A"] = float("nan")
+    elif invalid_case == "negative_A":
+        spec["A"] = -1.0
+    elif invalid_case == "zero_edge_hold":
+        spec["edge_hold_values"] = [0.0, 0.92]
+    elif invalid_case == "high_edge_hold":
+        spec["edge_hold_values"] = [0.83, 1.01]
+    else:
+        spec["status"] = "INVALID"
+    entry = {
+        "value": spec,
+        "source": "test::explicit_fe_condensation_alpha",
+        "source_class": "cited_pure_fe_condensation_kinetics",
+        "status": "CITED",
+        "output_status": "sourced_with_surface_proxy",
+    }
+    if entrypoint == "stage":
+        materials = _materials_with_stage_alpha(1, "Fe", entry)
+        with pytest.raises(ValueError):
+            condensation_module._stage_alpha_record(
+                CondensationTrain.create_default().stages[1],
+                "Fe",
+                materials,
+                T_K=temperature_K,
+            )
+    else:
+        materials = _materials_with_wall_alpha("Fe", entry)
+        with pytest.raises(ValueError):
+            condensation_module._wall_alpha_record(
+                "Fe",
+                materials,
+                T_K=temperature_K,
+            )
+
+
+def test_fe_condensation_sidecar_loader_validates_nested_arrhenius_spec(
+    tmp_path,
+) -> None:
+    raw = copy.deepcopy(condensation_module.STICKING_DATA)
+    del raw["species"]["Fe"]["condensation"]["value"]["A"]
+    path = tmp_path / "sticking.yaml"
+    path.write_text(yaml.safe_dump(raw), encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        condensation_module._load_sticking_data(path)
+
+
 def _analytical_value_ref_entry(source_class: str) -> dict[str, object]:
     return {
         "value_ref": (
-            "data/literature/vacuum_pyrolysis_sticking.yaml::species.Fe.value"
+            "data/literature/vacuum_pyrolysis_sticking.yaml::"
+            "species.Fe.condensation.value"
         ),
         "citation_status": "CITED",
         "status": "sourced",
@@ -284,6 +359,7 @@ def _route_wall_deposit_authority(
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={species: 1.0},
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         campaign_name="C0",
     )
     melt = MeltState()
@@ -575,67 +651,19 @@ def test_null_wall_liner_alpha_falls_back_to_grounded_sidecar() -> None:
     assert null_dep == pytest.approx(default_dep)
 
 
-def test_uncertified_capture_budget_alpha_driving_wall_deposit_fails_closed(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    original_sticking_alpha_s = condensation_module._sticking_alpha_s
-    original_capture_budget_alpha_record = (
-        condensation_module._capture_budget_alpha_record
-    )
-
-    def fake_sticking_alpha_s(species: str, T_K: float) -> float:
-        if species == "Fe":
-            return 1.0
-        return original_sticking_alpha_s(species, T_K)
-
-    def fake_capture_budget_alpha_record(
-        species: str,
-        T_K: float | None = None,
-    ) -> dict[str, object]:
-        if species != "Fe":
-            return original_capture_budget_alpha_record(species, T_K=T_K)
-        return {
-            "species": "Fe",
-            "alpha_s": 1.0,
-            "source": "test::capture_budget.Fe",
-            "source_class": "test_uncertified_capture_budget_alpha",
-            "status": "UNCERTIFIED",
-            "citation_status": "UNCERTIFIED",
-            "output_status": "status_bearing",
-        }
-
-    monkeypatch.setattr(
-        condensation_module,
-        "_sticking_alpha_s",
-        fake_sticking_alpha_s,
-    )
-    monkeypatch.setattr(
-        condensation_module,
-        "_capture_budget_alpha_record",
-        fake_capture_budget_alpha_record,
-    )
-
-    route, authority = _route_wall_deposit_authority("Fe")
-
-    assert route.wall_deposit_by_species["Fe"] > 0.0
-    assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
-    provenance = authority["alpha_s_provenance_by_species"]["Fe"]
-    assert provenance["capture_budget"]["source_class"] == (
-        "test_uncertified_capture_budget_alpha"
-    )
 
 
-def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
+def test_cited_fe_collector_inference_cannot_certify_wall_deposit() -> None:
     route, authority = _route_wall_deposit_authority(
         "Fe",
+        wall_temperature_C=1250.0,
         materials=_materials_with_stage_alpha(
             1,
             "Fe",
             {
                 "value_ref": (
                     "data/literature/vacuum_pyrolysis_sticking.yaml::"
-                    "species.Fe.value"
+                    "species.Fe.condensation.value"
                 ),
             },
         ),
@@ -643,10 +671,17 @@ def test_grounded_but_out_of_domain_alpha_cannot_certify_wall_deposit() -> None:
 
     assert route.wall_deposit_by_species["Fe"] > 0.0
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # wall_temperature_C sets the interstage wall, not the condenser's stage
+    # setpoints. Stage 1 stays at the shipped 1150 C (1423.15 K), just below
+    # the Tachibana band; its production-resolved Arrhenius value is flagged
+    # out of domain, and transfer to this collector remains an inference.
+    assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     provenance = authority["alpha_s_provenance_by_species"]["Fe"]
     assert provenance["stage_1"]["citation_status"] == "CITED"
-    assert provenance["capture_budget"]["citation_status"] == "CITED"
+    assert "capture_budget" not in provenance
+    assert provenance["stage_1"]["alpha_s_form"] == "arrhenius"
+    assert provenance["stage_1"]["alpha_s_domain_status"] == "out_of_domain"
+    assert provenance["stage_1"]["output_status"] == "status_bearing"
 
 
 def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
@@ -672,6 +707,7 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
     assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert authority["uncertified_alpha_species"] == []
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -889,19 +925,19 @@ def test_positive_wall_deposit_still_reaches_the_species_bearing_branch():
 
 
 @pytest.mark.parametrize(
-    ("temperature_K", "expected_authoritative"),
-    ((1750.0, True), (1800.1, False)),
+    ("temperature_K", "in_range"),
+    ((1523.15, True), (1633.1, False)),
 )
-def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
+def test_fe_collector_inference_is_non_authoritative_inside_and_above_band(
     temperature_K: float,
-    expected_authoritative: bool,
+    in_range: bool,
 ) -> None:
     record = condensation_module._alpha_record(
         species="Fe",
         entry={
             "value_ref": (
                 "data/literature/vacuum_pyrolysis_sticking.yaml::"
-                "species.Fe.value"
+                "species.Fe.condensation.value"
             )
         },
         source="test::Fe",
@@ -919,13 +955,13 @@ def test_positive_deposit_distinguishes_in_range_and_above_range_alpha(
         notice,
     )
 
-    assert authority["authoritative_for_deposit_mass"] is (
-        expected_authoritative
-    )
-    if expected_authoritative:
+    assert authority["authoritative_for_deposit_mass"] is False
+    assert record["citation_status"] == "CITED"
+    if in_range:
         assert record["alpha_s_domain_status"] == "in_domain"
+        assert authority["code"] == "wall_deposit_sticking_alpha_uncertified"
     else:
-        assert record["alpha_s_domain_status"] == "extrapolated"
+        assert record["alpha_s_domain_status"] == "out_of_domain"
         assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
 
 
@@ -936,6 +972,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -949,6 +986,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
     assert first.wall_deposit_by_species["Fe"] > 0.0
 
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         wall_temperature_C=2000.0,
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
@@ -963,6 +1001,7 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
     assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
 @pytest.mark.parametrize(
@@ -984,6 +1023,7 @@ def test_cumulative_carrier_authority_preserves_worst_status(
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1016,6 +1056,7 @@ def test_returned_authority_notice_cannot_mutate_model_history() -> None:
         wall_temperature_C=900.0,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1054,6 +1095,7 @@ def test_status_bearing_carrier_keeps_mass_but_cannot_certify_wall_deposit(
         wall_temperature_C=1476.85,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1155,6 +1197,7 @@ def test_non_debiting_carrier_states_remain_distinct_and_mass_explicit(
         wall_temperature_C=1476.85,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",
@@ -1350,6 +1393,7 @@ def test_wall_psat_extrapolation_survives_a_later_non_refusing_route() -> None:
     melt = MeltState()
     melt.temperature_C = 1700.0
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Mg": 1.0},
         campaign_name="C0",
@@ -1360,6 +1404,7 @@ def test_wall_psat_extrapolation_survives_a_later_non_refusing_route() -> None:
         melt,
     )
     model.configure_operating_conditions(
+        stage_area_m2_by_stage={str(stage.stage_number): 1.0 for stage in model.train.stages},
         overhead_pressure_mbar=10.0,
         species_partial_pressures_mbar={"Fe": 1.0},
         campaign_name="C0",

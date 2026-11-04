@@ -2384,6 +2384,143 @@ def test_c2a_profile_window_schedules_measured_temperature_window() -> None:
     assert temperatures[-1] == pytest.approx(1600.0)
 
 
+def test_c2a_thermal_window_seed_pressure_reaches_configure_campaign() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 5.0
+
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(5.0)
+
+
+def test_c2a_scalar_pressure_patch_beats_thermal_window_seed() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 6.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): 12.0}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(12.0)
+
+
+def test_c2a_interval_pressure_patch_keeps_thermal_window_seed_scalar() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 6.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): [5.0, 15.0]}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(6.0)
+
+
+def test_c2a_degenerate_interval_is_not_a_scalar_pressure_patch() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 7.0
+    patch = RecipePatch(
+        {("campaigns", "C2A_continuous", "p_total_mbar"): [5.0, 5.0]}
+    )
+    schema = RecipeSchema()
+
+    _, run_config = _build_eval_inputs(
+        patch,
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        schema,
+    )
+    session = _force_builtin_run_from_config(
+        run_config,
+        setpoints_patch=schema.to_setpoints_patch(patch),
+    )._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+
+    assert sim.melt.p_total_mbar == pytest.approx(7.0)
+
+
+def test_c2a_thermal_window_seed_pressure_outside_recipe_band_is_refused() -> None:
+    profile = _c2a_window_profile(1050.0, 1600.0, 24)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
+        "p_total_mbar_default"
+    ] = 3.0
+
+    with pytest.raises(ProfileValidationError):
+        _build_eval_inputs(
+            RecipePatch({}),
+            "lunar_mare_low_ti",
+            "internal-analytical",
+            profile,
+            RecipeSchema(),
+        )
+
+
+def test_c2b_thermal_window_seed_po2_reaches_configure_campaign() -> None:
+    profile = _campaign_window_profile("C2B", 1320.0, 1480.0, 17)
+    profile["seed_recipes"][0]["patch"]["campaigns"]["C2B"][
+        "pO2_mbar_default"
+    ] = 1.0
+
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    sim = session.simulator
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2B)
+
+    assert sim.melt.pO2_mbar == pytest.approx(1.0)
+
+
 def test_c2a_window_schedules_148_hours_under_carrier_seed_cap() -> None:
     profile = _c2a_window_profile(1050.0, 1600.0, 146)
     profile["seed_recipes"][0]["patch"]["campaigns"]["C2A_continuous"][
@@ -3371,6 +3508,49 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     )
     assert in_window_hours >= 2
 
+def test_in_window_c2a_run_captures_na_to_reagent_and_terminal_offgas() -> None:
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _c2a_window_profile(1400.0, 1450.0, 18),
+        RecipeSchema(),
+    )
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign=run_config.campaign,
+        hours=run_config.hours,
+        mass_kg=run_config.mass_kg,
+        backend_name=run_config.backend_name,
+        runtime_campaign_overrides=run_config.runtime_campaign_overrides,
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+        allow_unmeasured_alpha_fallback=True,
+    )
+    session = run._start_session()
+    result = run._run_session(session)
+
+    assert result["status"] == "ok"
+    ledger = session.simulator.atom_ledger
+    accounts = ledger.kg_by_account()
+    reagent_na = accounts["process.reagent_inventory"].get("Na", 0.0)
+    terminal_na = accounts["terminal.offgas"].get("Na", 0.0)
+    evolved_na = sum(
+        lot.species_kg.get("Na", 0.0)
+        for transition in ledger.transitions
+        for lot in transition.credits
+        if lot.account == "process.overhead_gas"
+    )
+
+    assert session.simulator.product_ledger()["Na"] == 0.0
+    assert reagent_na > 0.0
+    assert terminal_na > 0.0
+    assert reagent_na + terminal_na == pytest.approx(
+        evolved_na,
+        rel=1e-9,
+        abs=0.0,
+    )
+
 
 def test_lab_schedule_profile_schedules_declared_piecewise_temperature_pressure() -> None:
     schedule = _lab_schedule(
@@ -3900,13 +4080,18 @@ def _campaign_window_profile(
     }
 
 
-def _force_builtin_run_from_config(run_config) -> PyrolysisRun:
+def _force_builtin_run_from_config(
+    run_config,
+    *,
+    setpoints_patch: dict[str, object] | None = None,
+) -> PyrolysisRun:
     return PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign=run_config.campaign,
         hours=run_config.hours,
         mass_kg=run_config.mass_kg,
         backend_name=run_config.backend_name,
+        setpoints_patch=setpoints_patch or {},
         runtime_campaign_overrides=run_config.runtime_campaign_overrides,
         force_builtin_vapor_pressure=True,
         allow_fallback_vapor=True,

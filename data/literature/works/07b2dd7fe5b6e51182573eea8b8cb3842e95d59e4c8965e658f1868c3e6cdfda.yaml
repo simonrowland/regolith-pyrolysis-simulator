@@ -1,0 +1,615 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  citation: Eliezer, N., Howald, R. A., Marinkovic, M., and Eliezer, I. (1978). Vapor Pressure Measurements, Thermodynamic
+    Parameters, and Phase Diagram for the System Potassium Oxide-Silicon Oxide at High Temperatures. The Journal of Physical
+    Chemistry 82(9), 1021–1026.
+  source_ids:
+  - eliezer-howald-1978-potassium-silicate-vapor-pressure
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:eliezer-howald-1978-potassium-silicate-vapor-pressure
+      role: pdf
+      path: raw/eliezer-howald-1978-potassium-silicate-vapor-pressure/eliezer-howald-1978-potassium-silicate-vapor-pressure.pdf
+      sha256:
+        tag: value
+        value: 5e37949b30d48a4d5dc0d457f50a1a7c5d75baa4e6aa85c3f8988985c07b91d7
+    - asset_id: pdftotext:eliezer-howald-1978-potassium-silicate-vapor-pressure
+      role: pdftotext
+      path: text/eliezer-howald-1978-potassium-silicate-vapor-pressure
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:eliezer-howald-1978-potassium-silicate-vapor-pressure
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda::eliezer-howald-1978-potassium-silicate-vapor-pressure
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  locator:
+    page: 3
+    published_page: 1023
+    pdf_page_index: 2
+    table: I
+    note: row=X=0.21537; column=partial molal enthalpy; table_row_number=2; table_column_number=2
+context:
+- observation_id: eliezer_howald_1978_activity_conversion_assumption
+  type: thermodynamic_method_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1024
+    equation: '4'
+  units: dimensionless activities; pressure terms with unit not stated
+  values:
+    method_class: author_derived
+    equation_as_printed: P_O2 = 1/4 P_K; divide P_K P_O2^(1/4) = 0.707 P_K^(5/4) by the equilibrium constant for KO0.5(l)
+      -> K(g) + 1/4 O2(g)
+    condition_status: P_O2 = 1/4 P_K is an activity-calculation assumption, not a measured oxygen fugacity or experimental
+      pressure condition.
+    standard_temperature_as_printed: 1500 K
+    activity_coefficients_as_printed: Calculated activities are divided by the mole fraction and corrected to a standard temperature
+      of 1500 K.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_activity_conversion_assumption
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_equilibrium_constant_schema_gap
+  type: schema_gap_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    equation: '10'
+  units: dimensionless K as printed
+  values:
+    schema_gap: 'No exact linear equilibrium-constant quantity token is present: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+      represents log10 K, simulator/battery/migrate.py::QUANTITY_ALIASES and simulator/battery/migrate.py::TYPE_QUANTITY do
+      not define printed linear K, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no equilibrium_constant
+      observation type. The typed-refused rows carry a descriptive non-token quantity so gibbs_table cannot infer delta_fG.'
+    reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+    observations: The numeric equilibrium-constant cells are retained as typed-refused observations under SiO2.
+    temperature_labels_as_printed: K1175 at 1175 K; K1623 at 1623 K
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_equilibrium_constant_schema_gap
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_excess_enthalpy_comparison_context
+  type: thermodynamic_enthalpy_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+  units: kcal mol-1 as printed
+  values:
+    method_class: author_derived
+    composition_as_printed: X_KO0.5 = 0.390
+    comparisons_as_printed:
+    - value: '-16.3'
+      quantity_as_printed: excess enthalpy of mixing H_e
+      temperature_as_printed: room temperature, no numeric value stated
+      method_as_printed: interpolated from Kracek's room-temperature glass measurements
+    - value: '-16.0'
+      quantity_as_printed: excess enthalpy of mixing H_e
+      temperature_as_printed: 1000 K
+      method_as_printed: graphical integration of the mixture heat capacity
+    - value: '-17.7'
+      quantity_as_printed: excess enthalpy of mixing H_e
+      temperature_as_printed: not stated for this selected Redlich-Kister comparison
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_excess_enthalpy_comparison_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: KO0.5
+- observation_id: eliezer_howald_1978_excess_enthalpy_schema_gap
+  type: schema_gap_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+  units: kcal mol-1 as printed
+  values:
+    schema_gap: The paper prints excess enthalpy of mixing, which is not partial molar enthalpy. No exact excess-enthalpy
+      quantity exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES. The available
+      gibbs_table type is in tools/validate_literature_extracts.py::OBSERVATION_TYPES, but simulator/battery/migrate.py::TYPE_QUANTITY
+      would infer delta_fG if quantity were omitted; the row therefore uses a descriptive non-token quantity and stays unknown.
+    quantity_as_printed: H_e, excess enthalpy of mixing
+    value_as_printed: '-15.0'
+    temperature_as_printed: 1500 K
+    composition_as_printed: X_KO0.5 = 0.390
+    units_as_printed: kcal mol-1
+    method_class: author_derived
+    no_converted_value: No kJ/mol twin is stored.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_excess_enthalpy_schema_gap
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: KO0.5
+- observation_id: eliezer_howald_1978_figure1_context
+  type: figure_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    figure: '1'
+  units: pressure units not stated on the figure axis
+  values:
+    quantity_as_printed: potassium vapor pressure
+    method_class: figure_only
+    digitisation: none; plotted points were not digitized
+    caption_as_printed: Potassium vapor pressures over a K2O-SiO2 sample with X_KO0.5 = 0.1444.
+    potassium_mole_fraction_as_printed: '0.1444'
+    axes_as_printed: 'y: log p; x: 10^4/T'
+    pressure_unit_as_printed: not stated
+    numeric_pressure_points: unavailable; figure-only
+    temperature_points: unavailable; the figure labels inverse temperature, not a tabulation of point temperatures
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_figure1_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_figure3_context
+  type: figure_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1024
+    figure: '3'
+  units: log gamma1; mole fraction KO0.5
+  values:
+    quantity_as_printed: log gamma1 vs. mole fraction
+    method_class: figure_only
+    digitisation: none; plotted points were not digitized
+    marker_legend_as_printed: 'Diamonds: nonequilibrium glass of stoichiometric composition; squares: equilibrium liquid composition
+      from the phase diagram of Kracek et al.; solid black corresponding symbol: authors’ choice for each point.'
+    temperature_as_printed: log gamma1 values corrected to 1500 K
+    marker_legend_binding: Read from the printed prose adjacent to Figure 3; no point values were assigned by plotted order
+      or colour.
+    composition_notes_as_printed: Points at X=0.06664 are dropped from the least-squares treatment; experimental data do not
+      extend beyond X_KO0.5=0.55.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_figure3_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: KO0.5
+- observation_id: eliezer_howald_1978_figure4_context
+  type: figure_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1026
+    figure: '4'
+  units: temperature and mole fraction axes as printed
+  values:
+    method_class: figure_only
+    digitisation: none; plotted phase-diagram points were not digitized
+    caption_as_printed: Phase diagram of the K2O-SiO2 system.
+    temperature_axis_as_printed: T
+    composition_axis_as_printed: X_KO0.5; mole fraction of KO0.5 in SiO2
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_figure4_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_hbar2_coefficients_context
+  type: thermodynamic_relation_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+  units: kcal mol-1 as printed
+  values:
+    method_class: author_derived
+    redlich_kister_relations_as_printed:
+    - A - 1.812B = 9.7 ± 8 kcal mol-1
+    - A + 0.5519B = -115 kcal mol-1
+    - A(H) = -86 kcal mol-1
+    - B(H) = -53.5 kcal mol-1
+    context_as_printed: The first relation uses log gamma2; the orthogonal relation is evaluated from Table II.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_hbar2_coefficients_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_holmquist_na_phase_equilibrium
+  type: quoted_phase_equilibrium_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    section: Thermodynamic properties of tridymite
+  units: mole fraction as printed
+  values:
+    method_class: quoted_attributed
+    attribution: Holmquist, reference 24, as cited by Eliezer et al.
+    species_as_printed: NaO0.5
+    composition_as_printed: 0.00484 mole fraction NaO0.5 with quartz
+    temperature_K_as_printed: '1623'
+    duration_as_printed: weeks
+    phases_as_printed: both cristobalite and tridymite present at equilibrium
+    phase_composition_constraints_as_printed: solubility of NaO0.5 in cristobalite <0.00484 and in tridymite >0.00484 mole
+      fraction
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_holmquist_na_phase_equilibrium
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: NaO0.5
+- observation_id: eliezer_howald_1978_other_solid_standard_states_context
+  type: standard_state_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 1026
+    section: Thermodynamic values for solid potassium silicates
+  units: as printed
+  values:
+    standard_state_as_printed: Standard enthalpy of formation of K2Si2O5 at 298.15 K is compared with the value calculated
+      from heat of solution in HF.
+    reaction_as_printed: K2Si4O9(c) -> 2 KO0.5(l) + 4 SiO2(l)
+    melting_temperature_as_printed: 1034 K
+    heat_of_fusion_as_printed: 21 kcal mol-1
+    K2Si2O5_heat_of_fusion_as_printed: 17 kcal mol-1 at 1325 K
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_other_solid_standard_states_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_partial_molar_enthalpy_schema_gap
+  type: schema_gap_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: I
+    section: Enthalpy data
+  units: kcal mol-1 for Table I and the 1500 K value; cal mol-1 for the Gibbs-Duhem value, as printed
+  values:
+    schema_gap: Five partial molar enthalpy values are printed. simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY
+      has no value-field selection in simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS, so preserve the five printed values
+      and units as unavailable; the engine lane is adding a kJ/mol field separately.
+    unit_case: Four Table I values are printed in kcal mol-1; 860 ± 700 is printed in cal mol-1. The separate -15.0 excess
+      enthalpy is printed in kcal mol-1 and is not a partial molar enthalpy. No converted kJ twin is stored.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_partial_molar_enthalpy_schema_gap
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: KO0.5
+- observation_id: eliezer_howald_1978_redlich_kister_component_activity_context
+  type: activity_model_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    section: Redlich-Kister equations for log gamma
+  units: dimensionless activities and coefficients
+  values:
+    method_class: model_derived
+    equations_as_printed:
+    - log gamma2 = C/T
+    - B(log gamma) = +0.942 - 11583/T
+    phase_diagram_points_as_printed:
+    - T=1784 K at X_KO0.5=0.102
+    - T=1150 K at X_KO0.5=0.297
+    standard_state_as_printed: The passage describes activities and coefficients but does not separately state a standard-state
+      convention for log gamma2.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_redlich_kister_component_activity_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_sodium_oxide_heat_capacity_context
+  type: quoted_comparison_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1024
+    section: Thermodynamic data for KO0.5
+  units: as printed
+  values:
+    method_class: quoted_attributed
+    species_as_printed: sodium oxide
+    comparison_as_printed: NaO0.5-SiO2 liquid system has a substantial positive excess heat capacity of mixing.
+    related_temperature_as_printed: about 1000 K
+    cited_sources_as_printed: references 11, 16, 20, and 22
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_sodium_oxide_heat_capacity_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: NaO0.5
+- observation_id: eliezer_howald_1978_table2_enthalpy_coefficients_context
+  type: thermodynamic_table_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: II
+  units: kcal mol-1; 1500 K as printed in the caption
+  values:
+    table_caption_as_printed: Redlich-Kister Coefficients for Enthalpy in the KO0.5-SiO2 System at 1500 K
+    column_headings_as_printed: A(H), B(H), A + 0.5519B
+    table_values_as_printed:
+      data_this_work:
+      - '-132'
+      - '-9'
+      - '-137'
+      Plante_data_reference_12:
+      - '-116'
+      - '-103'
+      - '-173'
+      rate_of_vaporization_reference_13:
+      - '-97'
+      - '-24'
+      - '-110'
+      joint_reference_13_and_this_work:
+      - '-118'
+      - '-5'
+      - '-121'
+      enthalpy_of_glasses_25C_references_6_to_8:
+      - '-75'
+      - '-61'
+      - '-109'
+      corrected_to_1500K_references_6_and_11:
+      - '-71'
+      - '-43'
+      - '-95'
+      selected_including_log_gamma_2_data:
+      - '-86'
+      - '-53'
+      - '-115'
+    row_labels_as_printed:
+    - Data this work
+    - Plante data^{12}
+    - Rate of vaporization^{13}
+    - Joint, ref 13 and this work
+    - Enthalpy of glasses, 25 °C^{6-8}
+    - Corrected to 1500 K^{6,11}
+    - Selected, including log γ2 data
+    row_interpretation: The Rate of vaporization row reports enthalpy coefficients, not a numeric rate.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table2_enthalpy_coefficients_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_table3_standard_state_context
+  type: standard_state_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: III
+  units: Hf and H in cal mol-1; entropy and Cp in cal mol-1 K-1 as printed
+  values:
+    standard_state_as_printed: Standard heat of formation of solid KO0.5 at 298.15 K; Table III lists pure-material functions
+      at 298.15 K and 1000 K.
+    materials_as_printed: KO0.5(c), KO0.5(l), SiO2(quartz), SiO2(cristobalite), SiO2(tridymite), SiO2(l), K2Si4O9(s), K2Si2O5(s)
+    cp_equation_as_printed: Cp = a + b(T-1000) + c(T-1000)^2 + d(T-1000)^3
+    cp_equation_validity_as_printed: generally valid for 1000-2200 K
+    printed_row_count: 8
+    column_headings_as_printed:
+    - Material
+    - H°298.15, cal mol-1
+    - H°1000, cal mol-1
+    - Φ°1000, cal mol-1 K-1
+    - a
+    - 10^3b
+    - 10^6c
+    - 10^9d
+    rows_as_printed:
+    - material: KO0.5(c)
+      H°298.15_cal_mol-1: '-43200'
+      H°1000_cal_mol-1: '-36200'
+      Phi°1000_cal_mol-1_K-1: '18.090'
+      Cp_a: '9.097'
+      Cp_10^3b: '0.96'
+      Cp_10^6c: null
+      Cp_10^9d: null
+    - material: KO0.5(l)
+      H°298.15_cal_mol-1: '-40628'
+      H°1000_cal_mol-1: '-32128'
+      Phi°1000_cal_mol-1_K-1: '19.4256'
+      Cp_a: '11.45'
+      Cp_10^3b: '1.80'
+      Cp_10^6c: null
+      Cp_10^9d: null
+    - material: SiO2(quartz)
+      H°298.15_cal_mol-1: '-217700'
+      H°1000_cal_mol-1: '-206860'
+      Phi°1000_cal_mol-1_K-1: '16.899'
+      Cp_a: '16.48'
+      Cp_10^3b: '2.4'
+      Cp_10^6c: null
+      Cp_10^9d: null
+    - material: SiO2(cristobalite)
+      H°298.15_cal_mol-1: '-216417'
+      H°1000_cal_mol-1: '-206640'
+      Phi°1000_cal_mol-1_K-1: '18.1108'
+      Cp_a: '16.72175'
+      Cp_10^3b: '2.05366'
+      Cp_10^6c: '-1.65179'
+      Cp_10^9d: '0.6463'
+    - material: SiO2(tridymite)
+      H°298.15_cal_mol-1: '-217000'
+      H°1000_cal_mol-1: '-206432.6'
+      Phi°1000_cal_mol-1_K-1: '17.5259'
+      Cp_a: '16.72175'
+      Cp_10^3b: '2.05366'
+      Cp_10^6c: '-1.65179'
+      Cp_10^9d: '0.6463'
+    - material: SiO2(l)
+      H°298.15_cal_mol-1: '-215740'
+      H°1000_cal_mol-1: '-205399'
+      Phi°1000_cal_mol-1_K-1: '18.1766'
+      Cp_a: '16.61'
+      Cp_10^3b: '3.2268'
+      Cp_10^6c: '1.2384'
+      Cp_10^9d: null
+    - material: K2Si4O9(s)
+      H°298.15_cal_mol-1: '-1059818'
+      H°1000_cal_mol-1: '-1003060'
+      Phi°1000_cal_mol-1_K-1: '89.8337'
+      Cp_a: '85.081'
+      Cp_10^3b: '9.0876'
+      Cp_10^6c: '-3.1173'
+      Cp_10^9d: null
+    - material: K2Si2O5(s)
+      H°298.15_cal_mol-1: '-609691.4'
+      H°1000_cal_mol-1: '-557657.4'
+      Phi°1000_cal_mol-1_K-1: '67.1074'
+      Cp_a: '51.638'
+      Cp_10^3b: '5.504'
+      Cp_10^6c: '-1.55864'
+      Cp_10^9d: null
+    liquid_KO05_standard_state_as_printed: pure liquid KO0.5; authors state its thermodynamic properties had not been successfully
+      measured and use estimates in Table III as the basis for their calculations.
+    reference_temperature_as_printed: 298.15 K
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table3_standard_state_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_table4_redlich_kister_coefficients_context
+  type: thermodynamic_fit_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    table: IV
+  units: Table IV coefficients as printed; title states 1500 K
+  values:
+    method_class: model_derived
+    table_caption_as_printed: Summary of power series coefficients at 1500 K for KO0.5 in SiO2
+    liquid:
+      log_gamma:
+        redlich_kister:
+          A: '-10.9923'
+          B: '-6.7801'
+          C: '-1.0101'
+        bale_pelton:
+          q0: '-11.3290'
+          q1: '-6.7801'
+          q2: '-0.6734'
+      enthalpy:
+        redlich_kister:
+          A: '-86000'
+          B: '-53000'
+        bale_pelton:
+          q0: '-86000'
+          q1: '-53000'
+      heat_capacity:
+        redlich_kister:
+          A: '8'
+        bale_pelton:
+          q0: '8'
+    tridymite:
+      log_gamma:
+        redlich_kister:
+          A: '-4.8045'
+        bale_pelton:
+          q0: '-4.8045'
+      enthalpy:
+        redlich_kister:
+          A: '-35842'
+        bale_pelton:
+          q0: '-35842'
+    equations_as_printed:
+    - d log gamma1 / d(1/T) = -Hbar1 / 4.575428
+    - Hbar1 = (1-X)^2[-8600 - 5300(-1 + 4X)]
+    - Cp1 = (1-X)^2[8.0]
+    - log gamma2 = C/T
+    - B(log gamma) = +0.942 - 11583/T
+    preliminary_figure3_fit_as_printed:
+      A_log_gamma: '-11.2116'
+      B_log_gamma: '-7.4673'
+      C_log_gamma: '-1.6695'
+    printed_basis_note: Equation (9) is stated to use mole fraction of K2O rather than KO0.5 and not to give correct Henry's-law
+      behavior at low potassium oxide concentration.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_table4_redlich_kister_coefficients_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_tridymite_solubility_context
+  type: phase_equilibrium_context
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    section: Thermodynamic properties of tridymite
+  units: mole fraction as printed
+  values:
+    method_class: author_derived
+    composition_temperature_range_as_printed: Liquid compositions in equilibrium with tridymite are known from 1040 to 1743
+      K.
+    tridymite_stability_as_printed: KO0.5 mole fractions 0.0033 to 0.0091.
+    liquidus_phase_diagram_as_printed: The calculated phase diagram is for equilibria involving solid SiO2 and is shown with
+      experimental liquidus points.
+    holmquist_comparison_as_printed: Holmquist used 1323 K for the quartz-cristobalite equilibrium; this paper fixes that
+      equilibrium at 1175 K.
+    other_temperature_values_as_printed: Quartz-tridymite equilibrium at 1150 K; liquid K2Si4O9 fusion point at 1034 K; K2Si2O5
+      heat of fusion at 1325 K.
+    additional_composition_as_printed: X1=0.3333 for the partial-molar enthalpy calculation of the K2Si4O9 heat of fusion.
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_tridymite_solubility_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K
+- observation_id: eliezer_howald_1978_vapor_pressure_method_context
+  type: measurement_method_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 1022
+    section: Potassium vapor pressure measurements
+  units: pressure unit not stated for p
+  values:
+    method_class: measured_direct
+    measurement_as_printed: Atomic absorption of the steady-state distribution of potassium atoms in a graphite furnace.
+    calibration_as_printed: The steady-state absorbance is proportional to potassium pressure inside the sample cell; a temperature-dependent
+      conversion factor was evaluated with potassium aluminate standards.
+    calibration_relation_as_printed: p = cell e^(-39 kcal mol-1/RT) (absorbance)
+    calibration_energy_as_printed: 39 kcal mol-1, average obtained with two graphite tubes
+    cells_as_printed: platinum or molybdenum; molybdenum cells had screw closures with different hole sizes
+    furnace_as_printed: electrically heated graphite tube furnace; Woodriff furnace
+    atmosphere_as_printed: argon
+    temperature_measurement_as_printed: optical pyrometer
+    pressure_unit_as_printed: not stated
+    total_pressure:
+      tag: unknown
+      reason: no total pressure is printed
+    oxygen_fugacity:
+      tag: unknown
+      reason: no oxygen fugacity is printed
+    ion_intensity: not measured; atomic absorption absorbance was measured
+    flow_or_flux_values: no numeric flux or vaporization rate is reported
+    printed_reactions:
+    - KO0.5(l) -> K(g) + 1/4 O2(g)
+    - KO0.5(sol) -> K(g) + 1/4 O2(g)
+    - KO0.5(sol) + 1/2 H2O(g) -> KOH(g)
+    reaction_note: Equation (3) is the authors' interpretation of the potassium vaporization-rate data of Preston and Turner,
+      reference 13; it is not a measured species assignment from this work.
+    argon_flow_rate: not stated
+  context_id: eliezer-howald-1978-potassium-silicate-vapor-pressure::context::eliezer_howald_1978_vapor_pressure_method_context
+  work_id: 07b2dd7fe5b6e51182573eea8b8cb3842e95d59e4c8965e658f1868c3e6cdfda
+  source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+  species: K

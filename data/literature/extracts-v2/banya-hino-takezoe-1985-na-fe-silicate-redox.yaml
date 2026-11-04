@@ -2,6 +2,214 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
 observations:
+- observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound
+  experiment_id: 10.2355/tetsutohagane1955.71.15_1765::banya-hino-takezoe-1985-na-fe-silicate-redox
+  identity:
+    quantity:
+      tag: value
+      value: activity
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: Na2O
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not_applicable
+          charge:
+            tag: value
+            value: 0
+        component_basis: Na2O
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: not_published
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
+  value:
+    kind: bound
+    bound_operator: <=
+    bound_value: '0.000003162277660168379331998893544432719'
+    approximate: true
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound
+  source_id: banya-hino-takezoe-1985-na-fe-silicate-redox
+  locator:
+    page: 7
+    published_page: 1771
+    pdf_page_index: 6
+    figure: '11'
+    section: 4.4.4
+    note: The prose gives the bound for the displayed Figure 11 composition range; no point was read from a contour.
+  read_from: pdf:banya-hino-takezoe-1985-na-fe-silicate-redox
+  point_conditions:
+    T_C:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1400'
+          approximate: false
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        figure: '11'
+        section: 4.4.4
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        figure: '11'
+        section: 4.4.4
+        note: No discrete composition coordinates for the domain bound are printed.
+    iron_saturation:
+      state:
+        tag: value
+        value: slag in equilibrium with liquid iron
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        figure: '11'
+        section: 4.4.4
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        figure: '11'
+        section: 4.4.4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 7
+              published_page: 1771
+              pdf_page_index: 6
+              figure: '11'
+              section: 4.4.4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 7
+              published_page: 1771
+              pdf_page_index: 6
+              figure: '11'
+              section: 4.4.4
+        output_unit: K
+        references: []
+  derivation:
+    relation: Calculated by the authors using regular-solution relations and plotted as iso-activity contours in Figure 11.
+    inputs: []
+    parameters: []
+    output_unit: dimensionless
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        figure: '11'
+        section: 4.4.4
+        note: Per-composition activities and contour coordinates are not tabulated.
+    method:
+      state:
+        tag: value
+        value: Regular-solution relations from Eqs. (24), (26), and (33).
+      locator:
+        page: 7
+        published_page: 1771
+        pdf_page_index: 6
+        section: 4.4.4
+        equation: 24, 26, 33
+    references:
+    - 'Reference [36]: D. N. Rego, G. K. Sigworth and W. O. Philbrook, Proc. of Japan-United States Seminer, Kyoto (1983),
+      p. 87 [ISIJ].'
 - observation_id: banya-hino-takezoe-1985-na-fe-silicate-redox::banya_hino_takezoe_1985_t1_run_1_p002_t01_r03_c05
   experiment_id: 10.2355/tetsutohagane1955.71.15_1765::experiment::banya_hino_takezoe_1985_t1_co2_equilibrium
   identity:

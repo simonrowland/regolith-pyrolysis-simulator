@@ -1,0 +1,1631 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml
+observations:
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_gross_hcl_reaction_enthalpy
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy_for_hcl_reaction'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_for_hcl_reaction'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gross and Wilson [5]; authors give no uncertainty.
+  admission:
+    status: rejected
+    reason: Reaction enthalpy is distinct from enthalpy of formation and has no exact quantity token.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '7'
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '7'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_mean_calorimetric_heat_per_mass
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'mean_solution_reaction_enthalpy_per_mass'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'mean_solution_reaction_enthalpy_per_mass'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents specific solution reaction enthalpy.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        note: row=mean
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    note: row=mean
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        note: row=mean
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              note: row=mean
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              note: row=mean
+        output_unit: K
+        references: []
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_1
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_2
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_3
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_4
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_5
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_6
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_7
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_8
+  - ohare-1972-na2o-formation-enthalpy::ohare72_run_9
+  derivation:
+    relation: Arithmetic mean and standard deviation of the mean over the nine accepted calorimetric runs, as reported by
+      the authors.
+    inputs:
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_1
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_2
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_3
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_4
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_5
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_6
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_7
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_8
+    - ohare-1972-na2o-formation-enthalpy::ohare72_run_9
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_na2o_atomization_enthalpy_29815
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'atomization_enthalpy'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'atomization_enthalpy'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents atomization enthalpy.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 5
+        published_page: 4516
+        pdf_page_index: 4
+        paragraph: Atomization at 298.15 K
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 5
+    published_page: 4516
+    pdf_page_index: 4
+    paragraph: Atomization at 298.15 K
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 5
+        published_page: 4516
+        pdf_page_index: 4
+        paragraph: Atomization at 298.15 K
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::ohare72_na2o_gas_delta_fH_29815
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_na_g_atom_delta_fH
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_o_g_atom_delta_fH
+  derivation:
+    relation: O'Hare substitutes the printed gaseous-atom formation enthalpies and gaseous Na2O formation enthalpy into equation
+      (8).
+    inputs:
+    - ohare-1972-na2o-formation-enthalpy::ohare72_na2o_gas_delta_fH_29815
+    - ohare-1972-na2o-formation-enthalpy::context::ohare72_na_g_atom_delta_fH
+    - ohare-1972-na2o-formation-enthalpy::context::ohare72_o_g_atom_delta_fH
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_na2o_delta_fH_29815
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-414.82'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.28'
+      verbatim: -414.82±0.28 kJ mole−1 (−99.14±0.07 kcal mole−1)
+      confidence_level: not_stated
+      basis: Interval equal to twice the combined standard deviations of the mean; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ohare-1972-na2o-formation-enthalpy::ohare72_na2o_delta_fH_29815
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '6'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '6'
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_1_enthalpy
+  - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_2_dilution_enthalpy
+  - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_3_enthalpy
+  - ohare-1972-na2o-formation-enthalpy::ohare72_water_delta_fH_29815
+  derivation:
+    relation: The authors combine reaction enthalpies (1)–(4) using the printed thermochemical cycle, equation (5).
+    inputs:
+    - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_1_enthalpy
+    - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_2_dilution_enthalpy
+    - ohare-1972-na2o-formation-enthalpy::ohare72_reaction_3_enthalpy
+    - ohare-1972-na2o-formation-enthalpy::ohare72_water_delta_fH_29815
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_na2o_gas_delta_fH_29815
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-38.0744'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '3.0'
+      verbatim: -9.1±3.0 kcal mole−1
+      confidence_level: not_stated
+      basis: Printed ± width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ohare-1972-na2o-formation-enthalpy::ohare72_na2o_gas_delta_fH_29815
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '8'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '8'
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::ohare72_na2o_delta_fH_29815
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_na2o_sublimation_enthalpy
+  derivation:
+    relation: The authors combine their Na2O(cr) formation enthalpy with the cited sublimation enthalpy to derive Na2O(g)
+      formation enthalpy.
+    inputs:
+    - ohare-1972-na2o-formation-enthalpy::ohare72_na2o_delta_fH_29815
+    - ohare-1972-na2o-formation-enthalpy::context::ohare72_na2o_sublimation_enthalpy
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_reaction_1_enthalpy
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy_for_reaction_1'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_for_reaction_1'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: Reaction enthalpy is distinct from enthalpy of formation and has no exact quantity token.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '1'
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '1'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '1'
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::ohare72_mean_calorimetric_heat_per_mass
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_molecular_mass_na2o
+  derivation:
+    relation: The authors multiply the Table I mean specific reaction heat by the printed Na2O molecular weight to obtain
+      reaction (1)'s molar enthalpy.
+    inputs:
+    - ohare-1972-na2o-formation-enthalpy::ohare72_mean_calorimetric_heat_per_mass
+    - ohare-1972-na2o-formation-enthalpy::context::ohare72_molecular_mass_na2o
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_reaction_2_dilution_enthalpy
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy_for_reaction_2'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_for_reaction_2'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Parker compilation [17]
+  admission:
+    status: rejected
+    reason: Reaction enthalpy is distinct from enthalpy of formation and has no exact quantity token.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '2'
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '2'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '2'
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_parker_dilution_input
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_reaction_3_enthalpy
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy_for_reaction_3'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: aq
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_for_reaction_3'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gunn [18] and Parker [17]
+  admission:
+    status: rejected
+    reason: Reaction enthalpy is distinct from enthalpy of formation and has no exact quantity token.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '3'
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '3'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '3'
+  derived_from:
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_gunn_naoh_hf
+  - ohare-1972-na2o-formation-enthalpy::context::ohare72_parker_concentration_correction
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_1
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 1
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 1
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 1
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 1
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 1
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_2
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 2
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 2
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 2
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 2
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 2
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_3
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 3
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 3
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 3
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 3
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 3
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_4
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 4
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 4
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 4
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 4
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 4
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_5
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 5
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 5
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 5
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 5
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 5
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_6
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 6
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 6
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 6
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 6
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 6
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_7
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 7
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 7
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 7
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 7
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 7
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_8
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 8
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 8
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 8
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 8
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 8
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_run_9
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solution_calorimetry_run'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solution_calorimetry_run'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: No exact migrated quantity token represents an individual solution-calorimetry run.
+    decided_by:
+      worker: w1103oh-oh72
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 9
+  notices: []
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 3
+    published_page: 4514
+    pdf_page_index: 2
+    table: I
+    record: experiment column 9
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 3
+        published_page: 4514
+        pdf_page_index: 2
+        table: I
+        record: experiment column 9
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '25'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 9
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 3
+              published_page: 4514
+              pdf_page_index: 2
+              table: I
+              record: experiment column 9
+        output_unit: K
+        references: []
+- observation_id: ohare-1972-na2o-formation-enthalpy::ohare72_water_delta_fH_29815
+  experiment_id: 10.1063/1.1677897::ohare-1972-na2o-formation-enthalpy
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: H2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-285.83'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.04'
+      verbatim: -285.83±0.04 kJ mole−1
+      confidence_level: not_stated
+      basis: Printed ± width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: CODATA [19]
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fH
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: ohare-1972-na2o-formation-enthalpy::ohare72_water_delta_fH_29815
+  source_id: ohare-1972-na2o-formation-enthalpy
+  locator:
+    page: 4
+    published_page: 4515
+    pdf_page_index: 3
+    equation: '4'
+  read_from: pdf:ohare-1972-na2o-formation-enthalpy
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        page: 4
+        published_page: 4515
+        pdf_page_index: 3
+        equation: '4'

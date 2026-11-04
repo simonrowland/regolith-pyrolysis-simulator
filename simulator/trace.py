@@ -67,7 +67,7 @@ class PhysicsTrace:
     wall_deposit_sticking_authority: Mapping[str, Any] = field(
         default_factory=dict)
     wall_zone_by_segment: Mapping[str, str] = field(default_factory=dict)
-    stage_purity_pct: Mapping[int, Mapping[str, float]] = field(
+    stage_purity_pct: Mapping[str, Mapping[str, float]] = field(
         default_factory=dict)
     condensed_by_stage_species_delta: tuple[
         Mapping[tuple[int, str], float], ...] = ()

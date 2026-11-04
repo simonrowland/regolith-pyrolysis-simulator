@@ -1,0 +1,454 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  citation: Sanders, D. M. and Haller, W. K. (1977), "Effect of Water Vapor on Sodium Vaporization from Two Silica-Based Glasses",
+    Journal of the American Ceramic Society 60(3-4), 138-141.
+  source_ids:
+  - sanders-1977-water-vapour-na-vaporization
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: ea3e4608a09ecef4d28a1ba0a070b0644b56e56b
+    files:
+    - asset_id: pdf:sanders-1977-water-vapour-na-vaporization
+      role: pdf
+      path: raw/sanders-1977-water-vapour-na-vaporization/sanders-1977-water-vapour-na-vaporization.pdf
+      sha256:
+        tag: value
+        value: 7775bb803aeae983c438f40104523f34ef0dfbd01460d5708b7261a2f8c876f7
+    - asset_id: pdftotext:sanders-1977-water-vapour-na-vaporization
+      role: pdftotext
+      path: text/sanders-1977-water-vapour-na-vaporization
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:sanders-1977-water-vapour-na-vaporization
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_binary_1332K
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: '25'
+          SiO2: '75'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        note: Table I measurement pair; MinerU grid row 10; PDF page 2 render checked.; row=1; column=rho_t
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1332'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    composition:
+      state:
+        tag: unknown
+        reason: condition composition is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The source reports oxygen partial pressure, not oxygen fugacity.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    carrier_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to this experiment.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not classify the gas-flow regime.
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+- experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_quoted_NaOH_pressure
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'literature' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  locator:
+    page: 3
+    published_page: 140
+    pdf_page_index: 2
+    equation: '17'
+    note: Footnote below Eq. (17).
+- experiment_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43::experiment::sanders_1977_ternary_1570K
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          CaO: '10'
+          Na2O: '16'
+          SiO2: '74'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+        note: Table I measurement pair; MinerU grid row 5; PDF page 2 render checked.; row=1; column=rho_t
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1570'
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    composition:
+      state:
+        tag: unknown
+        reason: condition composition is not a scalar numeric value
+      locator:
+        page: 2
+        published_page: 139
+        pdf_page_index: 1
+        table: I
+    fO2_log:
+      state:
+        tag: unknown
+        reason: The source reports oxygen partial pressure, not oxygen fugacity.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    carrier_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to each row.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+        note: The paper prints a total pressure of 1 atm; 101325 Pa is the canonical identity value.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: Nitrogen and argon are both named as carrier gases; the paper does not assign a carrier gas to this experiment.
+      locator:
+        page: 1
+        published_page: 138
+        pdf_page_index: 0
+        section: II. Experimental Procedure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: The source does not classify the gas-flow regime.
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+context:
+- observation_id: sanders_1977_figure_only_results_context
+  type: context
+  units: as printed
+  locator:
+    page: 2
+    published_page: 139
+    pdf_page_index: 1
+    figure: '2'
+  values:
+    figure_read_candidates:
+    - figure: '2'
+      page: 2
+      published_page: 139
+      candidates:
+      - rho_t vs P_H2O^(1/2)
+      - Na2O activity vs P_H2O^(1/2)
+      disposition: figure_only; undigitized
+    - figure: '3'
+      page: 3
+      published_page: 140
+      candidates:
+      - P_Na
+      - P_NaOH
+      - their sum vs P_H2O^(1/2)
+      disposition: figure_only; undigitized
+    not_tabulated_or_not_reported:
+    - No numeric species-specific P_Na or P_NaOH values are printed outside figures.
+    - No numeric activity value is printed outside figures.
+    - No flux or vaporization-rate values are tabulated.
+    - No ion intensities are reported.
+    - No potassium-bearing vapor species is reported.
+    calculated_activity_basis_as_printed: Equation (18) estimates a_Na2O from the fitted slope m assuming all Na-containing
+      vapor is NaOH; the plotted activity values are not digitized.
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_figure_only_results_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na2O
+- observation_id: sanders_1977_fit_relation_context
+  type: context
+  units: as printed
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    equation: '1'
+  values:
+    equation_1_as_printed: rho_t = m P_H2O^x + b
+    table_caption_fit_as_printed: rho_t = m P_H2O^(1/2) + b
+    fit_method_as_printed: Linear least-squares fit with different x values; maximum correlation coefficient r selected.
+    fit_footnote_as_printed: b = intercept of linear least-squares fit of raw data; m = intercept of linear least-squares
+      fit of raw data; r = correlation coefficient.
+    fit_note: The table footnote calls m an intercept although Eq. (1) and the caption make m the coefficient on P_H2O^(1/2).
+      Both statements are retained.
+    printed_measurement_row_count: 10
+    fit_series:
+    - 4 ternary rows
+    - 6 binary rows
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_fit_relation_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na
+- observation_id: sanders_1977_method_atmosphere_context
+  type: context
+  units: as printed
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+  values:
+    apparatus_as_printed: Transpiration apparatus; recondensing saturation system loaded nitrogen and argon carrier gases
+      with known amounts of water vapor; well-stirred melts; equilibrium measurements.
+    carrier_gases_as_printed:
+    - nitrogen
+    - argon
+    carrier_gas_assignment: The paper does not assign nitrogen or argon to individual Table I rows.
+    oxygen_as_printed: 200 ± 50 ppm O2 throughout the measurements; measured at the equilibrium-chamber exit with a stabilized
+      zirconia-based oxygen meter.
+    dry_gas_water_as_printed: 350 ± 100 ppm H2O in the “dry” gas, measured at the end of the gas train.
+    water_saturation_system_temperature_as_printed: held to ±0.1°C
+    total_pressure_as_printed: 1 atm throughout the present work.
+    gas_volume_measurement_as_printed: Wet-test meter at the end of the gas train.
+    sodium_collection_analysis_as_printed: Sodium compounds condensed in the collection system and were analyzed with an atomic
+      emission spectrometer.
+    measurement_count_as_printed: Average of at least 4 independent measurements of Na vapor density for each water pressure.
+    uncertainty_as_printed: Uncertainty in the mean values is 3 standard deviations; the numerical error-bar widths are not
+      tabulated and are not digitized.
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_method_atmosphere_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na
+- observation_id: sanders_1977_na2o_standard_state_context
+  type: context
+  units: as printed
+  locator:
+    page: 3
+    published_page: 140
+    pdf_page_index: 2
+    equation: '4'
+  values:
+    activity_definition_as_printed: a_Na2O is the pressure of that component over the solution divided by its pressure over
+      pure liquid Na2O at the same temperature.
+    standard_state_as_printed: Pure liquid Na2O at the same temperature.
+    standard_state_statement_locators:
+    - page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '4'
+    - page: 3
+      published_page: 140
+      pdf_page_index: 2
+      equation: '9'
+    equations_as_printed:
+      eq2: Na2O(g) -> 2 Na(g) + 1/2 O2(g)
+      eq3: K1 = P_Na(g)^2 P_O2(g)^(1/2) / P_Na2O(g)
+      eq5: Na2O(l) -> 2 Na(g) + 1/2 O2(g)
+      eq6: K2 = P°_Na(g)^2 P°_O2(g)^(1/2)
+      eq8: Na2O(g) + H2O(g) -> 2 NaOH(g), with K3
+      eq10: Na2O(l) + H2O(g) -> 2 NaOH(g), with K4
+      eq13: P_t = 82.06 × 273.15 × rho_t / 22.99 atm
+      eq15: P_NaOH^2 = (P_O2^(1/2) K4/K2) P_Na^2 P_H2O
+      eq16: P_Na is calculated from rho_t, K′, and P_H2O^(1/2)
+      eq17: K′ = sqrt(P_O2^(1/2) K4/K2)
+      eq18: a_Na2O = sqrt(974.98 m K4)
+    equilibrium_constant_units: No separate units are printed for K2 or K4; retain the tabulated value and equation.
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_na2o_standard_state_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na2O
+- observation_id: sanders_1977_species_assumptions_and_attributions_context
+  type: context
+  units: as printed
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: III. Results and Discussion
+  values:
+    species_assumed_for_present_vapor_as_printed:
+    - Na
+    - NaOH
+    sodium_density_decomposition_as_printed: rho_t = rho_NaOH + rho_Na (Eq. 12); P_t denotes total pressure of species containing
+      Na (Eq. 13).
+    quoted_species_from_brewer_margrave:
+      species_as_printed:
+      - Na
+      - O2
+      conditions_as_printed: Over a dry melt of Na2O
+      attribution: Brewer and Margrave (Ref. 8)
+      evidence_class: quoted_attributed
+    quoted_species_from_piacente_matousek:
+      species_as_printed:
+      - Na
+      - O2
+      conditions_as_printed: Major species over sodium disilicate glass under vacuum
+      attribution: Piacente and Matousek (Ref. 9)
+      evidence_class: quoted_attributed
+    quoted_or_extrapolated_water_species:
+      species_as_printed:
+      - NaOH
+      - (NaOH)2
+      attribution: Schoonmaker and Porter (Ref. 10)
+      source_statement: The cited work reports significant (NaOH)2 below 800°C; Sanders and Haller extrapolate to the present
+        temperatures and partial pressures and judge NaOH monomer to be the major new vapor species.
+      evidence_class: quoted_attributed
+      author_interpretation_class: author_derived
+    possible_impurity_species_as_printed: NaCl impurity in the starting batch is discussed as a possible source of low-water-region
+      error; it is a hypothesis, not a measured vapor species.
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_species_assumptions_and_attributions_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na
+- observation_id: sanders_1977_vapor_density_definition_context
+  type: context
+  units: as printed
+  locator:
+    page: 1
+    published_page: 138
+    pdf_page_index: 0
+    section: II. Experimental Procedure
+  values:
+    rho_t_as_printed: Na vapor density, rho_t
+    definition_as_printed: Mass of Na which would be present in a milliliter of an ideal gas at 273.15 K and 1 atm.
+    reported_density_units_as_printed: g/STP ml
+    note: This 273.15 K and 1 atm definition is the standard-volume basis of rho_t; experiment total pressure is independently
+      printed as 1 atm.
+  context_id: sanders-1977-water-vapour-na-vaporization::context::sanders_1977_vapor_density_definition_context
+  work_id: 80d52dd1176d7c7bfd3355b8d42e7622b0ba06c964e002e4266eb9f7dfee0a43
+  source_id: sanders-1977-water-vapour-na-vaporization
+  species: Na

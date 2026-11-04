@@ -5456,6 +5456,9 @@ class EvaporationMixin:
                 # separate pipe temperature is a wall/liner condition.
                 gas_temperature_C=transport['conductance_temperature_C'],
                 stage_area_m2_by_stage=transport['stage_area_m2_by_stage'],
+                stage_hydraulic_diameter_m_by_stage=transport[
+                    'stage_hydraulic_diameter_m_by_stage'
+                ],
                 stage_area_geometry_provenance_notice=transport.get(
                     'stage_area_geometry_provenance_notice', {}),
                 carrier_gas=self._resolve_condensation_carrier_gas(),
@@ -6434,21 +6437,23 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        stages_by_number = {
-            stage.stage_number: stage for stage in self.train.stages
-        }
-        for stage_number, stage_species in (
+        from simulator.condensation_routing import stage_list_index_for_destination
+
+        for stage_key, stage_species in (
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
             if projected_kg <= 1e-12:
                 continue
-            stage = stages_by_number.get(stage_number)
-            if stage is None:
+            stage_idx = stage_list_index_for_destination(
+                self.train, str(stage_key),
+            )
+            if stage_idx is None:
                 continue
+            stage = self.train.stages[stage_idx]
             is_impurity = (
                 route_result.impurity_by_stage_species
-                .get(stage_number, {})
+                .get(stage_key, {})
                 .get(species, 0.0)
                 > 0.0
             )
@@ -6456,7 +6461,7 @@ class EvaporationMixin:
                 stage_product_kg = projected_kg * product_fraction
                 if stage_product_kg <= 1e-12:
                     continue
-                delta_key = (stage_number, product)
+                delta_key = (int(stage.stage_number), product)
                 deltas = self._last_condensed_by_stage_species_delta
                 deltas[delta_key] = deltas.get(delta_key, 0.0) + stage_product_kg
                 if is_impurity:
@@ -6470,7 +6475,7 @@ class EvaporationMixin:
                 })
                 self._record_stage_collection_source(
                     'process.condensation_train',
-                    stage_number,
+                    stage_idx,
                     product,
                     stage_product_kg,
                 )

@@ -1,0 +1,714 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  citation: Frischat, G. H. and Oel, H. J. (1966). Transportvorgänge in glasigem und kristallinem Na2O·2CaO·3SiO2. Glastechnische
+    Berichte 39(2), 50–61.
+  source_ids:
+  - frischat-oel-1966-sodium-calcium-silicate-transport
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: d4e8782b5c8686466a26591d7d43ca7b0ce92663
+    files:
+    - asset_id: pdf:frischat-oel-1966-sodium-calcium-silicate-transport
+      role: pdf
+      path: raw/frischat-oel-1966-sodium-calcium-silicate-transport/frischat-oel-1966-sodium-calcium-silicate-transport.pdf
+      sha256:
+        tag: value
+        value: f83f51c2c796bd7f83a153b1c97440f523e8e7ac00ec5f37616da922ab45e826
+    - asset_id: pdftotext:frischat-oel-1966-sodium-calcium-silicate-transport
+      role: pdftotext
+      path: text/frischat-oel-1966-sodium-calcium-silicate-transport
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:frischat-oel-1966-sodium-calcium-silicate-transport
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []
+context:
+- observation_id: frischat_oel_1966_abstract_correlation_factor
+  type: transport_context
+  locator:
+    page: 1
+    published_page: 50
+    pdf_page_index: 0
+    section: Abstract
+  units: dimensionless as printed
+  values:
+    quantity: sodium_self_diffusion_correlation_factor
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or observation type represents a correlation factor.
+    value_as_printed: f ≈ 0,2
+    phase_scope_as_printed: both glass and polycrystal
+    relation_as_printed: Comparison of measured Na self-diffusion with values calculated from specific electrical conductivity,
+      which is carried by Na ions.
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_abstract_correlation_factor
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_conclusion_correlation_factors
+  type: transport_context
+  locator:
+    page: 10
+    published_page: 59
+    pdf_page_index: 9
+    section: 2.3 Diffusionsmechanismus
+  units: dimensionless as printed
+  values:
+    quantity: sodium_self_diffusion_correlation_factor
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or observation type represents a correlation factor.
+    glass_value_as_printed: 0,16
+    polycrystal_value_as_printed: 0,20
+    determination_as_printed: experimentally determined from measured self-diffusion and electrical conductivity
+    relation_as_printed: failure of the Nernst-Einstein relation
+    attribution: Authors' reported experimental determination. The conductivity inputs are only plotted in Figure 7 and remain
+      undigitized.
+    confidence_level: not_stated
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_conclusion_correlation_factors
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_conductivity_arrhenius_fits
+  type: fit_context
+  locator:
+    page: 11
+    published_page: 60
+    pdf_page_index: 10
+    section: Zusammenfassung
+  units: Ω⁻¹ cm⁻¹; kcal/mol; eV; °C as printed
+  values:
+    quantity: electrical_conductivity_arrhenius_fit
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: Electrical conductivity exists as a scalar Quantity, but its Arrhenius fit parameters have no exact quantity
+      or observation type. The raw Fig. 7 conductivity points remain undigitized.
+    attribution: Frischat and Oel (1966), this work
+    fits:
+    - phase: glass
+      phase_as_printed: Glas
+      expression_as_printed: σ = 6,98·10² exp[−25,9 kcal/RT] Ω⁻¹ cm⁻¹
+      pre_exponential_as_printed: 6,98·10² (Ω⁻¹ cm⁻¹)
+      activation_energy_as_printed: 25,9 kcal/Mol (1,12 eV)
+      fit_temperature_range_C_as_printed: 250 bis 600 °C
+      measured_temperature_range_C_as_printed: 250 bis 900 °C
+    - phase: cr
+      phase_as_printed: Polykristall
+      expression_as_printed: σ = 89,9 exp[−26,2 kcal/RT] Ω⁻¹ cm⁻¹
+      pre_exponential_as_printed: 89,9 (Ω⁻¹ cm⁻¹)
+      activation_energy_as_printed: 26,2 kcal/Mol (1,14 eV)
+      fit_temperature_range_C_as_printed: 470 bis 900 °C
+      measured_temperature_range_C_as_printed: 350 bis 900 °C
+    publication_check: Render of page 11 (printed page 60) confirms both expressions, negative signs, comma decimals, exponents,
+      units, and ranges.
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_conductivity_arrhenius_fits
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_detailed_correlation_factors
+  type: transport_context
+  locator:
+    page: 9
+    published_page: 58
+    pdf_page_index: 8
+    section: '2.3'
+  units: dimensionless as printed
+  values:
+    quantity: sodium_self_diffusion_correlation_factor
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or observation type represents a correlation factor.
+    glass:
+      phase: glass
+      phase_as_printed: Glas
+      temperature_range_C_as_printed: 270 bis 600 °C
+      value_as_printed: 0,16
+      interval_as_printed: 0,15 bis 0,17
+      interval_lower_as_printed: 0,15
+      interval_upper_as_printed: 0,17
+    polycrystal:
+      phase: cr
+      phase_as_printed: Polykristall
+      temperature_range_C_as_printed: 500 bis 900 °C
+      value_as_printed: 0,20
+      interval_as_printed: 0,16 bis 0,24
+      interval_lower_as_printed: 0,16
+      interval_upper_as_printed: 0,24
+    determination_as_printed: experimentally determined from measured self-diffusion and electrical conductivity
+    relation_as_printed: failure of the Nernst-Einstein relation
+    attribution: Authors' reported experimental determination. The conductivity inputs are only plotted in Figure 7 and remain
+      undigitized.
+    confidence_level: not_stated
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_detailed_correlation_factors
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_figure10_diffusion_conductivity_candidate
+  type: figure_record
+  locator:
+    page: 9
+    published_page: 58
+    pdf_page_index: 8
+    figure: '10'
+  phase: glass and polycrystal
+  units: D in cm2/s as printed; temperature in K as plotted
+  values:
+    quantity: sodium_self_diffusion_coefficient
+    method_class: figure_only
+    schema_gap: No exact store Quantity represents self-diffusion coefficient.
+    axes_as_printed:
+      x: reciprocal absolute temperature
+      y: log D
+    legend_as_printed:
+    - '1: gemessen'
+    - '2: aus σ berechnet'
+    - '3: gemessen'
+    - '4: aus σ berechnet'
+    caption_as_printed: Comparison of measured Na self-diffusion with self-diffusion calculated from electrical conductivity
+      according to Nernst-Einstein.
+    digitisation: deferred; no numeric points stored
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_figure10_diffusion_conductivity_candidate
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_figure11_equal_diffusion_candidate
+  type: figure_record
+  locator:
+    page: 10
+    published_page: 59
+    pdf_page_index: 9
+    figure: '11'
+  phase: glass and crystal
+  units: temperature in °C as plotted
+  values:
+    quantity: equal_sodium_self_diffusion_temperature_comparison
+    method_class: figure_only
+    schema_gap: No exact store Quantity represents the temperature correspondence at equal diffusivity.
+    axes_as_printed: equal Na self-diffusion in glass and crystal
+    prose_comparison_as_printed: The text reports that 400 °C in glass corresponds to 485 °C in crystal, and 600 °C in glass
+      corresponds to 720 °C in crystal.
+    digitisation: deferred; no numeric figure points stored
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_figure11_equal_diffusion_candidate
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_figure6_diffusion_candidate
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 55
+    pdf_page_index: 5
+    figure: '6'
+  phase: glass and polycrystal, with additional off-stoichiometric curves
+  units: D in cm2/s; temperature in K as plotted
+  values:
+    quantity: sodium_self_diffusion_coefficient
+    method_class: figure_only
+    schema_gap: No exact store Quantity represents self-diffusion coefficient.
+    axes_as_printed:
+      x: reciprocal absolute temperature
+      y: log D
+    curve_labels_as_printed:
+    - '1: stoichiometric glass'
+    - '2: stoichiometric polycrystal'
+    - '3 and 4: glass and crystal with compositions deviating from stoichiometry'
+    digitisation: deferred; no numeric points stored
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_figure6_diffusion_candidate
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_figure7_conductivity_candidate
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 55
+    pdf_page_index: 5
+    figure: '7'
+  phase: glass and polycrystal
+  units: Ω⁻¹ cm⁻¹; temperature in K as plotted
+  values:
+    quantity: electrical_conductivity
+    method_class: figure_only
+    axes_as_printed:
+      x: 1/T in K⁻¹
+      y: log specific electrical conductivity
+    digitisation: deferred; no numeric points stored
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_figure7_conductivity_candidate
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_figure8_comparison_candidate
+  type: figure_record
+  locator:
+    page: 6
+    published_page: 55
+    pdf_page_index: 5
+    figure: '8'
+  phase: glass
+  units: D in cm2/s; temperature in K as plotted
+  values:
+    quantity: sodium_self_diffusion_coefficient
+    method_class: figure_only
+    schema_gap: No exact store Quantity represents self-diffusion coefficient.
+    axes_as_printed:
+      x: reciprocal absolute temperature
+      y: log D
+    scope_as_printed: comparison with sodium self-diffusion in comparable soda-lime silicate glasses
+    digitisation: deferred; no numeric points stored
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_figure8_comparison_candidate
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_glass_na_arrhenius_fit
+  type: fit_context
+  locator:
+    page: 5
+    published_page: 54
+    pdf_page_index: 4
+    paragraph: 1.2.2 Ergebnisse
+    note: Also repeated in the abstract (page 1) and summary (page 11).
+  units: cm2/s; kcal/mol; eV; °C as printed
+  values:
+    quantity: sodium_self_diffusion_arrhenius_fit
+    method_class: model_derived
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity represents self-diffusion coefficient or its Arrhenius parameters.
+    phase: glass
+    phase_as_printed: Glas
+    expression_as_printed: D = 3,67·10⁻² exp[−27,5 kcal/RT] cm²/s
+    D0_as_printed: 3,67·10⁻² cm²/s
+    activation_energy_as_printed: 27,5 kcal/Mol (1,19 eV)
+    fit_temperature_range_C_as_printed: 200 bis 600 °C
+    measurement_temperature_range_C_as_printed: etwa 200 bis 650 °C
+    fit_input_table_record: frischat_oel_1966_table2_na_self_diffusion_results
+    fit_input_printed_rows: 1-11
+    repeated_printings:
+    - page: 1
+      published_page: 50
+      section: Abstract
+    - page: 11
+      published_page: 60
+      section: Zusammenfassung
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_glass_na_arrhenius_fit
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_polycrystal_na_arrhenius_fit
+  type: fit_context
+  locator:
+    page: 5
+    published_page: 54
+    pdf_page_index: 4
+    paragraph: 1.2.2 Ergebnisse
+    note: Also repeated in the abstract (page 1) and summary (page 11).
+  units: cm2/s; kcal/mol; eV; °C as printed
+  values:
+    quantity: sodium_self_diffusion_arrhenius_fit
+    method_class: model_derived
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity represents self-diffusion coefficient or its Arrhenius parameters.
+    phase: cr
+    phase_as_printed: Polykristall
+    expression_as_printed: D = 1,88·10⁻² exp[−29,9 kcal/RT] cm²/s
+    D0_as_printed: 1,88·10⁻² cm²/s
+    activation_energy_as_printed: 29,9 kcal/Mol (1,30 eV)
+    fit_temperature_range_C_as_printed: 500 bis 900 °C
+    measurement_temperature_range_C_as_printed: 300 bis 900 °C
+    fit_input_table_record: frischat_oel_1966_table2_na_self_diffusion_results
+    fit_input_printed_rows: 1-9
+    repeated_printings:
+    - page: 1
+      published_page: 50
+      section: Abstract
+    - page: 11
+      published_page: 60
+      section: Zusammenfassung
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_polycrystal_na_arrhenius_fit
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_quoted_sodium_transference_number
+  type: transport_context
+  locator:
+    page: 7
+    published_page: 56
+    pdf_page_index: 6
+    section: 2.3 Diffusionsmechanismus
+  units: dimensionless as printed
+  values:
+    quantity: sodium_transference_number
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or observation type represents a transference number.
+    value_as_printed: tNa+ = 1
+    attribution_as_printed: several authors, reference [23]
+    statement_as_printed: In silicate glass with Na as the only alkali in addition to alkaline earths, the entire electrical
+      current is carried by Na ions.
+    statement_in_German_as_printed: Von verschiedenen Autoren [23] wurde nachgewiesen, daß der gesamte elektrische Strom durch
+      die Na-Ionen getragen wird, wenn Na das einzige Alkaliatom neben Erdalkalien in einem Silicatglas ist, d. h. tNa+ =
+      1.
+    note: This is an attributed literature statement, not a measurement in this paper.
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_quoted_sodium_transference_number
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_summary_correlation_factor
+  type: transport_context
+  locator:
+    page: 11
+    published_page: 60
+    pdf_page_index: 10
+    section: Zusammenfassung
+  units: dimensionless as printed
+  values:
+    quantity: sodium_self_diffusion_correlation_factor
+    method_class: quoted_attributed
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or observation type represents a correlation factor.
+    value_as_printed: f ≈ 0,2
+    phase_scope_as_printed: both glass and crystal
+    attribution: Authors' reported experimental determination from the Nernst-Einstein comparison.
+    confidence_level: not_stated
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_summary_correlation_factor
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_table1_composition_analyses
+  type: table_context
+  locator:
+    page: 2
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: All cells checked on page render; printed unit Gew.-%.
+  units: Gew.-% as printed
+  values:
+    quantity: nominal_and_analyzed_bulk_composition
+    admission_status: typed_unavailable
+    schema_gap: These target and bulk-analysis compositions are not compositions of a named equilibrium phase. The closest
+      token, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION, requires a phase composition basis from simulator/battery/enums.py::PHASE_BASIS_TOKENS
+      and a role from simulator/battery/enums.py::PhaseRole. Those identify phase compositions as in park-2021-vanadium-thermodynamics-thesis;
+      this table reports nominal batch and analyzed bulk compositions. The broad composition_series type in tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      does not supply a matching bulk-composition Quantity in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES
+      / TYPE_QUANTITY. BULK_NOT_LIQUID_COMPOSITION is a refusal reason (simulator/battery/enums.py::RefusalReason.BULK_NOT_LIQUID_COMPOSITION),
+      not a stored quantity.
+    target_values_are_nominal: true
+    analysis_values_method_class: measured_direct
+    printed_title: Einfluß der absichtlich geänderten Zusammensetzung auf die Kristallisation, Analysenwerte
+    unit_as_printed: Gew.-%
+    target_column_as_printed: Sollwerte
+    target_composition_as_printed:
+      Na2O: 17,49
+      CaO: 31,65
+      SiO2: 50,86
+      R2O3: em_dash
+    analyzed_compositions:
+    - sample_as_printed: '1'
+      Na2O:
+        value_as_printed: 17,55
+        deviation_as_printed: (+0,06)
+      CaO:
+        value_as_printed: 31,67
+        deviation_as_printed: (+0,02)
+      SiO2:
+        value_as_printed: 50,55
+        deviation_as_printed: (−0,31)
+      R2O3: 0,15
+      crystallisation_as_printed: schnelle Kristallisation
+    - sample_as_printed: '2'
+      Na2O:
+        value_as_printed: 17,80
+        deviation_as_printed: (+0,31)
+      CaO:
+        value_as_printed: 30,98
+        deviation_as_printed: (−0,33)
+      SiO2:
+        value_as_printed: 51,18
+        deviation_as_printed: (+0,32)
+      R2O3: 0,16
+      crystallisation_as_printed: langsamere Kristallisation
+    - sample_as_printed: '3'
+      Na2O:
+        value_as_printed: 18,89
+        deviation_as_printed: (+1,40)
+      CaO:
+        value_as_printed: 31,11
+        deviation_as_printed: (−0,54)
+      SiO2:
+        value_as_printed: 49,98
+        deviation_as_printed: (−0,88)
+      R2O3: 0,10
+      crystallisation_as_printed: relativ schlechte Kristallisation
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_table1_composition_analyses
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na
+- observation_id: frischat_oel_1966_table2_na_self_diffusion_results
+  type: table_context
+  locator:
+    page: 5
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2, 12 printed rows. MinerU and pdftotext digit agreement was 1.000 across 51 numeric cells; the render confirmed
+      every decimal comma D cell and the six-column row assignments.
+  units: cm2/s; temperature in °C
+  values:
+    quantity: sodium_self_diffusion_coefficient
+    method_class: measured_direct
+    admission_status: typed_unavailable
+    schema_gap: No exact store Quantity or validated observation type represents a Na self-diffusion coefficient. Retained
+      here as a typed refusal rather than assigned a near-miss transport quantity.
+    species_as_printed: Na
+    isotope_as_printed: 22Na
+    method_as_printed: Restaktivitätsmethode
+    phase_columns_as_printed:
+      glass: Glas
+      polycrystal: Polykristall
+    activity_columns_as_printed:
+      beta_plus: β+-Aktiv.
+      gamma: γ-Aktiv.
+    nominal_composition_as_printed: Na2O·2CaO·3SiO2
+    composition_target_from_table1:
+      amount_basis: mass_percent
+      components:
+        Na2O: '17.49'
+        CaO: '31.65'
+        SiO2: '50.86'
+      values_as_published:
+        Na2O: 17,49
+        CaO: 31,65
+        SiO2: 50,86
+      locator:
+        page: 2
+        published_page: 51
+        table: '1'
+        column: Sollwerte
+    conditions_as_published:
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            components:
+              Na2O: '17.49'
+              CaO: '31.65'
+              SiO2: '50.86'
+        locator:
+          page: 2
+          published_page: 51
+          table: '1'
+          column: Sollwerte
+        composition_as_printed_in_table2: Na2O·2CaO·3SiO2
+      total_pressure_Pa:
+        state: unknown
+        reason: not_published_for_diffusion_run
+        locator:
+          page: 5
+          published_page: 54
+          table: '2'
+      fO2_Pa:
+        state: unknown
+        reason: not_published_for_diffusion_run
+        locator:
+          page: 5
+          published_page: 54
+          table: '2'
+    measurement_temperature_ranges_as_printed:
+      glass: about 200-650 °C; crystallization above about 650 °C
+      polycrystal: 300-900 °C
+    uncertainty_as_printed: Die Fehler betragen etwa ± 10 bis 15%.
+    uncertainty_locator:
+      page: 11
+      published_page: 60
+      section: Zusammenfassung
+    overall_reported_D_interval_as_printed: 10⁻¹⁴ bis 10⁻⁷ cm²/s
+    overall_reported_D_interval_locator:
+      page: 11
+      published_page: 60
+      section: Zusammenfassung
+    prose_restatement:
+      value_as_printed: etwa 4·10⁻⁹ cm²/s
+      phase: glass
+      phase_as_printed: Glas
+      composition_as_printed: Na2O·2CaO·3SiO2
+      T_C: '575'
+      locator:
+        page: 7
+        published_page: 56
+        section: 2.3 Diffusionsmechanismus
+      relation_to_table2: Rounded prose restatement of the 575 °C glass measurements, not an additional independent table
+        point. Table 2 separately prints beta-plus and gamma activity values in two rows at this temperature.
+      conditions_as_published:
+        total_pressure_Pa:
+          state: unknown
+          reason: not_published_for_diffusion_run
+        fO2_Pa:
+          state: unknown
+          reason: not_published_for_diffusion_run
+    rows:
+    - printed_row: 1
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '207'
+        column_beta_plus_D_as_published: 1,23·10⁻¹⁴
+        column_gamma_D_as_published: 1,15·10⁻¹⁴
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '512'
+        column_beta_plus_D_as_published: 1,48·10⁻¹⁰
+    - printed_row: 2
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '305'
+        column_beta_plus_D_as_published: 1,98·10⁻¹²
+        column_gamma_D_as_published: 2,70·10⁻¹²
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '520'
+        column_gamma_D_as_published: 1,29·10⁻¹⁰
+    - printed_row: 3
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '305'
+        column_beta_plus_D_as_published: 2,17·10⁻¹²
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '575'
+        column_beta_plus_D_as_published: 2,73·10⁻¹⁰
+        column_gamma_D_as_published: 3,38·10⁻¹⁰
+    - printed_row: 4
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '375'
+        column_beta_plus_D_as_published: 2,10·10⁻¹¹
+        column_gamma_D_as_published: 1,99·10⁻¹¹
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '633'
+        column_beta_plus_D_as_published: 1,83·10⁻⁹
+    - printed_row: 5
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '425'
+        column_gamma_D_as_published: 1,07·10⁻¹⁰
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '643'
+        column_gamma_D_as_published: 1,21·10⁻⁹
+    - printed_row: 6
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '435'
+        column_beta_plus_D_as_published: 0,92·10⁻¹⁰
+        column_gamma_D_as_published: 1,21·10⁻¹⁰
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '701'
+        column_gamma_D_as_published: 2,81·10⁻⁹
+    - printed_row: 7
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '435'
+        column_beta_plus_D_as_published: 1,09·10⁻¹⁰
+        column_gamma_D_as_published: 1,37·10⁻¹⁰
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '775'
+        column_gamma_D_as_published: 1,11·10⁻⁸
+    - printed_row: 8
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '517'
+        column_beta_plus_D_as_published: 8,77·10⁻¹⁰
+        column_gamma_D_as_published: 9,39·10⁻¹⁰
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '790'
+        column_beta_plus_D_as_published: 1,14·10⁻⁸
+    - printed_row: 9
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '520'
+        column_gamma_D_as_published: 9,65·10⁻¹⁰
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+        T_C: '885'
+        column_gamma_D_as_published: 4,49·10⁻⁸
+    - printed_row: 10
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '575'
+        column_beta_plus_D_as_published: 3,67·10⁻⁹
+        column_gamma_D_as_published: 4,11·10⁻⁹
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+    - printed_row: 11
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '575'
+        column_gamma_D_as_published: 4,70·10⁻⁹
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+    - printed_row: 12
+      glass:
+        phase: glass
+        phase_as_printed: Glas
+        T_C: '633'
+        column_beta_plus_D_as_published: 1,22·10⁻⁸
+        column_gamma_D_as_published: 1,62·10⁻⁸
+      polycrystal:
+        phase: cr
+        phase_as_printed: Polykristall
+    quench_statement_for_glass:
+      state: asserted_preserved
+      locator:
+        page: 2
+        published_page: 51
+        section: Herstellung des Glases
+      statement_as_printed: Durch Ausgießen der Schmelze auf eine kalte Platte in eine Form und anschließendes Tempern gelangen
+        bei schnellem Arbeiten einige Proben ohne Kristallisation.
+      note: The source asserts no crystallization; it makes no quench redox statement.
+    condition_reporting:
+      nominal_composition: printed in the Table 2 caption; target wt% in Table 1 Sollwerte
+      total_pressure_Pa:
+        state: unknown
+        reason: not_published
+      fO2_Pa:
+        state: unknown
+        reason: not_published
+      sample_preparation_pressure: 3750 atm is printed for pressing finely ground glass powder into tablets; this is a preparation
+        condition, not a diffusion-run pressure.
+  context_id: frischat-oel-1966-sodium-calcium-silicate-transport::context::frischat_oel_1966_table2_na_self_diffusion_results
+  work_id: c9cc2ea2fa5c4e4397a81ee6d317133ad9606239eef09cefd27962ef02cbcb12
+  source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  species: Na

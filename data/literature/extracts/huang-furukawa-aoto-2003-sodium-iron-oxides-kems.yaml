@@ -1,0 +1,2768 @@
+schema_version: literature_extract.v1
+source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+source:
+  citation: Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part I. Mass spectrometric study of Na–Fe oxides", Thermochimica Acta 405, 61–66.
+  doi: 10.1016/S0040-6031(03)00136-9
+  url: https://doi.org/10.1016/S0040-6031(03)00136-9
+  year: 2003
+extraction:
+  method: Transcribed from the MinerU table draft and pdftotext layout; Table 1 row and column assignment checked against the PDF render. The article is born digital.
+  date: '2026-11-02'
+  worker: codex
+  provenance_path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-kems/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.pdf
+review_status: draft
+fidelity_samples:
+  - path: species.Na.observations[huang2003_table1_na_partial_pressure].values.points[0].partial_pressure_pa
+    value: '4.10E-03'
+    locator:
+      page: 5
+      published_page: 65
+      pdf_page_index: 4
+      table: '1'
+      row: 1
+      column: 3
+      note: Table 1 row 1 sodium partial pressure confirmed against the rendered page.
+  - path: species.Na.observations[huang2003_table1_na_partial_pressure].values.points[12].partial_pressure_pa
+    value: '6.00E-01'
+    locator:
+      page: 5
+      published_page: 65
+      pdf_page_index: 4
+      table: '1'
+      row: 13
+      column: 3
+      note: Table 1 row 13 sodium partial pressure confirmed against the rendered page.
+  - path: species.Na3FeO3.observations[huang2003_table1_reaction_gibbs_typed_refusal].values.points[12].value
+    value: '70746'
+    locator:
+      page: 5
+      published_page: 65
+      pdf_page_index: 4
+      table: '1'
+      row: 13
+      column: 4
+      note: Table 1 row 13 reaction Gibbs energy confirmed against the rendered page.
+  - path: species.Na3FeO3.observations[huang2003_table1_kp_typed_refusal].values.points[24].value
+    value: '1.78E-06'
+    locator:
+      page: 5
+      published_page: 65
+      pdf_page_index: 4
+      table: '1'
+      row: 25
+      column: 5
+      note: Table 1 row 25 Kp confirmed against the rendered page.
+  - path: species.Na.observations[huang2003_na_gas_delta_fh_298_15_this_work].values.delta_fH_298_kJ_mol
+    value: '107.6'
+    locator:
+      page: 3
+      published_page: 63
+      pdf_page_index: 2
+      section: 2.2 Sample preparation and pressure calibration
+      note: The authors' third-law value, 107.6 ± 0.8 kJ mol−1, is printed here.
+  - path: species.Na.observations[huang2003_na_gas_delta_fh_298_15_nist_janaf].values.delta_fH_298_kJ_mol
+    value: '107.3'
+    locator:
+      page: 3
+      published_page: 63
+      pdf_page_index: 2
+      section: 2.2 Sample preparation and pressure calibration
+      note: The comparison value attributed to NIST-JANAF [18].
+experiments:
+  - experiment_id: huang2003_kems
+    method: knudsen_effusion
+    locator:
+      page: 2
+      published_page: 62
+      pdf_page_index: 1
+      section: 2.1 Knudsen effusion mass spectrometer
+    pressure_environment:
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: No numeric pressure inside the K-cell is printed; the reported 10^-6 Pa is the vacuum system operating level.
+        locator:
+          page: 2
+          published_page: 62
+          pdf_page_index: 1
+          section: 2.1 Knudsen effusion mass spectrometer
+      sweep_gas:
+        state:
+          tag: unknown
+          reason: High-purity argon is stated only for purging the system; no measurement carrier gas is identified.
+        locator:
+          page: 2
+          published_page: 62
+          pdf_page_index: 1
+          section: 2.1 Knudsen effusion mass spectrometer
+      regime:
+        regime_class:
+          tag: unknown
+          reason: The cell is called a Knudsen effusion cell, but no numerical in-cell pressure or orifice-to-cell-area ratio is reported.
+benches:
+  - id: huang2003_kems_system
+    identity:
+      basis: described_in_this_work
+    apparatus_family:
+      state:
+        tag: value
+        value: quadrupole mass spectrometer with a Knudsen vapor effusion cell and vacuum chamber
+      locator:
+        page: 2
+        published_page: 62
+        pdf_page_index: 1
+        section: 2.1 Knudsen effusion mass spectrometer
+    cell_materials:
+      - state:
+          tag: value
+          value: Pt
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.1 Knudsen effusion mass spectrometer
+          note: Platinum K-cell with a silver-coated cover.
+species:
+  Na:
+    observations:
+      - observation_id: huang2003_table1_na_partial_pressure
+        type: partial_pressure
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 reports PNa in Pa for Na vapor over Na4FeO3(s).
+        phase: gas
+        standard_state: PNa/Pa as printed; no numeric reference pressure is stated.
+        experiment: huang2003_kems
+        regime: knudsen_effusion
+        units: Pa
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_reactant_mole_ratio_2_Na2O_to_1_FeO
+                amount_basis: mol_inventory
+                components:
+                  - - Na2O
+                    - '2'
+                  - - FeO
+                    - '1'
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The printed synthesis ratio is 2:1 molar Na2O(s):FeO(s); the charge is identified as Na4FeO3(s).
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: No in-cell total pressure is printed; 10^-6 Pa describes the vacuum system operating level.
+            locator:
+              page: 2
+              published_page: 62
+              pdf_page_index: 1
+              section: 2.1 Knudsen effusion mass spectrometer
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No measurement fO2 or measurement atmosphere is stated.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The <10 ppm oxygen statement applies to the glove box used in sample preparation.
+        values:
+          quantity: partial_pressure
+          method_class: author_derived
+          admission_status: admitted
+          gas_species: Na(g)
+          parent_condensed_species_as_printed: Na4FeO3(s)
+          reaction_as_printed: Na4FeO3(s) = Na3FeO3(s) + Na(gas), Eq. (2)
+          pressure_relation_as_printed: P(Na) = K × {I × T}
+          pressure_relation_note: I is Na+ ion intensity and T is sample temperature; K is calibrated against saturated sodium vapour pressure from [17]. The paper prints no numerical I or K.
+          points:
+          - row_number_as_printed: '1'
+            T_K: '590.6'
+            partial_pressure_pa: '4.10E-03'
+            value_as_printed: '4.10E-03'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 1
+              column: 3
+              row_label: '1'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 1
+                  column_header: T/K
+          - row_number_as_printed: '2'
+            T_K: '606.4'
+            partial_pressure_pa: '8.09E-03'
+            value_as_printed: '8.09E-03'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 2
+              column: 3
+              row_label: '2'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '606.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 2
+                  column_header: T/K
+          - row_number_as_printed: '3'
+            T_K: '622.3'
+            partial_pressure_pa: '1.69E-02'
+            value_as_printed: '1.69E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 3
+              column: 3
+              row_label: '3'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 3
+                  column_header: T/K
+          - row_number_as_printed: '4'
+            T_K: '638.2'
+            partial_pressure_pa: '3.58E-02'
+            value_as_printed: '3.58E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 4
+              column: 3
+              row_label: '4'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '638.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 4
+                  column_header: T/K
+          - row_number_as_printed: '5'
+            T_K: '654.0'
+            partial_pressure_pa: '6.25E-02'
+            value_as_printed: '6.25E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 5
+              column: 3
+              row_label: '5'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 5
+                  column_header: T/K
+          - row_number_as_printed: '6'
+            T_K: '664.6'
+            partial_pressure_pa: '8.91E-02'
+            value_as_printed: '8.91E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 6
+              column: 3
+              row_label: '6'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 6
+                  column_header: T/K
+          - row_number_as_printed: '7'
+            T_K: '669.9'
+            partial_pressure_pa: '1.09E-01'
+            value_as_printed: '1.09E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 7
+              column: 3
+              row_label: '7'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '669.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 7
+                  column_header: T/K
+          - row_number_as_printed: '8'
+            T_K: '675.2'
+            partial_pressure_pa: '1.27E-01'
+            value_as_printed: '1.27E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 8
+              column: 3
+              row_label: '8'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 8
+                  column_header: T/K
+          - row_number_as_printed: '9'
+            T_K: '685.8'
+            partial_pressure_pa: '2.40E-01'
+            value_as_printed: '2.40E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 9
+              column: 3
+              row_label: '9'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 9
+                  column_header: T/K
+          - row_number_as_printed: '10'
+            T_K: '696.4'
+            partial_pressure_pa: '3.53E-01'
+            value_as_printed: '3.53E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 10
+              column: 3
+              row_label: '10'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '696.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 10
+                  column_header: T/K
+          - row_number_as_printed: '11'
+            T_K: '701.6'
+            partial_pressure_pa: '4.31E-01'
+            value_as_printed: '4.31E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 11
+              column: 3
+              row_label: '11'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 11
+                  column_header: T/K
+          - row_number_as_printed: '12'
+            T_K: '701.6'
+            partial_pressure_pa: '5.31E-01'
+            value_as_printed: '5.31E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 12
+              column: 3
+              row_label: '12'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 12
+                  column_header: T/K
+          - row_number_as_printed: '13'
+            T_K: '706.9'
+            partial_pressure_pa: '6.00E-01'
+            value_as_printed: '6.00E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 13
+              column: 3
+              row_label: '13'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '706.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 13
+                  column_header: T/K
+          - row_number_as_printed: '14'
+            T_K: '712.2'
+            partial_pressure_pa: '6.57E-01'
+            value_as_printed: '6.57E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 14
+              column: 3
+              row_label: '14'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '712.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 14
+                  column_header: T/K
+          - row_number_as_printed: '15'
+            T_K: '717.5'
+            partial_pressure_pa: '7.27E-01'
+            value_as_printed: '7.27E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 15
+              column: 3
+              row_label: '15'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '717.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 15
+                  column_header: T/K
+          - row_number_as_printed: '16'
+            T_K: '590.6'
+            partial_pressure_pa: '3.68E-03'
+            value_as_printed: '3.68E-03'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 16
+              column: 3
+              row_label: '16'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 16
+                  column_header: T/K
+          - row_number_as_printed: '17'
+            T_K: '601.1'
+            partial_pressure_pa: '6.13E-03'
+            value_as_printed: '6.13E-03'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 17
+              column: 3
+              row_label: '17'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '601.1'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 17
+                  column_header: T/K
+          - row_number_as_printed: '18'
+            T_K: '611.7'
+            partial_pressure_pa: '1.01E-02'
+            value_as_printed: '1.01E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 18
+              column: 3
+              row_label: '18'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '611.7'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 18
+                  column_header: T/K
+          - row_number_as_printed: '19'
+            T_K: '622.3'
+            partial_pressure_pa: '1.49E-02'
+            value_as_printed: '1.49E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 19
+              column: 3
+              row_label: '19'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 19
+                  column_header: T/K
+          - row_number_as_printed: '20'
+            T_K: '632.9'
+            partial_pressure_pa: '2.19E-02'
+            value_as_printed: '2.19E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 20
+              column: 3
+              row_label: '20'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '632.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 20
+                  column_header: T/K
+          - row_number_as_printed: '21'
+            T_K: '643.5'
+            partial_pressure_pa: '3.35E-02'
+            value_as_printed: '3.35E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 21
+              column: 3
+              row_label: '21'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '643.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 21
+                  column_header: T/K
+          - row_number_as_printed: '22'
+            T_K: '654.0'
+            partial_pressure_pa: '5.19E-02'
+            value_as_printed: '5.19E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 22
+              column: 3
+              row_label: '22'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 22
+                  column_header: T/K
+          - row_number_as_printed: '23'
+            T_K: '664.6'
+            partial_pressure_pa: '8.50E-02'
+            value_as_printed: '8.50E-02'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 23
+              column: 3
+              row_label: '23'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 23
+                  column_header: T/K
+          - row_number_as_printed: '24'
+            T_K: '675.2'
+            partial_pressure_pa: '1.20E-01'
+            value_as_printed: '1.20E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 24
+              column: 3
+              row_label: '24'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 24
+                  column_header: T/K
+          - row_number_as_printed: '25'
+            T_K: '685.8'
+            partial_pressure_pa: '1.80E-01'
+            value_as_printed: '1.80E-01'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 25
+              column: 3
+              row_label: '25'
+              column_header: PNa /Pa
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 25
+                  column_header: T/K
+      - observation_id: huang2003_na_gas_delta_fh_298_15_this_work
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.2 Sample preparation and pressure calibration
+          note: The source states ΔfH°(298.15 K) = 107.6 ± 0.8 kJ mol−1.
+        phase: gas
+        standard_state: ΔfH° for Na(g), as printed; no numeric reference pressure is specified.
+        experiment: huang2003_kems
+        units: kJ/mol
+        uncertainty:
+          value: '0.8'
+          unit: kJ/mol
+          basis: as printed
+          confidence_level: not_stated
+          note: Printed width; confidence level not stated.
+        values:
+          quantity: delta_fH
+          method_class: author_derived
+          admission_status: admitted
+          delta_fH_298_kJ_mol: '107.6'
+          value_as_printed: 107.6 ± 0.8 kJ mol−1
+          temperature_K: '298.15'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298.15'
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          composition:
+            state:
+              tag: not_applicable
+              reason: A pure Na(g) standard-enthalpy value, not a mixture composition.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The article gives no numeric pressure for the standard-state value.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The article gives no fO2 condition for the standard-state value.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+      - observation_id: huang2003_na_gas_delta_fh_298_15_nist_janaf
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.2 Sample preparation and pressure calibration
+          note: Comparison value attributed to NIST-JANAF [18].
+        phase: gas
+        standard_state: ΔfH° for Na(g), as printed; numeric reference pressure not stated.
+        experiment: huang2003_kems
+        units: kJ/mol
+        values:
+          quantity: delta_fH
+          method_class: quoted_attributed
+          attribution: NIST-JANAF Thermodynamic Tables [18]
+          admission_status: admitted
+          delta_fH_298_kJ_mol: '107.3'
+          value_as_printed: 107.3 kJ mol−1
+          temperature_K: '298.15'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298.15'
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          composition:
+            state:
+              tag: not_applicable
+              reason: A pure Na(g) standard-enthalpy value, not a mixture composition.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The article gives no numeric pressure for the standard-state value.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The article gives no fO2 condition for the standard-state value.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+    context:
+      - observation_id: huang2003_na_pressure_fit_eq3
+        type: fitted_partial_pressure_context
+        units: Pa
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          equation: '3'
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          method_class: model_derived
+          quantity: partial_pressure
+          equation_as_printed: lnPNa = 24.376 − 17749/T
+          coefficient_A_as_printed: '24.376'
+          coefficient_B_as_printed: '17749'
+          temperature_as_printed: K
+          pressure_unit_as_printed: Pa per Table 1
+          temperature_range_as_printed: 590–717 K
+          standard_state_note: The equation prints lnPNa, Table 1 labels PNa/Pa, and no numeric reference pressure is stated.
+          derived_from:
+            - huang2003_table1_na_partial_pressure
+          inputs_note: Fit of the 25 experimental Table 1 pressure rows.
+      - observation_id: huang2003_na_enthalpy_derivation_context
+        type: third_law_calculation_context
+        units: kJ/mol
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.2 Sample preparation and pressure calibration
+        values:
+          method_class: author_derived
+          relation_as_printed: Third-law treatment of the Na(liq) = Na(g) pressure-temperature relationship
+          resulting_value_as_printed: ΔfH°(298.15 K) = 107.6 ± 0.8 kJ mol−1
+          raw_temperature_pressure_points: not published
+          result_observation_id: huang2003_na_gas_delta_fh_298_15_this_work
+      - observation_id: huang2003_na_pressure_calibration_standard_context
+        type: pressure_calibration_context
+        units: Pa
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.2 Sample preparation and pressure calibration
+        values:
+          calibration_standard_as_printed: Sodium (99.7%)
+          vapor_species_as_printed: Na(g)
+          calibration_reference_as_printed: Saturated sodium vapor pressure given in [17]
+          calibration_relation_as_printed: P(Na) = K × {I × T}
+          calibration_inputs_as_printed: I is Na+ ion intensity; T is the sample temperature.
+          proportional_constant_as_printed: K, calibrated from the saturated sodium vapor pressure in [17]; no numerical K or I is printed.
+      - observation_id: huang2003_na_species_detection_context
+        type: vapor_species_detection_context
+        units: as_printed
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          principal_vapor_species_as_printed: Na(g)
+          Na_detection_temperature_as_printed: about 550 K
+          sodium_role: main vapor species over Na4FeO3(s)
+          numeric_Na_ion_intensities: not printed
+          direct_Na_partial_pressures: Table 1
+          Na2_ion_intensity_comparison: Refer to species.Na2.context.
+      - observation_id: huang2003_standard_state_context
+        type: standard_state_context
+        units: not_applicable
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          standard_symbols_as_printed:
+            - ΔrG°
+            - ΔfG°
+            - ΔfH°
+          standard_pressure_or_fugacity_basis: not stated
+          Kp_standard_state: no unit or standard-pressure value printed
+          rule: No 1 bar or 1 atm standard pressure is inferred.
+          sampling_sequence_as_printed: Temperature was changed step by step while Na+ intensity was measured.
+  Na3FeO3:
+    observations:
+      - observation_id: huang2003_table1_reaction_gibbs_typed_refusal
+        type: gibbs_table
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 reaction Gibbs-change column ΔrG°(T)/J mol−1.
+        phase: cr
+        standard_state: ΔrG°(T) as printed for reaction (2); no numeric reference pressure is stated.
+        experiment: huang2003_kems
+        units: J/mol
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_reactant_mole_ratio_2_Na2O_to_1_FeO
+                amount_basis: mol_inventory
+                components:
+                  - - Na2O
+                    - '2'
+                  - - FeO
+                    - '1'
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The printed synthesis ratio is 2:1 molar Na2O(s):FeO(s); the charge is identified as Na4FeO3(s).
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: No in-cell total pressure is printed; 10^-6 Pa describes the vacuum system operating level.
+            locator:
+              page: 2
+              published_page: 62
+              pdf_page_index: 1
+              section: 2.1 Knudsen effusion mass spectrometer
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No measurement fO2 or measurement atmosphere is stated.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The <10 ppm oxygen statement applies to the glove box used in sample preparation.
+        values:
+          quantity: reaction_gibbs_energy_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          schema_gap: No exact stored quantity token represents the reaction Gibbs-energy change ΔrG°. Quantity.DELTA_FG represents formation Gibbs energy rather than reaction Gibbs energy.
+          schema_gap_symbols:
+            - simulator/battery/enums.py::Quantity.DELTA_FG
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          reaction_as_printed: Na4FeO3(s) = Na3FeO3(s) + Na(gas), Eq. (2)
+          derived_from:
+            - huang2003_table1_na_partial_pressure
+          points:
+          - row_number_as_printed: '1'
+            T_K: '590.6'
+            value: '83575'
+            value_as_printed: '83575'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 1
+              column: 4
+              row_label: '1'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 1
+                  column_header: T/K
+          - row_number_as_printed: '2'
+            T_K: '606.4'
+            value: '82397'
+            value_as_printed: '82397'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 2
+              column: 4
+              row_label: '2'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '606.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 2
+                  column_header: T/K
+          - row_number_as_printed: '3'
+            T_K: '622.3'
+            value: '80736'
+            value_as_printed: '80736'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 3
+              column: 4
+              row_label: '3'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 3
+                  column_header: T/K
+          - row_number_as_printed: '4'
+            T_K: '638.2'
+            value: '78816'
+            value_as_printed: '78816'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 4
+              column: 4
+              row_label: '4'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '638.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 4
+                  column_header: T/K
+          - row_number_as_printed: '5'
+            T_K: '654.0'
+            value: '77752'
+            value_as_printed: '77752'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 5
+              column: 4
+              row_label: '5'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 5
+                  column_header: T/K
+          - row_number_as_printed: '6'
+            T_K: '664.6'
+            value: '77051'
+            value_as_printed: '77051'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 6
+              column: 4
+              row_label: '6'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 6
+                  column_header: T/K
+          - row_number_as_printed: '7'
+            T_K: '669.9'
+            value: '76554'
+            value_as_printed: '76554'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 7
+              column: 4
+              row_label: '7'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '669.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 7
+                  column_header: T/K
+          - row_number_as_printed: '8'
+            T_K: '675.2'
+            value: '76281'
+            value_as_printed: '76281'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 8
+              column: 4
+              row_label: '8'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 8
+                  column_header: T/K
+          - row_number_as_printed: '9'
+            T_K: '685.8'
+            value: '73861'
+            value_as_printed: '73861'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 9
+              column: 4
+              row_label: '9'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 9
+                  column_header: T/K
+          - row_number_as_printed: '10'
+            T_K: '696.4'
+            value: '72751'
+            value_as_printed: '72751'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 10
+              column: 4
+              row_label: '10'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '696.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 10
+                  column_header: T/K
+          - row_number_as_printed: '11'
+            T_K: '701.6'
+            value: '72150'
+            value_as_printed: '72150'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 11
+              column: 4
+              row_label: '11'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 11
+                  column_header: T/K
+          - row_number_as_printed: '12'
+            T_K: '701.6'
+            value: '70931'
+            value_as_printed: '70931'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 12
+              column: 4
+              row_label: '12'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 12
+                  column_header: T/K
+          - row_number_as_printed: '13'
+            T_K: '706.9'
+            value: '70746'
+            value_as_printed: '70746'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 13
+              column: 4
+              row_label: '13'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '706.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 13
+                  column_header: T/K
+          - row_number_as_printed: '14'
+            T_K: '712.2'
+            value: '70734'
+            value_as_printed: '70734'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 14
+              column: 4
+              row_label: '14'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '712.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 14
+                  column_header: T/K
+          - row_number_as_printed: '15'
+            T_K: '717.5'
+            value: '70661'
+            value_as_printed: '70661'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 15
+              column: 4
+              row_label: '15'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '717.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 15
+                  column_header: T/K
+          - row_number_as_printed: '16'
+            T_K: '590.6'
+            value: '84112'
+            value_as_printed: '84112'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 16
+              column: 4
+              row_label: '16'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 16
+                  column_header: T/K
+          - row_number_as_printed: '17'
+            T_K: '601.1'
+            value: '83064'
+            value_as_printed: '83064'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 17
+              column: 4
+              row_label: '17'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '601.1'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 17
+                  column_header: T/K
+          - row_number_as_printed: '18'
+            T_K: '611.7'
+            value: '81999'
+            value_as_printed: '81999'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 18
+              column: 4
+              row_label: '18'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '611.7'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 18
+                  column_header: T/K
+          - row_number_as_printed: '19'
+            T_K: '622.3'
+            value: '81397'
+            value_as_printed: '81397'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 19
+              column: 4
+              row_label: '19'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 19
+                  column_header: T/K
+          - row_number_as_printed: '20'
+            T_K: '632.9'
+            value: '80742'
+            value_as_printed: '80742'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 20
+              column: 4
+              row_label: '20'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '632.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 20
+                  column_header: T/K
+          - row_number_as_printed: '21'
+            T_K: '643.5'
+            value: '79834'
+            value_as_printed: '79834'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 21
+              column: 4
+              row_label: '21'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '643.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 21
+                  column_header: T/K
+          - row_number_as_printed: '22'
+            T_K: '654.0'
+            value: '78763'
+            value_as_printed: '78763'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 22
+              column: 4
+              row_label: '22'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 22
+                  column_header: T/K
+          - row_number_as_printed: '23'
+            T_K: '664.6'
+            value: '77306'
+            value_as_printed: '77306'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 23
+              column: 4
+              row_label: '23'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 23
+                  column_header: T/K
+          - row_number_as_printed: '24'
+            T_K: '675.2'
+            value: '76601'
+            value_as_printed: '76601'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 24
+              column: 4
+              row_label: '24'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 24
+                  column_header: T/K
+          - row_number_as_printed: '25'
+            T_K: '685.8'
+            value: '75495'
+            value_as_printed: '75495'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 25
+              column: 4
+              row_label: '25'
+              column_header: ΔrG°(T)/J mol−1
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 25
+                  column_header: T/K
+      - observation_id: huang2003_table1_kp_typed_refusal
+        type: gibbs_table
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 raw Kp column; the printed Kp is not log10(Kp).
+        phase: cr
+        standard_state: Kp as printed; no unit or numerical standard pressure is given.
+        experiment: huang2003_kems
+        units: not_printed
+        point_conditions:
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_reactant_mole_ratio_2_Na2O_to_1_FeO
+                amount_basis: mol_inventory
+                components:
+                  - - Na2O
+                    - '2'
+                  - - FeO
+                    - '1'
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The printed synthesis ratio is 2:1 molar Na2O(s):FeO(s); the charge is identified as Na4FeO3(s).
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: No in-cell total pressure is printed; 10^-6 Pa describes the vacuum system operating level.
+            locator:
+              page: 2
+              published_page: 62
+              pdf_page_index: 1
+              section: 2.1 Knudsen effusion mass spectrometer
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: No measurement fO2 or measurement atmosphere is stated.
+            locator:
+              page: 3
+              published_page: 63
+              pdf_page_index: 2
+              section: 2.2 Sample preparation and pressure calibration
+              note: The <10 ppm oxygen statement applies to the glove box used in sample preparation.
+        values:
+          quantity: raw_reaction_equilibrium_constant_Kp_as_printed
+          method_class: author_derived
+          admission_status: typed_refusal
+          schema_gap: No exact token represents raw linear Kp. Quantity.LOG10_K_REACTION and reaction_equilibrium_constant in QUANTITY_ALIASES represent log10(K), not the printed Kp values.
+          schema_gap_symbols:
+            - simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+            - simulator/battery/migrate.py::QUANTITY_ALIASES
+            - simulator/battery/migrate.py::TYPE_QUANTITY
+            - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+          reaction_as_printed: Na4FeO3(s) = Na3FeO3(s) + Na(gas), Eq. (2)
+          derived_from:
+            - huang2003_table1_reaction_gibbs_typed_refusal
+          points:
+          - row_number_as_printed: '1'
+            T_K: '590.6'
+            value: '4.05E-08'
+            value_as_printed: '4.05E-08'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 1
+              column: 5
+              row_label: '1'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 1
+                  column_header: T/K
+          - row_number_as_printed: '2'
+            T_K: '606.4'
+            value: '7.99E-08'
+            value_as_printed: '7.99E-08'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 2
+              column: 5
+              row_label: '2'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '606.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 2
+                  column_header: T/K
+          - row_number_as_printed: '3'
+            T_K: '622.3'
+            value: '1.67E-07'
+            value_as_printed: '1.67E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 3
+              column: 5
+              row_label: '3'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 3
+                  column_header: T/K
+          - row_number_as_printed: '4'
+            T_K: '638.2'
+            value: '3.54E-07'
+            value_as_printed: '3.54E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 4
+              column: 5
+              row_label: '4'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '638.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 4
+                  column_header: T/K
+          - row_number_as_printed: '5'
+            T_K: '654.0'
+            value: '6.17E-07'
+            value_as_printed: '6.17E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 5
+              column: 5
+              row_label: '5'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 5
+                  column_header: T/K
+          - row_number_as_printed: '6'
+            T_K: '664.6'
+            value: '8.79E-07'
+            value_as_printed: '8.79E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 6
+              column: 5
+              row_label: '6'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 6
+                  column_header: T/K
+          - row_number_as_printed: '7'
+            T_K: '669.9'
+            value: '1.07E-06'
+            value_as_printed: '1.07E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 7
+              column: 5
+              row_label: '7'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '669.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 7
+                  column_header: T/K
+          - row_number_as_printed: '8'
+            T_K: '675.2'
+            value: '1.25E-06'
+            value_as_printed: '1.25E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 8
+              column: 5
+              row_label: '8'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 8
+                  column_header: T/K
+          - row_number_as_printed: '9'
+            T_K: '685.8'
+            value: '2.37E-06'
+            value_as_printed: '2.37E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 9
+              column: 5
+              row_label: '9'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 9
+                  column_header: T/K
+          - row_number_as_printed: '10'
+            T_K: '696.4'
+            value: '3.49E-06'
+            value_as_printed: '3.49E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 10
+              column: 5
+              row_label: '10'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '696.4'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 10
+                  column_header: T/K
+          - row_number_as_printed: '11'
+            T_K: '701.6'
+            value: '4.25E-06'
+            value_as_printed: '4.25E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 11
+              column: 5
+              row_label: '11'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 11
+                  column_header: T/K
+          - row_number_as_printed: '12'
+            T_K: '701.6'
+            value: '5.24E-06'
+            value_as_printed: '5.24E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 12
+              column: 5
+              row_label: '12'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '701.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 12
+                  column_header: T/K
+          - row_number_as_printed: '13'
+            T_K: '706.9'
+            value: '5.92E-06'
+            value_as_printed: '5.92E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 13
+              column: 5
+              row_label: '13'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '706.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 13
+                  column_header: T/K
+          - row_number_as_printed: '14'
+            T_K: '712.2'
+            value: '6.49E-06'
+            value_as_printed: '6.49E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 14
+              column: 5
+              row_label: '14'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '712.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 14
+                  column_header: T/K
+          - row_number_as_printed: '15'
+            T_K: '717.5'
+            value: '7.17E-06'
+            value_as_printed: '7.17E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 15
+              column: 5
+              row_label: '15'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '717.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 15
+                  column_header: T/K
+          - row_number_as_printed: '16'
+            T_K: '590.6'
+            value: '3.63E-08'
+            value_as_printed: '3.63E-08'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 16
+              column: 5
+              row_label: '16'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '590.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 16
+                  column_header: T/K
+          - row_number_as_printed: '17'
+            T_K: '601.1'
+            value: '6.05E-08'
+            value_as_printed: '6.05E-08'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 17
+              column: 5
+              row_label: '17'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '601.1'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 17
+                  column_header: T/K
+          - row_number_as_printed: '18'
+            T_K: '611.7'
+            value: '9.95E-08'
+            value_as_printed: '9.95E-08'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 18
+              column: 5
+              row_label: '18'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '611.7'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 18
+                  column_header: T/K
+          - row_number_as_printed: '19'
+            T_K: '622.3'
+            value: '1.47E-07'
+            value_as_printed: '1.47E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 19
+              column: 5
+              row_label: '19'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '622.3'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 19
+                  column_header: T/K
+          - row_number_as_printed: '20'
+            T_K: '632.9'
+            value: '2.17E-07'
+            value_as_printed: '2.17E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 20
+              column: 5
+              row_label: '20'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '632.9'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 20
+                  column_header: T/K
+          - row_number_as_printed: '21'
+            T_K: '643.5'
+            value: '3.30E-07'
+            value_as_printed: '3.30E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 21
+              column: 5
+              row_label: '21'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '643.5'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 21
+                  column_header: T/K
+          - row_number_as_printed: '22'
+            T_K: '654.0'
+            value: '5.12E-07'
+            value_as_printed: '5.12E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 22
+              column: 5
+              row_label: '22'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '654.0'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 22
+                  column_header: T/K
+          - row_number_as_printed: '23'
+            T_K: '664.6'
+            value: '8.39E-07'
+            value_as_printed: '8.39E-07'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 23
+              column: 5
+              row_label: '23'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '664.6'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 23
+                  column_header: T/K
+          - row_number_as_printed: '24'
+            T_K: '675.2'
+            value: '1.18E-06'
+            value_as_printed: '1.18E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 24
+              column: 5
+              row_label: '24'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '675.2'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 24
+                  column_header: T/K
+          - row_number_as_printed: '25'
+            T_K: '685.8'
+            value: '1.78E-06'
+            value_as_printed: '1.78E-06'
+            locator:
+              page: 5
+              published_page: 65
+              pdf_page_index: 4
+              table: '1'
+              row: 25
+              column: 5
+              row_label: '25'
+              column_header: Kp
+            point_conditions:
+              temperature_K:
+                state:
+                  tag: value
+                  value:
+                    kind: point
+                    point: '685.8'
+                locator:
+                  page: 5
+                  published_page: 65
+                  pdf_page_index: 4
+                  table: '1'
+                  row: 25
+                  column_header: T/K
+    context:
+      - observation_id: huang2003_table1_delta_rG_fit_eq4
+        type: reaction_gibbs_fit_context
+        units: J/mol
+        locator:
+          page: 4
+          published_page: 64
+          pdf_page_index: 3
+          equation: '4'
+          section: 4.1 Thermodynamic evaluation
+        values:
+          method_class: model_derived
+          quantity: reaction_gibbs_energy_as_printed
+          schema_gap: The fit is retained in context because reaction Gibbs energy has no exact quantity token.
+          schema_gap_symbols:
+            - simulator/battery/enums.py::Quantity.DELTA_FG
+          equation_as_printed: ΔrG°(T) = (148522.2 ± 2753.8) − (108.29 ± 4.18) × T, (590 − 717 K)
+          intercept_as_printed: '148522.2'
+          intercept_uncertainty_as_printed: '2753.8'
+          slope_as_printed: '108.29'
+          slope_uncertainty_as_printed: '4.18'
+          intercept_unit: J mol−1
+          slope_unit: J mol−1 K−1
+          temperature_range_as_printed: 590–717 K
+          uncertainty_confidence_level: not stated
+          derived_from:
+            - huang2003_table1_reaction_gibbs_typed_refusal
+          fit_inputs: Table 1 reaction Gibbs-energy rows 1–25.
+      - observation_id: huang2003_delta_fG_sgte_equation_quoted
+        type: quoted_thermodynamic_fit_context
+        units: J/mol
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          section: 4.2 Discussion
+        values:
+          method_class: quoted_attributed
+          attribution: SGTE database given by Thermo-Calc [19]
+          quantity_as_printed: ΔfG°(Na, gas)
+          equation_as_printed: ΔfG°(Na, gas) = 104949 − 95.53×T
+          intercept_as_printed: '104949'
+          slope_as_printed: '95.53'
+          units_as_printed: J mol−1; T in K
+      - observation_id: huang2003_na4feo3_delta_fG_bhat_borgstedt_quoted
+        type: quoted_thermodynamic_fit_context
+        units: J/mol
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          equation: '6'
+          section: 4.2 Discussion
+          note: Equation (6) on this page.
+        values:
+          method_class: quoted_attributed
+          attribution: Bhat and Borgstedt [7]
+          quantity_as_printed: ΔfG°(Na4FeO3)
+          equation_as_printed: ΔfG°(Na4FeO3) = −1212202 + 351.10 × T
+          intercept_as_printed: '−1212202'
+          slope_as_printed: '351.10'
+          units_as_printed: J mol−1; T in K
+          uncertainty_as_printed: ±2100 J mol−1
+          uncertainty_confidence_level: not stated
+      - observation_id: huang2003_na3feO3_delta_fG_fit_eq7
+        type: formation_gibbs_fit_context
+        units: J/mol
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          equation: '7'
+          section: 4.2 Discussion
+        values:
+          quantity: delta_fG
+          method_class: model_derived
+          equation_as_printed: ΔfG°(Na3FeO3) = −1168629 + 338.34 × T, (298 < T < 720 K)
+          intercept_as_printed: '−1168629'
+          slope_as_printed: '338.34'
+          units_as_printed: J mol−1; T in K
+          temperature_range_as_printed: 298 < T < 720 K
+          uncertainty_as_printed: about ±7 kJ mol−1
+          uncertainty_basis: Source-data uncertainty; Bhat and Borgstedt [7] reported ±2100 J mol−1 for Na4FeO3.
+          uncertainty_confidence_level: not stated
+          derived_from:
+            - huang2003_table1_delta_rG_fit_eq4
+            - huang2003_delta_fG_sgte_equation_quoted
+            - huang2003_na4feo3_delta_fG_bhat_borgstedt_quoted
+          derivation_as_printed: Equation (5) derives ΔfG°(Na3FeO3) from the reaction ΔrG° and the Na(g) and Na4FeO3 formation Gibbs functions.
+      - observation_id: huang2003_delta_fG_derivation_eq5
+        type: reaction_thermodynamic_relation_context
+        units: J/mol
+        locator:
+          page: 4
+          published_page: 64
+          pdf_page_index: 3
+          equation: '5'
+          section: 4.1 Thermodynamic evaluation
+        values:
+          method_class: relation_as_printed
+          equation_as_printed: ΔfG°(Na3FeO3) = ΔrG°(T) − ΔfG°(Na, gas) + ΔfG°(Na4FeO3)
+      - observation_id: huang2003_figures_undigitised
+        type: figure_read_candidate_context
+        units: Pa
+        locator:
+          page: 4
+          published_page: 64
+          pdf_page_index: 3
+          figure: '3'
+          note: Figure 3 plots the Table 1 sodium pressure behavior and does not supply separate values.
+        values:
+          method_class: figure_only
+          digitisation: undigitised
+          note: No additional Figure 3 points were extracted; its pressure series is represented by Table 1.
+      - observation_id: huang2003_malt2_comparison_undigitised
+        type: figure_read_candidate_context
+        units: J/mol
+        locator:
+          page: 5
+          published_page: 65
+          pdf_page_index: 4
+          figure: '4'
+          note: Figure 4 compares Na3FeO3 formation Gibbs energy with MALT2.
+        values:
+          method_class: figure_only
+          digitisation: undigitised
+          note: Figure values were not read from axes.
+  Na2:
+    observations: []
+    context:
+      - observation_id: huang2003_na2_relative_ion_intensity
+        type: ion_intensity_context
+        units: not_printed
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          vapor_species_as_printed: Na2(g)
+          relation_to_Na_ion_intensity_as_printed: Three to four orders of magnitude lower than the monomer.
+          numerical_ion_intensities: not printed
+  NaO:
+    observations: []
+    context:
+      - observation_id: huang2003_nao_not_observed
+        type: vapor_species_detection_context
+        units: not_applicable
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          vapor_species_as_printed: NaO(g)
+          observation_as_printed: Not observed due to the detection limit.
+          numeric_pressure_or_intensity: not printed
+  Na2O:
+    observations: []
+    context:
+      - observation_id: huang2003_na2o_not_observed
+        type: vapor_species_detection_context
+        units: not_applicable
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 3.2 Temperature dependence of sodium vapor pressure over Na4FeO3(s)
+        values:
+          vapor_species_as_printed: Na2O(g)
+          observation_as_printed: Not observed due to the detection limit.
+          numeric_pressure_or_intensity: not printed
+  Na4FeO3:
+    observations: []
+    context:
+      - observation_id: huang2003_apparatus_system_pressure_and_purging
+        type: apparatus_context
+        units: as_printed
+        locator:
+          page: 2
+          published_page: 62
+          pdf_page_index: 1
+          section: 2.1 Knudsen effusion mass spectrometer
+        values:
+          apparatus_as_printed: The system consists of a quadrupole mass spectrometer, Knudsen vapor effusion cell (K-cell), and vacuum chamber.
+          model_as_printed: Microvision Plus LM70
+          supplier_as_printed: Spectra Instruments
+          vacuum_system_ultimate_pressure_as_printed: 10^-7 Pa
+          experiment_vacuum_system_pressure_as_printed: 10^-6 Pa level, even at high temperatures
+          pressure_scope: Vacuum system/chamber pressure; not stated as K-cell in-cell total pressure.
+          purge_gas_as_printed: High purity argon
+          purge_gas_role: Used for purging the system.
+          measurement_carrier_gas: Not stated.
+          mass_analyser_as_printed: Quadrupole mass spectrometer.
+          detector_as_printed:
+            - Faraday cup
+            - secondary electron multiplier
+          secondary_electron_multiplier_factor_calibration_as_printed: The factor is calibrated by the Faraday cup.
+          ionization_filament_as_printed: ThO2-Ir filament.
+          electron_impact_energy_as_printed: 9.8 eV
+          cell_orifice_diameter_as_printed: 1 mm
+          cell_material_as_printed: Pt
+          cell_cover_as_printed: Silver-coated cover
+          compatibility_tests_as_printed: Mo formed Na2MoO4 and Na2Mo3O6 with NaFeO2 around 1200 K; severe reaction with NaOH(liq) around 900 K; Pt showed no interactions with Na-containing substances until 1400 K.
+      - observation_id: huang2003_sample_synthesis_and_changes
+        type: sample_preparation_context
+        units: as_printed
+        locator:
+          page: 3
+          published_page: 63
+          pdf_page_index: 2
+          section: 2.2 Sample preparation and pressure calibration
+        values:
+          source_materials_as_printed:
+            - Na2O(s) 99.4%
+            - FeO(s) 99.9%
+          starting_mole_ratio_as_printed: 2:1 Na2O(s):FeO(s)
+          sealing_container_as_printed: stainless steel container
+          preparation_atmosphere_as_printed: glove box; oxygen concentration less than 10 ppm; water vapor concentration less than 10 ppm
+          sintering_as_printed: 873 K for 100 h
+          identification_as_printed: XRD showed prepared sample almost pure Na4FeO3(s), JCPDS file No. 34-0891
+          premeasurement_storage_as_printed: Prepared sample was continuously stored in a glove box before transfer into the K-cell.
+          installation_atmosphere_as_printed: Sample installation was carried out in another glove box attached to the high-temperature mass spectrometer.
+          reaction_1_as_printed: 2Na2O(s) + FeO(s) = Na4FeO3(s)
+          experiment_specimens_as_printed: Two separate measurements on Na4FeO3(s).
+          first_specimen_run_as_printed: 4 h over 590–717 K; post-run Na4FeO3(s):Na3FeO3(s) molar ratio 9:1.
+          second_specimen_run_as_printed: Evaporated about 30 h; complete decomposition from Na4FeO3(s) into Na3FeO3(s).
+          XRD_NaOH_as_printed: A small NaOH peak was attributed to possible moisture absorption from the environment during XRD.
+          table_row_assignment: Table 1 does not label row-to-specimen assignments; no row split is inferred.

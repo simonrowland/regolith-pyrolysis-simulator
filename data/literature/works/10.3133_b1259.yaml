@@ -9099,45 +9099,6 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0169-bunsenite.json
     record: b1259-298k-0169-bunsenite
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0171-po-aqueous-ion:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 18
-    pdf_page_index: 24
-    table: b1259-298k-0171-po-aqueous-ion
-    note: as_published='-244000'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
-      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements; elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, P=B1259
-      reference-state table p.60/PDF p.66
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0171-po-aqueous-ion.json
-    record: b1259-298k-0171-po-aqueous-ion
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0172-litharge:tabulation
   kind: literature
   method:
@@ -9325,45 +9286,6 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0176-sulfur-trioxide.json
     record: b1259-298k-0176-sulfur-trioxide
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0177-so-aqueous-ion:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 18
-    pdf_page_index: 24
-    table: b1259-298k-0177-so-aqueous-ion
-    note: as_published='-116300'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
-      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements; elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259
-      reference-state table p.63/PDF p.69
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0177-so-aqueous-ion.json
-    record: b1259-298k-0177-so-aqueous-ion
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0178-so-aqueous-ion:tabulation
   kind: literature
   method:
@@ -12303,43 +12225,6 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0278-scheelite.json
     record: b1259-298k-0278-scheelite
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0279-ferberite:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 22
-    pdf_page_index: 28
-    table: b1259-298k-0279-ferberite
-    note: as_published='31.5'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
-      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0279-ferberite.json
-    record: b1259-298k-0279-ferberite
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0280-stolzite:tabulation
   kind: literature
   method:
@@ -13158,43 +13043,6 @@ experiments:
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0311-hexagonal-anorthite.json
     record: b1259-298k-0311-hexagonal-anorthite
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0315-adularia:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 24
-    pdf_page_index: 30
-    table: b1259-298k-0315-adularia
-    note: as_published='55.99'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
-      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
-      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0315-adularia.json
-    record: b1259-298k-0315-adularia
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0317-kaliophilite:tabulation
   kind: literature
   method:
@@ -18902,44 +18750,6 @@ experiments:
       atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0145-scacchite.json
     record: b1259-ht-0145-scacchite
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0146-salammoniac:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 171
-    pdf_page_index: 177
-    table: b1259-ht-0146-salammoniac
-    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0146-salammoniac.json
-    record: b1259-ht-0146-salammoniac
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0147-halite:tabulation
   kind: literature
   method:
@@ -20196,82 +20006,6 @@ experiments:
       atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0183-gehlenite.json
     record: b1259-ht-0183-gehlenite
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0184-grcssular:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 209
-    pdf_page_index: 215
-    table: b1259-ht-0184-grcssular
-    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0184-grcssular.json
-    record: b1259-ht-0184-grcssular
-- experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0185-merwinite:tabulation
-  kind: literature
-  method:
-    tag: value
-    value: tabulation
-  sample: {}
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 10.3133/b1259
-  locator:
-    published_page: 210
-    pdf_page_index: 216
-    table: b1259-ht-0185-merwinite
-    note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
-      H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
-      value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
-    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0185-merwinite.json
-    record: b1259-ht-0185-merwinite
 - experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-ht-0186-akermanite:tabulation
   kind: literature
   method:

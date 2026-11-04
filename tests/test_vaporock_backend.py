@@ -345,10 +345,8 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             pressure_bar=2e-6,
         )
 
-    # The hot case is 1800 K: above the certified [1073.15, 1700] K band but
-    # inside the adapter's hard [1350, 1950] K gate. The certified lower T
-    # bound is unreachable through that gate, so only the upper bound can
-    # produce a temperature notice here.
+    # The hot case is outside the MELTS band but inside the VapoRock band;
+    # the cold case is below both bands and carries both notices.
     cases = {
         'in_band': (1400.0, {'SiO2': 50.0, 'Na2O': 50.0}, None, None),
         'low_sio2': (
@@ -369,6 +367,12 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             'temperature_range',
             ('temperature_range',),
         ),
+        'cold': (
+            1000.0 - 273.15,
+            {'SiO2': 50.0, 'Na2O': 50.0},
+            'temperature_range',
+            ('temperature_range',),
+        ),
     }
     notice_warning = (
         'CommissioningNotice: out of certified band; '
@@ -383,7 +387,7 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
         )
         # A/B: the same point with the assessment stubbed to no-notice must
         # give byte-identical predicted values and identical diagnostics
-        # modulo the three notice keys.
+        # modulo the notice fields.
         monkeypatch.setattr(
             vaporock_module,
             'assess_engine_commissioning',
@@ -403,9 +407,24 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
         stripped = {
             key: value
             for key, value in result.diagnostics.items()
-            if key not in ('commissioning_notice', 'authority', 'certified_band')
+            if key not in (
+                'commissioning_notice',
+                'authority',
+                'certified_band',
+                'vaporock_temperature_notice',
+            )
         }
-        assert stripped == bare.diagnostics, label
+        bare_stripped = {
+            key: value
+            for key, value in bare.diagnostics.items()
+            if key not in (
+                'commissioning_notice',
+                'authority',
+                'certified_band',
+                'vaporock_temperature_notice',
+            )
+        }
+        assert stripped == bare_stripped, label
 
         notice = result.diagnostics.get('commissioning_notice')
         if reason is None:
@@ -430,6 +449,12 @@ def test_vaporock_commissioning_notice_preserves_prediction_values(monkeypatch):
             assert [
                 w for w in result.warnings if w != notice_warning
             ] == bare.warnings
+            if label == 'hot':
+                assert 'vaporock_temperature_notice' not in result.diagnostics
+            if label == 'cold':
+                assert result.diagnostics['vaporock_temperature_notice'][
+                    'reason'
+                ] == 'temperature_range'
     # The fake engine depends on its inputs, so the A/B equalities above are
     # not tautological: distinct compositions give distinct pressures.
     assert observed['low_sio2'] != observed['in_band']
@@ -708,6 +733,14 @@ def test_system_entrypoint_marks_pressure_non_authoritative(monkeypatch):
 
 
 def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch):
+    from engines.builtin import vapor_pressure as builtin_vapor_pressure
+
+    monkeypatch.setattr(
+        builtin_vapor_pressure,
+        "openimcc_binding_selected_by_inputs",
+        lambda **_kwargs: False,
+    )
+
     class FakeSystem:
         def set_melt_comp(self, composition):
             self.composition = dict(composition)
@@ -1552,14 +1585,14 @@ def _fake_system_module(log10_bar_by_species, *, track=None):
     return types.SimpleNamespace(System=FakeSystem), FakeSystem
 
 
-def test_domain_helpers_admit_only_1350_to_1950_K():
+def test_domain_helpers_pin_vaporock_certified_band_1350_to_1950_K():
+    from engines.engine_commissioning import vaporock_temperature_in_domain
     from simulator.melt_backend.vaporock import (
         VAPOROCK_T_MAX_K,
         VAPOROCK_T_MIN_K,
         temperature_C_to_K,
         vaporock_liquid_fraction_admitted,
         vaporock_sum_pressure_sane,
-        vaporock_temperature_in_domain,
     )
 
     assert VAPOROCK_T_MIN_K == 1350.0
@@ -1594,54 +1627,65 @@ def test_domain_helpers_admit_only_1350_to_1950_K():
     assert sum_bar == pytest.approx(VAPOROCK_PROBE_10000K_SUM_P_BAR)
 
 
-def test_temperature_domain_gate_refuses_outside_envelope(monkeypatch):
-    calls = {"n": 0}
-
-    def calc_vapor_pressures(**_):
-        calls["n"] += 1
-        return {"Na": 1.0}
-
-    fake_module = types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
+@pytest.mark.parametrize("temperature_K", [1200.0, 2000.0, 10000.0])
+def test_finite_temperature_outside_vaporock_band_runs_and_is_flagged(
+    monkeypatch,
+    temperature_K,
+):
+    fake_module, fake_system = _fake_system_module({"Na(g)": -4.0})
     _install_fake_import(monkeypatch, fake_module)
     backend = VapoRockBackend()
     assert backend.initialize({"warm_worker": False}) is True
 
-    # 10000 K (probe fabrication point): refuse before any engine call.
-    t_c_10000k = 10000.0 - 273.15
     result = backend.equilibrate(
-        t_c_10000k,
+        temperature_K - 273.15,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+    )
+    assert result.status == "non_authoritative"
+    assert result.diagnostics["temperature_K"] == pytest.approx(temperature_K)
+    assert len(fake_system.instances) == 1
+    assert len(fake_system.instances[0].eval_calls) == 1
+    assert fake_system.instances[0].eval_calls[0][0] == pytest.approx(
+        temperature_K
+    )
+    assert getattr(result, "vaporock_full_speciation_Pa", {}) == {
+        "Na": pytest.approx(10.0)
+    }
+    notice = result.diagnostics["vaporock_temperature_notice"]
+    assert notice["kind"] == "engine_commissioning"
+    assert notice["reason"] == "temperature_range"
+    assert notice["authority"] == "extrapolated"
+    assert notice["certified_band"] == {
+        "temperature_K": [1350.0, 1950.0]
+    }
+    _assert_h2_melt_envelope(
+        result.diagnostics,
+        temperature_K=temperature_K,
+        status=(
+            "in_calibration" if temperature_K <= 1700.0 else "extrapolated"
+        ),
+    )
+
+def test_out_of_band_sum_pressure_ceiling_still_refuses(monkeypatch):
+    fake_module, fake_system = _fake_system_module({"Na(g)": 2.0})
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1200.0 - 273.15,
         composition_mol={"SiO2": 1.0, "Na2O": 0.1},
         fO2_log=-8.0,
         pressure_bar=1e-6,
     )
     assert result.status == "out_of_domain"
     assert result.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
     )
-    assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
-    assert result.vapor_pressures_Pa == {}
-    assert getattr(result, "vaporock_full_speciation_Pa", {}) in ({}, None) or not getattr(
-        result, "vaporock_full_speciation_Pa", {}
-    )
-    assert calls["n"] == 0
-    assert any("outside admitted domain" in w for w in result.warnings)
-    _assert_h2_melt_envelope(
-        result.diagnostics,
-        temperature_K=10000.0,
-        status="extrapolated",
-    )
-
-    # Below floor.
-    result_lo = backend.equilibrate(
-        1350.0 - 273.15 - 1.0,
-        composition_mol={"SiO2": 1.0},
-        fO2_log=-8.0,
-    )
-    assert result_lo.status == "out_of_domain"
-    assert result_lo.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
-    )
-    assert calls["n"] == 0
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(100.0)
+    assert len(fake_system.instances[0].eval_calls) == 1
 
 
 @pytest.mark.parametrize(
@@ -1690,7 +1734,7 @@ def test_nonfinite_temperature_has_fail_closed_h2_envelope(
     assert calls["n"] == 0
 
 
-def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
+def test_vaporock_certified_band_edges_run_without_range_notice(monkeypatch):
     seen_T = []
 
     class FakeSystem:
@@ -1723,6 +1767,7 @@ def test_temperature_domain_gate_admits_envelope_edges(monkeypatch):
             temperature_K=t_k,
             status="in_calibration" if t_k <= 1700.0 else "extrapolated",
         )
+        assert "vaporock_temperature_notice" not in result.diagnostics
 
     assert seen_T == pytest.approx([1350.0, 1950.0])
 
@@ -1762,13 +1807,31 @@ def test_liquid_fraction_gate_refuses_subliquid(monkeypatch):
     assert calls["n"] == 1
 
 
+def test_out_of_band_liquid_fraction_gate_still_refuses(monkeypatch):
+    fake_module, fake_system = _fake_system_module({"Na(g)": -4.0})
+    _install_fake_import(monkeypatch, fake_module)
+    backend = VapoRockBackend()
+    assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1200.0 - 273.15,
+        composition_mol={"SiO2": 1.0, "Na2O": 0.1},
+        fO2_log=-8.0,
+        liquid_fraction=0.94,
+    )
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.LIQUID_STATE.value
+    )
+    assert fake_system.instances == []
+
+
 def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     """Defense-in-depth: even in-domain T, absurd totals are refused.
 
     Fixture source: docs-private/research/2026-07-31-vaporock-probe/findings.md
-    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). The T gate would catch 10000 K
-    first; this test injects the probe-scale total at an admitted T to pin
-    the sum-pressure gate itself.
+    (10000 K sum_P_bar_finite ≈ 8.3e5 bar). Inject it at an admitted T to
+    isolate the sum-pressure guard from the new finite-temperature notice.
     """
     from simulator.melt_backend.vaporock import VAPOROCK_PROBE_10000K_SUM_P_BAR
 
@@ -1807,8 +1870,10 @@ def test_sum_pressure_sanity_refuses_probe_scale_garbage(monkeypatch):
     assert any("10000 K" in w for w in result.warnings)
 
 
-def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch):
-    """HI-8: 10000 K is refused by the T gate before any engine call.
+def test_10000K_finite_fabrication_regression_refuses_at_sum_pressure_ceiling(
+    monkeypatch,
+):
+    """HI-8: 10000 K reaches the engine but the finite sum still refuses.
 
     The 2026-07-31 probe stored sum_P_bar ≈ 8.3e5 as a fixture. Tests
     replay that literal through a fake System; they do not recompute it
@@ -1824,7 +1889,7 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
 
         def eval_gas_abundances(self, temperature, log_fO2):
             engine_calls["n"] += 1
-            # Would return probe-scale garbage if reached.
+            # Replays the probe-scale finite total through the existing guard.
             return {"SiO(g)": math.log10(VAPOROCK_PROBE_10000K_SUM_P_BAR)}
 
     fake_module = types.SimpleNamespace(System=FakeSystem)
@@ -1838,12 +1903,15 @@ def test_10000K_finite_fabrication_regression_refuses_before_engine(monkeypatch)
         fO2_log=3.025,  # probe IW-at-10000K-ish
         pressure_bar=1e-6,
     )
-    assert engine_calls["n"] == 0
+    assert engine_calls["n"] == 2
     assert result.status == "out_of_domain"
     assert result.diagnostics["backend_status_reason"] == (
-        OutOfDomainReason.TEMPERATURE_RANGE.value
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
     )
     assert result.diagnostics["temperature_K"] == pytest.approx(10000.0)
+    assert result.diagnostics["sum_pressure_bar"] == pytest.approx(
+        VAPOROCK_PROBE_10000K_SUM_P_BAR
+    )
     # Stored 2026-07-31 fixture identity, not a live-engine recompute.
     assert VAPOROCK_PROBE_10000K_SUM_P_BAR == pytest.approx(8.323344495585738e5)
 
@@ -2364,16 +2432,17 @@ def test_warm_pool_owns_system_lifecycle_live():
         sum_bar = float(result.diagnostics.get("sum_pressure_bar") or 0.0)
         assert sum_bar < 10.0
 
-        # 10000 K still refused by the parent-side domain gate (no worker call).
-        refused = backend.equilibrate(
-            10000.0 - 273.15,
+        # Finite cold extrapolation reaches the warm worker and is flagged.
+        extrapolated = backend.equilibrate(
+            1200.0 - 273.15,
             composition_kg=_MARE_PROBE_WT_PCT,
-            fO2_log=3.0,
+            fO2_log=-9.94,
             pressure_bar=1e-6,
         )
-        assert refused.status == "out_of_domain"
-        assert refused.diagnostics["backend_status_reason"] == (
-            OutOfDomainReason.TEMPERATURE_RANGE.value
+        assert extrapolated.status == "non_authoritative"
+        assert extrapolated.diagnostics["temperature_K"] == pytest.approx(1200.0)
+        assert extrapolated.diagnostics["vaporock_temperature_notice"]["reason"] == (
+            "temperature_range"
         )
     finally:
         backend.close()
@@ -2487,6 +2556,60 @@ class _FakeWarmPool:
         del timeout_s
         self.requests.append(dict(request))
         return _WarmPayloadFuture(self.payload)
+
+
+def test_warm_pool_activity_request_is_opt_in_and_projects_payload():
+    state = (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
+    base_request = {
+        "composition_wt_pct": {"Na2O": 100.0},
+        "temperature_K": 1600.0,
+        "fO2_log": -8.0,
+    }
+    default_pool = _FakeWarmPool({"log10_bar": {"Na(g)": -0.5}})
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = default_pool
+    default_pressures = backend._call_vaporock_via_pool(**base_request)
+    assert default_pool.requests == [base_request]
+    from multiprocessing.reduction import ForkingPickler
+
+    default_wire_request = default_pool.requests[0]
+    assert set(default_wire_request) == {
+        "composition_wt_pct",
+        "temperature_K",
+        "fO2_log",
+    }
+    assert bytes(ForkingPickler.dumps(default_wire_request)) == bytes(
+        ForkingPickler.dumps(base_request)
+    )
+    assert default_pressures["Na"] == pytest.approx(10.0 ** -0.5 * 1.0e5)
+
+    pool = _FakeWarmPool(
+        {
+            "log10_bar": {"Na(g)": -0.5},
+            "oxide_activity": {"Na2O": 0.25},
+            "oxide_activity_standard_state": state,
+        }
+    )
+    backend._warm_pool = pool
+
+    pressures, activity, returned_state = backend._call_vaporock_via_pool(
+        **base_request,
+        include_oxide_activities=True,
+    )
+
+    assert pool.requests == [
+        {
+            **base_request,
+            "include_oxide_activities": True,
+        }
+    ]
+    assert pressures["Na"] == pytest.approx(10.0 ** -0.5 * 1.0e5)
+    assert activity == {"Na2O": 0.25}
+    assert returned_state == state
 
 
 def test_warm_pool_empty_log10_bar_is_typed_not_silent_success():
@@ -3617,6 +3740,437 @@ def test_system_call_warm_and_cold_paths_match_float_hex_golden():
         "SiO": "0x1.5f769cae07281p+12",
     }
     assert warm_pa == cold
+
+
+def test_warm_worker_default_response_serialization_is_golden():
+    """The absent opt-in flag keeps the existing warm-worker wire payload.
+
+    EnginePool's Connection.send serializes ('ok', result) with
+    multiprocessing's ForkingPickler. Compare the actual transport bytes to
+    the explicit green payload using the same runtime pickler, so this pins the
+    transported fields without binding to Python-version-specific pickle
+    framing.
+    """
+    import json
+    from multiprocessing.reduction import ForkingPickler
+
+    class FakeSystem:
+        def set_melt_comp(self, _composition):
+            pass
+
+        def eval_gas_abundances(self, _temperature, _log_fO2):
+            return {"Na(g)": -0.5, "SiO(g)": -1.25}
+
+    resource = {
+        "system_cls": FakeSystem,
+        "system": None,
+        "temperature_units": "K",
+        "vapor_pressure_units": "bar",
+        "reuse_system": False,
+        "system_construct_count": 0,
+        "reuse_equivalence_checks_done": 0,
+        "reuse_latched_fresh": False,
+    }
+    payload = vaporock_module._handle_vaporock_request(
+        resource,
+        {
+            "composition_wt_pct": {"Na2O": 100.0},
+            "temperature_K": 1600.0,
+            "fO2_log": -8.0,
+        },
+        None,
+    )
+
+    assert json.dumps(payload, separators=(",", ":")) == (
+        '{"log10_bar":{"Na(g)":-0.5,"SiO(g)":-1.25},'
+        '"speciation_row_count":2,"speciation_finite_count":2,'
+        '"speciation_nan_count":0,"speciation_neginf_count":0,'
+        '"speciation_other_nonfinite_count":0,"path":"system",'
+        '"system_construct_count":1,"reuse_mode":"fresh",'
+        '"reuse_latched_fresh":false}'
+    )
+    expected_payload = {
+        "log10_bar": {"Na(g)": -0.5, "SiO(g)": -1.25},
+        "speciation_row_count": 2,
+        "speciation_finite_count": 2,
+        "speciation_nan_count": 0,
+        "speciation_neginf_count": 0,
+        "speciation_other_nonfinite_count": 0,
+        "path": "system",
+        "system_construct_count": 1,
+        "reuse_mode": "fresh",
+        "reuse_latched_fresh": False,
+    }
+    assert set(payload) == set(expected_payload)
+    actual_wire_result = ("ok", payload)
+    expected_wire_result = ("ok", expected_payload)
+    assert bytes(ForkingPickler.dumps(actual_wire_result)) == bytes(
+        ForkingPickler.dumps(expected_wire_result)
+    )
+
+
+def test_warm_worker_opt_in_returns_present_oxide_activities_only():
+    import numpy as np
+
+    class FakeVapor:
+        class _ReactionCoefficients:
+            columns = ["O2", "SiO2", "Na2O", "K2O"]
+
+        rxn_coefs = _ReactionCoefficients()
+
+    class FakeSystem:
+        vapor = FakeVapor()
+
+        def set_melt_comp(self, _composition):
+            pass
+
+        def eval_gas_abundances(
+            self, _temperature, _log_fO2, *, full_output=False
+        ):
+            assert full_output is True
+            log_pressure = {"Na(g)": -0.5, "SiO(g)": -1.25}
+            log_activity = np.asarray(
+                [[-8.0 * math.log(10.0)], [math.log(0.5)],
+                 [math.log(0.25)], [math.log(0.1)]]
+            )
+            return log_pressure, None, log_activity
+
+    resource = {
+        "system_cls": FakeSystem,
+        "system": None,
+        "temperature_units": "K",
+        "vapor_pressure_units": "bar",
+        "reuse_system": False,
+        "system_construct_count": 0,
+        "reuse_equivalence_checks_done": 0,
+        "reuse_latched_fresh": False,
+    }
+    payload = vaporock_module._handle_vaporock_request(
+        resource,
+        {
+            "composition_wt_pct": {"SiO2": 60.0, "Na2O": 40.0, "K2O": 0.0},
+            "temperature_K": 1600.0,
+            "fO2_log": -8.0,
+            "include_oxide_activities": True,
+        },
+        None,
+    )
+
+    assert payload["oxide_activity"] == {
+        "SiO2": pytest.approx(0.5),
+        "Na2O": pytest.approx(0.25),
+    }
+    assert payload["oxide_activity_standard_state"] == (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
+
+
+def test_provider_projects_fixture_oxide_activities_as_optional_read_only_data():
+    from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
+
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={},
+        vaporock_full_speciation_Pa={"Na": 1000.0},
+        activity_coefficients={},
+        status="non_authoritative",
+        warnings=(),
+        diagnostics={
+            "oxide_activity": {"Na2O": 0.25},
+            "oxide_activity_standard_state": (
+                "melts_endmember_transformed_oxide_component; "
+                "mu_i = mu_i0 + R*T*ln(a_i)"
+            )
+        },
+    )
+    diagnostics = VapoRockProvider._project_equilibrium(
+        equilibrium,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="fixture",
+        melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
+    )
+
+    assert diagnostics.oxide_activity == {"Na2O": 0.25}
+    with pytest.raises(TypeError):
+        diagnostics.oxide_activity["Na2O"] = 0.5
+    payload = diagnostics.as_diagnostic()
+    assert payload["oxide_activity"] == {"Na2O": 0.25}
+    assert payload["oxide_activity_standard_state"] == (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
+
+    without_activities = types.SimpleNamespace(
+        vapor_pressures_Pa={},
+        vaporock_full_speciation_Pa={"Na": 1000.0},
+        status="non_authoritative",
+        warnings=(),
+        diagnostics={},
+    )
+    default_payload = VapoRockProvider._project_equilibrium(
+        without_activities,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="fixture",
+        melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
+    ).as_diagnostic()
+    assert "oxide_activity" not in default_payload
+    assert "oxide_activity_standard_state" not in default_payload
+
+
+def test_opt_in_empty_speciation_omits_oxide_activity_and_basis():
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({
+        "log10_bar": {},
+        "oxide_activity": {"Na2O": 0.25},
+        "oxide_activity_standard_state": (
+            "melts_endmember_transformed_oxide_component; "
+            "mu_i = mu_i0 + R*T*ln(a_i)"
+        ),
+    })
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.status == "not_converged"
+    assert "oxide_activity" not in result.diagnostics
+    assert "oxide_activity_standard_state" not in result.diagnostics
+
+
+@pytest.mark.parametrize("log_pressure", [None, {}], ids=["none", "empty"])
+def test_opt_in_direct_system_empty_pressure_omits_activity_pair(log_pressure):
+    class FakeVapor:
+        class _ReactionCoefficients:
+            columns = ["O2", "Na2O"]
+
+        rxn_coefs = _ReactionCoefficients()
+
+    class FakeSystem:
+        vapor = FakeVapor()
+
+        def set_melt_comp(self, _composition):
+            pass
+
+        def eval_gas_abundances(
+            self, _temperature, _log_fO2, *, full_output=False
+        ):
+            assert full_output is True
+            return (
+                log_pressure,
+                None,
+                [[-8.0 * math.log(10.0)], [math.log(0.25)]],
+            )
+
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._vaporock = types.SimpleNamespace(System=FakeSystem)
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.status == "not_converged"
+    assert "oxide_activity" not in result.diagnostics
+    assert "oxide_activity_standard_state" not in result.diagnostics
+
+
+def test_opt_in_underflowed_pressure_omits_activity_pair():
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = _FakeWarmPool({
+        "log10_bar": {"Na(g)": -400.0},
+        "oxide_activity": {"Na2O": 0.25},
+        "oxide_activity_standard_state": (
+            "melts_endmember_transformed_oxide_component; "
+            "mu_i = mu_i0 + R*T*ln(a_i)"
+        ),
+    })
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.status == "not_converged"
+    assert result.vaporock_full_speciation_Pa == {}
+    assert "oxide_activity" not in result.diagnostics
+    assert "oxide_activity_standard_state" not in result.diagnostics
+
+
+@pytest.mark.parametrize("call_path", ["warm-worker", "direct-system"])
+def test_opt_in_sum_pressure_rejection_omits_activity_pair(call_path):
+    state = (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
+    backend = VapoRockBackend()
+    backend._available = True
+    if call_path == "warm-worker":
+        backend._warm_pool = _FakeWarmPool({
+            "log10_bar": {"Na(g)": 2.0},
+            "oxide_activity": {"Na2O": 0.25},
+            "oxide_activity_standard_state": state,
+        })
+    else:
+        class FakeVapor:
+            class _ReactionCoefficients:
+                columns = ["O2", "Na2O"]
+
+            rxn_coefs = _ReactionCoefficients()
+
+        class FakeSystem:
+            vapor = FakeVapor()
+
+            def set_melt_comp(self, _composition):
+                pass
+
+            def eval_gas_abundances(
+                self, _temperature, _log_fO2, *, full_output=False
+            ):
+                assert full_output is True
+                return (
+                    {"Na(g)": 2.0},
+                    None,
+                    [[-8.0 * math.log(10.0)], [math.log(0.25)]],
+                )
+
+        backend._vaporock = types.SimpleNamespace(System=FakeSystem)
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == (
+        OutOfDomainReason.SUM_PRESSURE_SANITY.value
+    )
+    assert result.vapor_pressures_Pa == {}
+    assert "oxide_activity" not in result.diagnostics
+    assert "oxide_activity_standard_state" not in result.diagnostics
+
+
+@pytest.mark.parametrize(
+    "pressure_fields",
+    [
+        pytest.param({}, id="missing"),
+        pytest.param({"vaporock_full_speciation_Pa": {}}, id="empty"),
+        pytest.param(
+            {
+                "vaporock_full_speciation_Pa": {
+                    "Na": float("nan"),
+                    "SiO": -1.0,
+                }
+            },
+            id="wholly-rejected",
+        ),
+    ],
+)
+def test_provider_omits_activities_without_projected_speciation(
+    pressure_fields,
+):
+    from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
+
+    equilibrium_fields = {
+        "status": "non_authoritative",
+        "warnings": (),
+        "diagnostics": {
+            "oxide_activity": {"Na2O": 0.25},
+            "oxide_activity_standard_state": (
+                "melts_endmember_transformed_oxide_component; "
+                "mu_i = mu_i0 + R*T*ln(a_i)"
+            ),
+        },
+    }
+    equilibrium_fields.update(pressure_fields)
+    diagnostics = VapoRockProvider._project_equilibrium(
+        types.SimpleNamespace(**equilibrium_fields),
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="fixture",
+        melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
+    )
+
+    assert diagnostics.vaporock_full_speciation_Pa == {}
+    assert diagnostics.oxide_activity is None
+    assert diagnostics.oxide_activity_standard_state is None
+    payload = diagnostics.as_diagnostic()
+    assert "oxide_activity" not in payload
+    assert "oxide_activity_standard_state" not in payload
+
+
+def test_provider_drops_entire_invalid_oxide_activity_map():
+    from simulator.melt_backend.melt_envelope import melt_extrapolation_envelope
+
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={},
+        vaporock_full_speciation_Pa={"Na": 1000.0},
+        status="non_authoritative",
+        warnings=(),
+        diagnostics={
+            "oxide_activity": {"Na2O": 0.25, "SiO2": float("nan")},
+            "oxide_activity_standard_state": (
+                "melts_endmember_transformed_oxide_component; "
+                "mu_i = mu_i0 + R*T*ln(a_i)"
+            ),
+        },
+    )
+    diagnostics = VapoRockProvider._project_equilibrium(
+        equilibrium,
+        pO2_bar=1e-9,
+        mode="system_eval_gas_abundances",
+        engine_version="fixture",
+        melt_envelope=melt_extrapolation_envelope(1600.0, "MELTS-v1.0"),
+    )
+
+    assert diagnostics.oxide_activity is None
+    assert diagnostics.oxide_activity_standard_state is None
+    payload = diagnostics.as_diagnostic()
+    assert "oxide_activity" not in payload
+    assert "oxide_activity_standard_state" not in payload
+
+
+def test_opt_in_oxide_activity_stays_out_of_generic_equilibrium_field(monkeypatch):
+    state = (
+        "melts_endmember_transformed_oxide_component; "
+        "mu_i = mu_i0 + R*T*ln(a_i)"
+    )
+    backend = VapoRockBackend()
+    backend._available = True
+    backend._warm_pool = object()
+    monkeypatch.setattr(
+        backend,
+        "_call_vaporock",
+        lambda **_: ({"Na(g)": 1.0}, {"Na2O": 0.25}, state),
+    )
+
+    result = backend.equilibrate(
+        1600.0,
+        composition_kg={"SiO2": 50.0, "Na2O": 3.0},
+        fO2_log=-8.0,
+        pressure_bar=1e-6,
+        include_oxide_activities=True,
+    )
+
+    assert result.activity_coefficients == {}
+    assert result.diagnostics["oxide_activity"] == {"Na2O": 0.25}
+    assert result.diagnostics["oxide_activity_standard_state"] == state
 
 
 def test_provider_selection_falls_back_with_native_init_failure_reason(

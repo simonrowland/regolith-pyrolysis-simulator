@@ -24,20 +24,27 @@ def _load_sticking_data() -> dict:
     return yaml.safe_load(DATA_PATH.read_text(encoding="utf-8"))
 
 
+def _published_fe_condensation_alpha(temperature_K: float) -> float:
+    """Tachibana ln(alpha_c) = 0.61 - 1127/T, as stored A*exp(-B/T)."""
+    spec = _load_sticking_data()["species"]["Fe"]["condensation"]["value"]
+    return float(spec["A"]) * math.exp(-float(spec["B"]) / float(temperature_K))
+
+
 def _assert_synthetic_sio_route_authority(route) -> None:
     authority = route.condensation_authority_by_species["SiO"]
     stage_outcomes = route.condensation_refusals_by_species.get("SiO", {}).get(
         "stage_outcomes", []
     )
-    assert authority["status"] == "authoritative"
+    # Source pressure remains authoritative; colder collectors extrapolate
+    # the synthetic curve's 1323-1324 K support and cannot inherit that claim.
+    assert authority["status"] == "status_bearing"
+    assert authority["authoritative_for_condensation"] is False
     assert authority["carrier_authority"]["pressure"] == {
         "kind": "value",
         "pa": 100.0,
         "valid_range_K": [1323.0, 1324.0],
     }
-    assert {
-        outcome["reason"] for outcome in stage_outcomes
-    }.isdisjoint({"antoine_psat_unavailable_at_T"})
+    assert any(outcome["reason"] == "antoine_psat_unavailable_at_T" for outcome in stage_outcomes)
 
 
 def _configure_knudsen_policy(model: CondensationModel) -> CondensationModel:
@@ -72,10 +79,8 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
         if isinstance(value, dict):
             assert value["form"] == "arrhenius", species
             assert value["status"] in {"CITED", "UNCERTIFIED"}, species
-            assert value["valid_range_K"] == [1000, 1800], species
-            assert value["uncertainty_envelope"] == pytest.approx(
-                [0.003, 0.067]
-            )
+            assert value["valid_range_K"] == row["temperature_range_K"], species
+            assert value["uncertainty_envelope"] == pytest.approx(row["envelope"])
             assert value["cite"], species
         else:
             assert 0.0 <= float(value) <= 1.0, species
@@ -87,6 +92,34 @@ def test_wall_sticking_coefficients_are_cited_or_uncertified():
             assert row["output_status"] == "status_bearing", species
         else:
             assert row["source_url"], species
+
+
+def test_fe_stage_one_capture_uses_the_condensation_fit_at_its_midpoint():
+    stage = next(
+        stage
+        for stage in CondensationTrain.create_default().stages
+        if stage.stage_number == 1
+    )
+
+    record = condensation._stage_alpha_record(stage, "Fe")
+    midpoint_K = condensation._stage_midpoint_temperature_K(stage)
+
+    assert stage.temp_range_C == (1150.0, 1150.0)
+    assert midpoint_K == pytest.approx(1150.0 + condensation.CELSIUS_TO_KELVIN_OFFSET)
+    assert record["alpha_s_temperature_K"] == pytest.approx(midpoint_K)
+    assert record["alpha_s"] == pytest.approx(_published_fe_condensation_alpha(midpoint_K))
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_extrapolated"] is True
+    assert record["citation_status"] == "CITED"
+
+
+def test_fe_root_value_and_default_alpha_resolver_remain_the_evaporation_proxy():
+    fe = _load_sticking_data()["species"]["Fe"]
+    context: dict[str, object] = {}
+
+    assert fe["value"] == pytest.approx(0.02)
+    assert condensation.alpha_s("Fe", 1750.0, context) == pytest.approx(0.02)
+    assert context["alpha_s_evaluation"]["alpha_s_form"] == "scalar"
 
 
 def test_sio_sticking_alpha_s_uses_uncertified_growth_proxy_form():
@@ -187,53 +220,8 @@ def test_sio_cold_wall_wall_alpha_uses_unity_condensation_gate():
     assert record["segment"] == "cold_spot"
 
 
-def test_sio_pressure_isolated_stage_eval_uses_cold_wall_gate():
-    stage = CondensationStage(
-        stage_number=1,
-        label="cold pressure stage",
-        temp_range_C=(500.0, 600.0),
-        target_species=["SiO"],
-    )
-    alpha_record: dict[str, object] = {}
-
-    captured = condensation._pressure_isolated_capture_budget_kg(
-        "SiO",
-        1.0,
-        [stage],
-        {1: 1.0},
-        temps={"SiO": 1000.0},
-        alpha_record_out=alpha_record,
-    )
-
-    assert captured > 0.0
-    stage_eval = alpha_record["alpha_s_stage_evaluations"]["1"]
-    assert stage_eval["alpha_s"] == pytest.approx(1.0)
-    assert stage_eval["alpha_s_form"] == "cold_wall_condensation"
-    assert stage_eval["alpha_s_cold_wall_condensation"] is True
 
 
-def test_pressure_isolated_efficiency_uses_declared_time_constant(monkeypatch):
-    stage = CondensationStage(
-        stage_number=1,
-        label="cold pressure stage",
-        temp_range_C=(400.0, 600.0),
-        target_species=["SiO"],
-    )
-    monkeypatch.setattr(
-        condensation,
-        "CAPTURE_BUDGET_REGULARIZER_TIME_S",
-        2.0,
-    )
-
-    efficiency = condensation._pressure_isolated_stage_efficiency(
-        stage,
-        T_cond_C=1000.0,
-        residence_s=2.0,
-        alpha_s=1.0,
-    )
-
-    # delta_T/T_cond = 0.5, so tau = 2.0 s / 0.5 = 4.0 s.
-    assert efficiency == pytest.approx(1.0 - math.exp(-2.0 / 4.0))
 
 
 def test_sticking_yaml_rejects_boolean_numeric_value(tmp_path: Path):
@@ -256,45 +244,8 @@ def test_runtime_arrhenius_rejects_nonpositive_coefficients():
         condensation._alpha_s_evaluation("SiO", 1000.0, spec)
 
 
-def test_pressure_isolated_efficiency_handles_zero_alpha_and_refuses_nonfinite():
-    stage = CondensationStage(
-        stage_number=1,
-        label="test",
-        temp_range_C=(500.0, 600.0),
-        target_species=["SiO"],
-    )
-
-    assert condensation._pressure_isolated_stage_efficiency(
-        stage, 1000.0, 1.0, 0.0
-    ) == 0.0
-    with pytest.raises(ValueError, match="must be finite"):
-        condensation._pressure_isolated_stage_efficiency(
-            stage, 1000.0, 1.0, float("nan")
-        )
 
 
-@pytest.mark.parametrize(
-    "temp_range_C",
-    [
-        (float("nan"), 600.0),
-        (500.0, float("inf")),
-        (600.0, 500.0),
-    ],
-)
-def test_pressure_isolated_efficiency_refuses_invalid_stage_temperature_bounds(
-    temp_range_C,
-):
-    stage = CondensationStage(
-        stage_number=1,
-        label="invalid stage",
-        temp_range_C=temp_range_C,
-        target_species=["SiO"],
-    )
-
-    with pytest.raises(ValueError, match="temperature|finite"):
-        condensation._pressure_isolated_stage_efficiency(
-            stage, 1000.0, 1.0, 1.0
-        )
 
 
 def test_sio_stage_band_flux_uses_cold_wall_gate(
@@ -343,8 +294,56 @@ def test_sio_stage_band_flux_uses_cold_wall_gate(
     )
 
 
-def test_non_sio_sticking_alpha_s_keeps_scalar_value():
-    assert condensation.alpha_s("Fe", 1500.0, {}) == pytest.approx(0.02)
+def test_fe_stage_one_uses_reviewed_metal_condensation_fit():
+    # Reviewed b-878 pin; Tachibana et al. 2001, LPSC #1767, p. 2 Fig. 1.
+    stage = next(s for s in CondensationTrain.create_default().stages if s.stage_number == 1)
+    record = condensation._stage_alpha_record(stage, "Fe")
+    midpoint_K = condensation._stage_midpoint_temperature_K(stage)
+    assert record["alpha_s"] == pytest.approx(_published_fe_condensation_alpha(midpoint_K))
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["citation_status"] == "CITED"
+    assert record["output_status"] == "status_bearing"
+    assert "supersaturation-regime transfer is inferred" in record["uncertainty_flag"]
+
+
+@pytest.mark.parametrize("temperature", [1.0, 1200.0, 1700.0, 3000.0])
+def test_fe_extrapolation_keeps_published_trend_and_probability_bounds(temperature):
+    record = condensation._wall_alpha_record("Fe", T_K=temperature)
+    assert 0.0 < record["alpha_s"] <= 1.0
+    assert record["alpha_s_extrapolated"] is True
+    assert record["alpha_s_valid_range_K"] == [1443.0, 1633.0]
+    assert record["alpha_s_extrapolation_method"] == "bounded_arrhenius"
+    assert record["alpha_s_authority_level"] == "extrapolated"
+    assert record["alpha_s_extrapolation_reason"] == "temperature_outside_certified_band"
+    assert record["output_status"] == "status_bearing"
+    assert record["alpha_s_authoritative_at_temperature"] is False
+    if temperature == 3000.0:
+        assert record["alpha_s"] == 1.0
+        assert record["alpha_s_raw_arrhenius"] > 1.0
+    elif temperature == 1200.0:
+        lower_edge = condensation._wall_alpha_record("Fe", T_K=1443.0)
+        assert lower_edge["alpha_s_extrapolated"] is False
+        assert record["alpha_s"] < lower_edge["alpha_s"]
+    elif temperature == 1700.0:
+        upper_edge = condensation._wall_alpha_record("Fe", T_K=1633.0)
+        assert upper_edge["alpha_s_extrapolated"] is False
+        assert record["alpha_s"] > upper_edge["alpha_s"]
+
+
+@pytest.mark.parametrize("missing", ["A", "B", "valid_range_K", "cite", "status"])
+def test_fe_extrapolation_does_not_bypass_spec_validation(missing):
+    spec = dict(_load_sticking_data()["species"]["Fe"]["condensation"]["value"])
+    spec.pop(missing)
+    with pytest.raises(ValueError):
+        condensation.alpha_s("Fe", 1200.0, {"coefficient_spec": spec})
+
+
+def test_explicit_fe_evaporation_coefficient_is_independent_of_sticking():
+    assert condensation.alpha_s(
+        "Fe", 1500.0, {"coefficient_spec": 0.02}
+    ) == pytest.approx(0.02)
 
 
 def test_malformed_sticking_coefficient_spec_fails_loud():
@@ -395,7 +394,11 @@ def test_material_defaults_reference_sticking_sidecar():
         assert set(entry) == {"value_ref"}
         assert entry["value_ref"] == (
             "data/literature/vacuum_pyrolysis_sticking.yaml::"
-            f"species.{species}.value"
+            + (
+                "species.Fe.condensation.value"
+                if species == "Fe"
+                else f"species.{species}.value"
+            )
         )
 
 
@@ -408,12 +411,17 @@ def test_legacy_by_feel_sticking_constant_text_is_gone():
     assert "STICKING_COEFF/default alpha_s values are ungrounded" not in materials
 
 
-def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
+def test_sio_wall_alpha_changes_unsaturated_route_in_kinetic_direction(monkeypatch):
     model = CondensationModel(
         CondensationTrain.create_default(),
         wall_temperature_C=900.0,
     )
     _configure_knudsen_policy(model)
+    model.configure_operating_conditions(
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1e-6 for stage in model.train.stages
+        },
+    )
     melt = MeltState()
     melt.temperature_C = 1700.0
 
@@ -424,6 +432,7 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         )
 
     grounded_route = route_sio()
+    grounded_alpha = condensation.alpha_s("SiO", 900.0 + 273.15)
     monkeypatch.setitem(
         condensation.STICKING_DATA["species"]["SiO"],
         "value",
@@ -433,15 +442,10 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
     grounded = float(grounded_route.wall_deposit_by_species["SiO"])
     legacy = float(legacy_route.wall_deposit_by_species["SiO"])
 
-    # Explicit stage area makes restored predicted baffle capture compete with
-    # wall capture. The grounded lower-alpha case still leaves more vapor for
-    # the wall sink, while the missing Antoine authority stays visible.
-    # Restored Stage-3 reactive-product backstop (170b9faf) takes mass from
-    # the wall, not remaining: new_wall == old_wall - stage
-    # (0.9572497806398499 - 0.0191108354895643 = 0.9381389451502856;
-    # legacy analog). Conservation is wall + stage + remaining == 1, not a
-    # copied 12-digit pin of current output.
-    assert grounded > legacy
+    assert grounded_alpha < 0.7
+    assert 0.0 < grounded < 1.0
+    assert 0.0 < legacy < 1.0
+    assert grounded < legacy
     for route in (grounded_route, legacy_route):
         authority = route.condensation_authority_by_species["SiO"]
         refusal = route.condensation_refusals_by_species["SiO"]
@@ -449,33 +453,8 @@ def test_grounded_sio_alpha_drives_wall_deposit_direction(monkeypatch):
         stage = float(authority["stage_condensed_mass_kg_hr"])
         remaining = float(route.remaining_by_species["SiO"])
         assert authority["status"] == "missing"
-        assert authority["authority_level"] == "extrapolated"
-        assert stage > 0.0
+        assert authority["authoritative_for_condensation"] is False
+        assert route.antoine_extrapolations
         assert wall + stage + remaining == pytest.approx(1.0, rel=0.0, abs=1e-12)
         assert authority["mass_closure_error_kg_hr"] == pytest.approx(0.0)
         assert refusal["upstream_authority_status"] == "missing"
-        assert any(
-            outcome["reason"] == "antoine_psat_unavailable_at_T"
-            for outcome in refusal["stage_outcomes"]
-        )
-
-
-def test_capture_budget_regularizer_is_marked_numerical_uncertified():
-    data = _load_sticking_data()
-    floor = data["capture_budget_regularizer_floor"]
-    time_constant = data["capture_budget_regularizer_time_s"]
-
-    assert floor["value"] == pytest.approx(0.01)
-    assert floor["status"] == "UNCERTIFIED"
-    assert floor["source_class"] == "numerical_regularizer_not_literature_constant"
-    assert floor["output_status"] == "uncertainty_only"
-    assert time_constant["value"] == pytest.approx(1.0)
-    assert time_constant["status"] == "UNCERTIFIED"
-    assert time_constant["source_class"] == "numerical_regularizer_not_literature_constant"
-    assert time_constant["output_status"] == "uncertainty_only"
-    assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
-        "citation_status"
-    ] == "UNCERTIFIED"
-    assert condensation.CAPTURE_BUDGET_REGULARIZER_NOTICE[
-        "time_constant_citation_status"
-    ] == "UNCERTIFIED"

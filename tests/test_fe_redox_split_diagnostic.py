@@ -124,6 +124,10 @@ def test_fe_redox_split_reads_oxygen_reservoir_not_stale_mirror() -> None:
 
 def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
+    # This imposed 1600 C state uses the matching 6 h C2A hot-face schedule;
+    # the 0 h/IDLE wall is below this test's Fe dew point.
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.campaign_hour = 6.0
     _seed_redox_liquidus_curve(sim)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
@@ -175,9 +179,11 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
         overhead_mol.get("Fe", 0.0) * fe_mm
     )
     assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0
+    # t-1579 keeps this C2A hot face above the test state's Fe dew point;
+    # Fe goes to the dedicated Stage-1 collector instead of the Stage-0 wall.
     assert sim.atom_ledger.kg_by_account(
         "process.wall_deposit_segment_stage_0_to_stage_1"
-    ).get("Fe", 0.0) > 0.0
+    ).get("Fe", 0.0) == pytest.approx(0.0)
     assert tap["Fe"] + routed_vapor_mol * fe_mm == pytest.approx(
         split_fe_mol * fe_mm,
     )

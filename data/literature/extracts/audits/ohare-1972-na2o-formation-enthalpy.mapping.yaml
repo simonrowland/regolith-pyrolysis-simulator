@@ -1,0 +1,124 @@
+source_id: ohare-1972-na2o-formation-enthalpy
+source:
+  citation: O'Hare (1972), J. Chem. Phys. 56, 4513.
+  doi: 10.1063/1.1677897
+input_order:
+  primary_machine_text:
+    - text/ohare-1972-na2o-formation-enthalpy/mineru/p002-p005
+    - text/ohare-1972-na2o-formation-enthalpy/pdftotext-layout.txt
+  render_policy: Rendered only to resolve flagged text/table cells and verify numeric row/column placement and printed locators.
+  table_tool:
+    convert: tools/mineru_table_draft.py convert
+    qa: tools/mineru_table_qa.py
+    compare: tools/mineru_table_draft.py compare
+    qa_result: >-
+      QA reported Table I p003-t01 as 8 rows x 10 columns, 73 candidate numeric
+      cells, digit agreement 0.187, with latex=10 and numeric_mismatch=70 flags.
+      The page render resolved the merged mean cell and all row/column values;
+      no OCR redo was needed. Table II p004-t02 had 8 rows x 2 columns, 7 numeric
+      cells, digit agreement 1.000; the page render verified its caption and
+      superscript footnote markers.
+printed_tables:
+  - printed_table: 'I'
+    pdf_page: 3
+    published_page: 4514
+    printed_experiment_count: 9
+    accepted_runs: 9
+    rejected_runs: 1
+    unique_numeric_cells: 67
+    body_matrix_cells: 63
+    mean_row_numeric_cells: 4
+    run_columns: '1–9 under the printed Experiment number heading'
+    printed_measurement_rows:
+      - {printed_row: Experiment number, stored_field: values.run_number}
+      - {printed_row: m(Na2O) (g), stored_field: values.mass_Na2O_g}
+      - {printed_row: Δtc (°K), footnote: b, stored_field: values.delta_t_c_K}
+      - {printed_row: mean calorimeter energy equivalent (J °K−1), footnote: c, stored_field: values.calorimeter_energy_equivalent_J_K}
+      - {printed_row: mean calorimeter heat (J), stored_field: values.calorimeter_heat_J}
+      - {printed_row: ΔHvap (J), stored_field: values.delta_H_vap_J}
+      - {printed_row: ΔH/M (J g−1), stored_field: values.delta_H_over_M_J_g}
+    summary_cells:
+      - '-3858.16 ± 1.59 J g−1'
+      - '-922.12 ± 0.38 cal g−1'
+    phase: Na2O(c), stored as cr
+    temperature: Table I footnote b, mean reaction temperature 25.0 °C; each run has this condition.
+    method_class: measured_direct per run; mean is measured_reduced from all nine runs.
+    schema_disposition: >-
+      Individual calorimetric heat, specific reaction enthalpy and its correction
+      terms are preserved on typed-refused observations. No exact solution or
+      reaction enthalpy quantity is present in simulator/battery/enums.py::Quantity,
+      simulator/battery/migrate.py::QUANTITY_ALIASES, or simulator/battery/migrate.py::TYPE_QUANTITY.
+    render_verification: >-
+      PDF page 3 confirms all nine experiment columns and their row/column
+      assignments, the 63 experiment-number/matrix values, four mean-row numeric values,
+      minus signs, the ΔHvap corrections, and markers b, c, and d. Route (b)
+      applies to all Table I cells because the table QA did not reliably align
+      the merged layout. No cell was taken from an unverified CSV candidate.
+  - printed_table: 'II'
+    pdf_page: 4
+    published_page: 4515
+    printed_rows: 7
+    numeric_values: 7
+    columns: Investigator; ΔHf,298°(Na2O), kcal mole−1
+    row_markers: [11, 8a, 8b, 9, 10, 5, absent]
+    table_caption_footnote_marker: a
+    footnote: Results from Refs. 8–11 taken directly from JANAF.21a
+    phase: not specified per Table II entry; retained as located context, not assigned to observations
+    render_verification: >-
+      MinerU and pdftotext agree on all seven numeric values (route a). PDF page
+      4 render checks row association, the caption's superscript a, and the row
+      reference suffixes; it resolves pdftotext's Forerand OCR spelling as
+      Forcrand. The table's This work value duplicates the main result.
+non_table_mappings:
+  - locator: {page: 2, published_page: 4513, section: 'Purification and characterization'}
+    stored: Na2O preparation temperature and tolerance, initial mass, time, hydrolysis analysis, handling, water-vapor concentration and exposure time
+    render_verification: PDF page 2 resolves pdftotext's garbled 520±10°C as 520±10°C.
+  - locator: {page: 3, published_page: 4514, section: 'Calorimetric experiments and results'}
+    stored: 0.1M NaOH solution, ten determinations, one rejected run, nine accepted runs; reaction temperature on Table I footnote b; reactions (1)–(2)
+  - locator: {page: 4, published_page: 4515, equations: '3–7'}
+    stored: Reaction enthalpies ΔH1–ΔH4, the dilution and concentration corrections, Na2O molecular mass, formation result, Gross and Wilson reaction comparison and Table II
+  - locator: {page: 4, published_page: 4515, equation: '8'}
+    stored: Printed atomization relation
+  - locator: {page: 5, published_page: 4516, paragraph: 'Atomization at 298.15 K'}
+    stored: Atomic formation-enthalpy inputs, atomization result and mean bond enthalpy
+    render_verification: PDF page 5 verifies the continuation values and physical-page locators.
+  - locator: {page: 5, published_page: 4516, section: 'Part I ending'}
+    disposition: No fit equation with a validity range is printed in Part I. Part II begins after the Part I result.
+schema_gaps:
+  - specific solution-calorimetry run, reaction enthalpy, dilution enthalpy, atomization enthalpy, sublimation enthalpy, and mean bond enthalpy have no exact token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES
+  - simulator/battery/migrate.py::TYPE_QUANTITY has no reaction-enthalpy fallback; descriptive non-token quantities are explicit on typed-refused observations
+evidence_class_decisions:
+  - Table I run cells: measured_direct; source authors report nine calorimetric measurements.
+  - Table I mean and reaction (1): measured_reduced; the mean comes from those nine runs and reaction (1) uses the printed Na2O molecular mass.
+  - Reactions (2) and (3): quoted_attributed typed refusals; the printed outputs use Parker and Gunn compilation inputs, which are retained with attribution.
+  - Na2O(c) formation enthalpy: measured_reduced; the authors combine their measured reaction result with the stored attributed reaction terms and print equation (5).
+  - Na2O(g) formation enthalpy: measured_reduced; the authors derive it from their solid result and Hildenbrand and Murad's stored sublimation enthalpy.
+  - H2O(l) formation enthalpy: quoted_attributed to CODATA; it is not O'Hare's measurement.
+  - Atomization enthalpy: author_derived and typed refused; its exact quantity is not represented.
+render_checks:
+  - {pdf_page: 2, printed_page: 4513, reason: 'pdftotext reads the heat-treatment tolerance as 520±lOoC; render confirms 520±10°C.'}
+  - {pdf_page: 3, printed_page: 4514, reason: 'Table I row/column alignment, nine run columns, minus signs, merged mean row and b/c/d superscript markers.'}
+  - {pdf_page: 4, printed_page: 4515, reason: 'Table II locator, printed caption footnote a, reference suffixes, and Forcrand spelling.'}
+  - {pdf_page: 5, printed_page: 4516, reason: 'Atomization value continuation and its page locator.'}
+stored_temperature_and_unprinted_conditions:
+  printed_temperature: 25.0 °C for every Table I run; point conditions carry the normalized 298.15 K.
+  reaction_cycle_temperature: 298.15 K for reactions (1)–(4), explicitly printed in the preceding sentence.
+  no_total_pressure: true
+  no_fO2: true
+  vacuum_note: The high-vacuum treatment is sample preparation, not a calorimeter-run pressure condition.
+  source_condition_rule: The Gross and Wilson reaction enthalpy has no printed temperature; it remains without a temperature condition.
+  phase_rule: Table I Na2O(c) is stored as cr; reaction-cycle intermediate aqueous entries use aq as printed; water uses l; gas Na2O and atomization use g.
+  table_ii_phase_rule: Historical phase is not assigned where Table II does not print it.
+expected_migration:
+  observations: 18
+  numeric_points: 3
+  unavailable: 15
+  hard_issues: 0
+  quantity_unknown_ids: 15 explicitly typed-refused rows
+  phase_unknown: 0
+  store_regeneration: not run
+  expected_store_delta: +18 source observations; 3 numeric points and 15 unavailable, with no generated store files committed
+j01_census:
+  numeric_series_cells: 0
+  unavailable_series_cells: 0
+  source_contribution: {}

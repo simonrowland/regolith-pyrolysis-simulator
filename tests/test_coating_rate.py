@@ -633,7 +633,9 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "6c448ac13bd4f3ed3cd76c58b37a312f862268d5cfb2313c26440af4c8502e1c"
+        # b773 merge: repin on gate box
+        # b-773 headspace pin was 6c448ac13bd4f3ed3cd76c58b37a312f862268d5cfb2313c26440af4c8502e1c
+        "84fd56f0bea9ee322da880febe06d0262b0324795b60030c2c6369e3dd2cad2d"
     )
 
 
@@ -744,7 +746,8 @@ def test_shadow_rate_shares_species_supply_across_segments() -> None:
         and record["supersaturated"] is False
         for record in records_by_species["Na"]
     )
-    assert len(records_by_species["SiO"]) > 1
+    # t-1217: complete first-wall SiO capture leaves one segment with positive supply.
+    assert len(records_by_species["SiO"]) == 1
     for species, records in records_by_species.items():
         available_supply_mol_s = max(
             float(record["available_supply_mol_s"])

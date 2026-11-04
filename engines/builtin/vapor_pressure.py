@@ -121,7 +121,6 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     normalize_high_t_melt_activity,
     single_cation_mole_fractions,
 )
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K  # noqa: E402
 from simulator.melt_backend import openimcc_bridge  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
     GAS_CONSTANT,
@@ -748,6 +747,13 @@ def _k2o_authority_exclusion_for_pack_digest(
     return exclusion
 
 
+# d-207 ("Move activity only", 2026-10-20): keep SiO evolution and the vapour
+# channels on the builtin analytical model through this boundary, then select
+# OpenIMCC above it pending investigation of OpenIMCC's 1700-1950 K SiO
+# under-prediction. This source-selection boundary is not a VapoRock band edge.
+BUILTIN_VAPOUR_CHANNEL_SWITCH_K = 1950.0
+
+
 def openimcc_binding_selected_by_inputs(
     *,
     temperature_K: float,
@@ -762,7 +768,7 @@ def openimcc_binding_selected_by_inputs(
     if mode != "openimcc":
         return False
     if quantity_class == "vapour":
-        return temperature_K > VAPOROCK_T_MAX_K
+        return temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
     return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
 
 
@@ -1083,8 +1089,9 @@ def _build_high_t_melt_activity_authority(
         "schema": "high_t_melt_activity.v1",
         "requested": mode,
         "temperature_K": float(temperature_K),
-        "vaporock_cap_K": float(VAPOROCK_T_MAX_K),
-        "above_vaporock_cap": temperature_K > VAPOROCK_T_MAX_K,
+        # Preserve the legacy metadata keys consumed by runner fixtures.
+        "vaporock_cap_K": float(BUILTIN_VAPOUR_CHANNEL_SWITCH_K),
+        "above_vaporock_cap": temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
         "fallback": False,
         "provider": "openimcc",
         "composition_policy": {},
@@ -1588,8 +1595,8 @@ def _build_high_t_melt_activity_authority(
     if not crossing and previous_temperature is not None:
         try:
             crossing = (
-                float(previous_temperature) <= VAPOROCK_T_MAX_K
-                and temperature_K > VAPOROCK_T_MAX_K
+                float(previous_temperature) <= BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+                and temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
             )
         except (TypeError, ValueError):
             crossing = False
@@ -1599,7 +1606,7 @@ def _build_high_t_melt_activity_authority(
                 "code": "openimcc_activity_cap_step_exceeds_0_1_dex",
                 "type": "typed_notice",
                 "temperature_K": float(temperature_K),
-                "cap_K": float(VAPOROCK_T_MAX_K),
+                "cap_K": float(BUILTIN_VAPOUR_CHANNEL_SWITCH_K),
                 "max_abs_ratio_dex": max_abs_dex,
                 "threshold_dex": _HIGH_T_ACTIVITY_SEAM_LIMIT_DEX,
                 "message": (
@@ -2531,30 +2538,26 @@ def wall_condensation_antoine_coefficients(
     """Return coefficients for local wall ``P_sat`` consumers.
 
     Melt-source standard-reaction terms are not pure-species saturation
-    pressures. A standard-reaction row uses its pure-component sidecar when
-    the segment projection gate accepts it, or when the block is partial or
-    malformed with A present so the wall consumer can type the refusal. Other
-    unusable projections fail closed with an empty block. Non-standard rows
-    use the runtime selector unchanged.
+    pressures. Wall saturation uses the independent pure-component sidecar
+    even when the melt-source interval requires activities. Its finite Antoine
+    flank is predicted outside the fit band and the wall consumer flags that
+    extrapolation. Non-standard rows use the runtime selector unchanged.
     """
 
     if _fit_target(row) != FIT_TARGET_STANDARD_REACTION:
         return vapor_pressure_antoine_coefficients(row, temperature_K)
-    if not bool((row or {}).get("interval_required")):
-        pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
-        if _is_mapping(pure):
-            selected = _selected_temperature_segment(pure, temperature_K)
-            # Same guard as the runtime selector: do not replace the
-            # selector's phase-boundary result with an empty block or
-            # the other phase. An extension already carries its flank.
-            if selected.get("selection_refusal"):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
-            if _pure_segment_usable(selected, temperature_K):
-                return selected, COEFF_BLOCK_PURE_COMPONENT
-            # A grounded pure-species wall answer exists but not at this
-            # temperature: fail closed so the caller types a refusal rather
-            # than extrapolate through a pole or substitute the melt term.
-            return {}, COEFF_BLOCK_PURE_COMPONENT
+    pure = (row or {}).get(COEFF_BLOCK_PURE_COMPONENT)
+    if _is_mapping(pure):
+        selected = _selected_temperature_segment(pure, temperature_K)
+        # Same guard as the runtime selector: do not replace the
+        # selector's phase-boundary result with an empty block or
+        # the other phase. An extension already carries its flank.
+        if selected.get("selection_refusal"):
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        if _pure_segment_usable(selected, temperature_K):
+            return selected, COEFF_BLOCK_PURE_COMPONENT
+        # A pole or non-finite pressure still has no physical prediction.
+        return {}, COEFF_BLOCK_PURE_COMPONENT
     return {}, COEFF_BLOCK_PURE_COMPONENT
 
 

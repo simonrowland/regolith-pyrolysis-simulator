@@ -1,0 +1,157 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
+  citation: Neudorf, D. A. and Elliott, J. F. (1980), ‘Thermodynamic Properties of Na2O-SiO2-CaO Melts at 1000 to 1100 °C’,
+    Metallurgical Transactions B 11B, 607–614 (December 1980).
+  source_ids:
+  - neudorf-elliott-1980-na2o-cao-silicate-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:neudorf-elliott-1980-na2o-cao-silicate-activities
+      role: pdf
+      path: raw/neudorf-elliott-1980-na2o-cao-silicate-activities/neudorf-elliott-1980-na2o-cao-silicate-activities.pdf
+      sha256:
+        tag: value
+        value: 451300e848e602e62f1007dbfddf1d52c11505a29ea1a2aa7ed2f9372720edc7
+    - asset_id: pdftotext:neudorf-elliott-1980-na2o-cao-silicate-activities
+      role: pdftotext
+      path: text/neudorf-elliott-1980-na2o-cao-silicate-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:neudorf-elliott-1980-na2o-cao-silicate-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7::experiment::neudorf_elliott_1980_cell_emf
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample: {}
+  conditions:
+    fO2_Pa:
+      state:
+        tag: value
+        value: '21278.25'
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+        note: The cell diagram prints O2(g, 0.21 atm) on both sides; 0.21 atm converted to Pa for the migrator.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper prints oxygen partial pressure but no total pressure for the experiment.
+      locator:
+        page: 1
+        published_page: 607
+        pdf_page_index: 0
+        section: Thermodynamic Considerations
+    temperature_range_C_as_printed:
+      state:
+        tag: unknown
+        reason: condition temperature_range_C_as_printed is not a scalar numeric value
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
+  locator:
+    page: 1
+    published_page: 607
+    pdf_page_index: 0
+    section: Thermodynamic Considerations
+context:
+- observation_id: neudorf_elliott_1980_method_and_reference_states
+  type: context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 608
+    section: Thermodynamic Considerations
+  units: As printed; temperatures °C or K and pressure atm where stated.
+  values:
+    cell_relation_as_printed: ΔG3 = −2FE = RT ln(aNa2O,tung / aNa2O,sil) [4]
+    method_as_printed: Activities of Na2O were calculated from the reversible emf of the cell.
+    cell_gas_as_printed: O2(g, 0.21 atm) is printed on both sides of the cell diagram.
+    Na2O_standard_state_as_printed: The standard state of Na2O is chosen to be pure liquid Na2O at 1 atm pressure.
+    Na2O_standard_state_locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 608
+      section: Thermodynamic Considerations
+    SiO2_standard_state_as_printed: Standard states are pure, liquid Na2O and pure, solid tridymite.
+    SiO2_standard_state_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 607
+      section: Abstract
+    Table_II_SiO2_standard_state_as_printed: Tridymite is the Standard State.
+    Table_II_standard_state_locator:
+      page: 5
+      pdf_page_index: 4
+      published_page: 611
+      table: II
+    Table_IV_star_footnote_as_printed: '* Relative to pure solid silica (tridymite).'
+    Table_IV_star_footnote_locator:
+      page: 7
+      pdf_page_index: 6
+      published_page: 613
+      table: IV
+    reference_melt_equations_attributed_as_printed: Lin and Elliott [24]
+    reference_melt_GM_equation_as_printed: GM(Na2O), (tung) = -95.10 - 347.2 NWO3 (kJ) [5]
+    reference_melt_GM_conditions_as_printed: 1200 K and 0.53 < NWO3 < 0.8
+    reference_melt_HM_equation_as_printed: HM(Na2O), (tung) = -709.8 + 262.57/NWO3 (kJ) [6]
+    reference_melt_HM_conditions_as_printed: 0.53 < NWO3 < 0.8 and 1113 < T, K < 1230
+    reference_melt_relation_locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 608
+      section: Thermodynamic Considerations
+    emf_values_as_printed: No numerical cell emf is tabulated; measured potentials are used in Eq. [4].
+    vapor_values_as_printed: No vapor-pressure values are reported.
+  context_id: neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_method_and_reference_states
+  work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  species: Na2O
+- observation_id: neudorf_elliott_1980_sio2_activity_cao_binary_reference
+  type: context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 612
+    section: Na2O-CaO-SiO2 System
+  units: dimensionless activity; temperature °C; composition mole fraction.
+  values:
+    activity_as_printed: roughly 1.56
+    temperature_as_printed: 1070 °C
+    composition_as_printed: CaO-SiO2 binary at NSiO2 = 0.65
+    reference_state_as_printed: relative to tridymite
+    method_class: quoted_attributed
+    attribution: Rein and Chipman [25] activity data at 1550 and 1600 °C; Neudorf and Elliott extrapolate to 1070 °C.
+    note: This quoted estimate is an input mentioned in the prose; it is not a sodium activity observation.
+  context_id: neudorf-elliott-1980-na2o-cao-silicate-activities::context::neudorf_elliott_1980_sio2_activity_cao_binary_reference
+  work_id: a8027651af13c06f77b133e1020591f69b61b9f0bca9a03803c8196cac3a15c7
+  source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  species: SiO2

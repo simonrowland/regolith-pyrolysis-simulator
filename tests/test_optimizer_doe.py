@@ -72,30 +72,13 @@ def test_t155_conditional_sobol_subspaces_are_fixed_dimensional_and_index_equal(
         }
         for item in batch
     ]
-    # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, scipy-sobol).
-    # C3 leaves C0.temp_range_C and the C2A early-ramp rate in the vocabulary
-    # but disables both for search, removing two dimensions from each subspace.
-    # Regenerated at work-v064-green HEAD. All 17 changed vocabulary leaves vs
-    # 082c2809 (8 numeric bounds, 7 bounds_source strings, 2 digests):
-    #   1. furnace_max_T_C.high 2000 -> 2200 (c5434d19; FURNACE_MAX_T_BOUNDS_C[1]
-    #      inherited from zirconia_ysz max_service_T_C)
-    #   2-7. six overhead_headspace *.default_C.high 1750 -> 2200 (36da8e17/b-329;
-    #      liner, pipe default, stage_0..3_to_next; inherited from
-    #      FURNACE_MAX_T_BOUNDS_C[1], not an independent lever)
-    #   8. overhead_headspace.temperature_offset_K.low -443 -> -800
-    #      (1400 - 2200; 36da8e17)
-    #   9-14. those six overhead *.default_C.bounds_source: literal 1750 / Doloma
-    #      service text -> inherited-from-envelope text (36da8e17)
-    #   15. overhead_headspace.temperature_offset_K.bounds_source: 1843-dense-alumina
-    #      derivation -> envelope-minus-1400 derivation (36da8e17)
-    #   16. bounds_digest 5a5aba76...ecd9184 -> 9d87f239...df66cccd (derived)
-    #   17. payload_digest 77ff7776...d4ab6a0 -> 511c72ec...1dc56c12 (derived)
-    # Restoring the eight numeric bounds recovers the previous digest
-    # 85eb0ad69e593c8b1f6089ad0cc27ad403e81d5e68500109c12daf028a9b3757; no other
-    # patch path, mask, subspace digest, or effective pin differs.
+    # The Stage-4 split bounds stage_4_to_stage_5 at the 250 C Na/Mg
+    # collector (the downstream K trap is 40 C), replacing the former 700 C
+    # search ceiling. That single knob bound changes the sampled stream digest;
+    # the 59/65 conditional subspace dimensions remain fixed.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "dc098af5a43044412f15665c955a96ed036840ef0528c4f26f9f3869122d9efb"
+    ).hexdigest() == "ca8aab1fcef51d118585f967f9bc589d54e70cfb22e06447e489e5b57ad83eea"
 
 
 def test_t155_conditional_lhc_stream_is_exactly_pinned():
@@ -117,17 +100,11 @@ def test_t155_conditional_lhc_stream_is_exactly_pinned():
         }
         for item in batch
     ]
-    # Pin of sample_recipe_candidates(RecipeSchema(), n=8, seed=19, LHC).
-    # C3 disables C0.temp_range_C and the C2A early-ramp rate for search.
-    # Same 17-leaf envelope rebind as the Sobol pin above (8 numeric bounds +
-    # 7 bounds_source strings + 2 derived digests; c5434d19 furnace high and
-    # 36da8e17/b-329 overhead inheritance). Restoring those eight numeric
-    # bounds recovers
-    # 1983fce535aade41fcf064c3d7ca6fa1552ded02de6bacefac124478d7051cd7. C3's
-    # two disabled search paths also change this sampled stream.
+    # The same Stage-4 interface bound change moves the deterministic LHC
+    # samples; it leaves the C5-on/off subspace dimensions unchanged.
     assert hashlib.sha256(
         doe_module.canonical_json_dumps(payload).encode()
-    ).hexdigest() == "1b92c2122fda21526afea93379dd6619991ff0aa7f4d7fb9cdfa077bb85a6028"
+    ).hexdigest() == "3f4dbcca0c21e68c142e83ac2c1e83bdb1fd2b27e07b55b53432c892bf933a03"
 
 
 def test_t155_conditional_batch_refuses_duplicate_zero_dimensional_subspace():

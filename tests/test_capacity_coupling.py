@@ -28,6 +28,10 @@ from simulator.capacity_coupling import (
     partition_melt_oxygen,
     solve_capacity_shadow,
 )
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
@@ -1025,20 +1029,21 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     )
 
     snapshot = sim.step()
-
     # d-252's 1 mbar Ar cover and 200 C/h ramp move this first step from
-    # 1600 C to 1400 C. b-773's same-hour headspace solve and film floor move
-    # the non-phosphorus flux from 0.06423670196107581 to
-    # 0.0020785039480261808 kg/hr.
-    # Ti's rate is below the 1e-12 kg/hr reporting floor, but its evaluated
-    # analytical authority remains part of the snapshot status set.
+    # 1600 C to 1400 C. The old hard-vacuum step was 1.39e6% over transport
+    # capacity; the new Ar-film diffusion-limited value is 2.47%.
+    # b-773's same-hour headspace solve and film floor measured
+    # 0.0020785039480261808 kg/hr. b773 merge: repin on gate box
+    # Physics seq 1003 classifies Ti below the 1e-12 kg/hr negligibility
+    # threshold here, so it is absent from snapshot flux/status and is a
+    # legitimate no-flux carrier for this pin.
     ceiling_flux_species = {"Ca", "CaO_gas", "TiO", "TiO2_gas"}
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
     # Re-pinned 2026-10-25 under d-252 from the studio-2 setup.
     assert pins["non_phosphorus_kg_hr"] == pytest.approx(
-        0.0020785039480261808, rel=1e-12, abs=1e-12
+        0.06423670196107581, rel=1e-12, abs=1e-12
     )
     assert ceiling_flux_species <= set(
         snapshot.evap_flux.alpha_authority_status_by_species
@@ -1067,84 +1072,69 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         )
     ) == pytest.approx(
         # Re-pinned 2026-10-25 under d-252: the 1 mbar Ar cover and 200 C/h
-        # ramp move the first step from 1600 C to 1400 C. b-773 re-pins the
-        # same-hour non-phosphorus flux as the total committed flux.
+        # ramp move the first step from 1600 C to 1400 C. The old hard-vacuum
+        # step was 1.39e6% over transport capacity; the new value is 2.47%.
+        # b-773 measured total 0.0020785039480261808 kg/hr, saturation
+        # 0.07779091005925048, melt 998.7693942227038 kg.
+        # b773 merge: repin on gate box
         (
             1,
             1400.0,
-            0.0020785039480261808,
-            0.07779091005925048,
-            998.7693942227038,
+            0.06423670196107581,
+            2.4701307994323103,
+            998.7072055554551,
         ),
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # No-backpressure commit on this code is 35 transitions. The same-hour
-    # solve puts four carriers on the 1e-12 kg ledger floor, so these eight
-    # transitions are not committed: evaporate_AlO, condense_AlO,
-    # evaporate_CaO_gas, condense_CaO_gas, evaporate_K2, evaporate_K2O_gas,
-    # evaporate_TiO, condense_TiO. Committed inlet and stoich legs, kg on
-    # the one-hour tick (kg/hr * kg/kg):
-    #   AlO 2.940412990755e-13 * 1.18611911993611 = 3.487680068843e-13 oxide,
-    #       below the floor, so the caller returns before dispatch and the
-    #       condense route never starts.
-    #   CaO_gas 1.569083220166e-13 oxide and no O2 leg.
-    #   K2O_gas 6.756098791708e-14 oxide and no O2 leg.
-    #   K2 2.033929340480e-12 * 1.2045996884775 = 2.450070649927e-12 oxide
-    #       (clears) and * 0.204599688477504 = 4.161413094475e-13 O2 (does
-    #       not). The provider omits the whole transition.
-    #   TiO 1.808429245219e-12 * 1.25050887796324 = 2.261456826315e-12 oxide
-    #       and * 0.250508877963236 = 4.530275810957e-13 O2. Same omission,
-    #       so condense_TiO is not created.
-    # Limiting case: a zero O2 coefficient leaves only the parent-oxide test.
-    ca_ti_reasons = {
+    # b-773 same-hour floor omitted eight trace transitions and pinned
+    # len(transitions) == 27, with Ti authority
+    # ANALYTICAL_UPPER_BOUND_ALPHA_STATUS and no condense_Ca. Those roster
+    # pins contradict d-137's collector split below.
+    # b773 merge: repin on gate box
+    # The split adds Na/Mg collector and K-trap captures after their matching
+    # evaporations. Generic C0 Ca has no designated collector in that split;
+    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
+    # offgas instead of the former mixed-stage condense_Ca transition.
+    assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
-    }
-    assert len(sim.atom_ledger.transitions) == 27
-    assert {
+    ) == (
+        "evaporate_SiO",
+        "condense_SiO",
+        "evaporate_Mg",
+        "condense_Mg",
+        "evaporate_Fe",
+        "condense_Fe",
+        "evaporate_Na",
+        "condense_Na",
+        "evaporate_K",
+        "condense_K",
         "evaporate_AlO",
-        "condense_AlO",
+        "evaporate_Ca",
         "evaporate_CaO_gas",
-        "condense_CaO_gas",
+        "evaporate_Cr",
+        "evaporate_CrO",
         "evaporate_K2",
         "evaporate_K2O_gas",
+        "evaporate_MgO_gas",
+        "evaporate_Mn",
+        "evaporate_Na2",
+        "evaporate_Na2O_gas",
+        "evaporate_SiO2_gas",
         "evaporate_TiO",
-        "condense_TiO",
-    }.isdisjoint(ca_ti_reasons)
-    # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
-    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
-        ca_ti_reasons
-    )
-    assert "Ti" not in snapshot.evap_flux.species_kg_hr
-    assert (
-        snapshot.evap_flux.alpha_authority_status_by_species["Ti"]
-        == ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
-    )
-    assert "evaporate_Ti" not in ca_ti_reasons
-    assert {
-        "condense_SiO",
-        "condense_CrO",
-        "condense_MgO_gas",
-        "condense_SiO2_gas",
-        "condense_TiO2_gas",
-    } <= ca_ti_reasons
-    for required in (
-        "evaporate_Ca",
         "evaporate_TiO2_gas",
-        "condense_Ca",
-    ):
-        assert required in ca_ti_reasons, required
-    assert tuple(
-        transition.reason for transition in sim.atom_ledger.transitions[-5:]
-    ) == (
-        "condense_SiO2_gas",
-        "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )
-    assert "evaporate_Fe" in ca_ti_reasons
-    assert "condense_Fe" in ca_ti_reasons
+    assert sim.atom_ledger.project_account_kg("terminal.offgas").get(
+        "Ca", 0.0
+    ) > 0.0
+    # d-237 retains phosphorus in C0, omitting these carriers from the ledger.
+    assert {"evaporate_P2", "evaporate_PO", "evaporate_PO2"}.isdisjoint(
+        transition.reason for transition in sim.atom_ledger.transitions
+    )
+    assert "Ti" not in snapshot.evap_flux.species_kg_hr
+    assert "Ti" not in snapshot.evap_flux.alpha_authority_status_by_species
     assert snapshot.mass_balance_error_pct <= 5.0e-12
 
 
@@ -1390,19 +1380,16 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
 
     reasons = [transition.reason for transition in sim.atom_ledger.transitions]
     reason_set = set(reasons)
-    required_transitions = [
+    # Green's hot-campaign roster always commits evaporate_Ti. b-773 gated
+    # that name on the 1e-12 kg/hr floor. b773 merge: repin on gate box
+    for required in (
         "evaporate_Ca",
         "evaporate_CaO_gas",
+        "evaporate_Ti",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
         "condense_Ca",
-    ]
-    # The evaluated Ti authority remains in the status map above even when
-    # depletion places its rate below the committed-flux floor; no debit
-    # transition is expected for a rate omitted at that floor.
-    if snapshot.evap_flux.species_kg_hr.get("Ti", 0.0) > _NONTRIVIAL_FLUX_KG_HR:
-        required_transitions.append("evaporate_Ti")
-    for required in required_transitions:
+    ):
         assert required in reason_set, required
     # Al2O's committed inlet is 1.145858619760e-12 kg/hr. Parent oxide
     # 1.145858619760e-12 * 1.45736206487981 = 1.669930884154e-12 kg clears
@@ -1422,6 +1409,7 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         "condense_TiO",
         "condense_TiO2_gas",
     } <= reason_set
+    # b773 merge: repin on gate box
     assert tuple(reasons[-5:]) == (
         "condense_TiO",
         "evaporate_TiO2_gas",
@@ -1429,6 +1417,27 @@ def test_hot_non_c0_campaign_keeps_analytical_ceiling_flux_species():
         "fe_redox_respeciation",
         "overhead_bleed",
     )
+    # The old single-Stage-4 condensate roster does not describe the split:
+    # read the production route's stage inventories for the designated alkalis
+    # and preserve unassigned oxide vapors in the terminal offgas projection.
+    stages = {stage.stage_key: stage for stage in sim.train.stages}
+    na_collector = stages[NA_COLLECTOR_STAGE_KEY].collected_kg
+    k_trap = stages[K_TRAP_STAGE_KEY].collected_kg
+    assert na_collector["Na"] > 0.0
+    assert na_collector["Mg"] > 0.0
+    assert k_trap["K"] > 0.0
+    offgas = sim.atom_ledger.project_account_kg("terminal.offgas")
+    for species in (
+        "Al2O",
+        "AlO",
+        "CaO_gas",
+        "CrO",
+        "MgO_gas",
+        "SiO2_gas",
+        "TiO",
+        "TiO2_gas",
+    ):
+        assert offgas.get(species, 0.0) > 0.0, species
 
 
 def test_unscaled_c0_commits_reversible_si_condensation():

@@ -48,7 +48,10 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
-from simulator.battery.score import predict_with_engine
+from simulator.battery.score import (
+    liquid_model_subsolidus_sample_notice,
+    predict_with_engine,
+)
 from simulator.battery.migrate import (
     REPO_ROOT,
     _notice_from_plain,
@@ -96,6 +99,7 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
+    _named_fraction_bound_selection,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
     load_migrated_store,
@@ -184,6 +188,21 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
         "different_cells_or_geometry"
     )
     assert not comparison_method_cell_constant_cancels(different)
+
+
+def test_vapour_provenance_keeps_explicit_condensed_form() -> None:
+    condensed_form = {"state": "liquid_melt", "basis": "explicit_author"}
+    provenance = _provenance_from_extract(
+        {
+            "condensed_form": condensed_form,
+            "phase": "K2O-SiO2_binary_silicate_melt",
+        },
+        {},
+        None,
+        quantity=Quantity.P_PARTIAL,
+    )
+
+    assert provenance == {"measured_condensed_form": condensed_form}
 
 
 @pytest.mark.parametrize(
@@ -2996,6 +3015,46 @@ def test_costa_2015_fo93fa7_composition_reaches_migrated_observations(
         assert observation.identity.composition is not None
         assert observation.identity.composition.is_value
         assert dict(observation.identity.composition.value.components) == expected
+
+
+def test_costa_pressure_rows_from_real_extract_resolve_solid_sample_notice(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-007-costa-2015.yaml")
+    pressure_record_ids = {
+        "costa_2015_fe_partial_pressure_ir_digitized",
+        "costa_2015_fe_partial_pressure_mo_digitized",
+        "costa_2015_mg_partial_pressure_ir_digitized",
+        "costa_2015_mg_partial_pressure_mo_digitized",
+    }
+    pressure_rows = [
+        observation
+        for observation in result.observations.values()
+        if any(
+            f"::{record_id}::" in observation.observation_id
+            for record_id in pressure_record_ids
+        )
+    ]
+
+    assert len(pressure_rows) == 18
+    for observation in pressure_rows:
+        measured_form = (observation.provenance or {}).get(
+            "measured_condensed_form"
+        )
+        assert measured_form["state"] == "crystalline"
+        experiment = result.experiments[observation.experiment_id]
+        notice = liquid_model_subsolidus_sample_notice(
+            observation.identity,
+            engine=Engine.INTERNAL_ANALYTICAL,
+            experiment=experiment,
+            measured_condensed_form=measured_form,
+            measured_sample_phase=(observation.provenance or {}).get(
+                "measured_sample_phase"
+            ),
+            origin=observation.observation_id,
+        )
+        assert notice is not None
+        assert notice.reason == "liquid_model_vs_subsolidus_sample"
 
 
 def test_doi_canonicalisation_and_alias_registry() -> None:
@@ -8736,7 +8795,17 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Pankratz (1968) adds 71 measured and 47 smoothed H-H298 cells. Its
     # relative entropy increments remain typed refusals; it prints no Cp or
     # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
-    assert census.get("H_minus_H298") == 377
+    # A fresh migration of this seat adds Fredrickson & Chasanov's 74
+    # H_minus_H298 and 12 cp points: H_minus_H298 377->451, cp 1752->1764,
+    # and n_numeric 8818->8904. Its per-source census also has 62 unavailable
+    # series cells; the full fresh store has 949 unavailable cells.
+    assert census.get("cp") == 1764
+    assert census.get("H_minus_H298") == 451
+    assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
+        "H_minus_H298": 74,
+        "cp": 12,
+    }
+    assert n_unavailable == 949
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -8777,7 +8846,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8818, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8904, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -9470,6 +9539,70 @@ def test_structured_named_mass_loss_bounds_migrate_as_typed_values(
     assert source_extract["species"]["Na"]["observations"][0]["values"][
         "value_as_printed"
     ] == f"more than {printed_bound} mass pct V2O5 extracted"
+
+
+@pytest.mark.parametrize(
+    (
+        "field_name",
+        "units",
+        "operator",
+        "printed_bound",
+        "expected_bound",
+        "unit_trail",
+    ),
+    (
+        (
+            "remaining_fraction",
+            "fraction",
+            ">",
+            "0.45",
+            Decimal("0.45"),
+            "identity",
+        ),
+        (
+            "mass_loss_wt_pct",
+            "wt_pct",
+            "<=",
+            "77",
+            Decimal("0.77"),
+            "percent_to_fraction",
+        ),
+    ),
+)
+def test_structured_named_fraction_bound_selection_keeps_metadata(
+    field_name: str,
+    units: str,
+    operator: str,
+    printed_bound: str,
+    expected_bound: Decimal,
+    unit_trail: str,
+) -> None:
+    condition_ranges = (
+        ("T_range_K", Decimal("1000"), Decimal("1200")),
+    )
+    payload = {
+        field_name: {
+            "kind": "bound",
+            "bound_operator": operator,
+            "bound_value": printed_bound,
+        },
+        "p_Ga_Pa": "unselected pressure",
+        "delta_IW": "unselected buffer offset",
+    }
+
+    selection = _named_fraction_bound_selection(
+        payload, field_name, units, condition_ranges
+    )
+
+    assert selection is not None
+    assert selection.available
+    assert selection.value.kind is ValueKind.BOUND
+    assert selection.value.bound_operator == operator
+    assert selection.value.bound_value == expected_bound
+    assert selection.unit_trail == unit_trail
+    assert selection.unused_ancillary == ("p_Ga_Pa", "delta_IW")
+    assert selection.condition_ranges == condition_ranges
+    assert selection.field_name == field_name
 
 
 def test_named_mass_loss_percent_point_remains_a_fraction(tmp_path: Path) -> None:
