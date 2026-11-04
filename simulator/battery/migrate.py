@@ -19467,12 +19467,14 @@ class Migrator:
             obs_type, values, units=obs.get("units"), row=obs
         )
         q_token = quantity.value if quantity.is_value else None
-        composition_axis_required = _composition_axis_is_required(
+        identity_profile_uses_composition = _composition_axis_is_required(
             q_token,
             values.get("basis")
             if q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             else values.get("subtype"),
         )
+        composition_axis_required = identity_profile_uses_composition
+        identity_profile_known = q_token is not None
         declared_printed_map = _named_printed_composition_map(values)
         composition_role, composition_role_error = _declared_composition_role(values)
         declares_composition_datum = _has_explicit_composition_field(values) or (
@@ -19867,7 +19869,7 @@ class Migrator:
                 source_composition,
                 closure_context=composition_closure_context,
             )
-            if composition_axis_required
+            if (identity_profile_uses_composition or not identity_profile_known)
             and isinstance(source_composition_state, Mapping)
             and source_composition_state.get("tag") == StateTag.UNKNOWN.value
             else None
@@ -21379,30 +21381,6 @@ class Migrator:
                     located_composition = Located(
                         composition_state, locator=printed.locator
                     )
-                carried_projection_notice = None
-                if (
-                    composition_state.is_value
-                    and printed is not None
-                    and printed.state.is_value
-                    and isinstance(printed.state.value, Mapping)
-                ):
-                    carried_projection_notice = _composition_projection_notice(
-                        printed.state.value,
-                        closure_context=phase_closure_context,
-                        quantity=(
-                            q_token
-                            if isinstance(q_token, Quantity)
-                            else None
-                        ),
-                        origin=obs_id,
-                        declared_component_map=printed.state.value,
-                    )
-                projection_notice = carried_projection_notice
-                projection_notices = (
-                    ()
-                    if carried_projection_notice is None
-                    else (carried_projection_notice,)
-                )
                 ident_kwargs["composition"] = composition_state
                 point_conditions = {
                     **(point_conditions or {}),
@@ -21454,6 +21432,19 @@ class Migrator:
             item
             for item in experiment_provenance
             if any(item.startswith(f"identity.{name}=") for name in inherited_identity_fields)
+        )
+        experiment = self.result.experiments.get(experiment_id)
+        experiment_starting_composition = (
+            experiment.sample.initial_composition
+            if experiment is not None
+            else None
+        )
+        identity_composition_from_starting_material = (
+            experiment_starting_composition is not None
+            and experiment_starting_composition.state.is_value
+            and isinstance(experiment_starting_composition.state.value, Composition)
+            and ident_kwargs.get("composition")
+            == experiment_starting_composition.state
         )
         if q_token in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
             fO2_condition = (point_conditions or {}).get("fO2_log")
@@ -21642,6 +21633,9 @@ class Migrator:
                     experiment_id=experiment_id,
                     locator=locator,
                     identity_base=(yield_quantity, species, ident_kwargs),
+                    identity_composition_from_starting_material=(
+                        identity_composition_from_starting_material
+                    ),
                     evidence=evidence,
                     admission=point_admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -21768,6 +21762,9 @@ class Migrator:
                         experiment_id=experiment_id,
                         locator=locator,
                         identity_base=(quantity, point_species, ident_kwargs),
+                        identity_composition_from_starting_material=(
+                            identity_composition_from_starting_material
+                        ),
                         evidence=evidence,
                         admission=admission,
                         uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -21896,6 +21893,9 @@ class Migrator:
                     experiment_id=experiment_id,
                     locator=locator,
                     identity_base=(quantity, species, ident_kwargs),
+                    identity_composition_from_starting_material=(
+                        identity_composition_from_starting_material
+                    ),
                     evidence=evidence,
                     admission=admission,
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
@@ -22098,6 +22098,19 @@ class Migrator:
                             quantity,
                             species,
                             point_identity_kwargs if non_yield_points else ident_kwargs,
+                        ),
+                        identity_composition_from_starting_material=(
+                            identity_composition_from_starting_material
+                            and (
+                                point_identity_kwargs
+                                if non_yield_points
+                                else ident_kwargs
+                            ).get("composition")
+                            == (
+                                experiment_starting_composition.state
+                                if experiment_starting_composition is not None
+                                else None
+                            )
                         ),
                         evidence=evidence,
                         admission=admission,
@@ -22621,6 +22634,7 @@ class Migrator:
         experiment_id: str,
         locator: Locator,
         identity_base: tuple[Quantity | State[Quantity], Species, dict[str, Any]],
+        identity_composition_from_starting_material: bool = False,
         evidence: Evidence,
         admission: Admission,
         uncertainty: Uncertainty,
@@ -23032,6 +23046,11 @@ class Migrator:
                 point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
+        preserve_starting_identity_composition = (
+            identity_composition_from_starting_material
+            and isinstance(ident_kwargs.get("composition"), State)
+            and ident_kwargs["composition"].is_value
+        )
         if malformed_composition_amount is not None:
             self.result.registry_issues.append(
                 ValidationIssue(
@@ -23041,10 +23060,18 @@ class Migrator:
                 )
             )
         if point_catalogue is not None:
-            ident_kwargs["composition"] = point_catalogue.state
+            if not (
+                preserve_starting_identity_composition
+                and point_composition_refusal
+            ):
+                ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
-            ident_kwargs["composition"] = point_composition_located.state
+            if not (
+                preserve_starting_identity_composition
+                and point_composition_refusal
+            ):
+                ident_kwargs["composition"] = point_composition_located.state
         elif q_token is Quantity.TRANSITION_TEMPERATURE:
             raw_point_conditions = (
                 raw_item.get("point_conditions")
@@ -23133,10 +23160,7 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if point_composition_refusal and not (
-            q_token_point is Quantity.MASS_LOSS_FRACTION
-            and getattr(ident_kwargs.get("composition"), "is_value", False)
-        ):
+        if point_composition_refusal and not preserve_starting_identity_composition:
             ident_kwargs["composition"] = State.unknown(
                 composition_unknown_reason(point_composition_refusal)
             )

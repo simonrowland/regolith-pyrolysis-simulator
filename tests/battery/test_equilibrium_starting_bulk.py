@@ -525,3 +525,43 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     identity = blank.identity.composition
     assert identity is not None and identity.is_unknown
     assert identity.reason == _BLANK_REASON
+
+
+def test_partial_equilibrium_phase_child_refusal_keeps_starting_bulk_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_mol": {"SiO2": "0.5", "Al2O3": "0.5"},
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    root = _write_min_tree(tmp_path, extract=document)
+    result = migrate(root, write=False)
+    children = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(children) == 1
+    child = children[0]
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert identity_composition.value == _starting_mole_fraction()
+
+    measured_composition = child.point_conditions["composition"]
+    assert measured_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
