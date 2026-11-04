@@ -504,9 +504,14 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # and carries the source unit text.
     # b-979 / d-053: source_relation on all 18 residuals moves from
     # independent to unknown. Kress attribution stays UNKNOWN unless both
-    # walks are complete. No numeric field moved.
+    # walks are complete.
+    # d-342 retarget. At b1cb2dec4 the payload hashed to
+    # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
+    # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
+    # Those twelve now score. The six Aithala rows are byte-identical.
+    # The previous pin was already stale at that base.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "11313cf08df6b900eb17e50da8ab69b4387ac75d91956105d34e50cfcdee33d5"
+        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
     )
 
 
