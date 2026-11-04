@@ -8795,7 +8795,17 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
     # Pankratz (1968) adds 71 measured and 47 smoothed H-H298 cells. Its
     # relative entropy increments remain typed refusals; it prints no Cp or
     # absolute S cells. H-H298 259->377 and n_numeric 8700->8818.
-    assert census.get("H_minus_H298") == 377
+    # A fresh migration of this seat adds Fredrickson & Chasanov's 74
+    # H_minus_H298 and 12 cp points: H_minus_H298 377->451, cp 1752->1764,
+    # and n_numeric 8818->8904. Its per-source census also has 62 unavailable
+    # series cells; the full fresh store has 949 unavailable cells.
+    assert census.get("cp") == 1764
+    assert census.get("H_minus_H298") == 451
+    assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
+        "H_minus_H298": 74,
+        "cp": 12,
+    }
+    assert n_unavailable == 949
     assert per_source.get("schumm-1981-alkali-aluminosilicate-thermochemical-tables") == {
         "cp": 123,
         "H_minus_H298": 123,
@@ -8836,7 +8846,7 @@ def test_j01_store_census_series_numeric_matches_declared_field(tmp_path: Path) 
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 8818, (n_numeric, census, n_unavailable)
+    assert n_numeric == 8904, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:

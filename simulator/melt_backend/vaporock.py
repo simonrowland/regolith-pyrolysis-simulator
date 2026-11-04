@@ -120,7 +120,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
-from engines.engine_commissioning import assess_engine_commissioning
+from engines.engine_commissioning import (
+    VAPOROCK_T_MAX_K,
+    VAPOROCK_T_MIN_K,
+    assess_engine_commissioning,
+    vaporock_temperature_notice,
+)
 from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
 from simulator.engine_pool import (
     EngineWorkerDied,
@@ -152,15 +157,13 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # ---------------------------------------------------------------------------
 # External validation domain (DESIGN-REV5 §4.2.1; VR-5)
 # ---------------------------------------------------------------------------
-# Load-bearing gate: the 2026-07-31 probe
+# External-validation evidence: the 2026-07-31 probe
 # (docs-private/research/2026-07-31-vaporock-probe/findings.md) found zero
-# typed refusals from 1200 K through 10000 K. The checked-in
-# ~8.3e5 bar figure is that probe's stored finite-sum fixture, replayed
-# by tests through a fake System. It is not recomputed against the
-# current installed engine. A finite provider return is therefore no
-# evidence of domain validity.
-VAPOROCK_T_MIN_K = 1350.0
-VAPOROCK_T_MAX_K = 1950.0
+# typed refusals from 1200 K through 10000 K. Its checked-in ~8.3e5 bar
+# finite-sum fixture is replayed by tests through a fake System; it is not
+# recomputed against the current installed engine. Finite returns outside
+# the certified band are extrapolated predictions, still subject to the
+# independent sum-pressure ceiling below.
 _MELT_MODEL_ID = 'MELTS-v1.0'
 # In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
 # is a conservative sum-pressure sanity ceiling well below the 2026-07-31
@@ -367,17 +370,6 @@ _VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 def temperature_C_to_K(temperature_C: float) -> float:
     """Convert the adapter's Celsius melt temperature to Kelvin."""
     return float(temperature_C) + 273.15
-
-
-def vaporock_temperature_in_domain(temperature_K: float) -> bool:
-    """True iff *temperature_K* lies in the admitted VapoRock envelope."""
-    try:
-        t = float(temperature_K)
-    except (TypeError, ValueError):
-        return False
-    if not math.isfinite(t):
-        return False
-    return VAPOROCK_T_MIN_K <= t <= VAPOROCK_T_MAX_K
 
 
 def vaporock_liquid_fraction_admitted(
@@ -1753,14 +1745,14 @@ class VapoRockBackend(MeltBackend):
         is called (binding spec §7).  The melt composition is then
             projected to VapoRock's MELTS-compatible oxide/volatile wt% basis.
 
-        External domain gate (DESIGN-REV5 §4.2.1 / VR-5; load-bearing):
-        refuse outside 1350–1950 K, on liquid-fraction failure when a
-        fraction is supplied, on projection/non-basis failure, and on
-        sum-pressure sanity failure after the engine returns. Upstream
-        fabricates smooth finite garbage at extreme T (historical
-        2026-07-31 probe fixture ~8.3e5 bar total at 10000 K; that
-        number is not a current-engine recompute) and does not
-        self-refuse.
+        The external validation band is 1350–1950 K. Finite temperatures
+        outside it still reach VapoRock and carry an extrapolation notice;
+        non-finite temperature, liquid-fraction failure when a fraction is
+        supplied, projection/non-basis failure, and sum-pressure sanity
+        failure remain typed refusals. Upstream can return smooth finite
+        garbage at extreme T (the historical 2026-07-31 fixture is about
+        8.3e5 bar total at 10000 K; it is not a current-engine recompute),
+        so the independent 10 bar ceiling still applies after evaluation.
 
         ``pressure_bar`` remains diagnostic-only: the System path in this
         adapter does not pass total pressure through to the engine
@@ -1800,18 +1792,14 @@ class VapoRockBackend(MeltBackend):
 
         prior_warnings: List[str] = []
 
-        # --- HARD external temperature gate (before any engine call) ---
-        if not vaporock_temperature_in_domain(temperature_K):
+        # Non-finite temperatures cannot be evaluated or assigned a range notice.
+        if not math.isfinite(temperature_K):
             diagnostics = {
                 **melt_envelope_diagnostics,
                 'backend_status_reason': (
                     OutOfDomainReason.TEMPERATURE_RANGE.value
                 ),
-                **(
-                    {'temperature_K': float(temperature_K)}
-                    if math.isfinite(temperature_K)
-                    else {'temperature_input_category': 'non_finite'}
-                ),
+                'temperature_input_category': 'non_finite',
                 'vaporock_t_min_K': VAPOROCK_T_MIN_K,
                 'vaporock_t_max_K': VAPOROCK_T_MAX_K,
                 'requested_pressure_bar': float(pressure_bar),
@@ -1825,11 +1813,8 @@ class VapoRockBackend(MeltBackend):
                 phase_assemblage_available=False,
                 status='out_of_domain',
                 warnings=[
-                    f'VapoRock refused T={temperature_K:g} K outside '
-                    f'admitted domain '
-                    f'[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K '
-                    '(external domain gate; upstream fabricates finite '
-                    'garbage outside this envelope)'
+                    'VapoRock refused non-finite temperature '
+                    '(temperature_range)'
                 ],
                 diagnostics=diagnostics,
             )
@@ -2062,6 +2047,7 @@ class VapoRockBackend(MeltBackend):
             sio2_wt_pct=comp_wt.get('SiO2', 0.0),
             temperature_K=temperature_K,
         )
+        temperature_notice = vaporock_temperature_notice(temperature_K)
         if commissioning.notice is not None:
             notice = dict(commissioning.notice)
             projection_diagnostics = dict(projection_diagnostics)
@@ -2074,6 +2060,12 @@ class VapoRockBackend(MeltBackend):
                 'CommissioningNotice: out of certified band; '
                 f"authority={notice['authority']}; engine will run"
             )
+        if temperature_notice is not None:
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics['vaporock_temperature_notice'] = (
+                temperature_notice
+            )
+            prior_warnings.extend(temperature_notice['warnings'])
 
         temperature_value = (
             temperature_C + 273.15

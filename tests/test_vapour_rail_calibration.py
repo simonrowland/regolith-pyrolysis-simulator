@@ -78,6 +78,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_temperature_grid_covers_vaporock_domain_and_user_story_slice():
+    from engines.engine_commissioning import vaporock_temperature_in_domain
+
     grid = temperature_grid_K()
     assert grid[0] == VAPOROCK_T_MIN_K == 1350.0
     assert grid[-1] == VAPOROCK_T_MAX_K == 1950.0
@@ -86,7 +88,7 @@ def test_temperature_grid_covers_vaporock_domain_and_user_story_slice():
     assert 1900.0 in grid
     assert 1573.15 in grid  # 1300 °C user-story slice
     # No out-of-domain points.
-    assert all(VAPOROCK_T_MIN_K <= t <= VAPOROCK_T_MAX_K for t in grid)
+    assert all(vaporock_temperature_in_domain(t) for t in grid)
 
 
 def test_temperature_grid_refuses_outside_vaporock_domain():

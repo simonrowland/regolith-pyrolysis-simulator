@@ -1,0 +1,4096 @@
+schema_version: literature_extract.v1
+source_id: related-beerkens-1986-deposits-condensation-thesis
+source:
+  citation: Beerkens, R.G.C. (1986). Deposits and Condensation from Flue Gases in Glass Furnaces. Doctoral thesis,
+    Technische Universiteit Eindhoven.
+  year: 1986
+extraction:
+  method: Measured gas concentrations and condensate/deposition results transcribed from MinerU and pdftotext-layout.
+    Render checks were used for Tables 1.5, 2.4, 3.8, 4.1, 4.2, 4.3 and 4.4; explicit prose values were checked
+    against both machine reads. Table values retain printed units. CFBL outputs are separate quoted model values
+    because the full model inputs are not stored. Figure-only curves are not digitized.
+  scope: Tables 1.5, 2.4, 4.2 and 4.3; the one explicitly measured Table 3.8 laboratory dew point; measured prose
+    values for Na2SO4, K2SO4 and PbO; and cited literature dew points in section 2.4.
+  schema_gaps:
+  - Flue-gas elemental volume ppm has no exact quantity token; it is not converted to partial pressure because total
+    pressure is not printed.
+  - Wall deposition mass per area per time and paddle carryover g/24 h have no exact quantity token. The nearest
+    closed quantities differ in dimensionality or direction.
+  - The extract records printed gas mixtures verbatim in located atmosphere conditions. Identity.composition cannot
+    represent the combination of gas species with volume-percent and volume-ppm values through the current closed
+    composition path; no conversion or guessed identity was introduced. See simulator/battery/migrate.py::_COMPOSITION_COMPONENTS,
+    simulator/battery/enums.py::AmountBasis.MOLE_PERCENT, simulator/battery/enums.py::PHASE_BASIS_TOKENS.
+  - No measured Na2O or K2O activity was found. Table 2.2 is a calculated vapor-pressure/temperature relation, not
+    a measured activity table.
+  figure_read_candidates:
+  - 'Figures 4.14-4.21: measured sodium sulphate, sodium metaborate, potassium sulphate and lead oxide deposition
+    curves; only explicit prose values were transcribed.'
+  - 'Figures 5.1-5.14: deposition calculations and recuperator profiles; model outputs are outside this measured-data
+    pass.'
+  date: '2026-11-02'
+  worker: w1103cw1-be86
+review_status: draft
+fidelity_samples:
+- path: species.S.observations[beerkens_1986_table1_5_s_volume_ppm].values.points[0].value
+  value: 1200
+  locator:
+    page: 28
+    published_page: 19
+    table: '1.5'
+    row: 2
+    table_row_number: 2
+    column: 3
+    table_column_number: 3
+    note: render-checked furnace A sulfur cell
+- path: species.unknown.observations[beerkens_1986_table2_4_water_cooled_paddle_carryover].values.points[0].value
+  value: 3.3
+  locator:
+    page: 73
+    published_page: 64
+    table: '2.4'
+    row: 4
+    table_row_number: 4
+    column: 2
+    table_column_number: 2
+    note: render-checked first carryover value
+- path: species.Na2SO4.observations[beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment].values.points[3].value
+  value: 1.6
+  locator:
+    page: 137
+    published_page: 128
+    table: '4.2'
+    row: 5
+    table_row_number: 5
+    column: 2
+    table_column_number: 2
+    note: render-checked experimental maximum rate
+- path: species.Na2SO4.observations[beerkens_1986_table4_3_na2so4_dew_point_experiment].values.points[0].T_K
+  value: 1120
+  locator:
+    page: 139
+    published_page: 130
+    table: '4.3'
+    row: 2
+    table_row_number: 2
+    column: 5
+    table_column_number: 5
+    note: render-checked experimental dew point
+- path: species.Na2SO4.observations[beerkens_1986_section3_3_2_na2so4_experimental_dew_point_gas_i].values.points[0].T_K
+  value: 1240
+  locator:
+    page: 112
+    published_page: 103
+    section: 3.3.2
+    note: MinerU and pdftotext, prose value
+- path: species.K2SO4.observations[beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate].values.points[0].value
+  value: 2.9
+  locator:
+    page: 167
+    published_page: 158
+    section: 4.5.5
+    note: render p167; MinerU and pdftotext agree
+- path: species.PbO.observations[beerkens_1986_section4_5_6_pbo_measured_dew_point].values.points[0].T_K
+  value: 1090
+  locator:
+    page: 168
+    published_page: 159
+    section: 4.5.6
+    note: render p168; MinerU and pdftotext agree
+- path: species.PbO.observations[beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate].values.points[0].value
+  value: 3.0
+  locator:
+    page: 169
+    published_page: 160
+    section: 4.5.6
+    note: render p169; MinerU and pdftotext agree
+species:
+  unknown:
+    observations:
+    - observation_id: beerkens_1986_table2_4_water_cooled_paddle_carryover
+      type: rate_series
+      locator:
+        page: 73
+        published_page: 64
+        table: '2.4'
+        note: 19 printed carryover values across the two table blocks
+      phase: cr
+      units: g/24 h as printed
+      values:
+        quantity: water_cooled_paddle_carryover_mass_per_24h
+        rail: wall_deposition
+        method_class: quoted_attributed
+        attribution: Busby and Sengelow [34], as cited in Beerkens Table 2.4.
+        schema_gap: No exact quantity token represents deposit mass per 24 h collected on a water-cooled probe.
+          wall_deposit_mass is mass, mass_loss_areal_density is areal mass without time, and mass_loss_rate is sample
+          loss in the opposite direction; see simulator/battery/enums.py::Quantity and simulator/battery/migrate.py::TYPE_QUANTITY.
+        points:
+        - port_as_printed: A
+          fuel_as_printed: Oil
+          value: 3.3
+          locator: &id001
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 2
+            table_column_number: 2
+            note: first or end port A
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id001
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id001
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id001
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id001
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id001
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id001
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id001
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id001
+        - port_as_printed: B
+          fuel_as_printed: Oil
+          value: 4.0
+          locator: &id002
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 3
+            table_column_number: 3
+            note: first or end port B
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id002
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id002
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id002
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id002
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id002
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id002
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id002
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id002
+        - port_as_printed: C
+          fuel_as_printed: Gas
+          value: 3.8
+          locator: &id003
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 4
+            table_column_number: 4
+            note: first or end port C
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id003
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id003
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id003
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id003
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id003
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id003
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id003
+            atmosphere:
+              state:
+                tag: value
+                value: gas fired; soda-lime glass; water-cooled paddle
+              locator: *id003
+        - port_as_printed: E
+          fuel_as_printed: Gas
+          value: 2.7
+          locator: &id004
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 5
+            table_column_number: 5
+            note: first or end port E
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id004
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id004
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id004
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id004
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id004
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id004
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id004
+            atmosphere:
+              state:
+                tag: value
+                value: gas fired; soda-lime glass; water-cooled paddle
+              locator: *id004
+        - port_as_printed: F
+          fuel_as_printed: Oil
+          value: 8.1
+          locator: &id005
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 6
+            table_column_number: 6
+            note: first or end port F
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id005
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id005
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id005
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id005
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id005
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id005
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id005
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id005
+        - port_as_printed: G
+          fuel_as_printed: Oil
+          value: 3.8
+          locator: &id006
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 7
+            table_column_number: 7
+            note: first or end port G
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id006
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id006
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id006
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id006
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id006
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id006
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id006
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id006
+        - port_as_printed: H
+          fuel_as_printed: Oil
+          value: 5.1
+          locator: &id007
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 8
+            table_column_number: 8
+            note: first or end port H
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id007
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id007
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id007
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id007
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id007
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id007
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id007
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id007
+        - port_as_printed: I
+          fuel_as_printed: Oil
+          value: 8.9
+          locator: &id008
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 9
+            table_column_number: 9
+            note: first or end port I
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id008
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id008
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id008
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id008
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id008
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id008
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id008
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id008
+        - port_as_printed: J
+          fuel_as_printed: Oil
+          value: 7.7
+          locator: &id009
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 10
+            table_column_number: 10
+            note: first or end port J
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id009
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id009
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id009
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id009
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id009
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id009
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id009
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id009
+        - port_as_printed: K
+          fuel_as_printed: Oil
+          value: 12.6
+          locator: &id010
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 11
+            table_column_number: 11
+            note: first or end port K
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id010
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id010
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id010
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id010
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id010
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id010
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id010
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id010
+        - port_as_printed: L
+          fuel_as_printed: Oil
+          value: 2.7
+          locator: &id011
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 12
+            table_column_number: 12
+            note: first or end port L
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id011
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id011
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id011
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id011
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id011
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id011
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id011
+            atmosphere:
+              state:
+                tag: value
+                value: oil fired; soda-lime glass; water-cooled paddle
+              locator: *id011
+        - port_as_printed: M
+          fuel_as_printed: Gas
+          value: 7.1
+          locator: &id012
+            page: 73
+            published_page: 64
+            table: '2.4'
+            row: 4
+            table_row_number: 4
+            column: 13
+            table_column_number: 13
+            note: first or end port M
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id012
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id012
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id012
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id012
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id012
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id012
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id012
+            atmosphere:
+              state:
+                tag: value
+                value: gas fired; soda-lime glass; water-cooled paddle
+              locator: *id012
+        - port_as_printed: H first port
+          value: 5.1
+          locator: &id013
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 2
+            table_column_number: 2
+            note: unnumbered continuation of Table 2.4; H furnace, first port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id013
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id013
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id013
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id013
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id013
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id013
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id013
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id013
+        - port_as_printed: H second port
+          value: 4.5
+          locator: &id014
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 3
+            table_column_number: 3
+            note: unnumbered continuation of Table 2.4; H furnace, second port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id014
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id014
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id014
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id014
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id014
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id014
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id014
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id014
+        - port_as_printed: H third port
+          value: 4.8
+          locator: &id015
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 4
+            table_column_number: 4
+            note: unnumbered continuation of Table 2.4; H furnace, third port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id015
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id015
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id015
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id015
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id015
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id015
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id015
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id015
+        - port_as_printed: I first port
+          value: 8.9
+          locator: &id016
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 5
+            table_column_number: 5
+            note: unnumbered continuation of Table 2.4; I furnace, first port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id016
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id016
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id016
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id016
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id016
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id016
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id016
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id016
+        - port_as_printed: I second port
+          value: 4.8
+          locator: &id017
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 6
+            table_column_number: 6
+            note: unnumbered continuation of Table 2.4; I furnace, second port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id017
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id017
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id017
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id017
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id017
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id017
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id017
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id017
+        - port_as_printed: I third port
+          value: 4.0
+          locator: &id018
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 7
+            table_column_number: 7
+            note: unnumbered continuation of Table 2.4; I furnace, third port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id018
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id018
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id018
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id018
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id018
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id018
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id018
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id018
+        - port_as_printed: I fourth port
+          value: 3.2
+          locator: &id019
+            page: 73
+            published_page: 64
+            row: 16
+            table_row_number: 16
+            column: 8
+            table_column_number: 8
+            note: unnumbered continuation of Table 2.4; I furnace, fourth port; along furnace length
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The paddle is described as water-cooled; no numeric paddle temperature is printed.
+              locator: *id019
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas or paddle temperature is reported for an individual sample.
+              locator: *id019
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id019
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id019
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id019
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: The unit is g/24 h, but the individual sampling duration is not stated.
+              locator: *id019
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Paddle collection area is not stated.
+              locator: *id019
+            atmosphere:
+              state:
+                tag: value
+                value: oil-fired soda-lime furnace; water-cooled paddle
+              locator: *id019
+  Na2SO4:
+    observations:
+    - observation_id: beerkens_1986_table4_2_na2so4_max_deposition_rate_experiment
+      type: rate_series
+      locator:
+        page: 137
+        published_page: 128
+        table: '4.2'
+        note: 4 printed dopant rows
+      phase: cr
+      units: mg/cm2·hr as printed
+      values:
+        quantity: surface_deposition_areal_mass_rate
+        rail: wall_deposition
+        method_class: measured_direct
+        schema_gap: No exact quantity token represents wall deposit mass per area per time; nearby mass_loss_areal_density
+          has no time denominator and mass_loss_rate has no area denominator. See simulator/battery/enums.py::Quantity
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        points:
+        - na_volume_ppm: 20
+          s_volume_ppm: 20
+          value: 0.38
+          locator: &id020
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 2
+            table_row_number: 2
+            column: 2
+            table_column_number: 2
+          dopant_locator: &id024
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 2
+            table_row_number: 2
+            column: 1
+            table_column_number: 1
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id020
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id020
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id020
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id020
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id020
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id020
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id020
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 20 volume-ppm and S 20 volume-ppm.'
+              locator: *id020
+        - na_volume_ppm: 50
+          s_volume_ppm: 50
+          value: 1.04
+          locator: &id021
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 3
+            table_row_number: 3
+            column: 2
+            table_column_number: 2
+          dopant_locator: &id026
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 3
+            table_row_number: 3
+            column: 1
+            table_column_number: 1
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id021
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id021
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id021
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id021
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id021
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id021
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id021
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 50 volume-ppm and S 50 volume-ppm.'
+              locator: *id021
+        - na_volume_ppm: 75
+          s_volume_ppm: 75
+          value: 1.17
+          locator: &id022
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 4
+            table_row_number: 4
+            column: 2
+            table_column_number: 2
+          dopant_locator: &id028
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 4
+            table_row_number: 4
+            column: 1
+            table_column_number: 1
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id022
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id022
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id022
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id022
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id022
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id022
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id022
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 75 volume-ppm and S 75 volume-ppm.'
+              locator: *id022
+        - na_volume_ppm: 100
+          s_volume_ppm: 100
+          value: 1.6
+          locator: &id023
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 5
+            table_row_number: 5
+            column: 2
+            table_column_number: 2
+          dopant_locator: &id030
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 5
+            table_row_number: 5
+            column: 1
+            table_column_number: 1
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id023
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id023
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id023
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id023
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id023
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id023
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id023
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 100 volume-ppm and S 100 volume-ppm.'
+              locator: *id023
+    - observation_id: beerkens_1986_table4_2_na2so4_max_deposition_rate_cfbl
+      type: rate_series
+      locator:
+        page: 137
+        published_page: 128
+        table: '4.2'
+        note: 4 CFBL calculation rows
+      phase: cr
+      units: mg/cm2·hr as printed
+      values:
+        quantity: surface_deposition_areal_mass_rate
+        rail: wall_deposition
+        method_class: quoted_attributed
+        attribution: CFBL calculations reported by Beerkens; model inputs and parameters are not all stored here.
+        schema_gap: No exact quantity token represents wall deposit mass per area per time; model output is kept
+          separate from measured values. See simulator/battery/enums.py::Quantity::MASS_LOSS_AREAL_DENSITY and simulator/battery/enums.py::Quantity::MASS_LOSS_RATE.
+        points:
+        - na_volume_ppm: 20
+          s_volume_ppm: 20
+          value: 0.28
+          locator: &id025
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 2
+            table_row_number: 2
+            column: 3
+            table_column_number: 3
+          dopant_locator: *id024
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id025
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id025
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id025
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id025
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id025
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id025
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id025
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 20 volume-ppm and S 20 volume-ppm.'
+              locator: *id025
+          model_as_printed: CFBL
+        - na_volume_ppm: 50
+          s_volume_ppm: 50
+          value: 0.7
+          locator: &id027
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 3
+            table_row_number: 3
+            column: 3
+            table_column_number: 3
+          dopant_locator: *id026
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id027
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id027
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id027
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id027
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id027
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id027
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id027
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 50 volume-ppm and S 50 volume-ppm.'
+              locator: *id027
+          model_as_printed: CFBL
+        - na_volume_ppm: 75
+          s_volume_ppm: 75
+          value: 1.04
+          locator: &id029
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 4
+            table_row_number: 4
+            column: 3
+            table_column_number: 3
+          dopant_locator: *id028
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id029
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id029
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id029
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id029
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id029
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id029
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id029
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 75 volume-ppm and S 75 volume-ppm.'
+              locator: *id029
+          model_as_printed: CFBL
+        - na_volume_ppm: 100
+          s_volume_ppm: 100
+          value: 1.4
+          locator: &id031
+            page: 137
+            published_page: 128
+            table: '4.2'
+            row: 5
+            table_row_number: 5
+            column: 3
+            table_column_number: 3
+          dopant_locator: *id030
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: The maximum-rate table gives no exact surface temperature; section 4.3.1 reports a range
+                  only.
+              locator: *id031
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id031
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id031
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id031
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id031
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id031
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id031
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 100 volume-ppm and S 100 volume-ppm.'
+              locator: *id031
+          model_as_printed: CFBL
+    - observation_id: beerkens_1986_table4_3_na2so4_dew_point_experiment
+      type: transition_point
+      locator:
+        page: 139
+        published_page: 130
+        table: '4.3'
+        note: 4 printed dopant rows
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: measured_direct
+        points:
+        - T_K: 1120
+          na_volume_ppm: 20
+          s_volume_ppm: 20
+          locator: &id032
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 5
+            table_column_number: 5
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1120
+              locator: *id032
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id032
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id032
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id032
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id032
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id032
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id032
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 20 volume-ppm and S 20 volume-ppm.'
+              locator: *id032
+        - T_K: 1190
+          na_volume_ppm: 50
+          s_volume_ppm: 50
+          locator: &id033
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 5
+            table_column_number: 5
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1190
+              locator: *id033
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id033
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id033
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id033
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id033
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id033
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id033
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 50 volume-ppm and S 50 volume-ppm.'
+              locator: *id033
+        - T_K: 1237
+          na_volume_ppm: 75
+          s_volume_ppm: 75
+          locator: &id034
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 5
+            table_column_number: 5
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1237
+              locator: *id034
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id034
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id034
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id034
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id034
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id034
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id034
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 75 volume-ppm and S 75 volume-ppm.'
+              locator: *id034
+        - T_K: 1263
+          na_volume_ppm: 100
+          s_volume_ppm: 100
+          locator: &id035
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 5
+            table_column_number: 5
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1263
+              locator: *id035
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id035
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id035
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id035
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id035
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id035
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id035
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 100 volume-ppm and S 100 volume-ppm.'
+              locator: *id035
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+          locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+    - observation_id: beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_1
+      type: transition_point
+      locator:
+        page: 139
+        published_page: 130
+        table: '4.3'
+        note: 4 printed dopant rows
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: quoted_attributed
+        points:
+        - T_K: 1290
+          na_volume_ppm: 20
+          s_volume_ppm: 20
+          locator: &id036
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 6
+            table_column_number: 6
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1290
+              locator: *id036
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id036
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id036
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id036
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id036
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id036
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id036
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 20 volume-ppm and S 20 volume-ppm.'
+              locator: *id036
+          model_as_printed: CFBL supersaturation=1
+        - T_K: 1338
+          na_volume_ppm: 50
+          s_volume_ppm: 50
+          locator: &id037
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 6
+            table_column_number: 6
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1338
+              locator: *id037
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id037
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id037
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id037
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id037
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id037
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id037
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 50 volume-ppm and S 50 volume-ppm.'
+              locator: *id037
+          model_as_printed: CFBL supersaturation=1
+        - T_K: 1362
+          na_volume_ppm: 75
+          s_volume_ppm: 75
+          locator: &id038
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 6
+            table_column_number: 6
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1362
+              locator: *id038
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id038
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id038
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id038
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id038
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id038
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id038
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 75 volume-ppm and S 75 volume-ppm.'
+              locator: *id038
+          model_as_printed: CFBL supersaturation=1
+        - T_K: 1377
+          na_volume_ppm: 100
+          s_volume_ppm: 100
+          locator: &id039
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 6
+            table_column_number: 6
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1377
+              locator: *id039
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id039
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id039
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id039
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id039
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id039
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id039
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 100 volume-ppm and S 100 volume-ppm.'
+              locator: *id039
+          model_as_printed: CFBL supersaturation=1
+        attribution: CFBL calculation reported by Beerkens; model inputs and parameters are not all stored here.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+          locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+    - observation_id: beerkens_1986_table4_3_na2so4_dew_point_cfbl_saturation_10
+      type: transition_point
+      locator:
+        page: 139
+        published_page: 130
+        table: '4.3'
+        note: 4 printed dopant rows
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: quoted_attributed
+        points:
+        - T_K: 1252
+          na_volume_ppm: 20
+          s_volume_ppm: 20
+          locator: &id040
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 7
+            table_column_number: 7
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 2
+            table_row_number: 2
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1252
+              locator: *id040
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id040
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id040
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id040
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id040
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id040
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id040
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 20 volume-ppm and S 20 volume-ppm.'
+              locator: *id040
+          model_as_printed: CFBL supersaturation=10
+        - T_K: 1290
+          na_volume_ppm: 50
+          s_volume_ppm: 50
+          locator: &id041
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 7
+            table_column_number: 7
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 3
+            table_row_number: 3
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1290
+              locator: *id041
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id041
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id041
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id041
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id041
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id041
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id041
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 50 volume-ppm and S 50 volume-ppm.'
+              locator: *id041
+          model_as_printed: CFBL supersaturation=10
+        - T_K: 1310
+          na_volume_ppm: 75
+          s_volume_ppm: 75
+          locator: &id042
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 7
+            table_column_number: 7
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 4
+            table_row_number: 4
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1310
+              locator: *id042
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id042
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id042
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id042
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id042
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id042
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id042
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 75 volume-ppm and S 75 volume-ppm.'
+              locator: *id042
+          model_as_printed: CFBL supersaturation=10
+        - T_K: 1328
+          na_volume_ppm: 100
+          s_volume_ppm: 100
+          locator: &id043
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 7
+            table_column_number: 7
+          dopant_locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+            row: 5
+            table_row_number: 5
+            column: 2
+            table_column_number: 2
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1328
+              locator: *id043
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The text gives a propane flame temperature, not a bulk gas temperature at the cylinder.
+              locator: *id043
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id043
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id043
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id043
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for the cross-flow cylinder measurements.
+              locator: *id043
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Cylinder area is not reported for the cross-flow measurements.
+              locator: *id043
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas no. 2: H2O 15.2 vol-%, O2 2.3 vol-%, N2 71.5 vol-%, Ar 0.9 vol-%, CO2 10.1 vol-%
+                  (Table 4.1); propane flame about 1750 K; surface-temperature range 800-1300 K; air excess 4-12%;
+                  cross-flow cylinder diameter 15 mm. Gas velocity is about 4 m/s (section 4.3.1). Flame temperature
+                  is not treated as a measured bulk gas temperature. Dopants: Na 100 volume-ppm and S 100 volume-ppm.'
+              locator: *id043
+          model_as_printed: CFBL supersaturation=10
+        attribution: CFBL calculation reported by Beerkens; model inputs and parameters are not all stored here.
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed; CFBL dew-point outputs are not total pressure.
+          locator:
+            page: 139
+            published_page: 130
+            table: '4.3'
+    - observation_id: beerkens_1986_section3_3_2_na2so4_experimental_dew_point_gas_i
+      type: transition_point
+      locator: &id044
+        page: 112
+        published_page: 103
+        section: 3.3.2
+        note: experimentally determined dew point for simulated flue gas I
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: measured_direct
+        points:
+        - T_K: 1240
+          locator: *id044
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1240
+              locator: *id044
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: The laboratory gas-temperature profile is not reported at the dew-point location.
+              locator: *id044
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id044
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id044
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id044
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is stated.
+              locator: *id044
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: Platinum-strip area is not stated.
+              locator: *id044
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas I: O2 4.5 vol-%, N2 72.7 vol-%, H2O 13.0 vol-%, CO2 9.0 vol-%, Ar 0.8 vol-%, Na
+                  125 volume-ppm, S 240 volume-ppm, Cl 62.5 volume-ppm.'
+              locator: *id044
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed.
+          locator: *id044
+    - observation_id: beerkens_1986_literature_kohl_na2so4_dew_point
+      type: transition_point
+      locator: &id045
+        page: 71
+        published_page: 62
+        section: '2.4'
+        note: Kohl et al. [33] measured sodium-sulphate dew point
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: quoted_attributed
+        attribution: Kohl et al. [33], as summarized by Beerkens.
+        points:
+        - T_K: 1260
+          locator: *id045
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1260
+              locator: *id045
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas temperature is reported for the cited measurement.
+              locator: *id045
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id045
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id045
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id045
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported.
+              locator: *id045
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No probe area is reported.
+              locator: *id045
+            atmosphere:
+              state:
+                tag: value
+                value: Sea-salt dopant 11.3 ppm (69% NaCl and 11.5% Na2SO4); O2 6.6 volume-%; water vapour 10 volume-%.
+                  The total gas composition and pressure are not stated.
+              locator: *id045
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed.
+          locator: *id045
+    - observation_id: beerkens_1986_section4_5_5_na2so4_model_comparator_rate
+      type: rate_series
+      locator: &id046
+        page: 167
+        published_page: 158
+        section: 4.5.5
+        note: PDF p167 comparison; PDF p160 states "The theoretically calculated maximum deposition rate at 1200 K is 2.3 mg/m²·s, for the experimental case this value is approximately 20% lower."
+      phase: cr
+      units: mg/m2·s as printed
+      values:
+        quantity: surface_deposition_areal_mass_rate
+        rail: wall_deposition
+        method_class: author_estimate
+        schema_gap: No exact quantity token represents wall deposition mass per area per time. This row is the explicit
+          prose comparison; PDF p160 identifies this as the author's theoretically calculated result. It is author_estimate because the calculation inputs are not stored and no derivation lineage can be claimed. The experimental value is not printed and is not inferred. It is not Table 4.5's CFBL output. See simulator/battery/enums.py::Quantity and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        points:
+        - value: 2.3
+          locator: *id046
+          conditions_as_printed: same concentrations (in volume ppm) as stated in the potassium-sulphate comparison;
+            separate gas mixture and maximum-rate temperature are not printed
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No maximum-rate temperature is stated for this comparator.
+              locator: *id046
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No exact gas temperature is stated for this comparator.
+              locator: *id046
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id046
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id046
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id046
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No individual duration is stated.
+              locator: *id046
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No area is stated.
+              locator: *id046
+  K2SO4:
+    observations:
+    - observation_id: beerkens_1986_section4_5_5_k2so4_measured_maximum_deposition_rate
+      type: rate_series
+      locator: &id047
+        page: 167
+        published_page: 158
+        section: 4.5.5
+        note: experimental maximum potassium-sulphate rate at 1100 K
+      phase: cr
+      units: mg/m2·s as printed
+      values:
+        quantity: surface_deposition_areal_mass_rate
+        rail: wall_deposition
+        method_class: measured_direct
+        schema_gap: No exact quantity token represents wall deposition mass per area per time; the current areal-mass
+          and mass-loss-rate quantities have different dimensions/direction. See simulator/battery/enums.py::Quantity
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        points:
+        - T_K: 1100
+          temperature_as_printed: 1100 K
+          value: 2.9
+          locator: *id047
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1100
+              locator: *id047
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 4.4 reports a channel range, not the exact gas temperature at this rate point.
+              locator: *id047
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id047
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id047
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id047
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: Table 4.4 gives a standard 16-24 hour experiment duration, not an individual duration.
+              locator: *id047
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: The areal rate is printed; a specimen area is not stated.
+              locator: *id047
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas for Table 4.7: K 160 volume-ppm, S 160 volume-ppm, O2 4.4 volume-%, CO2 10.0 volume-%,
+                  H2O 15.0 volume-%, N2 70.6 volume-%. Cylindrical channel standard conditions from Table 4.4: flue
+                  gas 1700-700 K; velocity 4.5 m/s; Reynolds numbers 2200 at 1700 K and 4900 at 600 K; deposition-surface
+                  range 1380-550 K; inner diameter 0.026 m; height 1.0 m; gas volume 1.44 m3/min; Sherwood range
+                  ±3.65 at 600 K and ±12.00 at 1700 K; central-gas-to-wall temperature difference 400±25 K; experiment
+                  duration 16-24 h.'
+              locator: *id047
+          experiment_duration_as_printed: 16-24 hours (Table 4.4 standard conditions)
+          surface_area_as_reported: not reported; the apparatus dimensions are printed but area is not stated
+  PbO:
+    observations:
+    - observation_id: beerkens_1986_section4_5_6_pbo_measured_maximum_deposition_rate
+      type: rate_series
+      locator: &id048
+        page: 169
+        published_page: 160
+        section: 4.5.6
+        note: experimental PbO maximum rate at approximately 1000 K
+      phase: cr
+      units: mg/m2·s as printed
+      values:
+        quantity: surface_deposition_areal_mass_rate
+        rail: wall_deposition
+        method_class: measured_direct
+        schema_gap: No exact quantity token represents wall deposition mass per area per time. See simulator/battery/enums.py::Quantity
+          and simulator/battery/migrate.py::QUANTITY_ALIASES.
+        points:
+        - T_K: 1000
+          temperature_as_printed: approximately 1000 K
+          approximate: true
+          value: 3.0
+          locator: *id048
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1000
+              locator: *id048
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 4.4 reports a channel range, not the exact gas temperature at this rate point.
+              locator: *id048
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id048
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id048
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id048
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: Table 4.4 gives a standard 16-24 hour experiment duration, not an individual duration.
+              locator: *id048
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: The areal rate is printed; a specimen area is not stated.
+              locator: *id048
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas for Table 4.8: Pb 100 volume-ppm, O2 4.4 volume-%, CO2 15.0 volume-%, H2O 10.0
+                  volume-%, N2 70.6 volume-%. Cylindrical channel standard conditions from Table 4.4: flue gas 1700-700
+                  K; velocity 4.5 m/s; Reynolds numbers 2200 at 1700 K and 4900 at 600 K; deposition-surface range
+                  1380-550 K; inner diameter 0.026 m; height 1.0 m; gas volume 1.44 m3/min; Sherwood range ±3.65
+                  at 600 K and ±12.00 at 1700 K; central-gas-to-wall temperature difference 400±25 K; experiment
+                  duration 16-24 h.'
+              locator: *id048
+          experiment_duration_as_printed: 16-24 hours (Table 4.4 standard conditions)
+          surface_area_as_reported: not reported; the apparatus dimensions are printed but area is not stated
+    - observation_id: beerkens_1986_section4_5_6_pbo_measured_dew_point
+      type: transition_point
+      locator: &id049
+        page: 168
+        published_page: 159
+        section: 4.5.6
+        note: experimental PbO deposition onset; render p168 confirms page 159
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: measured_direct
+        points:
+        - T_K: 1090
+          locator: *id049
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1090
+              locator: *id049
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 4.4 reports a channel range, not exact gas temperature at onset.
+              locator: *id049
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id049
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id049
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id049
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: Table 4.4 gives a standard duration range, not an individual duration.
+              locator: *id049
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No probe area is stated.
+              locator: *id049
+            atmosphere:
+              state:
+                tag: value
+                value: 'Flue gas for Table 4.8: Pb 100 volume-ppm, O2 4.4 volume-%, CO2 15.0 volume-%, H2O 10.0
+                  volume-%, N2 70.6 volume-%. Cylindrical channel standard conditions from Table 4.4: flue gas 1700-700
+                  K; velocity 4.5 m/s; Reynolds numbers 2200 at 1700 K and 4900 at 600 K; deposition-surface range
+                  1380-550 K; inner diameter 0.026 m; height 1.0 m; gas volume 1.44 m3/min; Sherwood range ±3.65
+                  at 600 K and ±12.00 at 1700 K; central-gas-to-wall temperature difference 400±25 K; experiment
+                  duration 16-24 h.'
+              locator: *id049
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed.
+          locator: *id049
+  NaCl:
+    observations:
+    - observation_id: beerkens_1986_literature_jackson_duffin_34_nacl_dew_point
+      type: transition_point
+      locator: &id050
+        page: 70
+        published_page: 61
+        section: '2.4'
+        note: Jackson and Duffin [26] measured sodium-chloride dew point
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: quoted_attributed
+        attribution: Jackson and Duffin [26], as summarized by Beerkens.
+        points:
+        - T_K: 910
+          locator: *id050
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 910
+              locator: *id050
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas temperature is reported for the cited measurement.
+              locator: *id050
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id050
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id050
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id050
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported.
+              locator: *id050
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No probe area is reported.
+              locator: *id050
+            atmosphere:
+              state:
+                tag: value
+                value: Sodium chloride concentration 34 mg/m3 as reported for the cited flue gas; total gas composition
+                  and total pressure are not stated.
+              locator: *id050
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed.
+          locator: *id050
+    - observation_id: beerkens_1986_literature_jackson_duffin_1700_nacl_dew_point
+      type: transition_point
+      locator: &id051
+        page: 70
+        published_page: 61
+        section: '2.4'
+        note: Jackson and Duffin [26] measured sodium-chloride dew point
+      phase: gas
+      units: K
+      values:
+        quantity: transition_temperature
+        property_kind: dew_point
+        method_class: quoted_attributed
+        attribution: Jackson and Duffin [26], as summarized by Beerkens.
+        points:
+        - T_K: 1038
+          locator: *id051
+          point_conditions:
+            temperature_K:
+              state:
+                tag: value
+                value: 1038
+              locator: *id051
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: No gas temperature is reported for the cited measurement.
+              locator: *id051
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id051
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id051
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id051
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported.
+              locator: *id051
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No probe area is reported.
+              locator: *id051
+            atmosphere:
+              state:
+                tag: value
+                value: Sodium chloride concentration 1700 mg/m3 as reported for the cited flue gas; total gas composition
+                  and total pressure are not stated.
+              locator: *id051
+      point_conditions:
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No experimental total pressure is printed.
+          locator: *id051
+  S:
+    observations:
+    - observation_id: beerkens_1986_table1_5_s_volume_ppm
+      type: concentration_series
+      locator:
+        page: 28
+        published_page: 19
+        table: '1.5'
+        note: 8 furnace rows; dashes omitted, not zero
+      phase: gas
+      units: volume ppm as printed
+      values:
+        quantity: elemental_flue_gas_volume_concentration
+        rail: vapour
+        method_class: quoted_attributed
+        attribution: Table 1.5 compiles industrial reports and several literature sources; footnote assumes the
+          elements are gaseous in combustion gases.
+        schema_gap: No token represents measured elemental volume-ppm concentration in flue gas. It is not an absolute
+          partial pressure because total pressure is not printed; do not map it to p_partial. See tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and simulator/battery/migrate.py::TYPE_QUANTITY.
+        printed_interpretation: assumed as gaseous elements in combustion gases
+        points:
+        - furnace_as_printed: A
+          value: 1200
+          locator: &id052
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 2
+            table_row_number: 2
+            column: 3
+            table_column_number: 3
+            note: furnace A
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id052
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id052
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id052
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id052
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id052
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id052
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id052
+        - furnace_as_printed: B
+          value: 160
+          locator: &id053
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 3
+            table_row_number: 3
+            column: 3
+            table_column_number: 3
+            note: furnace B
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id053
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id053
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id053
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id053
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id053
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id053
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id053
+        - furnace_as_printed: C
+          value: 190
+          locator: &id054
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 4
+            table_row_number: 4
+            column: 3
+            table_column_number: 3
+            note: furnace C
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id054
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id054
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id054
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id054
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id054
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id054
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id054
+        - furnace_as_printed: D
+          value: 1200
+          locator: &id055
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 5
+            table_row_number: 5
+            column: 3
+            table_column_number: 3
+            note: furnace D
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id055
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id055
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id055
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id055
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id055
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id055
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id055
+        - furnace_as_printed: E
+          value: 1340
+          locator: &id056
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 6
+            table_row_number: 6
+            column: 3
+            table_column_number: 3
+            note: furnace E
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id056
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id056
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id056
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id056
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id056
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id056
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id056
+        - furnace_as_printed: G
+          value: 160
+          locator: &id057
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 8
+            table_row_number: 8
+            column: 3
+            table_column_number: 3
+            note: furnace G
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id057
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id057
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id057
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id057
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id057
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id057
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id057
+  Na:
+    observations:
+    - observation_id: beerkens_1986_table1_5_na_volume_ppm
+      type: concentration_series
+      locator:
+        page: 28
+        published_page: 19
+        table: '1.5'
+        note: 8 furnace rows; dashes omitted, not zero
+      phase: gas
+      units: volume ppm as printed
+      values:
+        quantity: elemental_flue_gas_volume_concentration
+        rail: vapour
+        method_class: quoted_attributed
+        attribution: Table 1.5 compiles industrial reports and several literature sources; footnote assumes the
+          elements are gaseous in combustion gases.
+        schema_gap: No token represents measured elemental volume-ppm concentration in flue gas. It is not an absolute
+          partial pressure because total pressure is not printed; do not map it to p_partial. See tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and simulator/battery/migrate.py::TYPE_QUANTITY.
+        printed_interpretation: assumed as gaseous elements in combustion gases
+        points:
+        - furnace_as_printed: A
+          value: 100
+          locator: &id058
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 2
+            table_row_number: 2
+            column: 5
+            table_column_number: 5
+            note: furnace A
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id058
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id058
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id058
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id058
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id058
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id058
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id058
+        - furnace_as_printed: B
+          value: 100
+          locator: &id059
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 3
+            table_row_number: 3
+            column: 5
+            table_column_number: 5
+            note: furnace B
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id059
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id059
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id059
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id059
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id059
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id059
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id059
+        - furnace_as_printed: C
+          value: 100
+          locator: &id060
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 4
+            table_row_number: 4
+            column: 5
+            table_column_number: 5
+            note: furnace C
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id060
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id060
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id060
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id060
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id060
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id060
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id060
+        - furnace_as_printed: D
+          value: 30
+          locator: &id061
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 5
+            table_row_number: 5
+            column: 5
+            table_column_number: 5
+            note: furnace D
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id061
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id061
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id061
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id061
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id061
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id061
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id061
+        - furnace_as_printed: F
+          value: 16
+          locator: &id062
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 7
+            table_row_number: 7
+            column: 5
+            table_column_number: 5
+            note: furnace F
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id062
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id062
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id062
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id062
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id062
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id062
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id062
+        - furnace_as_printed: G
+          value: 500
+          locator: &id063
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 8
+            table_row_number: 8
+            column: 5
+            table_column_number: 5
+            note: furnace G
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id063
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id063
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id063
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id063
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id063
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id063
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id063
+        - furnace_as_printed: H
+          value: 5
+          locator: &id064
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 9
+            table_row_number: 9
+            column: 5
+            table_column_number: 5
+            note: furnace H
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id064
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id064
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id064
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id064
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id064
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id064
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id064
+  K:
+    observations:
+    - observation_id: beerkens_1986_table1_5_k_volume_ppm
+      type: concentration_series
+      locator:
+        page: 28
+        published_page: 19
+        table: '1.5'
+        note: 8 furnace rows; dashes omitted, not zero
+      phase: gas
+      units: volume ppm as printed
+      values:
+        quantity: elemental_flue_gas_volume_concentration
+        rail: vapour
+        method_class: quoted_attributed
+        attribution: Table 1.5 compiles industrial reports and several literature sources; footnote assumes the
+          elements are gaseous in combustion gases.
+        schema_gap: No token represents measured elemental volume-ppm concentration in flue gas. It is not an absolute
+          partial pressure because total pressure is not printed; do not map it to p_partial. See tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+          simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES and simulator/battery/migrate.py::TYPE_QUANTITY.
+        printed_interpretation: assumed as gaseous elements in combustion gases
+        points:
+        - furnace_as_printed: A
+          value: 10
+          locator: &id065
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 2
+            table_row_number: 2
+            column: 6
+            table_column_number: 6
+            note: furnace A
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id065
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id065
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id065
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id065
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id065
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id065
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id065
+        - furnace_as_printed: B
+          value: 10
+          locator: &id066
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 3
+            table_row_number: 3
+            column: 6
+            table_column_number: 6
+            note: furnace B
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id066
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id066
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id066
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id066
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id066
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id066
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id066
+        - furnace_as_printed: D
+          value: 80
+          locator: &id067
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 5
+            table_row_number: 5
+            column: 6
+            table_column_number: 6
+            note: furnace D
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id067
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id067
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id067
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id067
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id067
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id067
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id067
+        - furnace_as_printed: F
+          value: 25
+          locator: &id068
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 7
+            table_row_number: 7
+            column: 6
+            table_column_number: 6
+            note: furnace F
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id068
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id068
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id068
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id068
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id068
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id068
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id068
+        - furnace_as_printed: G
+          value: 100
+          locator: &id069
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 8
+            table_row_number: 8
+            column: 6
+            table_column_number: 6
+            note: furnace G
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id069
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id069
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id069
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id069
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id069
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id069
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id069
+        - furnace_as_printed: H
+          value: 40
+          locator: &id070
+            page: 28
+            published_page: 19
+            table: '1.5'
+            row: 9
+            table_row_number: 9
+            column: 6
+            table_column_number: 6
+            note: furnace H
+          point_conditions:
+            temperature_K:
+              state:
+                tag: unknown
+                reason: No probe temperature is part of Table 1.5.
+              locator: *id070
+            gas_temperature_K:
+              state:
+                tag: unknown
+                reason: Table 1.5 gives no flue-gas or furnace temperature.
+              locator: *id070
+            fO2_Pa:
+              state:
+                tag: unknown
+                reason: No absolute oxygen fugacity or partial pressure is printed; gas percentage alone does not
+                  establish it.
+              locator: *id070
+            total_pressure_Pa:
+              state:
+                tag: unknown
+                reason: No experimental total pressure is printed.
+              locator: *id070
+            composition:
+              state:
+                tag: unknown
+                reason: The printed gas mixture is retained verbatim in atmosphere/gas_mix; no exact gas-composition
+                  identity basis exists for the mixed vol-% and volume-ppm fields in this extract.
+              locator: *id070
+            exposure_time_s:
+              state:
+                tag: unknown
+                reason: No exposure duration is reported for these compiled furnace readings.
+              locator: *id070
+            surface_area_m2:
+              state:
+                tag: unknown
+                reason: No collection probe area is reported for these compiled gas concentrations.
+              locator: *id070

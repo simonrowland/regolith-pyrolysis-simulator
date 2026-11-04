@@ -1,0 +1,67 @@
+source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+source:
+  citation: Roeder, P. L. (1974), “Activity of Iron and Olivine Solubility in Basaltic Liquids”, Earth and Planetary Science
+    Letters 23, 397–410.
+  year: 1974
+  corpus_asset: raw/roeder-1974-iron-activity-olivine-basaltic-liquids/roeder-1974-iron-activity-olivine-basaltic-liquids.pdf
+extraction:
+  method: >-
+    Diagnostic mapping for row-transposed Table 1: column 1 selects the
+    quantity, and columns 2–10 select the run. MinerU flattened the five
+    physical page sections into the PDF p. 4 draft block, so this mapping
+    cannot preserve the physical page locators or per-run conditions. The
+    extract is hand-assembled from the render audit; this mapping documents
+    the draft layout for the compare report and is not used to emit rows.
+  date: '2026-11-02'
+  worker: w1103ro-ro74
+review_status: draft
+tables:
+- page: 4
+  published_page: 400
+  table_index: 1
+  type: table_context
+  quantity: row_heading_selected_table_values_as_printed
+  unit: as printed by row heading
+  phase: l
+  rows: all
+  conditions: 'Printed Table 1 is transposed: columns 2–10 are runs, while row headings select the field. Rows for SiO2, Al2O3,
+    FeO, MgO, CaO, Na2O, K2O, TiO2, MnO, Total, Temp., CO2/H2, Log fO2, Act. FeO, and γ FeO map to the same-named cell-audit
+    column. The stored extract uses physical PDF pages 4–8 and printed table label 1.'
+  values:
+  - column: 2
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 3
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 4
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 5
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 6
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 7
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 8
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 9
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  - column: 10
+    species: FeO
+    unit: as printed by row heading
+    quantity: row_heading_selected_table_values
+  render_verified: []
