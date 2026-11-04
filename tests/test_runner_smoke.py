@@ -104,7 +104,11 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # b-858: atomic-Si evaporation through the sourced Si Lennard-Jones row
         # (trace Si flux; largest product move 6.3e-7 relative). Same values on
         # studio-2 and studio-3 (gate config).
-        "flux_maps_sha256": "1318ea49a31a979ceabc87b538bd0a921ba0bde033c0a596f07af559fc5e2bb0",
+        # b773l: armed headspace probes replay the series law and do not
+        # dispatch. ffec48bd3 and this tree match on the public payload
+        # and on ledger_sha256 below. This hash is the remaining provider
+        # diagnostics (268 maps; the pre-replay list was 16996).
+        "flux_maps_sha256": "949fd1a4efc384050eedc6ea8d690198bff16ca8f4384cb80ee060eba50816ab",
         "ledger_sha256": "d08335cdf91784bf18e2c117d1794f195b70c2638ef3cd4723caa231c6b6623b",
     },
     "mars_basalt_C2A_12h": {
