@@ -292,7 +292,16 @@ def _fusion_gibbs_difference_from_points(
     solid_points: tuple[tuple[Decimal, Decimal], ...],
     liquid_points: tuple[tuple[Decimal, Decimal], ...],
     temperature_K: Decimal,
+    *,
+    extrapolate: bool = False,
 ) -> Decimal:
+    """Return liquid-minus-solid Gibbs energy, strict for scored rows by default."""
+    if extrapolate:
+        return _interpolate_table_points(
+            liquid_points, temperature_K, extrapolate=True
+        ) - _interpolate_table_points(
+            solid_points, temperature_K, extrapolate=True
+        )
     return _interpolate_formation_gibbs(
         liquid_points, temperature_K
     ) - _interpolate_formation_gibbs(solid_points, temperature_K)
@@ -326,5 +335,5 @@ def d144_fusion_delta_g_kJ_per_mol(
         temperature,
     )
     return _fusion_gibbs_difference_from_points(
-        solid_points, liquid_points, temperature
+        solid_points, liquid_points, temperature, extrapolate=True
     )
