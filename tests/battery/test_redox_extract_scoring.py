@@ -1290,7 +1290,7 @@ def test_unknown_phase_redox_still_refuses_other_identity_axis_mismatches(axis, 
     assert residuals[0].refusal.reason is RefusalReason.IDENTITY_MISMATCH
 
 
-def test_aithala_redox_rows_score_only_when_composition_is_printed():
+def test_aithala_redox_rows_score_when_printed_composition_is_joined():
     root = Path(__file__).resolve().parents[2]
     extract = root / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
     migrator = migrate_one_extract(root, extract)
@@ -1306,10 +1306,9 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
     projected_ids = {
         row.observation_id
         for row in redox_rows
-        if row.experiment_id.rsplit("::", 1)[-1]
-        in _AITHALA_REDOX_EXPERIMENTS
+        if row.identity.composition is not None and row.identity.composition.is_value
     }
-    assert len(projected_ids) == 6
+    assert len(projected_ids) == 16
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -1329,10 +1328,7 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
             assert residual.numeric is not None
             assert residual.refusal is not None
             assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
-        elif observation_id in projected_ids and engine in {
-            "alphamelts",
-            "thermoengine",
-        }:
+        elif engine in {"alphamelts", "thermoengine"}:
             # Composition is printed, so these engines attempt a ferric split.
             # The unsupported-engine refusal is the one from before that path.
             if (
@@ -1344,19 +1340,6 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
                     "no fixed-T/fO2/composition ferric output without "
                     "phase-equilibrium execution"
                 )
-        elif engine in {
-            "internal-analytical",
-            "openimcc",
-            "alphamelts",
-            "thermoengine",
-        }:
-            assert residual.numeric is None
-            assert residual.refusal is not None
-            assert residual.refusal.detail == {
-                "reason": "missing_input",
-                "input": "composition",
-            }
-            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
         else:
             assert residual.numeric is None
             assert residual.refusal is not None
@@ -1364,6 +1347,44 @@ def test_aithala_redox_rows_score_only_when_composition_is_printed():
                 residual.refusal.reason
                 is RefusalReason.ENGINE_DOES_NOT_REPORT_FE_REDOX
             )
+
+
+def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
+    root = Path(__file__).resolve().parents[2]
+    extract = (
+        root
+        / "data/literature/extracts/kress-carmichael-1988-iron-oxidation-stoichiometry.yaml"
+    )
+    migrator = migrate_one_extract(root, extract)
+    migrator.finalize()
+    result = migrator.result
+    hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
+    assert hard_issue_details.count("derived observation requires derived_from") == 0
+    assert result.validation.hard_issues == ()
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        origins={key: extract.name for key in result.observations},
+        benches=result.benches,
+    )
+    residuals, _ = score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
+    )
+    residuals = [
+        residual
+        for residual in residuals
+        if "kress-carmichael-1988-iron-oxidation-stoichiometry" in residual.key
+    ]
+    assert len(residuals) == 63
+    assert all(residual.numeric is None for residual in residuals)
+    assert all(
+        residual.refusal is not None
+        and residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        and residual.refusal.detail
+        == {"fields": ["total_pressure_Pa"], "detail": ""}
+        for residual in residuals
+    )
 
 
 def _borisov_row4():
