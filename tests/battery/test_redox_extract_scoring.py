@@ -168,6 +168,7 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_result)
     total_flags = 0
+    total_standard_notices = 0
     for observation_id, observation in sorted(observations.items()):
         calls_before = len(results)
         prediction = predict_with_engine(Engine.OPENIMCC, observation)
@@ -179,7 +180,12 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
         flag_notices = tuple(
             notice
             for notice in prediction.notices
-            if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            if notice.origin == "openimcc.evaluate_redox"
+        )
+        standard_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.origin == "openimcc.check_pack_standards"
         )
         assert flags
         assert tuple(notice.reason for notice in flag_notices) == flags
@@ -188,14 +194,21 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
             and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
             for notice in flag_notices
         )
+        assert all(
+            notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
+            for notice in standard_notices
+        )
         assert not any(
             notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
             for notice in prediction.notices
         )
         total_flags += len(flags)
+        total_standard_notices += len(standard_notices)
 
     assert len(results) == 18
     assert total_flags == 130
+    assert total_standard_notices == 84
 
 
 def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
@@ -223,7 +236,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 130
+        assert backlog["engine_model_caveat"] == 214
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
