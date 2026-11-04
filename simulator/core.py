@@ -592,6 +592,7 @@ from simulator.feedstock_composition import (
 )
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
+    LiquidFeODomain,
     RedoxState,
     _non_absolute_redox_state_kwargs,
     _reanchor_redox_state,
@@ -668,6 +669,7 @@ from simulator.equilibrium import EquilibriumMixin
 from simulator.evaporation import (
     EvaporationFluxRefusal,
     EvaporationMixin,
+    _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
 )
 from simulator.extraction import ExtractionMixin
 from simulator.melt_backend.base import (
@@ -723,6 +725,10 @@ _VALID_DECISION_CHOICES = {
     DecisionType.C7_PROCEED: ('yes', 'no'),
 }
 _RESOLVE_MELT_REDOX_GATE_AUTHORITY = object()
+# Distinct from a resolved curve of None (gate read in progress). The FeO
+# domain reads a curve the hour already resolved. It must not start a
+# liquidus solve, and it must not treat a missing read as below.
+_LIQUID_FEO_GATE_NOT_ESTABLISHED = object()
 _MELT_REDOX_GATE_FALLBACK_HISTORY_MAXLEN = 256
 DEGRADED_PATH_ENGAGEMENT_KEYS = (
     'vapour_pressure_extrapolation',
@@ -2364,6 +2370,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         melt_activity_engine_inputs: Mapping[str, Any] | None = None,
         provider_candidates_by_species: dict | None = None,
         flux_activation_context: FluxActivationContext | None = None,
+        liquid_feo_domain: Any = None,
     ):
         """Exact-key vapour batch via VR-6 request builder + refusal closure.
 
@@ -2429,6 +2436,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "melt_activity_engine_inputs": dict(
                 melt_activity_engine_inputs or {}
             ),
+            "liquid_feo_domain": liquid_feo_domain,
         }
         return self.vapour_rail_catalog.resolve_batch(
             ledger_snapshot,
@@ -5179,7 +5187,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(authority, Mapping)
             and isinstance(authority.get('curve'), Mapping)
         ):
-            return authority['curve']
+            # Replay, and a live record admission rejects, already have a
+            # liquidus. The redox pin cannot hold them: the resolver
+            # collapses that record to None, and None means no curve, which
+            # would mark a hot hour below the liquidus. Keep the curve for
+            # the FeO domain only.
+            curve = authority['curve']
+            self._liquid_feo_resolved_curve_hour = current_hour
+            self._liquid_feo_resolved_curve = curve
+            return curve
         return authority
 
     def _clear_melt_redox_gate_authority_for_completed_hour(
@@ -5612,6 +5628,116 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # lands after the predicate-unification work.
         self._last_melt_regime_diagnostic = regime_diagnostic
         return regime != MeltRegime.FROZEN
+
+    def liquid_feo_domain_at(self, temperature_K: float) -> LiquidFeODomain | None:
+        """Liquid-state fact for the FeO activity owner.
+
+        The silicate liquidus on the melt-redox gate curve is the bound.
+        The Kress91 calibration floor applies only when that curve is the
+        floor fallback and no silicate liquidus exists. This method does
+        not evaluate a liquid activity coefficient. An hour that has not
+        established the gate returns None: that is not a below-liquidus
+        claim, and it does not start a liquidus solve.
+        """
+
+        if isinstance(temperature_K, bool):
+            raise TypeError("temperature_K must be a finite float")
+        try:
+            T_K = float(temperature_K)
+        except (TypeError, ValueError) as exc:
+            raise TypeError("temperature_K must be a finite float") from exc
+        if not math.isfinite(T_K) or T_K <= 0.0:
+            raise ValueError("temperature_K must be finite and positive")
+        T_C = T_K - 273.15
+        # The step establishes the gate before these callers. Read the curve
+        # that call already resolved, or the redox pin. Do not dispatch a
+        # liquidus solve from inside the activity diagnostic.
+        pinned_hour = getattr(
+            self,
+            "_melt_redox_gate_authority_tick_hour",
+            None,
+        )
+        pinned = getattr(
+            self,
+            "_melt_redox_gate_authority_this_tick",
+            _RESOLVE_MELT_REDOX_GATE_AUTHORITY,
+        )
+        retained_hour = getattr(self, "_liquid_feo_resolved_curve_hour", None)
+        retained = getattr(
+            self,
+            "_liquid_feo_resolved_curve",
+            _LIQUID_FEO_GATE_NOT_ESTABLISHED,
+        )
+        try:
+            hour = int(self.melt.hour)
+        except (TypeError, ValueError, AttributeError):
+            hour = None
+        if (
+            hour is not None
+            and retained_hour == hour
+            and retained is not _LIQUID_FEO_GATE_NOT_ESTABLISHED
+        ):
+            curve = retained
+        elif (
+            hour is None
+            or pinned_hour != hour
+            or pinned is _RESOLVE_MELT_REDOX_GATE_AUTHORITY
+        ):
+            curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
+        else:
+            curve = self._resolved_melt_redox_gate_authority(pinned)
+        if curve is _LIQUID_FEO_GATE_NOT_ESTABLISHED:
+            return None
+        if isinstance(curve, _MeltRedoxLiquidusFloorFallback):
+            floor_C = float(KRESS91_LIQUID_CALIBRATION_MIN_T_C)
+            # Same strict bound the redox gate uses when the silicate
+            # liquidus is unavailable: liquid only above the floor.
+            # The object source names why the silicate liquidus is missing.
+            # The bound itself is the Kress91 calibration floor, and the
+            # analytical floor curve already cites that source.
+            return LiquidFeODomain(
+                below_liquidus=not (T_C > floor_C),
+                temperature_K=T_K,
+                liquidus_T_C=floor_C,
+                solidus_T_C=floor_C,
+                source=_KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE,
+            )
+        if curve is None:
+            # The gate record is absent while the curve is still being
+            # built. The redox gate treats that read as not liquid, and
+            # there is no silicate liquidus to cite.
+            return LiquidFeODomain(
+                below_liquidus=True,
+                temperature_K=T_K,
+                liquidus_T_C=None,
+                solidus_T_C=None,
+                source="none:liquidus_gate_in_progress",
+            )
+        if isinstance(curve, Mapping) and "liquidus_T_C" not in curve:
+            nested = curve.get("curve")
+            if isinstance(nested, Mapping):
+                curve = nested
+        if not isinstance(curve, Mapping) or curve.get("liquidus_T_C") is None:
+            return LiquidFeODomain(
+                below_liquidus=True,
+                temperature_K=T_K,
+                liquidus_T_C=None,
+                solidus_T_C=None,
+                source="none:liquidus_unresolved",
+            )
+        liquidus_T_C = float(curve["liquidus_T_C"])
+        raw_solidus = curve.get("solidus_T_C")
+        solidus_T_C = None if raw_solidus is None else float(raw_solidus)
+        source = str(curve.get("source") or "liquidus_solidus")
+        # Valid at and above the silicate liquidus. The Kress91 floor
+        # (max(liquidus, 1200 C)) is a redox-capacity gate, not this bound.
+        return LiquidFeODomain(
+            below_liquidus=T_C < liquidus_T_C,
+            temperature_K=T_K,
+            liquidus_T_C=liquidus_T_C,
+            solidus_T_C=solidus_T_C,
+            source=source,
+        )
 
     def _re_reference_melt_fO2_to_temperature(
         self,
@@ -7769,12 +7895,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native_fe_threshold': 'FeO_activity_saturation',
                 'native_fe_frac': 0.0,
             }
+        domain_at = getattr(self, "liquid_feo_domain_at", None)
+        liquid_domain = domain_at(T_K) if callable(domain_at) else None
         try:
             activity = calphad_ferrous_feo_activity_diagnostic(
                 comp_wt=comp,
                 fO2_log=fO2_log,
                 T_K=T_K,
                 pressure_bar=pressure_bar,
+                liquid_domain=liquid_domain,
             )
             a_feo = float(activity.get('a_FeO_authoritative', 0.0) or 0.0)
             pure_feo_iw = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
@@ -7783,13 +7912,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native Fe saturation split requires grounded FeO activity; '
                 'CALPHAD/Holzheid FeO activity diagnostic failed'
             ) from exc
+        notices = activity.get("notices")
+
+        def _carry_liquidus_notice(payload: Dict[str, Any]) -> Dict[str, Any]:
+            if notices:
+                payload["notices"] = list(notices)
+            return payload
+
         if a_feo <= 0.0 or not math.isfinite(a_feo):
-            return {
+            return _carry_liquidus_notice({
                 'native_fe_saturation': False,
                 'native_fe_threshold': 'FeO_activity_saturation',
                 'native_fe_frac': 0.0,
                 'native_fe_activity_source': 'unavailable:no_positive_a_FeO',
-            }
+            })
         # FeO(l) = Fe(metal) + 1/2 O2; Holzheid et al. 1997
         # doi:10.1016/S0009-2541(97)00030-2 grounds FeO(l) DeltaG in
         # feo_iw_log10_fO2_bar(), so a_FeO,sat = 10^((log fO2 - IW)/2).
@@ -7805,7 +7941,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         else:
             native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
         native = min(ferrous_available, max(0.0, native))
-        return {
+        return _carry_liquidus_notice({
             'native_fe_saturation': native > 0.0,
             'native_fe_threshold': 'FeO_activity_saturation',
             'native_fe_frac': native,
@@ -7816,7 +7952,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'Holzheid1997 DOI 10.1016/S0009-2541(97)00030-2 '
                 'FeO(l)=Fe+0.5O2 saturation'
             ),
-        }
+        })
 
     def _compute_native_fe_saturation_extent(
         self,
@@ -8733,6 +8869,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         )
         self._melt_redox_gate_authority_tick_hour = None
+        # load_batch sets melt.hour back to 0. A retained curve from the
+        # previous batch is keyed by that same hour, and the domain reads
+        # it ahead of the pin. Drop it with the pin. None is not a curve:
+        # a missing retain is "not established", not below-liquidus.
+        self._liquid_feo_resolved_curve_hour = None
+        self._liquid_feo_resolved_curve = _LIQUID_FEO_GATE_NOT_ESTABLISHED
         self._poisoned_hour = None
         label = str(feedstock.get('label', feedstock_key))
         oxidation_specs, oxidized_offgas_kg = (
@@ -10347,6 +10489,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
+                'liquid_feo_domain': self.liquid_feo_domain_at(T_C + 273.15),
                 **high_t_control_inputs,
             },
             'fO2_log': intrinsic_fO2_log,
