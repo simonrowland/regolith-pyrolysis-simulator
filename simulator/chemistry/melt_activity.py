@@ -16,7 +16,8 @@ from functools import lru_cache
 from typing import Any
 
 from simulator.reference_data.janaf_fusion import (
-    d144_fusion_delta_g_kJ_per_mol,
+    FusionDomainVerdict,
+    _d144_fusion_conversion,
     d144_fusion_table_pair,
 )
 
@@ -629,11 +630,12 @@ def _melt_oxide_gamma_for_activity(
     parent_oxide: str,
     gamma_s: float,
     temperature_K: float | None,
-) -> tuple[float, str | None]:
+) -> tuple[float, str | None, FusionDomainVerdict | None]:
     """Return the liquid-basis gamma and separate reference-state notice."""
 
     provenance = reference_state_provenance.get(parent_oxide)
     gamma = float(gamma_s)
+    fusion_domain_verdict = None
     if (
         isinstance(provenance, _VerifiedGammaReferenceState)
         and provenance.phase == "solid"
@@ -644,11 +646,11 @@ def _melt_oxide_gamma_for_activity(
                     f"temperature_K required for solid-referenced {parent_oxide} gamma"
                 )
             temperature = float(temperature_K)
-            delta_g_fus = float(
-                d144_fusion_delta_g_kJ_per_mol(
-                    parent_oxide, Decimal(str(temperature))
-                )
+            conversion = _d144_fusion_conversion(
+                parent_oxide, Decimal(str(temperature))
             )
+            delta_g_fus = float(conversion.delta_g_fus_kJ_per_mol)
+            fusion_domain_verdict = conversion.domain_verdict
             # mu = mu_s° + RT ln(a_s) = mu_l° + RT ln(a_l), so
             # a_l = a_s exp(-(mu_l° - mu_s°)/RT). At the same X,
             # gamma_l = gamma_s exp(-dG_fus/RT). JANAF supplies dG in
@@ -659,7 +661,11 @@ def _melt_oxide_gamma_for_activity(
             # and a factor ~0.14; the JANAF chord gives the Kume row
             # a_l/a_s factor ~0.16.
             gamma *= math.exp(-delta_g_fus / (R_KJ_PER_MOL_K * temperature))
-    return gamma, _gamma_reference_state_notice(parent_oxide)
+    return (
+        gamma,
+        _gamma_reference_state_notice(parent_oxide),
+        fusion_domain_verdict,
+    )
 
 
 def melt_oxide_activity(
@@ -772,10 +778,20 @@ def melt_oxide_activity(
         )
 
     activity_authority_status = "temperature_not_supplied"
-    gamma, _ = _melt_oxide_gamma_for_activity(
+    (
+        gamma,
+        _,
+        fusion_domain_verdict,
+    ) = _melt_oxide_gamma_for_activity(
         parent, coeff.gamma, resolved_temperature_K
     )
-    activity_warning = None
+    activity_warning = (
+        None
+        if fusion_domain_verdict is None or resolved_temperature_K is None
+        else fusion_domain_verdict.warning_text(
+            parent, Decimal(str(resolved_temperature_K))
+        )
+    )
     if resolved_temperature_K is not None and coeff.valid_range_K is not None:
         low, high = (float(coeff.valid_range_K[0]), float(coeff.valid_range_K[1]))
         if low <= resolved_temperature_K <= high:
@@ -789,7 +805,11 @@ def melt_oxide_activity(
                 f"parent_oxide={parent} temperature_K={resolved_temperature_K:.3f} "
                 f"valid_range_K=[{low:g}, {high:g}] cannot_certify"
             )
-            activity_warning = domain_warning
+            activity_warning = (
+                domain_warning
+                if activity_warning is None
+                else f"{activity_warning}; {domain_warning}"
+            )
 
     if x_single_cation <= 0.0:
         return MeltOxideActivity(

@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 from collections.abc import Mapping
+from dataclasses import dataclass
 from decimal import Decimal
+from enum import Enum
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -50,6 +52,43 @@ _FUSION_NODE_SET_SHA256 = {
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
 }
+
+
+class FusionDomainAuthority(str, Enum):
+    CERTIFIED = "certified"
+    BRIDGE = "bridge"
+    EXTRAPOLATED = "extrapolated"
+
+
+@dataclass(frozen=True)
+class FusionDomainVerdict:
+    authority: FusionDomainAuthority
+    reason: str | None
+    certified_band_K: tuple[Decimal, Decimal]
+
+    def warning_text(
+        self, oxide: str, temperature_K: Decimal
+    ) -> str | None:
+        if self.authority is FusionDomainAuthority.CERTIFIED:
+            return None
+
+        def number(value: Decimal) -> str:
+            text = format(value, "f")
+            return text.rstrip("0").rstrip(".") if "." in text else text
+
+        low, high = self.certified_band_K
+        return (
+            "d144_fusion_conversion|"
+            f"oxide={oxide}|temperature_K={number(temperature_K)}|"
+            f"authority={self.authority.value}|reason={self.reason}|"
+            f"certified_band_K=[{number(low)}, {number(high)}]"
+        )
+
+
+@dataclass(frozen=True)
+class D144FusionConversion:
+    delta_g_fus_kJ_per_mol: Decimal
+    domain_verdict: FusionDomainVerdict
 
 
 def _sidecar_hashes(path: Path = SIDECAR_PATH) -> dict[str, str]:
@@ -250,12 +289,11 @@ def _complete_fusion_overlap_nodes(
     return tuple(overlap), solid_missing, liquid_missing
 
 
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
 def _fusion_crossing_temperature(
     oxide: str,
     solid_table_id: str,
     liquid_table_id: str,
-    *,
-    target_temperature_K: Decimal | None = None,
 ) -> Decimal:
     """Resolve the unique solid/liquid Gibbs crossing from JANAF nodes."""
 
@@ -267,7 +305,7 @@ def _fusion_crossing_temperature(
         liquid_table_id,
         solid_points,
         liquid_points,
-        target_temperature_K,
+        None,
     )
 
     def difference(temperature_K: Decimal) -> Decimal:
@@ -380,10 +418,10 @@ def d144_fusion_table_pair(oxide: str) -> tuple[str, str] | None:
     return pair
 
 
-def d144_fusion_delta_g_kJ_per_mol(
+def _d144_fusion_conversion(
     oxide: str, temperature_K: Decimal
-) -> Decimal:
-    """Return the JANAF liquid-minus-solid Gibbs chord for the d-144 pair."""
+) -> D144FusionConversion:
+    """Return liquid-minus-solid Gibbs energy and its JANAF domain verdict."""
 
     pair = d144_fusion_table_pair(oxide)
     if pair is None:
@@ -399,6 +437,41 @@ def d144_fusion_delta_g_kJ_per_mol(
         liquid_points,
         temperature,
     )
-    return _fusion_gibbs_difference_from_points(
+    melting_temperature = _fusion_crossing_temperature(oxide, pair[0], pair[1])
+    delta_g = _fusion_gibbs_difference_from_points(
         solid_points, liquid_points, temperature, extrapolate=True
     )
+    certified_band = (
+        max(solid_points[0][0], liquid_points[0][0]),
+        min(solid_points[-1][0], liquid_points[-1][0]),
+    )
+    low, high = certified_band
+    if temperature < low or temperature > high:
+        verdict = FusionDomainVerdict(
+            FusionDomainAuthority.EXTRAPOLATED,
+            "temperature is outside at least one JANAF phase table; the liquid "
+            "or solid Gibbs value uses a linear terminal Gibbs chord",
+            certified_band,
+        )
+    elif temperature < melting_temperature:
+        verdict = FusionDomainVerdict(
+            FusionDomainAuthority.BRIDGE,
+            "JANAF tabulates the liquid phase below its solid-liquid Gibbs "
+            "crossing; this is JANAF's metastable (supercooled) liquid branch",
+            certified_band,
+        )
+    else:
+        verdict = FusionDomainVerdict(
+            FusionDomainAuthority.CERTIFIED, None, certified_band
+        )
+    return D144FusionConversion(delta_g, verdict)
+
+
+def d144_fusion_delta_g_kJ_per_mol(
+    oxide: str, temperature_K: Decimal
+) -> Decimal:
+    """Return the numeric JANAF liquid-minus-solid chord for d-144."""
+
+    return _d144_fusion_conversion(
+        oxide, temperature_K
+    ).delta_g_fus_kJ_per_mol
