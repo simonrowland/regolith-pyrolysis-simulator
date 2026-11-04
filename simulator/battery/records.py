@@ -30,6 +30,7 @@ from typing import Any, Generic, Mapping, TypeVar
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
+    AmbientPressureEvidenceClass,
     AssetRole,
     Authority,
     BoundDirection,
@@ -391,6 +392,24 @@ class Composition:
     proxy_flag: str | None = None
     proxy_source: str | None = None
     analysis_selection_rule: str | None = None
+    # How this vector was chosen as an engine input. Closed tokens, set by
+    # migrate.py from locators, notes, and table identity. Absent means a
+    # writer that has not been classified. The phase scorer does not compare
+    # component amounts to the scored point.
+    #   scored_phase_analysis
+    #     own-row analysis, a sibling of that phase, a printed-phase stamp of
+    #     a product or analysed phase, or a table of averages of analyses.
+    #   printed_starting_bulk
+    #     starting, batched, or nominal charge on a different table from the
+    #     scored row, or a note that says so.
+    #   named_material_mixture_of_printed_starts
+    #     t-1593 mixture whose parents are printed starting materials.
+    #   analysed_melt_minus_scored
+    #     d-323 analysed single-melt majors. The stored amounts stay the
+    #     printed analysis; the scorer removes the scored components.
+    #   same_run_initial_analysed_melt
+    #     KC91 Table 3 initial analysis bound onto the final row.
+    input_provenance: str | None = None
 
     def __post_init__(self) -> None:
         if not self.basis:
@@ -407,7 +426,12 @@ class Composition:
                     f"Composition component {key!r} must be a nonnegative finite amount"
                 )
         object.__setattr__(self, "components", canonical)
-        for name in ("proxy_flag", "proxy_source", "analysis_selection_rule"):
+        for name in (
+            "proxy_flag",
+            "proxy_source",
+            "analysis_selection_rule",
+            "input_provenance",
+        ):
             value = getattr(self, name)
             if value is not None:
                 value = str(value).strip()
@@ -419,6 +443,81 @@ class Composition:
         return dict(self.components)
 
 
+_CITED_SATURATION_METHOD = "cited_standard"
+_DERIVED_SATURATION_METHOD = "derived_from_source_analyses"
+_SATURATION_METHODS = frozenset(
+    {_CITED_SATURATION_METHOD, _DERIVED_SATURATION_METHOD}
+)
+
+
+@dataclass(frozen=True)
+class IronSaturationComposition:
+    """Recorded saturation composition an extract can carry into the one owner.
+
+    ``cited_standard`` is precedence (1): the thermo chain names the oxide
+    (quote, locator, composition as printed, for example Fe0.947O). No band.
+    ``derived_from_source_analyses`` is precedence (1.5): N_Fe2+ is a recorded
+    reduction of the source's own printed analyses, with method provenance and
+    the method-spread band in dex. The number is never a constant in the scorer.
+    """
+
+    method: str
+    composition_as_printed: str
+    quote: str
+    locator: Locator
+    n_fe2_plus: Decimal | None = None
+    provenance: str | None = None
+    band_dex: Decimal | None = None
+
+    def __post_init__(self) -> None:
+        method = str(self.method or "").strip()
+        if method not in _SATURATION_METHODS:
+            raise ValueError(
+                "IronSaturationComposition.method must be cited_standard "
+                "or derived_from_source_analyses"
+            )
+        object.__setattr__(self, "method", method)
+        for name in ("composition_as_printed", "quote"):
+            value = str(getattr(self, name) or "").strip()
+            if not value:
+                raise ValueError(f"IronSaturationComposition.{name} is required")
+            object.__setattr__(self, name, value)
+        if not isinstance(self.locator, Locator):
+            raise TypeError("IronSaturationComposition.locator is required")
+        if method == _CITED_SATURATION_METHOD:
+            if (
+                self.n_fe2_plus is not None
+                or self.provenance is not None
+                or self.band_dex is not None
+            ):
+                raise ValueError(
+                    "cited_standard carries the printed formula only"
+                )
+            return
+        if self.n_fe2_plus is None:
+            raise ValueError(
+                "derived_from_source_analyses requires n_fe2_plus"
+            )
+        n_fe2_plus = as_decimal(self.n_fe2_plus)
+        if n_fe2_plus <= 0 or n_fe2_plus > 1:
+            raise ValueError("n_fe2_plus must lie in (0, 1]")
+        object.__setattr__(self, "n_fe2_plus", n_fe2_plus)
+        provenance = str(self.provenance or "").strip()
+        if not provenance:
+            raise ValueError(
+                "derived_from_source_analyses requires provenance"
+            )
+        object.__setattr__(self, "provenance", provenance)
+        if self.band_dex is None:
+            raise ValueError(
+                "derived_from_source_analyses requires band_dex"
+            )
+        band_dex = as_decimal(self.band_dex)
+        if band_dex <= 0:
+            raise ValueError("band_dex must be positive")
+        object.__setattr__(self, "band_dex", band_dex)
+
+
 @dataclass(frozen=True)
 class StandardState:
     convention: ReferenceStateConvention
@@ -426,6 +525,8 @@ class StandardState:
     component_basis: str
     # Absent when the source does not print a number. Never a default of 1 bar.
     reference_pressure_bar: Decimal | None = None
+    # Absent unless the extract records a cited or derived saturation composition.
+    iron_saturation_composition: IronSaturationComposition | None = None
 
     def __post_init__(self) -> None:
         if not self.component_basis:
@@ -438,6 +539,12 @@ class StandardState:
         if self.reference_pressure_bar is not None:
             object.__setattr__(
                 self, "reference_pressure_bar", as_decimal(self.reference_pressure_bar)
+            )
+        recorded = self.iron_saturation_composition
+        if recorded is not None and not isinstance(recorded, IronSaturationComposition):
+            raise TypeError(
+                "StandardState.iron_saturation_composition must be "
+                "IronSaturationComposition or absent"
             )
 
 
@@ -498,6 +605,14 @@ class Derivation:
         has_physical_page = (
             isinstance(page, int) and not isinstance(page, bool) and page > 0
         ) or (isinstance(page, str) and bool(page.strip()))
+        has_section_or_equation = locator is not None and any(
+            (isinstance(location, str) and bool(location.strip()))
+            or (
+                isinstance(location, (int, float))
+                and not isinstance(location, bool)
+            )
+            for location in (locator.section, locator.equation)
+        )
         return (
             self.method is not None
             and self.method.state.is_value
@@ -505,14 +620,14 @@ class Derivation:
             and bool(self.method.state.value.strip())
             and locator is not None
             and has_physical_page
-            and isinstance(locator.equation, str)
-            and bool(locator.equation.strip())
+            and has_section_or_equation
         )
 
     @property
     def has_named_references(self) -> bool:
         return bool(self.references) and all(
             isinstance(reference, str) and bool(reference.strip())
+            and reference != "none_printed"
             for reference in self.references
         )
 
@@ -1225,6 +1340,19 @@ class PressureEnvironment:
 
 
 @dataclass(frozen=True)
+class AmbientPressureEvidence:
+    evidence_class: AmbientPressureEvidenceClass
+    quote: str
+    locator: Locator
+
+    def __post_init__(self) -> None:
+        if not self.quote.strip():
+            raise ValueError("AmbientPressureEvidence.quote is required")
+        if self.locator is None:
+            raise ValueError("AmbientPressureEvidence.locator is required")
+
+
+@dataclass(frozen=True)
 class Experiment:
     experiment_id: str
     kind: ExperimentKind
@@ -1236,6 +1364,7 @@ class Experiment:
     simulated_experiment_id: str | None = None
     locator: Locator | None = None
     apparatus: Apparatus | None = None
+    ambient_pressure_evidence: AmbientPressureEvidence | None = None
     fO2_control: FO2Control | None = None
     bench_id: str | None = None
     # FK to the work record's context row holding this experiment's equipment

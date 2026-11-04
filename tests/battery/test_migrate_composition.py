@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     EvidenceClass,
     NoticeKind,
     Phase,
+    Quantity,
     RefusalReason,
     ValueKind,
 )
@@ -389,9 +390,24 @@ def test_volovetskii_starting_glass_material_state_is_initial() -> None:
         values=observation["values"],
         locator=migrate_module.locator_from_mapping(observation["locator"]),
     )
+    printed_cl = Decimal(str(observation["values"]["composition_wt_pct"]["Cl"]))
+    assert printed_cl == Decimal("0.81")
     expected = selected.initial_composition
-    assert expected is not None and not expected.state.is_value
-    assert "unsupported numeric component(s): Cl" in expected.state.reason
+    assert expected is not None and expected.state.is_value
+    assert isinstance(expected.state.value, Composition)
+    assert "Cl" in dict(expected.state.value.components)
+    printed = selected.printed_composition
+    assert printed is not None and printed.state.is_value
+    assert printed.state.value["Cl"] == str(printed_cl)
+    from simulator.battery.composition import partition_engine_components
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+    _kept, excluded = partition_engine_components(
+        {name: Decimal(str(amount)) for name, amount in printed.state.value.items()},
+        engine_components=MELTS_OXIDE_BASIS,
+        retain_components=(),
+    )
+    assert ("Cl", printed_cl) in excluded
 
     migrator = migrate_one_extract(REPO_ROOT, path)
     migrator.finalize()
@@ -1851,6 +1867,144 @@ def test_nonclosing_mole_percent_composition_is_flagged() -> None:
     )
 
 
+def test_existing_percent_fraction_conversion_outputs_are_pinned() -> None:
+    composition = migrate_module._composition_located_from_plain(
+        {
+            "basis": "printed_mole_percent",
+            "amount_basis": "mole_percent",
+            "components": [["SiO2", "51.93"], ["MgO", "48.07"]],
+        }
+    )
+    selection = migrate_module.select_declared_source(
+        Quantity.MASS_LOSS_FRACTION,
+        "wt%",
+        {"mass_loss_wt_pct": "51.93"},
+    )
+
+    assert composition.state.is_value
+    assert composition.state.value.as_map() == {
+        "SiO2": Decimal("0.5193"),
+        "MgO": Decimal("0.4807"),
+    }
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "percent_to_fraction"
+
+
+def test_phase_component_mol_percent_scales_exactly_and_preserves_printed() -> None:
+    printed = "51.93 mol%"
+    payload = {
+        "basis": "mole_fraction",
+        "component_amount": "51.93",
+        "component_amount_as_published": printed,
+        "value_units_as_published": "mol%",
+    }
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mole fraction",
+        payload,
+    )
+
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "percent_to_fraction"
+    assert payload["component_amount_as_published"] == "51.93 mol%"
+
+
+def test_phase_component_wt_percent_keeps_mass_basis_scale() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "wt%",
+        {
+            "basis": "wt_percent",
+            "component_amount": "51.93",
+            "value_units_as_published": "wt%",
+        },
+    )
+
+    assert selection.amount == Decimal("51.93")
+    assert selection.unit_trail == "identity:wt_percent"
+
+
+def test_phase_component_bare_percent_uses_declared_wt_percent_basis() -> None:
+    payload = {
+        "basis": "wt_percent",
+        "component_amount": "32.80",
+        "component_amount_as_published": "32.80 (0.67)",
+    }
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "%",
+        payload,
+    )
+
+    assert selection.amount == Decimal("32.80")
+    assert selection.unit_trail == "identity:wt_percent"
+    assert payload["component_amount_as_published"] == "32.80 (0.67)"
+
+
+def test_phase_component_at_percent_refuses_missing_atom_fraction_basis() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mole_fraction",
+        {
+            "basis": "mole_fraction",
+            "component_amount": "0.27",
+            "value_as_published": "0.27 at.%",
+            "value_units_as_published": "at.%",
+        },
+    )
+
+    assert not selection.available
+    assert selection.reason is not None
+    assert "atom_fraction" in selection.reason
+
+
+def test_phase_component_unrecognized_percent_unit_is_typed_refusal() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "vol%",
+        {
+            "basis": "mole_fraction",
+            "component_amount": "51.93",
+            "value_units_as_published": "vol%",
+        },
+    )
+
+    assert not selection.available
+    assert selection.reason is not None
+    assert "unrecognized percent unit" in selection.reason
+
+
+def test_phase_component_already_fractional_mol_percent_is_not_rescaled() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        None,
+        {
+            "basis": "mole_fraction",
+            "component_amount": "0.5193",
+            "component_amount_as_published": "51.93 mol%",
+            "component_amount_printed_unit": "mol%",
+        },
+    )
+
+    assert selection.amount == Decimal("0.5193")
+    assert selection.unit_trail == "identity:mole_fraction"
+
+
+def test_phase_component_float_fraction_artifact_is_retained_verbatim() -> None:
+    selection = migrate_module.select_declared_source(
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "mol.% as printed",
+        {
+            "basis": "mole_fraction",
+            "component_amount": 0.6459999999999999,
+            "component_amount_as_published": "64.6 ± 0.90 mol.%",
+        },
+    )
+
+    assert selection.amount == Decimal("0.6459999999999999")
+    assert selection.unit_trail == "identity:mole_fraction"
+
+
 @pytest.mark.parametrize("wrapped", [False, True])
 @pytest.mark.parametrize(
     "components",
@@ -2595,7 +2749,11 @@ def test_bischof_measured_and_nominal_initials_remain_conflicted() -> None:
     )
 
 
-def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical() -> None:
+def test_mass_percent_initial_keeps_the_printed_map_and_stores_chlorine() -> None:
+    """Cl is a real formula. The printed map stays verbatim and the mole
+    fraction stores Cl. MELTS does not list Cl, so the engine split names it.
+    """
+
     raw = {
         "initial_composition": {
             "locator": {"table": "2", "page": 14},
@@ -2614,8 +2772,20 @@ def test_ambiguous_mass_percent_initial_preserves_print_and_withholds_canonical(
 
     assert sample.printed_composition is not None
     assert sample.printed_composition.state.value == raw["initial_composition"]["state"]["value"]
-    assert sample.initial_composition is not None
-    assert sample.initial_composition.state.is_unknown
+    initial = sample.initial_composition
+    assert initial is not None and initial.state.is_value
+    assert isinstance(initial.state.value, Composition)
+    assert set(dict(initial.state.value.components)) == {"SiO2", "Cl"}
+    from simulator.battery.composition import partition_engine_components
+    from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+    kept, excluded = partition_engine_components(
+        {"SiO2": Decimal("60"), "Cl": Decimal("40")},
+        engine_components=MELTS_OXIDE_BASIS,
+        retain_components=(),
+    )
+    assert dict(kept) == {"SiO2": Decimal("60")}
+    assert ("Cl", Decimal("40")) in excluded
 
 
 def _iter_store_observations() -> list[dict]:

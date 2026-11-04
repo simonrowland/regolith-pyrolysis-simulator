@@ -39,6 +39,7 @@ from simulator.battery.enums import (
     CellMaterial,
     CONDENSED_PHASES,
     EQUILIBRIUM_FIT_QUANTITIES,
+    ELEMENT_WT_PERCENT_BASIS,
     Engine,
     EvidenceClass,
     ExecutionState,
@@ -51,8 +52,9 @@ from simulator.battery.enums import (
     MetricOperation,
     MethodToken,
     NoticeKind,
-    PHASE_BASIS_TOKENS,
     PHASE_COMPOSITION_QUANTITIES,
+    PROSE_MOLE_PERCENT_PHASE_COMPONENT,
+    effective_phase_basis,
     PRINTED_CAPACITY_QUANTITIES,
     PerBasis,
     Phase,
@@ -77,6 +79,8 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    SweepIdentity,
+    WallIdentity,
     IdentityEqualKind,
     IdentityEqualOutcome,
     PA_PER_BAR_DEC,
@@ -100,8 +104,24 @@ from simulator.battery.source_oxygen import (
     source_oxygen_closure_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
+from simulator.battery.input_provenance import (
+    ANALYSED_MELT_MINUS_SCORED,
+    SINGLE_LIQUID_MASS_FRACTION,
+    InputDecision,
+    analysed_melt_decision,
+    analysed_melt_weight_map,
+    collect_run_texts,
+    composition_with_provenance,
+    crystal_prediction_notice,
+    input_composition_echo_detail,
+    input_rewrite_notices,
+    liquid_experiment_notice,
+    printed_single_melt_evidence,
+    single_phase_printed_bulk_policy,
+)
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _COMPOSITION_COMPONENTS,
     canonicalize_rail,
     iter_observation_store_paths,
     load_migrated_benches,
@@ -110,6 +130,7 @@ from simulator.battery.migrate import (
     load_yaml,
     _convert_compilation_amount,
     _log_fO2_to_pa,
+    PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
     fe3_fe2_ratio_from_ferric_fraction,
@@ -121,6 +142,9 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    ALPHA_GAS_SYSTEM_H2,
+    HK_RATIO_ALPHA_DEFINITION,
+    evaporation_alpha_family_key,
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -166,7 +190,19 @@ from simulator.battery.oxygen_balance import (
     _cell_oxygen_class,
     has_own_engine_solved_oxygen_balance,
 )
-from simulator.battery.composition import composition_wt_pct
+from simulator.battery.composition import (
+    SLAG_METAL_CHARGE_BASIS,
+    canonical_element_symbol,
+    chloride_component_symbol,
+    composition_wt_pct,
+    element_mass_fraction_redox,
+    element_wt_percent_on_printed_analysis,
+    elemental_charge_symbol,
+    excluded_component_notice_reason,
+    partition_engine_components,
+    phase_ppm_mass_as_wt_percent,
+    phase_printed_mole_amounts_to_wt_percent,
+)
 from simulator.battery.source_lineage import (
     coefficient_lineage_sources,
     openimcc_engine_identity_sources,
@@ -187,6 +223,7 @@ from simulator.battery.validity import (
     GateOutcome,
     _calibration_grounded,
     _partial_pressure_observations_by_experiment,
+    apparatus_geometry_interval_notice,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
@@ -362,6 +399,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.EVAPORATION_RATE: MetricOperation.RELATIVE,
     Quantity.MASS_LOSS_RATE: MetricOperation.RELATIVE,
     Quantity.WALL_DEPOSIT_MASS: MetricOperation.RELATIVE,
+    Quantity.WALL_DEPOSIT_AREAL_RATE: MetricOperation.RELATIVE,
     Quantity.TRANSITION_TEMPERATURE: MetricOperation.ABSOLUTE,
     Quantity.FE3_FE2_RATIO: MetricOperation.DEX,
     Quantity.VISCOSITY: MetricOperation.DEX,
@@ -979,7 +1017,7 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
         or quantity in VAPORIZATION_ENTHALPIES
     ):
         return Rail.THERMOCHEMISTRY
-    if quantity is Quantity.WALL_DEPOSIT_MASS:
+    if quantity in {Quantity.WALL_DEPOSIT_MASS, Quantity.WALL_DEPOSIT_AREAL_RATE}:
         return Rail.WALL_DEPOSITION
     if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
         return Rail.REDOX
@@ -1369,7 +1407,9 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
             if identity.subtype is not None and identity.subtype.is_value
             else None
         )
-        if subtype in PHASE_BASIS_TOKENS:
+        # Prose wt% and mole-percent synonyms are the same dex observable
+        # as a token phase row. The stored subtype is not rewritten.
+        if effective_phase_basis(subtype) is not None:
             return MetricOperation.DEX
         return MetricOperation.ABSOLUTE
     if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
@@ -2881,11 +2921,22 @@ _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
 _DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
-_DISTIN_N_FE2_PLUS_FACTORS = {
-    Decimal("2058.15"): Decimal("0.9787"),
-    Decimal("2153.15"): Decimal("0.9861"),
-    Decimal("2233.15"): Decimal("0.9968"),
-}
+# Ruled Darken & Gurry iron–liquid-oxide saturation, Tables III A/B, at the
+# three Table III B temperatures. These are the owner's anchors. A linear fit
+# of the stored line-CN r column does not reproduce them, so they are not
+# refit from that column.
+_DG_OFE_SAT_ANCHORS = (
+    (Decimal("1649.15"), Decimal("1.0394")),
+    (Decimal("1709.15"), Decimal("1.0287")),
+    (Decimal("1766.15"), Decimal("1.0265")),
+)
+# Coughlin's Fe0.947O, the band reference for an owner-supplied composition.
+# N0 = 3 - 2/(0.947) displays as 0.888.
+_COUGHLIN_FE_PER_O = Decimal("0.947")
+_CITED_SATURATION_NOTICE = "fe_saturation_composition_from_cited_standard"
+_DERIVED_SATURATION_NOTICE = "composition_derived_from_source_analyses"
+_OWNER_SATURATION_NOTICE = "fe_saturation_composition_owner_supplied"
+_FE_PER_O_FORMULA = re.compile(r"^Fe([0-9]+(?:\.[0-9]+)?)O$")
 _KELVIN_FROM_CELSIUS = Decimal("273.15")
 _IRON_SATURATED_FEO_MISSING_INPUT = "iron-saturated FeO conversion missing input:"
 # Cold and hot ends of the Holzheid and Distin rows this conversion scores.
@@ -3126,6 +3177,245 @@ def _feo_jackknife_factors(
     return min(factors), max(factors)
 
 
+@dataclass(frozen=True)
+class IronSaturationDecision:
+    """One owner's saturation composition for a row."""
+
+    notice: str
+    n_fe2_plus: Decimal | None = None
+    o_over_fe: Decimal | None = None
+    source: str | None = None
+    authority: Authority | None = None
+    band_dex: Decimal | None = None
+    extrapolated: bool = False
+    failure: str | None = None
+
+    @property
+    def recorded(self) -> bool:
+        """Cited chain or a recorded source-analysis reduction. Not the D&G fallback."""
+
+        return self.failure is None and self.notice in {
+            _CITED_SATURATION_NOTICE,
+            _DERIVED_SATURATION_NOTICE,
+        }
+
+
+def _n0_from_o_over_fe(o_over_fe: Decimal) -> Decimal:
+    """Fe2+ ion fraction on the wüstite cation-vacancy balance.
+
+    Premise: the iron-saturated oxide is Fe2+_(1-3x) Fe3+_(2x) □_x O, so the
+    atom ratio O/Fe = 1/(1-x) and the Fe2+ fraction among cations is
+    N0 = (1-3x)/(1-x). Darken & Gurry print r = (Fe2++Fe3+)/Fe2+ and
+    N_O/N_Fe = (3r-1)/(2r). Algebra: y = (3r-1)/(2r) gives r = 1/(3-2y),
+    so N0 = 1/r = 3 - 2y. Sanity at 1649.15 K: 3 - 2*1.0394 = 0.9212.
+    """
+
+    return 3 - 2 * o_over_fe
+
+
+def _n0_from_printed_feo(composition_as_printed: str) -> Decimal | None:
+    """Fe0.947O means Fe/O = 0.947, so O/Fe = 1/0.947 and N0 = 3 - 2/0.947."""
+
+    match = _FE_PER_O_FORMULA.fullmatch(composition_as_printed.strip())
+    if match is None:
+        return None
+    fe_per_o = Decimal(match.group(1))
+    if fe_per_o <= 0:
+        return None
+    n0 = _n0_from_o_over_fe(1 / fe_per_o)
+    if n0 <= 0 or n0 > 1:
+        return None
+    return n0
+
+
+def _ofe_sat_at(temperature_K: Decimal) -> tuple[Decimal, bool]:
+    """(O/Fe)sat(T) through the three ruled anchors.
+
+    The anchors are not collinear: the cold segment slope is
+    (1.0287-1.0394)/(1709.15-1649.15) and the hot segment slope is
+    (1.0265-1.0287)/(1766.15-1709.15). One least-squares line cannot hit
+    all three ruled values. Piecewise linear in T hits each anchor and,
+    outside them, extends the adjacent segment, so the value is never
+    clamped to an endpoint. Below ~1644 K (the iron-saturated liquidus,
+    1371 °C) and above 1766.15 K the authority is extrapolated.
+    """
+
+    anchors = _DG_OFE_SAT_ANCHORS
+
+    def line(
+        left: tuple[Decimal, Decimal],
+        right: tuple[Decimal, Decimal],
+        temperature: Decimal,
+    ) -> Decimal:
+        t0, y0 = left
+        t1, y1 = right
+        return y0 + (y1 - y0) * (temperature - t0) / (t1 - t0)
+
+    if temperature_K <= anchors[0][0]:
+        return line(anchors[0], anchors[1], temperature_K), temperature_K < anchors[0][0]
+    if temperature_K >= anchors[-1][0]:
+        return (
+            line(anchors[-2], anchors[-1], temperature_K),
+            temperature_K > anchors[-1][0],
+        )
+    for left, right in zip(anchors, anchors[1:]):
+        if left[0] <= temperature_K <= right[0]:
+            return line(left, right, temperature_K), False
+    raise ValueError("Darken & Gurry saturation anchors have a gap")
+
+
+def _coughlin_n0() -> Decimal:
+    n0 = _n0_from_printed_feo(f"Fe{_COUGHLIN_FE_PER_O}O")
+    if n0 is None:
+        raise ValueError("Coughlin Fe0.947O has no Fe2+ fraction")
+    return n0
+
+
+def _composition_band_dex(n0: Decimal, *, extrapolated: bool, temperature_K: Decimal) -> Decimal:
+    """Propagate |N0(D&G) - N0(Coughlin Fe0.947O)| onto log10 a.
+
+    A shift of the standard's Fe2+ fraction scales a stoichiometric activity
+    by N0, so the dex width is |log10(N0 / N0_Coughlin)|. Outside the anchor
+    window the band is at least the spread at the nearest anchor: the local
+    spread can shrink as the line moves toward 0.888, and the ruling forbids
+    a tighter band than the D&G-versus-Coughlin spread.
+    """
+
+    coughlin = _coughlin_n0()
+    local = abs((n0 / coughlin).log10())
+    if not extrapolated:
+        return local
+    edge_index = 0 if temperature_K < _DG_OFE_SAT_ANCHORS[0][0] else -1
+    edge = abs((_n0_from_o_over_fe(_DG_OFE_SAT_ANCHORS[edge_index][1]) / coughlin).log10())
+    return max(local, edge)
+
+
+def iron_saturation_composition(reference: Observation) -> IronSaturationDecision:
+    """Saturation composition for one row. Cited, else recorded analyses, else D&G.
+
+    This is the only owner. Engine branches read it; they do not carry a
+    second composition table.
+    """
+
+    identity = reference.identity
+    standard = (
+        identity.reference_state.value
+        if isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+        else None
+    )
+    recorded = None if standard is None else standard.iron_saturation_composition
+    if recorded is not None and recorded.method == "cited_standard":
+        n0 = _n0_from_printed_feo(recorded.composition_as_printed)
+        if n0 is None:
+            return IronSaturationDecision(
+                notice=_CITED_SATURATION_NOTICE,
+                failure=(
+                    "cited composition is not a Fe<number>O formula: "
+                    f"{recorded.composition_as_printed}"
+                ),
+                source=recorded.quote,
+            )
+        fe_per_o = Decimal(
+            _FE_PER_O_FORMULA.fullmatch(
+                recorded.composition_as_printed.strip()
+            ).group(1)
+        )
+        return IronSaturationDecision(
+            notice=_CITED_SATURATION_NOTICE,
+            n_fe2_plus=n0,
+            o_over_fe=1 / fe_per_o,
+            source=recorded.quote,
+            authority=None,
+            band_dex=None,
+        )
+    if recorded is not None and recorded.method == "derived_from_source_analyses":
+        return IronSaturationDecision(
+            notice=_DERIVED_SATURATION_NOTICE,
+            n_fe2_plus=recorded.n_fe2_plus,
+            source=recorded.provenance,
+            authority=Authority.DERIVED,
+            band_dex=recorded.band_dex,
+        )
+    if not isinstance(identity, Identity):
+        return IronSaturationDecision(
+            notice=_OWNER_SATURATION_NOTICE,
+            failure="observation has no identity",
+        )
+    temperature_K = temperature_of(identity)
+    if temperature_K is None:
+        return IronSaturationDecision(
+            notice=_OWNER_SATURATION_NOTICE,
+            failure="D&G saturation composition requires temperature_K",
+        )
+    o_over_fe, extrapolated = _ofe_sat_at(temperature_K)
+    n0 = _n0_from_o_over_fe(o_over_fe)
+    return IronSaturationDecision(
+        notice=_OWNER_SATURATION_NOTICE,
+        n_fe2_plus=n0,
+        o_over_fe=o_over_fe,
+        source="Darken & Gurry 1946 Tables IIIA/B",
+        authority=(
+            Authority.EXTRAPOLATED if extrapolated else Authority.DERIVED
+        ),
+        band_dex=_composition_band_dex(
+            n0, extrapolated=extrapolated, temperature_K=temperature_K
+        ),
+        extrapolated=extrapolated,
+    )
+
+
+def _composition_notice(
+    reference: Observation,
+    decision: IronSaturationDecision,
+    quantity: Quantity,
+) -> Notice:
+    if decision.failure:
+        reason = f"{decision.notice}: {decision.failure}"
+        band = None
+    else:
+        band_text = (
+            None
+            if decision.band_dex is None
+            else f"{format(decision.band_dex, 'f')} dex"
+        )
+        n0_text = (
+            ""
+            if decision.n_fe2_plus is None
+            else f"; N0={format(decision.n_fe2_plus, 'f')}"
+        )
+        y_text = (
+            ""
+            if decision.o_over_fe is None
+            else f"; O/Fe={format(decision.o_over_fe, 'f')}"
+        )
+        reason = (
+            f"{decision.notice}{n0_text}{y_text}; source={decision.source}"
+        )
+        band = band_text
+    return Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=reference.observation_id,
+        band=band,
+        authority=decision.authority,
+        source=decision.source,
+    )
+
+
+def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
+    return replace(
+        standard_state,
+        endmember=replace(
+            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
+        ),
+        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
+    )
+
+
 @lru_cache(maxsize=1)
 def _iron_saturated_feo_calibration() -> tuple[
     _IronSaturatedFeOCalibration, tuple[Decimal, ...]
@@ -3194,26 +3484,38 @@ def _iron_saturated_feo_calibration() -> tuple[
 def _iron_saturated_feo_comparison(
     reference: Observation, *, engine: Engine | None
 ) -> Observation | None:
-    """Retag iron-saturated Fe(1-x)O(l) onto stoichiometric FeO(l).
+    """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
 
-    The standard-state change is the FeO component's chemical potential,
-    mu_FeO = mu_Fe + mu_O, in the iron-saturated liquid. a_Fe = 1 fixes
-    mu_Fe. Distin's dissolved-oxygen bound is a factor 0.972–0.985 on that
-    activity; it is not applied, and it sits inside the jackknife envelope.
-    No mole fraction redefines the reported activity or activity coefficient.
+    Holzheid's standard is the iron-saturated liquid's chemical potential,
+    mu_FeO = mu_Fe + mu_O. a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
+    carries that partial onto JANAF Fe-019. Page 801's N_O/N_Fe = (3r−1)/(2r)
+    fixes the saturation composition and does not multiply this partial.
+    The composition itself comes from iron_saturation_composition. It does
+    not scale the activity.
+
+    Distin's tabulated activity is the oxygen ratio a_D = O_metal / O_sat
+    on that same iron-saturated standard (p. 74). O_sat is the oxygen
+    solubility of iron under pure iron oxide at that T. Printed p. 75
+    divides the measured metal oxygen by 0.44, 0.63 and 0.83 wt% at
+    1785, 1880 and 1960 °C (0.43/0.44 rounds to the stored 0.977). This
+    paper's eight references do not include Taylor & Chipman. The
+    levitation technique is their own prior paper (6), Can. Met. Quart.
+    10(1): 13 (1971); the saturation sentence does not say whether those
+    three percents were measured there or taken from an uncited table.
+    The extract records the printed percents in derivation prose and
+    carries no cited solubility source. That source is follow-up data,
+    not a number invented here. a_F019 = a_D * f, with
+    f = exp((ΔG_w - ΔfG(Fe-019)) / RT). Sanity: an iron-saturated melt
+    (a_D = 1) maps to f. The Temkin-frame reading a_F019 = a_D * f / N0
+    is withdrawn: the stored column is the oxygen ratio, and Masson's N0
+    multiply is not this Fe-019 step. No ion-fraction constant lives here.
 
     Both ΔG_w and JANAF ΔfG(FeO,l) use O2 at the same standard pressure
     (1 bar), so that pressure cancels. The extracts' 1.01325 bar is the
     condensed-phase standard state. V dP is about 0.01 J/mol and is not
-    applied. The gas ratios are Darken & Gurry's direct Table III B
-    iron-and-liquid-oxide measurements. Page 801 states
-    N_O/N_Fe = (3r−1)/(2r); that identity fixes composition and does not
-    multiply this partial. Distin p. 75 converts to the stoichiometric oxide
-    by an earlier procedure and prints no factor.
-
-    Supercooled liquid FeO(l) is the comparison convention for a melt
-    component below the oxide's melting marker. Rows outside the measured
-    gas window are scored and flagged, not refused.
+    applied. Supercooled liquid FeO(l) is the comparison convention below
+    the oxide's melting marker. Rows outside the measured gas window are
+    scored and flagged, not refused.
     """
 
     identity = reference.identity
@@ -3245,64 +3547,6 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
-    if (
-        engine is Engine.OPENIMCC
-        and reference.source_id == _DISTIN_SOURCE_ID
-        and quantity is Quantity.ACTIVITY
-    ):
-        temperature_K = temperature_of(identity)
-        factor = (
-            None
-            if temperature_K is None
-            else _DISTIN_N_FE2_PLUS_FACTORS.get(temperature_K)
-        )
-        if factor is None:
-            missing = (
-                f"temperature_K={temperature_K} has no Distin N_Fe2+^0 factor"
-            )
-            notice = Notice(
-                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                affected_quantities=(quantity,),
-                reason=f"{_IRON_SATURATED_FEO_MISSING_INPUT} {missing}",
-                origin=reference.observation_id,
-                band=missing,
-            )
-            return replace(reference, notices=union_notices(reference.notices, (notice,)))
-
-        # Premise: Distin's measured activity uses Fe-saturated nonstoichiometric
-        # liquid oxide; openimcc predicts the FeO(l) component on its stoichiometric
-        # reference. Algebra: μ_FeO(stoich)=μ_FeO(source)+RT ln N_Fe2+^0, so
-        # a_FeO(stoich)=N_Fe2+^0·a_FeO(source). Unit check: N_Fe2+^0 is
-        # dimensionless, and its log10 is a dex shift. Sanity: at 1880 C,
-        # 0.952×0.9861=0.9388 and log10(0.9861)=-0.0061 dex.
-        converted = reference.value.point * factor
-        log10_shift_dex = factor.log10()
-        stoichiometric = replace(
-            standard_state,
-            endmember=replace(
-                standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
-            ),
-            component_basis=_FEO_STOICHIOMETRIC_FORMULA,
-        )
-        notice = Notice(
-            kind=NoticeKind.DERIVATION_USES_COMPILATION,
-            affected_quantities=(quantity,),
-            reason=(
-                "reference_converted_via_iron_saturation; "
-                "method=a_FeO(stoich)=N_Fe2+^0*a_FeO(source); "
-                f"factor={factor}; log10_shift={_display_decimal(log10_shift_dex, '0.0001')} "
-                f"dex; source_value={reference.value.point}; "
-                f"converted_value={converted}; T={temperature_K} K; "
-                "N_Fe2+^0 source=openimcc-species feo-liquid-candidate.md"
-            ),
-            origin=reference.observation_id,
-        )
-        return replace(
-            reference,
-            identity=replace(identity, reference_state=State.of(stoichiometric)),
-            value=replace(reference.value, point=converted),
-            notices=union_notices(reference.notices, (notice,)),
-        )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
         if engine is None:
@@ -3337,13 +3581,7 @@ def _iron_saturated_feo_comparison(
     log_f_spread_dex = (
         Decimal(_HOLZHEID_PRINTED_FACTOR_1400_C) / Decimal("1.792")
     ).log10()
-    stoichiometric = replace(
-        standard_state,
-        endmember=replace(
-            standard_state.endmember, formula=_FEO_STOICHIOMETRIC_FORMULA
-        ),
-        component_basis=_FEO_STOICHIOMETRIC_FORMULA,
-    )
+    stoichiometric = _stoichiometric_standard(standard_state)
     iron_phase = "liquid" if temperature_K > calibration.fusion_tm_K else "solid"
     conversion_notice = Notice(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
@@ -3397,6 +3635,11 @@ def _iron_saturated_feo_comparison(
     )
     if row_band.notice is not None:
         notices += (row_band.notice,)
+    notices += (
+        _composition_notice(
+            reference, iron_saturation_composition(reference), quantity
+        ),
+    )
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
@@ -3411,8 +3654,9 @@ def fusion_comparison_reference(
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Iron-saturated Fe(1-x)O(l) activities and activity coefficients
-    move onto stoichiometric FeO(l) by the Darken & Gurry oxygen potential.
+    energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
+    tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
+    & Gurry factor f. A recorded saturation composition does not scale them.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
@@ -5308,6 +5552,16 @@ def _read_decision_band_ratchet(
     return entries, False, history
 
 
+# Same minimum the HK-ratio alpha family uses before a row can leave the
+# insufficient-sources hold. Two independent source_ids, not two rows.
+MINIMUM_INDEPENDENT_FAMILY_SOURCES = 2
+DERIVED_BAND_INSUFFICIENT_SOURCES = "derived_band_insufficient_sources"
+FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED = (
+    "forsterite_h2_equilibrium_gas_not_modelled"
+)
+_FORSTERITE_CRYSTAL_FORMULA = "Mg2SiO4"
+
+
 def _source_band_catalog(
     context: ScoreContext,
     ratchet_entries: Mapping[str, Mapping[str, object]],
@@ -5369,8 +5623,8 @@ def _source_band_catalog(
     records: list[dict[str, object]] = []
     no_band_reasons: dict[str, str] = {}
     for key, by_source in sources.items():
-        if len(by_source) < 2:
-            no_band_reasons[key] = "derived_band_insufficient_sources"
+        if len(by_source) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+            no_band_reasons[key] = DERIVED_BAND_INSUFFICIENT_SOURCES
             continue
         if any(len(row["values"]) != 1 for row in by_source.values()):
             continue
@@ -6575,6 +6829,105 @@ class _FeRedoxMaterial:
     temperature: Decimal
     composition_state: State[Composition]
     composition_wt: dict[str, float]
+    notices: tuple[Notice, ...] = ()
+
+
+def _input_composition_echo_detail(identity: Identity) -> dict[str, object] | None:
+    """SC-458 guard. The owner is input_provenance; this is the score name."""
+
+    return input_composition_echo_detail(identity)
+
+
+def _composition_provenance(identity: Identity) -> str | None:
+    state = identity.composition
+    if (
+        state is None
+        or not state.is_value
+        or not isinstance(state.value, Composition)
+    ):
+        return None
+    return state.value.input_provenance
+
+
+def _engine_liquid_fraction(result: object) -> float | None:
+    raw = getattr(result, "liquid_fraction", None)
+    if raw is None:
+        return None
+    try:
+        number = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if number != number:
+        return None
+    return number
+
+
+def _gate_input_composition(
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None,
+) -> tuple[
+    Identity,
+    RefusalReason | None,
+    dict[str, object] | None,
+    InputDecision | None,
+]:
+    """d-323, then the echo guard. Absent composition is left to the old gate.
+
+    Runs before a basis check and before a missing temperature. The decision
+    refuses an unstated or crystalline analysed melt before the weaker
+    total-iron exception in the echo guard. Amounts are not compared.
+    """
+
+    state = identity.composition
+    if (
+        state is None
+        or not state.is_value
+        or not isinstance(state.value, Composition)
+    ):
+        return identity, None, None, None
+    formula = identity.species.formula if identity.species is not None else ""
+    quantity = quantity_token(identity)
+    role_state = identity.phase_role
+    role = (
+        role_state.value
+        if (
+            role_state is not None
+            and role_state.is_value
+            and isinstance(role_state.value, PhaseRole)
+        )
+        else None
+    )
+    decision = analysed_melt_decision(
+        provenance=state.value.input_provenance,
+        quantity=quantity,
+        formula=formula,
+        phase_role=role,
+        texts=collect_run_texts(experiment, observation),
+        point_conditions=observation.point_conditions,
+        temperature_K=temperature_of(identity),
+    )
+    updated = identity
+    rewrite: InputDecision | None = None
+    if decision.action == "refuse" and decision.refusal is not None:
+        return identity, decision.refusal, dict(decision.detail or {}), None
+    if decision.action == "rewrite":
+        updated = replace(
+            identity,
+            composition=State.of(
+                composition_with_provenance(state.value, ANALYSED_MELT_MINUS_SCORED)
+            ),
+        )
+        rewrite = decision
+    echo = input_composition_echo_detail(updated)
+    if echo is not None:
+        return (
+            updated,
+            RefusalReason.INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS,
+            dict(echo),
+            None,
+        )
+    return updated, None, None, rewrite
 
 
 @dataclass(frozen=True)
@@ -6619,12 +6972,18 @@ def _printed_condition_decimal(observation: Observation, key: str) -> Decimal | 
 
 
 def _fe_redox_material(
-    observation: Observation, identity: Identity
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None = None,
 ) -> _FeRedoxMaterial | _FeRedoxRefusal:
     """Temperature and the full oxide weight map.
 
     Kress mol fractions are ``_fe_redox_kress_basis``. OpenIMCC does not
     call that helper. A MELTS pot is this weight map, not the Kress basis.
+    d-323 and the echo guard run once the composition is present and before
+    that weight map is built. A rewrite passes the FeO_T total under FeO.
+    The literal key FeO_T is not a species formula and is not put on the
+    map. The number is not written back into the mole-fraction Composition.
     """
 
     temperature = temperature_of(identity) or _printed_condition_decimal(
@@ -6639,6 +6998,8 @@ def _fe_redox_material(
     composition_state = identity.composition
     if composition_state is None or not composition_state.is_value:
         composition_state, _notice = _printed_point_composition(observation)
+        if composition_state is not None:
+            identity = replace(identity, composition=composition_state)
     if (
         composition_state is None
         or not composition_state.is_value
@@ -6648,7 +7009,15 @@ def _fe_redox_material(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "composition"},
         )
+    identity, refusal, detail, rewrite = _gate_input_composition(
+        observation, identity, experiment
+    )
+    if refusal is not None:
+        return _FeRedoxRefusal(refusal, dict(detail or {}))
+    composition_state = identity.composition
+    assert composition_state is not None and composition_state.is_value
     composition = composition_state.value
+    assert isinstance(composition, Composition)
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -6662,10 +7031,27 @@ def _fe_redox_material(
             RefusalReason.INVALID_IDENTITY,
             {"reason": "invalid_redox_composition", "detail": str(exc)},
         )
+    notices: tuple[Notice, ...] = ()
+    if rewrite is not None:
+        formula = identity.species.formula if identity.species is not None else ""
+        quantity = quantity_token(identity)
+        composition_wt, excluded = analysed_melt_weight_map(
+            composition_wt, formula=formula, redox=True
+        )
+        if quantity is not None:
+            notices = input_rewrite_notices(
+                quantity=quantity,
+                origin=observation.observation_id,
+                evidence_reason=rewrite.evidence_reason,
+                quote=rewrite.quote,
+                excluded=excluded,
+                iron_passed_as="FeO" if excluded else None,
+            )
     return _FeRedoxMaterial(
         temperature=temperature,
         composition_state=composition_state,
         composition_wt=composition_wt,
+        notices=notices,
     )
 
 
@@ -7066,6 +7452,7 @@ def _predict_fe_redox(
     *,
     handles: Mapping[str, object] | None = None,
     isolated: bool | None = None,
+    experiment: Experiment | None = None,
 ) -> EnginePrediction:
     """Predict Fe3+/Fe2+ from Kress91, OpenIMCC, or a MELTS ferric split.
 
@@ -7099,6 +7486,7 @@ def _predict_fe_redox(
 
     melts = engine in _MELTS_FE_REDOX_ENGINES
     melts_sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    material_notices: list[Notice] = []
 
     def refused(
         reason: RefusalReason,
@@ -7118,7 +7506,7 @@ def _predict_fe_redox(
             channel=channel,
             execution=Execution(state=execution_state, call_evidence=call_evidence),
             authority=authority,
-            notices=notices,
+            notices=tuple(material_notices) + tuple(notices),
             coefficient_sources=sources if sources is not None else (
                 melts_sources
                 if melts or engine is Engine.OPENIMCC
@@ -7132,9 +7520,14 @@ def _predict_fe_redox(
             version=version,
         )
 
-    material = _fe_redox_material(observation, identity)
+    circular = _circular_measured_oxygen_redox(engine, observation, identity)
+    if circular is not None:
+        return refused(circular[0], circular[1])
+
+    material = _fe_redox_material(observation, identity, experiment)
     if isinstance(material, _FeRedoxRefusal):
         return refused(material.reason, material.detail)
+    material_notices.extend(material.notices)
 
     # Offer 20 checks printed fO2 and Fe atoms before any Kress projection.
     # Internal-analytical and MELTS keep the stack's FeOt gate here.
@@ -7241,7 +7634,7 @@ def _predict_fe_redox(
             value=as_decimal(str(prediction_value)),
             unit="dimensionless",
             authority=authority,
-            notices=notices,
+            notices=tuple(material_notices) + notices,
             coefficient_sources=(
                 f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
             ),
@@ -7355,7 +7748,7 @@ def _predict_fe_redox(
             value=as_decimal(str(prediction_value)),
             unit="dimensionless",
             authority=authority,
-            notices=notices,
+            notices=tuple(material_notices) + notices,
             coefficient_sources=_KRESS91_SOURCES,
             lineage_complete=False,
             certified_band=certified_band,
@@ -7505,7 +7898,7 @@ def _predict_fe_redox(
         value=ratio,
         unit="dimensionless",
         authority=authority,
-        notices=notices,
+        notices=tuple(material_notices) + notices,
         coefficient_sources=expanded,
         lineage_complete=lineage_complete_for(melts_sources),
         certified_band=certified_band,
@@ -8572,11 +8965,12 @@ def _equilibrate_phase_assemblage(
     *,
     temperature_C: float,
     composition_kg: Mapping[str, float],
-    fO2_log: float,
+    fO2_log: float | None,
     pressure_bar: float,
     solute_fugacity_bar: float | None = None,
     solute_fugacity_parameter: str | None = None,
     handles: Mapping[str, object] | None = None,
+    redox_mode: str | None = None,
 ) -> EquilibriumResult:
     """One melt-backend equilibrate. Tests replace this; it does not default pO2 or P.
 
@@ -8602,6 +8996,17 @@ def _equilibrate_phase_assemblage(
             parameters = inspect.signature(backend.equilibrate).parameters
         except (TypeError, ValueError):
             parameters = {}
+        if redox_mode is not None:
+            accepts_redox = "redox_mode" in parameters or any(
+                item.kind is inspect.Parameter.VAR_KEYWORD
+                for item in parameters.values()
+            )
+            if not accepts_redox:
+                raise RuntimeError(
+                    f"{type(backend).__name__} does not accept redox_mode; "
+                    "a measured-oxygen ferric fraction is not converted to fO2"
+                )
+            kwargs["redox_mode"] = redox_mode
         from simulator.melt_backend.alphamelts_contract import isothermal_run_kwargs
 
         kwargs.update(isothermal_run_kwargs(handle.name, parameters))
@@ -8751,6 +9156,650 @@ def _component_wt(
     return matched[1], repair_notices
 
 
+def _subtype_text(identity: Identity) -> str | None:
+    subtype = identity.subtype
+    if subtype is None or not subtype.is_value:
+        return None
+    return subtype.value
+
+
+def _printed_phase_component(identity: Identity) -> tuple[str | None, str | None]:
+    """Oxide key of a phase row, or a typed refusal.
+
+    Prose mole percent names the measured oxide in the subtype. The
+    species formula on those rows is not that oxide (Cheng prints Fe3O4
+    on a CaO mol% row). Scoring the number against the formula would
+    rename the evidence, so a disagreement stays refused. A subtype that
+    does not name an oxide uses the formula.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    subtype = _subtype_text(identity)
+    if (
+        effective_phase_basis(subtype) == "mole_percent"
+        and subtype in PROSE_MOLE_PERCENT_PHASE_COMPONENT
+    ):
+        named = PROSE_MOLE_PERCENT_PHASE_COMPONENT[subtype]
+        if named is not None and named != formula:
+            return None, "phase_species_disagrees_with_basis_component"
+        return (named or formula), None
+    return formula, None
+
+
+def _fe_valence_named_form(identity: Identity) -> str:
+    """``ratio``, ``fraction``, ``other_fe``, or ``non_fe``.
+
+    The ratio form is species Fe, numerator Fe3+, value_form ratio,
+    denominator oxidation state 2 (Fe3+/Fe2+). The fraction form is
+    species Fe, numerator Fe3+, value_form fraction, denominator the
+    total element (Fe3+/sumFe). Any other iron printing, and every
+    non-iron element, stays refused. The species string must be ``Fe``.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    if formula != "Fe":
+        return "non_fe"
+    basis_state = identity.valence_basis
+    if basis_state is None or not basis_state.is_value:
+        return "other_fe"
+    basis = basis_state.value
+    numerator = basis.numerator_oxidation_states
+    if (
+        numerator == (3,)
+        and basis.value_form is ValenceValueForm.RATIO
+        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+        and basis.denominator_oxidation_state == 2
+    ):
+        return "ratio"
+    if (
+        numerator == (3,)
+        and basis.value_form is ValenceValueForm.FRACTION
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    ):
+        return "fraction"
+    return "other_fe"
+
+
+def _coefficient_basis_detail(
+    subtype: str | None,
+    typed_reason: str,
+    detail: str,
+) -> dict[str, object]:
+    return {
+        "reason": typed_reason,
+        "basis": subtype,
+        "engine_basis": "wt_percent",
+        "detail": detail,
+    }
+
+
+def _phase_mole_sibling_amounts(
+    observations: Iterable[Observation],
+    reference: Observation,
+) -> tuple[Mapping[str, Decimal] | None, str | None]:
+    """Printed sibling amounts for one phase point, or a typed refusal.
+
+    The group is experiment_id + phase_role + temperature_K + mole scale.
+    experiment_id alone mixes phases: one Cheng run has liquid and spinel.
+    The pool is this scoring context. A file scorer's context is that
+    file's batch, so a phase split across files is not shown to be closed
+    and stays refused. Duplicate component keys are refused rather than
+    summed twice. Mole-fraction tokens and prose mole percent are different
+    scales and do not share a group. Returns (None, None) when this row
+    is not a mole row.
+    """
+
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return None, None
+    scale = effective_phase_basis(_subtype_text(identity))
+    if scale not in {"mole_fraction", "mole_percent"}:
+        return None, None
+    role = _phase_role_value(identity, "phase_role")
+    if role is None:
+        return None, None
+    temperature = temperature_of(identity)
+    rows = list(observations)
+    if all(row.observation_id != reference.observation_id for row in rows):
+        rows.append(reference)
+    amounts: dict[str, Decimal] = {}
+    for row in rows:
+        row_identity = row.identity
+        if not isinstance(row_identity, Identity):
+            continue
+        if quantity_token(row_identity) is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+            continue
+        if row.experiment_id != reference.experiment_id:
+            continue
+        if _phase_role_value(row_identity, "phase_role") is not role:
+            continue
+        if temperature_of(row_identity) != temperature:
+            continue
+        if effective_phase_basis(_subtype_text(row_identity)) != scale:
+            continue
+        component, refusal = _printed_phase_component(row_identity)
+        if refusal is not None:
+            return None, refusal
+        if not component:
+            return None, "phase_mole_fraction_component_absent"
+        point = point_magnitude(row.value)
+        if point is None:
+            return None, "phase_mole_fraction_non_finite"
+        if component in amounts:
+            return None, "phase_mole_fraction_duplicate_component"
+        amounts[component] = point
+    return amounts, None
+
+
+def _engine_scale_reference(
+    identity: Identity,
+    reference: Decimal,
+    phase_siblings: Mapping[str, Decimal] | None,
+    phase_sibling_refusal: str | None,
+) -> tuple[Decimal | None, RefusalReason | None, dict[str, object] | None]:
+    """Measured point on the engine scale, or a typed refusal.
+
+    Token and prose wt% are already weight percent. element_ppm_by_mass
+    keeps the existing /10000 path. ppm_mass uses ppm_mass_to_wt_percent
+    only for an engine-map oxide key. Mole fraction and prose mole percent
+    use the closed-phase wt% conversion. An Fe3+/sumFe fraction becomes
+    Fe3+/Fe2+ by the existing ferric-fraction function; the stored point
+    of a ratio form is already that ratio.
+    """
+
+    if (
+        quantity_token(identity) is Quantity.VALENCE_RATIO
+        and _fe_valence_named_form(identity) == "fraction"
+    ):
+        # Premise: r = Fe3+/sumFe as printed, and Fe2+ with Fe3+ are all
+        # the iron. Algebra: R = r / (1 - r), owned by
+        # fe3_fe2_ratio_from_ferric_fraction. Unit check: mol/mol.
+        # Worked example: r = 0.25 → R = 1/3. r outside (0, 1) stays refused.
+        converted = fe3_fe2_ratio_from_ferric_fraction(reference)
+        if converted is None:
+            return None, RefusalReason.UNSUPPORTED, {
+                "reason": "fe3_sumfe_ratio_undefined",
+                "detail": (
+                    "Fe3+/sumFe fraction r converts by R = r/(1-r) only when 0 < r < 1"
+                ),
+            }
+        return converted, None, None
+
+    subtype = _subtype_text(identity)
+    basis = effective_phase_basis(subtype)
+    if basis in {"mole_fraction", "mole_percent"}:
+        if phase_sibling_refusal is not None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                phase_sibling_refusal,
+                f"phase mole set refused: {phase_sibling_refusal}",
+            )
+        component, component_refusal = _printed_phase_component(identity)
+        if component_refusal is not None or not component:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                component_refusal or "phase_mole_fraction_component_absent",
+                "printed species formula disagrees with the oxide named by the basis",
+            )
+        if phase_siblings is None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                "phase_mole_fraction_siblings_unavailable",
+                "sibling mole fractions are required to show the phase closes",
+            )
+        wt_percent, reason = phase_printed_mole_amounts_to_wt_percent(
+            component,
+            phase_siblings,
+            mole_percent=basis == "mole_percent",
+        )
+        if reason is not None or wt_percent is None:
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                reason or "phase_mole_fraction_set_unclosed",
+                "mole fraction is converted to wt% only for a closed engine-map oxide set",
+            )
+        return wt_percent, None, None
+    if basis == "ppm_mass":
+        formula = identity.species.formula if identity.species is not None else ""
+        wt_percent, reason = phase_ppm_mass_as_wt_percent(formula, reference)
+        if reason is not None or wt_percent is None:
+            # The element-ppm sentence is the existing refusal text.
+            return None, RefusalReason.COEFFICIENT_BASIS_MISMATCH, _coefficient_basis_detail(
+                subtype,
+                reason or "element_ppm_not_oxide_wt_percent",
+                "engine phase maps are wt%; ppm_mass is not converted to wt%",
+            )
+        return wt_percent, None, None
+    return _phase_component_reference_wt_percent(identity, reference), None, None
+
+
+def _stored_element_wt_percent(
+    observation: Observation,
+) -> tuple[dict[str, Decimal], Decimal | None] | None:
+    """Printed element wt% and the printed O wt% sigma, when this row has them."""
+
+    located = (observation.point_conditions or {}).get(ELEMENT_WT_PERCENT_BASIS)
+    if (
+        not isinstance(located, Located)
+        or not located.state.is_value
+        or not isinstance(located.state.value, Composition)
+    ):
+        return None
+    sigma: Decimal | None = None
+    excess = (observation.point_conditions or {}).get("oxygen_excess_mol_per_100g")
+    if isinstance(excess, Located) and excess.inference is not None:
+        for name, param in excess.inference.parameters:
+            if (
+                name == "oxygen_wt_percent_sigma"
+                and isinstance(param, Located)
+                and param.state.is_value
+                and isinstance(param.state.value, Decimal)
+            ):
+                sigma = param.state.value
+    return dict(located.state.value.components), sigma
+
+
+# Listed on an adapter basis, and not a metal phase. MAGEMin O is excess
+# redox oxygen. MAGEMin S is bulk sulfur. Neither is the alloy element.
+_BASIS_TOKENS_THAT_ARE_NOT_METAL = frozenset(
+    {"O", "S", "H2O", "CO2", "FeOt", "FeO_total", "FeOT"}
+)
+
+
+def _engine_accepts_metal_component(engine: Engine, symbol: str) -> bool:
+    """True when the adapter lists this element as a metal component.
+
+    No current adapter does. A name that is only excess oxygen or bulk
+    sulfur is not accepted as the metal.
+    """
+
+    if elemental_charge_symbol(symbol) is None:
+        return False
+    if symbol in _BASIS_TOKENS_THAT_ARE_NOT_METAL:
+        return False
+    return symbol in _engine_bulk_component_names(engine)
+
+
+def _unaccepted_metal_charge(
+    engine: Engine, composition: Composition
+) -> tuple[RefusalReason, dict[str, object]] | None:
+    """Refuse a slag-metal charge this engine cannot take as metal.
+
+    Ordinary oxide maps, including a bulk sulfur component, are not this
+    charge and stay on the omit path.
+    """
+
+    if composition.basis != SLAG_METAL_CHARGE_BASIS:
+        return None
+    metals = [
+        name
+        for name, amount in composition.components
+        if amount > 0
+        and elemental_charge_symbol(name) is not None
+        and not _engine_accepts_metal_component(engine, name)
+    ]
+    if not metals:
+        return None
+    return (
+        RefusalReason.ENGINE_CANNOT_ACCEPT_METAL,
+        {
+            "reason": RefusalReason.ENGINE_CANNOT_ACCEPT_METAL.value,
+            "engine": engine.value,
+            "metal_components": tuple(metals),
+            "detail": (
+                "engine input keeps metallic elements as metals; "
+                "this engine accepts no metal component; "
+                "the metal is not dropped or converted"
+            ),
+        },
+    )
+
+
+def _engine_bulk_component_names(engine: Engine) -> tuple[str, ...]:
+    """Declared bulk components. Chlorine is included only from this set."""
+
+    if engine in {Engine.ALPHAMELTS, Engine.THERMOENGINE}:
+        from simulator.melt_backend.alphamelts import MELTS_OXIDE_BASIS
+
+        return tuple(MELTS_OXIDE_BASIS)
+    if engine is Engine.MAGEMIN:
+        from simulator.melt_backend.magemin import MAGEMinBackend
+
+        return tuple(MAGEMinBackend._MAGEMIN_INPUT_BASIS)
+    if engine is Engine.OPENIMCC:
+        from simulator.melt_backend.openimcc_bridge import OPENIMCC_PARENT_OXIDES
+
+        return tuple(OPENIMCC_PARENT_OXIDES)
+    return ()
+
+
+def _element_decision_notices(
+    decision: object,
+    quantity: Quantity,
+    origin: str,
+) -> tuple[Notice, ...]:
+    notices = getattr(decision, "notices", ())
+    built: list[Notice] = []
+    for item in notices:
+        built.append(
+            Notice(
+                kind=item.kind,
+                affected_quantities=(quantity,),
+                reason=item.reason,
+                origin=origin,
+                dropped=item.dropped or None,
+            )
+        )
+    return tuple(built)
+
+
+def _circular_measured_oxygen_redox(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+) -> tuple[RefusalReason, dict[str, object]] | None:
+    """Refuse a derived Fe3+ that would be fed back into the same Fe3+ row."""
+
+    stored = _stored_element_wt_percent(observation)
+    if stored is None:
+        return None
+    elements, sigma = stored
+    decision = element_mass_fraction_redox(
+        elements,
+        oxygen_wt_percent_sigma=sigma,
+        observable=quantity_token(identity),
+        chloride_components=_engine_bulk_component_names(engine),
+    )
+    engine_refusal = _element_redox_engine_refusal(decision)
+    if engine_refusal is not None:
+        return engine_refusal
+    if (
+        decision.redox_kind == "ferric_fraction"
+        or decision.ferric_split_wt_percent is not None
+    ):
+        return (
+            RefusalReason.CYCLIC_DERIVATION,
+            {
+                "reason": RefusalReason.CYCLIC_DERIVATION.value,
+                "detail": (
+                    "the row observable is the oxygen excess or its Fe3+; "
+                    "the engine redox input is fO2 or the conditions, "
+                    "not Fe3+ derived from this row"
+                ),
+            },
+        )
+    return None
+
+
+def _element_row_observable(observation: Observation, quantity: Quantity | None) -> str:
+    relation = ""
+    if observation.derivation is not None and observation.derivation.relation:
+        relation = observation.derivation.relation.strip()
+    if relation == "oxygen_excess":
+        return "oxygen_excess"
+    if quantity is None:
+        return ""
+    return quantity.value
+
+
+def _predict_element_mass_fraction_phase(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    *,
+    quantity: Quantity | None,
+    role: PhaseRole,
+    handles: Mapping[str, object] | None,
+    refused: Callable[..., EnginePrediction],
+) -> EnginePrediction:
+    """Score one printed element. The engine sees FeO_T or the ferric split.
+
+    O is not rebuilt. Out-of-range oxygen is the typed refusal and does not
+    call the engine. A row whose observable is the oxygen excess passes fO2.
+    """
+
+    if quantity is None:
+        return refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {"reason": "quantity_unknown"},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    stored = _stored_element_wt_percent(observation)
+    if stored is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": ELEMENT_WT_PERCENT_BASIS},
+            execution=ExecutionState.NOT_PROBED,
+        )
+    elements, sigma = stored
+    decision = element_mass_fraction_redox(
+        elements,
+        oxygen_wt_percent_sigma=sigma,
+        observable=_element_row_observable(observation, quantity),
+        chloride_components=_engine_bulk_component_names(engine),
+    )
+    notices = _element_decision_notices(decision, quantity, observation.observation_id)
+    symbol = canonical_element_symbol(identity.species.formula)
+    if symbol == "Pt":
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "pt_excluded_capsule_contamination",
+                "detail": "Pt is capsule contamination and is not a silicate component",
+            },
+            notices=notices,
+        )
+    if symbol == "Cl" and not any(
+        chloride_component_symbol(name) for name in _engine_bulk_component_names(engine)
+    ):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "cl_excluded_no_engine_chloride_component",
+                "detail": "Cl stays on the printed analysis; this engine has no Cl component",
+            },
+            notices=notices,
+        )
+    engine_refusal = _element_redox_engine_refusal(decision)
+    if engine_refusal is not None:
+        reason, detail = engine_refusal
+        return refused(reason, detail, notices=notices)
+
+    temperature = temperature_of(identity)
+    if temperature is None or not temperature.is_finite() or temperature <= 0:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "temperature_K"},
+            execution=ExecutionState.NOT_PROBED,
+            notices=notices,
+        )
+    pressure_bar = _printed_total_pressure_bar(identity, observation)
+    if pressure_bar is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "total_pressure_Pa"},
+            execution=ExecutionState.NOT_PROBED,
+            notices=notices,
+        )
+
+    redox_mode: str | None = None
+    fo2_log: float | None = None
+    if decision.redox_kind == "ferric_fraction":
+        from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+        weights = decision.ferric_split_wt_percent or ()
+        redox_mode = REDOX_MODE_NOT_AN_INPUT
+    elif decision.redox_kind == "conditions":
+        fo2_log = _printed_fo2_log10_bar(identity)
+        if fo2_log is None:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "fO2_Pa"},
+                execution=ExecutionState.NOT_PROBED,
+                notices=notices,
+            )
+        weights = _feo_t_wt_percent(decision)
+    else:
+        from simulator.melt_backend.base import REDOX_MODE_NOT_AN_INPUT
+
+        weights = _feo_t_wt_percent(decision)
+        redox_mode = REDOX_MODE_NOT_AN_INPUT
+    if not weights:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "composition"},
+            execution=ExecutionState.NOT_PROBED,
+            notices=notices,
+        )
+    try:
+        result = _equilibrate_phase_assemblage(
+            engine,
+            temperature_C=float(temperature - Decimal("273.15")),
+            composition_kg={
+                name: float(amount) / 1000.0 for name, amount in weights
+            },
+            fO2_log=fo2_log,
+            pressure_bar=float(pressure_bar),
+            handles=handles,
+            redox_mode=redox_mode,
+        )
+    except Exception as exc:
+        return refused(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            {
+                "reason": "phase_assemblage_unavailable",
+                "engine": engine.value,
+                "detail": f"{type(exc).__name__}: {exc}",
+            },
+            execution=ExecutionState.NOT_PROBED,
+            notices=notices,
+        )
+    diagnostics = getattr(result, "diagnostics", None)
+    if (
+        isinstance(diagnostics, Mapping)
+        and diagnostics.get("redox_mode") == "not_an_input"
+        and diagnostics.get("multivalent_components")
+    ):
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "engine_refused_composition_redox",
+                "detail": (
+                    "the ferric split is the redox input; fO2 was not invented, "
+                    "and this adapter refuses not_an_input when a multivalent "
+                    "element is present"
+                ),
+                "multivalent_components": list(diagnostics["multivalent_components"]),
+            },
+            notices=notices,
+        )
+    phase_map, phase_issue = _select_phase_composition(result, role)
+    if phase_map is None:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": phase_issue or "phase_not_in_assemblage",
+                "phase_role": role.value,
+                "engine": engine.value,
+            },
+            notices=notices,
+        )
+    charge_mass = decision.charge_mass_g_per_100g
+    if charge_mass is None:
+        return refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {"reason": "missing_input", "input": "charge_mass"},
+            notices=notices,
+        )
+    amount = _element_amount_in_phase(
+        symbol, phase_map, charge_mass_g_per_100g=charge_mass
+    )
+    if amount is None or not amount.is_finite() or amount <= 0:
+        return refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "phase_component_absent",
+                "phase_role": role.value,
+                "formula": identity.species.formula,
+            },
+            notices=notices,
+        )
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(
+            state=ExecutionState.PRODUCED, call_evidence="phase_assemblage"
+        ),
+        value=amount,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
+def _feo_t_wt_percent(decision: object) -> tuple[tuple[str, float], ...]:
+    fractions = getattr(decision, "oxide_mole_fractions", None)
+    if not fractions:
+        return ()
+    composition = Composition(
+        basis="element_wt_percent_feo_t",
+        components=tuple(fractions),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    weights = composition_wt_pct(composition)
+    if not weights:
+        return ()
+    return tuple(weights.items())
+
+
+def _element_redox_engine_refusal(
+    decision: object,
+) -> tuple[RefusalReason, dict[str, object]] | None:
+    """Map an owner refusal onto the engine refusal. A conditions row is not one.
+
+    The owner keeps ``redox_kind`` as ``refusal`` when oxygen is missing or
+    outside the Fe2+–Fe3+ span. Circularity does not override that. This
+    function does not recompute the excess.
+    """
+
+    if getattr(decision, "redox_kind", None) != "refusal":
+        return None
+    token = getattr(decision, "refusal", None)
+    if token == RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE.value:
+        reason = RefusalReason.OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE
+    elif token == "measured_oxygen_not_printed":
+        reason = RefusalReason.IDENTITY_INCOMPLETE
+    else:
+        reason = RefusalReason.INVALID_IDENTITY
+    return (
+        reason,
+        {"reason": token or reason.value, "detail": token or ""},
+    )
+
+
+def _element_amount_in_phase(
+    symbol: str,
+    phase_map: Mapping[str, float],
+    *,
+    charge_mass_g_per_100g: Decimal,
+) -> Decimal | None:
+    if symbol == "Cl":
+        for name, amount in phase_map.items():
+            if chloride_component_symbol(str(name)) and amount:
+                return Decimal(str(amount))
+        return None
+    return element_wt_percent_on_printed_analysis(
+        phase_map,
+        symbol,
+        charge_mass_g_per_100g=charge_mass_g_per_100g,
+    )
+
+
 def _predict_phase_row(
     engine: Engine,
     observation: Observation,
@@ -8759,6 +9808,9 @@ def _predict_phase_row(
     sources: tuple[str, ...],
     *,
     handles: Mapping[str, object] | None = None,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
+    experiment: Experiment | None = None,
 ) -> EnginePrediction:
     """One printed component, or one printed L_X, from an assemblage."""
 
@@ -8823,34 +9875,64 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "counter_phase_role"},
             execution=ExecutionState.NOT_PROBED,
         )
-    subtype = identity.subtype.value if identity.subtype is not None and identity.subtype.is_value else None
+    subtype = _subtype_text(identity)
+    if solute is None and subtype == ELEMENT_WT_PERCENT_BASIS:
+        return _predict_element_mass_fraction_phase(
+            engine,
+            observation,
+            identity,
+            channel,
+            sources,
+            quantity=quantity,
+            role=role,
+            handles=handles,
+            refused=refused,
+        )
+    identity, gate_refusal, gate_detail, rewrite = _gate_input_composition(
+        observation, identity, experiment
+    )
+    if gate_refusal is not None:
+        return refused(gate_refusal, dict(gate_detail or {}))
+    provenance_notices: tuple[Notice, ...] = ()
     if solute is None:
-        # Engine phase maps are wt%. mole_fraction and ppm_mass are closed
-        # bases on another scale. ppm_mass_to_wt_percent is the ppm scale
-        # rule and is not applied here: the stored point stays as printed.
-        # element_ppm_by_mass stays scoreable; it is not ppm_mass.
-        if subtype in PHASE_BASIS_TOKENS and subtype not in {
+        # Engine phase maps are wt%. A closed mole set and an oxide-key
+        # ppm_mass convert onto that scale; the stored point stays printed.
+        # element_ppm_by_mass stays on its own /10000 path. A precondition
+        # failure stays refused and does not call the assemblage.
+        basis = effective_phase_basis(subtype)
+        if basis is None or basis not in {
             "wt_percent",
             "element_ppm_by_mass",
+            "mole_fraction",
+            "mole_percent",
+            "ppm_mass",
         }:
-            return refused(
-                RefusalReason.COEFFICIENT_BASIS_MISMATCH,
-                {
-                    "reason": RefusalReason.COEFFICIENT_BASIS_MISMATCH.value,
-                    "basis": subtype,
-                    "engine_basis": "wt_percent",
-                    "detail": (
-                        "engine phase maps are wt%; "
-                        f"{subtype} is not converted to wt%"
-                    ),
-                },
-            )
-        if subtype not in {"wt_percent", "element_ppm_by_mass"}:
             return refused(
                 RefusalReason.IDENTITY_INCOMPLETE,
                 {"reason": "missing_input", "input": "basis"},
                 execution=ExecutionState.NOT_PROBED,
             )
+        if basis not in {"wt_percent", "element_ppm_by_mass"}:
+            point = point_magnitude(observation.value)
+            if point is None:
+                return refused(
+                    RefusalReason.COEFFICIENT_BASIS_MISMATCH,
+                    _coefficient_basis_detail(
+                        subtype,
+                        "phase_ppm_mass_non_finite"
+                        if basis == "ppm_mass"
+                        else "phase_mole_fraction_non_finite",
+                        "the printed phase amount is not a finite point",
+                    ),
+                )
+            _converted, scale_reason, scale_detail = _engine_scale_reference(
+                identity,
+                point,
+                phase_siblings,
+                phase_sibling_refusal,
+            )
+            if scale_reason is not None:
+                return refused(scale_reason, scale_detail or {"reason": scale_reason.value})
     temperature = temperature_of(identity)
     if temperature is None or not temperature.is_finite() or temperature <= 0:
         return refused(
@@ -8869,6 +9951,10 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    metal_charge = _unaccepted_metal_charge(engine, composition_state.value)
+    if metal_charge is not None:
+        reason, detail = metal_charge
+        return refused(reason, detail)
     if (
         quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
@@ -8889,12 +9975,66 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    if rewrite is not None and quantity is not None:
+        scored_formula = (
+            identity.species.formula if identity.species is not None else ""
+        )
+        wt, scored_excluded = analysed_melt_weight_map(
+            wt, formula=scored_formula, redox=False
+        )
+        provenance_notices = input_rewrite_notices(
+            quantity=quantity,
+            origin=observation.observation_id,
+            evidence_reason=rewrite.evidence_reason,
+            quote=rewrite.quote,
+            excluded=scored_excluded,
+        )
+        if not wt:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "composition"},
+                execution=ExecutionState.NOT_PROBED,
+                notices=provenance_notices,
+            )
+    # Historical table components stay. H2O and Cl pass only when this
+    # engine lists them. Anything else is named, with its amount, and is
+    # not sent. The kept weights are rescaled only when something was excluded.
+    kept, excluded = partition_engine_components(
+        wt,
+        engine_components=_engine_bulk_component_names(engine),
+        retain_components=tuple(_COMPOSITION_COMPONENTS),
+    )
+    exclusion_notices: tuple[Notice, ...] = provenance_notices
+    if excluded and quantity is not None:
+        exclusion_notices = provenance_notices + (
+            Notice(
+                kind=NoticeKind.INPUT_OMITTED,
+                affected_quantities=(quantity,),
+                reason=excluded_component_notice_reason(excluded, unit="wt%"),
+                origin=observation.observation_id,
+                dropped=tuple(name for name, _amount in excluded),
+            ),
+        )
+    if excluded:
+        kept_total = sum((amount for _name, amount in kept), Decimal(0))
+        if kept_total <= 0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "composition"},
+                execution=ExecutionState.NOT_PROBED,
+                notices=exclusion_notices,
+            )
+        wt = {
+            name: float(Decimal(100) * amount / kept_total)
+            for name, amount in kept
+        }
     fo2_log = _printed_fo2_log10_bar(identity)
     if fo2_log is None:
         return refused(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "fO2_Pa"},
             execution=ExecutionState.NOT_PROBED,
+            notices=exclusion_notices,
         )
     pressure_bar = _printed_total_pressure_bar(identity, observation)
     if pressure_bar is None:
@@ -8902,6 +10042,7 @@ def _predict_phase_row(
             RefusalReason.IDENTITY_INCOMPLETE,
             {"reason": "missing_input", "input": "total_pressure_Pa"},
             execution=ExecutionState.NOT_PROBED,
+            notices=exclusion_notices,
         )
     anion_pa: Decimal | None = None
     law: _CapacityLaw | None = None
@@ -8956,6 +10097,7 @@ def _predict_phase_row(
                 "detail": f"{type(exc).__name__}: {exc}",
             },
             execution=ExecutionState.NOT_PROBED,
+            notices=exclusion_notices,
         )
 
     worker_failure = _engine_worker_lifecycle_failure(result)
@@ -8968,6 +10110,52 @@ def _predict_phase_row(
                 "backend_failure_exception": worker_failure,
             },
             execution=ExecutionState.ATTEMPTED_UNAVAILABLE,
+            notices=exclusion_notices,
+        )
+
+    liquid_fraction = _engine_liquid_fraction(result)
+    provenance = _composition_provenance(identity)
+    if (
+        provenance == ANALYSED_MELT_MINUS_SCORED
+        and liquid_fraction is not None
+        and liquid_fraction < SINGLE_LIQUID_MASS_FRACTION
+        and quantity is not None
+    ):
+        exclusion_notices = exclusion_notices + (
+            crystal_prediction_notice(quantity, observation.observation_id),
+        )
+    melt_evidence = printed_single_melt_evidence(
+        collect_run_texts(experiment, observation),
+        point_conditions=observation.point_conditions,
+        temperature_K=temperature,
+    )
+    policy = single_phase_printed_bulk_policy(
+        provenance=provenance,
+        quantity=quantity,
+        liquid_fraction=liquid_fraction,
+        evidence=melt_evidence,
+    )
+    if policy is not None and policy.notice_reason is not None and quantity is not None:
+        exclusion_notices = exclusion_notices + (
+            liquid_experiment_notice(
+                quantity,
+                observation.observation_id,
+                quote=melt_evidence.quote,
+            ),
+        )
+    if policy is not None and policy.refusal is not None:
+        return refused(
+            policy.refusal,
+            {
+                "reason": policy.refusal.value,
+                "detail": policy.refusal.value,
+                "input_provenance": provenance,
+                "formula": (
+                    identity.species.formula if identity.species is not None else ""
+                ),
+                "liquid_fraction": liquid_fraction,
+            },
+            notices=exclusion_notices,
         )
 
     formula = identity.species.formula
@@ -8980,6 +10168,7 @@ def _predict_phase_row(
                 "phase_role": role.value,
                 "engine": engine.value,
             },
+            notices=exclusion_notices,
         )
     # Capacity uses the solute weight percent, including an elemental label.
     # Oxide matching would drop raw S and Cl.
@@ -8990,10 +10179,13 @@ def _predict_phase_row(
         oxide=oxide,
         phase=role.value,
     )
-    notices = _oxide_projection_notices(
-        amount_warnings,
-        quantity=quantity,
-        engine=engine,
+    notices = union_notices(
+        exclusion_notices,
+        _oxide_projection_notices(
+            amount_warnings,
+            quantity=quantity,
+            engine=engine,
+        ),
     )
     if amount is None or not math.isfinite(amount):
         return refused(
@@ -9251,6 +10443,73 @@ def _predict_mass_loss_with_residue(
     )
 
 
+def _predict_named_fe_valence(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    *,
+    handles: Mapping[str, object] | None,
+    isolated: bool | None,
+    experiment: Experiment | None = None,
+) -> EnginePrediction:
+    """Route a named iron valence into ``_predict_fe_redox``.
+
+    Fe3+/Fe2+ (ratio form) is already R. Fe3+/sumFe (fraction form) is
+    scored as R = r/(1-r) after the engine returns R; r outside (0, 1)
+    is refused here, before the engine. Cr, V, Ti, Eu, Ce and every other
+    non-Fe valence stay refused. Other iron printings (average oxidation
+    state, log10, Fe2+/sumFe) stay refused. None of those are mapped onto
+    fe3_fe2_ratio.
+    """
+
+    form = _fe_valence_named_form(identity)
+    formula = identity.species.formula if identity.species is not None else ""
+
+    def unsupported(typed_reason: str, detail: str) -> EnginePrediction:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": typed_reason,
+                "species": formula,
+                "detail": detail,
+            },
+            identity=identity,
+        )
+
+    if form == "non_fe":
+        return unsupported(
+            "non_fe_valence_not_fe3_fe2",
+            f"{formula} valence is not Fe3+/Fe2+ and is not scored as that ratio",
+        )
+    if form == "fraction":
+        point = point_magnitude(observation.value)
+        if point is None or fe3_fe2_ratio_from_ferric_fraction(point) is None:
+            return unsupported(
+                "fe3_sumfe_ratio_undefined",
+                "Fe3+/sumFe fraction r converts by R = r/(1-r) only when 0 < r < 1",
+            )
+    elif form != "ratio":
+        return unsupported(
+            "fe_valence_form_not_fe3_fe2",
+            "only printed Fe3+/Fe2+ and Fe3+/sumFe are scored; this iron form stays refused",
+        )
+    return _predict_fe_redox(
+        engine,
+        observation,
+        identity,
+        channel,
+        handles=handles,
+        isolated=isolated,
+        experiment=experiment,
+    )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -9260,6 +10519,8 @@ def predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine and close any handle opened for this call."""
 
@@ -9272,6 +10533,8 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
         )
 
     provided_handles = handles or {}
@@ -9285,6 +10548,8 @@ def predict_with_engine(
             experiment=experiment,
             bench=bench,
             fo2_mode=fo2_mode,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -9298,6 +10563,404 @@ def predict_with_engine(
         )
 
 
+def _identity_decimal(state: object) -> Decimal | None:
+    if not isinstance(state, State) or not state.is_value:
+        return None
+    if isinstance(state.value, Decimal):
+        return state.value
+    return None
+
+
+def _condition_decimal(observation: Observation, key: str) -> Decimal | None:
+    located = (observation.point_conditions or {}).get(key)
+    if not isinstance(located, Located) or not located.state.is_value:
+        return None
+    value = located.state.value
+    if isinstance(value, bool) or not isinstance(value, (Decimal, int, float, str)):
+        return None
+    try:
+        return as_decimal(value)
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+
+def _component_mole_fraction(identity: Identity, formula: str) -> Decimal | None:
+    composition = identity.composition
+    if (
+        composition is None
+        or not composition.is_value
+        or not isinstance(composition.value, Composition)
+    ):
+        return None
+    for name, amount in composition.value.components:
+        if name == formula:
+            return amount
+    return None
+
+
+def _gas_thermo_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formulas: Sequence[str],
+) -> EnginePrediction | None:
+    """Typed refusal when a depositing or dew-point species has no gas thermo."""
+
+    from simulator.condensation import _condensation_admission_refusal
+
+    missing: list[str] = []
+    codes: list[str] = []
+    for formula in formulas:
+        code = _condensation_admission_refusal(formula)
+        if code:
+            missing.append(formula)
+            codes.append(code)
+    if not missing:
+        return None
+    reason = codes[0]
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={"reason": reason, "species": tuple(missing)},
+        identity=identity,
+    )
+
+
+def _wall_flux_input_refusal(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    missing: Sequence[str],
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNDERDETERMINED_APPARATUS,
+        refusal_detail={
+            "reason": "wall_flux_inputs_unprinted",
+            "missing": tuple(missing),
+        },
+        identity=identity,
+    )
+
+
+def _wall_flux_unsupported(
+    engine: Engine,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    reason: str,
+    **detail: object,
+) -> EnginePrediction:
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        authority=Authority.REFUSED,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        refusal_reason=RefusalReason.UNSUPPORTED,
+        refusal_detail={"reason": reason, **detail},
+        identity=identity,
+    )
+
+
+def _printed_wall_temperature_K(identity: Identity) -> Decimal | None:
+    wall = identity.wall
+    if wall is None or not wall.is_value or not isinstance(wall.value, WallIdentity):
+        return None
+    return _identity_decimal(wall.value.temperature_K)
+
+
+def _printed_sweep_carrier(identity: Identity) -> str | None:
+    sweep = identity.sweep_gas
+    if (
+        sweep is None
+        or not sweep.is_value
+        or not isinstance(sweep.value, SweepIdentity)
+    ):
+        return None
+    carrier = sweep.value.species.strip()
+    return carrier or None
+
+
+def _finite_diagnostic_decimal(value: object) -> Decimal | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float, Decimal)):
+        return None
+    try:
+        number = Decimal(str(value))
+    except InvalidOperation:
+        return None
+    if not number.is_finite():
+        return None
+    return number
+
+
+def _wall_areal_rate_from_existing_flux(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    channel: str,
+    sources: tuple[str, ...],
+    formula: str,
+) -> EnginePrediction:
+    """Mass flux from the wall model's series-resistance molar flux.
+
+    The call uses that model's contract: T_wall for p_sat, T_gas for the
+    ideal-gas denominator, the printed total pressure as overhead pressure,
+    the printed sweep gas as the carrier, the Knudsen regime factor, and
+    the reactive-product backstop only when the wall is at or below the
+    species condensation temperature. A missing input refuses. Pressure is
+    never left unset, because the flux helper then uses its 0.01 m^2/s
+    diffusion fallback.
+
+    When p_bulk < p_sat(T_wall) the model predicts zero net deposition.
+    That zero is returned with undersaturated_wall_net_evaporation so the
+    miss against a measured deposit is scored. A negative flux is clamped
+    to zero and is never reported as a deposit.
+    """
+
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.condensation import (
+        DepositionInputRefusal,
+        KnudsenRegimeRefusal,
+        WallSaturationPressureRefusal,
+        _knudsen_number,
+        _knudsen_regime_factor,
+        _reactive_product_backstop_authorized,
+        _series_resistance_deposition_flux_mol_m2_s,
+        _species_condensation_temperature_C,
+        reactive_product_backstop_enabled,
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    missing: list[str] = []
+    temperature = _identity_decimal(identity.temperature_K)
+    pressure = _identity_decimal(identity.total_pressure_Pa)
+    wall_temperature = _printed_wall_temperature_K(identity)
+    carrier = _printed_sweep_carrier(identity)
+    if temperature is None:
+        missing.append("temperature_K")
+    if pressure is None:
+        missing.append("total_pressure_Pa")
+    if wall_temperature is None:
+        missing.append("wall_temperature_K")
+    if carrier is None:
+        missing.append("sweep_gas")
+    fraction = _component_mole_fraction(identity, formula)
+    if fraction is None:
+        missing.append("partial_pressure_unprinted")
+    diameter = _condition_decimal(observation, "pipe_diameter_m")
+    if diameter is None:
+        missing.append("pipe_diameter_m")
+    alpha = _condition_decimal(observation, "sticking_coefficient")
+    if alpha is None:
+        alpha = _condition_decimal(observation, "alpha_s")
+    if alpha is None:
+        missing.append("sticking_coefficient")
+    if (
+        missing
+        or temperature is None
+        or pressure is None
+        or fraction is None
+        or diameter is None
+        or alpha is None
+        or wall_temperature is None
+        or carrier is None
+    ):
+        return _wall_flux_input_refusal(engine, identity, channel, sources, missing)
+    if _reactive_product_backstop_authorized(formula):
+        try:
+            condensation_C = _species_condensation_temperature_C(formula)
+        except ValueError:
+            return _wall_flux_unsupported(
+                engine,
+                identity,
+                channel,
+                sources,
+                "condensation_temperature_unprinted",
+                species=(formula,),
+            )
+        backstop = reactive_product_backstop_enabled(
+            formula,
+            float(wall_temperature) - float(CELSIUS_TO_KELVIN_OFFSET),
+            condensation_C,
+        )
+    else:
+        backstop = False
+    try:
+        regime_factor = _knudsen_regime_factor(
+            _knudsen_number(
+                float(pressure),
+                float(temperature),
+                float(diameter),
+                carrier_gas=carrier,
+            )
+        )
+    except (KnudsenRegimeRefusal, ValueError):
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            "wall_regime_factor_uncomputed",
+            species=(formula,),
+        )
+    diagnostic: dict[str, object] = {}
+    try:
+        molar_flux = _series_resistance_deposition_flux_mol_m2_s(
+            formula,
+            float(fraction * pressure),
+            float(wall_temperature),
+            float(alpha),
+            pipe_diameter_m=float(diameter),
+            regime_factor=regime_factor,
+            T_gas_K=float(temperature),
+            overhead_pressure_pa=float(pressure),
+            carrier_gas=carrier,
+            reactive_product_backstop=backstop,
+            diagnostic_out=diagnostic,
+        )
+    except WallSaturationPressureRefusal as exc:
+        printed = exc.reason
+        reason = (
+            printed
+            if _short_refusal_token(printed) is not None
+            else "wall_saturation_pressure_refused"
+        )
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            reason,
+            species=(formula,),
+        )
+    except DepositionInputRefusal as exc:
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            "deposition_input_refused",
+            species=(formula,),
+            parameter=exc.parameter,
+        )
+    if diagnostic.get("wall_saturation_pressure_refused"):
+        printed = diagnostic.get("wall_saturation_pressure_refusal_reason")
+        reason = (
+            printed
+            if isinstance(printed, str) and _short_refusal_token(printed) is not None
+            else "wall_saturation_pressure_refused"
+        )
+        return _wall_flux_unsupported(
+            engine,
+            identity,
+            channel,
+            sources,
+            reason,
+            species=(formula,),
+        )
+    try:
+        molar_mass = resolve_species_formula(formula).molar_mass_kg_per_mol()
+    except Exception:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            authority=Authority.REFUSED,
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
+            refusal_detail={
+                "reason": "species_molar_mass_unresolved",
+                "formula": formula,
+            },
+            identity=identity,
+        )
+    mass_flux = Decimal(str(molar_flux)) * Decimal(str(molar_mass))
+    p_bulk = fraction * pressure
+    p_sat = _finite_diagnostic_decimal(diagnostic.get("wall_saturation_pressure_pa"))
+    notices: tuple[Notice, ...] = ()
+    # Strictly below saturation. Equality is equilibrium, and a zero from
+    # alpha_s == 0 never writes p_sat, so it does not take this notice.
+    if p_sat is not None and p_bulk < p_sat:
+        mass_flux = Decimal(0)
+        notices = (
+            Notice(
+                kind=NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION,
+                affected_quantities=(Quantity.WALL_DEPOSIT_AREAL_RATE,),
+                reason=f"p_bulk_Pa={p_bulk}; p_sat_T_wall_Pa={p_sat}",
+                origin=observation.observation_id,
+            ),
+        )
+    elif mass_flux < 0:
+        mass_flux = Decimal(0)
+    return EnginePrediction(
+        engine=engine,
+        channel=channel,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        value=mass_flux,
+        unit=QUANTITY_UNITS[Quantity.WALL_DEPOSIT_AREAL_RATE],
+        authority=Authority.BRIDGE,
+        notices=notices,
+        coefficient_sources=sources,
+        lineage_complete=False,
+        identity=identity,
+    )
+
+
+def _wall_deposition_quantity_prediction(
+    engine: Engine,
+    observation: Observation,
+    identity: Identity,
+    quantity: Quantity,
+    channel: str,
+    sources: tuple[str, ...],
+) -> EnginePrediction | None:
+    """Dew point and areal wall flux. Other quantities fall through.
+
+    Gas thermo is checked before any temperature or pipe diameter is read.
+    A Na2SO4 dew point also needs NaOH, its equilibrium partner. An areal
+    rate checks only the depositing species.
+    """
+
+    formula = identity.species.formula if identity.species is not None else ""
+    if not formula:
+        return None
+    if quantity is Quantity.TRANSITION_TEMPERATURE:
+        subtype = identity.subtype
+        if (
+            subtype is None
+            or not subtype.is_value
+            or subtype.value != "dew_point"
+        ):
+            return None
+        partners = [formula]
+        if formula == "Na2SO4":
+            partners.append("NaOH")
+        return _gas_thermo_refusal(engine, identity, channel, sources, partners)
+    if quantity is not Quantity.WALL_DEPOSIT_AREAL_RATE:
+        return None
+    refusal = _gas_thermo_refusal(engine, identity, channel, sources, (formula,))
+    if refusal is not None:
+        return refusal
+    return _wall_areal_rate_from_existing_flux(
+        engine, observation, identity, channel, sources, formula
+    )
+
+
 def _predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -9307,6 +10970,8 @@ def _predict_with_engine(
     experiment: Experiment | None = None,
     bench: Bench | None = None,
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+    phase_siblings: Mapping[str, Decimal] | None = None,
+    phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -9395,25 +11060,46 @@ def _predict_with_engine(
             channel,
             handles=handles,
             isolated=isolated,
+            experiment=experiment,
         )
-    phase_basis = (
-        identity.subtype.value
-        if identity.subtype is not None and identity.subtype.is_value
-        else None
-    )
+    phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
-    # phase rows. They stay on the not-predicted path.
+    # phase rows. They stay on the not-predicted path. A closed prose
+    # weight-percent or mole-percent subtype is the same phase row.
     if (
         quantity in PRINTED_CAPACITY_QUANTITIES
         or quantity is Quantity.DISTRIBUTION_RATIO
         or (
             quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-            and phase_basis in PHASE_BASIS_TOKENS
+            and effective_phase_basis(phase_basis) is not None
         )
     ):
         return _predict_phase_row(
-            engine, observation, identity, channel, sources, handles=handles
+            engine,
+            observation,
+            identity,
+            channel,
+            sources,
+            handles=handles,
+            phase_siblings=phase_siblings,
+            phase_sibling_refusal=phase_sibling_refusal,
+            experiment=experiment,
         )
+    if quantity is Quantity.VALENCE_RATIO:
+        return _predict_named_fe_valence(
+            engine,
+            observation,
+            identity,
+            channel,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+        )
+    wall_prediction = _wall_deposition_quantity_prediction(
+        engine, observation, identity, quantity, channel, sources
+    )
+    if wall_prediction is not None:
+        return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
         from simulator.battery.compilation_tier import _engine_thermo_quantities
 
@@ -11855,6 +13541,60 @@ def _is_selected_condition_observation(
     return derivation is not None and reference.observation_id in derivation.inputs
 
 
+def hk_ratio_alpha_predictor_refusal(
+    reference: Observation,
+    observations: Iterable[Observation],
+) -> dict[str, object] | None:
+    """Typed H2 refusal, or the existing two-source hold, for an HK-ratio alpha.
+
+    Only rows the migrator marked ``j_exp_over_hk_maximum`` are considered.
+    Forsterite crystal measured against an H2-reactive maximum is refused
+    because that equilibrium gas is not modelled, even when the H2 family
+    already has two sources. Any other marked family with fewer than
+    ``MINIMUM_INDEPENDENT_FAMILY_SOURCES`` independent source_ids is held
+    with ``derived_band_insufficient_sources``. A large enough vacuum family
+    falls through to the ordinary kinetic rail.
+    """
+
+    provenance = reference.provenance
+    if not isinstance(provenance, Mapping):
+        return None
+    if provenance.get("alpha_definition") != HK_RATIO_ALPHA_DEFINITION:
+        return None
+    key = evaporation_alpha_family_key(reference)
+    if key is None:
+        return None
+    phase, formula, gas = key
+    if (
+        gas == ALPHA_GAS_SYSTEM_H2
+        and phase == Phase.CR.value
+        and formula == _FORSTERITE_CRYSTAL_FORMULA
+    ):
+        return {
+            "reason": FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED,
+            "gas_system": gas,
+            "phase": phase,
+            "formula": formula,
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    rows = list(observations)
+    if all(row.observation_id != reference.observation_id for row in rows):
+        rows.append(reference)
+    sources = {
+        row.source_id
+        for row in rows
+        if row.source_id and evaporation_alpha_family_key(row) == key
+    }
+    if len(sources) < MINIMUM_INDEPENDENT_FAMILY_SOURCES:
+        return {
+            "reason": DERIVED_BAND_INSUFFICIENT_SOURCES,
+            "n_sources": len(sources),
+            "family": {"phase": phase, "formula": formula, "gas_system": gas},
+            "quantity": Quantity.EVAPORATION_COEFFICIENT_ALPHA.value,
+        }
+    return None
+
+
 def compile_residual(
     reference: Observation,
     engine: Engine,
@@ -11955,11 +13695,27 @@ def compile_residual(
         if reference.value.approximate and quantity is not None
         else ()
     )
+    # The regime sentence is true only where the apparatus gates run.
+    # Model-derived rows skip those gates and must not claim the check.
+    apparatus_in_scope = evidence_class.is_value and (
+        evidence_class.value in MEASURED_EVIDENCE
+        or evidence_class.value is EvidenceClass.FIGURE_ONLY
+    )
+    geometry_interval_notices: tuple[Notice, ...] = ()
+    if apparatus_in_scope and experiment is not None and quantity is not None:
+        geometry_interval_notice = apparatus_geometry_interval_notice(
+            experiment,
+            quantity,
+            origin=reference.observation_id,
+        )
+        if geometry_interval_notice is not None:
+            geometry_interval_notices = (geometry_interval_notice,)
     notices = union_notices(
         reference.notices,
         flagged_notices,
         evidence_class_notices,
         approximate_value_notices,
+        geometry_interval_notices,
         _quench_notices(reference),
     )
     liquid_sample_domain_notice = (
@@ -12103,6 +13859,20 @@ def compile_residual(
             )
 
     if quantity is None:
+        if (
+            isinstance(identity, Identity)
+            and identity.quantity.is_unknown
+            and identity.quantity.reason == PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE
+        ):
+            return _refused(
+                RefusalReason.UNSUPPORTED,
+                {"reason": PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE},
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                exclusions=(
+                    "status_match_or_mismatch",
+                    "finite_numeric_point_endpoints",
+                ),
+            )
         detail: dict[str, object] = {"reason": "quantity_unknown"}
         if reference.value.kind is ValueKind.CATEGORICAL:
             detail["value_kind"] = ValueKind.CATEGORICAL.value
@@ -12113,6 +13883,22 @@ def compile_residual(
             detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
+        )
+    hk_alpha_refusal = hk_ratio_alpha_predictor_refusal(
+        reference, context.observations.values()
+    )
+    if hk_alpha_refusal is not None:
+        hk_reason = hk_alpha_refusal.get("reason")
+        hk_execution = (
+            ExecutionState.UNSUPPORTED
+            if hk_reason == FORSTERITE_H2_EQUILIBRIUM_GAS_NOT_MODELLED
+            else ExecutionState.NOT_PROBED
+        )
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            hk_alpha_refusal,
+            execution=Execution(state=hk_execution),
+            exclusions=("status_match_or_mismatch",),
         )
     if rail is None:
         return _refused(
@@ -12360,6 +14146,12 @@ def compile_residual(
             exclusions=("reference_state_conversion_inputs_present",),
         )
 
+    # Sibling mole amounts are this context's phase point. A precomputed
+    # prediction still converts the reference with the same map, so a raw
+    # mole fraction is not compared with an engine wt%.
+    phase_siblings, phase_sibling_refusal = _phase_mole_sibling_amounts(
+        context.observations.values(), reference
+    )
     if (
         prediction is None and predict in (None, predict_with_engine)
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
@@ -12456,6 +14248,14 @@ def compile_residual(
                 predictor_kwargs["bench"] = recorded
         if predictor is predict_with_engine and fo2_mode is not None:
             predictor_kwargs["fo2_mode"] = fo2_mode
+        # The built-in defaults are None. Pass the sibling map only when this
+        # row resolved one, so a double standing in for predict_with_engine
+        # keeps the handles/experiment contract on a non-phase row (0a7918296).
+        if predictor is predict_with_engine and (
+            phase_siblings is not None or phase_sibling_refusal is not None
+        ):
+            predictor_kwargs["phase_siblings"] = phase_siblings
+            predictor_kwargs["phase_sibling_refusal"] = phase_sibling_refusal
         prediction = predictor(
             engine,
             _melt_prediction_reference(implied_alpha_reference or reference),
@@ -12798,6 +14598,9 @@ def compile_residual(
         and isinstance(identity, Identity)
         and identity.valence_basis is not None
         and identity.valence_basis.is_value
+        # Fe3+/sumFe is compared as R = r/(1-r). The fraction range [0, 1]
+        # does not apply to R (r = 0.25 → R = 1/3; r = 0.8 → R = 4).
+        and _fe_valence_named_form(identity) != "fraction"
     ):
         basis = identity.valence_basis.value
         range_excess = basis._physical_range_excess(prediction.value)
@@ -12821,7 +14624,22 @@ def compile_residual(
 
     ref_point = point_magnitude(reference.value)
     assert ref_point is not None
-    ref_point = _phase_component_reference_wt_percent(identity, ref_point)
+    if isinstance(identity, Identity):
+        scaled, scale_reason, scale_detail = _engine_scale_reference(
+            identity, ref_point, phase_siblings, phase_sibling_refusal
+        )
+        if scale_reason is not None:
+            return _refused(
+                scale_reason,
+                scale_detail or {"reason": scale_reason.value},
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+                source_relation=source_relation,
+            )
+        assert scaled is not None
+        ref_point = scaled
+    else:
+        ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
     if implied_alpha:

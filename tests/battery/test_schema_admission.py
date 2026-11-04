@@ -476,20 +476,45 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     sample = M._sample_from_plain(yaml.safe_load(yaml.safe_dump(M.to_plain(sample))))
     experiment = replace(F.tabulation_experiment(), sample=sample)
     selected = normalized_composition(experiment, None).selected
+    charge = charge_moles_by_species(experiment, None)
+    chlorine_printed = any(
+        isinstance(item, (list, tuple)) and str(item[0]) == "Cl" for item in components
+    )
     feot_printed = any(
         isinstance(item, (list, tuple)) and str(item[0]) == "FeOT" for item in components
     )
-    if feot_printed:
+    assert sample.printed_composition.state.is_value
+    if chlorine_printed:
+        # 742826248 stores the printed Cl formula. MELTS does not list Cl, so
+        # the charge names it in dropped and does not pass it. SiO2 stays, at
+        # the printed 60% of the 0.001 kg sample, not the whole sample mass.
+        assert selected is None
+        assert set(charge.by_species) == {"SiO2"}
+        assert charge.dropped == ("Cl",)
+        sio2_charge = charge.by_species["SiO2"].selected
+        assert sio2_charge is not None
+        from simulator.accounting.formulas import resolve_species_formula
+
+        recovered = sio2_charge.value.point * Decimal(
+            str(resolve_species_formula("SiO2").molar_mass_kg_per_mol())
+        )
+        assert float(recovered) == pytest.approx(0.0006, rel=1e-12)
+        initial = sample.initial_composition
+        assert initial is not None and initial.state.is_value
+        assert set(dict(initial.state.value.components)) == {"SiO2", "Cl"}
+    elif feot_printed:
         assert selected is not None
         assert set(selected.value) == {"SiO2", "FeO"}
         assert selected.notice is not None
         assert "total_iron_as_FeO" in selected.notice
         assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in selected.notice
         assert "FeOT" in str(sample.printed_composition.state.value)
+        assert bool(charge.by_species) == valid
     else:
         assert (selected is not None) == valid
-    assert bool(charge_moles_by_species(experiment, None).by_species) == valid
-    assert sample.printed_composition.state.is_value
+        assert bool(charge.by_species) == valid
+    if chlorine_printed:
+        return
     if not valid:
         assert sample.initial_composition.state.is_unknown
     elif sample.initial_composition.state.is_value:

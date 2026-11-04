@@ -3159,11 +3159,15 @@ def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
 
 
 def _interpolate_formation_gibbs(
-    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    missing_temperatures: tuple[Decimal, ...] = (),
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    missing_node = _missing_node_for_interpolation(
+        points, missing_temperatures, temperature_K
+    )
     if missing_node is not None:
         raise ValueError(
             f"JANAF formation Gibbs interpolation spans missing grid node "
@@ -3402,6 +3406,28 @@ def _bracketed_signed_roots(
     if grid and difference(grid[-1]) == 0:
         roots.append(grid[-1])
     return tuple(roots)
+def _janaf_gas_formation_gibbs_J_per_mol(
+    formula: str, temperature_K: Decimal
+) -> Decimal:
+    """Hash-checked JANAF ΔfG°(T) for the unique neutral gas table."""
+
+    table_ids = _janaf_gas_table_ids().get(formula, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF gas table for {formula}")
+    if len(table_ids) != 1:
+        raise ValueError(
+            f"ambiguous JANAF gas tables for {formula}: {', '.join(table_ids)}"
+        )
+    table_id = table_ids[0]
+    points, _digest, missing = _fusion_property_points(
+        table_id, "formation_gibbs_energy"
+    )
+    # JANAF cells are kJ/mol; convert the owning table result to J/mol for
+    # reaction ΔG/(R T) calculations. Missing nodes and out-of-range T refuse.
+    return (
+        _interpolate_formation_gibbs(points, Decimal(temperature_K), missing)
+        * 1000
+    )
 
 
 def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:

@@ -13,14 +13,22 @@ EXTRACT_NAME = "shornikov-1997-cao-alumina-vapor.yaml"
 EXTRACT = ROOT / "data/literature/extracts" / EXTRACT_NAME
 
 
-def test_table2_oxygen_columns_keep_calculated_evidence_and_conditions(tmp_path):
+def test_table2_oxygen_columns_keep_reduced_evidence_and_conditions(tmp_path):
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     p_o_eq1, p_o_eq2 = document["species"]["O"]["observations"]
     p_o2 = document["species"]["O2"]["observations"][0]
 
-    assert p_o_eq1["values"]["method_class"] == "quoted_attributed"
-    assert p_o_eq2["values"]["method_class"] == "quoted_attributed"
-    assert p_o2["values"]["method_class"] == "quoted_attributed"
+    for observation in (p_o_eq1, p_o_eq2, p_o2):
+        values = observation["values"]
+        assert values["method_class"] == "measured_reduced"
+        assert values["evidence_class"] == "measured_reduced"
+        assert values["method"] == "comparison of ion currents"
+        assert "comparison of ion currents" in values["method_as_printed"]
+        derivation = observation["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["raw_inputs"]["locator"]["published_page"] == 20
+        assert derivation["raw_inputs"]["locator"]["section"] == "Results"
+        assert derivation["method"]["locator"]["equation"]
     assert p_o_eq1["values"]["points"][0]["P_O_by_eq1_times_10^9_atm_as_printed"] == "2.11"
     assert next(
         point
@@ -42,7 +50,7 @@ def test_table2_oxygen_columns_keep_calculated_evidence_and_conditions(tmp_path)
         "0.860": "6.92e-11",
     }
     assert "thermodynamic data [40]" in p_o_eq1["values"]["method_as_printed"]
-    assert "does not identify which atomic-O estimate" in p_o2["values"]["method_as_printed"]
+    assert "does not identify which atomic-oxygen estimate" in p_o2["derivation"]["raw_inputs"]["locator"]["note"]
 
     migrated = _migrate_real_extract(tmp_path, EXTRACT_NAME)
     assert migrated.validation is not None
@@ -72,7 +80,9 @@ def test_table2_oxygen_columns_keep_calculated_evidence_and_conditions(tmp_path)
     } == {"O2": -1, "O": 2}
     for observation in rows:
         assert observation.evidence.class_.is_value
-        assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        assert observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+        assert observation.derivation.raw_inputs is not None
+        assert observation.derivation.raw_inputs.state.value.value == "not_printed"
         assert observation.identity.temperature_K.is_value
         assert observation.identity.temperature_K.value == 1933
         for key in ("temperature_K", "composition"):

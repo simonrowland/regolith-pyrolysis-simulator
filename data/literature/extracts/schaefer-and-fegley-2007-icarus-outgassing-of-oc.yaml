@@ -347,13 +347,35 @@ species:
       standard_state: closed-system chemical equilibrium along Hebe T–P unless a figure states otherwise
       regime: equilibrium_closed_system_model
       units: log mole fraction / fO2 as plotted; no numeric table
+      derivation:
+        relation: Authors' calculated gas chemistry, elemental distribution, oxygen fugacity, mineralogy, and sensitivity results from chemical equilibrium modelling.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 463
+            pdf_page_index: 2
+            section: 2.1 Chemical equilibrium calculations
+            note: The article names IVTANTHERMO and METBASE inputs but does not reproduce the species-specific thermodynamic data used in the equilibrium runs.
+        method:
+          state: {tag: value, value: "Gibbs energy minimization code of the type described by Van Zeggern and Storey (1970), using IVTANTHERMO (Belov et al., 1999)."}
+          locator:
+            page: 3
+            published_page: 463
+            pdf_page_index: 2
+            section: 2.1 Chemical equilibrium calculations
+        references:
+        - Van Zeggern and Storey (1970)
+        - Belov et al. (1999)
+        - Koblitz (2005)
+        - Ghosh et al. (2003)
       values:
         quantity: equilibrium_outgassed_gas_composition_vs_T
-        evidence_class: quoted_attributed
-        method_class: quoted_attributed
+        evidence_class: model_derived
+        method_class: model_derived
         attribution: >-
-          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
-          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+          Calculated in this study with Gibbs energy minimization using a code of the type described by
+          Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         admission_status: figure_only
         status: typed_refusal
         reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist
@@ -950,13 +972,35 @@ species:
       standard_state: closed-system chemical equilibrium
       regime: equilibrium_closed_system_model
       units: dimensionless identity claim as printed
+      derivation:
+        relation: The authors' claim that CH4 is the major C-bearing gas follows from their chemical equilibrium calculations of ordinary chondrite outgassing.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator:
+            page: 3
+            published_page: 463
+            pdf_page_index: 2
+            section: 2.1 Chemical equilibrium calculations
+            note: The article names IVTANTHERMO and METBASE inputs but does not reproduce the species-specific thermodynamic data used in the equilibrium runs.
+        method:
+          state: {tag: value, value: "Gibbs energy minimization code of the type described by Van Zeggern and Storey (1970), using IVTANTHERMO (Belov et al., 1999)."}
+          locator:
+            page: 3
+            published_page: 463
+            pdf_page_index: 2
+            section: 2.1 Chemical equilibrium calculations
+        references:
+        - Van Zeggern and Storey (1970)
+        - Belov et al. (1999)
+        - Koblitz (2005)
+        - Ghosh et al. (2003)
       values:
         quantity: identity_of_major_C_bearing_gas
-        evidence_class: quoted_attributed
-        method_class: quoted_attributed
+        evidence_class: model_derived
+        method_class: model_derived
         attribution: >-
-          Schaefer and Fegley (2007), Gibbs energy minimization calculations using a code of the type
-          described by Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
+          Calculated in this study with Gibbs energy minimization using a code of the type described by
+          Van Zeggern and Storey (1970) and IVTANTHERMO (Belov et al., 1999).
         major_C_bearing_gas_during_metamorphism: CH4
         CO_never_major_during_ordinary_chondrite_metamorphism: true
         numeric_mole_fractions: figure_only

@@ -1,0 +1,120 @@
+source_id: shi-2025-mno-activity-eaf-spinel
+source:
+  citation: Shi et al. (2025), ISIJ International 65(13), 2269–2274.
+extraction:
+  method: MinerU draft conversion, pdftotext-layout comparison, and PDF renders for flagged cells and row/column assignment.
+  date: '2026-11-03'
+  worker: w1103cw3-sh25
+  review_status: draft
+tables:
+- page: 2
+  table: '1'
+  table_key: p002-t01
+  type: measured_table_context
+  unit: mol%
+  disposition: Initial slag recipes; retained as contexts and point conditions. Not post-equilibrium compositions.
+  columns:
+  - No.
+  - CaO
+  - SiO2
+  - Al2O3
+  - MgO
+  - FeO
+  - MnO
+  render_checked: all 4 rows, all 6 numeric composition columns; layout confirmed
+- page: 3
+  table: '2'
+  table_key: p003-t02
+  type: measured_table_context
+  unit: PCO/PCO2
+  disposition: CO/CO2 oxygen-potential control ratios during slow cooling; caption wording conflicts with printed
+    PCO/PCO2 header.
+  columns:
+  - Interval (K)
+  - PCO/PCO2
+  render_checked: all 10 interval and ratio rows
+- page: 3
+  table: '3'
+  table_key: p003-t03
+  type: activity_coefficient
+  quantity: activity
+  unit: dimensionless
+  evidence_class: model_derived
+  conditions:
+  - column: 2
+    species: Al2O3
+    field: alumina_content_mol_percent
+    unit: mol%
+  values:
+  - column: 3
+    species: Al2O3
+    quantity: activity
+  render_checked: all 5 rows, both numeric columns
+- page: 4
+  table: '4'
+  table_key: p004-t04
+  type: composition_series
+  quantity: equilibrium_phase_composition
+  unit: mol%
+  evidence_class: measured_direct
+  values:
+  - column: 3
+    species: O
+    phase: glass
+  - column: 4
+    species: Ca
+    phase: glass
+  - column: 5
+    species: Si
+    phase: glass
+  - column: 6
+    species: Al
+    phase: glass
+  - column: 7
+    species: Mg
+    phase: glass
+  - column: 8
+    species: Fe
+    phase: glass
+  - column: 9
+    species: Mn
+    phase: glass
+  typed_refusal: 28 Matrix composition observations retain the printed mol% values but remain unavailable until t-1600
+    fixes equilibrium_phase_composition percent scaling. Four Spinel phase rows remain context because PhaseRole has
+    no solid role.
+  render_checked: all 8 phase rows and all component cells; QA flagged fused-looking decimals, which were confirmed
+    exactly in the render
+- page: 5
+  table: '5'
+  table_key: p005-t05
+  type: measured_table_context
+  unit: mol%
+  disposition: Two solid spinel cooling rows retained in context under PhaseRole solid-role schema gap; text asserts
+    near-identical compositions.
+  columns:
+  - Cooling method
+  - O
+  - Al
+  - Mg
+  - Fe
+  - Mn
+  render_checked: both rows and all five numeric component cells
+- page: 6
+  table: '6'
+  table_key: p006-t06
+  type: equilibrium_phase_composition and activity_coefficient
+  unit: mole_fraction and dimensionless
+  conditions:
+  - column: 2
+    species: Al2O3
+    field: alumina_content_mol_percent
+    unit: mol%
+    role: initial charge content
+  values:
+  - column: 3
+    species: Mn
+    quantity: equilibrium_phase_composition
+  - column: 4
+    species: MnO
+    quantity: activity
+  render_checked: all 4 rows and all numeric columns; flagged decimal shapes confirmed exactly in the render

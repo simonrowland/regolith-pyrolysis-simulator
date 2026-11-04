@@ -14,6 +14,36 @@ EXTRACT_NAME = f"{SOURCE_ID}.yaml"
 EXTRACT_PATH = REPO_ROOT / "data" / "literature" / "extracts" / EXTRACT_NAME
 
 
+def test_authors_own_reductions_are_measured_reduced():
+    document = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    observations = {
+        row["observation_id"]: row
+        for block in document["species"].values()
+        for row in block.get("observations", [])
+    }
+    sample_ids = (
+        "de_maria_1969_table2_mq_23_appearance_potential_typed_refusal",
+        "de_maria_1969_table2_mq_56_appearance_potential_typed_refusal",
+        "de_maria_1969_results_sio_appearance_potential_prose_typed_refusal",
+        "de_maria_1969_results_mass80_to_mass78_ion_intensity_ratio",
+        "de_maria_1969_results_na_partial_pressure",
+        "de_maria_1969_results_k_partial_pressure",
+        "de_maria_1969_results_fe_partial_pressure",
+    )
+    for observation_id in sample_ids:
+        row = observations[observation_id]
+        assert row["values"]["method_class"] == "measured_reduced"
+        derivation = row["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["method"]["state"]["value"]
+        assert derivation["method"]["locator"]["page"] > 0
+        assert derivation["method"]["locator"]["section"]
+
+    for observation_id in sample_ids[-3:]:
+        row = observations[observation_id]
+        assert any("B. Pesce (1965)" in reference for reference in row["derivation"]["references"])
+
+
 def test_de_maria_1969_extraction_renders_and_migration(tmp_path: Path) -> None:
     document = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
     species = document["species"]

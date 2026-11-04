@@ -64,6 +64,16 @@ def test_tyurnina_activities_migrate_with_temperature_series_and_composition():
         if "_activity_table1_comp_" in observation.observation_id
     ]
     assert len(activity_observations) == 180
+    experiment = next(
+        experiment
+        for experiment in migrator.result.experiments.values()
+        if experiment.experiment_id.endswith("::experiment::tyurnina-2008-ba-borosilicate-kems")
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value.value == "knudsen_effusion"
+    assert {observation.experiment_id for observation in activity_observations} == {
+        experiment.experiment_id
+    }
     for source_id, source in rows_by_id.items():
         matches = [
             observation

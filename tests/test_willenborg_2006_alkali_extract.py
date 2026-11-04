@@ -35,6 +35,22 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
     # Render-verified prose values (PDF pages 2597) and Table 2 compositions
     # (PDF page 2594); the paper prints these values only approximately.
     values_by_id = {row["observation_id"]: row["values"] for row in observations}
+    contexts = extract["species"]["Na2O"]["context"]
+    values_by_id.update({row["observation_id"]: row["values"] for row in contexts})
+    own_reductions = {
+        "willenborg_2006_alsi8na1_na2o_activity_1400",
+        "willenborg_2006_alsi8mg8na1_na2o_activity_1400",
+        "willenborg_2006_slag_additive_activity_summaries_typed_refusal",
+        "willenborg_2006_slag_alkali_partial_pressure_typed_refusal",
+        "willenborg_2006_activity_ratio_sorbent_comparison_typed_refusal",
+    }
+    assert {key: values_by_id[key]["method_class"] for key in own_reductions} == {
+        key: "measured_reduced" for key in own_reductions
+    }
+    for observation_id in own_reductions:
+        raw_inputs = values_by_id[observation_id]["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]["published_page"] in {2595, 2596, 2597}
     expected_values = {
         "willenborg_2006_alsi8na1_na2o_activity_1400": Decimal("5e-14"),
         "willenborg_2006_alsi8mg8na1_na2o_activity_1400": Decimal("2e-13"),
@@ -73,7 +89,6 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
         assert "activity_coefficient" not in point
     assert values_by_id["willenborg_2006_alsi8na1_na2o_activity_1400"]["composition_wt_pct"]["SiO2"] == "81.12"
     assert values_by_id["willenborg_2006_alsi8mg8na1_na2o_activity_1400"]["composition_wt_pct"]["MgO"] == "7.43"
-    contexts = extract["species"]["Na2O"]["context"]
     comparison = next(row for row in contexts if row["observation_id"] == "willenborg_2006_activity_ratio_sorbent_comparison_typed_refusal")
     assert "AlSi8Mg8Na5 is about 2 times higher" in comparison["values"]["comparison_as_published"]
     assert "activity_coefficient_relation" not in str(extract)

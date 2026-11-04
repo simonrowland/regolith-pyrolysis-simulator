@@ -96,8 +96,24 @@ species:
       values:
         quantity: second_law_reaction_enthalpy_0K
         evidence_kind: model
-        method_class: quoted_attributed
-        attribution: "Gorokhov, Gusarov et al. (1977), Report 43-77 [77ГОР/ГУС], as reprocessed in Table Cr.T3"
+        method_class: model_derived
+        derivation:
+          relation: Table Cr.T3 reports the compilation's second-law reprocessing of the cited Gorokhov KEMS data, dated 3.12.2009.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: "HTML table Cr.T3"
+              source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+              section: "[77ГОР/ГУС] AlO + Cr = Al + CrO, 2242-2690 K, 12 points"
+              note: "The 12 original KEMS points are not reproduced on the OA HTML page."
+          method:
+            state: {tag: value, value: "Second-law (II-law) fit of the AlO + Cr = Al + CrO KEMS data; the compilation prints the calculation date 3.12.2009."}
+            locator:
+              page: "HTML table Cr.T3"
+              source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+              section: "CrO formation enthalpies, II-law column"
+          references:
+          - "Gorokhov, Gusarov et al. (1977), Report 43-77, record [77ГОР/ГУС]"
         law: II
         reaction_as_printed: AlO + Cr = Al + CrO
         T_range_K_as_printed: 2242-2690 K

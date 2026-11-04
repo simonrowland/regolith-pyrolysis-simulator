@@ -135,6 +135,59 @@ def test_render_pins_table_rows_and_detects_cell_mutation() -> None:
     assert check_all_fidelity_samples_match(mutated, label="mutated Table 3")
 
 
+def test_sc456_evidence_classes_and_lineage_are_pinned() -> None:
+    document = _document()
+    context_rows = {
+        row["observation_id"]: row
+        for row in document["species"]["NaCrO2"]["context"]
+    }
+    for observation_id in (
+        "chatain_2021_reaction_enthalpy_context",
+        "chatain_2021_table4_gamma_frequencies",
+        "chatain_2021_theoretical_entropy_function",
+    ):
+        assert context_rows[observation_id]["values"]["method_class"] == "quoted_attributed"
+
+    observations = {
+        row["observation_id"]: row
+        for row in document["species"]["NaCrO2"]["observations"]
+    }
+    expected_classes = {
+        "chatain_2021_theoretical_cp_fit": "model_derived",
+        "chatain_2021_experimental_cp_fit": "measured_reduced",
+        "chatain_2021_formation_gibbs_fit": "model_derived",
+        "chatain_2021_theoretical_cp_29815": "model_derived",
+        "chatain_2021_absolute_standard_entropy_29815": "model_derived",
+        "chatain_2021_absolute_standard_entropy_298": "model_derived",
+        "chatain_2021_dta_transition_temperature": "measured_reduced",
+    }
+    for observation_id, evidence_class in expected_classes.items():
+        assert observations[observation_id]["values"]["method_class"] == evidence_class
+
+    for observation_id in (
+        "chatain_2021_theoretical_cp_fit",
+        "chatain_2021_formation_gibbs_fit",
+        "chatain_2021_theoretical_cp_29815",
+        "chatain_2021_absolute_standard_entropy_29815",
+        "chatain_2021_absolute_standard_entropy_298",
+    ):
+        derivation = observations[observation_id]["values"]["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        method_locator = derivation["method"]["locator"]
+        assert method_locator["page"]
+        assert method_locator["section"]
+        assert derivation["references"]
+
+    for observation_id in (
+        "chatain_2021_experimental_cp_fit",
+        "chatain_2021_dta_transition_temperature",
+    ):
+        raw_inputs = observations[observation_id]["values"]["derivation"]["raw_inputs"]
+        assert raw_inputs["state"]["value"] == "not_printed"
+        assert raw_inputs["locator"]["page"]
+        assert raw_inputs["locator"]["section"]
+
+
 def test_isolated_real_migration_and_j01_series_census(tmp_path: Path) -> None:
     document = _document()
     result = _migrate_real_extract(

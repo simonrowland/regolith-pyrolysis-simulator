@@ -124,3 +124,39 @@ def test_shornikov_2003_render_pins_reject_mutated_cells() -> None:
     ]["values"]["value"] = "-1.7"
     with pytest.raises(AssertionError):
         _assert_figure_pins(mutated_figure)
+
+
+def _assert_sc456_evidence_classes(document: dict) -> None:
+    rows = _observations(document)
+    for observation_id in (
+        "shornikov_2003_mullite_thermodynamics_p004_t02_r02_c03",
+        "shornikov_2003_mullite_thermodynamics_p002_t01_r32_c04",
+    ):
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "measured_reduced"
+        assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    for observation_id in (
+        "shornikov_2003_mullite_thermodynamics_p002_t01_r31_c04",
+        "shornikov_2003_mullite_thermodynamics_p002_t01_r31_c05",
+    ):
+        row = rows[observation_id]
+        assert row["values"]["method_class"] == "model_derived"
+        assert "calculations from the cited thermochemical literature" in row["derivation"]["relation"]
+        assert "Calculations from literature data" in row["derivation"]["method"]["state"]["value"]
+        assert row["derivation"]["references"] == [
+            "Babushkin et al. 1986 [15]",
+            "Berezhnoi 1970 [17]",
+            "Kiseleva et al. 1983 [23]",
+        ]
+
+
+def test_sc456_evidence_class_pins_reject_quoted_reversion() -> None:
+    document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    _assert_sc456_evidence_classes(document)
+    mutated = copy.deepcopy(document)
+    row = _observations(mutated)[
+        "shornikov_2003_mullite_thermodynamics_p004_t02_r02_c03"
+    ]
+    row["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_sc456_evidence_classes(mutated)

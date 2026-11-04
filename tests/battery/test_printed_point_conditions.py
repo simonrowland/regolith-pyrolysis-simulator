@@ -118,10 +118,9 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         assert "predicted_partial_pressure" in obs.identity.quantity.reason
         assert obs.value.kind is ValueKind.UNAVAILABLE
         assert obs.evidence.class_.is_value
-        assert obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        assert obs.evidence.attribution == (
-            "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
-        )
+        assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        assert obs.derivation is not None
+        assert obs.derivation.references == ("Bale et al. [115]", "Snyder et al. [117]")
         assert rail_for_quantity(
             quantity_token(obs.identity),
             species_formula=obs.identity.species.formula,
@@ -147,6 +146,7 @@ def test_jacobson_table1_points_keep_printed_temperature_and_typed_reason(
         if issue.reason.value == "conditional_field"
         and "kems-139-jacobson-2024::" in issue.path
         and issue.path.endswith((".derived_from", ".derivation"))
+        and parent_id not in issue.path
     ]
 
 

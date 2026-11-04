@@ -407,6 +407,18 @@ def test_nasa_cea_private_locator_backlog():
 COMMITTED_STATUS = REPO_ROOT / "data" / "literature" / "SOURCE_STATUS.yaml"
 
 
+def test_repo_source_status_counts_match_rows() -> None:
+    status = yaml.safe_load(COMMITTED_STATUS.read_text(encoding="utf-8"))
+    by_stage = {
+        stage: sum(row["stage"] == stage for row in status["sources"])
+        for stage in builder.STATUS_STAGES
+    }
+    assert status["counts"] == {
+        "sources": len(status["sources"]),
+        "by_stage": by_stage,
+    }
+
+
 def _status_tree(tmp_path: Path, monkeypatch, *, git_corpus: bool = False) -> tuple[Path, Path]:
     root = tmp_path / "sim"
     corpus = tmp_path / "corpus"

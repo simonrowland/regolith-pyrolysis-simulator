@@ -14,6 +14,20 @@ from simulator.battery.migrate import Migrator
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/van-ende-2008-mn-cr-slag-steel.yaml"
 
+# Section headings transcribed from the source's pdftotext-layout text.
+PRINTED_SECTION_HEADINGS = {
+    "1. Introduction",
+    "2. Thermodynamic Background",
+    "2.1. Manganese Equilibrium",
+    "2.2. Chromium Equilibrium",
+    "3. Experimental",
+    "4. Results and Discussion",
+    "4.1. Manganese Equilibrium",
+    "4.2. Chromium Equilibrium",
+    "4.3. Manganese–Chromium Exchange Reaction be-\ntween Slag and Steel",
+    "5. Summary and Conclusions",
+}
+
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
@@ -31,6 +45,26 @@ def _table_rows(document: dict, table: str) -> list[list[str]]:
     contexts = document["species"]["SiO2"]["context"]
     record = next(row for row in contexts if row["locator"].get("table") == table)
     return list(csv.reader(StringIO(record["values"]["printed_rows_csv"])))
+
+
+def _section_strings(value: object):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key == "section":
+                yield child
+            else:
+                yield from _section_strings(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from _section_strings(child)
+
+
+def test_every_locator_section_is_a_printed_source_heading() -> None:
+    sections = set(_section_strings(_document()))
+
+    assert sections
+    assert sections <= PRINTED_SECTION_HEADINGS
+    assert sections == {"3. Experimental"}
 
 
 def _assert_table4_pins(document: dict) -> None:
@@ -125,6 +159,11 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
         },
     ]
     assert "temperature" in equations["values"]["note"]
+    table2 = _table_rows(document, "2")
+    assert table2[0] == ["Mn", "Cr", "C", "Ni", "Si", "N", "Al"]
+    assert table2[1] == ["11.8", "17.5", "0.15", "0.5", "0.3", "0.26", "0.008"]
+    assert "Fe" not in table2[0]
+
     table3 = _table_rows(document, "3")
     assert len(table3) == 20
     assert table3[1] == ["1-1", "10", "1600", "10", "10", "10", "42.0", "28.0", "1.5"]
@@ -145,6 +184,68 @@ def test_van_ende_table4_migrates_typed_values_and_source_conditions() -> None:
     result = migrator.result
     observations = [row for row in result.observations.values() if row.source_id == EXTRACT.stem]
     assert len(observations) == 189
+    combined_bulk_reason = "mixed metal + oxide charge not representable in the engine input schema (t-1625)"
+    migrated_by_id = {
+        row.observation_id.split("::", 1)[1]: row for row in observations
+    }
+    source_by_id = {row["observation_id"]: row for row in _observations(document)}
+    first_id = "van_ende_2008_1-1_slag_SiO2"
+    last_id = "van_ende_2008_6-2_metal_Mn"
+    first_source = source_by_id[first_id]
+    first_values = first_source["values"]
+    slag_start = first_values["starting_slag_composition"]
+    assert slag_start["state"]["value"]["basis"] == "wt_percent"
+    assert slag_start["state"]["value"]["components"] == {
+        "MgO": "10",
+        "MnO": "10",
+        "CrO1.5": "10",
+        "CaO": "42.0",
+        "SiO2": "28.0",
+    }
+    assert slag_start["locator"]["table"] == "3"
+    assert slag_start["locator"]["row"] == "1-1"
+    steel_start = first_values["starting_steel_composition"]
+    assert steel_start["state"]["value"]["components"] == {
+        "Mn": "11.8",
+        "Cr": "17.5",
+        "C": "0.15",
+        "Ni": "0.5",
+        "Si": "0.3",
+        "N": "0.26",
+        "Al": "0.008",
+        "Fe": "69.482",
+    }
+    assert steel_start["derivation"]["notice"] == "fe_balance_from_printed_steel_identity"
+    assert steel_start["derivation"]["listed_sum_wt_percent"] == "30.518"
+    assert steel_start["derivation"]["derived_fe_wt_percent"] == "69.482"
+    assert "unlisted elements (p, s, cu, mo, ...) are assumed absent" in steel_start["derivation"]["assumption"].lower()
+    assert steel_start["derivation"]["steel_identity_locator"]["section"] == "3. Experimental"
+    charge_masses = first_values["starting_charge_masses"]
+    assert charge_masses["state"]["value"] == {"slag_g": "15", "steel_g": "25"}
+    assert "15 g of slag" in charge_masses["quote"]
+    assert "25 g of the high Mn stainless steel" in charge_masses["quote"]
+    assert charge_masses["locator"]["section"] == "3. Experimental"
+    last_slag = source_by_id[last_id]["values"]["starting_slag_composition"]
+    assert last_slag["locator"]["row"] == "6-2"
+    assert last_slag["state"]["value"]["components"] == {
+        "MgO": "10",
+        "MnO": "10",
+        "CrO1.5": "5",
+        "CaO": "45.0",
+        "SiO2": "30.0",
+    }
+    for observation_id in (
+        first_id,
+        last_id,
+    ):
+        row = migrated_by_id[observation_id]
+        source_composition = source_by_id[observation_id]["values"]["composition"]
+        assert source_composition["state"]["tag"] == "unknown"
+        assert source_composition["state"]["reason"] == combined_bulk_reason
+        assert source_composition["locator"]["table"] == "2"
+        assert row.identity.composition is not None
+        assert row.identity.composition.is_unknown
+        assert row.identity.composition.reason == combined_bulk_reason
     assert sum(row.identity.quantity.value.value == "equilibrium_phase_composition" for row in observations) == 151
     assert sum(row.identity.quantity.value.value == "distribution_ratio" for row in observations) == 38
     assert sum(

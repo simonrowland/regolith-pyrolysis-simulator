@@ -92,23 +92,30 @@ def test_table3_series_are_render_pinned_and_migrate_without_hard_issues():
         for point in hk["values"]["points"]
     )
 
-    quoted_counts = {
+    model_derived_counts = {
         "shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure": 10,
         "shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure": 11,
         "shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure": 13,
         "shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure": 8,
         "shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure": 13,
     }
-    assert sum(quoted_counts.values()) == 55
-    for observation_id, count in quoted_counts.items():
+    assert sum(model_derived_counts.values()) == 55
+    for observation_id, count in model_derived_counts.items():
         observation = observations[observation_id][1]
         assert observation["type"] == "partial_pressure"
-        assert observation["values"]["method_class"] == "quoted_attributed"
-        assert observation["values"]["evidence_class"] == "quoted_attributed"
+        assert observation["values"]["method_class"] == "model_derived"
+        assert observation["values"]["evidence_class"] == "model_derived"
         assert len(observation["values"]["points"]) == count
         assert observation["values"]["attribution"].startswith(
-            "calculated in the present study from the thermochemical data of [9]"
+            "Calculated in the present study from the thermochemical data of [9]"
         )
+        equation = observation_id.split("_eq", 1)[1].split("_", 1)[0]
+        derivation = observation["derivation"]
+        assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+        assert derivation["method"]["locator"]["equation"] == equation
+        assert derivation["method"]["locator"]["page"] == 5
+        assert derivation["method"]["locator"]["section"] == "Experimental"
+        assert derivation["references"] == ["[9]"]
         assert all(point["pressure_atm_as_printed"].count("−") == 1
                    for point in observation["values"]["points"])
 
@@ -140,6 +147,11 @@ def test_table3_series_are_render_pinned_and_migrate_without_hard_issues():
     })
     assert len(migrated) == 68
     assert all(row.identity.temperature_K.is_value for row in migrated)
+    for row in migrated:
+        temperature = row.point_conditions["temperature_K"]
+        assert temperature.state.is_value
+        assert temperature.state.value == row.identity.temperature_K.value
+        assert temperature.locator is not None
     assert {
         int(row.identity.temperature_K.value) for row in migrated
     } == set(TABLE3_TEMPERATURES)
