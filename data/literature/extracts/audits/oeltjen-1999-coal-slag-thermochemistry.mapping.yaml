@@ -1,0 +1,91 @@
+source_id: oeltjen-1999-coal-slag-thermochemistry
+source_title: Vorhersage thermodynamischer Eigenschaften von Kohlenschlacken mittels Modellrechnungen
+machine_text_inputs:
+  mineru_tables:
+    - raw/oeltjen-1999-coal-slag-thermochemistry/ocr-mineru/p021-p040/out/oeltjen-1999-coal-slag-thermochemistry-p021-p040/vlm/oeltjen-1999-coal-slag-thermochemistry-p021-p040_content_list.json
+    - text/oeltjen-1999-coal-slag-thermochemistry/mineru/p041-p080/out/oeltjen-1999-coal-slag-thermochemistry-p041-p080/vlm/oeltjen-1999-coal-slag-thermochemistry-p041-p080_content_list.json
+  exact_text_layer: text/oeltjen-1999-coal-slag-thermochemistry/pdftotext-layout.txt
+tables:
+  - printed_table: '4.1'
+    absolute_pdf_page: 29
+    printed_page: 15
+    title_as_printed: Zusammensetzung von kohlenaschenrelevanten Modellsystemen
+    translated_title: Composition of model systems relevant to coal ashes
+    column_group_as_printed: Modellsysteme
+    translated_column_group: Model systems
+    printed_columns: [SK1, SK2, SK3, BK1, BK2, BK3]
+    printed_rows: 6
+    source_cells: 36
+    numeric_cells: 22
+    dash_cells: 14
+    unit_as_printed: Stoffmengenanteil in Mol %
+    translated_unit: Amount fraction in mole percent
+    row_mapping:
+      'SiO2*': values.printed_values.SiO2
+      Al2O3*: values.printed_values.Al2O3
+      CaO*: values.printed_values.CaO
+      FeO*: values.printed_values.FeO
+      Na2O*: values.printed_values.Na2O
+      K2O*: values.printed_values.K2O
+    column_mapping:
+      SK1: species.K2O.context[oeltjen_1999_table4_1_sk1]
+      SK2: species.K2O.context[oeltjen_1999_table4_1_sk2]
+      SK3: species.K2O.context[oeltjen_1999_table4_1_sk3]
+      BK1: species.Na2O.context[oeltjen_1999_table4_1_bk1]
+      BK2: species.Na2O.context[oeltjen_1999_table4_1_bk2]
+      BK3: species.Na2O.context[oeltjen_1999_table4_1_bk3]
+    role: Model-system composition context, not alkali-oxide activity results.
+    cell_audit: Every numeric cell was checked against both machine reads; the complete rendered page was used to verify row and column assignment and the one MinerU/pdftotext discrepancy reported by QA.
+  - printed_table: '5.1'
+    absolute_pdf_page: 41
+    printed_page: 27
+    title_as_printed: Zusammensetzung der synthetischen Schlackenproben
+    translated_title: Composition of synthetic slag samples
+    column_group_as_printed: Synthetische Proben
+    translated_column_group: Synthetic samples
+    printed_columns: ['1', '2', '3', '4', '5', '6']
+    printed_rows: 6
+    source_cells: 36
+    numeric_cells: 22
+    dash_cells: 14
+    unit_as_printed: Stoffmengenanteil in Mol %
+    translated_unit: Amount fraction in mole percent
+    row_mapping:
+      'SiO2*': experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.SiO2
+      Al2O3*: experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.Al2O3
+      CaO*: experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.CaO
+      FeO*: experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.FeO
+      Na2O*: experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.Na2O
+      K2O*: experiments[oeltjen_1999_kems_sample_N].sample.printed_composition.K2O
+    column_mapping:
+      '1': experiments[oeltjen_1999_kems_sample_1]
+      '2': experiments[oeltjen_1999_kems_sample_2]
+      '3': experiments[oeltjen_1999_kems_sample_3]
+      '4': experiments[oeltjen_1999_kems_sample_4]
+      '5': experiments[oeltjen_1999_kems_sample_5]
+      '6': experiments[oeltjen_1999_kems_sample_6]
+    role: Measured sample compositions retained with each KEMS experiment registry entry.
+    cell_audit: All numeric cells agree between MinerU and the exact pdftotext layer; the rendered page confirms all row and sample-column assignments.
+    temperature_mapping:
+      source_locator: page 71, printed page 57, section 6.2
+      destination: experiments[oeltjen_1999_kems_sample_N].conditions.temperature_K
+      form: Printed sample-specific interval in K; retained as interval without point digitization.
+    mass_mapping:
+      source_locator: page 44, printed page 30, section 5.2
+      destination: experiments[oeltjen_1999_kems_sample_N].sample.mass_kg
+      form: Printed 50 mg or 100 mg, converted to kg for the typed registry field.
+figures:
+  literature_comparison_figures: ['6.1', '6.2', '6.3', '6.4', '6.6', '6.7', '6.8', '6.18', '6.19', '6.20']
+  own_kems_figures: ['6.21', '6.22']
+  author_prediction_figures: ['6.23', '6.24', '6.25', '6.26', '6.27', '6.28', '6.29', '6.30', '6.31', '6.32', '6.33', '6.34', '6.35', '6.36', '6.37', '6.38', '6.39', '6.40']
+  treatment: Figure records preserve topics, attributions, and printed caption labels. Experimental symbols in Figures 6.21 and 6.22 were digitized. Model curves and the other figures were not.
+excluded_tables:
+  - printed_table: '2.1'
+    absolute_pdf_page: 21
+    reason: Coal-ash composition survey; not an alkali-oxide activity or KEMS result table. Rendered page checked after MinerU QA reported 3 digit mismatches.
+  - printed_table: '6.1'
+    absolute_pdf_page: 93
+    reason: Real coal sample compositions and melting markers; outside the synthetic-slag KEMS and alkali-activity results requested.
+  - printed_table: '6.2'
+    absolute_pdf_page: 94
+    reason: Reduced model compositions for coal samples; not tabulated alkali-oxide activities or KEMS results.
