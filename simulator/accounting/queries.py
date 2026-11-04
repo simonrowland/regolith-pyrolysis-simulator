@@ -7,7 +7,6 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.account_ids import (
-    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     METAL_BOTTOM_POOL_ACCOUNT,
@@ -74,10 +73,6 @@ PRODUCT_LEDGER_ACCOUNTS = (
     C7_AL_CREDIT_ACCOUNT,
     CONDENSATION_TRAIN_ACCOUNT,
     "process.overhead_gas",
-    # Captured-species census. The flat map adds these kilograms once.
-    # It is not a clean-metal assignment: classify_products reports this
-    # account as its own class and does not fold it into ingots.
-    ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
 )
 REAGENT_BOOKKEEPING_PRODUCT_PREFIXES = ("unspent_", "consumed_")
 REAGENT_BOOKKEEPING_PRODUCT_SUFFIX = "_reagent"
@@ -317,6 +312,14 @@ class AccountingQueries:
         )
 
     def product_ledger(self) -> dict[str, float]:
+        """Flat kilogram map of separated products only.
+
+        ``process.alkali_cartridge_solid_residue`` is not a member.
+        That mixed condensate stays on its own account.
+        ``classify_products`` reports it as the
+        ``alkali_cartridge_solid_residue`` class. Merging it into this
+        map made readers treat residue metal as an ingot.
+        """
         products: dict[str, float] = {}
         for account in PRODUCT_LEDGER_ACCOUNTS:
             _merge_masses(

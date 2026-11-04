@@ -83,6 +83,37 @@ def test_campaign_snapshot_captures_only_condensation_origin_state() -> None:
     ] == ["inputs"]
 
 
+def test_yield_disposition_counts_cartridge_residue_mass() -> None:
+    from simulator.account_ids import ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+
+    ledger = AtomLedger()
+    ledger.load_external(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        {"Fe": 4.0, "SiO2": 3.0, "MgO": 1.0},
+        source="stage-4 cartridge solids",
+        material_origin="feedstock",
+    )
+
+    payload = build_yield_disposition(_sim(ledger))
+
+    fe = _row(payload, "Fe")
+    assert fe["destination_fractions"]["product_condensed"] == pytest.approx(1.0)
+    residue_streams = [
+        stream
+        for stream in payload["terminal_species_streams"]
+        if stream["account"] == ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    ]
+    assert {stream["species"] for stream in residue_streams} == {
+        "Fe",
+        "MgO",
+        "SiO2",
+    }
+    assert {
+        stream["destination"] for stream in residue_streams
+    } == {"product_condensed"}
+    assert payload["closure"]["maximum_residual_fraction"] <= 5.0e-14
+
+
 def test_clean_feedstock_closes_on_element_basis_with_chart_payload() -> None:
     ledger = AtomLedger()
     ledger.load_external(

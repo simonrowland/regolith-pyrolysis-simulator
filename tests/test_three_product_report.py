@@ -36,6 +36,7 @@ from simulator.three_product_report import (
     PURE_SILICA_GLASS_SPECIES,
     build_product_story,
     classify_products,
+    product_story_extracted_kg,
 )
 
 
@@ -606,13 +607,19 @@ def _residue_capture_sim():
     return sim
 
 
-def test_product_ledger_counts_residue_species_once():
+def test_product_ledger_keeps_residue_out_of_the_flat_map():
+    """70d1a4090 pinned Fe == 10 by merging residue Fe into the flat key.
+
+    Readers of that key treat it as the metal product, so residue metal
+    counted as ingots. The flat map is separated products only: metal-phase
+    Fe stays 6 kg, and residue Fe/SiO2/MgO stay off it.
+    """
     products = _residue_capture_sim().product_ledger()
 
-    assert products['Fe'] == pytest.approx(10.0)
-    assert products['SiO2'] == pytest.approx(3.0)
-    assert products['MgO'] == pytest.approx(1.0)
+    assert products['Fe'] == pytest.approx(6.0)
     assert products['Na'] == pytest.approx(2.0)
+    assert 'SiO2' not in products
+    assert 'MgO' not in products
 
 
 def test_residue_is_captured_once_as_its_own_class():
@@ -631,11 +638,14 @@ def test_residue_is_captured_once_as_its_own_class():
     assert result['captured_volatiles']['kg_by_species'] == {}
     for species in ('Fe', 'SiO2', 'MgO'):
         assert species not in result['unclassified']['kg_by_species']
+    # The flat Fe key is separated metal only. Adding the class total
+    # to it would count residue Fe a second time, as an ingot.
+    assert sim.product_ledger()['Fe'] == pytest.approx(6.0)
     assert (
         result['ingots_metals']['species_kg'].get('Fe', 0.0)
         + result['unrecovered_metal_phase']['species_kg']['Fe']
         + residue['kg_by_species']['Fe']
-    ) == pytest.approx(sim.product_ledger()['Fe'])
+    ) == pytest.approx(10.0)
 
     story = build_product_story(
         sim,
@@ -654,6 +664,112 @@ def test_residue_is_captured_once_as_its_own_class():
     assert story['unrecovered_metal_phase']['species_kg']['Fe'] == pytest.approx(6.0)
     for species in ('Fe', 'MgO', 'SiO2'):
         assert species not in story['unrecovered_process_inventory']['species_kg']
+    qualified_kg = product_story_extracted_kg({
+        'metal_ingots': story['metal_ingots']['species_kg'],
+        'glass': story['glass']['species_kg'],
+        'oxygen': story['oxygen']['species_kg'],
+        'captured_volatiles': story['captured_volatiles']['species_kg'],
+    })
+    assert qualified_kg == pytest.approx(0.0)
+
+
+def test_ledgerless_classifier_does_not_mint_residue_ingots():
+    """Without project_account_kg, recovered metal is the flat map.
+
+    Residue Fe is not in that map, so it does not become an ingot.
+    """
+    separated = _residue_capture_sim().product_ledger()
+    sim = SimpleNamespace(
+        product_ledger=lambda: separated,
+        train=SimpleNamespace(stages=[]),
+        atom_ledger=None,
+        record=SimpleNamespace(
+            initial_inventory=SimpleNamespace(metal_alloy_kg={}),
+        ),
+    )
+
+    result = classify_products(sim)
+
+    assert result['ingots_metals']['species_kg'].get('Fe', 0.0) == pytest.approx(6.0)
+    assert result['metals_plus_O2']['metals_kg'].get('Fe', 0.0) == pytest.approx(6.0)
+    assert result[ALKALI_CARTRIDGE_SOLID_RESIDUE_CLASS]['class_total_kg'] == (
+        pytest.approx(0.0)
+    )
+    for species in ('SiO2', 'MgO'):
+        assert species not in result['ingots_metals']['species_kg']
+        assert species not in result['unclassified']['kg_by_species']
+
+
+def test_runner_metal_yields_omit_residue_mass():
+    from simulator.accounting import AtomLedger
+    from simulator.accounting.queries import AccountingQueries
+    from simulator.runner import build_per_hour_summary
+    from simulator.state import HourSnapshot
+
+    ledger = AtomLedger()
+    ledger.load_external(
+        'process.metal_phase',
+        {'Fe': 6.0},
+        source='metal phase',
+        material_origin='feedstock',
+    )
+    ledger.load_external(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
+        {'Fe': 4.0, 'SiO2': 3.0, 'MgO': 1.0},
+        source='stage-4 cartridge solids',
+        material_origin='feedstock',
+    )
+    ledger.load_external(
+        'process.condensation_train',
+        {'Na': 2.0},
+        source='condensation train',
+        material_origin='feedstock',
+    )
+    sim = SimpleNamespace(
+        atom_ledger=ledger,
+        _unspent_additive_reagents_kg=lambda: {},
+        record=SimpleNamespace(snapshots=()),
+        campaign_mgr=SimpleNamespace(last_pO2_enforcement=None),
+    )
+    sim.product_ledger = lambda: AccountingQueries(sim).product_ledger()
+    summary = build_per_hour_summary(sim, HourSnapshot())
+
+    assert summary['metal_yields_kg']['Fe'] == pytest.approx(6.0)
+    assert summary['product_ledger_kg_at_hour']['Fe'] == pytest.approx(6.0)
+    assert summary['product_ledger_kg_at_hour'] == summary['metal_yields_kg']
+    for species in ('Si', 'Mg', 'Cr', 'Mn'):
+        assert species not in summary['metal_yields_kg']
+
+
+def test_cost_allocation_inputs_omit_residue_mass():
+    from simulator.cost_ledger import _cost_allocation_product_inputs
+
+    inputs = _cost_allocation_product_inputs(
+        _residue_capture_sim().product_ledger()
+    )
+
+    assert inputs[('terminal.product', 'Fe')] == pytest.approx(6.0)
+    assert inputs[('terminal.product', 'Na')] == pytest.approx(2.0)
+    assert ('terminal.product', 'SiO2') not in inputs
+    assert ('terminal.product', 'MgO') not in inputs
+    assert sum(
+        kg for (_account, species), kg in inputs.items() if species == 'Fe'
+    ) == pytest.approx(6.0)
+
+
+def test_optimizer_species_kg_fallback_omits_residue_mass():
+    from simulator.optimize.objective import (
+        ObjectiveComputationError,
+        _metric_value,
+    )
+
+    sim = _residue_capture_sim()
+    products = sim.product_ledger()
+
+    assert _metric_value('Fe_kg', sim, products, {}) == pytest.approx(6.0)
+    for metric in ('Si_kg', 'Mg_kg'):
+        with pytest.raises(ObjectiveComputationError, match='not available'):
+            _metric_value(metric, sim, products, {})
 
 
 # ---------------------------------------------------------------------------
