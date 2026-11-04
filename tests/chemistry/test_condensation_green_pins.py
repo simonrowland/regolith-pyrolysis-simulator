@@ -121,13 +121,17 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
             digest_serialized.encode()
         ).hexdigest()
         print(f"T1217_RUNNER_SHA256 {name} {actual['runner_sha256']}")
-    # lunar_24h and c2a_staged are the production route after two capture
-    # changes. t-1604 evaluates stage D_AB at T_film = (T_gas,in + T_wall) / 2.
-    # b1113 removes the designated-species skip, so a colder stage captures
-    # vapor the skip used to pass: Fe on stage 2, and Na, K, SiO, and Cr
-    # on stage 4. Inlets are unchanged. Terminal kg falls by that capture.
-    # full_lunar is still the t-1604 measurement. The nightly run was not
-    # repeated here.
+    # lunar_24h and c2a_staged are the executable route on this tree.
+    # The previous numbers predate the Stage-1 plate already in
+    # 0a361d54c (0.2828 m2, wall 1100 C). On lunar C0, Mars C2A, and CI,
+    # Stage-1 Fe is identical to that parent: stage 0 has no capture
+    # area, so the Stage-1 film is still the train gas temperature.
+    # t-1626 cools the gas for the later stages, their capture falls,
+    # and the terminal rises by that mass. t-1604 remains D_AB at
+    # T_film = (T_gas,in + T_wall) / 2, with T_gas,in now this stage's
+    # bulk inlet. b1113 remains the removal of the designated-species
+    # skip. Inlets are unchanged. full_lunar is still the t-1604
+    # measurement and was not re-run.
     expected = json.loads(PINS.read_text())[name]
     for species in SPECIES:
         if species not in expected:
