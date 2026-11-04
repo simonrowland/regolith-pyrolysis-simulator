@@ -4642,8 +4642,18 @@ def build_sio_yield_report(
                 ),
             )
         return report
+    from simulator.account_ids import STAGE_COLLECTION_BACKING_ACCOUNTS
+
     cleaned_melt = final_state.get("process.cleaned_melt", {})
-    condensation_train = final_state.get("process.condensation_train", {})
+    # Condensed SiO sits on every account that backs the condenser train,
+    # including the Stage-4 cartridge and its melt-out solid residue, not
+    # only on process.condensation_train.
+    condensation_train: dict[str, float] = {}
+    for account_name in STAGE_COLLECTION_BACKING_ACCOUNTS:
+        for species, mol in final_state.get(account_name, {}).items():
+            condensation_train[species] = (
+                condensation_train.get(species, 0.0) + float(mol)
+            )
     wall_deposit = _wall_deposit_mol_by_species(final_state)
     terminal_offgas: dict[str, float] = {}
     for account_name in ("process.overhead_gas", "terminal.offgas"):
