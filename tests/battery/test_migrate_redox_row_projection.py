@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from simulator.battery.enums import NoticeKind
+from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
+    SCORED_PHASE_ANALYSIS,
+)
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO = Path(__file__).resolve().parents[2]
@@ -53,10 +58,14 @@ def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
         "SO2": Decimal("0.00"),
         "Total": Decimal("99.39"),
     }
-    expected = wt_pct_to_mole_fraction(printed)
+    printed_composition = wt_pct_to_mole_fraction(printed)
+    expected = replace(
+        printed_composition,
+        input_provenance=SCORED_PHASE_ANALYSIS,
+    )
     assert _composition(observation) == expected
     point = observation.point_conditions["composition"]
-    assert point.state.is_value and point.state.value == expected
+    assert point.state.is_value and point.state.value == printed_composition
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_value and f_o2.state.value == Decimal("0.00")
     redox_rows = [
@@ -113,10 +122,14 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
         "K2O": Decimal("0.029"),
         "P2O5": Decimal("0.13"),
     }
-    expected = wt_pct_to_mole_fraction(printed)
+    printed_composition = wt_pct_to_mole_fraction(printed)
+    expected = replace(
+        printed_composition,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
     assert _composition(observation) == expected
     point = observation.point_conditions["composition"]
-    assert point.state.is_value and point.state.value == expected
+    assert point.state.is_value and point.state.value == printed_composition
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_value and f_o2.state.value == Decimal("0.0")
     redox_rows = [
