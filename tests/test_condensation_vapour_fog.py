@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from simulator.condensation import CondensationModel, _stage_vapour_fog_notice
+from simulator.condensation import CondensationModel, _stage_midpoint_temperature_K, _stage_vapour_fog_notice
 from simulator.nucleation import (
     ETA_ROLE_UPPER_BOUND,
     FOG_RATE_THRESHOLD_M3_S,
@@ -12,7 +12,7 @@ from simulator.nucleation import (
     NOTICE_UNEVALUABLE,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.state import CondensationTrain, EvaporationFlux, MeltState
+from simulator.state import CondensationStage, CondensationTrain, EvaporationFlux, MeltState
 
 _P_PA = 5.89
 _INLET_KG_HR = 0.01
@@ -198,6 +198,19 @@ def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
     assert trap[0]["eta_molecular"] is not None
     assert trap[0]["saturation_authority"] is None
     assert trap[0]["saturation_notice"] is None
+
+
+
+def test_capture_wall_midpoint_kelvin_pin() -> None:
+    """Capture wall. Midpoint kelvin pinned before the fog cold-end split.
+
+    [200, 350] C is 548.15 K. [250, 250] C is 523.15 K.
+    """
+
+    wide = CondensationStage(5, "Vortex Dust Filter", (200.0, 350.0), [])
+    iso = CondensationStage(4, "Alkali/Mg Cyclone", (250.0, 250.0), ["Na"])
+    assert _stage_midpoint_temperature_K(wide).hex() == "0x1.1213333333333p+9"
+    assert _stage_midpoint_temperature_K(iso).hex() == "0x1.0593333333333p+9"
 
 
 def test_reset_clears_fog_history() -> None:
