@@ -1800,8 +1800,12 @@ def test_battery_rollup_matches_committed_model_limitations(
     # The old count of 16 included eight secondary Fedkin SiO alpha/rate
     # findings plus eight transition-point findings. The duplicate/model-fit
     # rows are now refused; the Si JANAF mismatch is corrected, leaving seven
-    # NIST/JANAF transition-point extrapolation findings.
-    assert "Extrapolated-alpha FINDINGs: **7**." in generated_section
+    # NIST/JANAF transition-point extrapolation findings. Browning-Potter
+    # then puts the sodium boiling point inside its 864–2499 K certified
+    # window (engine 1154.691 K, observed 1156 K, residual about 1.31 K
+    # against the 1 K budget). Sodium stays a FINDING and loses the
+    # extrapolated tag, so the extrapolated count is 7 → 6.
+    assert "Extrapolated-alpha FINDINGs: **6**." in generated_section
     for row in rows:
         assert row["species"] in generated_section
 
