@@ -4,7 +4,9 @@
 
 Machine text was read from the MinerU markdown and `pdftotext-layout.txt` in the source corpus. The article begins on PDF page 1; Tables I and II are printed on PDF page 2; the heat-content equations and melting discussion are on PDF page 3. Table I identifies its calcium compounds as `CaFe2O4` and `Ca2Fe2O5`; Table II repeats those formulas. The surrounding prose also identifies the latter as `Ca2Fe2O5`.
 
-The page-3 equation block prints the solid fit for `Ca2Fe2O5(c)`, then labels the liquid fit `CaFe2O5(l)`. This conflicts with Table I, Table II, the abstract and prose, all of which identify the compound as `Ca2Fe2O5`. The liquid-fit formula is retained as printed pending a ruling on whether the equation may be associated with the Ca2Fe2O5 species while preserving the source's apparent omission. No equation row has been assembled yet.
+The page-3 equation block prints the solid fit for `Ca2Fe2O5(c)`, then labels the liquid fit `CaFe2O5(l)`. The controller ruled that the equation may be associated with Ca2Fe2O5 if the paper ties it to that compound's sample and melting interval. It does: the immediately preceding paragraph says Ca2Fe2O5 melting was complete at 1752 K, and the liquid equation covers 1750–1850 K. Preserve `CaFe2O5(l)` as the printed label and document the formula as a contextual misprint.
+
+Table I has two CaFe2O4 observations in the incongruent-melting interval: 1504.6 K / 64,320(a) and 1529.7 K / 74,970(a). The source says melting may begin as low as 1463 K, is not complete at 1530 K, and adopts 1510 K arbitrarily for the fitted phase boundary. The table does not label the physical phase of these two measurements. A ruling is needed before assigning a phase token: should these two mixed-transition-region measurements be represented as typed refusals (with the measured numeric data retained) or assigned by the adopted 1510 K treatment?
 
 ## Table structure
 
@@ -16,4 +18,4 @@ The text states the results are in defined calories (1 cal. = 4.1840 abs. joules
 
 ## Remaining work
 
-Resolve the printed liquid-fit formula with the controller before associating that fit with a species. Then extract all calcium entries from Tables I and II, the unambiguous CaFe2O4 and Ca2Fe2O5 equations, melting temperatures/enthalpies, and the incongruent-melting text; finish the cell audit, isolated migration, focused fidelity test, required test files, and expected store-delta calculation.
+Resolve the phase assignment for the two CaFe2O4 points in the incongruent-melting interval. Then extract all calcium entries from Tables I and II, the equations, melting temperatures/enthalpies, and incongruent-melting text; finish the cell audit, isolated migration, focused fidelity test, required test files, and expected store-delta calculation.
