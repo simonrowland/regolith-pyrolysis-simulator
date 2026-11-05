@@ -1087,32 +1087,52 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # The split adds Na/Mg collector and K-trap captures after their matching
-    # evaporations. Generic C0 Ca has no designated collector in that split;
-    # this trace sends its tiny residual (5.908276614890879e-10 kg) to terminal
-    # offgas instead of the former mixed-stage condense_Ca transition.
+    # The split adds collector and trap captures after their evaporations.
+    # b1113 also condenses Ca, Cr, and Mn on cold stages. The freeze-out
+    # cartridge then swings each trap deposit: solids leave the alkali
+    # product, and liquid Na and K return to the train. A Ca residual
+    # still reaches terminal offgas; the assert below keeps that.
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions
     ) == (
         "evaporate_SiO",
         "condense_SiO",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
         "evaporate_Mg",
         "condense_Mg",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
         "evaporate_Fe",
         "condense_Fe",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
         "evaporate_Na",
         "condense_Na",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out returns liquid alkali to the train",
         "evaporate_K",
         "condense_K",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out returns liquid alkali to the train",
         "evaporate_AlO",
         "evaporate_Ca",
+        "condense_Ca",
         "evaporate_CaO_gas",
         "evaporate_Cr",
+        "condense_Cr",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
         "evaporate_CrO",
         "evaporate_K2",
         "evaporate_K2O_gas",
         "evaporate_MgO_gas",
         "evaporate_Mn",
+        "condense_Mn",
+        "alkali cartridge accumulates this hour of condensate",
+        "melt-out leaves this solid off the alkali product",
         "evaporate_Na2",
         "evaporate_Na2O_gas",
         "evaporate_SiO2_gas",
