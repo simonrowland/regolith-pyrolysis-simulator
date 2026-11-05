@@ -2011,6 +2011,15 @@ def test_high_t_activity_citation_uses_loaded_pack_identity() -> None:
                 BASE_MELT_MOL,
             )
         )
+        _converted, conversion_notices = (
+            vapor_pressure_module._converted_high_t_single_cation_activities(
+                bridge,
+                {"SiO2": single_activity},
+                BASE_MELT_MOL,
+                2200.0,
+                melt_pack=openimcc_bridge_module._load_pack(pack_name),
+            )
+        )
         authority = {
             "provider": "openimcc",
             "activities_by_oxide": {"SiO2": single_activity},
@@ -2026,6 +2035,26 @@ def test_high_t_activity_citation_uses_loaded_pack_identity() -> None:
         )
 
         assert activity is not None
+        if pack_name == "default":
+            assert conversion_notices == ()
+        else:
+            k2o_notice = next(
+                notice
+                for notice in conversion_notices
+                if notice["oxide"] == "K2O"
+            )
+            assert k2o_notice["standard_id"] == "FC87-Glushko-K2O"
+            assert k2o_notice["active_standard_id"] == "K-012"
+            assert k2o_notice["log10_offset"] == pytest.approx(
+                math.log10(
+                    _converted_parent_activity_ratio(
+                        bridge,
+                        pack_name,
+                        2200.0,
+                        "K2O",
+                    )
+                )
+            )
         assert activity.citation == (
             f"openimcc {bridge.pack_model_id} pack {bridge.pack_version} "
             f"digest={bridge.pack_digest}"
@@ -2033,6 +2062,83 @@ def test_high_t_activity_citation_uses_loaded_pack_identity() -> None:
         model_ids.append(bridge.pack_model_id)
 
     assert model_ids[0] != model_ids[1]
+
+
+def _converted_parent_activity_ratio(
+    bridge, pack_name: str, temperature_K: float, oxide: str
+) -> float:
+    from openimcc import gas
+
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        convert_parent_activities_for_gas,
+    )
+
+    converted, _notices = convert_parent_activities_for_gas(
+        bridge.parent_oxide_activities,
+        temperature_K,
+        openimcc_bridge_module._load_pack(pack_name),
+        gas.load_gas_datapack(),
+    )
+    return converted[oxide] / bridge.parent_oxide_activities[oxide]
+
+
+def _published_core_k_pressure_parity_delta_dex() -> float:
+    import openimcc
+    from openimcc import gas
+
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        convert_parent_activities_for_gas,
+    )
+
+    composition = {"K2O": 0.2, "Al2O3": 0.8}
+    temperature_K = 2200.0
+    gas_pack = gas.load_gas_datapack()
+    pressures_bar = {}
+    for pack_name in ("default", "published-core"):
+        bridge = openimcc_bridge_module.evaluate(
+            composition_mol=composition,
+            temperature_K=temperature_K,
+            pack=pack_name,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+        parent_activities, _notices = convert_parent_activities_for_gas(
+            bridge.parent_oxide_activities,
+            temperature_K,
+            openimcc_bridge_module._load_pack(pack_name),
+            gas_pack,
+        )
+        pressures_bar[pack_name] = float(
+            openimcc.evaluate_gas(
+                parent_activities,
+                temperature_K,
+                1.0e-9,
+                gas_pack,
+            )["K"]
+        )
+    return abs(math.log10(pressures_bar["published-core"] / pressures_bar["default"]))
+
+
+def test_published_core_conversion_matches_d066_k_pressure() -> None:
+    # D066's recorded source-to-active fit has a maximum 0.0271 dex residual;
+    # 0.03 dex allows that fit residual plus numerical rounding.
+    delta_dex = _published_core_k_pressure_parity_delta_dex()
+    assert delta_dex <= 0.03, f"p_K differs by {delta_dex:.8g} dex"
+
+
+def test_k_pressure_parity_detects_dropped_standard_conversion(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_liquid_standards
+
+    monkeypatch.setattr(
+        openimcc_liquid_standards,
+        "convert_parent_activities_for_gas",
+        lambda parent_activities, *_args, **_kwargs: (dict(parent_activities), ()),
+    )
+    with pytest.raises(AssertionError, match="p_K differs"):
+        delta_dex = _published_core_k_pressure_parity_delta_dex()
+        assert delta_dex <= 0.03, f"p_K differs by {delta_dex:.8g} dex"
 
 
 def test_above_cap_openimcc_provenance_carries_complex_saturation_notice() -> None:

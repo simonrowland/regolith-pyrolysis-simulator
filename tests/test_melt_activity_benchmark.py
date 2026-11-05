@@ -406,12 +406,10 @@ def test_imcc_benchmark_uses_openimcc():
     ]
     result = engine.evaluate(composition, 1800.0, 1.0e-9)
 
-    assert result.status == "refused"
-    assert "oxide=K2O" in result.reason
-    assert "declared=FC87-Glushko-K2O" in result.reason
-    assert "active=K-012" in result.reason
-    assert result.details["liquid_standard_refusal"]["category"] == 2
+    assert result.status == "ok", result.reason
+    assert result.activities
     assert result.details["liquid_standard_flags"] == expected_flags
+    assert result.details["liquid_standard_flags"]
 
     passing = _default_d066_imcc_benchmark_engine().evaluate(
         {"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9

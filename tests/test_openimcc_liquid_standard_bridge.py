@@ -41,56 +41,32 @@ def test_shared_owner_reports_sf04_k2o_mismatch_with_disclosures() -> None:
         {"K2O": 1.0, "SiO2": 1.0},
     )
 
-    assert assessment.flags
+    assert not assessment.refusals
     assert any(
-        item.kind == "mismatch"
-        and item.oxide == "K2O"
-        and item.declared_standard_id
-        and item.active_standard_id
-        and item.declared_standard_id != item.active_standard_id
-        for item in assessment.refusals
+        item.oxide == "K2O" and item.kind == "reference-unknown"
+        for item in assessment.flags
     )
 
 
-def test_bridge_refuses_sf04_k2o_mismatch_as_invalid_category_two() -> None:
+def test_bridge_predicts_and_flags_sf04_k2o_mismatch() -> None:
     composition = {"K2O": 1.0, "SiO2": 1.0}
     assessment = openimcc_bridge.liquid_standard_assessment(
         composition,
         melt_pack=_load_pack("published-core"),
     )
-    expected_flags = [
-        flag.as_dict() | {"reason": flag.reason}
-        for flag in assessment.flags
-    ]
+    result = openimcc_bridge.evaluate(
+        composition_mol=composition,
+        temperature_K=1800.0,
+        pack="published-core",
+    )
 
-    with pytest.raises(
-        openimcc_bridge.OpenImccCompositionPolicyRefusal
-    ) as caught:
-        openimcc_bridge.evaluate(
-            composition_mol=composition,
-            temperature_K=1800.0,
-            pack="published-core",
-        )
-
-    refusal = caught.value
-    assert refusal.code == "openimcc_liquid_standard_refused"
-    assert refusal.diagnostics["invalid_input"] is True
-    assert refusal.diagnostics["category"] == 2
-    assert refusal.diagnostics["liquid_standard_flags"] == expected_flags
-    failures = refusal.diagnostics["standard_failures"]
+    assert not assessment.refusals
+    assert result.pack_model_id == _load_pack("published-core").model_id
+    failures = result.liquid_standard_flags
     assert any(
-        item["kind"] == "mismatch"
-        and item["oxide"] == "K2O"
-        and item["declared_standard_id"]
-        and item["active_standard_id"]
-        and item["declared_standard_id"] != item["active_standard_id"]
+        item.oxide == "K2O" and item.kind == "reference-unknown"
         for item in failures
     )
-    reason = str(refusal)
-    assert "oxide=K2O" in reason
-    assert "pack=" in reason
-    assert "declared=" in reason
-    assert "active=" in reason
 
 
 def test_openimcc_source_error_from_solve_is_not_swallowed(
@@ -283,26 +259,27 @@ def test_scored_openimcc_liquid_standard_flags_are_translated_once(
     assert len(standard_notices) == (10 if full_melt else 3)
 
 
-def test_redox_bridge_refuses_melt_pack_mismatch(monkeypatch: Any) -> None:
+def test_redox_bridge_predicts_and_flags_melt_pack_mismatch(monkeypatch: Any) -> None:
     evaluate_redox = getattr(openimcc_bridge, "evaluate_redox", None)
     assert callable(evaluate_redox), "OpenIMCC redox bridge entry point is missing"
     if not callable(evaluate_redox):
         return
     mismatch_pack = _load_pack("published-core")
     monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: mismatch_pack)
+    from openimcc import redox
 
-    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as caught:
-        evaluate_redox(
-            {"Fe": 1.0, "O": 2.0, "K": 1.0, "Si": 1.0},
-            1800.0,
-            "closed",
-            composition={"K2O": 1.0, "SiO2": 1.0},
-        )
+    monkeypatch.setattr(redox, "evaluate_redox", lambda *_args, **_kwargs: object())
 
-    assert caught.value.diagnostics["category"] == 2
+    result = evaluate_redox(
+        {"Fe": 1.0, "O": 2.0, "K": 1.0, "Si": 1.0},
+        1800.0,
+        "closed",
+        composition={"K2O": 1.0, "SiO2": 1.0},
+    )
+
     assert any(
-        failure["kind"] == "mismatch" and failure["oxide"] == "K2O"
-        for failure in caught.value.diagnostics["standard_failures"]
+        flag.oxide == "K2O"
+        for flag in result.liquid_standard_flags
     )
 
 
@@ -339,7 +316,7 @@ def test_redox_bridge_returns_melt_and_redox_flag_records(monkeypatch: Any) -> N
     assert {"MnO(l)", "MnSiO3(l)"}.issubset(redox_rows)
 
 
-def test_production_vapor_pressure_caller_keeps_standard_refusal_visible(
+def test_production_vapor_pressure_caller_converts_published_pack_activity(
     monkeypatch: Any,
 ) -> None:
     mismatch_pack = _load_pack("published-core")
@@ -360,11 +337,18 @@ def test_production_vapor_pressure_caller_keeps_standard_refusal_visible(
     )
 
     assert authority is not None
-    assert authority["fallback"] is True
-    assert authority["fallback_reason"]["code"] == "openimcc_liquid_standard_refused"
+    assert authority["fallback"] is False
+    assert authority["provider"] == "openimcc"
+    k2o_notice = next(
+        notice
+        for notice in authority["openimcc_liquid_standard_conversion_notices"]
+        if notice["oxide"] == "K2O"
+    )
+    assert k2o_notice["standard_id"] == "FC87-Glushko-K2O"
+    assert k2o_notice["active_standard_id"] == "K-012"
     assert any(
-        notice.get("code") == "openimcc_liquid_standard_refused"
-        for notice in authority["notices"]
+        flag["oxide"] == "K2O"
+        for flag in authority["openimcc_liquid_standard_flags"]
     )
 
 
@@ -405,7 +389,7 @@ def test_default_bridge_returns_only_composition_dependent_flag_records() -> Non
     }
 
 
-def test_benchmark_refuses_a_published_pack_standard_mismatch():
+def test_benchmark_predicts_and_flags_published_pack_standard_mismatch():
     from benchmarks import melt_activity_benchmark as benchmark
 
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
@@ -415,11 +399,8 @@ def test_benchmark_refuses_a_published_pack_standard_mismatch():
 
     result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
 
-    assert result.status == "refused"
-    assert "oxide=K2O" in result.reason
-    assert "declared=" in result.reason
-    assert "active=" in result.reason
-    assert "pack=" in result.reason
+    assert result.status == "ok", result.reason
+    assert result.details["liquid_standard_flags"]
 
 
 def test_benchmark_carries_default_pack_liquid_standard_flags():

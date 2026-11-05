@@ -17,7 +17,7 @@ def _vaporock_root() -> Path | None:
     return Path(spec.origin).resolve().parents[2]
 
 
-def test_vaporock_gas_table_refuses_k2o_mismatch_and_flags_unknown_mgo(
+def test_vaporock_gas_table_converts_active_parent_standards_and_flags_unknown_mgo(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     pytest.importorskip("openimcc")
@@ -31,36 +31,48 @@ def test_vaporock_gas_table_refuses_k2o_mismatch_and_flags_unknown_mgo(
         pytest.skip("VapoRock checkout is not present")
 
     from simulator.diagnostic_helpers.binary_pot_battery import _OpenImccBatteryBackend
-    from simulator.melt_backend import openimcc_bridge
     from simulator.melt_backend.openimcc_liquid_standards import (
         assess_liquid_standards,
+        convert_parent_activities_for_gas,
     )
 
     monkeypatch.setenv("OPENIMCC_VAPOROCK_ROOT", str(vaporock_root))
     backend = _OpenImccBatteryBackend("openimcc")
 
-    with pytest.raises(openimcc_bridge.OpenImccCompositionPolicyRefusal) as caught:
-        backend.equilibrate(
-            temperature_C=1800.0 - 273.15,
-            composition_mol={"K2O": 1.0, "SiO2": 1.0},
-            fO2_log=-10.0,
-        )
-
-    refusal = caught.value
-    assert refusal.code == "openimcc_liquid_standard_refused"
-    assert refusal.diagnostics["invalid_input"] is True
-    assert refusal.diagnostics["category"] == 2
-    k2o_failure = next(
-        item
-        for item in refusal.diagnostics["standard_failures"]
-        if item["oxide"] == "K2O" and item["kind"] == "mismatch"
+    result = backend.equilibrate(
+        temperature_C=1800.0 - 273.15,
+        composition_mol={"K2O": 1.0, "SiO2": 1.0},
+        fO2_log=-10.0,
     )
-    assert k2o_failure["declared_standard_id"] == "K-012"
-    assert k2o_failure["active_standard_id"] == "LAM1984"
-    assert "oxide=K2O" in str(refusal)
-    assert "declared=K-012" in str(refusal)
-    assert "active=LAM1984" in str(refusal)
-    assert "pack=" in str(refusal)
+
+    assert result.status == "ok"
+    assert result.vapor_pressures_Pa["K"] > 0.0
+    conversion = next(
+        notice
+        for notice in result.diagnostics["imcc_notices"]
+        if notice.get("kind") == "openimcc_liquid_standard_conversion"
+        and notice.get("oxide") == "K2O"
+    )
+    assert conversion["standard_id"] == "K-012"
+    assert conversion["active_standard_id"] == "LAM1984"
+    assert conversion["log10_offset"] != 0.0
+
+    converted, parent_conversions = convert_parent_activities_for_gas(
+        {oxide: 1.0 for oxide in backend._pack.parent_oxides},
+        1800.0,
+        backend._pack,
+        backend._gas,
+    )
+    assert {
+        notice["oxide"] for notice in parent_conversions
+    } == {"SiO2", "MgO", "CaO", "Al2O3", "Na2O", "K2O"}
+    assert all(converted[notice["oxide"]] != 1.0 for notice in parent_conversions)
+    assert all(
+        notice["standard_id"]
+        and notice["active_standard_id"]
+        and notice["log10_offset"] != 0.0
+        for notice in parent_conversions
+    )
 
     assessment = assess_liquid_standards(
         backend._pack,

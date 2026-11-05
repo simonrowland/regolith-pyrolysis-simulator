@@ -5492,6 +5492,25 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
+        elif kind == "openimcc_liquid_standard_conversion":
+            details = "; ".join(
+                f"{key}={row.get(key)}"
+                for key in (
+                    "oxide",
+                    "standard_id",
+                    "active_standard_id",
+                    "log10_offset",
+                    "extrapolated",
+                )
+            )
+            notices.append(
+                Notice(
+                    kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                    affected_quantities=(quantity,),
+                    reason=f"openimcc_liquid_standard_conversion; {details}",
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == NoticeKind.IMCC_COMPLEX_SATURATION.value:
             notices.append(
                 Notice(
