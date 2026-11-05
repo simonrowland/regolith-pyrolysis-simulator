@@ -12,10 +12,11 @@ import yaml
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.records import Value
 from tests.battery.factories import migrate_one_extract
+from tools.validate_literature_extracts import validate_extract_file
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTRACT = ROOT / "data/literature/extracts/barin-1995-nafeo2-thermochemistry.yaml"
+EXTRACT = ROOT / "data/literature/extracts/barin-1995.yaml"
 SOURCE_ID = "barin-1995"
 PDF_PAGE = 823
 PRINTED_PAGE = 708
@@ -32,6 +33,10 @@ RENDER_PINS = {
 
 def _document() -> dict:
     return yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+
+
+def test_production_validator_accepts_extract() -> None:
+    assert validate_extract_file(EXTRACT, check_fidelity_match=True) == []
 
 
 def _observations(document: dict) -> dict[str, dict]:

@@ -67,21 +67,27 @@ S298, Cp, heat-content, or fusion value alongside these citations. Its
 reference key labels `e` as estimated data; no additional value is supplied in
 the References block.
 
-| Property | Barin (1995), p. 708 / PDF p. 823 | Barin–Knacke–Kubaschewski (1977) | Difference |
+| Property | Barin (1995) value and locator | Barin–Knacke–Kubaschewski (1977) evidence and locator | Difference |
 | --- | --- | --- | --- |
-| ΔfH298 | −698.787 kJ/mol, SOL-B at 298.15 K | No NaFeO2 entry found in the 1977 corpus machine text or MinerU output | Not comparable |
-| S298 | 88.299 J/(K mol), SOL-B at 298.15 K | No entry found | Not comparable |
-| Cp(T) | SOL-B, 84.517–102.105 J/(K mol), 298.15–1620 K; LIQ, 125.520 J/(K mol), 1620–2000 K | No entry found | Not comparable |
-| H−H298 | Full table in the audit above | No entry found | Not comparable |
-| Solid-state transition temperatures | TPT 870. and 1270. K; transition names and enthalpies are not printed | No entry found | Not comparable |
-| High-temperature phase near 1498 K | No delta phase or 1498 K transition appears on this page | No entry found | Not comparable |
-| Fusion | 1620.00 K; ΔHfus 49.371 kJ/mol; ΔSfus 30.476 J/(K mol) | No entry found | Not comparable |
+| ΔfH298 | −698.787 kJ/mol, SOL-B at 298.15 K; printed p. 708 / PDF p. 823, FeNaO2 row 298.15, ΔHf column | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
+| S298 | 88.299 J/(K mol), SOL-B at 298.15 K; printed p. 708 / PDF p. 823, FeNaO2 row 298.15, S column | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
+| Cp(T) | SOL-B, 84.517–102.105 J/(K mol), 298.15–1620 K; LIQ, 125.520 J/(K mol), 1620–2000 K; printed p. 708 / PDF p. 823, Cp column | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
+| H−H298 | Full table above; printed p. 708 / PDF p. 823, H−H298 column | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
+| Solid-state transition temperatures | TPT 870. and 1270. K; printed p. 708 / PDF p. 823, References, SOL-B row, Remarks column | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
+| High-temperature phase near 1498 K | No delta phase or 1498 K transition on printed p. 708 / PDF p. 823 | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | No 1498 K comparison; the index pointer is to the 1973 volume, p. 551 |
+| Fusion | 1620.00 K; ΔHfus 49.371 kJ/mol; ΔSfus 30.476 J/(K mol); printed p. 708 / PDF p. 823, transition-increment row, H and S columns | No numerical value; index alias `Na2O·Fe2O3`, printed p. LXVIII / PDF p. 68, V.=1, P.=551; volume key printed p. LIII / PDF p. 53 | Not comparable; the index pointer is to the 1973 volume, p. 551 |
 
-The corpus search for the 1977 supplement covered `NaFeO2`, `FeNaO2`, the
-pdftotext OCR form `FeNa02`, “sodium ferrite,” and “iron sodium.” No NaFeO2
-entry was located, so there is no 1977 value or page locator to pair with the
-1995 values and no numerical differences can be computed. In particular, the
-1995 page does not support a delta phase near 1498 K.
+The corpus search for numerical entries in the 1977 supplement covered
+`NaFeO2`, `FeNaO2`, the pdftotext OCR form `FeNa02`, “sodium ferrite,”
+“iron sodium,” and the oxide form `Na2O·Fe2O3`. Its index entry is at printed
+p. LXVIII / PDF p. 68, with V.=1, P.=551. The volume
+key at printed p. LIII / PDF p. 53 identifies volume 1 as the 1973 edition, so
+the index points to that edition's p. 551 rather than to a numerical NaFeO2
+table in the 1977 supplement. The 1973 volume is not present in the corpus
+`raw/` or `text/` source directories; they contain the 1977 supplement and
+Barin 1995, but no Barin 1973 volume. No numerical 1977 value is available to
+compare with the 1995 values, and the 1995 page does not support a delta phase
+near 1498 K.
 
 ## Cell checks
 
