@@ -1679,12 +1679,24 @@ def _composition_map_items_for_wrapper_check(
         return ()
     components = body.get("components")
     if isinstance(components, Mapping):
-        return tuple((str(key), value) for key, value in components.items())
+        return tuple(
+            (str(key), value)
+            for key, value in components.items()
+            if not _is_as_printed_provenance_echo(key)
+        )
     if isinstance(components, (list, tuple)) and all(
         isinstance(item, (list, tuple)) and len(item) == 2 for item in components
     ):
-        return tuple((str(name), value) for name, value in components)
-    return tuple((str(key), value) for key, value in body.items())
+        return tuple(
+            (str(name), value)
+            for name, value in components
+            if not _is_as_printed_provenance_echo(name)
+        )
+    return tuple(
+        (str(key), value)
+        for key, value in body.items()
+        if not _is_as_printed_provenance_echo(key)
+    )
 
 
 def _composition_map_reserved_scalar_reason(payload: object) -> str | None:
@@ -1767,12 +1779,17 @@ def _mass_percent_printed_from_plain(
         if isinstance(components, (list, tuple))
         else ()
     )
-    raw_components = (
-        {str(name): amount for name, amount in items}
+    component_items = (
+        tuple(
+            item
+            for item in items
+            if not _is_as_printed_provenance_echo(item[0])
+        )
         if all(isinstance(item, (list, tuple)) and len(item) == 2 for item in items)
-        else {}
+        else ()
     )
-    raw_components_are_unique = len(raw_components) == len(items)
+    raw_components = {str(name): amount for name, amount in component_items}
+    raw_components_are_unique = len(raw_components) == len(component_items)
     locator = (
         _locator_from_plain(payload.get("locator"))
         if isinstance(payload, Mapping)
@@ -1800,7 +1817,7 @@ def _mass_percent_printed_from_plain(
                 basis = basis.value
             if (
                 str(basis or "") == AmountBasis.MASS_PERCENT.value
-                and items
+                and component_items
                 and raw_components_are_unique
             ):
                 return located_value(_printed_map_payload(raw_components), locator)
@@ -2362,7 +2379,11 @@ def _composition_from_plain(
             amount_basis=AmountBasis.MOLE_FRACTION,
             **metadata,
         )
-    pairs = tuple((str(k), as_decimal(v)) for k, v in components)
+    pairs = tuple(
+        (str(key), as_decimal(value))
+        for key, value in components
+        if not _is_as_printed_provenance_echo(key)
+    )
     if amount_basis is AmountBasis.MASS_PERCENT:
         # Parsed but not convertible: keep the printed mass-percent pairs.
         # A row that is not a pair raises ValueError from the unpack above.
@@ -4724,7 +4745,9 @@ def _unrecognized_printed_chemical_components(
     dropped_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
     source_map: dict[str, tuple[Any, str]] = {
-        str(name): (amount, _GREEN_READ_OXIDE_MAP) for name, amount in wt.items()
+        str(name): (amount, _GREEN_READ_OXIDE_MAP)
+        for name, amount in wt.items()
+        if not _is_as_printed_provenance_echo(name)
     }
     if declared_component_map is not None:
         declared_source = (
@@ -4733,6 +4756,8 @@ def _unrecognized_printed_chemical_components(
             else _M1_ONLY_CLOSURE_CONTRIBUTOR
         )
         for name, amount in declared_component_map.items():
+            if _is_as_printed_provenance_echo(name):
+                continue
             source_map.setdefault(str(name), (amount, declared_source))
     for name, amount in (_printed_composition_source_map(closure_context) or {}).items():
         source_map.setdefault(
@@ -5888,14 +5913,22 @@ def _printed_mass_percent_map_refusal(
     components = body.get("components")
     if typed_mass_percent:
         if isinstance(components, Mapping):
-            pairs = [(str(name), value) for name, value in components.items()]
+            pairs = [
+                (str(name), value)
+                for name, value in components.items()
+                if not _is_as_printed_provenance_echo(name)
+            ]
         elif isinstance(components, (list, tuple)):
             if any(
                 not isinstance(item, (list, tuple)) or len(item) != 2
                 for item in components
             ):
                 return True, "mass-percent composition contains invalid component cells"
-            pairs = [(str(item[0]), item[1]) for item in components]
+            pairs = [
+                (str(item[0]), item[1])
+                for item in components
+                if not _is_as_printed_provenance_echo(item[0])
+            ]
         else:
             return True, "mass-percent composition contains invalid component cells"
     elif "components" in body or any(
@@ -5906,7 +5939,8 @@ def _printed_mass_percent_map_refusal(
         pairs = [
             (str(name), value)
             for name, value in body.items()
-            if not _is_composition_map_noncomponent_name(
+            if not _is_as_printed_provenance_echo(name)
+            and not _is_composition_map_noncomponent_name(
                 name, explicit_map_value=value
             )
         ]
@@ -5914,7 +5948,8 @@ def _printed_mass_percent_map_refusal(
     pairs = [
         (name, value)
         for name, value in pairs
-        if not _is_composition_map_noncomponent_name(
+        if not _is_as_printed_provenance_echo(name)
+        and not _is_composition_map_noncomponent_name(
             name, explicit_map_value=value
         )
     ]
@@ -6238,7 +6273,8 @@ def _oxide_map_from_mapping(
                 nested_for_parse = {
                     name: parsed
                     for name, value in nested.items()
-                    if (parsed := _printed_composition_amount(value)) is not None
+                    if not _is_as_printed_provenance_echo(name)
+                    and (parsed := _printed_composition_amount(value)) is not None
                 }
             got = _oxide_map_from_mapping(
                 nested_for_parse,
@@ -6692,7 +6728,10 @@ def _composition_mol_items(raw: object) -> Iterator[tuple[str, object]]:
         return
     for name, amount in raw.items():
         token = str(name).strip()
-        if token not in _COMPOSITION_MOL_META_KEYS:
+        if (
+            token not in _COMPOSITION_MOL_META_KEYS
+            and not _is_as_printed_provenance_echo(token)
+        ):
             yield token, amount
 
 

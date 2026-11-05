@@ -5064,6 +5064,69 @@ def test_mole_percent_composition_converts_to_mole_fraction() -> None:
     assert composition.locator.table == "1"
 
 
+def test_composition_mol_as_printed_ditto_is_skipped_before_amount_parse() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "H2O": "0",
+                "H2O_wt_pct_as_printed": "″",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+        "H2O": Decimal("0"),
+    }
+    assert omitted == ()
+
+
+def test_numeric_composition_mol_echo_is_not_an_omitted_component() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mol": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "H2O": "0",
+                "H2O_wt_pct_as_printed": "5.21",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+        "H2O": Decimal("0"),
+    }
+    assert omitted == ()
+
+
+def test_numeric_composition_mole_fraction_echo_is_not_omitted() -> None:
+    composition, omitted = migrate_module._mole_fraction_composition_from_values(
+        {
+            "composition_mole_fraction": {
+                "SiO2": "0.5",
+                "MgO": "0.5",
+                "SiO2_AS_PRINTED": "0.1",
+            }
+        }
+    )
+
+    assert composition is not None
+    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert composition.as_map() == {
+        "SiO2": Decimal("0.5"),
+        "MgO": Decimal("0.5"),
+    }
+    assert omitted == ()
+
+
 def test_nonclosing_mole_percent_composition_is_flagged() -> None:
     composition = migrate_module._composition_located_from_plain(
         {
