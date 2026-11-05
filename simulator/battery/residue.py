@@ -1338,6 +1338,9 @@ def _make_residue_pressure_model(
     engine_metadata: dict[str, str],
     engine_flags: set[str],
     liquid_standard_flags: dict[LiquidStandardFlag, None] | None = None,
+    liquid_standard_conversion_notices: dict[
+        tuple[str, str, float], dict[str, Any]
+    ] | None = None,
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
@@ -1359,6 +1362,9 @@ def _make_residue_pressure_model(
             _ENGINE_OUTER_TIMEOUT_S,
         )
         from simulator.melt_backend import openimcc_bridge
+        from simulator.melt_backend.openimcc_liquid_standards import (
+            convert_parent_activities_for_gas,
+        )
 
         pressure_state_cache: dict[
             tuple[tuple[str, float], ...], Mapping[str, float]
@@ -1407,8 +1413,29 @@ def _make_residue_pressure_model(
                         "openimcc_version": state.openimcc_version,
                     }
                 )
+                gas_parent_activities, conversions = (
+                    convert_parent_activities_for_gas(
+                        state.parent_oxide_activities,
+                        temperature_K,
+                        openimcc_bridge._load_pack(
+                            openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+                        ),
+                        gas_pack,
+                    )
+                )
+                if liquid_standard_conversion_notices is not None:
+                    liquid_standard_conversion_notices.update(
+                        {
+                            (
+                                str(notice["oxide"]),
+                                str(notice["active_standard_id"]),
+                                float(notice["temperature_K"]),
+                            ): dict(notice)
+                            for notice in conversions
+                        }
+                    )
                 base_pressure_bar = evaluate_gas(
-                    state.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     1.0,
                     gas_pack,
@@ -2038,6 +2065,9 @@ def predict_knudsen_residue_composition(
                          for s, (parent, _, _) in gas_channels)
         flags, metadata = set(), {}
         liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
+        liquid_standard_conversion_notices: dict[
+            tuple[str, str, float], dict[str, Any]
+        ] = {}
 
         def pressure_model(inventory, logp, temperature_K):
             if temperature_K not in pressure_callbacks:
@@ -2046,6 +2076,9 @@ def predict_knudsen_residue_composition(
                     total_pressure_Pa=_located_point(environment.total_pressure_Pa) or 0.0,
                     engine_metadata=metadata, engine_flags=flags,
                     liquid_standard_flags=liquid_standard_flags,
+                    liquid_standard_conversion_notices=(
+                        liquid_standard_conversion_notices
+                    ),
                     missing_channels_reason="residue_pressure_channels_missing",
                     caller="Knudsen residue prediction",
                 )
@@ -2073,6 +2106,9 @@ def predict_knudsen_residue_composition(
             "escaped_mass_fraction": math.fsum(n * _formula_terms(s)[1] for s, n in primary.evaporated_mol.items()) / math.fsum(n * _formula_terms(s)[1] for s, n in initial.items()),
             "engine_flags": tuple(sorted(flags)), "engine_metadata": metadata,
             "liquid_standard_flags": tuple(liquid_standard_flags),
+            "liquid_standard_conversion_notices": tuple(
+                liquid_standard_conversion_notices.values()
+            ),
         }
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         _append_omission_notices(notices, pressure_callbacks)
@@ -2194,6 +2230,9 @@ def predict_mass_loss_fraction(
     )
     flags: set[str] = set()
     liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
+    liquid_standard_conversion_notices: dict[
+        tuple[str, str, float], dict[str, Any]
+    ] = {}
     metadata: dict[str, str] = {}
     flags.add(
         "mass_loss_oxygen_escape_assumption: alpha_O=1.0; alpha_O2=1.0; "
@@ -2293,6 +2332,9 @@ def predict_mass_loss_fraction(
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
             engine_flags=flags,
             liquid_standard_flags=liquid_standard_flags,
+            liquid_standard_conversion_notices=(
+                liquid_standard_conversion_notices
+            ),
             missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
@@ -2427,6 +2469,10 @@ def predict_mass_loss_fraction(
         metadata["mass_loss_bound"] = json.dumps(diagnostics, sort_keys=True)
         metadata["sourced_alphas"] = json.dumps(fits, sort_keys=True)
         metadata["alpha_sources"] = json.dumps([fit["source_observation_id"] for fit in fits.values()])
+        if liquid_standard_conversion_notices:
+            metadata["liquid_standard_conversion_notices"] = json.dumps(
+                list(liquid_standard_conversion_notices.values()), sort_keys=True
+            )
         payload = omission_payload()
         if payload is not None:
             metadata["below_threshold_omissions"] = payload
@@ -2999,6 +3045,9 @@ def _predict_hashimoto_residue_cohort(
 
         engine_floor_inversion_diagnostics: dict[str, dict[str, object]] = {}
         liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
+        liquid_standard_conversion_notices: dict[
+            tuple[str, str, float], dict[str, Any]
+        ] = {}
         pressure_model = _make_residue_pressure_model(
             engine,
             gas_channels,
@@ -3008,6 +3057,9 @@ def _predict_hashimoto_residue_cohort(
             engine_metadata=melt_pack_identity,
             engine_flags=set(),
             liquid_standard_flags=liquid_standard_flags,
+            liquid_standard_conversion_notices=(
+                liquid_standard_conversion_notices
+            ),
             missing_channels_reason="hashimoto_internal_analytical_channels_missing",
             caller="Hashimoto residue cohort",
             floor_inversion_diagnostics=(
@@ -3221,6 +3273,9 @@ def _predict_hashimoto_residue_cohort(
                 "engine": engine,
                 "liquid_standard_flags": tuple(
                     flag.as_dict() for flag in liquid_standard_flags
+                ),
+                "liquid_standard_conversion_notices": tuple(
+                    liquid_standard_conversion_notices.values()
                 ),
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
@@ -3438,6 +3493,9 @@ def _predict_sossi_residue_cohort(
             from openimcc import evaluate_gas, load_gas_datapack
             from openimcc.kernel import ImccNonconvergenceError
             from simulator.melt_backend import openimcc_bridge
+            from simulator.melt_backend.openimcc_liquid_standards import (
+                convert_parent_activities_for_gas,
+            )
         except ImportError as exc:
             raise ResidueInventoryRefusal("openimcc_not_importable", str(exc)) from exc
         gas_pack = load_gas_datapack()
@@ -3549,6 +3607,9 @@ def _predict_sossi_residue_cohort(
         melt_activity_input_policy: dict[str, Any] = {}
         melt_activity_extensions: dict[str, dict[str, Any]] = {}
         liquid_standard_flags: dict[LiquidStandardFlag, None] = {}
+        liquid_standard_conversion_notices: dict[
+            tuple[str, str, float], dict[str, Any]
+        ] = {}
         if engine == "openimcc":
             from simulator.diagnostic_helpers.binary_pot_battery import (
                 _ENGINE_OUTER_TIMEOUT_S,
@@ -3592,6 +3653,27 @@ def _predict_sossi_residue_cohort(
                         ) from exc
                     gas_parent_oxide_activities = dict(
                         state.parent_oxide_activities
+                    )
+                    pack_parent_activities, conversions = (
+                        convert_parent_activities_for_gas(
+                            gas_parent_oxide_activities,
+                            temperature_K,
+                            openimcc_bridge._load_pack(
+                                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+                            ),
+                            gas_pack,
+                        )
+                    )
+                    gas_parent_oxide_activities.update(pack_parent_activities)
+                    liquid_standard_conversion_notices.update(
+                        {
+                            (
+                                str(notice["oxide"]),
+                                str(notice["active_standard_id"]),
+                                float(notice["temperature_K"]),
+                            ): dict(notice)
+                            for notice in conversions
+                        }
                     )
                     liquid_standard_flags.update(
                         dict.fromkeys(state.liquid_standard_flags)
@@ -3706,6 +3788,9 @@ def _predict_sossi_residue_cohort(
                         "engine": engine,
                         "liquid_standard_flags": tuple(
                             flag.as_dict() for flag in liquid_standard_flags
+                        ),
+                        "liquid_standard_conversion_notices": tuple(
+                            liquid_standard_conversion_notices.values()
                         ),
                         "run_refusal": {
                             **exc.as_record(),
@@ -3848,6 +3933,9 @@ def _predict_sossi_residue_cohort(
                         "liquid_standard_flags": tuple(
                             flag.as_dict() for flag in liquid_standard_flags
                         ),
+                        "liquid_standard_conversion_notices": tuple(
+                            liquid_standard_conversion_notices.values()
+                        ),
                         "run_refusal": {
                             **run_refusal.as_record(),
                             "cohort": "sossi_residue_cohort",
@@ -3931,6 +4019,9 @@ def _predict_sossi_residue_cohort(
                     "melt_pack_identity": dict(melt_pack_identity),
                     "liquid_standard_flags": tuple(
                         flag.as_dict() for flag in liquid_standard_flags
+                    ),
+                    "liquid_standard_conversion_notices": tuple(
+                        liquid_standard_conversion_notices.values()
                     ),
                     **(
                         {"melt_activity_input_policy": dict(melt_activity_input_policy)}

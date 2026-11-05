@@ -474,16 +474,16 @@ def _refuse_on_liquid_standard_failures(
     if assessment.refusals:
         failures = tuple(item.as_dict() for item in assessment.refusals)
         reason = (
-            "invalid_input; fail_closed_category=2; "
+            "invalid_input; fail_closed_category=1; "
             "openimcc liquid-reference refusal: "
             + " | ".join(item.reason for item in assessment.refusals)
         )
         raise OpenImccCompositionPolicyRefusal(
-            "openimcc_liquid_standard_refused",
+            "openimcc_liquid_standard_missing",
             reason,
             diagnostics={
                 "invalid_input": True,
-                "category": 2,
+                "category": 1,
                 "standard_failures": failures,
                 "liquid_standard_flags": [
                     flag.as_dict() | {"reason": flag.reason}

@@ -2741,6 +2741,22 @@ class _OpenImccBatteryBackend:
                 }
             )
 
+        gas_parent_activities = dict(result.parent_oxide_activities)
+        if self._gas is not None:
+            from simulator.melt_backend.openimcc_liquid_standards import (
+                convert_parent_activities_for_gas,
+            )
+
+            gas_parent_activities, conversion_notices = (
+                convert_parent_activities_for_gas(
+                    gas_parent_activities,
+                    temperature_K,
+                    self._pack,
+                    self._gas,
+                )
+            )
+            notices.extend(conversion_notices)
+
         pressures: dict[str, float] = {}
         vapor_sources: dict[str, str] = {}
         gas_diagnostics: dict[str, Any] = {}
@@ -2766,7 +2782,7 @@ class _OpenImccBatteryBackend:
                 )
 
                 po2_bar, gas_result, balance = evaluate_gas_oxygen_balance(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     self._gas,
                     parent_oxides=result.parent_oxides,
@@ -2816,7 +2832,7 @@ class _OpenImccBatteryBackend:
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
-                        result.parent_oxide_activities,
+                        gas_parent_activities,
                         temperature_K,
                         pO2_bar,
                         self._gas,
@@ -2836,7 +2852,7 @@ class _OpenImccBatteryBackend:
                     )
                 )
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     po2_bar,
                     self._gas,
@@ -2917,7 +2933,7 @@ class _OpenImccBatteryBackend:
 
                 fo2_bar = 10.0 ** float(fO2_log)
                 gas_result = evaluate_gas(
-                    result.parent_oxide_activities,
+                    gas_parent_activities,
                     temperature_K,
                     fo2_bar,
                     self._gas,

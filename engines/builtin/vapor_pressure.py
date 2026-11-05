@@ -119,6 +119,7 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     MELT_OXIDE_ACTIVITY_TIER,
     melt_oxide_activity,
     normalize_high_t_melt_activity,
+    single_cation_activity_and_fraction,
     single_cation_mole_fractions,
 )
 from simulator.melt_backend import openimcc_bridge  # noqa: E402
@@ -911,6 +912,37 @@ def _continued_certified_effective_gamma(
     }
 
 
+def _converted_high_t_single_cation_activities(
+    bridge: Any,
+    single_cation_activities: Mapping[str, float],
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+    *,
+    melt_pack: Any,
+) -> tuple[dict[str, float], tuple[dict[str, Any], ...]]:
+    """Wire pack-native bridge activities through the shared gas conversion."""
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        convert_parent_activities_for_gas,
+    )
+
+    parent_activities, conversion_notices = convert_parent_activities_for_gas(
+        bridge.parent_oxide_activities,
+        temperature_K,
+        melt_pack=melt_pack,
+        gas_pack=None,
+    )
+    if not conversion_notices:
+        return dict(single_cation_activities), conversion_notices
+    converted_single = dict(single_cation_activities)
+    for oxide in converted_single:
+        converted_single[oxide], _fraction = single_cation_activity_and_fraction(
+            oxide,
+            float(parent_activities[oxide]),
+            composition_mol,
+        )
+    return converted_single, conversion_notices
+
+
 def _same_composition_temperature_bridge(
     composition_mol: Mapping[str, float],
     temperature_K: float,
@@ -924,6 +956,7 @@ def _same_composition_temperature_bridge(
 
     points: list[tuple[float, dict[str, float]]] = []
     standard_flags: dict[tuple[str, str, str, str], Any] = {}
+    standard_conversions: dict[tuple[str, str, float], dict[str, Any]] = {}
     attempted: list[float] = []
     domain_low, domain_high = openimcc_bridge._temperature_domain_K()
 
@@ -947,6 +980,25 @@ def _same_composition_temperature_bridge(
                 )
             except refusal_types:
                 continue
+            converted_activities, conversion_notices = (
+                _converted_high_t_single_cation_activities(
+                    cleaned.bridge,
+                    cleaned.single_cation_activities,
+                    activity_basis_mol,
+                    probe_T,
+                    melt_pack=openimcc_bridge._load_pack(
+                        openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+                    ),
+                )
+            )
+            for notice in conversion_notices:
+                standard_conversions[
+                    (
+                        str(notice["oxide"]),
+                        str(notice["active_standard_id"]),
+                        float(notice["temperature_K"]),
+                    )
+                ] = notice
             for flag in cleaned.bridge.liquid_standard_flags:
                 standard_flags[
                     (flag.pack, flag.kind, flag.oxide, flag.row_key)
@@ -955,7 +1007,7 @@ def _same_composition_temperature_bridge(
                 "provider": "openimcc",
                 "activities_by_oxide": {
                     oxide: float(activity)
-                    for oxide, activity in cleaned.single_cation_activities.items()
+                    for oxide, activity in converted_activities.items()
                 },
                 "openimcc_pack_model_id": cleaned.bridge.pack_model_id,
                 "openimcc_pack_version": cleaned.bridge.pack_version,
@@ -1072,6 +1124,9 @@ def _same_composition_temperature_bridge(
         "liquid_standard_flags": tuple(
             standard_flags[key] for key in sorted(standard_flags)
         ),
+        "liquid_standard_conversion_notices": tuple(
+            standard_conversions[key] for key in sorted(standard_conversions)
+        ),
     }
 
 
@@ -1142,10 +1197,14 @@ def _build_high_t_melt_activity_authority(
         OpenImccUnavailableError,
         evaluate_cleaned_melt,
     )
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        LiquidStandardMissingError,
+    )
 
     expected_refusal_types = (
         OpenImccCompositionPolicyRefusal,
         OpenImccUnavailableError,
+        LiquidStandardMissingError,
     )
     if _IMCC_REFUSAL_ERROR_TYPE is not None:
         expected_refusal_types += (_IMCC_REFUSAL_ERROR_TYPE,)
@@ -1282,7 +1341,12 @@ def _build_high_t_melt_activity_authority(
             standard_notices = _openimcc_liquid_standard_notices(
                 bridge_result["liquid_standard_flags"]
             )
-            base["notices"].extend(standard_notices)
+            standard_conversion_notices = list(
+                bridge_result["liquid_standard_conversion_notices"]
+            )
+            base["notices"].extend(
+                [*standard_notices, *standard_conversion_notices]
+            )
             base["temperature_bridge"] = {
                 "call_count": bridge_result["call_count"],
                 "attempted_temperatures_K": list(
@@ -1293,10 +1357,14 @@ def _build_high_t_melt_activity_authority(
                     flag.as_dict()
                     for flag in bridge_result["liquid_standard_flags"]
                 ],
+                "liquid_standard_conversion_notices": standard_conversion_notices,
             }
         can_continue = (
             hour is not None and bool(certificates)
-            and not isinstance(exc, OpenImccCompositionPolicyRefusal)
+            and not isinstance(
+                exc,
+                (OpenImccCompositionPolicyRefusal, LiquidStandardMissingError),
+            )
         )
         # Composition-policy refusals never enter secant/freeze. A projected
         # numerical refusal bridges the projected composition above.
@@ -1482,6 +1550,17 @@ def _build_high_t_melt_activity_authority(
         return base
 
     bridge = cleaned.bridge
+    converted_single_cation_activities, conversion_notices = (
+        _converted_high_t_single_cation_activities(
+            bridge,
+            cleaned.single_cation_activities,
+            composition_mol,
+            temperature_K,
+            melt_pack=openimcc_bridge._load_pack(
+                openimcc_bridge.DEFAULT_BACKEND_PACK_NAME
+            ),
+        )
+    )
     policy_notices: list[dict[str, Any]] = []
     if cleaned.policy.get("notice"):
         policy_notices.append(dict(cleaned.policy["notice"]))
@@ -1505,12 +1584,14 @@ def _build_high_t_melt_activity_authority(
     liquid_standard_notices = _openimcc_liquid_standard_notices(
         liquid_standard_flags
     )
-    base["notices"].extend([*liquid_standard_notices, *typed_openimcc_notices])
+    base["notices"].extend(
+        [*liquid_standard_notices, *conversion_notices, *typed_openimcc_notices]
+    )
     base.update(
         {
-            "activities_by_oxide": dict(cleaned.single_cation_activities),
+            "activities_by_oxide": converted_single_cation_activities,
             "openimcc_activities_by_oxide": dict(
-                cleaned.single_cation_activities
+                converted_single_cation_activities
             ),
             "composition_policy": dict(cleaned.policy),
             "composition_projection_classification": dict(
@@ -1525,12 +1606,16 @@ def _build_high_t_melt_activity_authority(
                 list(bridge.notices)
                 + policy_notices
                 + liquid_standard_notices
+                + list(conversion_notices)
                 + typed_openimcc_notices
             ),
             "openimcc_typed_notices": typed_openimcc_notices,
             "openimcc_liquid_standard_flags": [
                 flag.as_dict() for flag in liquid_standard_flags
             ],
+            "openimcc_liquid_standard_conversion_notices": list(
+                conversion_notices
+            ),
             "openimcc_policy_notices": policy_notices,
             "openimcc_envelope_status": bridge.envelope_status,
             "openimcc_extrapolated": bool(bridge.extrapolated),
