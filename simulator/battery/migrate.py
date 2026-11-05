@@ -1576,6 +1576,66 @@ class _CompositionRefusal:
     closure_refusal: bool = False
 
 
+_COMPOSITION_MAP_RESERVED_KEYS = frozenset(
+    {
+        "state",
+        "tag",
+        "kind",
+        "components",
+        "amount_basis",
+        "basis",
+        "locator",
+        "value",
+    }
+)
+
+
+def _is_known_state_tag(value: object) -> bool:
+    return isinstance(value, str) and value in {tag.value for tag in StateTag}
+
+
+def _composition_map_items_for_wrapper_check(
+    payload: object,
+) -> tuple[tuple[str, object], ...]:
+    body = payload
+    if isinstance(body, Mapping) and isinstance(body.get("state"), Mapping):
+        state = body["state"]
+        if str(state.get("tag") or "value") != StateTag.VALUE.value:
+            return ()
+        body = state.get("value")
+    elif (
+        isinstance(body, Mapping)
+        and _is_known_state_tag(body.get("tag"))
+        and "value" in body
+    ):
+        if body.get("tag") != StateTag.VALUE.value:
+            return ()
+        body = body.get("value")
+    if not isinstance(body, Mapping):
+        return ()
+    components = body.get("components")
+    if isinstance(components, Mapping):
+        return tuple((str(key), value) for key, value in components.items())
+    if isinstance(components, (list, tuple)) and all(
+        isinstance(item, (list, tuple)) and len(item) == 2 for item in components
+    ):
+        return tuple((str(name), value) for name, value in components)
+    return tuple((str(key), value) for key, value in body.items())
+
+
+def _composition_map_reserved_scalar_reason(payload: object) -> str | None:
+    for name, value in _composition_map_items_for_wrapper_check(payload):
+        if (
+            name in _COMPOSITION_MAP_RESERVED_KEYS
+            and _as_dec_or_none(value) is not None
+        ):
+            return (
+                "composition map has a scalar value under reserved key "
+                f"'{name}'"
+            )
+    return None
+
+
 def _mass_percent_printed_from_plain(
     payload: object,
 ) -> Located[Mapping[str, Any]] | None:
@@ -1666,17 +1726,43 @@ def _composition_located_from_plain(
     body: object = payload
     if isinstance(payload, Mapping) and "state" in payload:
         state = payload.get("state")
+        if isinstance(state, Mapping):
+            state_tag = state.get("tag") or StateTag.VALUE.value
+            if not _is_known_state_tag(state_tag):
+                return Located(
+                    State.unknown("malformed composition state wrapper: invalid tag"),
+                    locator=_locator_from_plain(payload.get("locator"))
+                    if isinstance(payload.get("locator"), Mapping)
+                    else None,
+                )
         body = (
             state.get("value")
             if isinstance(state, Mapping)
             and str(state.get("tag") or "value") == "value"
             else None
         )
+    elif isinstance(payload, Mapping) and "tag" in payload and "value" in payload:
+        state_tag = payload.get("tag")
+        if not _is_known_state_tag(state_tag):
+            return Located(
+                State.unknown("malformed composition state wrapper: invalid tag")
+            )
+        if state_tag == StateTag.VALUE.value:
+            body = payload.get("value")
     elif (
         isinstance(payload, Mapping)
         and str(payload.get("tag") or "") == StateTag.VALUE.value
     ):
         body = payload.get("value")
+    reserved_reason = _composition_map_reserved_scalar_reason(body)
+    if reserved_reason is not None:
+        locator = (
+            _locator_from_plain(payload.get("locator"))
+            if isinstance(payload, Mapping)
+            and isinstance(payload.get("locator"), Mapping)
+            else None
+        )
+        return Located(State.unknown(reserved_reason), locator=locator)
     if (
         isinstance(body, Mapping)
         and _enum(AmountBasis, body.get("amount_basis"))
@@ -1787,6 +1873,42 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    composition_items = _composition_map_items_for_wrapper_check(payload)
+    is_composition_map = key == "printed_composition" or any(
+        _is_mass_percent_oxide_component(name)
+        for name, _value in composition_items
+    )
+    reserved_reason = (
+        _composition_map_reserved_scalar_reason(payload)
+        if is_composition_map
+        else None
+    )
+    if reserved_reason is not None:
+        locator = (
+            _locator_from_plain(payload.get("locator"))
+            if isinstance(payload, Mapping)
+            and isinstance(payload.get("locator"), Mapping)
+            else None
+        )
+        return Located(State.unknown(reserved_reason), locator=locator)
+    if isinstance(payload, Mapping) and isinstance(payload.get("state"), Mapping):
+        state_tag = payload["state"].get("tag") or StateTag.VALUE.value
+        if not _is_known_state_tag(state_tag):
+            locator = (
+                _locator_from_plain(payload.get("locator"))
+                if isinstance(payload.get("locator"), Mapping)
+                else None
+            )
+            return Located(
+                State.unknown("malformed point-condition state wrapper: invalid tag"),
+                locator=locator,
+            )
+    if isinstance(payload, Mapping) and "tag" in payload and "value" in payload:
+        state_tag = payload.get("tag")
+        if not _is_known_state_tag(state_tag):
+            return Located(
+                State.unknown("malformed point-condition state wrapper: invalid tag")
+            )
     if key in {"quench_state", "quench_direction"}:
         return _located_from_plain(payload, str)
     if key in {"fO2_control", "atmosphere", "gas_mix"}:
@@ -1818,7 +1940,17 @@ def _point_condition_from_plain(
         )
     if isinstance(payload, Mapping) and "state" not in payload:
         if "kind" in payload:
-            return _located_from_plain(payload, _value_or_point_from_plain)
+            if _is_value_kind_wrapper(payload):
+                return _located_from_plain(payload, _value_or_point_from_plain)
+            return Located(
+                State.unknown(
+                    "malformed printed value wrapper: invalid kind "
+                    f"{payload.get('kind')!r}"
+                ),
+                locator=_locator_from_plain(payload.get("locator"))
+                if isinstance(payload.get("locator"), Mapping)
+                else None,
+            )
         if "amount_basis" in payload or "components" in payload:
             if key == "printed_composition":
                 printed = _mass_percent_printed_from_plain(payload)
@@ -1849,7 +1981,15 @@ def _point_condition_from_plain(
             payload, closure_context=closure_context
         )
     if isinstance(value, Mapping) and "kind" in value:
-        return _located_from_plain(payload, _value_or_point_from_plain)
+        if _is_value_kind_wrapper(value):
+            return _located_from_plain(payload, _value_or_point_from_plain)
+        return Located(
+            State.unknown(
+                "malformed printed value wrapper: invalid kind "
+                f"{value.get('kind')!r}"
+            ),
+            locator=_locator_from_plain(payload.get("locator")),
+        )
 
     def _as_printed_map(raw: object) -> dict[str, Any]:
         assert isinstance(raw, Mapping)
@@ -2435,6 +2575,11 @@ def _value_or_point_from_plain(payload: object) -> Value:
     if isinstance(payload, Mapping) and payload.get("kind") is not None:
         return _value_from_plain(payload)
     return _value_from_plain({"kind": ValueKind.POINT.value, "point": payload})
+
+
+def _is_value_kind_wrapper(payload: Mapping[str, Any]) -> bool:
+    kind = payload.get("kind")
+    return isinstance(kind, str) and kind in {item.value for item in ValueKind}
 
 
 def _uncertainty_from_plain(payload: object) -> Uncertainty:
@@ -5153,6 +5298,10 @@ def _wt_percent_conversion_or_refusal(
                 component_map is not existing for existing in component_maps
             ):
                 component_maps.append(component_map)
+        for component_map in component_maps:
+            reserved_reason = _composition_map_reserved_scalar_reason(component_map)
+            if reserved_reason is not None:
+                return None, _CompositionRefusal(reserved_reason)
 
         try:
             oxide_wt = _oxide_mass_percent_components(
@@ -5394,6 +5543,10 @@ def _printed_mass_percent_map_refusal(
         body = state.get("value")
     if not isinstance(body, Mapping):
         return False, None
+
+    reserved_reason = _composition_map_reserved_scalar_reason(body)
+    if reserved_reason is not None:
+        return True, reserved_reason
 
     basis = body.get("amount_basis")
     if isinstance(basis, AmountBasis):

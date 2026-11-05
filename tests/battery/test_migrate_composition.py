@@ -1113,7 +1113,7 @@ def test_declared_unknown_trace_projects_with_notice() -> None:
     assert "unknown-component=0.3 wt%" in notice.reason
 
 
-def test_numeric_metadata_in_explicit_map_uses_unsupported_trace_policy() -> None:
+def test_scalar_reserved_metadata_in_explicit_map_is_malformed() -> None:
     rejected_map = {
         "SiO2": "50",
         "MgO": "49",
@@ -1126,31 +1126,11 @@ def test_numeric_metadata_in_explicit_map_uses_unsupported_trace_policy() -> Non
         refusal_reason=refusal,
         refusal_classification=classification,
     ) is None
-    # Green read the numeric metadata cell as a component; 1 wt% is an unflagged refusal (a).
+    # The record format reserves basis, so scalar content is malformed and unflagged.
     assert refusal == [
-        "partial analysis contains unsupported component(s) above 0.5 wt%: "
-        "basis=1 wt%"
+        "composition map has a scalar value under reserved key 'basis'"
     ]
     assert len(classification) == 1 and not classification[0].closure_refusal
-
-    trace_map = {
-        "SiO2": "49.85",
-        "MgO": "49.85",
-        "basis": "0.3",
-    }
-    trace_source = {"composition_wt_pct": trace_map}
-    parsed = _oxide_map_from_mapping(trace_source)
-    assert parsed == {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")}
-    # Green accepts an unsupported trace at or below 0.5 wt% with disclosure.
-    notice = migrate_module._composition_projection_notice(
-        parsed,
-        closure_context=trace_source,
-        quantity=migrate_module.Quantity.ACTIVITY,
-        origin="fixture",
-        declared_component_map=trace_map,
-    )
-    assert notice is not None and notice.dropped == ("basis",)
-    assert "basis=0.3 wt%" in notice.reason
 
     string_source = {
         "composition_wt_pct": {
@@ -2404,26 +2384,23 @@ def test_point_condition_printed_map_keeps_uncertainty_text_verbatim() -> None:
     }
 
 
-def test_point_condition_printed_map_counts_numeric_locator_and_ignores_real_locator() -> None:
+def test_point_condition_printed_map_refuses_scalar_locator_and_ignores_real_locator() -> None:
     printed = migrate_module._point_condition_from_plain(
         {"SiO2": "50", "MgO": "50", "locator": 1},
         key="printed_composition",
     )
 
-    assert printed.state.is_value
-    assert printed.state.value == {
-        "SiO2": Decimal("50"),
-        "MgO": Decimal("50"),
-        "locator": Decimal("1"),
-    }
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'locator'" in (
+        printed.state.reason or ""
+    )
     refused, reason = migrate_module._printed_mass_percent_map_refusal(
-        printed.state.value,
+        {"SiO2": "50", "MgO": "50", "locator": 1},
         {},
         reject_dropped_components=True,
     )
     assert refused
-    assert reason is not None
-    assert "unsupported component(s) above 0.5 wt%: locator=1 wt%" in reason
+    assert reason is not None and "reserved key 'locator'" in reason
 
     real_locator = {"page": 2, "table": "1", "note": "printed composition"}
     with_real_locator = migrate_module._point_condition_from_plain(
@@ -2436,6 +2413,84 @@ def test_point_condition_printed_map_counts_numeric_locator_and_ignores_real_loc
         "MgO": Decimal("50"),
     }
     assert with_real_locator.locator is not None
+
+
+@pytest.mark.parametrize(
+    ("reserved_key", "value"),
+    (
+        ("state", Decimal("1")),
+        ("tag", Decimal("1")),
+        ("kind", Decimal("1")),
+        ("components", Decimal("0.3")),
+        ("amount_basis", "0.3"),
+        ("basis", Decimal("1")),
+        ("locator", Decimal("1")),
+        ("value", Decimal("1")),
+    ),
+)
+def test_reserved_scalar_composition_keys_are_unflagged_malformed_input(
+    reserved_key: str, value: object
+) -> None:
+    wt = {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85"), reserved_key: value}
+
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        wt, closure_context=wt, declared_component_map=wt
+    )
+
+    assert converted is None
+    assert refusal is not None and not refusal.closure_refusal
+    assert refusal.reason == (
+        "composition map has a scalar value under reserved key "
+        f"'{reserved_key}'"
+    )
+
+
+def test_point_condition_printed_map_kind_scalar_is_refused_without_decoding() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "kind": "0.3"},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'kind'" in (
+        printed.state.reason or ""
+    )
+
+
+def test_point_condition_printed_map_tag_scalar_is_refused() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "tag": 1},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert "composition map has a scalar value under reserved key 'tag'" in (
+        printed.state.reason or ""
+    )
+
+
+def test_point_condition_invalid_state_tag_is_refused_without_decoding() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"state": {"tag": 1, "value": {"SiO2": "50", "MgO": "50"}}},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_unknown
+    assert printed.state.reason == "malformed point-condition state wrapper: invalid tag"
+
+
+def test_reserved_key_inside_typed_components_map_is_refused() -> None:
+    refused, reason = migrate_module._printed_mass_percent_map_refusal(
+        {
+            "amount_basis": "mass_percent",
+            "components": {"SiO2": "49.85", "MgO": "49.85", "basis": 1},
+        },
+        {},
+        reject_dropped_components=True,
+    )
+
+    assert refused
+    assert reason == "composition map has a scalar value under reserved key 'basis'"
 
 
 @pytest.mark.parametrize(
