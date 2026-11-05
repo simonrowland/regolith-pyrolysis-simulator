@@ -7,7 +7,12 @@ from unittest.mock import patch
 import yaml
 
 import simulator.battery.migrate as migrate_module
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import (
+    AdmissionStatus,
+    QUANTITY_UNITS,
+    Quantity,
+    ValueKind,
+)
 from tests.battery.test_migrate import assert_extract_source_mutation_fails
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -149,8 +154,91 @@ def test_every_migrated_numeric_value_and_conditions():
         assert row.identity.total_pressure_Pa is None or not row.identity.total_pressure_Pa.is_value
         assert row.identity.fO2_Pa is None or not row.identity.fO2_Pa.is_value
 
+    expected_enthalpies = {
+        "eliezer_howald_1978_hbar2_x0297": (
+            Decimal("3.59824"),
+            "SiO2",
+            Decimal("0.297"),
+            Decimal("0.703"),
+            None,
+        ),
+        "eliezer_howald_1978_table1_x021537_hm827": (
+            Decimal("-346.0168"),
+            "KO0.5",
+            Decimal("0.21537"),
+            Decimal("0.78463"),
+            "argon",
+        ),
+        "eliezer_howald_1978_table1_x028548_hm632": (
+            Decimal("-264.4288"),
+            "KO0.5",
+            Decimal("0.28548"),
+            Decimal("0.71452"),
+            "argon",
+        ),
+        "eliezer_howald_1978_table1_x033497_hm594": (
+            Decimal("-248.5296"),
+            "KO0.5",
+            Decimal("0.33497"),
+            Decimal("0.66503"),
+            "argon",
+        ),
+        "eliezer_howald_1978_table1_x034025_hm630": (
+            Decimal("-263.592"),
+            "KO0.5",
+            Decimal("0.34025"),
+            Decimal("0.65975"),
+            "argon",
+        ),
+    }
+    for observation_id, (
+        value,
+        species,
+        x_ko05,
+        x_sio2,
+        atmosphere,
+    ) in expected_enthalpies.items():
+        row = rows[observation_id]
+        assert row.value.kind is ValueKind.POINT, observation_id
+        assert row.value.point == value, observation_id
+        quantity = row.identity.quantity.value
+        assert quantity is Quantity.PARTIAL_MOLAR_ENTHALPY, observation_id
+        assert QUANTITY_UNITS[quantity] == "kJ_per_declared_mol_basis"
+        assert row.admission.status is AdmissionStatus.ADMITTED, observation_id
+        assert row.identity.species.formula == species, observation_id
+        assert row.identity.species.phase.value.value == "l", observation_id
+        assert row.identity.temperature_K.is_unknown, observation_id
+        assert row.identity.total_pressure_Pa.is_unknown, observation_id
+        expected_condition_keys = {"temperature_K", "fO2_log", "composition"}
+        if atmosphere is not None:
+            expected_condition_keys.add("atmosphere")
+        assert set(row.point_conditions) == expected_condition_keys, observation_id
+        assert row.point_conditions["temperature_K"].state.is_unknown, observation_id
+        assert row.point_conditions["fO2_log"].state.is_unknown, observation_id
+        composition = row.point_conditions["composition"].state
+        assert composition.is_value, observation_id
+        assert composition.value.basis == "printed_mole_fraction", observation_id
+        assert dict(composition.value.components) == {
+            "KO0.5": x_ko05,
+            "SiO2": x_sio2,
+        }, observation_id
+        assert row.identity.composition.is_value, observation_id
+        assert row.identity.composition.value == composition.value, observation_id
+        if atmosphere is not None:
+            atmosphere_condition = row.point_conditions["atmosphere"].state
+            assert atmosphere_condition.is_value, observation_id
+            assert atmosphere_condition.value == atmosphere, observation_id
+
     unavailable = {key for key, row in rows.items() if row.value.kind is ValueKind.UNAVAILABLE}
-    assert len(unavailable) == 11
+    assert len(unavailable) == 6
+    assert unavailable == {
+        "eliezer_howald_1978_K1175_1p00455",
+        "eliezer_howald_1978_K1175_0p99658",
+        "eliezer_howald_1978_K1623_lt_0p99526",
+        "eliezer_howald_1978_K1623_0p993",
+        "eliezer_howald_1978_K_approx_0p98",
+        "eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k",
+    }
     unknown_quantity = {
         key for key, row in rows.items() if row.identity.quantity.is_unknown
     }
@@ -185,6 +273,7 @@ def test_every_migrated_numeric_value_and_conditions():
         if observation["values"].get("quantity") == "partial_molar_enthalpy"
     }
     assert len(enthalpy_ids) == 5
+    assert enthalpy_ids == set(expected_enthalpies)
     assert {
         observation_id: source[observation_id]["units"]
         for observation_id in enthalpy_ids
@@ -199,7 +288,6 @@ def test_every_migrated_numeric_value_and_conditions():
         values = source[observation_id]["values"]
         assert values["units_as_printed"] in {"kcal mol-1", "cal mol-1"}
         assert "partial_molar_enthalpy_kJ_mol-1" not in values
-        assert rows[observation_id].value.kind is ValueKind.UNAVAILABLE
     hbar2 = source["eliezer_howald_1978_hbar2_x0297"]
     assert hbar2["uncertainty"]["basis"] == "cal mol-1"
     excess_id = "eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k"

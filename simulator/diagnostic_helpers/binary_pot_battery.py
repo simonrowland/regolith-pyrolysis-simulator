@@ -2447,10 +2447,12 @@ class _OpenImccBatteryBackend:
         except Exception as exc:  # noqa: BLE001 - melt rail remains usable
             self._gas = None
             self._gas_error = f"{type(exc).__name__}: {exc}"
+            self._identity["gas_load_failure"] = self._gas_error
             return
         self._identity["engine_binding_identity"] = (
             self._bridge.engine_binding_identity(self._pack, self._gas)
         )
+        self._identity.pop("gas_load_failure", None)
         self._gas_error = None
 
     def equilibrate(

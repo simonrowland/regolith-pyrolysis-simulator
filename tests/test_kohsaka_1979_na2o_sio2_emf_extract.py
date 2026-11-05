@@ -79,7 +79,31 @@ def test_isolated_real_migration_preserves_conditions_and_schema_refusals(tmp_pa
 
     rows = list(result.observations.values())
     unavailable = [row for row in rows if row.value.kind.value == "unavailable"]
-    assert len(unavailable) == 95
+    assert len(unavailable) == 85
+    expected_enthalpy_values = {
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r02_c04": Decimal("68.2"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r03_c04": Decimal("-8.6"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r04_c04": Decimal("-17.2"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r05_c04": Decimal("-25.1"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r06_c04": Decimal("-18.4"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r07_c04": Decimal("-23.8"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r08_c04": Decimal("0"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r09_c04": Decimal("46.9"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r10_c04": Decimal("38.1"),
+        "kohsaka_1979_na2o_sio2_emf_p003_t02_r11_c04": Decimal("35.7"),
+    }
+    enthalpy_rows = [
+        row
+        for row in rows
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "partial_molar_enthalpy"
+    ]
+    assert len(enthalpy_rows) == 10
+    assert all(row.value.kind.value == "point" for row in enthalpy_rows)
+    assert {
+        row.observation_id.rsplit("::", 1)[-1]: row.value.point for row in enthalpy_rows
+    } == expected_enthalpy_values
+    assert all(row.admission.status.value == "rejected" for row in enthalpy_rows)
     assert all(row.identity.species.phase.is_value for row in rows)
     assert all(row.identity.species.phase.value.value == "l" for row in rows)
     for row in rows:
@@ -142,7 +166,7 @@ def test_isolated_real_migration_preserves_conditions_and_schema_refusals(tmp_pa
     table2_enthalpy = _by_id(rows, "kohsaka_1979_na2o_sio2_emf_p003_t02_r03_c04")
     assert table2_enthalpy.identity.quantity.value.value == "partial_molar_enthalpy"
     assert table2_enthalpy.derived_from
-    assert table2_enthalpy.value.kind.value == "unavailable"
+    assert table2_enthalpy.value.kind.value == "point"
     assert table2_enthalpy.admission.status.value == "rejected"
 
     literature_root = tmp_path / "tree" / "data" / "literature"

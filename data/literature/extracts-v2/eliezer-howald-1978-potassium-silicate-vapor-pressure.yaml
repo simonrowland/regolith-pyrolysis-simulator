@@ -583,9 +583,8 @@ observations:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, units_as_printed,
-      value_as_printed, component_as_printed, composition_mol'
+    kind: point
+    point: '3.59824'
     approximate: false
   uncertainty:
     kind: printed
@@ -605,9 +604,14 @@ observations:
       reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_hbar2_x0297
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
@@ -1254,9 +1258,8 @@ observations:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, value_as_printed,
-      units_as_printed, component_as_printed, fit_as_printed, composition_mol'
+    kind: point
+    point: '-346.0168'
     approximate: false
   uncertainty:
     kind: none
@@ -1266,9 +1269,14 @@ observations:
       reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x021537_hm827
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
@@ -1391,9 +1399,8 @@ observations:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, value_as_printed,
-      units_as_printed, component_as_printed, fit_as_printed, composition_mol'
+    kind: point
+    point: '-264.4288'
     approximate: false
   uncertainty:
     kind: none
@@ -1403,9 +1410,14 @@ observations:
       reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x028548_hm632
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
@@ -1528,9 +1540,8 @@ observations:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, value_as_printed,
-      units_as_printed, component_as_printed, fit_as_printed, composition_mol'
+    kind: point
+    point: '-248.5296'
     approximate: false
   uncertainty:
     kind: none
@@ -1540,9 +1551,14 @@ observations:
       reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x033497_hm594
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
@@ -1665,9 +1681,8 @@ observations:
       tag: not_applicable
       reason: profile partial_molar_enthalpy does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: 'no mapped partial_molar_enthalpy field selected; source fields: quantity, method_class, value, value_as_printed,
-      units_as_printed, component_as_printed, fit_as_printed, composition_mol'
+    kind: point
+    point: '-263.592'
     approximate: false
   uncertainty:
     kind: none
@@ -1677,9 +1692,14 @@ observations:
       reason: author reduction requires an author derivation and admitted measured lineage
     original_method_class: author_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - partial_molar_enthalpy
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: eliezer-howald-1978-potassium-silicate-vapor-pressure::eliezer_howald_1978_table1_x034025_hm630
   source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
   locator:
     page: 3
