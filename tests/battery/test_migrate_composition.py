@@ -5932,6 +5932,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             False,
             id="green-unknown-token",
         ),
+        # (b) Green never read nested XxO; only m1 sees its unsupported mass.
+        pytest.param(
+            "nested-unknown-token",
+            {"SiO2": "50", "MgO": "50"},
+            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            None,
+            True,
+            id="m1-nested-unknown-token",
+        ),
         # (a) The over-limit unsupported total includes a token Green rejected.
         pytest.param(
             "formula-unknown-and-chloride-traces",
@@ -5940,6 +5949,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             None,
             False,
             id="green-unknown-token-makes-combined-traces-unflagged",
+        ),
+        # (a) Green read XxO inside the map; nested Cl pushes dropped mass above 0.5.
+        pytest.param(
+            "unknown-token-and-nested-chloride-trace",
+            {"SiO2": "50", "MgO": "49.7", "XxO": "0.3"},
+            {"point_conditions": {"printed_composition": {"Cl": "0.4"}}},
+            None,
+            False,
+            id="green-unknown-token-plus-nested-chloride-over-limit",
         ),
         # (a) Green read and rejected the malformed oxide cell.
         pytest.param(
@@ -6155,6 +6173,10 @@ def test_mass_closure_refusal_check_order(
     if case == "oxide-negative-and-volatile-negative":
         assert "printed component has negative or non-finite amount" in refusal.reason
     if case in {"unknown-token", "formula-unknown-and-chloride-traces"}:
+        assert "partial analysis contains unsupported component(s) above" in (
+            refusal.reason
+        )
+    if case in {"nested-unknown-token", "unknown-token-and-nested-chloride-trace"}:
         assert "partial analysis contains unsupported component(s) above" in (
             refusal.reason
         )

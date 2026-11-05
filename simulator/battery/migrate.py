@@ -1570,10 +1570,6 @@ def _percent_composition_closure_error(
     return None
 
 
-class _MassPercentClosureError(ValueError):
-    """A refusal introduced by the mass-percent closure rule."""
-
-
 @dataclass(frozen=True)
 class _CompositionRefusal:
     reason: str
@@ -1644,7 +1640,10 @@ def _mass_percent_printed_from_plain(
     dropped = _unrecognized_printed_chemical_components(
         wt, payload, declared_component_map=declared_component_map
     )
-    if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+    if (
+        sum(dropped.values(), Decimal("0"))
+        > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+    ):
         return preserved_envelope()
     if (
         _mass_percent_pairs(payload) is not None
@@ -4390,6 +4389,9 @@ def _unrecognized_printed_chemical_components(
     *,
     declared_component_map: Mapping[str, Any] | None = None,
     volatile_components: Mapping[str, Decimal] | None = None,
+    volatile_sources: Mapping[str, str] | None = None,
+    green_read_maps: Sequence[Mapping[str, Any]] = (),
+    dropped_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
     declared_names = (
         {
@@ -4399,22 +4401,45 @@ def _unrecognized_printed_chemical_components(
         if declared_component_map is not None
         else set()
     )
-    source_map = {
-        **wt,
-        **(_printed_composition_source_map(closure_context) or {}),
-        **(declared_component_map or {}),
+    source_map: dict[str, tuple[Any, str]] = {
+        str(name): (amount, _GREEN_READ_OXIDE_MAP) for name, amount in wt.items()
     }
+    source_map.update(
+        {
+            str(name): (amount, _M1_ONLY_CLOSURE_CONTRIBUTOR)
+            for name, amount in (
+                _printed_composition_source_map(closure_context) or {}
+            ).items()
+        }
+    )
+    if declared_component_map is not None:
+        declared_source = (
+            _GREEN_READ_OXIDE_MAP
+            if any(declared_component_map is item for item in green_read_maps)
+            else _M1_ONLY_CLOSURE_CONTRIBUTOR
+        )
+        source_map.update(
+            {
+                str(name): (amount, declared_source)
+                for name, amount in declared_component_map.items()
+            }
+        )
     if volatile_components is None:
         volatile_components = _printed_volatile_mass_percent(closure_context)
     source_map.update(
         {
-            name: amount
+            name: (
+                amount,
+                (volatile_sources or {}).get(
+                    name, _M1_ONLY_CLOSURE_CONTRIBUTOR
+                ),
+            )
             for name, amount in volatile_components.items()
             if name == "Cl"
         }
     )
     dropped: dict[str, Decimal] = {}
-    for raw_name, raw_amount in source_map.items():
+    for raw_name, (raw_amount, source) in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         volatile = _volatile_closure_component(name)
         # A declared map may retain trace analyses in ppm beside its wt% oxides.
@@ -4434,6 +4459,8 @@ def _unrecognized_printed_chemical_components(
         amount = _printed_mass_percent_number(raw_amount)
         if amount is not None:
             dropped[name] = amount
+            if dropped_sources is not None:
+                dropped_sources[name] = source
     return dropped
 
 
@@ -4597,7 +4624,9 @@ def _composition_projection_notice(
     )
     if printed_total <= 0:
         return None
-    detail = ", ".join(f"{name}={amount} wt%" for name, amount in dropped.items())
+    detail = ", ".join(
+        f"{name}={amount} wt%" for name, amount in dropped.items()
+    )
     return Notice(
         kind=NoticeKind.COMPOSITION_PROJECTED,
         affected_quantities=(quantity,),
@@ -4612,6 +4641,7 @@ def _printed_volatile_mass_percent(
     *payloads: object,
     diagnostics: list[tuple[str, str]] | None = None,
     green_read_maps: Sequence[Mapping[str, Any]] = (),
+    component_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
     """Read numeric volatile amounts attached to this composition row only."""
 
@@ -4650,7 +4680,7 @@ def _printed_volatile_mass_percent(
                 if composition_map is not None:
                     scopes.append((composition_map, _M1_ONLY_CLOSURE_CONTRIBUTOR))
 
-    selected: dict[str, tuple[int, Decimal]] = {}
+    selected: dict[str, tuple[int, Decimal, str]] = {}
     reported: set[str] = set()
 
     def reject(reason: str, component: str, source: str) -> None:
@@ -4691,8 +4721,18 @@ def _printed_volatile_mass_percent(
                 )
             current = selected.get(component)
             if current is None or priority < current[0]:
-                selected[component] = (priority, amount)
-    return {component: amount for component, (_priority, amount) in selected.items()}
+                selected[component] = (priority, amount, source)
+    if component_sources is not None:
+        component_sources.update(
+            {
+                component: source
+                for component, (_priority, _amount, source) in selected.items()
+            }
+        )
+    return {
+        component: amount
+        for component, (_priority, amount, _source) in selected.items()
+    }
 
 
 def _printed_composition_closure_components(
@@ -5099,11 +5139,13 @@ def _wt_percent_conversion_or_refusal(
                 )
             )
 
+        volatile_sources: dict[str, str] = {}
         volatile_wt = _printed_volatile_mass_percent(
             wt,
             closure_context,
             diagnostics=diagnostics,
             green_read_maps=green_read_maps,
+            component_sources=volatile_sources,
         )
 
         closure_only_wt = _printed_composition_closure_components(
@@ -5119,15 +5161,25 @@ def _wt_percent_conversion_or_refusal(
                     )
                 )
 
+        dropped_sources: dict[str, str] = {}
         dropped = _unrecognized_printed_chemical_components(
             wt,
             closure_context,
             declared_component_map=declared_component_map,
             volatile_components=volatile_wt,
+            volatile_sources=volatile_sources,
+            green_read_maps=green_read_maps,
+            dropped_sources=dropped_sources,
         )
         for component_map in (wt, *declared_maps):
             if component_map is None:
                 continue
+            source = (
+                _GREEN_READ_OXIDE_MAP
+                if component_map is wt
+                or any(component_map is item for item in green_read_maps)
+                else _M1_ONLY_CLOSURE_CONTRIBUTOR
+            )
             for raw_name, raw_amount in component_map.items():
                 name, _has_mass_suffix = _mass_percent_component_key(
                     str(raw_name)
@@ -5138,6 +5190,7 @@ def _wt_percent_conversion_or_refusal(
                 kind, amount = _classify_composition_cell(raw_amount)
                 if kind == "number" and amount is not None:
                     dropped.setdefault(component[1], amount)
+                    dropped_sources.setdefault(component[1], source)
         dropped_amounts = tuple(dropped.values())
         invalid_dropped = any(
             not amount.is_finite() or amount < 0 for amount in dropped_amounts
@@ -5192,7 +5245,8 @@ def _wt_percent_conversion_or_refusal(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
             green_rejected_unsupported = any(
-                amount > 0
+                dropped_sources.get(name) == _GREEN_READ_OXIDE_MAP
+                and amount > 0
                 and name not in _COMPOSITION_COMPONENTS
                 and name not in ATOMIC_WEIGHTS_G_PER_MOL
                 and _volatile_closure_component(name) is None
@@ -5242,11 +5296,6 @@ def _wt_percent_conversion_or_refusal(
 
         converted = _mole_fraction_from_wt_percent_components(oxide_wt)
         return converted, None
-    except _MassPercentClosureError as exc:
-        return None, _CompositionRefusal(
-            f"mass-percent composition is not usable: {exc}",
-            closure_refusal=True,
-        )
     except (ArithmeticError, ValueError) as exc:
         return None, _CompositionRefusal(
             f"mass-percent composition is not usable: {exc}"
