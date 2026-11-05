@@ -85,6 +85,16 @@ def _native_output_worker():
     )
 
 
+def _close_native_output_worker_and_capture(worker, capfd):
+    capture = worker._native_output_capture
+    reader_thread = capture[3] if capture is not None else None
+    worker.close()
+    if reader_thread is not None:
+        reader_thread.join(timeout=5.0)
+        assert not reader_thread.is_alive()
+    return capfd.readouterr()
+
+
 def _bootstrap_recording_worker(results, started=None, release=None):
     return {
         'results': results,
@@ -228,9 +238,8 @@ def test_warm_worker_deduplicates_native_fd_output_and_preserves_results(
             for index in range(50)
         ]
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     assert results == list(range(50))
     assert captured.out == ''
     assert captured.err.count(native_line.decode()) == 1
@@ -253,9 +262,8 @@ def test_warm_worker_deduplicates_repeated_error_like_native_lines(capfd):
             for index in range(2)
         ]
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     assert results == [0, 1]
     assert captured.out == ''
     assert captured.err.encode().count(native_line) == 1
@@ -277,9 +285,8 @@ def test_native_output_keeps_long_error_line_continuations(capfd):
             'result': 'unchanged',
         }) == 'unchanged'
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     assert captured.err.encode().count(native_line) == 1
     assert '[engine-pool native output] count=1:' in captured.err
     assert captured.out == ''
@@ -296,9 +303,8 @@ def test_python_warning_still_reaches_parent_without_native_deduplication(
             'result': 'unchanged',
         }) == 'unchanged'
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     assert 'UserWarning: native worker warning stays visible' in captured.err
     assert '[engine-pool native output]' not in captured.err
     assert captured.out == ''
@@ -325,9 +331,8 @@ def test_native_output_distinct_line_cap_keeps_errors_and_bounds_summaries(
             'result': 'unchanged',
         })
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     output_lines = captured.err.splitlines()
     raw_lines = [line for line in output_lines if line.startswith('species-')]
     summary_lines = [
@@ -359,9 +364,8 @@ def test_native_output_partial_line_buffer_is_capped_and_marked(capfd):
             'result': 'unchanged',
         }) == 'unchanged'
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     assert b'z' * cap + b'...[truncated]\n' in captured.out.encode() + captured.err.encode()
     assert len(captured.err.encode()) <= (
         cap + 2 * engine_pool_module.MAX_NATIVE_OUTPUT_SUMMARY_BYTES + 64
@@ -381,9 +385,8 @@ def test_native_output_budget_includes_long_error_fragments(capfd):
             'result': 'unchanged',
         }) == 'unchanged'
     finally:
-        worker.close()
+        captured = _close_native_output_worker_and_capture(worker, capfd)
 
-    captured = capfd.readouterr()
     output = captured.err.encode()
     assert output[:budget] == payload[:budget]
     assert b'forwarding budget reached' in output[budget:]
