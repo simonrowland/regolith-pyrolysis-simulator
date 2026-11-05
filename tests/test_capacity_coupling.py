@@ -1110,6 +1110,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # at 1400 C and set its transport saturation. The green a6d75d8b4 ->
         # restacked a93958edc reports move total flux 0.06423670196107581 ->
         # 0.06422943778094445 kg/hr (-7.26418013136e-6, -0.0113085%),
+        # a -1.13084574855e-4 relative change,
         # saturation 2.4701307994323103 -> 2.4698591005232133%
         # (-0.000271698909 percentage points), and melt mass
         # 998.7072055554551 -> 998.7072128196352 kg (+7.26418011254e-6),
@@ -1138,27 +1139,44 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     assert "Ti" not in snapshot.evap_flux.species_kg_hr
     assert "Ti" not in snapshot.evap_flux.alpha_authority_status_by_species
     assert "evaporate_Ti" not in ca_ti_reasons
-    assert {
-        "condense_SiO", "condense_AlO",
-        "condense_CrO", "condense_MgO_gas", "condense_SiO2_gas", "condense_TiO",
-        "condense_TiO2_gas",
-    } <= ca_ti_reasons
-    for required in (
+    assert tuple(
+        transition.reason for transition in sim.atom_ledger.transitions
+    ) == (
+        "evaporate_SiO",
+        "condense_SiO",
+        "evaporate_Mg",
+        "condense_Mg",
+        "evaporate_Fe",
+        "condense_Fe",
+        "evaporate_Na",
+        "condense_Na",
+        "evaporate_K",
+        "condense_K",
+        "evaporate_AlO",
         "evaporate_Ca",
+        "evaporate_Cr",
+        "evaporate_CrO",
+        "evaporate_K2",
+        "evaporate_K2O_gas",
+        "evaporate_MgO_gas",
+        "evaporate_Mn",
+        "evaporate_Na2",
+        "evaporate_Na2O_gas",
+        "evaporate_SiO2_gas",
         "evaporate_TiO",
         "evaporate_TiO2_gas",
-        "condense_Ca",
-    ):
-        assert required in ca_ti_reasons, required
+        "fe_redox_respeciation",
+        "overhead_bleed",
+    )
     assert {"evaporate_CaO_gas", "condense_CaO_gas"}.isdisjoint(
         ca_ti_reasons
     )
     assert tuple(
         transition.reason for transition in sim.atom_ledger.transitions[-5:]
     ) == (
-        "condense_TiO",
+        "evaporate_SiO2_gas",
+        "evaporate_TiO",
         "evaporate_TiO2_gas",
-        "condense_TiO2_gas",
         "fe_redox_respeciation",
         "overhead_bleed",
     )

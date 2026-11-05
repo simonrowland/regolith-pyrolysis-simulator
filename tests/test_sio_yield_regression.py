@@ -465,9 +465,15 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 # magnitude; the post-flip regime is ~1.94 mg total SiO evolved
 # (1000x less absolute mass, with relative routing inverted).
 # Re-pinned from the executable sio_yield CLI after stage-key reporting.
+# b-1119's CaO/MgO liquid reference via d-144 fusion moves Stage-4 silica
+# carryover from the green fixture values: lunar 1.05988273133e-09 ->
+# 1.1039431106e-09 kg (+4.406037927e-11 kg, +4.1570994571e-2 relative),
+# Mars 1.26683344649e-06 -> 1.26683074311e-06 kg
+# (-2.70338e-12 kg, -2.13396639266e-6 relative). Both values are Studio-3
+# obtained pins, not laptop regenerations.
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 1.05988273133e-09,
-    "mars_basalt": 1.26683344649e-06,
+    "lunar_mare_low_ti": 1.1039431106e-09,
+    "mars_basalt": 1.26683074311e-06,
 }
 
 # 2026-07-21 B1: measured stage-3 SiO-zone product on compose-0.6.3 after the
@@ -521,11 +527,14 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2.75786146523e-06 -> 1.88317547314e-06 -> 1.10774716572e-06 kg. Evolved SiO
 # remains unchanged; the feedstock-dependent capture shifts follow the
 # integrated pressure-limited wall response.
-# b-1119's CaO/MgO liquid reference via d-144 fusion moves the lunar studio
-# stage-3 pin 6.95337203734e-06 -> 6.95332797045e-06 kg
-# (-4.406689e-11 kg, -0.000633748486%). The supplied studio Mars fixture moves
-# its matching pin 1.10774716572e-06 -> 1.10775807581e-06 kg
-# (+1.091009e-11 kg, +0.0009849%).
+# b-1119's CaO/MgO liquid reference via d-144 fusion moves the lunar Stage-3
+# report pin 6.73119341581e-06 -> 6.95332797045e-06 kg
+# (+2.2213455464e-07 kg, +3.30007683509e-2 relative). The Mars Stage-3 value
+# is fixture-derived: the green fixture's 2.75786059627e-06 kg becomes the
+# supplied Studio-3 golden's 1.10775807581e-06 kg (-1.65010252046e-06 kg,
+# -0.598327023016 relative). The pin report's sio_stage3_silica_kg is the
+# lunar-only CLI pin; there is no independent Mars Stage-3 report value, so the
+# Mars baseline intentionally follows the Studio-3 golden.
 BASELINE_STAGE3_SIO2_KG = {
     "lunar_mare_low_ti": 6.95332797045e-06,
     "mars_basalt": 1.10775807581e-06,
@@ -707,24 +716,23 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
     # t-1217 restores source-preserving causal capture and changes the bulk-
-    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
-    # activities shift the SiO route, yielding midpoint-era 24-hour closure
-    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
-    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
-    # excess-inventory balance; the production resolver now reports the pins
-    # below without relaxing the independent atom-ledger closure bound.
-    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
-    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
-    # and studio-3, so this value is not a laptop re-run.
+    # inventory subtraction's roundoff path; d-137fix4 integrates the Stage-3
+    # band before applying the same excess-inventory balance. b-1119's CaO/MgO
+    # liquid reference via d-144 fusion shifts the Studio-3 cancellation
+    # residuals from green to tip: lunar 6.164333585288513e-7 ->
+    # 6.904942247340407e-7 (+7.40608662052e-8, +0.120144156997 relative),
+    # Mars 2.2716049134323923e-7 -> 8.041771960548321e-7
+    # (+5.77016704712e-7, +2.54012791265 relative). The independent atom-ledger
+    # closure bound remains 5e-12%; these full-run pins are Studio-3 values.
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 6.164333585288513e-7,
+        "lunar_mare_low_ti": 6.904942247340407e-7,
         # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
         # from reservoir.fo2_buffer; the unbacked remainder is held and the
         # resulting subtraction residual is reported by the production resolver.
         # The piecewise segment solve changes the cancellation residual by
         # 1.134167275e-14 percentage points from the single-exponential pin;
         # canonical atom-ledger balance remains within 5e-12 percent.
-        "mars_basalt": 2.2716049134323923e-7,
+        "mars_basalt": 8.041771960548321e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -779,7 +787,9 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    assert "cited_hkl_accommodation" in notice["source_classes"]
+    # The obtained notice uses the current hkl_ideal_upper_bound vocabulary;
+    # cited_hkl_accommodation is older and was not introduced by b-1119.
+    assert "hkl_ideal_upper_bound" in notice["source_classes"]
     assert "uncertified_na_analogy_default" in notice["source_classes"]
     # d-144 (5b5d2a080) shifts the one-hour melt composition enough that Mg
     # no longer contributes to this wall-sticking notice.

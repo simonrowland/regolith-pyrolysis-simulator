@@ -111,12 +111,17 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # Stage-3 capture, typed saturation refusal): flux unchanged; the
         # ledger digest moves with the additive unrecovered_metal_phase /
         # source-account fields. Regenerated on studio-3 at b0b70903d.
-        # d137p: both digests are the studio-3 actuals (pins2 log, tree
-        # 9666fc129 plus the de32c69ca runner regen). The runner regen script
-        # does not update these pins. Lunar full runs diverge between the
-        # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        # Studio-3 restack values: b-1119's CaO/MgO liquid reference via
+        # d-144 fusion changes the flux and ledger output. Green -> tip hashes
+        # are recorded exactly because hashes have no numeric subtraction:
+        # flux maps 87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d
+        # -> a685d2f743f4868645ce36e5b29a28dc81a85628556ee13144c66945f80a3f4c;
+        # ledger d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db
+        # -> 2f67bcbdcc10496d7d6a9ab68a4590dff8da07639cf3634ddff837e1b9e9e01f.
+        # Lunar full runs diverge between laptop and studio-3, so these are the
+        # obtained Studio-3 digests.
+        "flux_maps_sha256": "a685d2f743f4868645ce36e5b29a28dc81a85628556ee13144c66945f80a3f4c",
+        "ledger_sha256": "2f67bcbdcc10496d7d6a9ab68a4590dff8da07639cf3634ddff837e1b9e9e01f",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -816,9 +821,11 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # 40 C K trap. The c679673f5/85fedcb8e band-integrated capture path gives
     # this production row total; the next row transfers it to reagent, so live
     # product returns to zero while cumulative condensate and recycled mass
-    # retain the capture.
+    # retain the capture. b-1119's CaO/MgO liquid reference via d-144 fusion
+    # moves the Studio-3 total 0.0004975311735864234 -> 0.0004977157023971441
+    # kg (+1.84528810721e-7 kg, +3.70888942276e-4 relative).
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        0.0004977157023971441, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2048,8 +2055,13 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
             allow_nan=False,
         ).encode("utf-8")
         assert canonical_hours == expected_hours
+        # b-1119's CaO/MgO liquid reference via d-144 fusion changes the
+        # serialized authority notices; the Studio-3 digest moves from green
+        # e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386
+        # to tip e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74
+        # (a byte-hash change, not a numeric delta).
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "e90fcc66cbb705e2bc8626289d513ea8f9a56fd0a2ce20dcc055620fb3cd2386"
+            "e29ab87bdcc8a8cf65358666a1b30f2e04801f0d162be56e997651bcd3d2ae74"
         )
 
 

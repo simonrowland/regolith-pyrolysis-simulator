@@ -277,6 +277,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # The repaired 510 -> 860 C continuous trajectory no longer dwells in the
     # staged high-temperature Na recovery window.
     assert staged_products.get("Na", 0.0) > continuous_products.get("Na", 0.0) > 0.0
+    assert staged_products.get("Na", 0.0) == pytest.approx(
+        0.2568295880586315, rel=1e-12
+    )
     # 2026-07-21 B1 wall-gate fix: "Stage 3 remains Fe-only / Si goes to the
     # wall" was the unguarded hot-wall backstop artifact. With hot walls
     # honest (zero deposit above T_cond), the staged probe's Si-bearing
@@ -293,7 +296,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # the designated Stage 3 trap. b-1119's CaO/MgO liquid reference via d-144
     # fusion moves staged silica 0.006596004558853442 ->
     # 0.006596193654840881 kg (+1.8909598744e-7 kg, +0.00286682621%);
-    # the staged product SiO pin remains 0.0 -> 0.0 kg.
+    # the staged product SiO pin remains 0.0 -> 0.0 kg. Staged Na moves
+    # 0.25673675926756195 -> 0.2568295880586315 kg
+    # (+9.28287910695e-5 kg, +3.61571873597e-4 relative).
     assert staged_silica == pytest.approx(0.006596193654840881, rel=1e-9)
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
     assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
@@ -302,6 +307,9 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
         staged_silica, rel=1e-12
     )
     assert continuous_sio_stage == {}
+    # This emitter pin reads the SiO key in the product ledger. The nonzero
+    # Si/SiO2 mass is a separate solid collection in the Stage-3 trap, already
+    # checked against staged_silica above, so the zero SiO assertion is right.
     assert pins["staged_product_sio_kg"] == pytest.approx(0.0)
 
 
