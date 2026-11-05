@@ -128,6 +128,27 @@ forever — but the state is explicit and reviewable rather than implied by abse
 
 Clean. No local patches.
 
+### magemin — v1.9.6 / upstream `40ed109`
+
+Three fixes held as patches pending upstream, with a draft pull-request description in
+`patches/magemin/UPSTREAM-PR.md` (owner-gated; not filed):
+
+- `0001` THERMOCALC `aMgO`: the `tc` branch of `compute_activities()` never stored the periclase
+  `gbase`, so `aMgO` printed `exp(Gamma_MgO/RT)` (~1e-21). Until b-1123 lands, regolith's MAGEMin
+  adapter takes that printed `aMgO` as is, so an unpatched build feeds the ~1e-21 value; b-1123
+  replaces it with a recompute from the same run's `Gamma_MgO` and periclase energy.
+- `0002` LP loop: the iteration cap also required `PC_checked == 2`, so the loop could fail to
+  terminate and overrun its diagnostic arrays. Found as an unrecorded edit in the sibling
+  `../MAGEMin` checkout and recorded here; not reproduced in a 164-point sweep.
+- `0003` sb21 `aFeO`: the four-cation wustite scaling was computed and then overwritten
+  (printed aFeO ~5.6e25 for a basaltic sb21 bulk; 0.473 after). sb24 has no `FeO` oxide; its
+  `aFeO` comes from the later Fe+O block, which already divides by 4 and is not touched.
+
+The patch files keep MAGEMin's CRLF line endings: apply them with `git am --keep-cr` (or `git apply`),
+and edit them byte-safely. `enginepatch.sh` maps
+`magemin` to `../MAGEMin` (override with `MAGEMIN_CHECKOUT`). The engine's live binary is built
+from a separate, clean v1.9.6 tree, so none of these patches is in it; see `STATUS`.
+
 ### alphamelts — bundled 2.3.1 arm64 artifact / upstream `957b8f5`
 
 The bundled executable crashes on Fe-free melts with an imposed absolute

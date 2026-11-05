@@ -47,6 +47,7 @@ engine_override_var() {
     thermoengine) echo "THERMOENGINE_CHECKOUT" ;;
     pysulfsat)    echo "PYSULFSAT_CHECKOUT" ;;
     sulfliq)      echo "SULFLIQ_CHECKOUT" ;;
+    magemin)      echo "MAGEMIN_CHECKOUT" ;;
     *)            echo "" ;;
   esac
 }
@@ -57,6 +58,7 @@ engine_override() {
     thermoengine) echo "${THERMOENGINE_CHECKOUT:-}" ;;
     pysulfsat)    echo "${PYSULFSAT_CHECKOUT:-}" ;;
     sulfliq)      echo "${SULFLIQ_CHECKOUT:-}" ;;
+    magemin)      echo "${MAGEMIN_CHECKOUT:-}" ;;
     *)            echo "" ;;
   esac
 }
@@ -66,6 +68,9 @@ engine_fallback() {
     # Preserve sulfliq's historical default for inspection, but do not treat
     # it as the tree loaded by an interpreter that cannot import SulfLiq.
     sulfliq)      echo "$HOME/Repos/sulfliq" ;;
+    # MAGEMin is a compiled binary, never importable: check the sibling source
+    # checkout. The live binary is built from a separate tree (see STATUS).
+    magemin)      echo "$(dirname "${COMMON_REPO_ROOT:-$REPO_ROOT}")/MAGEMin" ;;
     *)            echo "" ;;
   esac
 }
