@@ -633,7 +633,7 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "84fd56f0bea9ee322da880febe06d0262b0324795b60030c2c6369e3dd2cad2d"
+        "67e76a2d71c466371aa85342d2966a89540ca8b5dd90fd2d14a937b2782c9f0b"
     )
 
 
