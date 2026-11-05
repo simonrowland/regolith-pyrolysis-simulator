@@ -1025,9 +1025,10 @@ def test_declared_composition_map_refuses_combined_alkali_label_by_name() -> Non
         {"composition_wt_pct": values["composition_wt_pct"]},
         refusal_reason=refusal,
     ) is None
+    # Green refused the combined label, so (a) outranks the partial-analysis (b) reason.
     assert refusal == [
-        "mass-percent composition is a partial analysis: kept sum=58.0 wt% "
-        "is below 95 wt%"
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "Na2O_plus_K2O=4.2 wt%"
     ]
 
 
