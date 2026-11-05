@@ -396,6 +396,9 @@ def test_sio_wall_sweep_refuses_nonfinite_po2_and_po2_above_total() -> None:
 # The resulting melt-activity and SiO route change moves these CLI totals:
 # lunar 1.0409922677e-05 -> 1.04099076417e-05,
 # mars 1.05360311732e-05 -> 1.05354760695e-05.
+# b-1119's CaO/MgO liquid reference via d-144 fusion moves the Mars evolved
+# SiO report pin 1.05354760695e-05 -> 1.05354763902e-05 kg
+# (+3.207e-13 kg, +3.04400102e-6%); the lunar evolved pin is unchanged.
 from tests.studio_pin_support import sio_evolved_baseline
 
 BASELINE_SIO_EVOLVED_KG = {
@@ -518,9 +521,14 @@ BASELINE_STAGE4_SIO2_KG = {
 # 2.75786146523e-06 -> 1.88317547314e-06 -> 1.10774716572e-06 kg. Evolved SiO
 # remains unchanged; the feedstock-dependent capture shifts follow the
 # integrated pressure-limited wall response.
+# b-1119's CaO/MgO liquid reference via d-144 fusion moves the lunar studio
+# stage-3 pin 6.95337203734e-06 -> 6.95332797045e-06 kg
+# (-4.406689e-11 kg, -0.000633748486%). The supplied studio Mars fixture moves
+# its matching pin 1.10774716572e-06 -> 1.10775807581e-06 kg
+# (+1.091009e-11 kg, +0.0009849%).
 BASELINE_STAGE3_SIO2_KG = {
-    "lunar_mare_low_ti": 6.95337203734e-06,
-    "mars_basalt": 1.10774716572e-06,
+    "lunar_mare_low_ti": 6.95332797045e-06,
+    "mars_basalt": 1.10775807581e-06,
 }
 
 
