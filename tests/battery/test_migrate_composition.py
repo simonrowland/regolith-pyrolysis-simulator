@@ -1113,6 +1113,63 @@ def test_declared_unknown_trace_projects_with_notice() -> None:
     assert "unknown-component=0.3 wt%" in notice.reason
 
 
+def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
+    rejected = {
+        "SiO2": "50",
+        "MgO": "49",
+        "unknown-component": "1",
+    }
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        rejected,
+        refusal_reason=refusal,
+        refusal_classification=classification,
+        declared_map=True,
+    ) is None
+    # Green read and refused the unsupported numeric label, so the refusal is unflagged (a).
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "unknown-component=1 wt%"
+    ]
+    assert len(classification) == 1 and not classification[0].closure_refusal
+
+    trace = {
+        "SiO2": "50.2",
+        "MgO": "49.5",
+        "unknown-component": "0.3",
+    }
+    parsed = _oxide_map_from_mapping(trace, declared_map=True)
+    assert parsed == {"SiO2": Decimal("50.2"), "MgO": Decimal("49.5")}
+    notice = migrate_module._composition_projection_notice(
+        parsed,
+        closure_context=trace,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+    )
+    # Green accepted the trace label; the approved rule accepts it with disclosure.
+    assert notice is not None and notice.dropped == ("unknown-component",)
+    assert "unknown-component=0.3 wt%" in notice.reason
+
+
+def test_declared_flat_map_counts_bare_phosphorus() -> None:
+    values = {"SiO2": "50", "MgO": "49", "P": "1"}
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        values,
+        refusal_reason=refusal,
+        refusal_classification=classification,
+        declared_map=True,
+    ) is None
+    # Green accepted elemental P as a non-oxide; its 1 wt% excess is a flagged closure refusal (b).
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "P=1 wt%"
+    ]
+    assert len(classification) == 1 and classification[0].closure_refusal
+
+
 def test_formula_unknown_trace_projects_with_notice() -> None:
     source = {
         "composition_wt_pct": {
@@ -1482,11 +1539,14 @@ def test_wt_percent_derivation_ignores_printed_totals() -> None:
     assert "M_Total_g_mol" not in dict(derivation.parameters)
 
 
-def test_nested_and_flat_composition_maps_skip_mass_loss_conditions() -> None:
+def test_nested_map_counts_numeric_conditions_but_flat_row_skips_them() -> None:
     components = {"SiO2": Decimal("60"), "MgO": Decimal("40")}
+    refusal: list[str] = []
     assert _initial_oxide_map_from_values(
-        {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}}
-    ) == components
+        {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}},
+        refusal_reason=refusal,
+    ) is None
+    assert len(refusal) == 1 and "mass_loss_wt_pct=10 wt%" in refusal[0]
     assert _initial_oxide_map_from_values(
         {**components, "mass_loss_wt_pct": 10}, declared_map=True
     ) == components
@@ -5931,6 +5991,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             None,
             False,
             id="green-unknown-token",
+        ),
+        # (a) Green read and refused in-map XxO; the nested duplicate cannot replace that source.
+        pytest.param(
+            "in-map-and-nested-unknown-token",
+            {"SiO2": "50", "MgO": "49", "XxO": "1"},
+            {"point_conditions": {"printed_composition": {"XxO": "1"}}},
+            None,
+            False,
+            id="green-unknown-token-source-wins-over-nested-copy",
         ),
         # (b) Green never read nested XxO; only m1 sees its unsupported mass.
         pytest.param(
