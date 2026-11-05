@@ -133,7 +133,7 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
     assert set(migrated) == expected_ids
     assert len(migrated) == 278
     assert len(migrator.result.validation.hard_issues) == 0
-    # The unruled T.Fe valence convention leaves 16 flux-e/flux-h rows refused.
+    # T.Fe-only rows in (102,105] stay refused until t-1651 implements d-343: 16 flux-e/flux-h rows.
     assert len(migrator.result.validation.issues) == 634
     assert {issue.reason.value for issue in migrator.result.validation.issues} == {
         "identity_incomplete"
@@ -269,8 +269,8 @@ def test_isolated_migration_binds_rows_conditions_and_exact_schema_gaps() -> Non
             assert "unsupported component(s)" not in reason
     assert renormalized_rows == 0
     elemental_iron_refusal = (
-        "total iron printed as element: renormalisation depends on the iron "
-        "valence convention, pending an owner ruling"
+        "total iron printed as element: renormalisation waits on the "
+        "owner-accepted T.Fe valence-bracket rule (d-343), not yet implemented (t-1651)"
     )
     for flux, total in (("e", "102.15"), ("h", "104.70")):
         experiment_id = f"kunisada-1986-na2co3-flux-{flux}"

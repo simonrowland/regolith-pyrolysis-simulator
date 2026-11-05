@@ -1607,12 +1607,12 @@ def _percent_composition_closure_error(
         ):
             # Kunisada flux-e has S=102.15 with 2.3 wt% T.Fe as Fe; treating
             # it as FeO shifts S by 2.3 * (71.844 / 55.845 - 1) ~= 0.66 to
-            # 102.81, so renormalisation would depend on the unruled valence.
+            # 102.81, so renormalisation depends on the valence; d-343 rules the bracket, t-1651 implements it.
             return (
                 "mass-percent composition exceeds the accepted kept-sum limit: "
                 f"sum={total} wt% is above {_MASS_PERCENT_RENORMALIZE_ABOVE} wt%; "
-                "total iron printed as element: renormalisation depends on the "
-                "iron valence convention, pending an owner ruling"
+                "total iron printed as element: renormalisation waits on the "
+                "owner-accepted T.Fe valence-bracket rule (d-343), not yet implemented (t-1651)"
             )
     elif abs(total - Decimal("100")) > rounding_bound:
         return f"{basis}-percent composition does not close to 100 (sum={total})"

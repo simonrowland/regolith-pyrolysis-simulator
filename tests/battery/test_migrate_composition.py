@@ -3828,8 +3828,8 @@ def test_renormalization_notice_follows_composition_across_source_stores() -> No
                 kunisada_flux_eh_refusals += 1
                 assert composition is not None and composition.is_unknown
                 assert (
-                    "total iron printed as element: renormalisation depends on "
-                    "the iron valence convention, pending an owner ruling"
+                    "total iron printed as element: renormalisation waits on the "
+                    "owner-accepted T.Fe valence-bracket rule (d-343), not yet implemented (t-1651)"
                     in composition.reason
                 )
             loaded = migrate_module.observation_from_plain(to_plain(observation))
