@@ -6,7 +6,7 @@ Machine text was read from the MinerU markdown and `pdftotext-layout.txt` in the
 
 The page-3 equation block prints the solid fit for `Ca2Fe2O5(c)`, then labels the liquid fit `CaFe2O5(l)`. The controller ruled that the equation may be associated with Ca2Fe2O5 if the paper ties it to that compound's sample and melting interval. It does: the immediately preceding paragraph says Ca2Fe2O5 melting was complete at 1752 K, and the liquid equation covers 1750–1850 K. Preserve `CaFe2O5(l)` as the printed label and document the formula as a contextual misprint.
 
-Table I has two CaFe2O4 observations in the incongruent-melting interval: 1504.6 K / 64,320(a) and 1529.7 K / 74,970(a). The source says melting may begin as low as 1463 K, is not complete at 1530 K, and adopts 1510 K arbitrarily for the fitted phase boundary. The table does not label the physical phase of these two measurements. A ruling is needed before assigning a phase token: should these two mixed-transition-region measurements be represented as typed refusals (with the measured numeric data retained) or assigned by the adopted 1510 K treatment?
+Table I has two CaFe2O4 observations in the incongruent-melting interval: 1504.6 K / 64,320(a) and 1529.7 K / 74,970(a). The source says melting may begin as low as 1463 K, is not complete at 1530 K, and adopts 1510 K arbitrarily for the fitted phase boundary. By controller ruling, retain both numeric values as typed-refused rows with phase unknown; do not assign phase from the adopted 1510 K. Preserve the row marker and footnote (a), and record the melting interval and the fitted 1510 K treatment separately with their locators.
 
 ## Table structure
 
@@ -18,4 +18,4 @@ The text states the results are in defined calories (1 cal. = 4.1840 abs. joules
 
 ## Remaining work
 
-Resolve the phase assignment for the two CaFe2O4 points in the incongruent-melting interval. Then extract all calcium entries from Tables I and II, the equations, melting temperatures/enthalpies, and incongruent-melting text; finish the cell audit, isolated migration, focused fidelity test, required test files, and expected store-delta calculation.
+Extract all calcium entries from Tables I and II, the equations, melting temperatures/enthalpies, and incongruent-melting text; finish the cell audit, isolated migration, focused fidelity test, required test files, and expected store-delta calculation.
