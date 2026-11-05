@@ -170,7 +170,7 @@ ul { padding-left: 1.4rem; }</style>
 <li><code>data/foulant_thermo.yaml:230</code> - CaCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.1&quot;</li>
 <li><code>data/foulant_thermo.yaml:250</code> - MgCO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.2&quot;</li>
 <li><code>data/foulant_thermo.yaml:270</code> - Na2CO3.thermo.source: source: &quot;REF-012 NIST WebBook dagger; E1 sec 2.3 C0-corrected (-84 kJ/mol @900 degC)&quot;</li>
-<li><code>data/setpoints.yaml:1885</code> - overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.schedule: # pure-Fe curve is derived from REF-012 Tb and dH_vap and is used below</li>
+<li><code>data/setpoints.yaml:1895</code> - overhead_headspace.pipe_segment_temperatures_C.segments.stage_0_to_stage_1.schedule: # pure-Fe curve is derived from REF-012 Tb and dH_vap and is used below</li>
 <li><code>data/species_catalog.yaml:122</code> - id.source: REF-012 and Kanari 2018 per foulant_thermo.yaml.</li>
 <li><code>data/species_catalog.yaml:179</code> - id.source: gate; NIST WebBook REF-012 per foulant_thermo.yaml.</li>
 <li><code>data/vapor_pressures.yaml:1523</code> - families.metals_fe_family.physical_properties.species.Fe.pure_component_antoine.source: source: REF-012 CRC/NIST normal boiling point; CRC/NIST dH_vap~340 kJ/mol; Clausius-Clapeyron</li>
@@ -1203,7 +1203,7 @@ ul { padding-left: 1.4rem; }</style>
 <blockquote><p>1728 K, melting point of Ni; DeltaH = 4.10 kcal/mole.</p><footer>p. 28; Pins the solid-Ni/liquid-Ni segment boundary used by the NiO Ellingham row.</footer></blockquote>
 <p><strong>Cited by:</strong></p>
 <ul>
-<li><code>data/setpoints.yaml:1575</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
+<li><code>data/setpoints.yaml:1585</code> - mre_voltage_sequence.sequence.species.note: NiO graph source: REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668</li>
 <li><code>engines/builtin/electrolysis_step.py:127</code> - &quot;REF-058 Mah &amp; Pankratz 1976 USBM Bulletin 668 NiO(s) &quot;</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:82</code> - def delta_g_kJ_per_mol_O2(self, temperature_K: float) -&gt; float: # and REF-058 USBM Bulletin 668 for Ni/NiO.</li>
 <li><code>simulator/chemistry/ellingham_thermo.py:413</code> - def _na2o_janaf_fit_segments() -&gt; tuple[EllinghamFitSegment, ...]: # Ni premise: REF-058, Mah &amp; Pankratz, U.S. Bureau of Mines Bulletin 668</li>
