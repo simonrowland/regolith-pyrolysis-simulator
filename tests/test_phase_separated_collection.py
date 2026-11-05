@@ -10,6 +10,11 @@ from simulator.campaigns import CampaignManager
 from simulator.condensation import (
     CondensationModel, CondensationRouteResult, DepositionInputRefusal, Stage3SilicaExposureRefusal,
 )
+from simulator.condensation_routing import (
+    K_TRAP_STAGE_KEY,
+    NA_COLLECTOR_STAGE_KEY,
+    STAGE_KEY_BY_NUMBER,
+)
 from simulator.config import load_config_bundle
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -96,14 +101,14 @@ def test_open_zero_alkali_sio_window_reaches_stage3(monkeypatch):
 def test_diverted_alkali_sio_numeric_pin():
     """Pin the merged bypass route while the silica cartridge is isolated.
 
-    The Na collector (identity (4, 0)) still has the film-temperature
-    capture: SiO 0x1.ee08a93fba8b2p-1 and Na 0x1.6bb536538edccp-11.
-    Those hexes were the whole stage-number 4 total while the K trap
-    accepted only its designated species. The trap now applies the same
-    saturation law, so the SiO and Na that used to pass it condense at
-    (4, 1). K is supersaturated at 250 C, so the collector takes part of
-    it and the trap takes the rest. Stage number 4 is the sum. The hex
-    strings are that production route().
+    The Na collector (identity (4, 0)) keeps the film-temperature Na and
+    K hexes. e-NTU bulk temperature moved 0.005226 kg of SiO off that
+    collector and onto the trap: collector SiO 0x1.eb5bad0247ecbp-1, trap
+    SiO 0x1.4a452fdb81350p-5, and their sum is the whole kilogram. The
+    trap applies the same saturation law, so Na and K that pass the
+    collector condense at (4, 1). Stage number 4 is that sum. The hex
+    strings are this production route(), and the three species close
+    against the inlet.
     """
     model = _model("divert", hard_gate=False)
     result = model.route(
@@ -116,24 +121,30 @@ def test_diverted_alkali_sio_numeric_pin():
         return {sp: kg.hex() for sp, kg in bucket.items()}
 
     assert hexes(result.capture_kg_by_stage_identity[(4, 0)]) == {
-        "SiO": "0x1.ee08a93fba8b2p-1",
+        "SiO": "0x1.eb5bad0247ecbp-1",
         "Na": "0x1.6bb536538edccp-11",
         "K": "0x1.37fba2863fc46p-14",
     }
     assert hexes(result.capture_kg_by_stage_identity[(4, 1)]) == {
-        "SiO": "0x1.1f756c04573f3p-5",
-        "Na": "0x1.a59943bbb4c41p-18",
-        "K": "0x1.adca24840d987p-16",
+        "SiO": "0x1.4a452fdb81350p-5",
+        "Na": "0x1.a59943ba3757cp-18",
+        "K": "0x1.adca243e7e035p-16",
     }
-    assert hexes(result.condensed_by_stage_species[4]) == {
-        "SiO": "0x1.ffffffffffff1p-1",
-        "Na": "0x1.6f0068db06465p-11",
-        "K": "0x1.a36e2ba7432a8p-14",
+    # The public map is keyed by stage key. Stage number 4 is the sum of
+    # the Na collector and the K trap, the two surfaces that share it.
+    stage4 = {}
+    for stage_key in (NA_COLLECTOR_STAGE_KEY, K_TRAP_STAGE_KEY):
+        for species, kg in result.condensed_by_stage_species.get(stage_key, {}).items():
+            stage4[species] = stage4.get(species, 0.0) + kg
+    assert hexes(stage4) == {
+        "SiO": "0x1.0000000000000p+0",
+        "Na": "0x1.6f0068db034b7p-11",
+        "K": "0x1.a36e2b95df453p-14",
     }
     assert hexes(result.remaining_by_species) == {
         "SiO": "0x0.0p+0",
-        "Na": "0x1.618e0c0000000p-70",
-        "K": "0x1.53eb7af400000p-63",
+        "Na": "0x1.6973dba000000p-70",
+        "K": "0x1.5b8351ab00000p-63",
     }
 
 
@@ -284,7 +295,7 @@ def test_admitted_alkali_parcel_requires_reactive_stage3_uptake(oxygen_mol, monk
     )
     assert model.train.collection_route["stage3_route"] == "through"
     assert model.last_stage3_route_diagnostic["capture_purity"] >= 0.98
-    stage3 = result.condensed_by_stage_species.get(3, {})
+    stage3 = result.condensed_by_stage_species.get(STAGE_KEY_BY_NUMBER[3], {})
     uptake_mol = {
         sp: stage3.get(sp, 0.0) / resolve_species_formula(sp).molar_mass_kg_per_mol()
         for sp in ("Na", "K")
@@ -315,8 +326,9 @@ def test_vanishing_oxygen_pressure_disables_reaction_despite_available_oxidant(m
     )
     assert all(not r['favoured'] and r['log_Q_over_K'] > 0.0
                for r in result.stage3_reactive_alkali_by_species.values())
-    assert result.condensed_by_stage_species[3].get('Na', 0.0) == 0.0
-    assert result.condensed_by_stage_species[3].get('K', 0.0) == 0.0
+    stage3 = result.condensed_by_stage_species[STAGE_KEY_BY_NUMBER[3]]
+    assert stage3.get('Na', 0.0) == 0.0
+    assert stage3.get('K', 0.0) == 0.0
 
 
 @pytest.mark.parametrize('oxygen_mol', [1.0, 1e-7, 0.0])
@@ -379,8 +391,18 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
     if oxygen_mol:
         assert oxide_mol > 0.0
         assert stage_purity_report(sim.train)['stage_3_sio_zone']['purity_fraction'] < 1.0
-        assert sum(sim.train.stages[4].collected_kg.get(sp, 0.0) for sp in ('Na', 'K')) < sum(
-            bypass.condensed_by_stage_species[4].get(sp, 0.0) for sp in ('Na', 'K'))
+        # Stage number 4 is the Na collector plus the K trap. The through
+        # path has already taken alkali at stage 3, so less of it reaches
+        # those two surfaces than on the divert route.
+        bypass_stage4 = 0.0
+        for stage_key in (NA_COLLECTOR_STAGE_KEY, K_TRAP_STAGE_KEY):
+            bypass_stage4 += sum(
+                bypass.condensed_by_stage_species.get(stage_key, {}).get(sp, 0.0)
+                for sp in ('Na', 'K')
+            )
+        assert sum(
+            sim.train.stages[4].collected_kg.get(sp, 0.0) for sp in ('Na', 'K')
+        ) < bypass_stage4
         assert sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O')) / (
             stage3['SiO2'] + sum(stage3.get(oxide, 0.0) for oxide in ('Na2O', 'K2O'))) <= 0.02
 
@@ -389,7 +411,7 @@ def test_reactive_stage3_kernel_commit_closes_atoms_and_projects_oxide(oxygen_mo
 @pytest.mark.parametrize("amount", [1.0, 1e-30])
 def test_open_refuses_every_positive_alkali_carrier_with_zero_capture(carrier, amount, monkeypatch):
     model = _model("through")
-    monkeypatch.setattr(model, "_route", lambda *args: CondensationRouteResult())
+    monkeypatch.setattr(model, "_route", lambda *args, **kwargs: CondensationRouteResult())
     with pytest.raises(Stage3SilicaExposureRefusal, match="silica_exposed_to_alkali") as caught:
         model.route(EvaporationFlux({carrier: amount}), MeltState())
     finding = caught.value.stage3_route_diagnostic["findings"][0]
@@ -683,8 +705,10 @@ def test_live_capture_purity_bound_and_limits(monkeypatch, purity, factor, captu
     from simulator.condensation import CondensationRouteResult
     model = _model("through")
     model.train.collection_route["stage3_product_purity"] = purity
-    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": capture}})
-    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    projection = CondensationRouteResult(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"SiO": capture}},
+    )
+    monkeypatch.setattr(model, "_route", lambda *args, **kwargs: projection)
     # Set an oxide-equivalent dose independently via the production formula resolver.
     na = resolve_species_formula("Na", {}).molar_mass_kg_per_mol()
     oxide = resolve_species_formula("Na2O", {}).molar_mass_kg_per_mol()
@@ -749,8 +773,10 @@ def test_retained_alkali_is_charged_to_live_purity_budget(monkeypatch, dose_fact
     model = _model("through")
     # Exercise the supported 0.999 runtime override (d-287); the default is 0.98.
     model.train.collection_route["stage3_product_purity"] = 0.999
-    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
-    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    projection = CondensationRouteResult(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"SiO": 1.0}},
+    )
+    monkeypatch.setattr(model, "_route", lambda *args, **kwargs: projection)
     oxide = resolve_species_formula("K2O", {}).molar_mass_kg_per_mol()
     # One hour of retained K, converted on the production formula basis.
     allowance = projection.silica_capture_kg(3) * (1 - 0.999) / 0.999
@@ -767,8 +793,10 @@ def test_interim_gate_uses_product_grade_before_chunk4_burst_ceiling(monkeypatch
     model = _model("through")
     model.train.collection_route.update({
         "stage3_product_purity": 0.999, "stage3_instantaneous_purity": 0.99})
-    projection = CondensationRouteResult(condensed_by_stage_species={3: {"SiO": 1.0}})
-    monkeypatch.setattr(model, "_route", lambda *args: projection)
+    projection = CondensationRouteResult(
+        condensed_by_stage_species={STAGE_KEY_BY_NUMBER[3]: {"SiO": 1.0}},
+    )
+    monkeypatch.setattr(model, "_route", lambda *args, **kwargs: projection)
     # A 99.5% silica/oxide mixture lies between the two owner specifications.
     # Na2O is already the oxide mass basis, so no carrier conversion is needed.
     oxide_dose = projection.silica_capture_kg(3) * (1 - 0.995) / 0.995
