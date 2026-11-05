@@ -2861,6 +2861,162 @@ def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("echo", "resolved", "oxide_total", "expected_water"),
+    (
+        ("″", "0", "100", Decimal("0")),
+        ("5.21", "5.21", "99.5", Decimal("5.21")),
+        ("5.21", None, "99.5", None),
+    ),
+)
+def test_m1_as_printed_fields_are_not_composition_or_closure_components(
+    echo: str,
+    resolved: str | None,
+    oxide_total: str,
+    expected_water: Decimal | None,
+) -> None:
+    oxides = {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal(oxide_total) - Decimal("50"),
+    }
+    payload = {
+        "composition_wt_pct": oxides,
+        "H2O_WT_PCT_AS_PRINTED": echo,
+        "_migrate_closure_only_components": {
+            "H2O_wt_pct_as_printed": echo,
+        },
+    }
+    if resolved is not None:
+        payload["H2O_wt_pct"] = resolved
+
+    diagnostics: list[tuple[str, str]] = []
+    expected_volatile = (
+        {} if expected_water is None else {"H2O": expected_water}
+    )
+    assert migrate_module._printed_volatile_mass_percent(
+        payload, diagnostics=diagnostics
+    ) == expected_volatile
+    assert diagnostics == []
+    assert migrate_module._mass_percent_kept_total(
+        oxides, closure_context=payload
+    ) == Decimal(oxide_total) + (expected_water or Decimal("0"))
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        oxides, closure_context=payload, declared_component_map=oxides
+    )
+    assert converted is not None
+    assert refusal is None
+
+    assert migrate_module._printed_composition_map(
+        {"components": {"SiO2": "50", "FeO_as_printed": "″"}}
+    ) == {"SiO2": "50"}
+    oxide_diagnostics: list[tuple[str, str]] = []
+    assert migrate_module._oxide_mass_percent_components(
+        {
+            "SiO2": "50",
+            "MgO": "50",
+            "FeO_AS_PRINTED": "″",
+        },
+        diagnostics=oxide_diagnostics,
+    ) == {"SiO2": Decimal("50"), "MgO": Decimal("50")}
+    assert oxide_diagnostics == []
+    closure_only_diagnostics: list[tuple[str, str]] = []
+    assert migrate_module._printed_composition_closure_components(
+        {
+            "_migrate_closure_only_components": {
+                "FeO_AS_PRINTED": "″"
+            }
+        },
+        diagnostics=closure_only_diagnostics,
+    ) == {}
+    assert closure_only_diagnostics == []
+
+
+def test_gaillard_as_printed_water_echoes_keep_live_compositions() -> None:
+    extract_path = (
+        REPO_ROOT
+        / "data/literature/extracts/gaillard-2003-hydrous-silicic-melt-activity.yaml"
+    )
+    document = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    series_rows = [
+        row
+        for species in document["species"].values()
+        for observation in species.get("observations", [])
+        for row in (observation.get("values", {}).get("series", []) or [])
+        if isinstance(row, dict) and "H2O_wt_pct_as_printed" in row
+    ]
+    ditto_row = next(
+        row
+        for row in series_rows
+        if row["H2O_wt_pct_as_printed"] == "″"
+        and row.get("H2O_wt_pct") == "0"
+    )
+    numeric_row = next(
+        row
+        for row in series_rows
+        if row["H2O_wt_pct_as_printed"] == "5.21"
+        and row.get("H2O_wt_pct") == "5.21"
+    )
+    for row, water in ((ditto_row, Decimal("0")), (numeric_row, Decimal("5.21"))):
+        diagnostics: list[tuple[str, str]] = []
+        assert migrate_module._printed_volatile_mass_percent(
+            row, diagnostics=diagnostics
+        ) == {"H2O": water}
+        assert diagnostics == []
+        source_map = migrate_module._printed_composition_source_map(row)
+        assert source_map is not None
+        oxide_total = sum(
+            migrate_module._oxide_mass_percent_components(source_map).values(),
+            Decimal("0"),
+        )
+        assert migrate_module._mass_percent_kept_total(
+            {}, closure_context=row
+        ) == oxide_total + water
+        converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+            {
+                name: Decimal(str(amount))
+                for name, amount in source_map.items()
+            },
+            closure_context=row,
+            declared_component_map=source_map,
+        )
+        assert converted is not None
+        assert refusal is None
+
+    migrator = migrate_one_extract(REPO_ROOT, extract_path)
+    migrator.finalize()
+    compositions = [
+        observation.point_conditions["composition"]
+        for observation in migrator.result.observations.values()
+        if observation.source_id == extract_path.stem
+        and observation.point_conditions is not None
+        and "composition" in observation.point_conditions
+    ]
+    assert len(compositions) == 24
+    assert all(composition.state.is_value for composition in compositions)
+    source_map = migrate_module._printed_composition_source_map(ditto_row)
+    assert source_map is not None
+    expected_composition, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {
+            name: Decimal(str(amount))
+            for name, amount in source_map.items()
+        },
+        closure_context=ditto_row,
+        declared_component_map=source_map,
+    )
+    assert expected_composition is not None
+    assert refusal is None
+    assert any(
+        composition.state.is_value
+        and composition.state.value.as_map() == expected_composition.as_map()
+        for composition in compositions
+    )
+    assert not any(
+        "_as_printed" in (composition.state.reason or "")
+        for composition in compositions
+        if not composition.state.is_value
+    )
+
+
 def test_refused_high_kept_total_has_no_projection_notice() -> None:
     printed = {
         "SiO2": Decimal("40"),

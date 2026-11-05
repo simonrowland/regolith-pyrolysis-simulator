@@ -886,6 +886,10 @@ def _mass_percent_component_stem(name: str) -> tuple[str, bool]:
     )
 
 
+def _is_as_printed_provenance_echo(name: object) -> bool:
+    return str(name).strip().casefold().endswith("_as_printed")
+
+
 @lru_cache(maxsize=2048)
 def _mass_percent_component_key(name: str) -> tuple[str, bool]:
     """Normalize a printed wt% key using the parser's oxide alias resolver."""
@@ -4509,14 +4513,10 @@ _VOLATILE_CLOSURE_COMPONENTS = {
     "h2o": ("H2O", 2),
     "h2o_empa": ("H2O", 1),
     "h2o_wt_pct": ("H2O", 0),
-    "h2o_wt_pct_as_printed": ("H2O", 3),
     "h2o_wt_percent": ("H2O", 0),
-    "h2o_wt_percent_as_printed": ("H2O", 3),
     "co2": ("CO2", 1),
     "co2_wt_pct": ("CO2", 0),
-    "co2_wt_pct_as_printed": ("CO2", 2),
     "co2_wt_percent": ("CO2", 0),
-    "co2_wt_percent_as_printed": ("CO2", 2),
     "loi": ("LOI", 1),
     "loi_wt_pct": ("LOI", 0),
     "s": ("S", 1),
@@ -4538,6 +4538,8 @@ _RESIDUE_COMPONENT_SLOT_FIELDS = (
 @lru_cache(maxsize=2048)
 def _volatile_closure_component(name: str) -> tuple[str, int] | None:
     token = str(name).strip()
+    if _is_as_printed_provenance_echo(token):
+        return None
     alias = _VOLATILE_CLOSURE_COMPONENTS.get(token.casefold())
     if alias is not None:
         return alias
@@ -4581,19 +4583,22 @@ def _printed_composition_map(payload: object) -> Mapping[str, Any] | None:
         return {
             str(key): value
             for key, value in components.items()
-            if not _is_skipped_composition_map_walk_key(key, value)
+            if not _is_as_printed_provenance_echo(key)
+            and not _is_skipped_composition_map_walk_key(key, value)
         }
     if isinstance(components, (list, tuple)):
         return {
             str(pair[0]): pair[1]
             for pair in components
             if isinstance(pair, (list, tuple)) and len(pair) == 2
+            and not _is_as_printed_provenance_echo(pair[0])
             and not _is_skipped_composition_map_walk_key(pair[0], pair[1])
         }
     return {
         str(key): value
         for key, value in payload.items()
-        if not _is_skipped_composition_map_walk_key(key, value)
+        if not _is_as_printed_provenance_echo(key)
+        and not _is_skipped_composition_map_walk_key(key, value)
     }
 
 
@@ -4813,6 +4818,8 @@ def _source_printed_composition_values(
     printed: dict[str, Any] = {}
     for key, value in source_map.items():
         name = str(key)
+        if _is_as_printed_provenance_echo(name):
+            continue
         normalized_name, _has_mass_suffix = _mass_percent_component_key(name)
         if normalized_name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
             continue
@@ -5105,6 +5112,8 @@ def _printed_volatile_mass_percent(
 
     for scope, source in scopes:
         for name, raw_amount in scope.items():
+            if _is_as_printed_provenance_echo(name):
+                continue
             alias = _volatile_closure_component(str(name))
             if alias is None:
                 normalized_name, _has_mass_suffix = _mass_percent_component_key(
@@ -5162,6 +5171,8 @@ def _printed_composition_closure_components(
         return {}
     components: dict[str, Decimal] = {}
     for name, value in raw.items():
+        if _is_as_printed_provenance_echo(name):
+            continue
         kind, amount = _classify_composition_cell(value)
         if kind == "malformed" and diagnostics is not None:
             diagnostics.append(
@@ -5183,7 +5194,11 @@ def _oxide_mass_percent_components(
     green_read_maps: Sequence[Mapping[str, Any]] = (),
     diagnostics: list[tuple[str, str]] | None = None,
 ) -> dict[str, Decimal]:
-    names = {_mass_percent_component_key(str(name))[0] for name in wt}
+    names = {
+        _mass_percent_component_key(str(name))[0]
+        for name in wt
+        if not _is_as_printed_provenance_echo(name)
+    }
     if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
         overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
         reason = f"ambiguous total iron components: FeOT with {overlap}"
@@ -5245,6 +5260,8 @@ def _oxide_mass_percent_components(
 
     components: dict[str, Decimal] = {}
     for raw_name, amount in wt.items():
+        if _is_as_printed_provenance_echo(raw_name):
+            continue
         record_raw_cell_rejection(
             str(raw_name), amount, _GREEN_READ_OXIDE_MAP
         )
@@ -5342,6 +5359,8 @@ def _is_composition_map_noncomponent_name(
     explicit_map_value: object = None,
 ) -> bool:
     raw_name = str(name).strip()
+    if _is_as_printed_provenance_echo(raw_name):
+        return True
     token, _has_mass_suffix = _mass_percent_component_key(raw_name)
     folded = token.casefold()
     # P is a row-level pressure alias outside a component map, but elemental P
