@@ -72,9 +72,20 @@ def test_runtime_override_numeric_boundary_pin():
     (-1, "must be >= 0"),
 ])
 def test_runtime_override_numeric_error_pin(value, suffix):
+    from simulator.campaigns import CampaignManager
+
+    # pO2 admission is the pressure owner. The web boundary surfaces that
+    # text. ``suffix`` is the prose this node used before the reason code:
+    # None and "" are not_numeric, and the strings "nan" and "inf" are
+    # not declared scalars, so they are not_numeric rather than nonfinite.
+    del suffix
+    with pytest.raises(ValueError) as owner:
+        CampaignManager.validate_runtime_campaign_overrides(
+            {"C4": {"pO2_mbar": value}}
+        )
     with pytest.raises(web_events.InputValidationError) as caught:
         web_events._coerce_runtime_campaign_overrides({"C4": {"pO2_mbar": value}})
-    assert str(caught.value) == f"runtime_campaign_overrides.C4.pO2_mbar {suffix}"
+    assert str(caught.value) == str(owner.value)
 
 
 @pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
