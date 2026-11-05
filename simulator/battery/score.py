@@ -14956,19 +14956,19 @@ def measured_engine_rail_records(
     return records
 
 
-def _paired_engine_rail_benchmarks(
+def _paired_engine_rail_comparisons(
     residuals: Iterable[Mapping[str, object]],
     *,
     primary_engines: Sequence[str],
     comparison_engines: Sequence[str],
     rails: Sequence[str],
 ) -> list[dict[str, object]]:
-    """Choose each primary's lowest-RMS comparison on pairwise shared rows.
+    """Return every comparison engine's RMS on pairwise shared rows.
 
     Only one numeric dex row per engine/reference/rail is unambiguous enough
     to pair. Missing rows and duplicates are excluded from that comparison.
-    A result is returned for every requested rail and primary, including an
-    explicit unavailable record when no comparison engine shares rows.
+    Each requested rail and primary receives a record, with comparisons sorted
+    by shared-row count descending and engine name for ties.
     """
 
     values: dict[tuple[str, str], dict[str, list[Decimal]]] = defaultdict(
@@ -14998,7 +14998,7 @@ def _paired_engine_rail_benchmarks(
         values[(rail, reference)][engine].append(value)
 
     records: list[dict[str, object]] = []
-    comparison_names = set(comparison_engines) - set(primary_engines)
+    comparison_names = sorted(set(comparison_engines) - set(primary_engines))
     for rail in sorted(set(rails)):
         for primary_engine in primary_engines:
             pairs_by_engine: dict[str, list[tuple[Decimal, Decimal]]] = defaultdict(list)
@@ -15016,38 +15016,28 @@ def _paired_engine_rail_benchmarks(
                             (primary_value, comparison_values[0])
                         )
 
-            candidates: list[tuple[Decimal, str, Decimal, int]] = []
+            candidates: list[tuple[int, str, Decimal, Decimal]] = []
             for engine, pairs in pairs_by_engine.items():
-                benchmark_rms = _rms([comparison for _primary, comparison in pairs])
+                outside_rms = _rms([comparison for _primary, comparison in pairs])
                 primary_rms = _rms([primary for primary, _comparison in pairs])
-                if benchmark_rms is not None and primary_rms is not None:
+                if outside_rms is not None and primary_rms is not None:
                     candidates.append(
-                        (benchmark_rms, engine, primary_rms, len(pairs))
+                        (len(pairs), engine, outside_rms, primary_rms)
                     )
-            if not candidates:
-                records.append(
-                    {
-                        "rail": rail,
-                        "primary_engine": primary_engine,
-                        "benchmark_engine": None,
-                        "n": 0,
-                        "primary_rms_dex": None,
-                        "benchmark_rms_dex": None,
-                    }
-                )
-                continue
-
-            benchmark_rms, engine, primary_rms, count = min(
-                candidates, key=lambda candidate: (candidate[0], candidate[1])
-            )
+            candidates.sort(key=lambda candidate: (-candidate[0], candidate[1]))
             records.append(
                 {
                     "rail": rail,
                     "primary_engine": primary_engine,
-                    "benchmark_engine": engine,
-                    "n": count,
-                    "primary_rms_dex": str(primary_rms),
-                    "benchmark_rms_dex": str(benchmark_rms),
+                    "comparisons": [
+                        {
+                            "engine": engine,
+                            "n_shared": n_shared,
+                            "outside_rms_dex": str(outside_rms),
+                            "primary_rms_dex_on_shared": str(primary_rms),
+                        }
+                        for n_shared, engine, outside_rms, primary_rms in candidates
+                    ],
                 }
             )
     return records
@@ -15361,7 +15351,7 @@ def _battery_hero_deck_records(
 
     observations = observations or {}
     points: list[dict[str, object]] = []
-    benchmark_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
+    comparison_rows: dict[str, list[Mapping[str, object]]] = defaultdict(list)
     metric_values: dict[tuple[str, str], list[Decimal]] = defaultdict(list)
     unavailable: dict[tuple[str, str], int] = defaultdict(int)
     axis_refusals: dict[tuple[str, str, str], int] = defaultdict(int)
@@ -15409,7 +15399,7 @@ def _battery_hero_deck_records(
             **fields,
         }
         points.append(point)
-        benchmark_rows[chart].append({**row, "rail": chart})
+        comparison_rows[chart].append({**row, "rail": chart})
 
     for row in rows:
         rail = str(row.get("rail") or "")
@@ -15658,10 +15648,10 @@ def _battery_hero_deck_records(
                     None if not values else str(_median_abs(values))
                 ),
             }
-    benchmarks = {
+    comparisons = {
         (str(record["rail"]), str(record["primary_engine"])): record
-        for record in _paired_engine_rail_benchmarks(
-            (row for chart_rows in benchmark_rows.values() for row in chart_rows),
+        for record in _paired_engine_rail_comparisons(
+            (row for chart_rows in comparison_rows.values() for row in chart_rows),
             primary_engines=primary_engines,
             comparison_engines=comparison_engines,
             rails=_BATTERY_HERO_DECK_CHART_IDS,
@@ -15670,7 +15660,7 @@ def _battery_hero_deck_records(
     return {
         "points": tuple(points),
         "metrics": metrics,
-        "benchmarks": benchmarks,
+        "comparisons": comparisons,
         "unavailable_axis_counts": dict(unavailable),
         "axis_refusals": dict(axis_refusals),
         "axis_refusal_details": {

@@ -94,7 +94,7 @@ from simulator.battery.score import (
     _battery_hero_minor_foulant_facets,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_sweet_spot_records,
-    _paired_engine_rail_benchmarks,
+    _paired_engine_rail_comparisons,
     _residual_engine_observable,
     compile_residual,
     compute_metric,
@@ -7437,7 +7437,7 @@ def test_measured_engine_rail_records_group_source_relation() -> None:
     ]
 
 
-def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> None:
+def test_paired_engine_rail_comparisons_include_all_shared_rows() -> None:
     rows = [
         {
             "rail": Rail.VAPOUR.value,
@@ -7449,7 +7449,7 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
             "rail": Rail.VAPOUR.value,
             "reference": "internal-vaporock",
             "candidate_request": {"engine": "internal-analytical"},
-            "numeric": {"operation": "dex", "value": "4"},
+            "numeric": {"operation": "dex", "value": "3"},
         },
         {
             "rail": Rail.VAPOUR.value,
@@ -7473,7 +7473,7 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
             "rail": Rail.VAPOUR.value,
             "reference": "shared",
             "candidate_request": {"engine": "vaporock"},
-            "numeric": {"operation": "dex", "value": "0.5"},
+            "numeric": {"operation": "dex", "value": "4"},
         },
         {
             "rail": Rail.VAPOUR.value,
@@ -7495,7 +7495,10 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
         },
     ]
 
-    records = _paired_engine_rail_benchmarks(
+    # Hand check: openimcc/VapoRock (4^2)=16, n=1, sqrt(16/1)=4;
+    # internal/VapoRock (4^2+4^2)=32, n=2, sqrt(32/2)=4;
+    # internal/ThermoEngine (2^2)=4, n=1, sqrt(4/1)=2.
+    records = _paired_engine_rail_comparisons(
         rows,
         primary_engines=("openimcc", "internal-analytical"),
         comparison_engines=("vaporock", "thermoengine", "alphamelts", "magemin"),
@@ -7508,27 +7511,44 @@ def test_paired_engine_rail_benchmarks_choose_best_comparison_per_primary() -> N
     assert by_key[(Rail.VAPOUR.value, "openimcc")] == {
         "rail": Rail.VAPOUR.value,
         "primary_engine": "openimcc",
-        "benchmark_engine": "vaporock",
-        "n": 1,
-        "primary_rms_dex": "1",
-        "benchmark_rms_dex": "0.5",
+        "comparisons": [
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "1",
+            },
+            {
+                "engine": "vaporock",
+                "n_shared": 1,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "1",
+            },
+        ],
     }
     assert by_key[(Rail.VAPOUR.value, "internal-analytical")] == {
         "rail": Rail.VAPOUR.value,
         "primary_engine": "internal-analytical",
-        "benchmark_engine": "thermoengine",
-        "n": 1,
-        "primary_rms_dex": "3",
-        "benchmark_rms_dex": "2",
+        "comparisons": [
+            {
+                "engine": "vaporock",
+                "n_shared": 2,
+                "outside_rms_dex": "4",
+                "primary_rms_dex_on_shared": "3",
+            },
+            {
+                "engine": "thermoengine",
+                "n_shared": 1,
+                "outside_rms_dex": "2",
+                "primary_rms_dex_on_shared": "3",
+            },
+        ],
     }
     for primary in ("openimcc", "internal-analytical"):
         assert by_key[(Rail.REDOX.value, primary)] == {
             "rail": Rail.REDOX.value,
             "primary_engine": primary,
-            "benchmark_engine": None,
-            "n": 0,
-            "primary_rms_dex": None,
-            "benchmark_rms_dex": None,
+            "comparisons": [],
         }
 
 
