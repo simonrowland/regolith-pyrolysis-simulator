@@ -292,6 +292,11 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # (-0.98%), and b99fc004f (-32%). D066's package change is separate:
     # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
     # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). Studio pin
+    # At green a6d75d8b4, its test expected silica 0.06888507997517511 kg
+    # and product SiO 0.0076796816652895455 kg, while its Studio report already
+    # recorded silica 0.006596004558853442 kg and product SiO 0 kg. This
+    # pre-existing green discrepancy is not caused by b-1119 and is tracked
+    # separately; keep these pins aligned with the supplied Studio report.
     # Studio reports pin the silicon disproportionation products collected by
     # the designated Stage 3 trap. b-1119's CaO/MgO liquid reference via d-144
     # fusion moves staged silica 0.006596004558853442 ->

@@ -528,11 +528,11 @@ BASELINE_STAGE4_SIO2_KG = {
 # remains unchanged; the feedstock-dependent capture shifts follow the
 # integrated pressure-limited wall response.
 # b-1119's CaO/MgO liquid reference via d-144 fusion moves the lunar Stage-3
-# report pin 6.73119341581e-06 -> 6.95332797045e-06 kg
-# (+2.2213455464e-07 kg, +3.30007683509e-2 relative). The Mars Stage-3 value
-# is fixture-derived: the green fixture's 2.75786059627e-06 kg becomes the
-# supplied Studio-3 golden's 1.10775807581e-06 kg (-1.65010252046e-06 kg,
-# -0.598327023016 relative). The pin report's sio_stage3_silica_kg is the
+# report pin from the green report and fixture value 6.95337203734e-06 kg to
+# 6.95332797045e-06 kg (-4.40668899999e-11 kg, -6.33748485818e-6 relative).
+# Mars's green fixture value 1.10774716572e-06 kg becomes the supplied
+# Studio-3 golden's 1.10775807581e-06 kg (+1.09100900002e-11 kg,
+# +9.84889904286e-6 relative). The pin report's sio_stage3_silica_kg is the
 # lunar-only CLI pin; there is no independent Mars Stage-3 report value, so the
 # Mars baseline intentionally follows the Studio-3 golden.
 BASELINE_STAGE3_SIO2_KG = {
@@ -787,13 +787,14 @@ def test_sio_yield_diagnostics_include_wall_sticking_alpha_notice():
     assert notice["severity"] == "warning"
     assert notice["code"] == "wall_deposit_sticking_alpha_uncertified"
     assert notice["source_class"] == "status_bearing_material_alpha"
-    # The obtained notice uses the current hkl_ideal_upper_bound vocabulary;
-    # cited_hkl_accommodation is older and was not introduced by b-1119.
+    # Mg retains cited_hkl_accommodation, but is absent because it leaves the
+    # one-hour participating roster under d-144; Na supplies
+    # hkl_ideal_upper_bound.
     assert "hkl_ideal_upper_bound" in notice["source_classes"]
     assert "uncertified_na_analogy_default" in notice["source_classes"]
-    # d-144 (5b5d2a080) shifts the one-hour melt composition enough that Mg
-    # no longer contributes to this wall-sticking notice.
+    # d-144 (5b5d2a080) removes Mg from the one-hour participating roster.
     assert notice["species"] == ["Fe", "K", "Mn", "Na"]
+    assert "Mg" not in notice["species"]
     assert "Mg" not in notice["alpha_s_by_species"]
     assert (
         notice["grounding_target"]
