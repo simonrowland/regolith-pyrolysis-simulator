@@ -3495,13 +3495,15 @@ def test_in_window_c2a_run_captures_na_product() -> None:
     per_hour = session.per_hour_summaries()
     below_window = [summary for summary in per_hour if float(summary["T_C"]) < 1400.0]
     assert below_window
-    na_before_window_kg = float(
-        below_window[-1]["product_ledger_kg_at_hour"].get("Na", 0.0)
+    # Captured Na books to the condensation train and, after the C3 transfer,
+    # the reagent inventory; it never enters the flat product ledger (see
+    # test_in_window_c2a_run_captures_na_to_reagent_and_terminal_offgas).
+    accounts = session.simulator.atom_ledger.kg_by_account()
+    captured_na_kg = sum(
+        float(accounts.get(account, {}).get("Na", 0.0))
+        for account in ("process.condensation_train", "process.reagent_inventory")
     )
-    na_at_end_kg = float(
-        per_hour[-1]["product_ledger_kg_at_hour"].get("Na", 0.0)
-    )
-    assert na_at_end_kg - na_before_window_kg > 0.0
+    assert captured_na_kg > 0.0
 
     in_window_hours = sum(
         1400.0 <= float(summary["T_C"]) <= 1450.0 for summary in per_hour
