@@ -202,11 +202,27 @@ def _assert_internal_activity_residual_matches_production(
     )
     assert expected_residual is not None
     assert residual.numeric.value == pytest.approx(expected_residual.value, rel=1e-9)
-    fallback = next(
-        notice for notice in residual.notices if notice.kind is NoticeKind.FALLBACK
+    fusion_fallback = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith(
+            "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
+        )
     )
-    assert fallback.authority is Authority.BRIDGE
-    assert fallback.reason == "melt_oxide_activity has no certified evidence tier"
+    assert fusion_fallback.authority is Authority.BRIDGE
+    assert fusion_fallback.band == "[298.15, 4000] K"
+    assert fusion_fallback.reason == (
+        "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
+        "authority=bridge|reason=JANAF tabulates the liquid phase below its "
+        "solid-liquid Gibbs crossing; this is JANAF's metastable (supercooled) "
+        "liquid branch|certified_band_K=[298.15, 4000]"
+    )
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason == "melt_oxide_activity has no certified evidence tier"
+        for notice in residual.notices
+    )
     return residual
 
 
@@ -363,6 +379,9 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
             ),
         ),
         (
+            # f9adcc63b propagates the JANAF d-144 metastable-liquid verdict
+            # for CaO and MgO as a bridge fallback, retaining each separate
+            # evidence-tier notice.
             "CaO",
             Decimal("1873"),
             frozenset(
@@ -374,6 +393,21 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "d144_fusion_conversion|oxide=CaO|temperature_K=1873|"
+                            "authority=bridge|reason=JANAF tabulates the liquid "
+                            "phase below its solid-liquid Gibbs crossing; this is "
+                            "JANAF's metastable (supercooled) liquid branch|"
+                            "certified_band_K=[298.15, 3600]"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band="[298.15, 3600] K",
                         authority=Authority.BRIDGE,
                     )
                 }
@@ -391,6 +425,21 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
+                    ),
+                    Notice(
+                        kind=NoticeKind.FALLBACK,
+                        affected_quantities=(Quantity.ACTIVITY,),
+                        reason=(
+                            "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
+                            "authority=bridge|reason=JANAF tabulates the liquid "
+                            "phase below its solid-liquid Gibbs crossing; this is "
+                            "JANAF's metastable (supercooled) liquid branch|"
+                            "certified_band_K=[298.15, 4000]"
+                        ),
+                        origin=(
+                            "simulator.chemistry.melt_activity.melt_oxide_activity"
+                        ),
+                        band="[298.15, 4000] K",
                         authority=Authority.BRIDGE,
                     )
                 }

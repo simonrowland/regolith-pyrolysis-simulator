@@ -560,10 +560,15 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "81eff0369d7c3cfed06705c05b9d6dd697cde2869bcc1f647263320c8971d69a"
-    # The decoded notice/provenance-only delta changes the projected digest.
+    # Re-decoded after f9adcc63b: the numeric payload is bit-identical. The
+    # projected metadata carries d-144 fusion-conversion bridge warnings for
+    # CaO and MgO at 1800 K. Their JANAF metastable-liquid reasons carry bands
+    # [298.15, 3600] and [298.15, 4000] K; the provenance payload contains the
+    # same warnings on the Ca/Ca2/CaO_gas and Mg/Mg2/MgO_gas species records.
+    # The changed digest is therefore notice/provenance only.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "a2192b577479a10ba45237a2212c3b05e897dcef6d3f23f9f6670b72a8a787c6"
+    ).hexdigest() == "d891ffba61c564a5249ae9580e1abbc30fd956c5da569ef7ccf0fc2631ce18d6"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
