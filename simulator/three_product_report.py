@@ -125,6 +125,64 @@ ladder is queried via ``ExtractionMixin._RUMP_ELEMENT_SPECIES``
 which carries Si / Al / Mg / Ti routing too."""
 
 
+def _uncertified_cro_proxy_flag(
+    sim,
+    mass_kg: float,
+    account: str,
+) -> dict[str, Any] | None:
+    """Flag proxy-bridge CrO that the wall cannot certify.
+
+    CrO's source reaction carries an activity exponent and a pO2 exponent,
+    so it is not a wall saturation curve. The condenser refuses capture and
+    leaves the mass on ``account``. The flag names that account. A
+    non-positive mass, or any other alpha authority, returns None.
+    """
+
+    if mass_kg <= 0.0:
+        return None
+    alpha_authority = getattr(
+        sim, '_alpha_authority_status_by_species_engaged', {}
+    ) or {}
+    if alpha_authority.get('CrO') != PROXY_BRIDGE_ALPHA_STATUS:
+        return None
+    vapor_pressures = getattr(sim, 'vapor_pressures', {}) or {}
+    oxide_vapors = vapor_pressures.get('oxide_vapors', {}) or {}
+    cro_data = oxide_vapors.get('CrO', {}) or {}
+    alpha_spec = cro_data.get('evaporation_alpha', {}) or {}
+    alpha_spec = alpha_spec if isinstance(alpha_spec, Mapping) else {}
+    flux_diagnostic = getattr(
+        sim, '_last_evaporation_flux_diagnostic', {}
+    ) or {}
+    alpha_used = flux_diagnostic.get('alpha_used_by_species', {}) or {}
+    alpha_value = alpha_used.get('CrO', alpha_spec.get('value'))
+    alpha_text = (
+        f'{float(alpha_value):.15g}'
+        if isinstance(alpha_value, (int, float))
+        else 'unknown'
+    )
+    tier = alpha_spec.get('tier', 'unknown')
+    rail_catalog = getattr(sim, 'vapour_rail_catalog', None)
+    compiled_cro = (
+        rail_catalog.species.get('CrO')
+        if rail_catalog is not None
+        else None
+    )
+    routing = compiled_cro.fiat_routing.raw if compiled_cro is not None else {}
+    routing_note = routing.get('routing_note') or (
+        'Routing note unavailable; capture remains uncertified.'
+    )
+    return {
+        'status': 'flagged prediction',
+        'authority': PROXY_BRIDGE_ALPHA_STATUS,
+        'reason': (
+            f'{mass_kg:.15g} kg CrO is in '
+            f'{account}; it used tier-{tier} '
+            f'evaporation alpha {alpha_text}. Capture is uncertified: '
+            f'{routing_note}'
+        ),
+    }
+
+
 def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     """Project a PyrolysisSimulator's product surface onto the four
     north-star product classes.
@@ -377,50 +435,9 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
     train_crO_kg = _ledger_species_kg(
         sim, (CONDENSATION_TRAIN_ACCOUNT,)
     ).get('CrO', 0.0)
-    captured_volatiles_flag: dict[str, Any] | None = None
-    alpha_authority = getattr(
-        sim, '_alpha_authority_status_by_species_engaged', {}
-    ) or {}
-    if (
-        train_crO_kg > 0.0
-        and alpha_authority.get('CrO') == PROXY_BRIDGE_ALPHA_STATUS
-    ):
-        vapor_pressures = getattr(sim, 'vapor_pressures', {}) or {}
-        oxide_vapors = vapor_pressures.get('oxide_vapors', {}) or {}
-        cro_data = oxide_vapors.get('CrO', {}) or {}
-        alpha_spec = cro_data.get('evaporation_alpha', {}) or {}
-        alpha_spec = alpha_spec if isinstance(alpha_spec, Mapping) else {}
-        flux_diagnostic = getattr(
-            sim, '_last_evaporation_flux_diagnostic', {}
-        ) or {}
-        alpha_used = flux_diagnostic.get('alpha_used_by_species', {}) or {}
-        alpha_value = alpha_used.get('CrO', alpha_spec.get('value'))
-        alpha_text = (
-            f'{float(alpha_value):.15g}'
-            if isinstance(alpha_value, (int, float))
-            else 'unknown'
-        )
-        tier = alpha_spec.get('tier', 'unknown')
-        rail_catalog = getattr(sim, 'vapour_rail_catalog', None)
-        compiled_cro = (
-            rail_catalog.species.get('CrO')
-            if rail_catalog is not None
-            else None
-        )
-        routing = compiled_cro.fiat_routing.raw if compiled_cro is not None else {}
-        routing_note = routing.get('routing_note') or (
-            'Routing note unavailable; capture remains uncertified.'
-        )
-        captured_volatiles_flag = {
-            'status': 'flagged prediction',
-            'authority': PROXY_BRIDGE_ALPHA_STATUS,
-            'reason': (
-                f'{train_crO_kg:.15g} kg CrO is in '
-                f'{CONDENSATION_TRAIN_ACCOUNT}; it used tier-{tier} '
-                f'evaporation alpha {alpha_text}. Capture is uncertified: '
-                f'{routing_note}'
-            ),
-        }
+    captured_volatiles_flag = _uncertified_cro_proxy_flag(
+        sim, train_crO_kg, CONDENSATION_TRAIN_ACCOUNT
+    )
 
     # ----- Process inventory: spent reductant residue -----
     spent_reductant_kg_by_species = _spent_reductant_residue_kg(sim)
@@ -1562,4 +1579,15 @@ def build_product_story(
                     if rump_flag.get('status') == 'unavailable':
                         story['terminal_residue'][field] = None
                         story['terminal_residue']['class_total_kg'] = None
+    # Refused wall capture leaves proxy CrO on terminal.offgas. The same
+    # flag the train path attaches to captured volatiles follows that mass
+    # onto the escaped-to-vacuum bucket.
+    offgas_cro_kg = _ledger_species_kg(
+        sim, (TERMINAL_ESCAPE_ACCOUNT,)
+    ).get('CrO', 0.0)
+    offgas_cro_flag = _uncertified_cro_proxy_flag(
+        sim, offgas_cro_kg, TERMINAL_ESCAPE_ACCOUNT
+    )
+    if offgas_cro_flag is not None:
+        story['escaped_to_vacuum']['flag'] = offgas_cro_flag
     return story
