@@ -229,7 +229,14 @@ from simulator.battery.validity import (
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
-from simulator.fe_redox import feo_iw_log10_fO2_bar
+from simulator.fe_redox import (
+    IRON_SATURATION_SPECIATION_NO_TOTAL_IRON,
+    IronSaturationSpeciationRefusal,
+    MetalSaturationValenceSplit,
+    _saturation_temperature,
+    feo_iw_log10_fO2_bar,
+    metal_saturation_valence_split,
+)
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
 from simulator.reference_data.janaf import formula_composition
 
@@ -3562,6 +3569,279 @@ def iron_saturation_composition(reference: Observation) -> IronSaturationDecisio
             n0, extrapolated=extrapolated, temperature_K=temperature_K
         ),
         extrapolated=extrapolated,
+    )
+
+
+# Elemental total iron, as printed. Bare "Fe" is not read: it is either
+# metal or total iron, and this function does not choose.
+_ELEMENTAL_TOTAL_FE_KEYS = ("T.Fe", "FeT", "Fe_T")
+_METALLIC_FE_KEYS = ("M.Fe", "Fe_metal")
+_FEOT_ALREADY_KEYS = ("FeOT", "FeO_T", "FeOt", "FeO*")
+_PRINTED_VALENCE_KEYS = ("FeO", "Fe2O3")
+IRON_SATURATION_SPECIATION_METALLIC_IRON_EXCEEDS_TOTAL = (
+    "iron_saturation_speciation_metallic_iron_exceeds_total"
+)
+IRON_SATURATION_SPECIATION_IRON_AMOUNT_INVALID = (
+    "iron_saturation_speciation_iron_amount_invalid"
+)
+IRON_SATURATION_SPECIATION_VALENCE_ALREADY_PRINTED = (
+    "iron_saturation_speciation_valence_already_printed"
+)
+IRON_SATURATION_SPECIATION_FEOT_ALREADY_PRINTED = (
+    "iron_saturation_speciation_feot_already_printed"
+)
+IRON_SATURATION_SPECIATION_DUPLICATE_TOTAL_IRON = (
+    "iron_saturation_speciation_duplicate_total_iron"
+)
+IRON_SATURATION_SPECIATION_DUPLICATE_METALLIC_IRON = (
+    "iron_saturation_speciation_duplicate_metallic_iron"
+)
+IRON_SATURATION_SPECIATION_BARE_FE_KEY = (
+    "iron_saturation_speciation_bare_fe_key"
+)
+IRON_SATURATION_SPECIATION_TOTAL_IRON_DISAGREES = (
+    "iron_saturation_speciation_total_iron_disagrees"
+)
+IRON_SATURATION_SPECIATION_METALLIC_IRON_DISAGREES = (
+    "iron_saturation_speciation_metallic_iron_disagrees"
+)
+
+
+@dataclass(frozen=True, slots=True)
+class IronSaturationValenceSplit:
+    """FeO and Fe2O3 wt% at iron saturation, plus the speciation notice.
+
+    Weights are grams per 100 g of the printed analysis, the same basis as
+    elemental T.Fe. They are not renormalized and not clamped.
+    """
+
+    feo_wt: float
+    fe2o3_wt: float
+    feot_wt: float
+    oxidised_fe_wt: float
+    metallic_fe_wt: float | None
+    split: MetalSaturationValenceSplit
+    notice: Notice
+
+
+def _finite_nonnegative_wt(value: object) -> float:
+    if isinstance(value, bool) or value is None:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_IRON_AMOUNT_INVALID
+        )
+    try:
+        number = float(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_IRON_AMOUNT_INVALID
+        ) from exc
+    if not math.isfinite(number) or number < 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_IRON_AMOUNT_INVALID
+        )
+    return number
+
+
+def _one_printed_wt(
+    comp_wt: Mapping[str, object],
+    keys: tuple[str, ...],
+    *,
+    duplicate_reason: str,
+) -> tuple[float | None, str | None]:
+    found: float | None = None
+    found_key: str | None = None
+    for key in keys:
+        if key not in comp_wt:
+            continue
+        if found_key is not None:
+            raise IronSaturationSpeciationRefusal(duplicate_reason)
+        found_key = key
+        found = _finite_nonnegative_wt(comp_wt[key])
+    return found, found_key
+
+
+def _feot_wt_from_elemental_fe(elemental_fe_wt: float) -> float:
+    """FeOT wt% from elemental iron wt%.
+
+    Premise: printed T.Fe is grams of iron per 100 g of sample, not grams
+    of FeO. The redox owner takes total iron as FeO (FeOT). Metallic iron,
+    when printed, is already subtracted, so this mass is the oxidised iron.
+
+    Algebra: one mole of Fe becomes one mole of FeO, so
+    FeOT = T.Fe * M(FeO) / M(Fe). Both masses are simulator.state.MOLAR_MASS,
+    the CIAAW atomic-weight owner.
+
+    Unit check: (g Fe / 100 g) * (g FeO / mol) / (g Fe / mol) = g FeO / 100 g.
+
+    Sanity: M(FeO)/M(Fe) is about 1.2865, so 10 wt% Fe is about 12.865 wt% FeOT.
+    """
+
+    from simulator.state import MOLAR_MASS
+
+    return elemental_fe_wt * float(MOLAR_MASS["FeO"]) / float(MOLAR_MASS["Fe"])
+
+
+def _feo_fe2o3_wt(
+    oxidised_fe_wt: float, fe3_over_sigma_fe: float
+) -> tuple[float, float]:
+    """FeO and Fe2O3 wt% on the printed 100 g basis.
+
+    Premise: q = Fe3+/ΣFe of the oxidised iron. Two Fe3+ make one Fe2O3.
+    The fraction is not an oxygen-excess closure and it is not clipped.
+
+    Algebra: n_Fe = w_Fe / M_Fe, n_FeO = (1 - q) * n_Fe,
+    n_Fe2O3 = q * n_Fe / 2, w = n * M. Masses are MOLAR_MASS.
+
+    Unit check: (g / 100 g) / (g / mol) * (g / mol) = g / 100 g.
+
+    Sanity: q = 0 returns FeOT and no Fe2O3.
+    """
+
+    from simulator.state import MOLAR_MASS
+
+    m_fe = float(MOLAR_MASS["Fe"])
+    n_fe = oxidised_fe_wt / m_fe
+    n_feo = (1.0 - fe3_over_sigma_fe) * n_fe
+    n_fe2o3 = fe3_over_sigma_fe * n_fe / 2.0
+    return (
+        n_feo * float(MOLAR_MASS["FeO"]),
+        n_fe2o3 * float(MOLAR_MASS["Fe2O3"]),
+    )
+
+
+def _saturation_notice(
+    split: MetalSaturationValenceSplit,
+    *,
+    quantity: Quantity,
+    origin: str,
+) -> Notice:
+    lo, hi = split.band
+    reason = (
+        "iron_valence_speciated_at_iron_saturation: "
+        f"log10_fO2_sat={split.log10_fO2_sat!r}; "
+        f"delta_iw_pure_feo={split.delta_iw_pure_feo!r}; "
+        f"a_FeO={split.a_FeO!r}; "
+        f"fe3_over_sigma_fe={split.fe3_over_sigma_fe!r}; "
+        f"band=[{lo!r}, {hi!r}]; "
+        f"iterations={split.iterations}; "
+        f"kress91_extrapolation={split.kress91_extrapolation}; "
+        f"kress91_high_uncertainty={split.kress91_high_uncertainty}"
+    )
+    return Notice(
+        kind=NoticeKind.IRON_VALENCE_SPECIATED_AT_IRON_SATURATION,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=origin,
+        band=f"[{lo!r}, {hi!r}]",
+        authority=Authority.DERIVED,
+    )
+
+
+def iron_saturation_valence_split(
+    comp_wt: Mapping[str, object],
+    *,
+    T_K: object,
+    pressure_bar: float,
+    total_fe_wt: float | None = None,
+    metallic_fe_wt: float | None = None,
+    quantity: Quantity = Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+) -> IronSaturationValenceSplit:
+    """FeO and Fe2O3 wt% for elemental T.Fe at iron saturation.
+
+    Oxidised iron is T.Fe minus M.Fe when metallic iron is printed, and all
+    of T.Fe otherwise. That iron is fed to the redox owner as FeOT. The
+    owner solves the metal-saturation tie point. This function does not
+    apply binary-wustite N0 and does not derive Fe3+ from an oxygen closure.
+
+    TODO(d-336): call this from the migration/scoring path that today leaves
+    a source's metallic-iron or iron-saturation elemental T.Fe analysis as
+    unspeciated FeOT. That path is the d-336 closure owner, which has not
+    landed. Do not open a second closure window, and do not call this from
+    element_mass_fraction_redox.
+    """
+
+    _saturation_temperature(T_K)
+    if "Fe" in comp_wt:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_BARE_FE_KEY
+        )
+    if any(key in comp_wt for key in _PRINTED_VALENCE_KEYS):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_VALENCE_ALREADY_PRINTED
+        )
+    if any(key in comp_wt for key in _FEOT_ALREADY_KEYS):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_FEOT_ALREADY_PRINTED
+        )
+    printed_total, _total_key = _one_printed_wt(
+        comp_wt,
+        _ELEMENTAL_TOTAL_FE_KEYS,
+        duplicate_reason=IRON_SATURATION_SPECIATION_DUPLICATE_TOTAL_IRON,
+    )
+    printed_metal, _metal_key = _one_printed_wt(
+        comp_wt,
+        _METALLIC_FE_KEYS,
+        duplicate_reason=IRON_SATURATION_SPECIATION_DUPLICATE_METALLIC_IRON,
+    )
+    if total_fe_wt is not None:
+        total = _finite_nonnegative_wt(total_fe_wt)
+        if (
+            printed_total is not None
+            and not math.isclose(total, printed_total, rel_tol=0.0, abs_tol=0.0)
+        ):
+            raise IronSaturationSpeciationRefusal(
+                IRON_SATURATION_SPECIATION_TOTAL_IRON_DISAGREES
+            )
+    else:
+        total = printed_total
+    if metallic_fe_wt is not None:
+        metallic = _finite_nonnegative_wt(metallic_fe_wt)
+        if (
+            printed_metal is not None
+            and not math.isclose(metallic, printed_metal, rel_tol=0.0, abs_tol=0.0)
+        ):
+            raise IronSaturationSpeciationRefusal(
+                IRON_SATURATION_SPECIATION_METALLIC_IRON_DISAGREES
+            )
+    else:
+        metallic = printed_metal
+    if total is None or total == 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_NO_TOTAL_IRON
+        )
+    oxidised = total if metallic is None else total - metallic
+    if oxidised < 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_METALLIC_IRON_EXCEEDS_TOTAL
+        )
+    if oxidised == 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_NO_TOTAL_IRON
+        )
+    feot = _feot_wt_from_elemental_fe(oxidised)
+    drop = set(_ELEMENTAL_TOTAL_FE_KEYS) | set(_METALLIC_FE_KEYS)
+    oxide_wt: dict[str, float] = {}
+    for name, raw in comp_wt.items():
+        if name in drop:
+            continue
+        oxide_wt[str(name)] = _finite_nonnegative_wt(raw)
+    oxide_wt["FeOT"] = feot
+    split = metal_saturation_valence_split(
+        oxide_wt, T_K=T_K, pressure_bar=pressure_bar
+    )
+    feo_wt, fe2o3_wt = _feo_fe2o3_wt(oxidised, split.fe3_over_sigma_fe)
+    return IronSaturationValenceSplit(
+        feo_wt=feo_wt,
+        fe2o3_wt=fe2o3_wt,
+        feot_wt=feot,
+        oxidised_fe_wt=oxidised,
+        metallic_fe_wt=metallic,
+        split=split,
+        notice=_saturation_notice(
+            split,
+            quantity=quantity,
+            origin="simulator.battery.score:iron_saturation_valence_split",
+        ),
     )
 
 

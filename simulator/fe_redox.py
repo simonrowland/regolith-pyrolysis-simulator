@@ -1324,3 +1324,204 @@ def _kress91_fe3_fe2_ratio(fe2o3_over_feo_molar: float) -> float:
     # One Fe2O3 formula unit contains two Fe3+ cations; FeO contains one
     # Fe2+ cation, so Fe3+/Fe2+ = 2*n(Fe2O3)/n(FeO) = 2*ratio.
     return 2.0 * float(fe2o3_over_feo_molar)
+
+
+# d-345. Fixed point of the existing metal-saturation tie point. The
+# tolerance is log10(fO2) units. The cap is the typed-refusal boundary.
+_METAL_SATURATION_FO2_TOLERANCE_LOG10 = 1e-6
+_METAL_SATURATION_VALENCE_SPLIT_MAX_ITERATIONS = 50
+
+IRON_SATURATION_SPECIATION_MISSING_TEMPERATURE = (
+    "iron_saturation_speciation_missing_temperature"
+)
+IRON_SATURATION_SPECIATION_DID_NOT_CONVERGE = (
+    "iron_saturation_speciation_did_not_converge"
+)
+IRON_SATURATION_SPECIATION_NO_TOTAL_IRON = (
+    "iron_saturation_speciation_no_total_iron"
+)
+IRON_SATURATION_SPECIATION_ACTIVITY_UNAVAILABLE = (
+    "iron_saturation_speciation_activity_unavailable"
+)
+
+
+class IronSaturationSpeciationRefusal(ValueError):
+    """Typed refusal. ``reason`` is the stable token, not a clipped number."""
+
+    def __init__(self, reason: str) -> None:
+        self.reason = reason
+        super().__init__(reason)
+
+
+@dataclass(frozen=True, slots=True)
+class MetalSaturationValenceSplit:
+    """Fe3+/ΣFe at the self-consistent metal-saturation tie point.
+
+    ``band`` is (lo, hi) of Fe3+/ΣFe at the converged tie point and at
+    a_FeO = 1 (pure IW, the oxidised edge). Authority is derived. The
+    fraction is the Kress91 value, not a clamp and not a closure difference.
+    """
+
+    log10_fO2_sat: float
+    delta_iw_pure_feo: float
+    a_FeO: float
+    fe3_over_sigma_fe: float
+    band: tuple[float, float]
+    iterations: int
+    kress91_extrapolation: bool
+    kress91_high_uncertainty: bool
+
+
+def _saturation_temperature(T_K: object) -> float:
+    if isinstance(T_K, bool) or T_K is None:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_MISSING_TEMPERATURE
+        )
+    try:
+        temperature = float(T_K)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_MISSING_TEMPERATURE
+        ) from exc
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_MISSING_TEMPERATURE
+        )
+    return temperature
+
+
+def _tie_point_fO2(components: Mapping[str, object]) -> float:
+    tie = components.get("metal_saturation_tie_point")
+    if not isinstance(tie, Mapping):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_NO_TOTAL_IRON
+        )
+    raw = tie.get("current_melt_metal_saturation_log10_fO2_bar")
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_DID_NOT_CONVERGE
+        ) from exc
+    if not math.isfinite(value):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_DID_NOT_CONVERGE
+        )
+    return value
+
+
+def _authoritative_feo_activity(components: Mapping[str, object]) -> float:
+    raw = components.get("a_FeO_authoritative")
+    try:
+        value = float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_ACTIVITY_UNAVAILABLE
+        ) from exc
+    if not math.isfinite(value):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_ACTIVITY_UNAVAILABLE
+        )
+    return value
+
+
+def _converge_metal_saturation_tie_point(
+    comp_wt: Mapping[str, float],
+    *,
+    T_K: float,
+    pressure_bar: float,
+) -> tuple[float, Mapping[str, object], int]:
+    """Fixed point of current_melt_metal_saturation_log10_fO2_bar.
+
+    Start at pure-FeO IW. Each step replaces fO2 with the tie point of the
+    melt activity at that fO2. Stop when the step is under 1e-6 log units.
+    """
+
+    fO2_log = feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+    components: Mapping[str, object] | None = None
+    for iteration in range(1, _METAL_SATURATION_VALENCE_SPLIT_MAX_ITERATIONS + 1):
+        components = _calphad_feo_activity_components(
+            comp_wt=comp_wt,
+            fO2_log=fO2_log,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        )
+        next_fO2 = _tie_point_fO2(components)
+        if abs(next_fO2 - fO2_log) < _METAL_SATURATION_FO2_TOLERANCE_LOG10:
+            return next_fO2, components, iteration
+        fO2_log = next_fO2
+    raise IronSaturationSpeciationRefusal(
+        IRON_SATURATION_SPECIATION_DID_NOT_CONVERGE
+    )
+
+
+def _kress91_fe3_at(
+    comp_wt: Mapping[str, float],
+    *,
+    fO2_log: float,
+    T_K: float,
+    pressure_bar: float,
+) -> dict[str, object]:
+    mol_fractions = melt_mol_fractions_for_kress91(comp_wt)
+    if not mol_fractions or float(mol_fractions.get("FeOt", 0.0) or 0.0) <= 0.0:
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_NO_TOTAL_IRON
+        )
+    return kress91_split(
+        fO2_log=fO2_log,
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=floor_vacuum_pressure_bar(pressure_bar),
+    )
+
+
+def metal_saturation_valence_split(
+    comp_wt: Mapping[str, float],
+    *,
+    T_K: object,
+    pressure_bar: float,
+) -> MetalSaturationValenceSplit:
+    """Fe3+/ΣFe at the self-consistent iron-saturation tie point.
+
+    The composition is an oxide wt% map whose iron is already FeOT (or an
+    FeO/Fe2O3 pair the Kress91 owner reads as FeOT). Elemental T.Fe and a
+    printed metallic subtraction are the battery sibling's job. Binary
+    wustite N0 is not applied. Fe3+ is Kress91 at the converged fO2, not
+    an oxygen-closure difference, and it is not clamped.
+    """
+
+    temperature = _saturation_temperature(T_K)
+    fO2_sat, components, iterations = _converge_metal_saturation_tie_point(
+        comp_wt,
+        T_K=temperature,
+        pressure_bar=pressure_bar,
+    )
+    pure_iw = feo_iw_log10_fO2_bar(temperature, a_feo=1.0)
+    saturated = _kress91_fe3_at(
+        comp_wt,
+        fO2_log=fO2_sat,
+        T_K=temperature,
+        pressure_bar=pressure_bar,
+    )
+    oxidised_edge = _kress91_fe3_at(
+        comp_wt,
+        fO2_log=pure_iw,
+        T_K=temperature,
+        pressure_bar=pressure_bar,
+    )
+    fe3 = float(saturated["fe3"])
+    fe3_edge = float(oxidised_edge["fe3"])
+    if fe3 <= fe3_edge:
+        band = (fe3, fe3_edge)
+    else:
+        band = (fe3_edge, fe3)
+    return MetalSaturationValenceSplit(
+        log10_fO2_sat=fO2_sat,
+        delta_iw_pure_feo=fO2_sat - pure_iw,
+        a_FeO=_authoritative_feo_activity(components),
+        fe3_over_sigma_fe=fe3,
+        band=band,
+        iterations=iterations,
+        kress91_extrapolation=bool(saturated["extrapolation"]),
+        kress91_high_uncertainty=bool(saturated["high_uncertainty"]),
+    )

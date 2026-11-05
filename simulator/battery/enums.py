@@ -360,6 +360,14 @@ class NoticeKind(StrEnum):
     BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
         "buffer_band_unsized_beyond_all_calibrations"
     )
+    # d-345. Fe3+/ΣFe at the iron-saturation tie point, where the source
+    # prints metallic iron or iron saturation beside elemental T.Fe and does
+    # not print the valence. Advisory. Not a flagged stratum. Kress91
+    # extrapolation stays a field of this notice; out_of_certified_band
+    # remains the flagged stratum when a caller attaches it.
+    IRON_VALENCE_SPECIATED_AT_IRON_SATURATION = (
+        "iron_valence_speciated_at_iron_saturation"
+    )
 
 
 class ReferenceStateConvention(StrEnum):
