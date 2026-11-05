@@ -66,7 +66,12 @@ def _bootstrap_native_output_worker():
 
 
 def _handle_native_output_request(_resource, request, _errlog):
-    os.write(request['fd'], request['line'])
+    if request.get('python_warning'):
+        import warnings
+
+        warnings.warn(request['python_warning'])
+    if request.get('line'):
+        os.write(request['fd'], request['line'])
     return request['result']
 
 
@@ -206,12 +211,19 @@ def test_warm_worker_matches_24_cold_workers_byte_for_byte():
 def test_warm_worker_deduplicates_native_fd_output_and_preserves_results(
     capfd,
 ):
-    native_line = b'X Fe3+ Tet/Oct = nan\n'
+    native_line = b'X Fe3+ Tet/Oct = 0.000 at 0x0\n'
     worker = _native_output_worker()
     worker.start()
     try:
         results = [
-            worker.call({'fd': 1, 'line': native_line, 'result': index})
+            worker.call({
+                'fd': 1,
+                'line': (
+                    f'X Fe3+ Tet/Oct = {index / 10:.3f} '
+                    f'at 0x{index:x}\n'
+                ).encode(),
+                'result': index,
+            })
             for index in range(50)
         ]
     finally:
@@ -247,6 +259,151 @@ def test_warm_worker_forwards_repeated_error_like_native_lines_in_full(capfd):
     assert captured.out == ''
     assert captured.err.encode().count(native_line) == 2
     assert f'[engine-pool native output] count=2: ' in captured.err
+
+
+def test_python_warning_still_reaches_parent_without_native_deduplication(
+    capfd,
+):
+    worker = _native_output_worker()
+    worker.start()
+    try:
+        assert worker.call({
+            'python_warning': 'native worker warning stays visible',
+            'result': 'unchanged',
+        }) == 'unchanged'
+    finally:
+        worker.close()
+
+    captured = capfd.readouterr()
+    assert 'UserWarning: native worker warning stays visible' in captured.err
+    assert '[engine-pool native output]' not in captured.err
+    assert captured.out == ''
+
+
+def test_native_output_distinct_line_cap_keeps_errors_and_bounds_summaries(
+    capfd,
+):
+    line_names = [
+        ''.join(
+            chr(ord('a') + (index // (26 ** power)) % 26)
+            for power in (2, 1, 0)
+        )
+        for index in range(engine_pool_module.MAX_NATIVE_OUTPUT_DISTINCT_LINES + 44)
+    ]
+    native_lines = ''.join(f'species-{name} = x\n' for name in line_names)
+    error_line = b'FATAL native output beyond the distinct cap\n'
+    worker = _native_output_worker()
+    worker.start()
+    try:
+        result = worker.call({
+            'fd': 1,
+            'line': native_lines.encode() + error_line,
+            'result': 'unchanged',
+        })
+    finally:
+        worker.close()
+
+    captured = capfd.readouterr()
+    output_lines = captured.err.splitlines()
+    raw_lines = [line for line in output_lines if line.startswith('species-')]
+    summary_lines = [
+        line for line in output_lines
+        if line.startswith('[engine-pool native output]')
+    ]
+    assert result == 'unchanged'
+    assert len(raw_lines) == engine_pool_module.MAX_NATIVE_OUTPUT_DISTINCT_LINES
+    assert error_line.decode().strip() in raw_lines or (
+        error_line.decode().strip() in output_lines
+    )
+    assert len(summary_lines) == (
+        engine_pool_module.MAX_NATIVE_OUTPUT_DISTINCT_LINES + 1
+    )
+    assert summary_lines[-1].startswith(
+        '[engine-pool native output] other_count=45 '
+    )
+    assert captured.out == ''
+
+
+def test_native_output_partial_line_buffer_is_capped_and_marked(capfd):
+    cap = engine_pool_module.MAX_NATIVE_OUTPUT_PENDING_BYTES
+    native_line = b'z' * (cap + 1)
+    worker = _native_output_worker()
+    worker.start()
+    try:
+        assert worker.call({
+            'fd': 1,
+            'line': native_line,
+            'result': 'unchanged',
+        }) == 'unchanged'
+    finally:
+        worker.close()
+
+    captured = capfd.readouterr()
+    assert b'z' * cap + b'...[truncated]\n' in captured.out.encode() + captured.err.encode()
+    assert len(captured.err.encode()) <= (
+        cap + 2 * engine_pool_module.MAX_NATIVE_OUTPUT_SUMMARY_BYTES + 64
+    )
+
+
+def test_native_output_reader_does_not_block_on_full_stderr_pipe():
+    import fcntl
+
+    source_reader, source_writer = multiprocessing.Pipe(duplex=False)
+    sink_reader, sink_writer = os.pipe()
+    flags = fcntl.fcntl(sink_writer, fcntl.F_GETFL)
+    fcntl.fcntl(sink_writer, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+    try:
+        while True:
+            os.write(sink_writer, b'x' * 4096)
+    except BlockingIOError:
+        pass
+    os.write(
+        source_writer.fileno(),
+        b'FATAL native sink backpressure\n' * 20,
+    )
+    source_writer.close()
+    dropped_bytes = []
+    reader_thread = threading.Thread(
+        target=lambda: dropped_bytes.append(
+            engine_pool_module._read_native_output(
+                source_reader,
+                stderr_fd=sink_writer,
+            )
+        ),
+        daemon=True,
+    )
+    started_at = time.monotonic()
+    reader_thread.start()
+    reader_thread.join(timeout=2.0)
+    elapsed = time.monotonic() - started_at
+    try:
+        assert not reader_thread.is_alive()
+        assert dropped_bytes and dropped_bytes[0] > 0
+        assert elapsed < 2.0
+    finally:
+        os.close(sink_writer)
+        os.close(sink_reader)
+
+
+def test_sigkill_worker_closes_native_output_capture_within_bound(capfd):
+    worker = _native_output_worker()
+    worker.start()
+    pid = worker.process.pid
+    assert worker.call({
+        'fd': 1,
+        'line': b'pre-crash native line\n',
+        'result': 'unchanged',
+    }) == 'unchanged'
+
+    os.kill(pid, signal.SIGKILL)
+    started_at = time.monotonic()
+    worker.close()
+    elapsed = time.monotonic() - started_at
+
+    captured = capfd.readouterr()
+    assert elapsed < 2.0
+    assert worker._native_output_capture is None
+    assert 'pre-crash native line' in captured.err
 
 
 def test_pre_ready_worker_death_is_engine_worker_died():

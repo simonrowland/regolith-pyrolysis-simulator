@@ -9,10 +9,14 @@ from __future__ import annotations
 
 import atexit
 import faulthandler
+import hashlib
+import logging
 import math
 import multiprocessing
 import multiprocessing.context
 import os
+import re
+import select
 import signal
 import queue
 import socket
@@ -29,6 +33,17 @@ ENGINE_WORKER_CANCEL_POLL_S = 0.05
 ENGINE_WORKER_WATCHDOG_GRACE_S = 0.25
 ENGINE_POOL_AUTOMATIC_PER_POOL_BUDGET_S = 3.0
 ENGINE_POOL_AUTOMATIC_TOTAL_BUDGET_S = 5.0
+# Keep only 256 normalized keys; overflow shares one count bucket.
+MAX_NATIVE_OUTPUT_DISTINCT_LINES = 256
+# Flush an unterminated line in marked fragments before its buffer exceeds 64 KiB.
+MAX_NATIVE_OUTPUT_PENDING_BYTES = 64 * 1024
+# Cap each summary payload and its identifying sample to bound shutdown output.
+MAX_NATIVE_OUTPUT_SUMMARY_BYTES = 1024
+MAX_NATIVE_OUTPUT_SUMMARY_EXAMPLE_BYTES = 192
+# Never make worker cleanup wait indefinitely for the parent stderr sink.
+ENGINE_NATIVE_OUTPUT_READER_JOIN_S = 0.25
+# POSIX guarantees a writable pipe accepts at least PIPE_BUF bytes atomically.
+NATIVE_OUTPUT_WRITE_CHUNK_BYTES = 512
 # _stop_pair on the start() handshake-timeout path (diagnostic=False):
 # killpg + join(0.1) + kill + join(1.0). These joins sit AFTER the
 # handshake wall and BEFORE _start_and_consume's ready.put.
@@ -53,16 +68,63 @@ def _pool_debug(msg: str) -> None:
               file=sys.stderr, flush=True)
 
 
+def _normalise_native_output_line(line: bytes) -> bytes:
+    line = _NATIVE_OUTPUT_HEX_RE.sub(b'<address>', line)
+    return _NATIVE_OUTPUT_NUMBER_RE.sub(b'<number>', line)
+
+
+def _preserve_python_output_streams() -> None:
+    """Keep Python stream output on the inherited scorer descriptors."""
+    global _WORKER_PYTHON_STREAMS
+
+    original_stdout, original_stderr = sys.stdout, sys.stderr
+    python_stdout = os.fdopen(
+        os.dup(1),
+        'w',
+        buffering=1,
+        encoding=original_stdout.encoding,
+        errors=original_stdout.errors,
+    )
+    python_stderr = os.fdopen(
+        os.dup(2),
+        'w',
+        buffering=1,
+        encoding=original_stderr.encoding,
+        errors=original_stderr.errors,
+    )
+    loggers = [logging.root]
+    loggers.extend(
+        logger
+        for logger in logging.root.manager.loggerDict.values()
+        if isinstance(logger, logging.Logger)
+    )
+    for logger in loggers:
+        for handler in logger.handlers:
+            if not isinstance(handler, logging.StreamHandler):
+                continue
+            if handler.stream is original_stdout:
+                handler.setStream(python_stdout)
+            elif handler.stream is original_stderr:
+                handler.setStream(python_stderr)
+    sys.stdout, sys.stderr = python_stdout, python_stderr
+    _WORKER_PYTHON_STREAMS = (original_stdout, original_stderr)
+
+
 WorkerBootstrap = Callable[..., tuple[Any, Any]]
 WorkerHandler = Callable[[Any, Any, Any], Any]
 INHERIT_PROCESS_GROUP_ENV = 'REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP'
 _LIVE_ENGINE_POOLS: weakref.WeakSet[Any] = weakref.WeakSet()
 _ENGINE_POOL_REGISTRY_LOCK = threading.Lock()
 _ENGINE_POOL_ATEXIT_REGISTERED = False
+_WORKER_PYTHON_STREAMS: tuple[Any, Any] | None = None
 # Monotonic per-process pool counter, for thread naming only. Reuses the
 # registry lock rather than adding a second one: both guard the same
 # "a pool is coming into existence" moment, and the increment is O(1).
 _ENGINE_POOL_SEQ = 0
+_NATIVE_OUTPUT_HEX_RE = re.compile(rb'0[xX][0-9a-fA-F]+')
+_NATIVE_OUTPUT_NUMBER_RE = re.compile(
+    rb'(?<![A-Za-z0-9_])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?'
+)
 
 
 def _next_engine_pool_seq() -> int:
@@ -244,6 +306,7 @@ def _run_engine_worker(
 ) -> None:
     """Run one initialized engine resource until clean shutdown or failure."""
     if native_output_connection is not None:
+        _preserve_python_output_streams()
         native_output_fd = native_output_connection.fileno()
         os.dup2(native_output_fd, 1)
         os.dup2(native_output_fd, 2)
@@ -324,35 +387,65 @@ def _run_engine_worker(
         connection.close()
 
 
-def _read_native_output(connection: Any) -> None:
-    """Forward distinct worker output once and summarize its repeat counts."""
+def _read_native_output(connection: Any, *, stderr_fd: int = 2) -> int:
+    """Deduplicate bounded native output; return bytes dropped at the sink."""
+    # 256 digest keys bound counts/examples to a small fixed amount per worker.
+    # One aggregate bucket represents additional ordinary lines; errors bypass it.
     counts: dict[bytes, int] = {}
+    examples: dict[bytes, bytes] = {}
     pending = bytearray()
+    overflow_count = 0
+    dropped_bytes = 0
 
     def write_stderr(payload: bytes) -> None:
+        nonlocal dropped_bytes
         while payload:
+            chunk = payload[:NATIVE_OUTPUT_WRITE_CHUNK_BYTES]
             try:
-                written = os.write(2, payload)
-            except OSError:
+                _, writable, _ = select.select([], [stderr_fd], [], 0)
+                if not writable:
+                    dropped_bytes += len(payload)
+                    return
+                written = os.write(stderr_fd, chunk)
+            except (BlockingIOError, OSError, ValueError):
+                dropped_bytes += len(payload)
                 return
             if written <= 0:
+                dropped_bytes += len(payload)
                 return
             payload = payload[written:]
 
     def forward_line(line: bytes) -> None:
-        previous_count = counts.get(line, 0)
-        counts[line] = previous_count + 1
+        nonlocal overflow_count
         lowered = line.lower()
         is_error = any(
             token in lowered
             for token in (b'error', b'abort', b'fatal', b'segmentation')
         )
+        key = hashlib.sha256(_normalise_native_output_line(line)).digest()
+        previous_count = counts.get(key)
+        if previous_count is None:
+            if len(counts) >= MAX_NATIVE_OUTPUT_DISTINCT_LINES:
+                overflow_count += 1
+                if is_error:
+                    write_stderr(line)
+                return
+            counts[key] = 0
+            examples[key] = line[:MAX_NATIVE_OUTPUT_SUMMARY_EXAMPLE_BYTES]
+            previous_count = 0
+        counts[key] = previous_count + 1
         if previous_count == 0 or is_error:
             write_stderr(line)
 
     try:
         while True:
-            chunk = os.read(connection.fileno(), 65536)
+            if len(pending) >= MAX_NATIVE_OUTPUT_PENDING_BYTES:
+                forward_line(bytes(pending) + b'...[truncated]\n')
+                pending.clear()
+            chunk = os.read(
+                connection.fileno(),
+                min(65536, MAX_NATIVE_OUTPUT_PENDING_BYTES - len(pending)),
+            )
             if not chunk:
                 break
             pending.extend(chunk)
@@ -373,10 +466,23 @@ def _read_native_output(connection: Any) -> None:
         except OSError:
             pass
 
-    for line, count in counts.items():
+    # At most 256 per-key summaries plus one aggregate overflow/drop summary.
+    for key, count in counts.items():
+        example = examples[key]
+        summary = (
+            f'[engine-pool native output] count={count}: {example!r}\n'
+        ).encode()
+        if len(summary) > MAX_NATIVE_OUTPUT_SUMMARY_BYTES:
+            summary = summary[:MAX_NATIVE_OUTPUT_SUMMARY_BYTES - 1] + b'\n'
+        write_stderr(summary)
+    if overflow_count or dropped_bytes:
         write_stderr(
-            f'[engine-pool native output] count={count}: {line!r}\n'.encode()
+            (
+                '[engine-pool native output] '
+                f'other_count={overflow_count} dropped_bytes={dropped_bytes}\n'
+            ).encode()
         )
+    return dropped_bytes
 
 
 class WarmEngineWorker:
@@ -575,7 +681,7 @@ class WarmEngineWorker:
             except OSError:
                 pass
             return
-        thread.join()
+        thread.join(timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S)
 
     def _receive_frame_with_deadline(
         self,
