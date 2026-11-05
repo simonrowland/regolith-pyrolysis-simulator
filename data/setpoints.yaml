@@ -1260,7 +1260,17 @@ condenser_geometry:
     cr_stage2: 4.5
     sio_stage3: 6.0
     alkali_stage4: 4.5093900542703675
-    k_stage4b: 5.658842421045168
+    # Stage-4 alkali freeze-out cartridge (owner d-344, 2026-11-05).
+    # Premise: 14.7388 m2 of cold area takes Na to 99.9 % of its f_eq
+    # ceiling on the binding run (lunar C2A_staged; cartsize study, model's
+    # own e-NTU with the carrier self-Lewis factor), at the 0.120 m throat.
+    # Algebra: ratio = 14.7388 m2 / initial_throat_area_m2,
+    # initial_throat_area_m2 = pi*(0.06 m)^2 = 0.011309733552923255 m2,
+    # ratio = 1303.1960418015706.
+    # Unit check: m2/m2 is dimensionless; the product is 14.7388 m2.
+    # Limit: the previous 5.658842421045168 gave 0.064 m2, which reached only
+    # about 6 % of the Na ceiling. Built as parallel tubes/baffles, not one duct.
+    k_stage4b: 1303.1960418015706
     terminal: 2.0
   stage_area_ratio_sources:
     fe_stage1: "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md"
