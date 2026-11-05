@@ -772,8 +772,11 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     # Production at ae5998456 explicitly reports P_sat=0 for that reactive
     # product backstop, yielding the measured 0.6848392024862018 kg remainder.
     # The earlier 0.6877125897008886 pin predates this diagnostic path.
+    # Film-temperature diffusivity and the e-NTU bulk temperature capture
+    # more of the same 1 kg parcel. The route's uncaptured remainder falls
+    # by 0.0410323097856537 kg.
     assert route.remaining_by_species["SiO"] == pytest.approx(
-        0.6848392024862018
+        0.6438068927005481
     )
     assert route.wall_deposit_by_species.get("SiO", 0.0) >= 0.0
 
