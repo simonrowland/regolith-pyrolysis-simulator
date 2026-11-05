@@ -66,6 +66,11 @@ def test_tfe_only_slag_splits_below_the_pure_iw_edge() -> None:
         result.split.fe3_over_sigma_fe
     )
     assert result.split.fe3_over_sigma_fe < result.split.band[1]
+    assert result.split.a_FeO_authoritative_clamped_to_pure_feo_ceiling is False
+    assert (
+        "a_FeO_authoritative_clamped_to_pure_feo_ceiling=False"
+        in result.notice.reason
+    )
     assert result.fe2o3_wt > 0.0
     assert result.notice.kind is (
         NoticeKind.IRON_VALENCE_SPECIATED_AT_IRON_SATURATION
@@ -78,6 +83,7 @@ def test_tfe_only_slag_splits_below_the_pure_iw_edge() -> None:
         "log10_fO2_sat=",
         "delta_iw_pure_feo=",
         "a_FeO=",
+        "a_FeO_authoritative_clamped_to_pure_feo_ceiling=",
         "fe3_over_sigma_fe=",
         "band=[",
         "iterations=",
@@ -87,6 +93,30 @@ def test_tfe_only_slag_splits_below_the_pure_iw_edge() -> None:
         assert field in result.notice.reason
     assert result.notice.band is not None
     assert flagged_strata((result.notice,)) == ()
+
+
+def test_ceiling_row_notice_carries_the_pure_feo_flag() -> None:
+    # Same Table 1(I) D-2 row 27 slag as the redox-owner ceiling test.
+    slag = {
+        "Na2O": 25.9,
+        "SiO2": 20.8,
+        "MgO": 4.9,
+        "P2O5": 2.44,
+        "T.Fe": 30.4,
+    }
+    result = iron_saturation_valence_split(
+        slag, T_K=1550.0 + 273.15, pressure_bar=_P_BAR
+    )
+
+    assert result.split.a_FeO_authoritative_clamped_to_pure_feo_ceiling is True
+    assert result.split.a_FeO == pytest.approx(1.0)
+    assert (
+        "a_FeO_authoritative_clamped_to_pure_feo_ceiling=True"
+        in result.notice.reason
+    )
+    assert result.notice.kind is (
+        NoticeKind.IRON_VALENCE_SPECIATED_AT_IRON_SATURATION
+    )
 
 
 def test_printed_metallic_iron_is_subtracted() -> None:
@@ -162,6 +192,7 @@ def test_weights_are_not_clamped_when_the_fraction_exceeds_one(
             log10_fO2_sat=-8.0,
             delta_iw_pure_feo=-1.0,
             a_FeO=0.3,
+            a_FeO_authoritative_clamped_to_pure_feo_ceiling=False,
             fe3_over_sigma_fe=1.2,
             band=(1.2, 1.2),
             iterations=3,

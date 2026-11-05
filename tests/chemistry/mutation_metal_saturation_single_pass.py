@@ -4,7 +4,8 @@ The mutation keeps the pure-FeO IW fO2 (a_FeO = 1) after one activity
 evaluation and does not update fO2. The slag test requires Fe3+/ΣFe below
 that pure-IW edge, so this single pass must fail it.
 
-Run from the seat root. The source file is restored before the process exits.
+Paths are relative to this file. Pytest uses the interpreter that runs
+this script. The source file is restored before the process exits.
 """
 
 from __future__ import annotations
@@ -38,17 +39,7 @@ def main() -> int:
         return 2
     env = os.environ.copy()
     env["PYTHONPATH"] = str(ROOT)
-    env.setdefault("DYLD_FALLBACK_LIBRARY_PATH", "/Users/simonrowland/lib")
-    env.setdefault(
-        "MPLCONFIGDIR", "/private/tmp/claude-501/main-review/mplcache"
-    )
-    scratch = "/private/tmp/claude-501/main-review/w1105t1651b"
-    env.setdefault("OMPI_MCA_orte_tmpdir_base", f"{scratch}/ompi")
-    env.setdefault("PRTE_MCA_prte_tmpdir_base", f"{scratch}/ompi")
-    env.setdefault("TMPDIR", f"{scratch}/tmp")
-    python = (
-        "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python"
-    )
+    python = sys.executable
     try:
         SOURCE.write_text(original.replace(ANCHOR, MUTATED, 1), encoding="utf-8")
         completed = subprocess.run(

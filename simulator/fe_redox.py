@@ -1365,6 +1365,7 @@ class MetalSaturationValenceSplit:
     log10_fO2_sat: float
     delta_iw_pure_feo: float
     a_FeO: float
+    a_FeO_authoritative_clamped_to_pure_feo_ceiling: bool
     fe3_over_sigma_fe: float
     band: tuple[float, float]
     iterations: int
@@ -1408,6 +1409,17 @@ def _tie_point_fO2(components: Mapping[str, object]) -> float:
             IRON_SATURATION_SPECIATION_DID_NOT_CONVERGE
         )
     return value
+
+
+def _authoritative_feo_ceiling_clamp(components: Mapping[str, object]) -> bool:
+    """The tie point's own ceiling flag. This function does not clamp."""
+
+    raw = components.get("a_FeO_authoritative_clamped_to_pure_feo_ceiling")
+    if not isinstance(raw, bool):
+        raise IronSaturationSpeciationRefusal(
+            IRON_SATURATION_SPECIATION_ACTIVITY_UNAVAILABLE
+        )
+    return raw
 
 
 def _authoritative_feo_activity(components: Mapping[str, object]) -> float:
@@ -1519,6 +1531,9 @@ def metal_saturation_valence_split(
         log10_fO2_sat=fO2_sat,
         delta_iw_pure_feo=fO2_sat - pure_iw,
         a_FeO=_authoritative_feo_activity(components),
+        a_FeO_authoritative_clamped_to_pure_feo_ceiling=(
+            _authoritative_feo_ceiling_clamp(components)
+        ),
         fe3_over_sigma_fe=fe3,
         band=band,
         iterations=iterations,

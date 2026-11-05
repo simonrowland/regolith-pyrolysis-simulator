@@ -3721,6 +3721,8 @@ def _saturation_notice(
         f"log10_fO2_sat={split.log10_fO2_sat!r}; "
         f"delta_iw_pure_feo={split.delta_iw_pure_feo!r}; "
         f"a_FeO={split.a_FeO!r}; "
+        "a_FeO_authoritative_clamped_to_pure_feo_ceiling="
+        f"{split.a_FeO_authoritative_clamped_to_pure_feo_ceiling}; "
         f"fe3_over_sigma_fe={split.fe3_over_sigma_fe!r}; "
         f"band=[{lo!r}, {hi!r}]; "
         f"iterations={split.iterations}; "

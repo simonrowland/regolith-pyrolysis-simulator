@@ -68,6 +68,7 @@ def test_tfe_slag_fe3_is_below_the_pure_iw_edge() -> None:
     assert result.band[0] < result.band[1]
     assert result.delta_iw_pure_feo < 0.0
     assert 0.0 < result.a_FeO < 1.0
+    assert result.a_FeO_authoritative_clamped_to_pure_feo_ceiling is False
     assert result.log10_fO2_sat == pytest.approx(
         feo_iw_log10_fO2_bar(_T_K, a_feo=1.0) + result.delta_iw_pure_feo
     )
@@ -90,6 +91,30 @@ def test_tfe_slag_fe3_is_below_the_pure_iw_edge() -> None:
     assert result.fe3_over_sigma_fe == float(direct["fe3"])
     assert result.kress91_extrapolation is bool(direct["extrapolation"])
     assert result.kress91_high_uncertainty is bool(direct["high_uncertainty"])
+
+
+def test_iron_rich_slag_carries_the_pure_feo_ceiling_flag() -> None:
+    # Kunisada & Iwai 1986 Table 1(I) row D-2, table row 27, 1550 C.
+    # The tie point's unclamped a_FeO is above 1, so the existing ceiling
+    # flag is true. This split does not apply a second clamp.
+    composition = {
+        "Na2O": 25.9,
+        "SiO2": 20.8,
+        "MgO": 4.9,
+        "P2O5": 2.44,
+    }
+    composition["FeOT"] = 30.4 * float(MOLAR_MASS["FeO"]) / float(MOLAR_MASS["Fe"])
+    temperature = 1550.0 + 273.15
+    result = metal_saturation_valence_split(
+        composition, T_K=temperature, pressure_bar=_P_BAR
+    )
+
+    assert result.a_FeO_authoritative_clamped_to_pure_feo_ceiling is True
+    assert result.a_FeO == pytest.approx(1.0)
+    assert result.fe3_over_sigma_fe == pytest.approx(
+        _pure_iw_fe3(composition, temperature)
+    )
+    assert result.delta_iw_pure_feo == pytest.approx(0.0, abs=1e-6)
 
 
 def test_kress91_flags_follow_the_temperature_band() -> None:
@@ -154,6 +179,7 @@ def test_fe3_is_not_clamped(monkeypatch: pytest.MonkeyPatch) -> None:
         return {
             "status": "ok",
             "a_FeO_authoritative": 1.7,
+            "a_FeO_authoritative_clamped_to_pure_feo_ceiling": True,
             "metal_saturation_tie_point": {
                 "current_melt_metal_saturation_log10_fO2_bar": float(
                     kwargs["fO2_log"]  # type: ignore[arg-type]
@@ -177,6 +203,7 @@ def test_fe3_is_not_clamped(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     assert result.fe3_over_sigma_fe == 1.2
     assert result.a_FeO == 1.7
+    assert result.a_FeO_authoritative_clamped_to_pure_feo_ceiling is True
     assert result.band == (1.2, 1.2)
 
 
