@@ -701,19 +701,19 @@ class SimSession:
                 if sim.melt.campaign.name == campaign_name:
                     sim.melt.stir_state = clamped
             else:
-                # stage3_route and purity stay on the typed parser. Pressure
-                # fields then take the ceiling check (pO2 cannot exceed the
-                # campaign total) that the parser does not own.
-                sim.campaign_mgr._refuse_unknown_override_fields(
-                    campaign_name,
-                    {field_name: value},
-                )
-                finite_value = parse_campaign_override_value(
-                    field_name, value,
-                    f"campaign_override {campaign_name}.{field_name}",
-                )
+                # Pressure owns its own admission. A numeric string is not a
+                # declared scalar, so the ceiling check has to see the raw
+                # value. Parsing first would coerce "1.0" and skip
+                # runtime_campaign_pO2_mbar_not_numeric.
+                # Other fields, including stage3_route and purity, stay on
+                # the typed parser. Parse before the unknown-field refusal
+                # so a non-finite number still says must be finite.
                 if field_name in {"p_total_mbar", "pO2_mbar"}:
-                    candidate = {field_name: finite_value}
+                    candidate = {field_name: value}
+                    sim.campaign_mgr._refuse_unknown_override_fields(
+                        campaign_name,
+                        candidate,
+                    )
                     effective_total = None
                     if field_name == "pO2_mbar":
                         effective_total = (
@@ -727,6 +727,16 @@ class SimSession:
                         campaign_name,
                         candidate,
                         effective_p_total_mbar=effective_total,
+                    )
+                    finite_value = float(value)
+                else:
+                    finite_value = parse_campaign_override_value(
+                        field_name, value,
+                        f"campaign_override {campaign_name}.{field_name}",
+                    )
+                    sim.campaign_mgr._refuse_unknown_override_fields(
+                        campaign_name,
+                        {field_name: value},
                     )
                 target = sim.campaign_mgr.overrides.setdefault(campaign_name, {})
                 target[field_name] = finite_value
