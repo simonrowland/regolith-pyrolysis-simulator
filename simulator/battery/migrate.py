@@ -4296,24 +4296,14 @@ def _printed_composition_source_map(payload: object) -> Mapping[str, Any] | None
             source_map.update(printed)
     direct = _printed_composition_map(payload)
     if not source_map and direct is not None:
-        has_component = any(
-            _is_printed_chemical_component_name(str(name))
-            for name, value in direct.items()
-        )
-        if has_component:
-            for name, value in direct.items():
-                if (
-                    _is_numeric_composition_map_entry(
-                        name, value, flat_row=True
-                    )
-                    or (
-                        not _is_composition_map_noncomponent_name(
-                            name, flat_row=True
-                        )
-                        and _is_printed_chemical_component_name(str(name))
-                    )
-                ):
-                    source_map.setdefault(str(name), value)
+        for name, value in direct.items():
+            token, _has_mass_suffix = _mass_percent_component_key(str(name))
+            if (
+                not _is_composition_condition_key(token)
+                and not is_sample_code_formula(token)
+                and _is_printed_chemical_component_name(token)
+            ):
+                source_map.setdefault(str(name), value)
     return source_map or None
 
 
@@ -4439,7 +4429,9 @@ def _unrecognized_printed_chemical_components(
         # Numeric entries in selected composition maps remain components even
         # when their labels are not recognized chemical formulae.
         if (
-            _is_composition_map_noncomponent_name(raw_name)
+            _is_composition_map_noncomponent_name(
+                raw_name, explicit_map_value=raw_amount
+            )
             # Explicit ppm units are not mass-percent amounts for closure.
             or str(raw_name).strip().casefold().endswith(("_ppm", " ppm"))
             or (volatile is not None and volatile[0] != "Cl")
@@ -4507,11 +4499,18 @@ def _source_printed_composition_values(
         if not (
             normalized_name in declared_names
             or _is_numeric_composition_map_entry(
-                name, value, flat_row=declared_map is None
+                name,
+                value,
+                flat_row=declared_map is None,
+                explicit_map=declared_map is not None,
             )
             or (
                 not _is_composition_map_noncomponent_name(
-                    name, flat_row=declared_map is None
+                    name,
+                    flat_row=declared_map is None,
+                    explicit_map_value=(
+                        value if declared_map is not None else None
+                    ),
                 )
                 and _is_printed_chemical_component_name(normalized_name)
             )
@@ -4780,9 +4779,10 @@ def _oxide_mass_percent_components(
             return
         name, _has_mass_suffix = _mass_percent_component_key(raw_name)
         if (
-            raw_name in _WALK_SKIP_KEYS
-            or raw_name == "locator"
-            or _is_composition_map_noncomponent_name(raw_name)
+            raw_name == "locator"
+            or _is_composition_map_noncomponent_name(
+                raw_name, explicit_map_value=raw_amount
+            )
             or (
                 (
                     _volatile_closure_component(raw_name) is not None
@@ -4907,6 +4907,7 @@ _COMPOSITION_MAP_ROW_METADATA_KEYS = frozenset(
         "residual",
         "n_analyses",
         "duration_s",
+        "component_amount",
     }
 )
 
@@ -4916,20 +4917,32 @@ def _is_composition_condition_key(name: str) -> bool:
 
 
 def _is_composition_map_noncomponent_name(
-    name: object, *, flat_row: bool = False
+    name: object,
+    *,
+    flat_row: bool = False,
+    explicit_map_value: object = None,
 ) -> bool:
     raw_name = str(name).strip()
     token, _has_mass_suffix = _mass_percent_component_key(raw_name)
     folded = token.casefold()
     # P is a row-level pressure alias outside a component map, but elemental P
     # inside a selected map is an unsupported component and must be counted.
-    common_metadata = (
-        raw_name in _WALK_SKIP_KEYS
-        or folded in _PRINTED_COMPOSITION_METADATA_KEYS
-        or folded in _PRINTED_COMPOSITION_TOTAL_KEYS
+    explicit_numeric_metadata = (
+        explicit_map_value is not None
+        and _classify_composition_cell(explicit_map_value)[0] == "number"
+    )
+    # In an explicit map, _WALK_SKIP_KEYS and _PRINTED_COMPOSITION_METADATA_KEYS
+    # stay metadata only when their cell is non-numeric.
+    common_metadata = folded in _PRINTED_COMPOSITION_TOTAL_KEYS or (
+        not explicit_numeric_metadata
+        and (
+            raw_name in _WALK_SKIP_KEYS
+            or folded in _PRINTED_COMPOSITION_METADATA_KEYS
+        )
     )
     row_field = flat_row and (
         folded in _COMPOSITION_MAP_ROW_METADATA_KEYS
+        or folded.endswith("_is_initial_composition")
         or (
             _is_composition_condition_key(token)
             and token not in ATOMIC_WEIGHTS_G_PER_MOL
@@ -4939,10 +4952,18 @@ def _is_composition_map_noncomponent_name(
 
 
 def _is_numeric_composition_map_entry(
-    name: object, value: object, *, flat_row: bool = False
+    name: object,
+    value: object,
+    *,
+    flat_row: bool = False,
+    explicit_map: bool = False,
 ) -> bool:
     return (
-        not _is_composition_map_noncomponent_name(name, flat_row=flat_row)
+        not _is_composition_map_noncomponent_name(
+            name,
+            flat_row=flat_row,
+            explicit_map_value=value if explicit_map else None,
+        )
         and _classify_composition_cell(value)[0] == "number"
     )
 
@@ -5394,13 +5415,17 @@ def _printed_mass_percent_map_refusal(
         pairs = [
             (str(name), value)
             for name, value in body.items()
-            if str(name) not in _WALK_SKIP_KEYS and str(name) != "locator"
+            if not _is_composition_map_noncomponent_name(
+                name, explicit_map_value=value
+            )
         ]
 
     pairs = [
         (name, value)
         for name, value in pairs
-        if not _is_composition_map_noncomponent_name(name)
+        if not _is_composition_map_noncomponent_name(
+            name, explicit_map_value=value
+        )
     ]
     if not typed_mass_percent and not pairs:
         return False, None
@@ -5660,7 +5685,9 @@ def _oxide_map_from_mapping(
                 for name, value in nested.items():
                     token, _has_mass_suffix = _mass_percent_component_key(str(name))
                     if (
-                        _is_composition_map_noncomponent_name(name)
+                        _is_composition_map_noncomponent_name(
+                            name, explicit_map_value=value
+                        )
                         or _is_closure_only_volatile(token)
                     ):
                         continue
@@ -5702,7 +5729,9 @@ def _oxide_map_from_mapping(
                 for name, value in nested.items():
                     token, _has_mass_suffix = _mass_percent_component_key(str(name))
                     if (
-                        _is_composition_map_noncomponent_name(name)
+                        _is_composition_map_noncomponent_name(
+                            name, explicit_map_value=value
+                        )
                         or _is_closure_only_volatile(token)
                     ):
                         continue
@@ -5743,13 +5772,28 @@ def _oxide_map_from_mapping(
             continue
         oxide, _factor = equivalent
         comps[oxide] = comps.get(oxide, Decimal("0")) + amount
+    has_row_level_fields = any(
+        (
+            _is_composition_condition_key(name)
+            and name not in ATOMIC_WEIGHTS_G_PER_MOL
+        )
+        or name.casefold().endswith("_is_initial_composition")
+        or name.casefold() in _COMPOSITION_MAP_ROW_METADATA_KEYS
+        for name in (
+            _mass_percent_component_key(str(raw_name))[0]
+            for raw_name in obj
+        )
+    )
     green_component_map = {
         str(name): value
         for name, value in obj.items()
         if (
             not _is_composition_map_noncomponent_name(name, flat_row=True)
             and (
-                _classify_composition_cell(value)[0] == "number"
+                (
+                    not has_row_level_fields
+                    and _classify_composition_cell(value)[0] == "number"
+                )
                 or _is_printed_chemical_component_name(
                     _mass_percent_component_key(str(name))[0]
                 )

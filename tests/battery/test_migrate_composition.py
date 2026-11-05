@@ -1113,6 +1113,59 @@ def test_declared_unknown_trace_projects_with_notice() -> None:
     assert "unknown-component=0.3 wt%" in notice.reason
 
 
+def test_numeric_metadata_in_explicit_map_uses_unsupported_trace_policy() -> None:
+    rejected_map = {
+        "SiO2": "50",
+        "MgO": "49",
+        "basis": "1",
+    }
+    refusal: list[str] = []
+    classification: list[migrate_module._CompositionRefusal] = []
+    assert _oxide_map_from_mapping(
+        {"composition_wt_pct": rejected_map},
+        refusal_reason=refusal,
+        refusal_classification=classification,
+    ) is None
+    # Green read the numeric metadata cell as a component; 1 wt% is an unflagged refusal (a).
+    assert refusal == [
+        "partial analysis contains unsupported component(s) above 0.5 wt%: "
+        "basis=1 wt%"
+    ]
+    assert len(classification) == 1 and not classification[0].closure_refusal
+
+    trace_map = {
+        "SiO2": "49.85",
+        "MgO": "49.85",
+        "basis": "0.3",
+    }
+    trace_source = {"composition_wt_pct": trace_map}
+    parsed = _oxide_map_from_mapping(trace_source)
+    assert parsed == {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")}
+    # Green accepts an unsupported trace at or below 0.5 wt% with disclosure.
+    notice = migrate_module._composition_projection_notice(
+        parsed,
+        closure_context=trace_source,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=trace_map,
+    )
+    assert notice is not None and notice.dropped == ("basis",)
+    assert "basis=0.3 wt%" in notice.reason
+
+    string_source = {
+        "composition_wt_pct": {
+            "SiO2": "50",
+            "MgO": "50",
+            "basis": "oxide",
+        }
+    }
+    # The string basis remains metadata and is ignored inside the explicit map.
+    assert _oxide_map_from_mapping(string_source) == {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("50"),
+    }
+
+
 def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
     rejected = {
         "SiO2": "50",
@@ -1146,6 +1199,7 @@ def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
         closure_context=trace,
         quantity=migrate_module.Quantity.ACTIVITY,
         origin="fixture",
+        declared_component_map=trace,
     )
     # Green accepted the trace label; the approved rule accepts it with disclosure.
     assert notice is not None and notice.dropped == ("unknown-component",)
@@ -4874,6 +4928,22 @@ def _markova_vi_extract() -> dict:
             }
         },
     }
+
+
+def test_initial_charge_row_ignores_measurement_columns_as_components() -> None:
+    row = {
+        "T_C": 0,
+        "T_C_is_initial_composition": True,
+        "SiO2_wt_pct": 70,
+        "MgO_wt_pct": 27.55,
+        "component_amount": 70,
+    }
+    refusal: list[str] = []
+    # Green treats these as row conditions and a measurement, not components.
+    assert _initial_oxide_map_from_values(
+        row, refusal_reason=refusal, declared_map=True
+    ) == {"SiO2": Decimal("70"), "MgO": Decimal("27.55")}
+    assert refusal == []
 
 
 def test_flat_refused_point_ignores_numeric_condition_columns(tmp_path: Path) -> None:
