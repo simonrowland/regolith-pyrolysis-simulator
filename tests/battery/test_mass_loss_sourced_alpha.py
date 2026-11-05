@@ -651,7 +651,6 @@ def test_mass_loss_residue_result_carries_liquid_standard_flags(
         "_evaluate_openimcc_isolated",
         lambda _evaluate, *, timeout_s, **_kwargs: state,
     )
-    monkeypatch.setattr(openimcc, "load_gas_datapack", lambda: object())
     monkeypatch.setattr(
         openimcc, "evaluate_gas", lambda *_args, **_kwargs: {"K": 1e-12, "O2": 1e-12}
     )
