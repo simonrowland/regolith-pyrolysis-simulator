@@ -368,14 +368,18 @@ def test_low_voltage_debug_feedstock_exercises_mre_electrolysis(monkeypatch):
     ) == pytest.approx(0.0)
     # The corrected NaO0.5 liquid activity changes the one-step MRE sodium
     # overhead to the production value pinned below.
+    # Film-temperature diffusivity and the e-NTU bulk temperature leave
+    # more of that sodium in overhead. The train loses the same
+    # 0.1775043344159135 kg, so overhead plus train stays 2.334791680747916 kg.
+    # Wall, metal, cartridge residue, and offgas stay empty.
     assert sim.atom_ledger.kg_by_account("process.overhead_gas")[
         "Na"
-    ] == pytest.approx(1.9975393324006498)
+    ] == pytest.approx(2.1750436668165634)
     # The corrected activity also changes the condensation-train share;
     # Faraday input remains independently pinned by the ledger checks below.
     assert sim.atom_ledger.kg_by_account("process.condensation_train")[
         "Na"
-    ] == pytest.approx(0.33725234834726603)
+    ] == pytest.approx(0.15974801393135252)
     wall_na_kg = sum(
         sim.atom_ledger.kg_by_account(account).get("Na", 0.0)
         for account in PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNTS
