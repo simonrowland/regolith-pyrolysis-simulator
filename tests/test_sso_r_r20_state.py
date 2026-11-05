@@ -3245,9 +3245,11 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]
     # 2026-09-22 03616bb20 corrected Chapman-Enskog's pressure prefactor
     # from the bar form used with P[atm] to 0.0018583*sqrt(2). The resulting
-    # finite-series-resistance escape fraction moved with D_AB.
+    # finite-series-resistance escape fraction moved with D_AB. At 1650 C,
+    # a490c6011 now extrapolates above the 1600 C Holzheid anchor instead of
+    # clamping; the studio pin rises by 3.66059036535659e-5 (1.85337%).
     assert partition["native_fe_vapor_escape_fraction_of_pool"] == pytest.approx(
-        0.0019750990648993625,
+        0.0020117049685529284,
         rel=0.0,
         abs=1.0e-15,
     )

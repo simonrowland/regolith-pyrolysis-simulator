@@ -160,6 +160,11 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
     # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
     # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
     # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
+    # The 33348ffc1 gate run re-pins all six route maps for a490c6011: the C0
+    # trajectory first differs at 1425 C inside the anchor span, then
+    # extrapolates above the old clamp at 1750 C and below it at 1150-1190 C.
+    # SiO Stage 3/4 move +7.8558002e-6/+1.0078889e-5 kg; remaining field
+    # deltas are reported.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
@@ -177,10 +182,14 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 
 @pytest.mark.parametrize("staged", [False, True], ids=["lunar_24h", "c2a_staged"])
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
-    # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
-    # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
-    # full runs diverge between the laptop and studio-3, so these digests are
-    # not a laptop re-run.
+    # These are the studio-3 actuals from the 33348ffc1 gate run. a490c6011's
+    # 1/T interpolation changes the Fe captures: C0 first differs at 1425 C
+    # inside 1300-1600 C and extrapolates above the former clamp at 1750 C;
+    # C2A reaches 1600 and 1750 C. Across the route fields, deltas range from
+    # -7.6572158e-7 to +6.3847681e-7 kg for c2a_staged and
+    # -5.2895398e-7 to +2.3543931e-7 kg for lunar_24h. The runner digests
+    # move 99896577...3d1aa4 -> 0382c1a7...e18352 and
+    # 7fbf2c86...9fce3e -> 59ebd8f7...e1d9b respectively.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(

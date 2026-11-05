@@ -1142,32 +1142,37 @@ def test_finite_capacity_in_domain_rates_match_parent_nonbinding_baseline(
     assert not sim._last_evaporation_flux_diagnostic.get(
         "continuum_extrapolation_notice"
     )
+    # Re-pinned from the 33348ffc1 studio-3 run for a490c6011 at 1670 C,
+    # above the 1600 C clamp: the Na rate moves -5.809001933e-6 kg/hr and
+    # K moves -2.257195436e-7 kg/hr (the other species deltas are in the
+    # worker report). The original 5672e61d9 fallback probe supplied the
+    # pre-change baseline.
     # Recorded on parent 5672e61d9 by the non-binding fallback probe:
     # B582_RUNTIME_ENFORCEMENT=0 ... b582_identity_probe.py.
     # b-850: alkali composite vapour rows use parent-oxide activity; K2O_gas is below the existing 1e-12 kg/hr cutoff.
     # b-858: atomic Si now uses the sourced Svehla 1962 Table I transport row.
     expected_rates = {
-        "Al": 1.776974630811854e-10,
-        "AlO": 2.622990526227972e-10,
-        "Ca": 6.00143229355403e-09,
-        "CaO_gas": 2.067737447801073e-11,
-        "Cr": 4.355218555260953e-05,
-        "CrO": 9.136286575214734e-06,
-        "CrO2": 3.1730720722299763e-06,
-        "CrO3": 9.294384109563237e-10,
-        "K": 1.8395070246088384e-04,
-        "K2": 1.6813544178336032e-11,
-        "Mg": 7.23266209617007e-05,
-        "MgO_gas": 1.0307259466430569e-07,
-        "Mn": 2.2585292315558916e-05,
-        "Na": 5.142690508092712e-03,
-        "Na2": 3.013634463408095e-08,
-        "Na2O_gas": 3.0031933641137976e-11,
-        "Si": 1.2046947950628297e-10,
-        "SiO": 7.769179203709372e-09,
-        "SiO2_gas": 4.598894711291365e-06,
-        "TiO": 2.8635316467141483e-09,
-        "TiO2_gas": 4.788176871001818e-08,
+        "Al": 1.7843414961709368e-10,
+        "AlO": 2.6197366359583885e-10,
+        "Ca": 6.010128264947351e-09,
+        "CaO_gas": 2.0596260995150332e-11,
+        "Cr": 4.3732599982291606e-05,
+        "CrO": 9.124923267493729e-06,
+        "CrO2": 3.1521260793398895e-06,
+        "CrO3": 9.183504092444115e-10,
+        "K": 0.00018372498291727347,
+        "K2": 1.677208080001182e-11,
+        "Mg": 7.243141418987857e-05,
+        "MgO_gas": 1.0266825047521306e-07,
+        "Mn": 2.261799473996269e-05,
+        "Na": 0.005136881506159663,
+        "Na2": 3.0064960964363506e-08,
+        "Na2O_gas": 2.980008686049584e-11,
+        "Si": 1.2129466539473987e-10,
+        "SiO": 8.01350446041343e-09,
+        "SiO2_gas": 4.58085411399764e-06,
+        "TiO": 2.8676808561625523e-09,
+        "TiO2_gas": 4.7693937491895365e-08,
     }
     actual_rates = {
         str(species): float(rate)

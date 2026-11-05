@@ -817,8 +817,11 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # this production row total; the next row transfers it to reagent, so live
     # product returns to zero while cumulative condensate and recycled mass
     # retain the capture.
+    # a490c6011's t-1591 1/T change moves the 1750 C Fe hot-hold row by
+    # +1.5594823214e-9 kg (+3.1344e-6 relative); 1750 C extrapolates above
+    # the old 1600 C clamp.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        0.0004975327330687448, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (

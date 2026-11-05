@@ -516,6 +516,10 @@ def _history_request(composition, temperature_K, hour, previous=None):
 
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
+    # At 2400.65 K (2127.50 C), a490c6011 leaves the numeric payload unchanged
+    # (7d93eda6...dfc8) but changes the metadata digest from
+    # 934e52dd...4cc9 to b5c99ba3...885e because this is above the 1600 C
+    # anchor and now carries the extrapolation notice.
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
     # from e975edd to e1423d8. Keep the numeric maps separate from metadata;
     # the historical digest excludes only b-813's new temperature notice
@@ -525,14 +529,14 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # Numeric-only hash captured from the 33348ffc1 studio-3 gate run.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "7d93eda6e2a5812bad5bfa80351c187c88adc91e79c2e369b9f7d64d336fdfc8"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # Projected metadata digest captured from the 33348ffc1 studio-3 gate run.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "934e52dd541fc5e6933b7fa9d3b106003b5d20f103aa0c6489c4f4ced3f74cc9"
+    ).hexdigest() == "b5c99ba33ebbc122cac8dc884f2e53498015dfc7432d9c81c2ca11d0b6db885e"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -544,14 +548,19 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
-    # Numeric-only hash captured from the green 4b95c7176 engine on studio-2.
+    # At 1800 K (1526.85 C), a490c6011 changes the numeric payload inside the
+    # 1300-1600 C anchor span: SHA-256 61e9be01...cf2b1 ->
+    # e295de86...f473903. The paired digest also moves to the decoded current
+    # payload hash below (delta is a payload change, not an extrapolation flag).
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "61e9be015d7f7fc80787b36f2836523b4094950b6fb8d1a0fa917cdb882cf2b1"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    ).hexdigest() == "e295de86e5004b2c5b69b69ad7dc23ed3f6458685ce28e929a1a1cbbff473903"
+    # Projected digest: old 7f0cbcb9...ea102 -> current
+    # f961836b...586d8. The 1800 K numeric SHA matches the studio-3 log, and
+    # this in-span case has no new extrapolation notice.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "7f0cbcb90a852319495d1eaf070ab30efa5d4361413d01e7bcfb57934e8ea102"
+    ).hexdigest() == "f961836b655a6e16edcbbfade91d9f9e0d39610c4d8d5c8a1d9ddb016c1586d8"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
