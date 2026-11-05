@@ -61,6 +61,25 @@ def _handle_test_request(resource, request, _errlog):
     }, sort_keys=True, separators=(',', ':')).encode()
 
 
+def _bootstrap_native_output_worker():
+    return None, 'native-output-ready'
+
+
+def _handle_native_output_request(_resource, request, _errlog):
+    os.write(request['fd'], request['line'])
+    return request['result']
+
+
+def _native_output_worker():
+    return WarmEngineWorker(
+        name='native output worker',
+        bootstrap=_bootstrap_native_output_worker,
+        handler=_handle_native_output_request,
+        startup_timeout_s=_RENDEZVOUS_TIMEOUT_S,
+        call_timeout_s=30.0,
+    )
+
+
 def _bootstrap_recording_worker(results, started=None, release=None):
     return {
         'results': results,
@@ -181,6 +200,52 @@ def test_warm_worker_matches_24_cold_workers_byte_for_byte():
         assert warm_worker.start_count == 1
     finally:
         warm_worker.close()
+
+
+def test_warm_worker_deduplicates_native_fd_output_and_preserves_results(
+    capfd,
+):
+    native_line = b'X Fe3+ Tet/Oct = nan\n'
+    worker = _native_output_worker()
+    worker.start()
+    try:
+        results = [
+            worker.call({'fd': 1, 'line': native_line, 'result': index})
+            for index in range(50)
+        ]
+    finally:
+        worker.close()
+
+    captured = capfd.readouterr()
+    assert results == list(range(50))
+    assert captured.out == ''
+    assert captured.err.count(native_line.decode()) == 1
+    assert len(captured.err.splitlines()) == 2
+    assert '[engine-pool native output] count=50:' in captured.err
+    assert len(captured.err.encode()) < 200
+
+
+def test_warm_worker_forwards_repeated_error_like_native_lines_in_full(capfd):
+    native_line = (
+        b'FATAL segmentation error from native engine: '
+        + b'x' * 4096
+        + b'\n'
+    )
+    worker = _native_output_worker()
+    worker.start()
+    try:
+        results = [
+            worker.call({'fd': 2, 'line': native_line, 'result': index})
+            for index in range(2)
+        ]
+    finally:
+        worker.close()
+
+    captured = capfd.readouterr()
+    assert results == [0, 1]
+    assert captured.out == ''
+    assert captured.err.encode().count(native_line) == 2
+    assert f'[engine-pool native output] count=2: ' in captured.err
 
 
 def test_pre_ready_worker_death_is_engine_worker_died():
