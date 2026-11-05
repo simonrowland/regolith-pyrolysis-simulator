@@ -295,7 +295,11 @@ def stage_list_index_for_destination(train: object, destination: str | None) -> 
         return None
     stages = getattr(train, 'stages', ())
     for index, stage in enumerate(stages):
-        if getattr(stage, 'stage_key', '') == destination:
+        if stage_key_for_stage(
+            stage,
+            falsey_sub_order_is_zero=True,
+            include_collector_fallback=True,
+        ) == destination:
             return index
     number = stage_number_for_destination(destination)
     if number is None:
@@ -307,37 +311,6 @@ def stage_list_index_for_destination(train: object, destination: str | None) -> 
         ):
             return index
     return None
-
-
-def collection_stage_index(train: object, stage_number: int, species: str) -> int | None:
-    """List index for a capture known only by public stage number.
-
-    Production routes carry capture_kg_by_stage_identity and book with
-    stage_index_for_visit_identity. This remains the designation fallback
-    for a stage-number total: a species designated to one of the keys
-    that share the number lands there; every other species lands on
-    sub_order 0.
-    """
-
-    stages = getattr(train, 'stages', ())
-    matches = [
-        index
-        for index, stage in enumerate(stages)
-        if int(stage.stage_number) == int(stage_number)
-    ]
-    if not matches:
-        return None
-    if len(matches) == 1:
-        return matches[0]
-    designated = DESIGNATED_STAGE.get(species)
-    if designated:
-        for index in matches:
-            if getattr(stages[index], 'stage_key', '') == designated:
-                return index
-    for index in matches:
-        if int(getattr(stages[index], 'sub_order', 0) or 0) == 0:
-            return index
-    return matches[0]
 
 
 def stage_index_for_visit_identity(

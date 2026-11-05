@@ -682,28 +682,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Na2O
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Na2O
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.5'
@@ -753,14 +740,14 @@ observations:
   locator:
     page: 3
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=1.1e-7
+    note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=1.1e-7
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.5'
@@ -770,7 +757,15 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.5
+        - Binary complement xNa2O = 1-xSiO2 = 0.5
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -778,7 +773,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=1.1e-7
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=1.1e-7
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -792,7 +787,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=1.1e-7
+              note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.;
+                printed_cell=1.1e-7
         - - factor
           - state:
               tag: value
@@ -800,7 +796,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=1.1e-7
+              note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.;
+                printed_cell=1.1e-7
         output_unit: K
         references: []
     fO2_log:
@@ -810,7 +807,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=1.1e-7
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=1.1e-7
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_callow_xsio2_067
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -847,28 +844,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Na2O
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Na2O
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.33'
@@ -918,14 +902,14 @@ observations:
   locator:
     page: 3
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=6.6e-9
+    note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=6.6e-9
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.33'
@@ -935,7 +919,15 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.67
+        - Binary complement xNa2O = 1-xSiO2 = 0.33
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -943,7 +935,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=6.6e-9
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=6.6e-9
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -957,7 +949,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=6.6e-9
+              note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.;
+                printed_cell=6.6e-9
         - - factor
           - state:
               tag: value
@@ -965,7 +958,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=6.6e-9
+              note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.;
+                printed_cell=6.6e-9
         output_unit: K
         references: []
     fO2_log:
@@ -975,7 +969,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Callow or calculated from their silica activity.; printed_cell=6.6e-9
+        note: Na2O activity estimated by Inoue and Suito from the cited Callow silica activity and thermodynamic data.; printed_cell=6.6e-9
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_050
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -1012,28 +1006,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Na2O
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Na2O
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.5'
@@ -1083,14 +1064,14 @@ observations:
   locator:
     page: 3
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.6e-6
+    note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.6e-6
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.5'
@@ -1100,7 +1081,15 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.5
+        - Binary complement xNa2O = 1-xSiO2 = 0.5
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -1108,7 +1097,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.6e-6
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.6e-6
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1122,7 +1111,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.6e-6
+              note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.;
+                printed_cell=1.6e-6
         - - factor
           - state:
               tag: value
@@ -1130,7 +1120,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.6e-6
+              note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.;
+                printed_cell=1.6e-6
         output_unit: K
         references: []
     fO2_log:
@@ -1140,7 +1131,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.6e-6
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.6e-6
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_charles_xsio2_067
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -1177,28 +1168,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Na2O
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Na2O
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.33'
@@ -1248,14 +1226,14 @@ observations:
   locator:
     page: 3
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.7e-8
+    note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.7e-8
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.33'
@@ -1265,7 +1243,15 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.67
+        - Binary complement xNa2O = 1-xSiO2 = 0.33
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -1273,7 +1259,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.7e-8
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.7e-8
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1287,7 +1273,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.7e-8
+              note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.;
+                printed_cell=1.7e-8
         - - factor
           - state:
               tag: value
@@ -1295,7 +1282,8 @@ observations:
             locator:
               page: 3
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.7e-8
+              note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.;
+                printed_cell=1.7e-8
         output_unit: K
         references: []
     fO2_log:
@@ -1305,7 +1293,7 @@ observations:
       locator:
         page: 3
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Charles or calculated from their silica activity.; printed_cell=1.7e-8
+        note: Na2O activity estimated by Inoue and Suito from the cited Charles silica activity and thermodynamic data.; printed_cell=1.7e-8
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_haller_1250
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -1363,12 +1351,12 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
-          - '0.33'
+          - '0.3333333333333333333333333333'
         - - SiO2
-          - '0.67'
+          - '0.6666666666666666666666666667'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1413,24 +1401,32 @@ observations:
   locator:
     page: 2
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=6.56e-8
+    note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+      state for that glass melt.; printed_cell=6.56e-8
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
-            - '0.33'
+            - '0.3333333333333333333333333333'
           - - SiO2
-            - '0.67'
+            - '0.6666666666666666666666666667'
           amount_basis: mole_fraction
       locator:
-        page: 2
-        paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.
+        page: 3
+        paragraph: Na2O activity calculation
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed formula Na2O·2SiO2
+        - Formula-unit ratio Na2O:SiO2 = 1:2; xNa2O=1/3; xSiO2=2/3
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -1438,7 +1434,8 @@ observations:
       locator:
         page: 2
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=6.56e-8
+        note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+          state for that glass melt.; printed_cell=6.56e-8
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1452,7 +1449,8 @@ observations:
             locator:
               page: 2
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=6.56e-8
+              note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid
+                standard state for that glass melt.; printed_cell=6.56e-8
         - - factor
           - state:
               tag: value
@@ -1460,7 +1458,8 @@ observations:
             locator:
               page: 2
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=6.56e-8
+              note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid
+                standard state for that glass melt.; printed_cell=6.56e-8
         output_unit: K
         references: []
     fO2_log:
@@ -1470,7 +1469,8 @@ observations:
       locator:
         page: 2
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=6.56e-8
+        note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+          state for that glass melt.; printed_cell=6.56e-8
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_na2o_activity_haller_1350
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -1528,12 +1528,12 @@ observations:
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
-          - '0.33'
+          - '0.3333333333333333333333333333'
         - - SiO2
-          - '0.67'
+          - '0.6666666666666666666666666667'
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
@@ -1578,24 +1578,32 @@ observations:
   locator:
     page: 2
     paragraph: Na2O activity comparison
-    note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=1.98e-7
+    note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+      state for that glass melt.; printed_cell=1.98e-7
   read_from: pdf:inoue-suito-1982-na-silicate-sulfur-partitions
   point_conditions:
     composition:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
-            - '0.33'
+            - '0.3333333333333333333333333333'
           - - SiO2
-            - '0.67'
+            - '0.6666666666666666666666666667'
           amount_basis: mole_fraction
       locator:
-        page: 2
-        paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.
+        page: 3
+        paragraph: Na2O activity calculation
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed formula Na2O·2SiO2
+        - Formula-unit ratio Na2O:SiO2 = 1:2; xNa2O=1/3; xSiO2=2/3
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -1603,7 +1611,8 @@ observations:
       locator:
         page: 2
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=1.98e-7
+        note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+          state for that glass melt.; printed_cell=1.98e-7
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1617,7 +1626,8 @@ observations:
             locator:
               page: 2
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=1.98e-7
+              note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid
+                standard state for that glass melt.; printed_cell=1.98e-7
         - - factor
           - state:
               tag: value
@@ -1625,7 +1635,8 @@ observations:
             locator:
               page: 2
               paragraph: Na2O activity comparison
-              note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=1.98e-7
+              note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid
+                standard state for that glass melt.; printed_cell=1.98e-7
         output_unit: K
         references: []
     fO2_log:
@@ -1635,7 +1646,8 @@ observations:
       locator:
         page: 2
         paragraph: Na2O activity comparison
-        note: Na2O activity attributed to Sanders and Haller or calculated from their silica activity.; printed_cell=1.98e-7
+        note: Sanders and Haller's absolute activity at the Na2O·2SiO2 composition is reported relative to the liquid standard
+          state for that glass melt.; printed_cell=1.98e-7
 - observation_id: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio05_denier_log_Cs
   experiment_id: 10.2355/isijinternational1966.22.514::inoue-suito-1982-na-silicate-sulfur-partitions
   identity:
@@ -2702,28 +2714,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.5'
@@ -2780,7 +2779,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.5'
@@ -2791,6 +2790,14 @@ observations:
         page: 3
         paragraph: SiO2 activity reports
         note: SiO2(l) activity reported by Callow and quoted by Inoue and Suito.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.5
+        - Binary complement xNa2O = 1-xSiO2 = 0.5
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -2867,28 +2874,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.33'
@@ -2945,7 +2939,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.33'
@@ -2956,6 +2950,14 @@ observations:
         page: 3
         paragraph: SiO2 activity reports
         note: SiO2(l) activity reported by Callow and quoted by Inoue and Suito.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.67
+        - Binary complement xNa2O = 1-xSiO2 = 0.33
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3032,28 +3034,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.5'
@@ -3110,7 +3099,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.5'
@@ -3121,6 +3110,14 @@ observations:
         page: 3
         paragraph: SiO2 activity reports
         note: SiO2(l) activity reported by Charles and quoted by Inoue and Suito.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.5
+        - Binary complement xNa2O = 1-xSiO2 = 0.5
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value
@@ -3197,28 +3194,15 @@ observations:
       tag: not_applicable
       reason: profile activity does not use formation_elements
     reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO2
-          phase:
-            tag: value
-            value: l
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO2
+      tag: unknown
+      reason: 'source reference state not printed: not printed'
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
       tag: value
       value:
-        basis: printed_mole_fraction
+        basis: identity_derived_binary_mole_fraction
         components:
         - - Na2O
           - '0.33'
@@ -3275,7 +3259,7 @@ observations:
       state:
         tag: value
         value:
-          basis: printed_mole_fraction
+          basis: identity_derived_binary_mole_fraction
           components:
           - - Na2O
             - '0.33'
@@ -3286,6 +3270,14 @@ observations:
         page: 3
         paragraph: SiO2 activity reports
         note: SiO2(l) activity reported by Charles and quoted by Inoue and Suito.
+      inference:
+        relation: identity_derived_binary_mole_fraction
+        inputs:
+        - Printed xSiO2 = 0.67
+        - Binary complement xNa2O = 1-xSiO2 = 0.33
+        parameters: []
+        output_unit: mole_fraction
+        references: []
     temperature_K:
       state:
         tag: value

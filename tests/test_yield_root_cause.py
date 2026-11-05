@@ -216,7 +216,11 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # This test asserts Fe reduction and Na2O pins, not extraction success.
     # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
     # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    assert na2o_left == pytest.approx(1.7919321517691174, abs=1e-6)
+    # d-329 (owner 2026-11-03, all three approved): the d-137 capture law
+    # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
+    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
+    # is the production value (train rpp nightly and the laptop run agree).
+    assert na2o_left == pytest.approx(0.07626529983087423, abs=1e-6)
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT

@@ -22,6 +22,7 @@ a second band.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from types import MappingProxyType
@@ -38,6 +39,11 @@ PUBLISHED_SIO2_CERTIFIED_WT_PCT: tuple[float, float] = (30.0, 80.0)
 PUBLISHED_SIO2_CRASH_FLOOR_WT_PCT: float = 34.0
 PUBLISHED_TEMPERATURE_CERTIFIED_K: tuple[float, float] = (1073.15, 1700.0)
 PUBLISHED_AUTHORITY_OUTSIDE: str = 'extrapolated'
+
+# VapoRock's external validation band is distinct from the MELTS band in
+# data/engine_commissioning.yaml.
+VAPOROCK_T_MIN_K = 1350.0
+VAPOROCK_T_MAX_K = 1950.0
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_COMMISSIONING_PATH = _REPO_ROOT / 'data' / 'engine_commissioning.yaml'
@@ -420,6 +426,46 @@ def assess_engine_commissioning(
     )
 
 
+def vaporock_temperature_in_domain(temperature_K: float) -> bool:
+    """Return whether *temperature_K* is inside VapoRock's validation band."""
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(temperature) and (
+        VAPOROCK_T_MIN_K <= temperature <= VAPOROCK_T_MAX_K
+    )
+
+
+def vaporock_temperature_notice(
+    temperature_K: float,
+) -> dict[str, Any] | None:
+    """Return the VapoRock validation-band notice for an out-of-band T."""
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(temperature) or vaporock_temperature_in_domain(
+        temperature
+    ):
+        return None
+    warning = (
+        f'temperature {temperature:g} K outside certified band '
+        f'[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K'
+    )
+    return {
+        'kind': COMMISSIONING_NOTICE_KIND,
+        'reason': CONSTRAINT_TEMPERATURE_RANGE,
+        'authority': PUBLISHED_AUTHORITY_OUTSIDE,
+        'certified_band': {
+            'temperature_K': [VAPOROCK_T_MIN_K, VAPOROCK_T_MAX_K],
+        },
+        'failed_constraints': (CONSTRAINT_TEMPERATURE_RANGE,),
+        'warnings': (warning,),
+        'temperature_K': temperature,
+    }
+
+
 _RUNTIME_TABLE = parse_engine_commissioning_file(DEFAULT_COMMISSIONING_PATH)
 
 
@@ -562,6 +608,8 @@ __all__ = (
     'PUBLISHED_SIO2_CERTIFIED_WT_PCT',
     'PUBLISHED_SIO2_CRASH_FLOOR_WT_PCT',
     'PUBLISHED_TEMPERATURE_CERTIFIED_K',
+    'VAPOROCK_T_MAX_K',
+    'VAPOROCK_T_MIN_K',
     'SiO2Commissioning',
     'TemperatureCommissioning',
     'assess_engine_commissioning',
@@ -569,4 +617,6 @@ __all__ = (
     'load_engine_commissioning',
     'parse_engine_commissioning',
     'parse_engine_commissioning_file',
+    'vaporock_temperature_in_domain',
+    'vaporock_temperature_notice',
 )

@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 from simulator.yaml_cache import load_cached_safe_yaml
 
 from scripts.calibration_battery import envelope, rail_for
@@ -29,7 +30,6 @@ from simulator.diagnostic_helpers.binary_pot_scoring import (
     iter_activity_comparators,
     load_scoring_pots,
     method_class_is_scored,
-    oxide_molar_mass_g_mol,
     recompute_scoring_from_report,
     render_scoring_report_markdown,
     score_scoring_arm,

@@ -63,6 +63,12 @@ TARGETS=("$@")
 
 LOCAL_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$LOCAL_ROOT"
+if [ -n "${RPS_MAIN_REPO:-}" ]; then
+  MAIN_REPO="$(cd "$RPS_MAIN_REPO" && pwd -P)"
+else
+  GIT_COMMON_DIR="$(git -C "$LOCAL_ROOT" rev-parse --path-format=absolute --git-common-dir)"
+  MAIN_REPO="$(cd "$(dirname "$GIT_COMMON_DIR")" && pwd -P)"
+fi
 
 if ! git rev-parse --verify "${TIP_REF}^{commit}" >/dev/null 2>&1; then
   echo "ERROR: tip-ref not a commit: $TIP_REF" >&2
@@ -256,9 +262,39 @@ trap cleanup EXIT
 
 # --- rsync + provision + run (studio-ci.sh stanzas) -------------------------
 ssh -o BatchMode=yes "$HOST" "mkdir -p ~/repos/ci-jobs"
-# rsync working tree (pinned tip); exclude repo-local venv/git — same as studio-ci.sh.
+# rsync working tree (pinned tip); exclude repo-local venv/git and docs-private — same as studio-ci.sh.
 # engines.local.toml is machine-local and overwritten from the studio grind tree.
-rsync -a --delete --exclude .git --exclude .venv "$PINNED_WT/" "$HOST:repos/ci-jobs/$JOB/"
+rsync -a --delete --exclude .git --exclude .venv --exclude '/docs-private' \
+  "$PINNED_WT/" "$HOST:repos/ci-jobs/$JOB/"
+
+# Copy of ~/Repos/studio-ci.sh's per-box APFS fixture mirror and job-clone stanza.
+# Git worktrees omit docs-private, so seed the mirror from the shared main checkout.
+if [ ! -d "$MAIN_REPO/docs-private/research" ]; then
+  echo "ERROR: docs-private fixture source guard ($MAIN_REPO/docs-private has no research/)" >&2
+  exit 1
+fi
+FIXV=$(ssh -o BatchMode=yes "$HOST" "set -e; F=\$HOME/repos/ci-fixtures/regolith; mkdir -p \"\$F\" \$HOME/repos/ci-jobs
+  [ \"\$(stat -L -f %d \"\$F\")\" = \"\$(stat -L -f %d \$HOME/repos/ci-jobs)\" ] || { echo 'fixture and job dirs on different devices' >&2; exit 3; }
+  if [ ! -L \"\$F/current\" ] && [ -d \"\$F/docs-private\" ]; then mv \"\$F/docs-private\" \"\$F/v-seed\"; ln -s v-seed \"\$F/current\"; fi
+  V=v-\$(date +%Y%m%d%H%M%S)-\$\$-$JOB
+  if [ -L \"\$F/current\" ]; then /bin/cp -c -R \"\$F/\$(readlink \"\$F/current\")\" \"\$F/\$V\"; else mkdir \"\$F/\$V\"; fi
+  echo \"\$V\"") || {
+  echo "ERROR: docs-private fixture version setup failed" >&2
+  exit 1
+}
+rsync -a --delete "$MAIN_REPO/docs-private/" "$HOST:repos/ci-fixtures/regolith/$FIXV/"
+FIXMODE=$(ssh -o BatchMode=yes "$HOST" "set -e; F=\$HOME/repos/ci-fixtures/regolith; J=\$HOME/repos/ci-jobs/$JOB
+  ln -sfn $FIXV \"\$F/current.tmp.$JOB\" && mv -fh \"\$F/current.tmp.$JOB\" \"\$F/current\"
+  mkdir -p \"\$J\"
+  # Re-mint reused regen jobs so each receives a clone of this fixture version.
+  if [ -d \"\$J/docs-private\" ]; then chmod -R u+w \"\$J/docs-private\" 2>/dev/null || true; rm -rf \"\$J/docs-private\"; M=reminted; else M=cloned; fi
+  /bin/cp -c -R \"\$F/$FIXV\" \"\$J/docs-private\"; echo \$M
+  CUR=\$(readlink \"\$F/current\")
+  for d in \$(find \"\$F\" -maxdepth 1 -name 'v-*' -Bmin +720 2>/dev/null); do [ \"\$(basename \"\$d\")\" = \"\$CUR\" ] || { chmod -R u+w \"\$d\" 2>/dev/null; rm -rf \"\$d\"; }; done") || {
+  echo "ERROR: docs-private fixture publish/clone failed" >&2
+  exit 1
+}
+echo "provisioned: docs-private fixtures $FIXMODE from per-box APFS mirror version $FIXV (mirror of $MAIN_REPO)"
 
 # Build remote script body. PATH + ulimit match studio-ci.sh (t-435 env parity).
 REMOTE_BODY=$(

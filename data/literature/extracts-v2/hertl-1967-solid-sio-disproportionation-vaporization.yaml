@@ -1,0 +1,264 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+observations:
+- observation_id: hertl-1967-solid-sio-disproportionation-vaporization::hertl_1967_apparent_disproportionation_activation_energy
+  experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'apparent_activation_energy_of_solid_SiO_disproportionation'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'apparent_activation_energy_of_solid_SiO_disproportionation';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hertl and Pultz (1967), this work.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    figure: '6'
+  read_from: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+  point_conditions:
+    temperature:
+      state:
+        tag: unknown
+        reason: Fig. 6 varies temperature; no fitted temperature interval is printed.
+      locator:
+        page: 3
+        published_page: 380
+        pdf_page_index: 2
+        figure: '6'
+- observation_id: hertl-1967-solid-sio-disproportionation-vaporization::hertl_1967_quoted_geld_kochnev_vaporization_heat
+  experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Gel'd and Kochnev, reference 1.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: III. Vaporization Experiments, Discussion
+  read_from: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+  point_conditions:
+    temperature:
+      state:
+        tag: unknown
+        reason: No temperature is printed for this attributed literature value.
+      locator:
+        page: 3
+        published_page: 380
+        pdf_page_index: 2
+        section: III. Vaporization Experiments, Discussion
+- observation_id: hertl-1967-solid-sio-disproportionation-vaporization::hertl_1967_quoted_schafer_hornle_vaporization_heat
+  experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Schäfer and Hörnle, reference 3.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: III. Vaporization Experiments, Discussion
+  read_from: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+  point_conditions:
+    temperature:
+      state:
+        tag: unknown
+        reason: No temperature is printed for this attributed literature value.
+      locator:
+        page: 3
+        published_page: 380
+        pdf_page_index: 2
+        section: III. Vaporization Experiments, Discussion
+- observation_id: hertl-1967-solid-sio-disproportionation-vaporization::hertl_1967_quoted_vaporization_enthalpy_range
+  experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'quoted_heat_of_vaporization_of_SiO_unresolved_reaction';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: References 5 and 7 as cited by Hertl and Pultz (1967).
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: III. Vaporization Experiments, Discussion
+  read_from: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+  point_conditions:
+    temperature:
+      state:
+        tag: unknown
+        reason: No single temperature or temperature interval is printed for the quoted literature range.
+      locator:
+        page: 3
+        published_page: 380
+        pdf_page_index: 2
+        section: III. Vaporization Experiments, Discussion
+- observation_id: hertl-1967-solid-sio-disproportionation-vaporization::hertl_1967_sio_vaporization_heat_this_work
+  experiment_id: 10.1111/j.1151-2916.1967.tb15135.x::hertl-1967-solid-sio-disproportionation-vaporization
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_vaporization_of_solid_SiO_unresolved_reaction'
+    species:
+      formula: SiO
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vaporization_of_solid_SiO_unresolved_reaction';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Hertl and Pultz (1967), this work.
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  locator:
+    page: 3
+    published_page: 380
+    pdf_page_index: 2
+    section: III. Vaporization Experiments, Discussion
+  read_from: pdf:hertl-1967-solid-sio-disproportionation-vaporization
+  point_conditions:
+    temperature:
+      state:
+        tag: unknown
+        reason: Fig. 4 uses multiple temperatures; no fitted temperature interval is printed.
+      locator:
+        page: 2
+        published_page: 379
+        pdf_page_index: 1
+        figure: '4'

@@ -814,6 +814,8 @@ def test_absent_source_atom_refuses_but_keeps_channel() -> None:
 
 
 def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
+    from engines.engine_commissioning import vaporock_temperature_in_domain
+
     rule = RequestRule(
         species_id="Fe",
         source_account="process.cleaned_melt",
@@ -831,12 +833,12 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
         validation_status="pending_validation",
     )
     ledger = {"process.cleaned_melt": {"FeO": 3.0}}
-    # Below VapoRock's 1350 K gate; literature Antoine still covers.
+    # Below VapoRock's certified band; literature Antoine still covers.
     state = VapourResolveState(temperature_K=1200.0)
 
     def vaporock_covers(state_map: dict) -> bool:
         t = state_map.get("temperature_K")
-        return t is not None and 1350.0 <= float(t) <= 1950.0
+        return t is not None and vaporock_temperature_in_domain(t)
 
     def literature_covers(state_map: dict) -> bool:
         t = state_map.get("temperature_K")

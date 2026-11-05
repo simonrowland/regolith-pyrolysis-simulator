@@ -2303,6 +2303,7 @@ class ExtractionMixin:
             REACTION_FAMILY_C3_NA,
         )
         from simulator.chemistry.kernel.capabilities import ChemistryIntent
+        from simulator.evaporation import EvaporationFluxRefusal
 
         configured_temperature_C = float(
             self.campaign_mgr.get_temp_target(
@@ -2324,20 +2325,46 @@ class ExtractionMixin:
             self.campaign_mgr.last_c3_na_hold_adjustment = None
             return
 
-        curve = self._melt_redox_liquidus_gate_curve()
+        curve = None
+        malformed_curve_diagnostic = None
+        try:
+            curve = self._melt_redox_liquidus_gate_curve()
+            if isinstance(curve, Mapping):
+                curve = self._validated_melt_redox_liquidus_curve(curve)
+        except EvaporationFluxRefusal as exc:
+            if exc.reason != 'liquid_fraction_provider_invalid_curve':
+                raise
+            malformed_curve_diagnostic = dict(exc.diagnostic)
         crossover_temperature_C = (
             BuiltinMetallothermicStepProvider._crossover_temperature_C(
                 'Na',
                 'Fe',
             )
         )
-        if not isinstance(curve, Mapping) or crossover_temperature_C is None:
-            diagnostic = {
+        if (
+                malformed_curve_diagnostic is not None
+                or not isinstance(curve, Mapping)
+                or crossover_temperature_C is None
+        ):
+            diagnostic = malformed_curve_diagnostic or {}
+            reason = 'na_fe_hold_window_authority_unavailable'
+            if malformed_curve_diagnostic is not None:
+                malformed_fields = ','.join(
+                    malformed_curve_diagnostic.get('malformed_fields', ())
+                )
+                reason = (
+                    'liquid_fraction_provider_invalid_curve:'
+                    f'{malformed_fields}'
+                )
+                diagnostic['typed_refusal_reason'] = (
+                    'liquid_fraction_provider_invalid_curve'
+                )
+            diagnostic.update({
                 'status': 'unavailable',
-                'reason': 'na_fe_hold_window_authority_unavailable',
+                'reason': reason,
                 'configured_temperature_C': configured_temperature_C,
                 'configured_margin_kJ_per_mol_O2': configured_margin,
-            }
+            })
             self._last_c3_na_hold_adjustment = diagnostic
             self.campaign_mgr.last_c3_na_hold_adjustment = diagnostic
             return
@@ -2348,15 +2375,10 @@ class ExtractionMixin:
         true_feo_mol = self._cleaned_melt_available_mol_by_species(('FeO',))
 
         def liquid_fraction_at(temperature_C: float) -> float:
-            try:
-                return float(
-                    self._interpolate_freeze_gate_curve(
-                        curve,
-                        temperature_C,
-                    )
-                )
-            except (IndexError, KeyError, TypeError, ValueError):
-                return 0.0
+            return self._melt_redox_liquid_fraction_at_temperature(
+                curve,
+                temperature_C,
+            )
 
         boundary_tolerance_C = 1.0e-9
 
@@ -2406,10 +2428,7 @@ class ExtractionMixin:
                 margin_low_C,
             }
             for point in tuple(curve.get('path') or ()):
-                try:
-                    sample_temperature_C = float(point[0])
-                except (IndexError, TypeError, ValueError):
-                    continue
+                sample_temperature_C = float(point[0])
                 if (
                         solidus_temperature_C
                         < sample_temperature_C
@@ -2496,10 +2515,7 @@ class ExtractionMixin:
                 margin_low_C,
             ))
             for point in tuple(curve.get('path') or ()):
-                try:
-                    sample_temperature_C = float(point[0])
-                except (IndexError, TypeError, ValueError):
-                    continue
+                sample_temperature_C = float(point[0])
                 if (
                         first_positive_liquid_temperature_C
                         <= sample_temperature_C

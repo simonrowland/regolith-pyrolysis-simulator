@@ -265,6 +265,19 @@ def full_electrolysis_run(
             continue
         sim.step()
         steps += 1
+        # Pool Si must stay nonnegative for the whole lunar (and Mars)
+        # run. A kg-roundtrip outward mol can debit 1 ulp past the
+        # canonical pool; the next hour then refuses prior_pool_mol['Si'].
+        for account in (
+            "process.metal_phase",
+            "process.metal_phase_bottom_pool",
+            "process.metal_phase_float_layer",
+        ):
+            for species, amount in sim.atom_ledger.mol_by_account(account).items():
+                assert amount >= 0.0, (
+                    f"{feedstock_key} {account}[{species}]={amount} "
+                    f"at hour {sim.melt.hour} campaign {sim.melt.campaign}"
+                )
     return feedstock_key, additives_kg, sim
 
 

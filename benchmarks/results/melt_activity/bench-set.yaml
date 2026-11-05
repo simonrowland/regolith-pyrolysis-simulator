@@ -8,8 +8,16 @@ provenance:
     not experiments. Richter-2007 supplies six convention-usable experimental
     gamma targets for an in-domain Type-B CAI-like CMAS melt; they are kept in
     a separate population and never relabelled as basalt measurements.
-    Hastie-1981 supplies six scored K and SiO KEMS pressures for a separate
-    in-domain silicate composition with an IW+2.4 oxygen-fugacity pin.
+    Hastie-1981 supplies six scored K and SiO KEMS pressures for Beaver's Bend
+    illite. Its scored fO2 is an assigned IW+2.4 input; NBSIR 81-2279 §8.2 does
+    not print an IW buffer or offset. In §8.2 (printed pp. 16-17) it states:
+    “The $O_{2}/K$ pressure ratios varied from about 2 to 1/2 during the experiment.”
+    It also says, “Also during this initial period, the $O_{2}$ pressures were in
+    excess of the reaction [3] level owing to reduction of $Fe_{2}O_{3}$ to
+    $Fe_{3}O_{4}$ .” For each measured K pressure, the printed ratio implies an
+    informational pO2 sensitivity of 0.5–2 × measured pK; for
+    hastie_k_1917_186 at 1917.186331 K this is about 1.4e-5–5.6e-5 bar. This
+    pressure band is informational only and is not the scoring condition.
     Tsaplin-2000 supplies 12 scored SiO2 activity targets from Na2O-SiO2
     binary melts; its 12 measured Na2O activities are retained but held from
     scoring pending an authoritative oxide-basis engine result.
@@ -185,7 +193,9 @@ compositions:
       K2O: 0.0
   hastie_case4_k_silicate:
     material_class: experimental_kems_silicate
-    source: Hastie et al. 1981 case 4; ferric iron folded into FeO
+    source: >-
+      Beaver's Bend illite, a K-bearing aluminous silicate, not a basalt
+      (NBSIR 81-2279 §8.2); ferric iron folded into FeO
     composition_wt_pct:
       SiO2: 60.40588433
       Al2O3: 26.08892014
@@ -2123,7 +2133,7 @@ points:
     measured: 2.8200057899468834
     units: Pa
     score: true
-    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured K(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: hastie_k_1917_282
     population: hastie1981_kems
     composition_id: hastie_case4_k_silicate
@@ -2136,7 +2146,7 @@ points:
     measured: 3.2100367171866595
     units: Pa
     score: true
-    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured K(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: hastie_k_1955_825
     population: hastie1981_kems
     composition_id: hastie_case4_k_silicate
@@ -2149,7 +2159,7 @@ points:
     measured: 4.530018754322407
     units: Pa
     score: true
-    convention: measured K(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured K(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: hastie_sio_1907_796
     population: hastie1981_kems
     composition_id: hastie_case4_k_silicate
@@ -2162,7 +2172,7 @@ points:
     measured: 0.08272751899576938
     units: Pa
     score: true
-    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: hastie_sio_1909_739
     population: hastie1981_kems
     composition_id: hastie_case4_k_silicate
@@ -2175,7 +2185,7 @@ points:
     measured: 0.11673739559614202
     units: Pa
     score: true
-    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: hastie_sio_1948_149
     population: hastie1981_kems
     composition_id: hastie_case4_k_silicate
@@ -2188,7 +2198,7 @@ points:
     measured: 0.20670929224757628
     units: Pa
     score: true
-    convention: measured SiO(g); common analytical gas layer; IW+2.4 fO2 pin
+    convention: measured SiO(g); common analytical gas layer; IW+2.4 assigned (3ffc4d7ac, ThermoEngine LEPR IW + 2.4 via VapoRock redox_buffer); no printed basis
   - id: richter_mg_gamma_1873
     population: richter_type_b_cai_gamma
     composition_id: richter_type_b_cai

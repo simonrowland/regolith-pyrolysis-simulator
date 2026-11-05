@@ -8,11 +8,11 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2279
+  sources: 2295
   by_stage:
     located: 209
-    inbox: 1268
-    in_progress: 212
+    inbox: 1265
+    in_progress: 231
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -40,7 +40,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 319
+      count: 321
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -148,6 +148,7 @@ anti_loss:
       - inoue-1991-n-s-partition-cao-al2o3
       - inoue-suito-1982-vanadium-mgo-saturated-slag
       - itoh-1985-beta-alumina-na2o-emf
+      - itoh-1988-na2s-beta-alumina-emf
       - itoh-1989-zno-solid-zinc-silicate
       - jackson-2005-ferrous-glass-multispectroscopy
       - jacquet-2026-alkali-recondensation
@@ -225,6 +226,7 @@ anti_loss:
       - mueller-2004-alkali-oxide-activity-coal-ash
       - myers-jacobson-2015-volatile-metal-hydroxides-presentation
       - naess-2014-liquid-silicon-oxidation-fume-flux
+      - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
       - nagata-1989-emf-calcium-aluminates
       - nam-2025-cmas-vanadium-thesis
       - nazarov-2015-dhofar-silicides
@@ -5574,6 +5576,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: centolanzi-1966-tektite-vapour-pressure
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/centolanzi-1966-tektite-vapour-pressure.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: chamberlin-beckett-stolper-1995-spinel-oxide-activities
   stage: inbox
   evidence:
@@ -6253,6 +6265,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: colson-haskin-1991-electrolytic-smelting-lunar-soil
   stage: inbox
   evidence:
@@ -6902,6 +6924,16 @@ sources:
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
   total_rows: 30
+  inbox_exclusion_reason: null
+- source_id: delgado-2015-mg-thermite-regolith
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/delgado-2015-mg-thermite-regolith.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: delgado-2016-magnesium-combustion-thesis
   stage: inbox
@@ -8425,6 +8457,16 @@ sources:
       AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
   total_rows: 1
+  inbox_exclusion_reason: null
+- source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/fredrickson-chasanov-1973-na2o-enthalpy-1300k.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: fredriksson-2003-feo-slag-activities-thesis
   stage: in_progress
@@ -10845,6 +10887,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: hayashi-2025-ca-fe-silicate-redox-activities
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/hayashi-2025-ca-fe-silicate-redox-activities.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: he-2017-karrooite-ordering-heat-capacity
   stage: ingested_complete
   evidence:
@@ -11009,6 +11061,16 @@ sources:
     artefacts:
     - raw/herd-benaroya-2025-mars-meteorite-fo2/herd-benaroya-2025-mars-meteorite-fo2.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: hertl-1967-solid-sio-disproportionation-vaporization
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/hertl-1967-solid-sio-disproportionation-vaporization.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -11550,6 +11612,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/huang-furukawa-aoto-2003-sodium-iron-oxides-kems.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: hubert-2017-industrial-glass-redox-control
   stage: inbox
   evidence:
@@ -11983,6 +12055,16 @@ sources:
     reason: v2.1 store present; 2/9 rows battery-usable
   usable_rows: 2
   total_rows: 9
+  inbox_exclusion_reason: null
+- source_id: itoh-1988-na2s-beta-alumina-emf
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/itoh-1988-na2s-beta-alumina-emf.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: itoh-1989-zno-solid-zinc-silicate
   stage: ingested_partial
@@ -19939,6 +20021,16 @@ sources:
   usable_rows: 0
   total_rows: 127
   inbox_exclusion_reason: null
+- source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/kress-carmichael-1989-lime-iron-silicate-redox.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: kress-carmichael-1991-iron-redox-calibration
   stage: ingested_partial
   evidence:
@@ -24674,6 +24766,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: nagahara-ozawa-1996-forsterite-hydrogen-evaporation
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/nagahara-ozawa-1996-forsterite-hydrogen-evaporation.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: nagahara-ozawa-1999-forsterite-surface-microstructures
   stage: ingested_partial
   evidence:
@@ -25844,6 +25946,26 @@ sources:
     artefacts:
     - raw/oe-2002-nakhla-partitioning/oe-2002-nakhla-partitioning.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: oeltjen-1999-coal-slag-thermochemistry
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/oeltjen-1999-coal-slag-thermochemistry.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: ohare-1972-na2o-formation-enthalpy
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/ohare-1972-na2o-formation-enthalpy.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27763,12 +27885,12 @@ sources:
   total_rows: 10
   inbox_exclusion_reason: null
 - source_id: related-beerkens-1986-deposits-condensation-thesis
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/related-beerkens-1986-deposits-condensation-thesis/related-beerkens-1986-deposits-condensation-thesis.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/related-beerkens-1986-deposits-condensation-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -29282,6 +29404,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/roeder-1974-iron-activity-olivine-basaltic-liquids.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: roeder-reynolds-1991-chromite
   stage: inbox
   evidence:
@@ -29915,6 +30047,16 @@ sources:
     - raw/sanbongi-ohmori-jjim-21-4-silica-activity/mineru/p001-p005/out/src--k-ocirc-1957-study-on-the-activity-of-constituent-in-the-molten-slag-1st-report-on-the-activity-of-s-p001-p005/vlm/src--k-ocirc-1957-study-on-the-activity-of-constituent-in-the-molten-slag-1st-report-on-the-activity-of-s-p001-p005_model.json
     - raw/sanbongi-ohmori-jjim-21-4-silica-activity/sanbongi-ohmori-jjim-21-4-silica-activity.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: sanders-1977-water-vapour-na-vaporization
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/sanders-1977-water-vapour-na-vaporization.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -32412,8 +32554,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - claims/shornikov-2022-meteorite-redox-evaporation.claim
-    - extracts/shornikov-2022-meteorite-redox-evaporation.yaml
+    - data/literature/extracts/shornikov-2022-meteorite-redox-evaporation.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -33708,6 +33849,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: sugawara-2024-na-silicate-molybdate-miscibility
   stage: in_progress
   evidence:
@@ -34613,12 +34764,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tachibana-takigawa-2014-forsterite-condensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/tachibana-takigawa-2014-forsterite-condensation/tachibana-takigawa-2014-forsterite-condensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/tachibana-takigawa-2014-forsterite-condensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -34967,12 +35118,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: tatsumi-2004-iron-condensation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/tatsumi-2004-iron-condensation/tatsumi-2004-iron-condensation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/tatsumi-2004-iron-condensation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -36373,6 +36524,16 @@ sources:
     reason: v2.1 store present; 538/538 rows battery-usable
   usable_rows: 538
   total_rows: 538
+  inbox_exclusion_reason: null
+- source_id: wang-2009-cr-slag-kems-original
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/wang-2009-cr-slag-kems-original.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: wang-2009-slag-thermophysical-thermochemical-thesis
   stage: inbox

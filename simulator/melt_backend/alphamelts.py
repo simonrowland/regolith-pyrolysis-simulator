@@ -27,6 +27,8 @@ PetThermoTools 0.4.5 schema verified from installed source:
 
 from __future__ import annotations
 
+import fcntl
+import hashlib
 import importlib
 import importlib.metadata
 import logging
@@ -676,6 +678,116 @@ def _signal_name(returncode: int) -> str:
         return f'signal {-int(returncode)}'
 
 
+def _crash_stderr_tail(stderr: str | None) -> str:
+    """Last 4000 characters of a signal-death stderr.
+
+    The isolated-worker crash cell calls this helper. A second slice
+    would split the bound.
+    """
+    if not stderr:
+        return ''
+    return stderr[-4000:]
+
+
+def _regolith_diagnostics_root() -> Path:
+    """Temp directory that already holds the engine diagnostic logs."""
+    return Path(tempfile.gettempdir(), 'regolith-pyrolysis-simulator')
+
+
+_ALPHAMELTS_CRASH_INPUT_DIR_NAME = 'alphamelts-crash-inputs'
+_ALPHAMELTS_CRASH_INPUT_MAX_FILES = 256
+_ALPHAMELTS_CRASH_INPUT_LOCK_NAME = '.retention.lock'
+
+
+def _retain_crash_melts_input(melts_path: Path) -> tuple[str, str]:
+    """Copy the .melts input into the crash-input directory.
+
+    The file name is the sha256, so a repeated crash of the same input
+    keeps one copy. Raises on failure; the caller leaves the refusal
+    unchanged.
+    """
+    payload = Path(melts_path).read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
+    directory = _regolith_diagnostics_root() / _ALPHAMELTS_CRASH_INPUT_DIR_NAME
+    directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / f'{digest}.melts'
+    lock_path = directory / _ALPHAMELTS_CRASH_INPUT_LOCK_NAME
+    with lock_path.open('a+b') as lock_file:
+        # Closing the file releases the kernel lock even if publish/prune fails.
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        if not destination.is_file() or destination.read_bytes() != payload:
+            temporary = directory / f'.{digest}.{os.getpid()}.tmp'
+            try:
+                temporary.write_bytes(payload)
+                os.replace(temporary, destination)
+            finally:
+                temporary.unlink(missing_ok=True)
+        _prune_crash_melt_inputs(directory, destination)
+    return digest, str(destination)
+
+
+def _prune_crash_melt_inputs(directory: Path, protected: Path) -> None:
+    """Delete the oldest retained inputs past the cap.
+
+    ``protected`` is the file just published and is never removed.
+    OSError is swallowed: pruning must not change the refusal.
+    """
+    try:
+        cap = int(_ALPHAMELTS_CRASH_INPUT_MAX_FILES)
+        entries = [
+            path for path in directory.glob('*.melts') if path.is_file()
+        ]
+        overflow = len(entries) - cap
+        if overflow <= 0:
+            return
+        protected_resolved = protected.resolve()
+        ordered = sorted(
+            entries,
+            key=lambda path: (path.stat().st_mtime_ns, path.name),
+        )
+        removed = 0
+        for path in ordered:
+            if removed >= overflow:
+                return
+            if path.resolve() == protected_resolved:
+                continue
+            path.unlink()
+            removed += 1
+    except OSError:
+        return
+
+
+def _subprocess_died_diagnostics(
+    melts_path: Path,
+    stderr: str | None,
+) -> dict[str, object]:
+    """Bounded stderr tail and retained .melts identity. Never raises."""
+    extra: dict[str, object] = {}
+    try:
+        tail = _crash_stderr_tail(
+            stderr if isinstance(stderr, str) else ''
+        )
+    except Exception:
+        logger.warning(
+            'AlphaMELTS crash stderr tail failed',
+            exc_info=True,
+        )
+        tail = ''
+    if tail:
+        extra['stderr_tail'] = tail
+    try:
+        digest, retained = _retain_crash_melts_input(melts_path)
+    except Exception:
+        logger.warning(
+            'AlphaMELTS crash input retention failed',
+            exc_info=True,
+        )
+        return extra
+    extra['melts_sha256'] = digest
+    extra['melts_path'] = retained
+    return extra
+
+
 def _alphamelts_backend_failure_detail(reason_code: str,
                                        detail: str | None = None) -> str:
     message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[reason_code]
@@ -1310,10 +1422,9 @@ class _MELTSBackendSupport(MeltBackend):
             self._engine_version = None
             self._preload_petthermotools_payload(self._pet_module)
             if self._pet_warm_enabled:
-                diagnostic_path = Path(
-                    tempfile.gettempdir(),
-                    'regolith-pyrolysis-simulator',
-                    'petthermotools-diagnostics.log',
+                diagnostic_path = (
+                    _regolith_diagnostics_root()
+                    / 'petthermotools-diagnostics.log'
                 )
                 self._pet_worker = WarmEngineWorker(
                     name='PetThermoTools native operation',
@@ -3979,6 +4090,19 @@ class _MELTSBackendSupport(MeltBackend):
 
             if result.returncode < 0:
                 signal_name = _signal_name(result.returncode)
+                failure = {
+                    'stage': 'alphamelts_subprocess_execute',
+                    'command': [str(binary), '1'],
+                    'returncode': result.returncode,
+                    'signal': signal_name,
+                }
+                # PetThermoTools worker deaths (warm exit, cold start, cold
+                # EOF) stay unchanged: those paths have no .melts input
+                # and no alphaMELTS stderr.
+                failure.update(_subprocess_died_diagnostics(
+                    melts_path,
+                    result.stderr,
+                ))
                 return self._subprocess_operational_failure_result(
                     temperature_C=requested_temperature_C,
                     pressure_bar=requested_pressure_bar,
@@ -3986,12 +4110,7 @@ class _MELTSBackendSupport(MeltBackend):
                     warnings=result_warnings,
                     diagnostics=diagnostics,
                     reason_code=ALPHAMELTS_REASON_SUBPROCESS_DIED,
-                    failure={
-                        'stage': 'alphamelts_subprocess_execute',
-                        'command': [str(binary), '1'],
-                        'returncode': result.returncode,
-                        'signal': signal_name,
-                    },
+                    failure=failure,
                     detail=f'{signal_name} (returncode {result.returncode})',
                 )
             if result.returncode > 0:

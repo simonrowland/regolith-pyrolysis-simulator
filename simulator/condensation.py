@@ -155,6 +155,7 @@ from simulator.condensation_routing import (
     K_TRAP_STAGE_KEY,
     K_TRAP_STAGE_NUMBER,
     K_TRAP_SUB_ORDER,
+    STAGE_KEY_BY_NUMBER,
     accepted_species_for_stage_key,
     accepted_species_for_stage_number,
     coproduct_species_for_stage_number,
@@ -2399,10 +2400,10 @@ class CondensationRouteResult:
 
     remaining_by_species: Dict[str, float] = field(default_factory=dict)
     retained_in_source_by_species: Dict[str, float] = field(default_factory=dict)
-    condensed_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    condensed_by_stage_species: Dict[str, Dict[str, float]] = field(default_factory=dict)
     # Visit identity (stage_number, sub_order) -> species kg. The public
-    # stage-number map above is the sum. Stage 4 and the K trap share a
-    # number, so the sum cannot say which surface condensed the vapor.
+    # map above is keyed by stage_key. Stage 4 and the K trap share a
+    # number, so the identity map says which surface condensed the vapor.
     capture_kg_by_stage_identity: Dict[tuple[int, int], Dict[str, float]] = field(
         default_factory=dict)
     wall_deposit_by_species: Dict[str, float] = field(default_factory=dict)
@@ -2425,7 +2426,7 @@ class CondensationRouteResult:
     wall_alkali_binding_diagnostic_state_by_segment: Dict[
         str, Dict[str, Any]
     ] = field(default_factory=dict)
-    impurity_by_stage_species: Dict[int, Dict[str, float]] = field(default_factory=dict)
+    impurity_by_stage_species: Dict[str, Dict[str, float]] = field(default_factory=dict)
     antoine_extrapolations: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     antoine_extrapolation_warnings: tuple[str, ...] = ()
     cold_spot_warnings: tuple[str, ...] = ()
@@ -2457,8 +2458,14 @@ class CondensationRouteResult:
 
     def silica_capture_kg(self, stage_number: int | None = None) -> float:
         """SiO2 product from the existing 2SiO -> Si + SiO2 split."""
-        sio_condensed_kg = (self.condensed_for_species('SiO') if stage_number is None
-            else self.condensed_by_stage_species.get(stage_number, {}).get('SiO', 0.0))
+        if stage_number is None:
+            sio_condensed_kg = self.condensed_for_species('SiO')
+        else:
+            stage_key = STAGE_KEY_BY_NUMBER.get(int(stage_number))
+            sio_condensed_kg = (
+                self.condensed_by_stage_species.get(stage_key, {}).get('SiO', 0.0)
+                if stage_key is not None else 0.0
+            )
         return sio_condensed_kg * 0.5 * MOLAR_MASS['SiO2'] / MOLAR_MASS['SiO']
 
     def silica_fume_fraction_of_feedstock(self, feedstock_kg: float) -> float:
@@ -3635,7 +3642,7 @@ class CondensationModel:
 
         remaining_by_species = {}
         retained_in_source_by_species: Dict[str, float] = {}
-        condensed_by_stage_species: Dict[int, Dict[str, float]] = {}
+        condensed_by_stage_species: Dict[str, Dict[str, float]] = {}
         capture_kg_by_stage_identity: Dict[tuple[int, int], Dict[str, float]] = {}
         wall_deposit_by_species: Dict[str, float] = {}
         wall_deposit_by_segment_species: Dict[str, Dict[str, float]] = {}
@@ -3646,7 +3653,7 @@ class CondensationModel:
         vapour_fog_notices: list[dict[str, Any]] = []
         cartridge_capture_by_species: dict[str, dict[str, Any]] = {}
         self._pending_vapour_fog_notice = vapour_fog_notices
-        impurity_by_stage_species: Dict[int, Dict[str, float]] = {}
+        impurity_by_stage_species: Dict[str, Dict[str, float]] = {}
         antoine_extrapolations: Dict[str, Dict[str, Any]] = {}
         antoine_extrapolation_warnings: list[str] = []
         wall_sticking_alpha_by_species: dict[str, float] = {}
@@ -3841,7 +3848,8 @@ class CondensationModel:
                     species, temps=self.condensation_temperatures_C,
                     vapor_pressure_data=self.vapor_pressure_data,
                 ),
-                'hkl_condensed_by_stage': {},
+                'hkl_condensed_by_stage_key': {},
+                'hkl_condensed_by_identity': {},
                 'stage_alpha_records_by_stage': {},
                 'reactive_kg': 0.0,
             }
@@ -4135,12 +4143,21 @@ class CondensationModel:
                         reactive_stage_capture_kg[species] = deposit
                         continue
                     # Stage 4 and the K trap share a public stage number.
-                    # A stage-number key overwrites the earlier surface, and
-                    # designation then books both captures onto one product.
+                    # The stage-key map names each surface; the identity map
+                    # is the same deposit for the visit that booked it.
                     identity = (int(stage.stage_number), int(stage.sub_order))
-                    route['hkl_condensed_by_stage'][identity] = deposit
+                    stage_key = stage_key_for_stage(
+                        stage,
+                        falsey_sub_order_is_zero=True,
+                        include_collector_fallback=True,
+                    )
+                    route['hkl_condensed_by_identity'][identity] = deposit
+                    route['hkl_condensed_by_stage_key'][stage_key] = deposit
                     if not species_accepted_on_stage(stage, species):
                         route.setdefault('impurity_identities', set()).add(identity)
+                        route.setdefault('impurity_stage_keys', set()).add(
+                            stage_key,
+                        )
                     stage_removed[species] = deposit
             if reactive_stage_capture_kg:
                 demand_mol = math.fsum(
@@ -4171,6 +4188,11 @@ class CondensationModel:
                     stage_route['reactive_capture_identity'] = (
                         int(stage.stage_number),
                         int(stage.sub_order),
+                    )
+                    stage_route['reactive_capture_stage_key'] = stage_key_for_stage(
+                        stage,
+                        falsey_sub_order_is_zero=True,
+                        include_collector_fallback=True,
                     )
                     reaction.update(
                         uptake_mol=uptake_mol,
@@ -4284,13 +4306,13 @@ class CondensationModel:
             wall_deposit_account_fractions_by_species[species] = {}
 
             stage_route = stage_route_by_species[species]
-            hkl_condensed_by_stage = dict(
-                stage_route['hkl_condensed_by_stage']
+            hkl_condensed_by_stage_key = dict(
+                stage_route['hkl_condensed_by_stage_key']
             )
             stage_alpha_records_by_stage = dict(
                 stage_route['stage_alpha_records_by_stage']
             )
-            hkl_condensed_total_kg = sum(hkl_condensed_by_stage.values())
+            hkl_condensed_total_kg = sum(hkl_condensed_by_stage_key.values())
             wall_hkl_by_segment = dict(
                 wall_hkl_by_species.get(species, {})
             )
@@ -4337,9 +4359,16 @@ class CondensationModel:
                 # Alkali reaction is a distinct Stage-3 impurity sink. Keep it
                 # in the common collection projection so ledger accounting has
                 # one owner, while its chemistry remains in reactive_alkali.
-                stage_bucket = condensed_by_stage_species.setdefault(3, {})
+                reactive_stage_key = stage_route.get(
+                    'reactive_capture_stage_key',
+                ) or STAGE_KEY_BY_NUMBER[3]
+                stage_bucket = condensed_by_stage_species.setdefault(
+                    reactive_stage_key, {},
+                )
                 stage_bucket[species] = stage_bucket.get(species, 0.0) + reactive_kg
-                impurity_bucket = impurity_by_stage_species.setdefault(3, {})
+                impurity_bucket = impurity_by_stage_species.setdefault(
+                    reactive_stage_key, {},
+                )
                 impurity_bucket[species] = (
                     impurity_bucket.get(species, 0.0) + reactive_kg
                 )
@@ -4366,18 +4395,20 @@ class CondensationModel:
                         active_pipe_segments,
                     )
                 )
-            impurity_identities = stage_route.get('impurity_identities', ())
-            for identity, deposit in hkl_condensed_by_stage.items():
-                stage_number = int(identity[0])
-                stage_bucket = condensed_by_stage_species.setdefault(stage_number, {})
+            impurity_stage_keys = stage_route.get('impurity_stage_keys', ())
+            for stage_key, deposit in hkl_condensed_by_stage_key.items():
+                stage_bucket = condensed_by_stage_species.setdefault(stage_key, {})
                 stage_bucket[species] = stage_bucket.get(species, 0.0) + deposit
-                if identity in impurity_identities:
+                if stage_key in impurity_stage_keys:
                     impurity_bucket = impurity_by_stage_species.setdefault(
-                        stage_number, {},
+                        stage_key, {},
                     )
                     impurity_bucket[species] = (
                         impurity_bucket.get(species, 0.0) + deposit
                     )
+            for identity, deposit in stage_route.get(
+                'hkl_condensed_by_identity', {},
+            ).items():
                 identity_bucket = capture_kg_by_stage_identity.setdefault(
                     identity, {},
                 )

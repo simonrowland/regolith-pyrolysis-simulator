@@ -3592,7 +3592,6 @@ def _recipe_runtime_overrides_from_controls(
     if not isinstance(raw, Mapping):
         raise BadRequest('controls.runtime_campaign_overrides must be an object')
     overrides: dict[str, dict[str, Any]] = {}
-    has_carrier_override = False
     for campaign, fields in raw.items():
         campaign_name = _recipe_text_value(campaign)
         if not campaign_name:
@@ -3613,7 +3612,10 @@ def _recipe_runtime_overrides_from_controls(
             label = f'controls.runtime_campaign_overrides.{campaign_name}.{field_name}'
             if field_name == 'carrier_gas':
                 clean_fields[field_name] = raw_value
-                has_carrier_override = True
+                continue
+            if field_name in {'p_total_mbar', 'pO2_mbar'}:
+                if raw_value is not None and raw_value != '':
+                    clean_fields[field_name] = raw_value
                 continue
             try:
                 value = parse_campaign_override_value(field_name, raw_value, label)
@@ -3629,16 +3631,14 @@ def _recipe_runtime_overrides_from_controls(
             clean_fields[field_name] = value
         if clean_fields:
             overrides[campaign_name] = clean_fields
-    if has_carrier_override:
-        try:
-            canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
-                overrides
-            )
-            CampaignManager.validate_runtime_campaign_overrides(canonical)
-            return canonical
-        except ValueError as exc:
-            raise BadRequest(str(exc)) from exc
-    return overrides
+    try:
+        canonical = CampaignManager._canonicalize_runtime_carrier_overrides(
+            overrides
+        )
+        CampaignManager.validate_runtime_campaign_overrides(canonical)
+        return canonical
+    except ValueError as exc:
+        raise BadRequest(str(exc)) from exc
 
 
 def _recipe_inputs_from_controls(controls: Mapping[str, Any]) -> dict[str, Any]:

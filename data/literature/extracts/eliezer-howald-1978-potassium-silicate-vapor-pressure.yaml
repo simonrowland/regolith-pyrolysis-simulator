@@ -1,0 +1,1757 @@
+schema_version: literature_extract.v1
+source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+source:
+  citation: Eliezer, N., Howald, R. A., Marinkovic, M., and Eliezer, I. (1978). Vapor Pressure Measurements, Thermodynamic
+    Parameters, and Phase Diagram for the System Potassium Oxide-Silicon Oxide at High Temperatures. The Journal
+    of Physical Chemistry 82(9), 1021–1026.
+  year: 1978
+  corpus_asset: raw/eliezer-howald-1978-potassium-silicate-vapor-pressure/eliezer-howald-1978-potassium-silicate-vapor-pressure.pdf
+extraction:
+  method: Transcribed the MinerU machine tables and markdown, reconciled against the born-digital pdftotext layout,
+    then used page renders to verify the table row and column placement, Table II's marked values, the printed K
+    superscript, and Figure 3's marker legend. Figure-only pressure and activity series were not digitized.
+  date: '2026-11-02'
+  worker: w1103eh-eh78
+review_status: draft
+figure_policy: Figure-only pressure and activity points are listed as candidates; no plotted points were digitized.
+fidelity_samples:
+- species: KO0.5
+  observation_id: eliezer_howald_1978_table1_x021537_hm827
+  field: value
+  value: '-82.7'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: I
+    row: X=0.21537
+    column: partial molal enthalpy
+- species: KO0.5
+  observation_id: eliezer_howald_1978_table1_x028548_hm632
+  field: value
+  value: '-63.2'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: I
+    row: X=0.28548
+    column: partial molal enthalpy
+- species: KO0.5
+  observation_id: eliezer_howald_1978_table1_x033497_hm594
+  field: value
+  value: '-59.4'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: I
+    row: X=0.33497
+    column: partial molal enthalpy
+- species: KO0.5
+  observation_id: eliezer_howald_1978_table1_x034025_hm630
+  field: value
+  value: '-63.0'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    table: I
+    row: X=0.34025
+    column: partial molal enthalpy
+- species: K
+  observation_id: eliezer_howald_1978_figure1_context
+  field: potassium_mole_fraction_as_printed
+  value: '0.1444'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    figure: '1'
+- species: KO0.5
+  observation_id: eliezer_howald_1978_figure3_context
+  field: marker_legend_as_printed
+  value: 'Diamonds: nonequilibrium glass of stoichiometric composition; squares: equilibrium liquid composition
+    from the phase diagram of Kracek et al.; solid black corresponding symbol: authors’ choice for each point.'
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 1024
+    figure: '3'
+- species: KO0.5
+  observation_id: eliezer_howald_1978_tridymite_ko05_activity_1743
+  field: activity
+  value: '0.7157e-6'
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 1025
+    section: Thermodynamic properties of tridymite
+- species: SiO2
+  observation_id: eliezer_howald_1978_phase_diagram_x0102_loggamma2
+  field: gamma
+  value: '0.0212'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+- species: SiO2
+  observation_id: eliezer_howald_1978_phase_diagram_x0297_loggamma2
+  field: gamma
+  value: '0.0459'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+- species: SiO2
+  observation_id: eliezer_howald_1978_phase_diagram_x0102_sio2_activity
+  field: activity
+  value: '0.94293'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+- species: SiO2
+  observation_id: eliezer_howald_1978_phase_diagram_x0297_sio2_activity
+  field: activity
+  value: '0.78139'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+- species: SiO2
+  observation_id: eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+  field: gamma
+  value: '-0.012'
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 1023
+    section: Enthalpy data
+species:
+  KO0.5:
+    observations:
+    - observation_id: eliezer_howald_1978_table1_x021537_hm827
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: I
+        row: X=0.21537
+        column: partial molal enthalpy
+        table_row_number: 2
+        table_column_number: 2
+      phase: l
+      units: kcal mol-1
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: 'Table I reports the fitted partial molal enthalpy, not a single temperature or per-composition fit interval.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source prints no oxygen fugacity for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source prints no total pressure for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.21537'
+              - - SiO2
+                - '0.78463'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+            row: X=0.21537
+            column: X
+        atmosphere:
+          state:
+            tag: value
+            value: argon
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Experimental procedure
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: author_derived
+        value: '-82.7'
+        value_as_printed: '-82.7'
+        units_as_printed: kcal mol-1
+        component_as_printed: KO0.5
+        fit_as_printed: ln P vs. 1/T
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.21537'
+          SiO2: '0.78463'
+    - observation_id: eliezer_howald_1978_table1_x033497_hm594
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: I
+        row: X=0.33497
+        column: partial molal enthalpy
+        table_row_number: 2
+        table_column_number: 4
+      phase: l
+      units: kcal mol-1
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: 'Table I reports the fitted partial molal enthalpy, not a single temperature or per-composition fit interval.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source prints no oxygen fugacity for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source prints no total pressure for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.33497'
+              - - SiO2
+                - '0.66503'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+            row: X=0.33497
+            column: X
+        atmosphere:
+          state:
+            tag: value
+            value: argon
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Experimental procedure
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: author_derived
+        value: '-59.4'
+        value_as_printed: '-59.4'
+        units_as_printed: kcal mol-1
+        component_as_printed: KO0.5
+        fit_as_printed: ln P vs. 1/T
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.33497'
+          SiO2: '0.66503'
+    - observation_id: eliezer_howald_1978_table1_x028548_hm632
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: I
+        row: X=0.28548
+        column: partial molal enthalpy
+        table_row_number: 3
+        table_column_number: 2
+      phase: l
+      units: kcal mol-1
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: 'Table I reports the fitted partial molal enthalpy, not a single temperature or per-composition fit interval.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source prints no oxygen fugacity for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source prints no total pressure for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.28548'
+              - - SiO2
+                - '0.71452'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+            row: X=0.28548
+            column: X
+        atmosphere:
+          state:
+            tag: value
+            value: argon
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Experimental procedure
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: author_derived
+        value: '-63.2'
+        value_as_printed: '-63.2'
+        units_as_printed: kcal mol-1
+        component_as_printed: KO0.5
+        fit_as_printed: ln P vs. 1/T
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.28548'
+          SiO2: '0.71452'
+    - observation_id: eliezer_howald_1978_table1_x034025_hm630
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: I
+        row: X=0.34025
+        column: partial molal enthalpy
+        table_row_number: 3
+        table_column_number: 4
+      phase: l
+      units: kcal mol-1
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: 'Table I reports the fitted partial molal enthalpy, not a single temperature or per-composition fit interval.'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source prints no oxygen fugacity for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source prints no total pressure for the vapor-pressure measurements.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Potassium vapor pressure measurements
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.34025'
+              - - SiO2
+                - '0.65975'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            table: I
+            row: X=0.34025
+            column: X
+        atmosphere:
+          state:
+            tag: value
+            value: argon
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 1022
+            section: Experimental procedure
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: author_derived
+        value: '-63.0'
+        value_as_printed: '-63.0'
+        units_as_printed: kcal mol-1
+        component_as_printed: KO0.5
+        fit_as_printed: ln P vs. 1/T
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.34025'
+          SiO2: '0.65975'
+    - observation_id: eliezer_howald_1978_tridymite_ko05_activity_1743
+      type: activity_coefficient
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        section: Thermodynamic properties of tridymite
+      phase: cr
+      standard_state: KO0.5(s), as printed
+      units: dimensionless
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1743'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is printed for the calculated tridymite activity.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is printed for the calculated tridymite activity.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.0234'
+              - - SiO2
+                - '0.9766'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+      values:
+        quantity: activity
+        method_class: author_derived
+        activity: '0.7157e-6'
+        activity_as_printed: 0.7157 × 10^-6
+        T_K: '1743'
+        component_as_printed: KO0.5(s)
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.0234'
+          SiO2: '0.9766'
+        approximate: true
+    context:
+    - observation_id: eliezer_howald_1978_figure3_context
+      type: figure_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1024
+        figure: '3'
+      units: log gamma1; mole fraction KO0.5
+      values:
+        quantity_as_printed: log gamma1 vs. mole fraction
+        method_class: figure_only
+        digitisation: none; plotted points were not digitized
+        marker_legend_as_printed: 'Diamonds: nonequilibrium glass of stoichiometric composition; squares: equilibrium
+          liquid composition from the phase diagram of Kracek et al.; solid black corresponding symbol: authors’
+          choice for each point.'
+        temperature_as_printed: log gamma1 values corrected to 1500 K
+        marker_legend_binding: Read from the printed prose adjacent to Figure 3; no point values were assigned by
+          plotted order or colour.
+        composition_notes_as_printed: Points at X=0.06664 are dropped from the least-squares treatment; experimental
+          data do not extend beyond X_KO0.5=0.55.
+    - observation_id: eliezer_howald_1978_partial_molar_enthalpy_schema_gap
+      type: schema_gap_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: I
+        section: Enthalpy data
+      units: kcal mol-1 for Table I and the 1500 K value; cal mol-1 for the Gibbs-Duhem value, as printed
+      values:
+        schema_gap: 'Five partial molar enthalpy values are printed. simulator/battery/enums.py::Quantity.PARTIAL_MOLAR_ENTHALPY has no value-field selection in simulator/battery/migrate.py::QUANTITY_SOURCE_FIELDS, so preserve the five printed values and units as unavailable; the engine lane is adding a kJ/mol field separately.'
+        unit_case: 'Four Table I values are printed in kcal mol-1; 860 ± 700 is printed in cal mol-1. The separate -15.0 excess enthalpy is printed in kcal mol-1 and is not a partial molar enthalpy. No converted kJ twin is stored.'
+    - observation_id: eliezer_howald_1978_excess_enthalpy_schema_gap
+      type: schema_gap_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      units: kcal mol-1 as printed
+      values:
+        schema_gap: 'The paper prints excess enthalpy of mixing, which is not partial molar enthalpy. No exact excess-enthalpy quantity exists in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES. The available gibbs_table type is in tools/validate_literature_extracts.py::OBSERVATION_TYPES, but simulator/battery/migrate.py::TYPE_QUANTITY would infer delta_fG if quantity were omitted; the row therefore uses a descriptive non-token quantity and stays unknown.'
+        quantity_as_printed: H_e, excess enthalpy of mixing
+        value_as_printed: '-15.0'
+        temperature_as_printed: 1500 K
+        composition_as_printed: X_KO0.5 = 0.390
+        units_as_printed: kcal mol-1
+        method_class: author_derived
+        no_converted_value: No kJ/mol twin is stored.
+    - observation_id: eliezer_howald_1978_excess_enthalpy_comparison_context
+      type: thermodynamic_enthalpy_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      units: kcal mol-1 as printed
+      values:
+        method_class: author_derived
+        composition_as_printed: X_KO0.5 = 0.390
+        comparisons_as_printed:
+        - value: '-16.3'
+          quantity_as_printed: excess enthalpy of mixing H_e
+          temperature_as_printed: room temperature, no numeric value stated
+          method_as_printed: interpolated from Kracek's room-temperature glass measurements
+        - value: '-16.0'
+          quantity_as_printed: excess enthalpy of mixing H_e
+          temperature_as_printed: 1000 K
+          method_as_printed: graphical integration of the mixture heat capacity
+        - value: '-17.7'
+          quantity_as_printed: excess enthalpy of mixing H_e
+          temperature_as_printed: not stated for this selected Redlich-Kister comparison
+  SiO2:
+    observations:
+    - observation_id: eliezer_howald_1978_phase_diagram_x0102_loggamma2
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: log10 activity coefficient as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1784'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.102'
+              - - SiO2
+                - '0.898'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
+        gamma: '0.0212'
+        printed_form: log10
+        component_as_printed: SiO2
+        T_K: '1784'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.102'
+          SiO2: '0.898'
+    - observation_id: eliezer_howald_1978_phase_diagram_x0297_loggamma2
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: log10 activity coefficient as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1150'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.297'
+              - - SiO2
+                - '0.703'
+              note: The binary system and printed X_KO0.5 define the SiO2 balance as 1-X for the complete composition
+                representation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
+        gamma: '0.0459'
+        printed_form: log10
+        component_as_printed: SiO2
+        T_K: '1150'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.297'
+          SiO2: '0.703'
+    - observation_id: eliezer_howald_1978_phase_diagram_x0102_sio2_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: dimensionless activity as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1784'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.102'
+              - - SiO2
+                - '0.898'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
+        activity: '0.94293'
+        printed_symbol_as_published: K
+        component_as_printed: SiO2
+        T_K: '1784'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.102'
+          SiO2: '0.898'
+    - observation_id: eliezer_howald_1978_phase_diagram_x0297_sio2_activity
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: dimensionless activity as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1150'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for the cited phase-diagram point.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.297'
+              - - SiO2
+                - '0.703'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: activity
+        method_class: quoted_attributed
+        attribution: Phase-diagram measurements, reference 15, as cited by Eliezer et al.
+        activity: '0.78139'
+        printed_symbol_as_published: K
+        component_as_printed: SiO2
+        T_K: '1150'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.297'
+          SiO2: '0.703'
+    - observation_id: eliezer_howald_1978_gibbs_duhem_x0293_loggamma2
+      type: activity_coefficient
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: log10 activity coefficient as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1784'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for this Gibbs-Duhem calculation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for this Gibbs-Duhem calculation.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.293'
+              - - SiO2
+                - '0.707'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: activity_coefficient
+        method_class: author_derived
+        gamma: '-0.012'
+        printed_form: log10
+        component_as_printed: SiO2
+        T_K: '1784'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.293'
+          SiO2: '0.707'
+    - observation_id: eliezer_howald_1978_table1_x0390_excess_enthalpy_at_1500k
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: kcal mol-1
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1500'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: This is a thermodynamic estimate; the source does not state an oxygen fugacity.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: This is a thermodynamic estimate; the source does not state a total pressure.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.390'
+              - - SiO2
+                - '0.610'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: excess_enthalpy_of_mixing_as_printed
+        method_class: author_derived
+        value: '-15.0'
+        units_as_printed: kcal mol-1
+        printed_quantity_as_published: H_e, excess enthalpy of mixing
+        component_as_printed: KO0.5-SiO2 mixture
+        excess_enthalpy_as_printed: '-15.0'
+        T_K: '1500'
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.390'
+          SiO2: '0.610'
+    - observation_id: eliezer_howald_1978_hbar2_x0297
+      type: gibbs_table
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      phase: l
+      units: cal mol-1
+      uncertainty:
+        kind: printed
+        value: '700'
+        basis: cal mol-1
+        verbatim: ± 700 cal mol-1; confidence level not stated
+        locator:
+          page: 3
+          pdf_page_index: 2
+          published_page: 1023
+          section: Enthalpy data
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: The source does not state a specific temperature for this 860 ± 700 cal mol-1 value.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        fO2_log:
+          state:
+            tag: unknown
+            reason: The source gives no oxygen fugacity for this derived enthalpy.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source gives no total pressure for this derived enthalpy.
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+        composition:
+          state:
+            tag: value
+            value:
+              basis: printed_mole_fraction
+              amount_basis: mole_fraction
+              components:
+              - - KO0.5
+                - '0.297'
+              - - SiO2
+                - '0.703'
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 1023
+            section: Enthalpy data
+      values:
+        quantity: partial_molar_enthalpy
+        method_class: author_derived
+        value: '860'
+        units_as_printed: cal mol-1
+        value_as_printed: 860 ± 700 cal mol-1
+        component_as_printed: SiO2
+        composition_mol:
+          basis: printed_mole_fraction
+          KO0.5: '0.297'
+          SiO2: '0.703'
+    - observation_id: eliezer_howald_1978_K1175_1p00455
+      type: gibbs_table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+      phase: cr
+      units: dimensionless K as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1175'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        composition:
+          state:
+            tag: unknown
+            reason: The source does not state a melt composition for this observation.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+      values:
+        quantity: linear_equilibrium_constant_as_printed
+        method_class: author_derived
+        value: '1.00455'
+        equilibrium_constant_as_printed: K1175 = 1.00455
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+        attribution: Eliezer et al. calculate this value for cristobalite and pure tridymite in equilibrium at 1743
+          K.
+        T_K: '1175'
+    - observation_id: eliezer_howald_1978_K1175_0p99658
+      type: gibbs_table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+      phase: cr
+      units: dimensionless K as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1175'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+        composition:
+          state:
+            tag: unknown
+            reason: The source does not state a melt composition for this observation.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            equation: '10'
+      values:
+        quantity: linear_equilibrium_constant_as_printed
+        method_class: author_derived
+        value: '0.99658'
+        equilibrium_constant_as_printed: K1175 = 0.99658
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+        attribution: Value calculated from the authors' Table III thermodynamic functions for tridymite.
+        T_K: '1175'
+    - observation_id: eliezer_howald_1978_K1623_lt_0p99526
+      type: gibbs_table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+        section: Thermodynamic properties of tridymite
+      phase: cr
+      units: dimensionless K as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1623'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        composition:
+          state:
+            tag: unknown
+            reason: The source does not state a melt composition for this observation.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+      values:
+        quantity: linear_equilibrium_constant_as_printed
+        method_class: author_derived
+        value: '0.99526'
+        bound_operator: <
+        equilibrium_constant_as_printed: K1623 <0.99526
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+        attribution: Inferred by the authors from Holmquist's NaO0.5 solubility result, reference 24.
+        T_K: '1623'
+    - observation_id: eliezer_howald_1978_K1623_0p993
+      type: gibbs_table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+        section: Thermodynamic properties of tridymite
+      phase: cr
+      units: dimensionless K as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value: '1623'
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        composition:
+          state:
+            tag: unknown
+            reason: The source does not state a melt composition for this observation.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+      values:
+        quantity: linear_equilibrium_constant_as_printed
+        method_class: author_derived
+        value: '0.993'
+        equilibrium_constant_as_printed: K1623 = 0.993
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+        attribution: Chosen by the authors from K1175 = 0.99658 to make K1623 equal 0.993.
+        T_K: '1623'
+    - observation_id: eliezer_howald_1978_K_approx_0p98
+      type: gibbs_table
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+        section: Thermodynamic properties of tridymite
+      phase: cr
+      units: dimensionless K as printed
+      point_conditions:
+        temperature_K:
+          state:
+            tag: unknown
+            reason: No specific temperature is attached to the possible 0.98 value.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        fO2_log:
+          state:
+            tag: unknown
+            reason: No oxygen fugacity is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: No total pressure is stated for the crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+        composition:
+          state:
+            tag: unknown
+            reason: The source does not state a melt composition for this crystalline transition equilibrium.
+          locator:
+            page: 5
+            pdf_page_index: 4
+            published_page: 1025
+            section: Thermodynamic properties of tridymite
+      values:
+        quantity: linear_equilibrium_constant_as_printed
+        method_class: author_derived
+        value: '0.98'
+        equilibrium_constant_as_printed: may be as small as 0.98
+        approximation: possible lower value; no specific temperature is stated with this sentence
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+  NaO0.5:
+    observations: []
+    context:
+    - observation_id: eliezer_howald_1978_holmquist_na_phase_equilibrium
+      type: quoted_phase_equilibrium_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        section: Thermodynamic properties of tridymite
+      units: mole fraction as printed
+      values:
+        method_class: quoted_attributed
+        attribution: Holmquist, reference 24, as cited by Eliezer et al.
+        species_as_printed: NaO0.5
+        composition_as_printed: 0.00484 mole fraction NaO0.5 with quartz
+        temperature_K_as_printed: '1623'
+        duration_as_printed: weeks
+        phases_as_printed: both cristobalite and tridymite present at equilibrium
+        phase_composition_constraints_as_printed: solubility of NaO0.5 in cristobalite <0.00484 and in tridymite
+          >0.00484 mole fraction
+    - observation_id: eliezer_howald_1978_sodium_oxide_heat_capacity_context
+      type: quoted_comparison_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1024
+        section: Thermodynamic data for KO0.5
+      units: as printed
+      values:
+        method_class: quoted_attributed
+        species_as_printed: sodium oxide
+        comparison_as_printed: NaO0.5-SiO2 liquid system has a substantial positive excess heat capacity of mixing.
+        related_temperature_as_printed: about 1000 K
+        cited_sources_as_printed: references 11, 16, 20, and 22
+  K:
+    observations: []
+    context:
+    - observation_id: eliezer_howald_1978_figure1_context
+      type: figure_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        figure: '1'
+      units: pressure units not stated on the figure axis
+      values:
+        quantity_as_printed: potassium vapor pressure
+        method_class: figure_only
+        digitisation: none; plotted points were not digitized
+        caption_as_printed: Potassium vapor pressures over a K2O-SiO2 sample with X_KO0.5 = 0.1444.
+        potassium_mole_fraction_as_printed: '0.1444'
+        axes_as_printed: 'y: log p; x: 10^4/T'
+        pressure_unit_as_printed: not stated
+        numeric_pressure_points: unavailable; figure-only
+        temperature_points: unavailable; the figure labels inverse temperature, not a tabulation of point temperatures
+    - observation_id: eliezer_howald_1978_vapor_pressure_method_context
+      type: measurement_method_context
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 1022
+        section: Potassium vapor pressure measurements
+      units: pressure unit not stated for p
+      values:
+        method_class: measured_direct
+        measurement_as_printed: Atomic absorption of the steady-state distribution of potassium atoms in a graphite
+          furnace.
+        calibration_as_printed: The steady-state absorbance is proportional to potassium pressure inside the sample
+          cell; a temperature-dependent conversion factor was evaluated with potassium aluminate standards.
+        calibration_relation_as_printed: p = cell e^(-39 kcal mol-1/RT) (absorbance)
+        calibration_energy_as_printed: 39 kcal mol-1, average obtained with two graphite tubes
+        cells_as_printed: platinum or molybdenum; molybdenum cells had screw closures with different hole sizes
+        furnace_as_printed: electrically heated graphite tube furnace; Woodriff furnace
+        atmosphere_as_printed: argon
+        temperature_measurement_as_printed: optical pyrometer
+        pressure_unit_as_printed: not stated
+        total_pressure:
+          tag: unknown
+          reason: no total pressure is printed
+        oxygen_fugacity:
+          tag: unknown
+          reason: no oxygen fugacity is printed
+        ion_intensity: not measured; atomic absorption absorbance was measured
+        flow_or_flux_values: no numeric flux or vaporization rate is reported
+        printed_reactions:
+        - KO0.5(l) -> K(g) + 1/4 O2(g)
+        - KO0.5(sol) -> K(g) + 1/4 O2(g)
+        - KO0.5(sol) + 1/2 H2O(g) -> KOH(g)
+        reaction_note: Equation (3) is the authors' interpretation of the potassium vaporization-rate data of Preston
+          and Turner, reference 13; it is not a measured species assignment from this work.
+        argon_flow_rate: not stated
+    - observation_id: eliezer_howald_1978_activity_conversion_assumption
+      type: thermodynamic_method_context
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 1024
+        equation: '4'
+      units: dimensionless activities; pressure terms with unit not stated
+      values:
+        method_class: author_derived
+        equation_as_printed: P_O2 = 1/4 P_K; divide P_K P_O2^(1/4) = 0.707 P_K^(5/4) by the equilibrium constant
+          for KO0.5(l) -> K(g) + 1/4 O2(g)
+        condition_status: P_O2 = 1/4 P_K is an activity-calculation assumption, not a measured oxygen fugacity or
+          experimental pressure condition.
+        standard_temperature_as_printed: 1500 K
+        activity_coefficients_as_printed: Calculated activities are divided by the mole fraction and corrected to
+          a standard temperature of 1500 K.
+    - observation_id: eliezer_howald_1978_table2_enthalpy_coefficients_context
+      type: thermodynamic_table_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: II
+      units: kcal mol-1; 1500 K as printed in the caption
+      values:
+        table_caption_as_printed: Redlich-Kister Coefficients for Enthalpy in the KO0.5-SiO2 System at 1500 K
+        column_headings_as_printed: A(H), B(H), A + 0.5519B
+        table_values_as_printed:
+          data_this_work:
+          - '-132'
+          - '-9'
+          - '-137'
+          Plante_data_reference_12:
+          - '-116'
+          - '-103'
+          - '-173'
+          rate_of_vaporization_reference_13:
+          - '-97'
+          - '-24'
+          - '-110'
+          joint_reference_13_and_this_work:
+          - '-118'
+          - '-5'
+          - '-121'
+          enthalpy_of_glasses_25C_references_6_to_8:
+          - '-75'
+          - '-61'
+          - '-109'
+          corrected_to_1500K_references_6_and_11:
+          - '-71'
+          - '-43'
+          - '-95'
+          selected_including_log_gamma_2_data:
+          - '-86'
+          - '-53'
+          - '-115'
+        row_labels_as_printed:
+        - Data this work
+        - Plante data^{12}
+        - Rate of vaporization^{13}
+        - Joint, ref 13 and this work
+        - Enthalpy of glasses, 25 °C^{6-8}
+        - Corrected to 1500 K^{6,11}
+        - Selected, including log γ2 data
+        row_interpretation: The Rate of vaporization row reports enthalpy coefficients, not a numeric rate.
+    - observation_id: eliezer_howald_1978_table3_standard_state_context
+      type: standard_state_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        table: III
+      units: Hf and H in cal mol-1; entropy and Cp in cal mol-1 K-1 as printed
+      values:
+        standard_state_as_printed: Standard heat of formation of solid KO0.5 at 298.15 K; Table III lists pure-material
+          functions at 298.15 K and 1000 K.
+        materials_as_printed: KO0.5(c), KO0.5(l), SiO2(quartz), SiO2(cristobalite), SiO2(tridymite), SiO2(l), K2Si4O9(s),
+          K2Si2O5(s)
+        cp_equation_as_printed: Cp = a + b(T-1000) + c(T-1000)^2 + d(T-1000)^3
+        cp_equation_validity_as_printed: generally valid for 1000-2200 K
+        printed_row_count: 8
+        column_headings_as_printed:
+        - Material
+        - H°298.15, cal mol-1
+        - H°1000, cal mol-1
+        - Φ°1000, cal mol-1 K-1
+        - a
+        - 10^3b
+        - 10^6c
+        - 10^9d
+        rows_as_printed:
+        - material: KO0.5(c)
+          H°298.15_cal_mol-1: '-43200'
+          H°1000_cal_mol-1: '-36200'
+          Phi°1000_cal_mol-1_K-1: '18.090'
+          Cp_a: '9.097'
+          Cp_10^3b: '0.96'
+          Cp_10^6c: null
+          Cp_10^9d: null
+        - material: KO0.5(l)
+          H°298.15_cal_mol-1: '-40628'
+          H°1000_cal_mol-1: '-32128'
+          Phi°1000_cal_mol-1_K-1: '19.4256'
+          Cp_a: '11.45'
+          Cp_10^3b: '1.80'
+          Cp_10^6c: null
+          Cp_10^9d: null
+        - material: SiO2(quartz)
+          H°298.15_cal_mol-1: '-217700'
+          H°1000_cal_mol-1: '-206860'
+          Phi°1000_cal_mol-1_K-1: '16.899'
+          Cp_a: '16.48'
+          Cp_10^3b: '2.4'
+          Cp_10^6c: null
+          Cp_10^9d: null
+        - material: SiO2(cristobalite)
+          H°298.15_cal_mol-1: '-216417'
+          H°1000_cal_mol-1: '-206640'
+          Phi°1000_cal_mol-1_K-1: '18.1108'
+          Cp_a: '16.72175'
+          Cp_10^3b: '2.05366'
+          Cp_10^6c: '-1.65179'
+          Cp_10^9d: '0.6463'
+        - material: SiO2(tridymite)
+          H°298.15_cal_mol-1: '-217000'
+          H°1000_cal_mol-1: '-206432.6'
+          Phi°1000_cal_mol-1_K-1: '17.5259'
+          Cp_a: '16.72175'
+          Cp_10^3b: '2.05366'
+          Cp_10^6c: '-1.65179'
+          Cp_10^9d: '0.6463'
+        - material: SiO2(l)
+          H°298.15_cal_mol-1: '-215740'
+          H°1000_cal_mol-1: '-205399'
+          Phi°1000_cal_mol-1_K-1: '18.1766'
+          Cp_a: '16.61'
+          Cp_10^3b: '3.2268'
+          Cp_10^6c: '1.2384'
+          Cp_10^9d: null
+        - material: K2Si4O9(s)
+          H°298.15_cal_mol-1: '-1059818'
+          H°1000_cal_mol-1: '-1003060'
+          Phi°1000_cal_mol-1_K-1: '89.8337'
+          Cp_a: '85.081'
+          Cp_10^3b: '9.0876'
+          Cp_10^6c: '-3.1173'
+          Cp_10^9d: null
+        - material: K2Si2O5(s)
+          H°298.15_cal_mol-1: '-609691.4'
+          H°1000_cal_mol-1: '-557657.4'
+          Phi°1000_cal_mol-1_K-1: '67.1074'
+          Cp_a: '51.638'
+          Cp_10^3b: '5.504'
+          Cp_10^6c: '-1.55864'
+          Cp_10^9d: null
+        liquid_KO05_standard_state_as_printed: pure liquid KO0.5; authors state its thermodynamic properties had
+          not been successfully measured and use estimates in Table III as the basis for their calculations.
+        reference_temperature_as_printed: 298.15 K
+    - observation_id: eliezer_howald_1978_table4_redlich_kister_coefficients_context
+      type: thermodynamic_fit_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        table: IV
+      units: Table IV coefficients as printed; title states 1500 K
+      values:
+        method_class: model_derived
+        table_caption_as_printed: Summary of power series coefficients at 1500 K for KO0.5 in SiO2
+        liquid:
+          log_gamma:
+            redlich_kister:
+              A: '-10.9923'
+              B: '-6.7801'
+              C: '-1.0101'
+            bale_pelton:
+              q0: '-11.3290'
+              q1: '-6.7801'
+              q2: '-0.6734'
+          enthalpy:
+            redlich_kister:
+              A: '-86000'
+              B: '-53000'
+            bale_pelton:
+              q0: '-86000'
+              q1: '-53000'
+          heat_capacity:
+            redlich_kister:
+              A: '8'
+            bale_pelton:
+              q0: '8'
+        tridymite:
+          log_gamma:
+            redlich_kister:
+              A: '-4.8045'
+            bale_pelton:
+              q0: '-4.8045'
+          enthalpy:
+            redlich_kister:
+              A: '-35842'
+            bale_pelton:
+              q0: '-35842'
+        equations_as_printed:
+        - d log gamma1 / d(1/T) = -Hbar1 / 4.575428
+        - Hbar1 = (1-X)^2[-8600 - 5300(-1 + 4X)]
+        - Cp1 = (1-X)^2[8.0]
+        - log gamma2 = C/T
+        - B(log gamma) = +0.942 - 11583/T
+        preliminary_figure3_fit_as_printed:
+          A_log_gamma: '-11.2116'
+          B_log_gamma: '-7.4673'
+          C_log_gamma: '-1.6695'
+        printed_basis_note: Equation (9) is stated to use mole fraction of K2O rather than KO0.5 and not to give
+          correct Henry's-law behavior at low potassium oxide concentration.
+    - observation_id: eliezer_howald_1978_equilibrium_constant_schema_gap
+      type: schema_gap_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        equation: '10'
+      units: dimensionless K as printed
+      values:
+        schema_gap: 'No exact linear equilibrium-constant quantity token is present: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+          represents log10 K, simulator/battery/migrate.py::QUANTITY_ALIASES and simulator/battery/migrate.py::TYPE_QUANTITY
+          do not define printed linear K, and tools/validate_literature_extracts.py::OBSERVATION_TYPES has no equilibrium_constant
+          observation type. The typed-refused rows carry a descriptive non-token quantity so gibbs_table cannot
+          infer delta_fG.'
+        reaction_as_printed: SiO2(cristobalite) -> SiO2(tridymite)
+        observations: The numeric equilibrium-constant cells are retained as typed-refused observations under SiO2.
+        temperature_labels_as_printed: K1175 at 1175 K; K1623 at 1623 K
+    - observation_id: eliezer_howald_1978_tridymite_solubility_context
+      type: phase_equilibrium_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        section: Thermodynamic properties of tridymite
+      units: mole fraction as printed
+      values:
+        method_class: author_derived
+        composition_temperature_range_as_printed: Liquid compositions in equilibrium with tridymite are known from
+          1040 to 1743 K.
+        tridymite_stability_as_printed: KO0.5 mole fractions 0.0033 to 0.0091.
+        liquidus_phase_diagram_as_printed: The calculated phase diagram is for equilibria involving solid SiO2 and
+          is shown with experimental liquidus points.
+        holmquist_comparison_as_printed: Holmquist used 1323 K for the quartz-cristobalite equilibrium; this paper
+          fixes that equilibrium at 1175 K.
+        other_temperature_values_as_printed: Quartz-tridymite equilibrium at 1150 K; liquid K2Si4O9 fusion point
+          at 1034 K; K2Si2O5 heat of fusion at 1325 K.
+        additional_composition_as_printed: X1=0.3333 for the partial-molar enthalpy calculation of the K2Si4O9 heat
+          of fusion.
+    - observation_id: eliezer_howald_1978_figure4_context
+      type: figure_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1026
+        figure: '4'
+      units: temperature and mole fraction axes as printed
+      values:
+        method_class: figure_only
+        digitisation: none; plotted phase-diagram points were not digitized
+        caption_as_printed: Phase diagram of the K2O-SiO2 system.
+        temperature_axis_as_printed: T
+        composition_axis_as_printed: X_KO0.5; mole fraction of KO0.5 in SiO2
+    - observation_id: eliezer_howald_1978_other_solid_standard_states_context
+      type: standard_state_context
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 1026
+        section: Thermodynamic values for solid potassium silicates
+      units: as printed
+      values:
+        standard_state_as_printed: Standard enthalpy of formation of K2Si2O5 at 298.15 K is compared with the value
+          calculated from heat of solution in HF.
+        reaction_as_printed: K2Si4O9(c) -> 2 KO0.5(l) + 4 SiO2(l)
+        melting_temperature_as_printed: 1034 K
+        heat_of_fusion_as_printed: 21 kcal mol-1
+        K2Si2O5_heat_of_fusion_as_printed: 17 kcal mol-1 at 1325 K
+    - observation_id: eliezer_howald_1978_redlich_kister_component_activity_context
+      type: activity_model_context
+      locator:
+        page: 5
+        pdf_page_index: 4
+        published_page: 1025
+        section: Redlich-Kister equations for log gamma
+      units: dimensionless activities and coefficients
+      values:
+        method_class: model_derived
+        equations_as_printed:
+        - log gamma2 = C/T
+        - B(log gamma) = +0.942 - 11583/T
+        phase_diagram_points_as_printed:
+        - T=1784 K at X_KO0.5=0.102
+        - T=1150 K at X_KO0.5=0.297
+        standard_state_as_printed: The passage describes activities and coefficients but does not separately state
+          a standard-state convention for log gamma2.
+    - observation_id: eliezer_howald_1978_hbar2_coefficients_context
+      type: thermodynamic_relation_context
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 1023
+        section: Enthalpy data
+      units: kcal mol-1 as printed
+      values:
+        method_class: author_derived
+        redlich_kister_relations_as_printed:
+        - A - 1.812B = 9.7 ± 8 kcal mol-1
+        - A + 0.5519B = -115 kcal mol-1
+        - A(H) = -86 kcal mol-1
+        - B(H) = -53.5 kcal mol-1
+        context_as_printed: The first relation uses log gamma2; the orthogonal relation is evaluated from Table
+          II.

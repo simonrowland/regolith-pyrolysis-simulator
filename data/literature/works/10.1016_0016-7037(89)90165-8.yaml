@@ -1,0 +1,813 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/0016-7037(89)90165-8
+  citation: 'Kress, V.C. and Carmichael, I.S.E. (1989). The lime-iron-silicate melt system: Redox and volume systematics.
+    Geochimica et Cosmochimica Acta 53(11), 2883-2892.'
+  source_ids:
+  - kress-carmichael-1989-lime-iron-silicate-redox
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:kress-carmichael-1989-lime-iron-silicate-redox
+      role: pdf
+      path: raw/kress-carmichael-1989-lime-iron-silicate-redox/kress-carmichael-1989-lime-iron-silicate-redox.pdf
+      sha256:
+        tag: value
+        value: ea0680311d8ae1eda4a59b8ff737c3db59934973a4e07a141c66e2f96a849ad4
+    - asset_id: pdftotext:kress-carmichael-1989-lime-iron-silicate-redox
+      role: pdftotext
+      path: text/kress-carmichael-1989-lime-iron-silicate-redox
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kress-carmichael-1989-lime-iron-silicate-redox
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/0016-7037(89)90165-8
+experiments:
+- experiment_id: 10.1016/0016-7037(89)90165-8::experiment::kress_carmichael_1989_table1_runs
+  kind: literature
+  method:
+    tag: unknown
+    reason: experiment method not published
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/0016-7037(89)90165-8
+  locator:
+    page: 3
+    published_page: 2885
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1, 52 sample rows.
+context:
+- observation_id: kc89_figure_read_candidates
+  type: figure_read_candidate
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2885
+    figure: 1–4
+  units: axes as printed
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    digitisation: undigitised
+    candidates:
+    - figure: '1'
+      candidate: starting melt compositions and quenchable versus not-completely-water-quenched symbols
+      locator:
+        page: 3
+        pdf_page_index: 2
+        published_page: 2885
+        figure: '1'
+    - figure: '2'
+      candidate: measured wt% FeO versus normalized reflectivity for seven air-equilibrated composition-B quenches
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2886
+        figure: '2'
+    - figure: '3'
+      candidate: ln(FeO1.5/FeO) contour plots against melt composition
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2886
+        figure: '3'
+    - figure: '4'
+      candidate: ln(FeO/FeO1.5) against ln(fO2) for composition A at approximately 1340 ± 3 °C
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 2886
+        figure: '4'
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_figure_read_candidates
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe
+- observation_id: kc89_methods_conditions_and_quench_context
+  type: method
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2884
+    section: Experimental procedure
+  units: as printed
+  values:
+    experiment_gases_as_printed:
+    - air
+    - CO-CO2 gas mixture
+    CO_CO2_ratios: Mixing ratios are calculated using equations from Deines et al. (1974), but run-specific ratios are not
+      tabulated or assigned to Table 1 rows.
+    quench_methods_as_printed:
+    - liquid Hg
+    - distilled water previously boiled and chilled to just above the ice point
+    quench_medium_per_run: not stated in Table 1
+    composition_analysis: Bulk compositions measured by an eight-channel ARL-SEMQ electron microprobe using a modified Bence-Albee
+      correction scheme.
+    FeO_analysis: Ferrous iron measured by calorimetric wet chemistry with ferric-iron interference correction.
+    Fe2O3_analysis: Ferric iron determined by subtracting ferrous iron from total iron; the total iron values are not tabulated.
+    Table1_uncertainties: No Table 1 column uncertainty is printed. Calibration statement 10.93 ± 0.21 (2σ) wt% FeO applies
+      to repeated JDFD-2 measurements, not to every Table 1 row.
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_methods_conditions_and_quench_context
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe
+- observation_id: kc89_table2_equation3_fit_coefficients
+  type: thermodynamic_fit
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 2887
+    table: '2'
+    equation: '3'
+  units: as printed
+  values:
+    quantity: empirical_redox_fit_coefficients_for_Fe2O3_over_FeO
+    method_class: quoted_attributed
+    attribution: Kress and Carmichael (1989), Table 2.
+    admission_status: typed_refusal
+    status: typed_refusal
+    schema_gap: The printed regression coefficient set has no exact quantity token; interaction_parameter is not the same
+      measured quantity and gibbs_table is not a fit-coefficient type. The closed candidates are tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY, and simulator/battery/enums.py::Quantity.
+    coefficients_as_printed:
+      a: '0.203'
+      b/1000: '12.909'
+      c: '-5.701'
+      d_Si: '-2.735'
+      d_Ca: '1.461'
+    equation_as_printed: ln(X_Fe2O3/X_FeO) = a ln(fO2) + b/T + c + Σ_i d_i X_i, (3)
+    fit_row_membership_note: Table 2 does not enumerate fit-parent run ids. The stored row set includes all 52 Table 1 samples;
+      Table 3 compares only 51, omitting 245B. No exact model_derived parent set is asserted.
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_table2_equation3_fit_coefficients
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe
+- observation_id: kc89_table3_measured_predicted_residual_comparison
+  type: redox_model_comparison
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 2887
+    table: '3'
+  units: Fe2O3 and FeO wt%; residuals in wt%
+  values:
+    quantity: table3_fe_oxide_measured_predicted_residuals
+    method_class: mixed_printed_measurement_and_model_output
+    admission_status: typed_refusal
+    status: typed_refusal
+    schema_gap: Table 3 combines measured composition, model predictions, residuals, and an E.S.D. summary without row conditions.
+      The measured compositions are separately stored from Table 1; no total pressure, fO2, temperature, or composition is
+      promoted onto Table 3 rows.
+    printed_run_rows: 51
+    rows:
+    - sample: 1A
+      printed_values:
+        Fe2O3_measured_wt_pct: '25.69'
+        Fe2O3_predicted_wt_pct: '25.85'
+        Fe2O3_residual_wt_pct: '-0.16'
+        FeO_measured_wt_pct: '2.78'
+        FeO_predicted_wt_pct: '2.63'
+        FeO_residual_wt_pct: '0.15'
+    - sample: 8B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.77'
+        Fe2O3_predicted_wt_pct: '35.67'
+        Fe2O3_residual_wt_pct: '0.10'
+        FeO_measured_wt_pct: '2.21'
+        FeO_predicted_wt_pct: '2.30'
+        FeO_residual_wt_pct: '-0.09'
+    - sample: 11A
+      printed_values:
+        Fe2O3_measured_wt_pct: '24.51'
+        Fe2O3_predicted_wt_pct: '24.13'
+        Fe2O3_residual_wt_pct: '0.38'
+        FeO_measured_wt_pct: '3.73'
+        FeO_predicted_wt_pct: '4.08'
+        FeO_residual_wt_pct: '-0.35'
+    - sample: 23A
+      printed_values:
+        Fe2O3_measured_wt_pct: '22.45'
+        Fe2O3_predicted_wt_pct: '22.24'
+        Fe2O3_residual_wt_pct: '0.21'
+        FeO_measured_wt_pct: '5.70'
+        FeO_predicted_wt_pct: '5.89'
+        FeO_residual_wt_pct: '-0.19'
+    - sample: 24B
+      printed_values:
+        Fe2O3_measured_wt_pct: '33.66'
+        Fe2O3_predicted_wt_pct: '33.48'
+        Fe2O3_residual_wt_pct: '0.18'
+        FeO_measured_wt_pct: '4.22'
+        FeO_predicted_wt_pct: '4.39'
+        FeO_residual_wt_pct: '-0.17'
+    - sample: 38D
+      printed_values:
+        Fe2O3_measured_wt_pct: '20.94'
+        Fe2O3_predicted_wt_pct: '21.10'
+        Fe2O3_residual_wt_pct: '-0.16'
+        FeO_measured_wt_pct: '4.75'
+        FeO_predicted_wt_pct: '4.60'
+        FeO_residual_wt_pct: '0.15'
+    - sample: 45A
+      printed_values:
+        Fe2O3_measured_wt_pct: '20.46'
+        Fe2O3_predicted_wt_pct: '20.20'
+        Fe2O3_residual_wt_pct: '0.26'
+        FeO_measured_wt_pct: '7.59'
+        FeO_predicted_wt_pct: '7.83'
+        FeO_residual_wt_pct: '-0.24'
+    - sample: 47C
+      printed_values:
+        Fe2O3_measured_wt_pct: '36.61'
+        Fe2O3_predicted_wt_pct: '36.33'
+        Fe2O3_residual_wt_pct: '0.28'
+        FeO_measured_wt_pct: '10.43'
+        FeO_predicted_wt_pct: '10.69'
+        FeO_residual_wt_pct: '-0.26'
+    - sample: 48D
+      printed_values:
+        Fe2O3_measured_wt_pct: '20.13'
+        Fe2O3_predicted_wt_pct: '20.29'
+        Fe2O3_residual_wt_pct: '-0.16'
+        FeO_measured_wt_pct: '5.56'
+        FeO_predicted_wt_pct: '5.41'
+        FeO_residual_wt_pct: '0.15'
+    - sample: 55D
+      printed_values:
+        Fe2O3_measured_wt_pct: '16.21'
+        Fe2O3_predicted_wt_pct: '16.19'
+        Fe2O3_residual_wt_pct: '0.02'
+        FeO_measured_wt_pct: '5.27'
+        FeO_predicted_wt_pct: '5.29'
+        FeO_residual_wt_pct: '-0.02'
+    - sample: 57C
+      printed_values:
+        Fe2O3_measured_wt_pct: '34.03'
+        Fe2O3_predicted_wt_pct: '34.32'
+        Fe2O3_residual_wt_pct: '-0.29'
+        FeO_measured_wt_pct: '12.60'
+        FeO_predicted_wt_pct: '12.33'
+        FeO_residual_wt_pct: '0.27'
+    - sample: 93A
+      printed_values:
+        Fe2O3_measured_wt_pct: '6.11'
+        Fe2O3_predicted_wt_pct: '5.79'
+        Fe2O3_residual_wt_pct: '0.32'
+        FeO_measured_wt_pct: '20.30'
+        FeO_predicted_wt_pct: '20.60'
+        FeO_residual_wt_pct: '-0.30'
+    - sample: 98B
+      printed_values:
+        Fe2O3_measured_wt_pct: '6.74'
+        Fe2O3_predicted_wt_pct: '6.79'
+        Fe2O3_residual_wt_pct: '-0.05'
+        FeO_measured_wt_pct: '27.26'
+        FeO_predicted_wt_pct: '27.22'
+        FeO_residual_wt_pct: '0.04'
+    - sample: 99A
+      printed_values:
+        Fe2O3_measured_wt_pct: '2.09'
+        Fe2O3_predicted_wt_pct: '2.61'
+        Fe2O3_residual_wt_pct: '-0.52'
+        FeO_measured_wt_pct: '21.95'
+        FeO_predicted_wt_pct: '21.47'
+        FeO_residual_wt_pct: '0.48'
+    - sample: 101A
+      printed_values:
+        Fe2O3_measured_wt_pct: '1.39'
+        Fe2O3_predicted_wt_pct: '1.52'
+        Fe2O3_residual_wt_pct: '-0.13'
+        FeO_measured_wt_pct: '22.82'
+        FeO_predicted_wt_pct: '22.70'
+        FeO_residual_wt_pct: '0.12'
+    - sample: 123A
+      printed_values:
+        Fe2O3_measured_wt_pct: '23.60'
+        Fe2O3_predicted_wt_pct: '23.49'
+        Fe2O3_residual_wt_pct: '0.11'
+        FeO_measured_wt_pct: '3.22'
+        FeO_predicted_wt_pct: '3.33'
+        FeO_residual_wt_pct: '-0.11'
+    - sample: 124B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.34'
+        Fe2O3_predicted_wt_pct: '35.28'
+        Fe2O3_residual_wt_pct: '0.06'
+        FeO_measured_wt_pct: '2.27'
+        FeO_predicted_wt_pct: '2.33'
+        FeO_residual_wt_pct: '-0.06'
+    - sample: 126B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.49'
+        Fe2O3_predicted_wt_pct: '35.52'
+        Fe2O3_residual_wt_pct: '-0.03'
+        FeO_measured_wt_pct: '2.36'
+        FeO_predicted_wt_pct: '2.34'
+        FeO_residual_wt_pct: '0.02'
+    - sample: 127A
+      printed_values:
+        Fe2O3_measured_wt_pct: '24.49'
+        Fe2O3_predicted_wt_pct: '24.63'
+        Fe2O3_residual_wt_pct: '-0.14'
+        FeO_measured_wt_pct: '3.38'
+        FeO_predicted_wt_pct: '3.25'
+        FeO_residual_wt_pct: '0.13'
+    - sample: 129A
+      printed_values:
+        Fe2O3_measured_wt_pct: '23.53'
+        Fe2O3_predicted_wt_pct: '23.43'
+        Fe2O3_residual_wt_pct: '0.10'
+        FeO_measured_wt_pct: '3.22'
+        FeO_predicted_wt_pct: '3.31'
+        FeO_residual_wt_pct: '-0.09'
+    - sample: 130B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.58'
+        Fe2O3_predicted_wt_pct: '35.52'
+        Fe2O3_residual_wt_pct: '0.06'
+        FeO_measured_wt_pct: '2.28'
+        FeO_predicted_wt_pct: '2.33'
+        FeO_residual_wt_pct: '-0.05'
+    - sample: 134B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.45'
+        Fe2O3_predicted_wt_pct: '35.19'
+        Fe2O3_residual_wt_pct: '0.26'
+        FeO_measured_wt_pct: '2.04'
+        FeO_predicted_wt_pct: '2.28'
+        FeO_residual_wt_pct: '-0.24'
+    - sample: 135A
+      printed_values:
+        Fe2O3_measured_wt_pct: '24.31'
+        Fe2O3_predicted_wt_pct: '24.36'
+        Fe2O3_residual_wt_pct: '-0.05'
+        FeO_measured_wt_pct: '3.31'
+        FeO_predicted_wt_pct: '3.26'
+        FeO_residual_wt_pct: '0.05'
+    - sample: 138B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.44'
+        Fe2O3_predicted_wt_pct: '35.47'
+        Fe2O3_residual_wt_pct: '-0.03'
+        FeO_measured_wt_pct: '2.36'
+        FeO_predicted_wt_pct: '2.33'
+        FeO_residual_wt_pct: '0.03'
+    - sample: 149A
+      printed_values:
+        Fe2O3_measured_wt_pct: '24.58'
+        Fe2O3_predicted_wt_pct: '24.59'
+        Fe2O3_residual_wt_pct: '-0.01'
+        FeO_measured_wt_pct: '3.31'
+        FeO_predicted_wt_pct: '3.30'
+        FeO_residual_wt_pct: '0.01'
+    - sample: 150B
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.13'
+        Fe2O3_predicted_wt_pct: '35.12'
+        Fe2O3_residual_wt_pct: '0.01'
+        FeO_measured_wt_pct: '2.32'
+        FeO_predicted_wt_pct: '2.33'
+        FeO_residual_wt_pct: '-0.01'
+    - sample: 154B
+      printed_values:
+        Fe2O3_measured_wt_pct: '29.12'
+        Fe2O3_predicted_wt_pct: '28.83'
+        Fe2O3_residual_wt_pct: '0.29'
+        FeO_measured_wt_pct: '7.96'
+        FeO_predicted_wt_pct: '8.23'
+        FeO_residual_wt_pct: '-0.27'
+    - sample: 155A
+      printed_values:
+        Fe2O3_measured_wt_pct: '16.30'
+        Fe2O3_predicted_wt_pct: '16.21'
+        Fe2O3_residual_wt_pct: '0.09'
+        FeO_measured_wt_pct: '9.62'
+        FeO_predicted_wt_pct: '9.70'
+        FeO_residual_wt_pct: '-0.08'
+    - sample: 157A
+      printed_values:
+        Fe2O3_measured_wt_pct: '16.73'
+        Fe2O3_predicted_wt_pct: '17.07'
+        Fe2O3_residual_wt_pct: '-0.34'
+        FeO_measured_wt_pct: '10.07'
+        FeO_predicted_wt_pct: '9.76'
+        FeO_residual_wt_pct: '0.31'
+    - sample: 161A
+      printed_values:
+        Fe2O3_measured_wt_pct: '15.60'
+        Fe2O3_predicted_wt_pct: '15.75'
+        Fe2O3_residual_wt_pct: '-0.15'
+        FeO_measured_wt_pct: '9.86'
+        FeO_predicted_wt_pct: '9.72'
+        FeO_residual_wt_pct: '0.14'
+    - sample: 162B
+      printed_values:
+        Fe2O3_measured_wt_pct: '29.19'
+        Fe2O3_predicted_wt_pct: '29.12'
+        Fe2O3_residual_wt_pct: '0.07'
+        FeO_measured_wt_pct: '8.23'
+        FeO_predicted_wt_pct: '8.29'
+        FeO_residual_wt_pct: '-0.06'
+    - sample: 166D
+      printed_values:
+        Fe2O3_measured_wt_pct: '16.04'
+        Fe2O3_predicted_wt_pct: '16.50'
+        Fe2O3_residual_wt_pct: '-0.46'
+        FeO_measured_wt_pct: '5.92'
+        FeO_predicted_wt_pct: '5.50'
+        FeO_residual_wt_pct: '0.42'
+    - sample: 169B
+      printed_values:
+        Fe2O3_measured_wt_pct: '29.84'
+        Fe2O3_predicted_wt_pct: '29.94'
+        Fe2O3_residual_wt_pct: '-0.10'
+        FeO_measured_wt_pct: '7.36'
+        FeO_predicted_wt_pct: '7.27'
+        FeO_residual_wt_pct: '0.09'
+    - sample: 173A
+      printed_values:
+        Fe2O3_measured_wt_pct: '17.49'
+        Fe2O3_predicted_wt_pct: '17.39'
+        Fe2O3_residual_wt_pct: '0.10'
+        FeO_measured_wt_pct: '8.75'
+        FeO_predicted_wt_pct: '8.84'
+        FeO_residual_wt_pct: '-0.09'
+    - sample: 175C
+      printed_values:
+        Fe2O3_measured_wt_pct: '36.80'
+        Fe2O3_predicted_wt_pct: '36.95'
+        Fe2O3_residual_wt_pct: '-0.15'
+        FeO_measured_wt_pct: '9.12'
+        FeO_predicted_wt_pct: '8.98'
+        FeO_residual_wt_pct: '0.14'
+    - sample: 180D
+      printed_values:
+        Fe2O3_measured_wt_pct: '20.52'
+        Fe2O3_predicted_wt_pct: '20.93'
+        Fe2O3_residual_wt_pct: '-0.41'
+        FeO_measured_wt_pct: '5.00'
+        FeO_predicted_wt_pct: '4.62'
+        FeO_residual_wt_pct: '0.38'
+    - sample: 183A
+      printed_values:
+        Fe2O3_measured_wt_pct: '20.45'
+        Fe2O3_predicted_wt_pct: '20.84'
+        Fe2O3_residual_wt_pct: '-0.39'
+        FeO_measured_wt_pct: '7.12'
+        FeO_predicted_wt_pct: '6.76'
+        FeO_residual_wt_pct: '0.36'
+    - sample: 185C
+      printed_values:
+        Fe2O3_measured_wt_pct: '40.75'
+        Fe2O3_predicted_wt_pct: '41.29'
+        Fe2O3_residual_wt_pct: '-0.54'
+        FeO_measured_wt_pct: '7.03'
+        FeO_predicted_wt_pct: '6.52'
+        FeO_residual_wt_pct: '0.51'
+    - sample: 193A
+      printed_values:
+        Fe2O3_measured_wt_pct: '22.02'
+        Fe2O3_predicted_wt_pct: '22.14'
+        Fe2O3_residual_wt_pct: '-0.12'
+        FeO_measured_wt_pct: '5.05'
+        FeO_predicted_wt_pct: '4.94'
+        FeO_residual_wt_pct: '0.11'
+    - sample: 194B
+      printed_values:
+        Fe2O3_measured_wt_pct: '34.57'
+        Fe2O3_predicted_wt_pct: '34.48'
+        Fe2O3_residual_wt_pct: '0.09'
+        FeO_measured_wt_pct: '3.60'
+        FeO_predicted_wt_pct: '3.69'
+        FeO_residual_wt_pct: '-0.09'
+    - sample: 196D
+      printed_values:
+        Fe2O3_measured_wt_pct: '22.49'
+        Fe2O3_predicted_wt_pct: '22.32'
+        Fe2O3_residual_wt_pct: '0.17'
+        FeO_measured_wt_pct: '3.86'
+        FeO_predicted_wt_pct: '4.02'
+        FeO_residual_wt_pct: '-0.16'
+    - sample: 199C
+      printed_values:
+        Fe2O3_measured_wt_pct: '38.44'
+        Fe2O3_predicted_wt_pct: '38.83'
+        Fe2O3_residual_wt_pct: '-0.39'
+        FeO_measured_wt_pct: '8.08'
+        FeO_predicted_wt_pct: '7.71'
+        FeO_residual_wt_pct: '0.37'
+    - sample: 203A
+      printed_values:
+        Fe2O3_measured_wt_pct: '22.15'
+        Fe2O3_predicted_wt_pct: '22.09'
+        Fe2O3_residual_wt_pct: '0.06'
+        FeO_measured_wt_pct: '5.82'
+        FeO_predicted_wt_pct: '5.88'
+        FeO_residual_wt_pct: '-0.06'
+    - sample: 204B
+      printed_values:
+        Fe2O3_measured_wt_pct: '33.51'
+        Fe2O3_predicted_wt_pct: '33.53'
+        Fe2O3_residual_wt_pct: '-0.02'
+        FeO_measured_wt_pct: '4.46'
+        FeO_predicted_wt_pct: '4.45'
+        FeO_residual_wt_pct: '0.01'
+    - sample: 205AF3
+      printed_values:
+        Fe2O3_measured_wt_pct: '35.68'
+        Fe2O3_predicted_wt_pct: '35.25'
+        Fe2O3_residual_wt_pct: '0.43'
+        FeO_measured_wt_pct: '11.84'
+        FeO_predicted_wt_pct: '12.25'
+        FeO_residual_wt_pct: '-0.41'
+    - sample: 206AF
+      printed_values:
+        Fe2O3_measured_wt_pct: '30.33'
+        Fe2O3_predicted_wt_pct: '30.15'
+        Fe2O3_residual_wt_pct: '0.18'
+        FeO_measured_wt_pct: '10.26'
+        FeO_predicted_wt_pct: '10.43'
+        FeO_residual_wt_pct: '-0.17'
+    - sample: 231G
+      printed_values:
+        Fe2O3_measured_wt_pct: '8.64'
+        Fe2O3_predicted_wt_pct: '8.45'
+        Fe2O3_residual_wt_pct: '0.19'
+        FeO_measured_wt_pct: '1.01'
+        FeO_predicted_wt_pct: '1.18'
+        FeO_residual_wt_pct: '-0.17'
+    - sample: 232H
+      printed_values:
+        Fe2O3_measured_wt_pct: '7.95'
+        Fe2O3_predicted_wt_pct: '7.50'
+        Fe2O3_residual_wt_pct: '0.45'
+        FeO_measured_wt_pct: '1.89'
+        FeO_predicted_wt_pct: '2.30'
+        FeO_residual_wt_pct: '-0.41'
+    - sample: 229G
+      printed_values:
+        Fe2O3_measured_wt_pct: '7.81'
+        Fe2O3_predicted_wt_pct: '7.47'
+        Fe2O3_residual_wt_pct: '0.34'
+        FeO_measured_wt_pct: '1.25'
+        FeO_predicted_wt_pct: '1.56'
+        FeO_residual_wt_pct: '-0.31'
+    - sample: 230H
+      printed_values:
+        Fe2O3_measured_wt_pct: '6.76'
+        Fe2O3_predicted_wt_pct: '6.58'
+        Fe2O3_residual_wt_pct: '0.18'
+        FeO_measured_wt_pct: '2.87'
+        FeO_predicted_wt_pct: '3.03'
+        FeO_residual_wt_pct: '-0.16'
+    - sample: 246B
+      printed_values:
+        Fe2O3_measured_wt_pct: '30.28'
+        Fe2O3_predicted_wt_pct: '30.07'
+        Fe2O3_residual_wt_pct: '0.21'
+        FeO_measured_wt_pct: '5.99'
+        FeO_predicted_wt_pct: '6.19'
+        FeO_residual_wt_pct: '-0.20'
+    - sample: E.S.D.
+      printed_values:
+        Fe2O3_measured_wt_pct: null
+        Fe2O3_predicted_wt_pct: null
+        Fe2O3_residual_wt_pct: '0.24'
+        FeO_measured_wt_pct: null
+        FeO_predicted_wt_pct: null
+        FeO_residual_wt_pct: '0.22'
+    model_prediction_method: Predicted values are from Equation 3 and Table 2; measured values are the paper's Table 1 run
+      products.
+    uncertainty_note: E.S.D. is 0.24 wt% for Fe2O3 residual and 0.22 wt% for FeO residual; no confidence level is stated.
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_table3_measured_predicted_residual_comparison
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe
+- observation_id: kc89_table4_equations9_10_fit_parameters
+  type: thermodynamic_fit
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2888
+    table: '4'
+    equation: 9–10
+  units: kJ, J/K, and dimensionless as printed
+  values:
+    quantity: asymmetric_regular_solution_redox_fit_parameters
+    method_class: quoted_attributed
+    attribution: Kress and Carmichael (1989), Table 4.
+    admission_status: typed_refusal
+    status: typed_refusal
+    schema_gap: The printed multi-parameter thermodynamic fit set has no exact observation quantity token; the closed candidates
+      are tools/validate_literature_extracts.py::OBSERVATION_TYPES, simulator/battery/migrate.py::QUANTITY_ALIASES and TYPE_QUANTITY,
+      and simulator/battery/enums.py::Quantity.
+    parameters_as_printed:
+      y: '0.3'
+      K2: '0.4'
+      ΔH0_kJ: '-145.9'
+      ΔS0_J_per_K: '-64.6'
+      ΔW_Si_kJ: '46.5'
+      ΔW_Ca_kJ: '-45.9'
+    equation_9_as_printed: X_FeO1.5^melt/X_FeO^melt = (K_D1 fO2^0.25 + 2y K_D2 K2^2y fO2^0.5y)/(1 + (1−2y)K_D2 K2^2y fO2^0.5y),
+      (9)
+    equation_10_as_printed: K_D1/K_γ1 = exp(−ΔH0/(RT) + ΔS0/R − (1/(RT)) Σ_i ΔW_i X_i), (10)
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_table4_equations9_10_fit_parameters
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe
+- observation_id: kc89_table5_dingwell_brearley_comparison
+  type: redox_comparator
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 2889
+    table: '5'
+  units: Fe3+/ΣFe ratio and FeO wt%; residuals as printed
+  values:
+    quantity: dingwell_brearley_mossbauer_redox_comparison
+    attribution: Dingwell and Brearley (1988), with Kress and Carmichael (1989) estimates from Equation 3.
+    admission_status: typed_refusal
+    status: typed_refusal
+    reason: Table 5 supplies no complete melt composition, temperature, or fO2 by row; these comparator values cannot be scored
+      in this extract without promoting unprinted conditions.
+    printed_run_rows: 16
+    rows:
+    - sample: 1-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.91'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.79'
+        Fe3plus_over_sum_Fe_residual: '0.12'
+        FeO_Dingwell_Brearley_wt_pct: '3.09'
+        FeO_Kress_Carmichael_wt_pct: '7.50'
+        FeO_residual_wt_pct: '-4.41'
+    - sample: 1-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.98'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.89'
+        Fe3plus_over_sum_Fe_residual: '0.08'
+        FeO_Dingwell_Brearley_wt_pct: '0.86'
+        FeO_Kress_Carmichael_wt_pct: '3.73'
+        FeO_residual_wt_pct: '-2.87'
+    - sample: 1-1225
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.98'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.95'
+        Fe3plus_over_sum_Fe_residual: '0.02'
+        FeO_Dingwell_Brearley_wt_pct: '0.77'
+        FeO_Kress_Carmichael_wt_pct: '1.61'
+        FeO_residual_wt_pct: '-0.84'
+    - sample: 2-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.66'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.63'
+        Fe3plus_over_sum_Fe_residual: '0.04'
+        FeO_Dingwell_Brearley_wt_pct: '8.63'
+        FeO_Kress_Carmichael_wt_pct: '9.56'
+        FeO_residual_wt_pct: '-0.93'
+    - sample: 2-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.84'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.79'
+        Fe3plus_over_sum_Fe_residual: '0.03'
+        FeO_Dingwell_Brearley_wt_pct: '3.99'
+        FeO_Kress_Carmichael_wt_pct: '5.37'
+        FeO_residual_wt_pct: '-1.38'
+    - sample: 2-1220
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.95'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.90'
+        Fe3plus_over_sum_Fe_residual: '0.04'
+        FeO_Dingwell_Brearley_wt_pct: '1.31'
+        FeO_Kress_Carmichael_wt_pct: '2.45'
+        FeO_residual_wt_pct: '-1.14'
+    - sample: 4-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.64'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.62'
+        Fe3plus_over_sum_Fe_residual: '0.02'
+        FeO_Dingwell_Brearley_wt_pct: '14.38'
+        FeO_Kress_Carmichael_wt_pct: '15.35'
+        FeO_residual_wt_pct: '-0.97'
+    - sample: 4-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.82'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.78'
+        Fe3plus_over_sum_Fe_residual: '0.04'
+        FeO_Dingwell_Brearley_wt_pct: '7.03'
+        FeO_Kress_Carmichael_wt_pct: '8.79'
+        FeO_residual_wt_pct: '-1.76'
+    - sample: 5-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.86'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.76'
+        Fe3plus_over_sum_Fe_residual: '0.10'
+        FeO_Dingwell_Brearley_wt_pct: '7.45'
+        FeO_Kress_Carmichael_wt_pct: '12.71'
+        FeO_residual_wt_pct: '-5.26'
+    - sample: 5-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.90'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.88'
+        Fe3plus_over_sum_Fe_residual: '0.02'
+        FeO_Dingwell_Brearley_wt_pct: '5.30'
+        FeO_Kress_Carmichael_wt_pct: '6.43'
+        FeO_residual_wt_pct: '-1.13'
+    - sample: 6-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.88'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.78'
+        Fe3plus_over_sum_Fe_residual: '0.10'
+        FeO_Dingwell_Brearley_wt_pct: '2.05'
+        FeO_Kress_Carmichael_wt_pct: '3.75'
+        FeO_residual_wt_pct: '-1.70'
+    - sample: 6-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.94'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.89'
+        Fe3plus_over_sum_Fe_residual: '0.05'
+        FeO_Dingwell_Brearley_wt_pct: '0.95'
+        FeO_Kress_Carmichael_wt_pct: '1.88'
+        FeO_residual_wt_pct: '-0.93'
+    - sample: 8-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.66'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.62'
+        Fe3plus_over_sum_Fe_residual: '0.04'
+        FeO_Dingwell_Brearley_wt_pct: '4.48'
+        FeO_Kress_Carmichael_wt_pct: '5.00'
+        FeO_residual_wt_pct: '-0.52'
+    - sample: 8-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.86'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.78'
+        Fe3plus_over_sum_Fe_residual: '0.07'
+        FeO_Dingwell_Brearley_wt_pct: '1.85'
+        FeO_Kress_Carmichael_wt_pct: '2.82'
+        FeO_residual_wt_pct: '-0.97'
+    - sample: 9-1600
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.73'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.63'
+        Fe3plus_over_sum_Fe_residual: '0.10'
+        FeO_Dingwell_Brearley_wt_pct: '13.75'
+        FeO_Kress_Carmichael_wt_pct: '18.89'
+        FeO_residual_wt_pct: '-5.14'
+    - sample: 9-1400
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: '0.78'
+        Fe3plus_over_sum_Fe_Kress_Carmichael: '0.79'
+        Fe3plus_over_sum_Fe_residual: '-0.01'
+        FeO_Dingwell_Brearley_wt_pct: '10.90'
+        FeO_Kress_Carmichael_wt_pct: '10.54'
+        FeO_residual_wt_pct: '0.36'
+    - sample: Mean
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: null
+        Fe3plus_over_sum_Fe_Kress_Carmichael: null
+        Fe3plus_over_sum_Fe_residual: '0.05'
+        FeO_Dingwell_Brearley_wt_pct: null
+        FeO_Kress_Carmichael_wt_pct: null
+        FeO_residual_wt_pct: '-1.74'
+    - sample: E.S.D.
+      printed_values:
+        Fe3plus_over_sum_Fe_Dingwell_Brearley: null
+        Fe3plus_over_sum_Fe_Kress_Carmichael: null
+        Fe3plus_over_sum_Fe_residual: '0.04'
+        FeO_Dingwell_Brearley_wt_pct: null
+        FeO_Kress_Carmichael_wt_pct: null
+        FeO_residual_wt_pct: '1.64'
+    summary_rows:
+    - Mean
+    - E.S.D.
+  context_id: kress-carmichael-1989-lime-iron-silicate-redox::context::kc89_table5_dingwell_brearley_comparison
+  work_id: 10.1016/0016-7037(89)90165-8
+  source_id: kress-carmichael-1989-lime-iron-silicate-redox
+  species: Fe

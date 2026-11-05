@@ -20,7 +20,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
 
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
@@ -40,7 +40,6 @@ from simulator.diagnostic_helpers.extract_reproduction import (
     AdoptedObservation,
     observation_admission_reason,
 )
-from simulator.state import MOLAR_MASS
 from simulator.yaml_cache import load_cached_safe_yaml
 
 
@@ -133,21 +132,6 @@ class ScoringPot:
             "why": self.why,
             "doi": self.doi,
         }
-
-
-def oxide_molar_mass_g_mol(oxide: str) -> float:
-    """Molar mass for an oxide formula. Prefer simulator MOLAR_MASS.
-
-    PbO is not an OXIDE_SPECIES; CIAAW Pb + O via parse_formula is the
-    fallback so PbO-P2O5 pots can be converted without adding Pb to the
-    runtime melt basis. Domain gates still refuse PbO.
-    """
-
-    if oxide in MOLAR_MASS:
-        mass = float(MOLAR_MASS[oxide])
-        if math.isfinite(mass) and mass > 0.0:
-            return mass
-    return float(parse_formula(oxide, species=oxide).molar_mass_g_mol)
 
 
 def _finite_positive(value: Any) -> float | None:

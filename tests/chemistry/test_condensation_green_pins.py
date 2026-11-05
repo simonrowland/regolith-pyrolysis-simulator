@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.condensation import CondensationModel
+from simulator.condensation_routing import stage_key_for_stage
 from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
@@ -34,8 +35,17 @@ def route_totals(monkeypatch):
             row["inlet"] += flux.species_kg_hr.get(species, 0.0)
             row["terminal"] += result.remaining_by_species.get(species, 0.0)
             row["wall"] += result.wall_deposit_by_species.get(species, 0.0)
-            for stage, captures in result.condensed_by_stage_species.items():
-                row[str(stage)] += captures.get(species, 0.0)
+            for stage_key, captures in result.condensed_by_stage_species.items():
+                stage_number = next(
+                    stage.stage_number
+                    for stage in model.train.stages
+                    if stage_key_for_stage(
+                        stage,
+                        falsey_sub_order_is_zero=True,
+                        include_collector_fallback=True,
+                    ) == stage_key
+                )
+                row[str(stage_number)] += captures.get(species, 0.0)
         return result
 
     monkeypatch.setattr(CondensationModel, "route", measure)
@@ -133,15 +143,24 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     # skip. Inlets are unchanged. full_lunar is still the t-1604
     # measurement and was not re-run.
     expected = json.loads(PINS.read_text())[name]
+    # Collect every species before failing: stopping at the first mismatch
+    # hid stale Cr/SiO pins behind an Fe miss through two repins.
+    mismatches = {}
     for species in SPECIES:
         if species not in expected:
             continue
         if name == "full_lunar" and species in {"Fe", "Cr", "SiO"}:
-            assert actual[species] == expected[species]
+            matches = actual[species] == expected[species]
         else:
-            assert actual[species] == pytest.approx(
+            matches = actual[species] == pytest.approx(
                 expected[species], rel=1e-10, abs=1e-14
             )
+        if not matches:
+            mismatches[species] = {
+                "actual": actual[species],
+                "expected": expected[species],
+            }
+    assert not mismatches, mismatches
     if runner_output is not None:
         assert actual["runner_sha256"] == expected["runner_sha256"]
 
@@ -188,6 +207,10 @@ def _without_engine_versions(value):
 @pytest.mark.xdist_group("magemin_fullrun_c")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
+    # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
+    # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
+    # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
+    # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass
@@ -205,6 +228,10 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
 
 @pytest.mark.parametrize("staged", [False, True], ids=["lunar_24h", "c2a_staged"])
 def test_green_runner_capture_pin(staged, route_totals, tmp_path):
+    # lunar_24h and c2a_staged runner_sha256 are the studio-3 actuals (pins2
+    # log, tree 9666fc129 plus the de32c69ca runner regen). Lunar and Mars
+    # full runs diverge between the laptop and studio-3, so these digests are
+    # not a laptop re-run.
     patch = (load_recipe_patch(Path("data/recipes/c2a_staged_temperature_ladder.yaml"))
              if staged else {})
     run = PyrolysisRun(

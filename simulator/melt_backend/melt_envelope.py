@@ -105,10 +105,8 @@ class MeltModelConstants(TypedDict):
 #   HT1-audit.md §2.2: "pMELTS/rhyolite-MELTS liquid experiments cluster
 #   below ~1400–1500 °C for many systems; treat 1700 K as a conservative
 #   'top of calibration' placeholder until versioned."
-#   This is the MELTS *liquid* calibration ceiling, NOT the fork's VapoRock
-#   evidence/backend gate (VAPOROCK_T_MAX_K = 1950 K in vaporock.py), which
-#   is a separate rail-domain clamp (docs/model-limitations.md 1350–1950 K
-#   external validation envelope for vapor cross-checks).
+#   The separate VapoRock external validation band is owned by
+#   engines/engine_commissioning.py; it does not clamp this melt envelope.
 #   Source that would refine this further: Ghiorso & Sack 1995 / Ghiorso et al.
 #   pMELTS / rhyolite-MELTS calibration papers' experimental T maxima for the
 #   liquid-solution dataset actually used by the ThermoEngine / alphaMELTS

@@ -1,0 +1,4852 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  citation: Roeder, P. L. (1974), “Activity of Iron and Olivine Solubility in Basaltic Liquids”, Earth and Planetary Science
+    Letters 23, 397–410.
+  source_ids:
+  - roeder-1974-iron-activity-olivine-basaltic-liquids
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:roeder-1974-iron-activity-olivine-basaltic-liquids
+      role: pdf
+      path: raw/roeder-1974-iron-activity-olivine-basaltic-liquids/roeder-1974-iron-activity-olivine-basaltic-liquids.pdf
+      sha256:
+        tag: value
+        value: 1d9a8ca96994bbbf8bc3f91f4574080f91ae733dafe2dd8227203738d8d61c19
+    - asset_id: pdftotext:roeder-1974-iron-activity-olivine-basaltic-liquids
+      role: pdftotext
+      path: text/roeder-1974-iron-activity-olivine-basaltic-liquids
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:roeder-1974-iron-activity-olivine-basaltic-liquids
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc::experiment::roeder_1974_iron_equilibrium_runs
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  locator:
+    page: 3
+    published_page: 399
+    pdf_page_index: 2
+    section: Experimental details
+context:
+- observation_id: roeder_1974_abstract_numeric_summary
+  type: experiment_series
+  locator:
+    page: 1
+    published_page: 397
+    pdf_page_index: 0
+    section: Abstract
+  units: as printed
+  values:
+    method_class: method_only
+    activity_coefficient_range_as_printed: 0.79 to 2.00
+    temperature_range_as_printed: 1150° to 1306°C
+    fO2_range_as_printed: log fO2 = -12.5 to -14.5 atm
+    note: The abstract gives study-wide ranges; they are not row-specific Table 1 values.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_abstract_numeric_summary
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_activity_definition_and_standard_state
+  type: typed_context
+  locator:
+    page: 1
+    published_page: 397
+    pdf_page_index: 0
+    equation: 1–2
+  units: as printed
+  values:
+    method_class: method_only
+    reaction_as_printed: Fe + 1/2 O2 ⇌ FeO (dissolved in liquid)
+    activity_relation_as_printed: K = a_FeO^Liquid / (a_Fe^Metal f_O2^(1/2)) = X_FeO^Liquid γ_FeO^Liquid / f_O2^(1/2)
+    activity_definition_as_printed: a_FeO^Liquid = activity of a hypothetical ferrous species in the liquid
+    composition_definition_as_printed: X_FeO^Liquid = mole fraction of iron dissolved in the liquid calculated as ferrous
+      oxide
+    metal_activity_as_printed: All the experiments in the present study were conducted in equilibrium with metallic iron and
+      assuming the iron to be pure the activity can be set equal to one.
+    reference_state_mapping:
+      state:
+        tag: unknown
+        reason: The exact source wording is retained, but it does not explicitly identify a closed reference-state convention;
+          no convention is inferred.
+      inferred: false
+      note: The source says “the liquid oxide in equilibrium with metallic iron” and calls the dissolved ferrous species hypothetical.
+    reference_state_locator:
+      page: 9
+      published_page: 405
+      pdf_page_index: 8
+    standard_state_as_printed: The standard state for “FeO” is the liquid oxide in equilibrium with metallic iron.
+    thermodynamic_data_attribution_as_printed: Schuhmann and Ensio [2] and Coughlin [9]
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_activity_definition_and_standard_state
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_activity_equation_and_gamma_fit
+  type: typed_context
+  locator:
+    page: 9
+    published_page: 405
+    pdf_page_index: 8
+    section: Results and discussion
+  units: as printed
+  values:
+    method_class: method_only
+    activity_equation_as_printed: log a_FeO = 12045/T + 0.5 log fO2 - 2.336
+    activity_equation_temperature_note: The equation prints T without a unit; Table 1 labels its run temperatures in °C.
+    activity_equation_note: The thermodynamic data are attributed to Schuhmann and Ensio [2] and Coughlin [9].
+    gamma_fit_as_printed: γFeO = (0.048)(wt.% Al2O3) + (0.084)(wt.% Na2O) + (0.12)(wt.% K2O) + 0.29; PMCC = 0.94
+    gamma_fit_number: '3'
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_activity_equation_and_gamma_fit
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_feo_quotation_mark_footnote
+  type: method
+  locator:
+    page: 2
+    published_page: 398
+    pdf_page_index: 1
+    marker: '*'
+  units: as printed
+  values:
+    method_class: method_only
+    marker_as_printed: '*'
+    footnote_as_printed: The quotation marks around “FeO” are used to remind the reader that although the iron/oxygen ratio
+      is close to 1 it does deviate from 1. In this paper all iron oxide values including the activity, are those in equilibrium
+      with metallic iron.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_feo_quotation_mark_footnote
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_figure2_constant_activity
+  type: experiment_series
+  locator:
+    page: 9
+    published_page: 405
+    pdf_page_index: 8
+    figure: '2'
+  units: dimensionless activity
+  uncertainty:
+    note: Printed width ±0.005; confidence level not stated.
+  values:
+    method_class: method_only
+    quantity_as_printed: activity of “FeO”
+    activity_as_printed: '0.113'
+    uncertainty_as_printed: ±0.005
+    note: The text and caption state that the Figure 2 runs for three rock samples were conducted at this constant activity.
+      Figure points are not digitized.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_figure2_constant_activity
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_and_prose_run_census
+  type: experiment_series
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+  units: as printed
+  values:
+    method_class: method_only
+    table_run_count: 45
+    prose_total_run_count: 47
+    prose_only_silica_check_runs:
+      temperature_as_printed: 1260°C
+      rows:
+      - prose_run_order: first
+        CO2_H2_ratio_as_printed: '0.400'
+        SiO2_wt_pct_as_printed: '31.8'
+      - prose_run_order: second
+        CO2_H2_ratio_as_printed: '0.393'
+        SiO2_wt_pct_as_printed: '31.2'
+    note: The two prose-only Fe-Si-O checks have no printed FeO activity, activity coefficient, or individual log fO2 value.
+      Their other oxide composition cells are not printed.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_and_prose_run_census
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_01_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 1; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 1
+    T_C_as_printed: '1306'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.104'
+    Log_fO2_as_printed: '-12.48'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '44.64'
+      Al2O3: '10.64'
+      FeO: '14.86'
+      MgO: '6.27'
+      CaO: '10.69'
+      Na2O: '0.46'
+      K2O: '0.39'
+      TiO2: '9.26'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 1, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.21'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1306'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 1, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.48'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 1, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.104
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 1, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 1, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_01_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_02_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 2; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 2
+    T_C_as_printed: '1259'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-12.93'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '44.85'
+      Al2O3: '10.63'
+      FeO: '15.41'
+      MgO: '6.32'
+      CaO: '10.60'
+      Na2O: '0.43'
+      K2O: '0.40'
+      TiO2: '9.24'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 2, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.88'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1259'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 2, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.93'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 2, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 2, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 2, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_02_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_03_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 3; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 3
+    T_C_as_printed: '1257'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-12.95'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '44.68'
+      Al2O3: '10.68'
+      FeO: '15.76'
+      MgO: '6.34'
+      CaO: '10.46'
+      Na2O: '0.44'
+      K2O: '0.39'
+      TiO2: '9.11'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 3, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.86'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1257'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 3, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.95'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 3, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 3, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 3, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_03_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_04_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 4; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 4
+    T_C_as_printed: '1210'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.205'
+    Log_fO2_as_printed: '-12.91'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '38.56'
+      Al2O3: '8.99'
+      FeO: '27.44'
+      MgO: '5.17'
+      CaO: '9.21'
+      Na2O: '0.39'
+      K2O: '0.52'
+      TiO2: '8.81'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 4, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.09'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1210'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 4, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.91'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 4, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.205
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 4, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 4, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_04_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_05_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 5; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 5
+    T_C_as_printed: '1210'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.44'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '43.67'
+      Al2O3: '10.60'
+      FeO: '16.16'
+      MgO: '6.19'
+      CaO: '10.27'
+      Na2O: '0.43'
+      K2O: '0.38'
+      TiO2: '9.53'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 5, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.23'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1210'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 5, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.44'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 5, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 5, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 5, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_05_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_06_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 6; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 6
+    T_C_as_printed: '1205'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.49'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '44.65'
+      Al2O3: '10.60'
+      FeO: '15.70'
+      MgO: '6.24'
+      CaO: '10.46'
+      Na2O: '0.53'
+      K2O: '0.36'
+      TiO2: '9.39'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 6, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.93'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1205'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 6, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.49'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 6, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 6, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 6, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_06_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_07_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 7; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 7
+    T_C_as_printed: '1207'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.154'
+    Log_fO2_as_printed: '-13.22'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '41.90'
+      Al2O3: '9.91'
+      FeO: '20.63'
+      MgO: '5.77'
+      CaO: '9.44'
+      Na2O: '0.49'
+      K2O: '0.42'
+      TiO2: '9.02'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 7, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.58'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1207'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 7, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.22'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 7, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.154
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 7, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 7, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_07_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_08_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 8; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 8
+    T_C_as_printed: '1154'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.206'
+    Log_fO2_as_printed: '-13.60'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '40.21'
+      Al2O3: '9.67'
+      FeO: '24.28'
+      MgO: '5.12'
+      CaO: '9.79'
+      Na2O: '0.53'
+      K2O: '0.48'
+      TiO2: '7.87'
+      MnO: '0.46'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '98.41'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1154'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 8, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.60'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 8, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.206
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 8, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '40.21'
+              Al2O3: '9.67'
+              FeO: '24.28'
+              MgO: '5.12'
+              CaO: '9.79'
+              Na2O: '0.53'
+              K2O: '0.48'
+              TiO2: '7.87'
+              MnO: '0.46'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 8, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_08_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_09_printed_conditions
+  type: typed_context
+  locator:
+    page: 4
+    published_page: 400
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 run SY-MN 9; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: SY-MN 9
+    T_C_as_printed: '1154'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.120'
+    Log_fO2_as_printed: '-14.11'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '46.93'
+      Al2O3: '11.18'
+      FeO: '14.68'
+      MgO: '6.24'
+      CaO: '10.98'
+      Na2O: '0.58'
+      K2O: '0.32'
+      TiO2: '7.65'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 9, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.56'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1154'
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 9, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.11'
+        units: log10(atm)
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 9, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.120
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 9, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 4
+          published_page: 400
+          pdf_page_index: 3
+          table: '1'
+          note: Table 1 row SY-MN 9, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_09_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_10_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 10; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 10
+    T_C_as_printed: '1304'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.104'
+    Log_fO2_as_printed: '-12.50'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.14'
+      Al2O3: '14.36'
+      FeO: '11.20'
+      MgO: '5.91'
+      CaO: '9.73'
+      Na2O: '1.37'
+      K2O: '0.86'
+      TiO2: '3.04'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 10, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.61'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1304'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 10, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.50'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 10, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.104
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 10, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 10, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_10_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_11_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 11; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 11
+    T_C_as_printed: '1257'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-12.95'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.33'
+      Al2O3: '14.32'
+      FeO: '11.10'
+      MgO: '5.88'
+      CaO: '9.69'
+      Na2O: '1.74'
+      K2O: '0.90'
+      TiO2: '3.11'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 11, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.07'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1257'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 11, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.95'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 11, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 11, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 11, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_11_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_12_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 12; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 12
+    T_C_as_printed: '1205'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.50'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.58'
+      Al2O3: '14.24'
+      FeO: '10.62'
+      MgO: '5.89'
+      CaO: '9.73'
+      Na2O: '2.10'
+      K2O: '1.01'
+      TiO2: '3.04'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 12, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.21'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1205'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 12, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.50'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 12, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 12, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 12, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_12_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_13_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 13; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 13
+    T_C_as_printed: '1165'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.154'
+    Log_fO2_as_printed: '-13.74'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '51.66'
+      Al2O3: '14.01'
+      FeO: '12.46'
+      MgO: '5.71'
+      CaO: '9.45'
+      Na2O: '1.51'
+      K2O: '0.90'
+      TiO2: '3.07'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 13, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.77'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1165'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 13, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.74'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 13, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.154
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 13, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 13, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_13_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_14_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 14; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 14
+    T_C_as_printed: '1164'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.068'
+    Log_fO2_as_printed: '-14.50'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '56.21'
+      Al2O3: '15.02'
+      FeO: '5.56'
+      MgO: '6.08'
+      CaO: '9.22'
+      Na2O: '2.59'
+      K2O: '1.16'
+      TiO2: '3.34'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 14, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.18'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1164'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 14, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.50'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 14, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.068
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 14, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 14, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_14_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_15_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 15; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 15
+    T_C_as_printed: '1162'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.201'
+    Log_fO2_as_printed: '-13.52'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '47.51'
+      Al2O3: '12.92'
+      FeO: '18.06'
+      MgO: '4.60'
+      CaO: '8.96'
+      Na2O: '2.23'
+      K2O: '1.05'
+      TiO2: '3.16'
+      MnO: '0.28'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '98.77'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1162'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 15, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.52'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 15, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.201
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 15, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '47.51'
+              Al2O3: '12.92'
+              FeO: '18.06'
+              MgO: '4.60'
+              CaO: '8.96'
+              Na2O: '2.23'
+              K2O: '1.05'
+              TiO2: '3.16'
+              MnO: '0.28'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 15, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_15_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_16_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 16; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 16
+    T_C_as_printed: '1161'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.099'
+    Log_fO2_as_printed: '-14.20'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '54.87'
+      Al2O3: '14.40'
+      FeO: '7.75'
+      MgO: '5.12'
+      CaO: '9.10'
+      Na2O: '2.47'
+      K2O: '1.26'
+      TiO2: '3.52'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 16, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.49'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1161'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 16, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.20'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 16, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.099
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 16, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 16, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_16_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_17_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 17; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 17
+    T_C_as_printed: '1160'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.143'
+    Log_fO2_as_printed: '-13.87'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '51.11'
+      Al2O3: '13.91'
+      FeO: '13.71'
+      MgO: '5.24'
+      CaO: '9.37'
+      Na2O: '1.96'
+      K2O: '0.95'
+      TiO2: '2.90'
+      MnO: '0.32'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.15'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1160'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 17, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.87'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 17, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.143
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 17, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '51.11'
+              Al2O3: '13.91'
+              FeO: '13.71'
+              MgO: '5.24'
+              CaO: '9.37'
+              Na2O: '1.96'
+              K2O: '0.95'
+              TiO2: '2.90'
+              MnO: '0.32'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 17, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_17_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_18_printed_conditions
+  type: typed_context
+  locator:
+    page: 5
+    published_page: 401
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1 run CRB 4a 18; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 18
+    T_C_as_printed: '1160'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.170'
+    Log_fO2_as_printed: '-13.71'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '49.82'
+      Al2O3: '13.38'
+      FeO: '15.25'
+      MgO: '5.01'
+      CaO: '9.18'
+      Na2O: '2.15'
+      K2O: '1.02'
+      TiO2: '3.06'
+      MnO: '0.31'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.18'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1160'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 18, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.71'
+        units: log10(atm)
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 18, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.170
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 18, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '49.82'
+              Al2O3: '13.38'
+              FeO: '15.25'
+              MgO: '5.01'
+              CaO: '9.18'
+              Na2O: '2.15'
+              K2O: '1.02'
+              TiO2: '3.06'
+              MnO: '0.31'
+        locator:
+          page: 5
+          published_page: 401
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 row CRB 4a 18, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_18_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_19_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run CRB 4a 19; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CRB 4a 19
+    T_C_as_printed: '1156'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.116'
+    Log_fO2_as_printed: '-14.12'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '54.28'
+      Al2O3: '14.29'
+      FeO: '8.98'
+      MgO: '5.68'
+      CaO: '9.79'
+      Na2O: '2.33'
+      K2O: '1.04'
+      TiO2: '3.17'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row CRB 4a 19, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.56'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1156'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row CRB 4a 19, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.12'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row CRB 4a 19, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.116
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row CRB 4a 19, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row CRB 4a 19, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_19_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_20_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run K14 G 20; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: K14 G 20
+    T_C_as_printed: '1306'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.104'
+    Log_fO2_as_printed: '-12.48'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.71'
+      Al2O3: '13.08'
+      FeO: '10.42'
+      MgO: '10.44'
+      CaO: '8.50'
+      Na2O: '1.05'
+      K2O: '1.93'
+      TiO2: '0.66'
+      MnO: '0.31'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.10'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1306'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 20, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.48'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 20, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.104
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 20, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '52.71'
+              Al2O3: '13.08'
+              FeO: '10.42'
+              MgO: '10.44'
+              CaO: '8.50'
+              Na2O: '1.05'
+              K2O: '1.93'
+              TiO2: '0.66'
+              MnO: '0.31'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 20, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_20_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_21_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run K14 G 21; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: K14 G 21
+    T_C_as_printed: '1254'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-12.99'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.70'
+      Al2O3: '14.19'
+      FeO: '9.69'
+      MgO: '8.34'
+      CaO: '9.13'
+      Na2O: '1.55'
+      K2O: '2.50'
+      TiO2: '0.80'
+      MnO: '0.25'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.15'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1254'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 21, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.99'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 21, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 21, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '52.70'
+              Al2O3: '14.19'
+              FeO: '9.69'
+              MgO: '8.34'
+              CaO: '9.13'
+              Na2O: '1.55'
+              K2O: '2.50'
+              TiO2: '0.80'
+              MnO: '0.25'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 21, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_21_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_22_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run K14 G 22; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: K14 G 22
+    T_C_as_printed: '1210'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.43'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '54.10'
+      Al2O3: '15.23'
+      FeO: '8.42'
+      MgO: '5.98'
+      CaO: '9.59'
+      Na2O: '2.26'
+      K2O: '3.14'
+      TiO2: '0.89'
+      MnO: '0.22'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.83'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1210'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 22, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.43'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 22, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 22, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '54.10'
+              Al2O3: '15.23'
+              FeO: '8.42'
+              MgO: '5.98'
+              CaO: '9.59'
+              Na2O: '2.26'
+              K2O: '3.14'
+              TiO2: '0.89'
+              MnO: '0.22'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row K14 G 22, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_22_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_23_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run 4135 23; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: 4135 23
+    T_C_as_printed: '1257'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.185'
+    Log_fO2_as_printed: '-12.46'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '41.29'
+      Al2O3: '12.17'
+      FeO: '24.06'
+      MgO: '7.46'
+      CaO: '9.89'
+      Na2O: '0.87'
+      K2O: '0.63'
+      TiO2: '2.38'
+      MnO: '0.36'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.11'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1257'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 23, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.46'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 23, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.185
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 23, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '41.29'
+              Al2O3: '12.17'
+              FeO: '24.06'
+              MgO: '7.46'
+              CaO: '9.89'
+              Na2O: '0.87'
+              K2O: '0.63'
+              TiO2: '2.38'
+              MnO: '0.36'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 23, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_23_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_24_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run 4135 24; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: 4135 24
+    T_C_as_printed: '1246'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.138'
+    Log_fO2_as_printed: '-12.86'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '46.57'
+      Al2O3: '14.14'
+      FeO: '13.26'
+      MgO: '8.63'
+      CaO: '10.75'
+      Na2O: '1.65'
+      K2O: '0.71'
+      TiO2: '2.11'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 24, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.82'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1246'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 24, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.86'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 24, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.138
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 24, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 24, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_24_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_25_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run 4135 25; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: 4135 25
+    T_C_as_printed: '1250'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-13.03'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '47.71'
+      Al2O3: '14.54'
+      FeO: '10.37'
+      MgO: '9.32'
+      CaO: '10.95'
+      Na2O: '1.61'
+      K2O: '0.73'
+      TiO2: '2.15'
+      MnO: '0.30'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '97.68'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1250'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 25, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.03'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 25, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 25, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '47.71'
+              Al2O3: '14.54'
+              FeO: '10.37'
+              MgO: '9.32'
+              CaO: '10.95'
+              Na2O: '1.61'
+              K2O: '0.73'
+              TiO2: '2.15'
+              MnO: '0.30'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row 4135 25, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_25_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_26_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run GL-654 26; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-654 26
+    T_C_as_printed: '1261'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.185'
+    Log_fO2_as_printed: '-12.42'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '42.50'
+      Al2O3: '10.28'
+      FeO: '25.47'
+      MgO: '7.57'
+      CaO: '8.87'
+      Na2O: '0.76'
+      K2O: '0.55'
+      TiO2: '2.71'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 26, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.71'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1261'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 26, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.42'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 26, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.185
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 26, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 26, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_26_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_27_printed_conditions
+  type: typed_context
+  locator:
+    page: 6
+    published_page: 402
+    pdf_page_index: 5
+    table: '1'
+    note: Table 1 run GL-654 27; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-654 27
+    T_C_as_printed: '1251'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-13.02'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '48.85'
+      Al2O3: '12.42'
+      FeO: '12.23'
+      MgO: '9.42'
+      CaO: '10.11'
+      Na2O: '1.18'
+      K2O: '0.55'
+      TiO2: '2.65'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 27, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.41'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1251'
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 27, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.02'
+        units: log10(atm)
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 27, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 27, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 6
+          published_page: 402
+          pdf_page_index: 5
+          table: '1'
+          note: Table 1 row GL-654 27, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_27_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_28_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run GL-654 28; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-654 28
+    T_C_as_printed: '1210'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.185'
+    Log_fO2_as_printed: '-13.01'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '43.34'
+      Al2O3: '11.31'
+      FeO: '23.71'
+      MgO: '5.99'
+      CaO: '9.73'
+      Na2O: '1.52'
+      K2O: '0.71'
+      TiO2: '2.86'
+      MnO: '0.26'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.43'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1210'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-654 28, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.01'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-654 28, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.185
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-654 28, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '43.34'
+              Al2O3: '11.31'
+              FeO: '23.71'
+              MgO: '5.99'
+              CaO: '9.73'
+              Na2O: '1.52'
+              K2O: '0.71'
+              TiO2: '2.86'
+              MnO: '0.26'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-654 28, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_28_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_29_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run HAW 29; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: HAW 29
+    T_C_as_printed: '1212'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.251'
+    Log_fO2_as_printed: '-12.68'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '43.40'
+      Al2O3: '15.45'
+      FeO: '17.98'
+      MgO: '4.03'
+      CaO: '8.68'
+      Na2O: '2.82'
+      K2O: '3.15'
+      TiO2: '2.28'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 29, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '97.79'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1212'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 29, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.68'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 29, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.251
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 29, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 29, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_29_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_30_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run HAW 30; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: HAW 30
+    T_C_as_printed: '1154'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.121'
+    Log_fO2_as_printed: '-14.11'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '50.53'
+      Al2O3: '18.24'
+      FeO: '6.92'
+      MgO: '4.52'
+      CaO: '9.84'
+      Na2O: '3.32'
+      K2O: '3.51'
+      TiO2: '2.12'
+      MnO: '0.28'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.28'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1154'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 30, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.11'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 30, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.121
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 30, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '50.53'
+              Al2O3: '18.24'
+              FeO: '6.92'
+              MgO: '4.52'
+              CaO: '9.84'
+              Na2O: '3.32'
+              K2O: '3.51'
+              TiO2: '2.12'
+              MnO: '0.28'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row HAW 30, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_30_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_31_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run GL-1050 31; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-1050 31
+    T_C_as_printed: '1211'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.222'
+    Log_fO2_as_printed: '-12.82'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '44.22'
+      Al2O3: '12.04'
+      FeO: '22.90'
+      MgO: '6.37'
+      CaO: '10.82'
+      Na2O: '0.94'
+      K2O: '0.56'
+      TiO2: '1.44'
+      MnO: '0.29'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.58'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1211'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 31, column Temp.; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.82'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 31, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.222
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 31, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '44.22'
+              Al2O3: '12.04'
+              FeO: '22.90'
+              MgO: '6.37'
+              CaO: '10.82'
+              Na2O: '0.94'
+              K2O: '0.56'
+              TiO2: '1.44'
+              MnO: '0.29'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 31, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_31_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_32_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run GL-1050 32; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-1050 32
+    T_C_as_printed: '1210'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.270'
+    Log_fO2_as_printed: '-12.64'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '41.34'
+      Al2O3: '11.24'
+      FeO: '27.90'
+      MgO: '5.64'
+      CaO: '10.28'
+      Na2O: '0.98'
+      K2O: '0.66'
+      TiO2: '1.36'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 32, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.40'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1210'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 32, column Temp.; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.64'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 32, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.270
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 32, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 32, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_32_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_33_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run GL-1050 33; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-1050 33
+    T_C_as_printed: '1156'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.119'
+    Log_fO2_as_printed: '-14.09'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '53.67'
+      Al2O3: '14.28'
+      FeO: '9.75'
+      MgO: '5.30'
+      CaO: '12.18'
+      Na2O: '0.24'
+      K2O: '0.97'
+      TiO2: '1.61'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 33, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.00'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1156'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 33, column Temp.; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.09'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 33, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.119
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 33, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1050 33, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_33_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_34_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run 4136 34; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: 4136 34
+    T_C_as_printed: '1153'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.120'
+    Log_fO2_as_printed: '-14.12'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '53.31'
+      Al2O3: '17.79'
+      FeO: '6.14'
+      MgO: '4.58'
+      CaO: '7.18'
+      Na2O: '4.37'
+      K2O: '1.92'
+      TiO2: '3.08'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row 4136 34, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.37'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1153'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row 4136 34, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.12'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row 4136 34, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.120
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row 4136 34, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row 4136 34, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_34_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_35_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run GL-1868 35; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-1868 35
+    T_C_as_printed: '1303'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.104'
+    Log_fO2_as_printed: '-12.51'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '48.59'
+      Al2O3: '12.32'
+      FeO: '12.53'
+      MgO: '12.33'
+      CaO: '9.20'
+      Na2O: '0.59'
+      K2O: '0.32'
+      TiO2: '1.74'
+      MnO: '0.36'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '97.98'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1303'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1868 35, column Temp.; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.51'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1868 35, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.104
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1868 35, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '48.59'
+              Al2O3: '12.32'
+              FeO: '12.53'
+              MgO: '12.33'
+              CaO: '9.20'
+              Na2O: '0.59'
+              K2O: '0.32'
+              TiO2: '1.74'
+              MnO: '0.36'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row GL-1868 35, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_35_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_36_printed_conditions
+  type: typed_context
+  locator:
+    page: 7
+    published_page: 403
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 run K30J 36; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: K30J 36
+    T_C_as_printed: '1258'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.103'
+    Log_fO2_as_printed: '-13.00'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '53.06'
+      Al2O3: '14.10'
+      FeO: '8.90'
+      MgO: '7.98'
+      CaO: '9.70'
+      Na2O: '1.61'
+      K2O: '2.45'
+      TiO2: '0.84'
+      MnO: '0.23'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '98.87'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1258'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row K30J 36, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.00'
+        units: log10(atm)
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row K30J 36, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.103
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row K30J 36, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '53.06'
+              Al2O3: '14.10'
+              FeO: '8.90'
+              MgO: '7.98'
+              CaO: '9.70'
+              Na2O: '1.61'
+              K2O: '2.45'
+              TiO2: '0.84'
+              MnO: '0.23'
+        locator:
+          page: 7
+          published_page: 403
+          pdf_page_index: 6
+          table: '1'
+          note: Table 1 row K30J 36, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_36_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_37_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run CA 4 37; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: CA 4 37
+    T_C_as_printed: '1211'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.42'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '50.56'
+      Al2O3: '15.91'
+      FeO: '10.43'
+      MgO: '7.44'
+      CaO: '9.58'
+      Na2O: '2.25'
+      K2O: '0.59'
+      TiO2: '1.43'
+      MnO: '0.26'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '98.45'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1211'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row CA 4 37, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.42'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row CA 4 37, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row CA 4 37, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '50.56'
+              Al2O3: '15.91'
+              FeO: '10.43'
+              MgO: '7.44'
+              CaO: '9.58'
+              Na2O: '2.25'
+              K2O: '0.59'
+              TiO2: '1.43'
+              MnO: '0.26'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row CA 4 37, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_37_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_38_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run WRAB 38; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: WRAB 38
+    T_C_as_printed: '1249'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-13.04'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '47.34'
+      Al2O3: '17.96'
+      FeO: '10.30'
+      MgO: '9.44'
+      CaO: '11.24'
+      Na2O: '1.56'
+      K2O: '0.19'
+      TiO2: '0.83'
+      MnO: '0.26'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.12'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1249'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 38, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.04'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 38, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 38, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '47.34'
+              Al2O3: '17.96'
+              FeO: '10.30'
+              MgO: '9.44'
+              CaO: '11.24'
+              Na2O: '1.56'
+              K2O: '0.19'
+              TiO2: '0.83'
+              MnO: '0.26'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 38, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_38_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_39_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run WRAB 39; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: WRAB 39
+    T_C_as_printed: '1246'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.139'
+    Log_fO2_as_printed: '-12.86'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '45.73'
+      Al2O3: '17.48'
+      FeO: '13.12'
+      MgO: '8.95'
+      CaO: '11.01'
+      Na2O: '1.44'
+      K2O: '0.23'
+      TiO2: '0.79'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 39, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.75'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1246'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 39, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.86'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 39, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.139
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 39, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row WRAB 39, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_39_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_40_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run Z 519 40; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: Z 519 40
+    T_C_as_printed: '1214'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.118'
+    Log_fO2_as_printed: '-13.38'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '58.58'
+      Al2O3: '19.32'
+      FeO: '7.18'
+      MgO: '3.44'
+      CaO: '5.47'
+      Na2O: '4.39'
+      K2O: '1.38'
+      TiO2: '0.70'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 519 40, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '100.46'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1214'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 519 40, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.38'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 519 40, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.118
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 519 40, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 519 40, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_40_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_41_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run Z 571 41; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: Z 571 41
+    T_C_as_printed: '1247'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.110'
+    Log_fO2_as_printed: '-13.06'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '50.50'
+      Al2O3: '19.35'
+      FeO: '8.90'
+      MgO: '5.06'
+      CaO: '10.02'
+      Na2O: '3.40'
+      K2O: '0.30'
+      TiO2: '1.45'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 571 41, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '98.98'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1247'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 571 41, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-13.06'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 571 41, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.110
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 571 41, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row Z 571 41, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_41_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_42_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run 653 42; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: 653 42
+    T_C_as_printed: '1150'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.121'
+    Log_fO2_as_printed: '-14.16'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '53.03'
+      Al2O3: '13.59'
+      FeO: '10.25'
+      MgO: '5.31'
+      CaO: '10.06'
+      Na2O: '2.41'
+      K2O: '0.95'
+      TiO2: '3.51'
+    oxide_absences_as_printed:
+      MnO:
+        state:
+          tag: not_applicable
+          reason: Table 1 prints this oxide cell blank; it is not zero.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row 653 42, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    Total_wt_pct_as_printed: '99.11'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1150'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row 653 42, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.16'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row 653 42, column Log fO2; 600 dpi page render; see the cell audit for the independent machine reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.121
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row 653 42, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: unknown
+          reason: The printed MnO cell is blank, so the full melt composition is not reported.
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row 653 42, column MnO; 600 dpi page render; see the cell audit for the independent machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_42_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_43_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run P 340409 43; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: P 340409 43
+    T_C_as_printed: '1158'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.119'
+    Log_fO2_as_printed: '-14.07'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '52.70'
+      Al2O3: '14.15'
+      FeO: '9.77'
+      MgO: '5.21'
+      CaO: '10.09'
+      Na2O: '3.16'
+      K2O: '0.81'
+      TiO2: '2.46'
+      MnO: '0.26'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '98.61'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1158'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row P 340409 43, column Temp.; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-14.07'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row P 340409 43, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.119
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row P 340409 43, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '52.70'
+              Al2O3: '14.15'
+              FeO: '9.77'
+              MgO: '5.21'
+              CaO: '10.09'
+              Na2O: '3.16'
+              K2O: '0.81'
+              TiO2: '2.46'
+              MnO: '0.26'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row P 340409 43, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_43_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_44_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run GL-C71 44; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-C71 44
+    T_C_as_printed: '1260'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.185'
+    Log_fO2_as_printed: '-12.43'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '42.36'
+      Al2O3: '11.01'
+      FeO: '22.86'
+      MgO: '8.28'
+      CaO: '10.99'
+      Na2O: '0.61'
+      K2O: '0.51'
+      TiO2: '2.59'
+      MnO: '0.36'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '99.57'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1260'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 44, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.43'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 44, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.185
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 44, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '42.36'
+              Al2O3: '11.01'
+              FeO: '22.86'
+              MgO: '8.28'
+              CaO: '10.99'
+              Na2O: '0.61'
+              K2O: '0.51'
+              TiO2: '2.59'
+              MnO: '0.36'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 44, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_44_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_table1_run_45_printed_conditions
+  type: typed_context
+  locator:
+    page: 8
+    published_page: 404
+    pdf_page_index: 7
+    table: '1'
+    note: Table 1 run GL-C71 45; values are transcribed from the run column.
+  units: Table 1 run conditions as printed
+  values:
+    run_label_as_transcribed: GL-C71 45
+    T_C_as_printed: '1213'
+    temperature_column_header_as_printed: Temp.
+    CO2_H2_ratio_as_printed: '0.268'
+    Log_fO2_as_printed: '-12.61'
+    fO2_reference_unit_as_printed: atm
+    fO2_reference_unit_locator:
+      page: 1
+      published_page: 397
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract reports the study-wide log fO2 range in atm.
+    oxide_wt_pct_as_printed:
+      SiO2: '40.20'
+      Al2O3: '11.47'
+      FeO: '27.37'
+      MgO: '5.60'
+      CaO: '11.39'
+      Na2O: '1.43'
+      K2O: '0.57'
+      TiO2: '2.63'
+      MnO: '0.26'
+    oxide_absences_as_printed: {}
+    Total_wt_pct_as_printed: '100.92'
+    point_conditions:
+      T_C:
+        state:
+          tag: value
+          value: '1213'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 45, column Temp.; 600 dpi page render; see the cell audit for the independent machine reads.
+      fO2_log:
+        state:
+          tag: value
+          value: '-12.61'
+        units: log10(atm)
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 45, column Log fO2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      gas_mix:
+        state:
+          tag: value
+          value: CO2/H2 = 0.268
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 45, column CO2/H2; 600 dpi page render; see the cell audit for the independent machine
+            reads.
+      total_pressure_Pa:
+        state:
+          tag: unknown
+          reason: The experimental total pressure is not printed.
+        locator:
+          page: 3
+          published_page: 399
+          pdf_page_index: 2
+          section: Experimental details
+          note: The experimental total pressure is not stated.
+      composition:
+        state:
+          tag: value
+          value:
+            amount_basis: mass_percent
+            basis: printed_wt_percent
+            components:
+              SiO2: '40.20'
+              Al2O3: '11.47'
+              FeO: '27.37'
+              MgO: '5.60'
+              CaO: '11.39'
+              Na2O: '1.43'
+              K2O: '0.57'
+              TiO2: '2.63'
+              MnO: '0.26'
+        locator:
+          page: 8
+          published_page: 404
+          pdf_page_index: 7
+          table: '1'
+          note: Table 1 row GL-C71 45, column oxide composition; 600 dpi page render; see the cell audit for the independent
+            machine reads.
+    note: Column 1 headings identify the run; the printed row label is retained with the Table 1 cell audit.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_table1_run_45_printed_conditions
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO
+- observation_id: roeder_1974_undigitized_figure_candidates
+  type: experiment_series
+  locator:
+    page: 3
+    published_page: 399
+    pdf_page_index: 2
+    figure: '1'
+  units: as printed
+  values:
+    method_class: figure_only
+    admission_status: figure_only
+    figures:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+    note: Figure-only plot values are not digitized. Figure 2's printed constant activity is retained separately; Table 1
+      is the source for row-specific activity and activity-coefficient values.
+  context_id: roeder-1974-iron-activity-olivine-basaltic-liquids::context::roeder_1974_undigitized_figure_candidates
+  work_id: 6530d7a793db41b88b4a8355d4f590c34cede6dc43fd8e95c8afb737b97a66bc
+  source_id: roeder-1974-iron-activity-olivine-basaltic-liquids
+  species: FeO

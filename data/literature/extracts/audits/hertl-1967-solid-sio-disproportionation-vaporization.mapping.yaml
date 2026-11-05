@@ -1,0 +1,50 @@
+source_id: hertl-1967-solid-sio-disproportionation-vaporization
+source_locator_basis: Absolute PDF page and printed figure number or section
+machine_input_order:
+  - MinerU markdown and content list inspected first; the target Hertl article text and tables were absent.
+  - pdftotext-layout.txt used next; its scanned-page OCR was checked against renders.
+target_article_pdf_pages: [1, 2, 3, 4]
+printed_pages: [378, 379, 380, 381]
+printed_table_count: 0
+printed_table_rows: 0
+mineru_table_blocks: []
+figures:
+  - figure: '1'
+    physical_page: 2
+    disposition: Figure record and separately located marker legend; no plotted coordinates digitized.
+    printed_conditions: 1-hr at 1200°C with constant evacuation; 4-hr at 1474°C in 1 atm argon.
+  - figure: '2'
+    physical_page: 2
+    disposition: Figure record; no plotted coordinates digitized.
+    printed_conditions: 1.000 g charge at 1160° to 1175°C with constant evacuation.
+  - figure: '3'
+    physical_page: 2
+    disposition: Figure record; prose flow-rate plateau retained; no plotted coordinates digitized.
+    printed_conditions: 3.000 g charge, 3-hr run at 1427°C in 1 atm argon.
+  - figure: '4'
+    physical_page: 2
+    disposition: Figure record; calculated 72.5 kcal/mole retained as a typed-refused observation; no plotted coordinates digitized.
+    printed_conditions: 1.000 g charge in constantly evacuated system; ΔW normalized to 1 hr.
+  - figure: '5'
+    physical_page: 3
+    disposition: Figure record and separately located marker-to-temperature legend; no plotted coordinates digitized.
+    printed_conditions: 0.250 g charge in 1 atm argon; 100% disproportionation equals 79.5 mg Si.
+  - figure: '6'
+    physical_page: 3
+    disposition: Figure record; printed E_a label also stored as typed-refused observation; no plotted coordinates digitized.
+    printed_conditions: Values from Fig. 5; no pressure stated in this caption.
+render_checks:
+  pages: [1, 2, 3, 4]
+  high_resolution_pages: [2, 3]
+  result: Every stored numeric cell was read on a page render because the MinerU article text was absent and pdftotext is OCR. The p379 muffle dimension disagreement resolves to 18 by 2 in. ID on the render (pdftotext reads 13 by 2); the p380 Fig. 5 legend resolves to 1330°C and 3600 sec for the cross and filled-circle series.
+schema_gaps:
+  - Vaporization heat is unresolved between two printed reactions; exact quantity token is unavailable, as in the ruling documented by powell-1971-alkali-sulfate-metasilicate-vapour.
+  - Apparent activation energy has no quantity token in simulator/battery/enums.py::Quantity or simulator/battery/migrate.py::QUANTITY_ALIASES and no observation type in tools/validate_literature_extracts.py::OBSERVATION_TYPES; rate_series would infer mass_loss_rate through simulator/battery/migrate.py::TYPE_QUANTITY if the explicit descriptive label were omitted.
+figure_read_candidates:
+  - Fig. 1 mass loss versus charge weight.
+  - Fig. 2 mass loss versus time.
+  - Fig. 3 mass loss versus argon flow rate.
+  - Fig. 4 Arrhenius plot of SiO weight loss.
+  - Fig. 5 disproportionation amount versus time.
+  - Fig. 6 Arrhenius plot of terminal disproportionation.
+  disposition: Figure-only records preserve captions, printed conditions, prose summaries, and legend pairings. No graph coordinates were digitized. No numerical SiO vapour pressures are printed.

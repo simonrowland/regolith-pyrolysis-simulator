@@ -1,0 +1,142 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89
+  citation: Fredrickson, D. R. & Chasanov, M. G. (1973), “The enthalpy of sodium oxide Na2O to 1300 K by drop calorimetry”,
+    Journal of Chemical Thermodynamics 5, 485–490.
+  source_ids:
+  - fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      role: pdf
+      path: raw/fredrickson-chasanov-1973-na2o-enthalpy-1300k/fredrickson-chasanov-1973-na2o-enthalpy-1300k.pdf
+      sha256:
+        tag: value
+        value: 41a5b949fd23f037320cb9c7eac7b2fe82d0eb22402d3b9ee856f0621795d42f
+    - asset_id: pdftotext:fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      role: pdftotext
+      path: text/fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:fredrickson-chasanov-1973-na2o-enthalpy-1300k
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89::fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89
+  locator:
+    page: 3
+    published_page: 487
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 q input series
+context:
+- observation_id: fredrickson_1973_sample_amount_and_procedure
+  type: sample_and_method_context
+  locator:
+    page: 3
+    published_page: 487
+    section: Experimental
+    subsection: Procedure
+  units: as printed
+  values:
+    sample_mass_g: '4.4438'
+    molar_mass_g_mol: '61.979'
+    capsule_filling: The sample-containing capsule was sealed under vacuum.
+    filling_weighing_sealing_as_printed: All filling, weighing, and sealing operations were carried out in a glove-box filled
+      with flowing high-purity helium.
+    capsule_correction_as_printed: An empirical expression for the enthalpy of the Pt + 10 mass per cent Rh capsule was determined
+      from separate empty-capsule experiments and used to correct the capsule heat at each experimental temperature.
+    capsule_correction_method_class: measured_reduced
+    capsule_correction_note: The paper reports the empirical correction expression but not the raw empty-capsule calibration
+      runs; q_o is retained as a typed-refused input for the measured enthalpy reductions.
+    capsule_sealed_under_vacuum_note: The capsule was sealed under vacuum, but no numerical total pressure is reported. The
+      glove-box helium is stated for filling, weighing, and sealing, not as a furnace atmosphere. No fO2 is reported.
+    unit_temperature_footnote_as_printed: Throughout this paper, cal_th = 4.184 J, and all temperatures are based on IPTS-68.
+  context_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::context::fredrickson_1973_sample_amount_and_procedure
+  work_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89
+  source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  species: Na2O
+- observation_id: fredrickson_1973_sample_and_drop_calorimetry
+  type: sample_and_method_context
+  locator:
+    page: 2
+    published_page: 486
+    section: Experimental
+  units: as printed
+  values:
+    sample_formula_as_printed: Na2O
+    sample_purity_statement_as_printed: (99.9 ± 0.2) per cent of the amount of NaOH that would be produced by pure Na2O
+    sample_purity_reference_marker_as_printed: (5)
+    sample_purity_basis_note: This is the titrimetric hydrolysis-product yield relative to the theoretical NaOH amount from
+      pure Na2O; it is not a printed Na2O mass-percent assay. Confidence level for ±0.2 is not stated.
+    preparation_as_printed: The sample was heated under vacuum at 783 K for 40 h to remove excess sodium and any NaOH; it
+      was then characterized by titrimetric analysis and emission spectrography.
+    capsule_as_printed: (platinum + 10 mass per cent of rhodium), 0.4 mm wall thickness, 1.25 cm diameter, 5 cm3 internal
+      volume, 5 cm length
+    apparatus_as_printed: Resistance-heated vacuum furnace; copper-block calorimeter operating at 298.15 K with a quartz-crystal
+      thermometer.
+    apparatus_procedure_reference_marker_as_printed: (6)
+    sapphire_check_reference_marker_as_printed: (7)
+    sapphire_check_as_printed: Six experiments using sapphire in a platinum + 10 mass per cent rhodium capsule covered 598
+      to 1010 K; results agreed with NBS certified values within ±0.3 per cent.
+    calorimeter_energy_equivalent_as_printed: (1046.24 ± 0.33) cal_th K−1
+    calorimeter_energy_equivalent_marker_as_printed: †
+    calorimeter_energy_equivalent_confidence_note: confidence level not stated
+    atmosphere_and_pressure_note: The source describes a resistance-heated vacuum furnace but gives no numerical total pressure
+      or fO2 for the experiment.
+  context_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::context::fredrickson_1973_sample_and_drop_calorimetry
+  work_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89
+  source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  species: Na2O
+- observation_id: fredrickson_1973_structure_and_melting_context
+  type: sample_and_method_context
+  locator:
+    page: 5
+    published_page: 489
+    section: Discussion
+  units: as printed
+  values:
+    phase_as_printed: The authors state that Na2O has an antifluorite crystal structure (reference [9]); individual table
+      rows do not name a distinct polymorph. The typeable phase is crystalline (cr).
+    melting_limit_as_printed: Measurements through melting were planned. A capsule developed a pin-hole at 1453 K during preliminary
+      vacuum-furnace experiments; after removal, the sample was exposed to air and extensively hydrolyzed. The paper does
+      not report a Na2O melting temperature or a measured liquid enthalpy series.
+  context_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k::context::fredrickson_1973_structure_and_melting_context
+  work_id: 5464476ae83455c92b1cdddc93ccea93fb289a9e301fd51ff1ccd45e0bca3c89
+  source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+  species: Na2O

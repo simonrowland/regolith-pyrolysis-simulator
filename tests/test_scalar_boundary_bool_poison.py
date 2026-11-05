@@ -365,7 +365,10 @@ def _dummy_sio_sim() -> SimpleNamespace:
         melt=SimpleNamespace(
             temperature_C=25.0,
             pO2_mbar=0.0,
-            p_total_mbar=0.0,
+            # Honest sio_po2 values are 0 and 0.5 mbar. pO2 above the
+            # live total is now a refusal, so the fixture total has to
+            # sit above 0.5. 10 mbar is the C2A continuous default.
+            p_total_mbar=10.0,
             atmosphere=None,
         ),
         overhead=SimpleNamespace(composition={}),

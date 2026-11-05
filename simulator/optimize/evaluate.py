@@ -3847,19 +3847,46 @@ def _profile_thermal_window_schedule(
             f"{max_hold_bound} is {max_hold_hr:g} h; regenerate with "
             "FORCE_PROFILES=1"
         )
+    overrides = {
+        "thermal_window_low_C": low_C,
+        "thermal_window_high_C": high_C,
+        "thermal_window_duration_h": duration_h,
+        "thermal_window_preheat_ramp_C_per_hr": preheat_ramp,
+        "thermal_window_preheat_hours": float(preheat_hours),
+        "thermal_window_ramp_C_per_hr": window_ramp,
+        "min_hold_hr": float(total_hours),
+        "max_hours": float(total_hours),
+    }
+    active_seed = active_thermal_window_seed(profile, campaign)
+    seed_patch = active_seed.get("patch") if active_seed is not None else None
+    profile_run = profile.get("run")
+    for runtime_field, profile_fields in (
+        ("p_total_mbar", ("p_total_mbar", "p_total_mbar_default")),
+        ("pO2_mbar", ("pO2_mbar", "pO2_mbar_default")),
+    ):
+        if recipe_patch is not None and any(
+            ("campaigns", campaign, field) in recipe_patch.values
+            and _finite_float_or_none(
+                recipe_patch.values[("campaigns", campaign, field)]
+            ) is not None
+            for field in profile_fields
+        ):
+            continue
+        # [5, 5] is a degenerate interval, still a bound rather than a scalar.
+        for field in profile_fields:
+            value = _campaign_setting(profile_run, campaign, field)
+            if value is None and seed_patch is not None:
+                value = _campaign_setting(seed_patch, campaign, field)
+            # Pressure intervals constrain recipes; only scalar values set a run.
+            numeric_value = _finite_float_or_none(value)
+            if numeric_value is not None:
+                overrides[runtime_field] = numeric_value
+                break
+
     return MappingProxyType({
         "campaign": campaign,
         "total_hours": total_hours,
-        "overrides": {
-            "thermal_window_low_C": low_C,
-            "thermal_window_high_C": high_C,
-            "thermal_window_duration_h": duration_h,
-            "thermal_window_preheat_ramp_C_per_hr": preheat_ramp,
-            "thermal_window_preheat_hours": float(preheat_hours),
-            "thermal_window_ramp_C_per_hr": window_ramp,
-            "min_hold_hr": float(total_hours),
-            "max_hours": float(total_hours),
-        },
+        "overrides": overrides,
     })
 
 

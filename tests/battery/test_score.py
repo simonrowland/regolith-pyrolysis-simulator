@@ -8869,6 +8869,265 @@ def _score_sample_phase_vapour(reference, experiment, engine):
     return residual, calls
 
 
+_LIQUID_MODEL_SUBSOLIDUS_SAMPLE = "liquid_model_vs_subsolidus_sample"
+
+
+def test_solid_sample_vapour_notice_preserves_numeric_score_and_headline() -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    baseline_experiment = replace(
+        experiment, sample=replace(experiment.sample, form=None)
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+    baseline, baseline_calls = _score_sample_phase_vapour(
+        reference, baseline_experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == baseline_calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert residual.numeric == baseline.numeric
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+    assert residual.status is baseline.status is ResidualStatus.NO_BAND
+    assert residual.score_eligible is baseline.score_eligible
+    assert score_mod.flagged_strata(residual.notices) == score_mod.flagged_strata(
+        baseline.notices
+    )
+    headline_with_notice = score_mod._headline_payload_admits(
+        residual_to_plain(residual), tier="measured"
+    )
+    headline_without_notice = score_mod._headline_payload_admits(
+        residual_to_plain(baseline), tier="measured"
+    )
+    assert headline_without_notice is True
+    assert headline_with_notice is headline_without_notice
+
+
+@pytest.mark.parametrize(
+    ("engine", "expected_notice"),
+    (
+        (Engine.VAPOROCK, True),
+        (Engine.OPENIMCC, True),
+        (Engine.INTERNAL_ANALYTICAL, True),
+        (Engine.ALPHAMELTS, False),
+    ),
+)
+def test_subsolidus_notice_is_scoped_to_single_liquid_engines(
+    engine: Engine, expected_notice: bool
+) -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    residual, calls = _score_sample_phase_vapour(reference, experiment, engine)
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    ) is expected_notice
+
+
+@pytest.mark.parametrize(
+    ("quantity", "formula", "expected_rail"),
+    (
+        (Quantity.P_SAT, "Mg", Rail.VAPOUR),
+        (Quantity.P_PARTIAL, "SiO", Rail.SIO_EVOLUTION),
+    ),
+)
+def test_subsolidus_notice_covers_psat_and_sio_rails(
+    quantity: Quantity, formula: str, expected_rail: Rail
+) -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    if quantity is Quantity.P_SAT:
+        identity = F.psat_identity(formula, T_K=Decimal("2100"))
+        # The partial-pressure fixture also carries printed fO2/total-P
+        # point conditions. They do not apply to this pure-component P_SAT row.
+        reference = replace(reference, identity=identity, point_conditions=None)
+    else:
+        identity = replace(
+            reference.identity,
+            species=replace(reference.identity.species, formula=formula),
+        )
+        reference = replace(reference, identity=identity)
+
+    assert (
+        validate_quantity_profile(reference.identity).kind is IdentityEqualKind.EQUAL
+    )
+    if quantity is Quantity.P_SAT:
+        assert reference.point_conditions is None
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.rail is expected_rail
+    assert residual.numeric is not None
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.affected_quantities == (quantity,)
+
+
+def test_shilov_ceramic_row_state_gets_nonblocking_domain_notice() -> None:
+    """Shilov's extract records the solid ceramic state on its Sr rows."""
+
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=None, characterization=None),
+    )
+    reference = replace(
+        reference,
+        observation_id="shilov_2026_table2_sr_sample1",
+        source_id="shilov-2026-sro-la2o3-kems",
+        provenance={"measured_condensed_form": "solid ceramic sample"},
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    (notice,) = tuple(
+        notice
+        for notice in residual.notices
+        if notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+    )
+    assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert notice.affected_quantities == (Quantity.P_PARTIAL,)
+
+
+def test_recorded_liquid_measurement_phase_overrides_solid_sample_description() -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    reference = replace(
+        reference,
+        provenance={
+            "measured_condensed_form": {
+                "state": "liquid_melt",
+                "basis": "explicit_author",
+            }
+        },
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+def test_recorded_liquid_row_state_overrides_solid_characterization() -> None:
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            form=None,
+            characterization=F.located("solid"),
+        ),
+    )
+    reference = replace(
+        reference,
+        provenance={
+            "measured_condensed_form": {
+                "state": "liquid_melt",
+                "basis": "explicit_author",
+            }
+        },
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "recorded_state",
+    (
+        "not solid",
+        "solid or liquid",
+        "partially molten",
+        "mostly solid at room temperature",
+    ),
+)
+def test_free_prose_row_state_does_not_create_subsolidus_domain_notice(
+    recorded_state: str,
+) -> None:
+    experiment, reference = _vapour_over_sample_form("solid")
+    reference = replace(
+        reference,
+        provenance={
+            "measured_condensed_form": {
+                "state": recorded_state,
+                "basis": "explicit_author",
+            }
+        },
+    )
+
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert residual.numeric is not None
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+def test_liquid_sample_vapour_has_no_subsolidus_domain_notice() -> None:
+    experiment, reference = _vapour_over_sample_form("condensed_liquid")
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
+def test_unknown_sample_phase_vapour_has_no_subsolidus_domain_notice() -> None:
+    experiment, reference = _vapour_over_sample_form("oxide melt samples")
+    experiment = replace(
+        experiment,
+        sample=replace(experiment.sample, form=None, characterization=None),
+    )
+    residual, calls = _score_sample_phase_vapour(
+        reference, experiment, Engine.INTERNAL_ANALYTICAL
+    )
+
+    assert calls == [reference.observation_id]
+    assert not any(
+        notice.reason == _LIQUID_MODEL_SUBSOLIDUS_SAMPLE
+        for notice in residual.notices
+    )
+
+
 def test_crystalline_sample_vapour_is_out_of_domain_for_a_liquid_engine() -> None:
     """Vapour over a typed crystal does not test a liquid-engine score."""
 

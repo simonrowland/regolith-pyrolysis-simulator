@@ -172,10 +172,20 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     for account in OPTIONAL_PRODUCT_ACCOUNTS:
         assert len({account in surface.ledger for surface in surfaces}) == 1
     assert "Fe" in batch.ledger["process.condensation_train"]
-    # Stage-2 midpoint P_sat(Cr) is 0.28857 Pa at 1200 C; this drive's
-    # p_Cr never exceeds 0.19365 Pa, so equilibrium-capped capture is zero.
-    # The complete ledger comparison below checks the routing on every surface.
-    assert "Cr" not in batch.ledger["process.condensation_train"]
+    # d-320 approved the Cr move from offgas into Stage 2. The Stage-2
+    # midpoint is still undersaturated (P_sat(Cr) = 0.28857 Pa at 1200 C;
+    # this drive's p_Cr stays at or below 0.19365 Pa), but band-integrated
+    # capture (85fedcb8e) condenses Cr on the colder strips. The midpoint
+    # exclusion written at bf8560703 described the pre-band model. Batch,
+    # CLI, and web carry the same captured Cr; the ledger comparison below
+    # checks the rest of the routing. Some Cr remains in terminal offgas.
+    cr_mol = {
+        surface.name: surface.ledger["process.condensation_train"]["Cr"]
+        for surface in surfaces
+    }
+    assert set(cr_mol) == {"batch", "cli", "web"}
+    assert min(cr_mol.values()) > 0.0
+    assert max(cr_mol.values()) - min(cr_mol.values()) <= LEDGER_TOLERANCE_MOL
     # SiO wall saturation is outside its source-certified range on this drive,
     # so the typed pass-through remains terminal offgas rather than fabricating
     # a condensed Si product. All three surfaces must preserve that routing.

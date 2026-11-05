@@ -1,0 +1,96 @@
+source_id: centolanzi-1966-tektite-vapour-pressure
+source_order:
+  - MinerU markdown and content-list JSON under the source's corpus text directory
+  - pdftotext-layout.txt
+  - rendered PDF only for numeric cells, symbol readings, and locator checks noted in the audit
+table_draft:
+  conversion: completed with the seat copy of tools/mineru_table_draft.py
+  printed_tables: 0
+  content_list_table_blocks: 0
+  details_chart_blocks: ignored as invented chart readings
+printed_data_mappings:
+  - source: Figure 7 explicit legend value for silver
+    destination: species.unknown.observations[centolanzi_1966_fig7_silver_areal_mass_loss_rate]
+    stored_value: '0.19'
+    printed_unit: g/cm² min
+  - source: Figure 7 explicit legend value for gold
+    destination: species.unknown.observations[centolanzi_1966_fig7_gold_areal_mass_loss_rate]
+    stored_value: '0.036'
+    printed_unit: g/cm² min
+  - source: Figure 7 explicit legend values for tektite glass and silica
+    destination: the source-specific Figure 7 rate observations
+    stored_value: '1.3 × 10^-5' for each material
+    printed_unit: g/cm² min
+  - source: Figure 7 600 dpi rendered legend
+    destination: species.unknown.context[centolanzi_1966_fig7_printed_legend]
+    printed_pairs: SILVER/open circle/.19; GOLD/open square/.036; TEKTITE/open diamond/1.3x10^-5; SILICA/open triangle/1.3x10^-5
+    printed_unit: gm/cm² min
+    use: binds each rate observation to its printed material marker and legend value; materials do not identify vapor species
+  - source: Figure 7 conditional bubble-pressure rate annotation
+    destination: species.unknown.observations[centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure]
+    stored_value: '12'
+    printed_unit: gm/cm² min
+    evidence_class_reason: author_derived; the printed conditional value uses Walter's bubble-pressure function and is not a direct measurement
+  - source: abstract, Figure 14, and summary fit forms for tektite-glass vapor pressure
+    destination: species.unknown.observations[centolanzi_1966_tektite_vapor_pressure_fit]
+    evidence_class_reason: author_derived; the authors' plotted input points are not stored or digitized
+  - source: no-boiling result for Figure 13(b)
+    destination: species.unknown.observations[centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound]
+    stored_value: '<0.05 atm at 2310°K'
+    evidence_class_reason: author_derived from the explicitly printed no-boiling condition, measured pressure, and stated surface temperature
+condition_mapping:
+  experiment_groups:
+    figure7_furnace:
+      observations: all five Figure 7 rate rows, including the conditional Walter bubble-pressure annotation
+      temperature_K: '1700'
+      total_pressure_atm: '10^-4'
+      atmosphere: argon
+      purpose: keep the printed furnace conditions together and away from aggregate or attributed fits
+    figure13b_no_boiling:
+      observations: the Figure 13(b) upper-bound row
+      temperature_K: '2310'
+      total_pressure_atm: '0.05'
+    summary_fit:
+      observation: centolanzi_1966_tektite_vapor_pressure_fit
+      temperature: unknown point value; the printed fit spans 1700 to 3000°K
+      total_pressure: unknown single experiment pressure
+    cited_prior_fit:
+      observation: centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+      temperature: equation variable only; no point temperature stated
+      total_pressure: not stated for the cited prior relation
+  furnace:
+    atmosphere: argon, explicitly stated
+    run_pressure: 10^-4 atm for Figure 7; converted to total_pressure_Pa using exact atm-to-Pa factor 101325
+    run_temperature: 1700°K for Figure 7
+    no_run_level_pressure_inference: furnace range and typical 1/2 atm text remain series context and are not copied to Figure 7 rows
+  arc_jet:
+    printed_pressures: retained as the printed experiment pressure with each figure locator; Pa conversion is exact multiplication by 101325
+    pressure_identity: total_pressure_Pa is populated only for the explicitly printed experiment pressure values
+    unprinted_conditions: arc-jet gas composition, fO2, numerical bulk composition, local shoulder pressure, and standard state remain unstated
+  identity:
+    vapor_species: never inferred from the condensed sample name or the phrase mainly silica
+    total_vapor_pressure: typed refusal via gas_basis TOTAL_PRESSURE_not_species
+schema_gaps:
+  vapor_species_identity:
+    rationale: >-
+      The source reports total tektite-vapor pressure and rates from sample materials,
+      but names no vapor molecules. All observation identities therefore remain species unknown.
+  exact_areal_mass_loss_rate_quantity:
+    stored_quantity_label: areal_mass_loss_rate_as_printed
+    code_checked:
+      - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+      - simulator/battery/migrate.py::QUANTITY_ALIASES
+      - simulator/battery/migrate.py::TYPE_QUANTITY
+      - simulator/battery/migrate.py::_convert_rate_to_kg_per_s
+      - simulator/battery/enums.py::Quantity.MASS_LOSS_RATE
+      - simulator/battery/enums.py::Quantity.MASS_LOSS_AREAL_DENSITY
+    rationale: >-
+      The print is mass per area per time. MASS_LOSS_RATE is mass per time;
+      MASS_LOSS_AREAL_DENSITY is mass per area without time. Neither is an exact
+      representation, so each rate remains typed-refused.
+    precedent: data/literature/extracts/audits/kems-010-richter-2007.mapping.yaml
+  total_vapor_pressure_identity:
+    code_checked: simulator/battery/migrate.py::_quantity_contradiction
+    rationale: >-
+      Existing migration explicitly refuses TOTAL_PRESSURE_not_species as a
+      single-species p_sat identity. No species is printed for tektite-glass vapor.

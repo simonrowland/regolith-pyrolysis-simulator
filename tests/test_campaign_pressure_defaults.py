@@ -15,7 +15,7 @@ from simulator.campaigns import (
 )
 from simulator.core import Atmosphere, CampaignPhase, MeltState
 from simulator.run_executor import RunExecutor
-from simulator.runner import PyrolysisRun
+from simulator.runner import PyrolysisRun, _parse_runtime_campaign_overrides_json
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -275,6 +275,66 @@ def test_campaign_pressure_default_override_reaches_melt_state():
     assert melt.p_total_mbar == pytest.approx(1.5)
 
 
+@pytest.mark.parametrize(
+    ("value", "reason_code"),
+    [
+        ("3", "runtime_campaign_p_total_mbar_not_numeric"),
+        (math.nan, "runtime_campaign_p_total_mbar_nonfinite"),
+        (0.0, "runtime_campaign_p_total_mbar_nonpositive"),
+        (-1.0, "runtime_campaign_p_total_mbar_nonpositive"),
+    ],
+)
+def test_runtime_total_pressure_override_refuses_invalid_values(
+    value: object,
+    reason_code: str,
+) -> None:
+    with pytest.raises(ValueError) as exc_info:
+        CampaignManager.validate_runtime_campaign_overrides(
+            {"C2B": {"p_total_mbar": value}}
+        )
+
+    assert exc_info.value.reason_code == reason_code
+    assert reason_code in str(exc_info.value)
+
+
+def test_cli_runtime_pressure_json_keeps_string_input_invalid() -> None:
+    overrides = _parse_runtime_campaign_overrides_json(
+        '{"C2B": {"p_total_mbar": "3"}}',
+        flag_name="--runtime-campaign-overrides",
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        CampaignManager.validate_runtime_campaign_overrides(overrides or {})
+
+    assert exc_info.value.reason_code == "runtime_campaign_p_total_mbar_not_numeric"
+
+
+def test_runtime_po2_override_above_total_refuses_without_clamping() -> None:
+    melt = MeltState()
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2B"] = {"pO2_mbar": 2.0}
+
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+        manager.configure_campaign(melt, CampaignPhase.C2B)
+
+    assert melt.p_total_mbar == pytest.approx(1.5)
+
+
+def test_cli_runtime_total_pressure_override_below_recipe_band_applies() -> None:
+    overrides = _parse_runtime_campaign_overrides_json(
+        '{"C2A": {"p_total_mbar": 3.0}}',
+        flag_name="--runtime-campaign-overrides",
+    )
+    assert overrides is not None
+    manager = CampaignManager(_setpoints())
+    manager.overrides.update(overrides)
+    melt = MeltState()
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.p_total_mbar == pytest.approx(3.0)
+
+
 def test_c2a_continuous_ramp_rates_use_yaml_midpoints():
     setpoints = _setpoints()
     bands = setpoints["campaigns"]["C2A_continuous"]["dT_dt_C_per_hr"]
@@ -479,8 +539,23 @@ def test_melt_pressure_validator_refuses_partial_pressure_above_total():
     melt.validate_melt_pressures()
 
     melt.pO2_mbar = 1.1
-    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total"):
+    with pytest.raises(ValueError, match="melt_pressure_partial_exceeds_total") as exc_info:
         melt.validate_melt_pressures()
+    assert exc_info.value.reason_code == "melt_pressure_partial_exceeds_total"
+
+
+def test_runtime_pressure_pair_refuses_po2_above_its_total():
+    with pytest.raises(ValueError) as exc_info:
+        CampaignManager.validate_runtime_campaign_overrides(
+            {"C4": {"pO2_mbar": 1.0, "p_total_mbar": 0.2}}
+        )
+
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_exceeds_total"
+    assert "0.2" in str(exc_info.value)
+
+    CampaignManager.validate_runtime_campaign_overrides(
+        {"C4": {"pO2_mbar": 0.2, "p_total_mbar": 0.2}}
+    )
 
 
 def test_configure_campaign_refuses_pO2_default_above_total():

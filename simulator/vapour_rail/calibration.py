@@ -33,8 +33,9 @@ from pathlib import Path
 from typing import Any, Final
 
 import yaml
-from simulator.yaml_cache import load_cached_safe_yaml
 
+from engines.engine_commissioning import vaporock_temperature_in_domain
+from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.melt_backend.melt_envelope import (
     MELT_EXTRAPOLATION_ENVELOPE_FIELDS,
@@ -403,7 +404,9 @@ def temperature_grid_K(
         raise ValueError("t_step must be positive")
     if t_min > t_max:
         raise ValueError("t_min must be <= t_max")
-    if t_min < VAPOROCK_T_MIN_K or t_max > VAPOROCK_T_MAX_K:
+    if not vaporock_temperature_in_domain(t_min) or not vaporock_temperature_in_domain(
+        t_max
+    ):
         raise ValueError(
             f"temperature grid must lie inside VapoRock domain "
             f"[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K"
@@ -411,7 +414,7 @@ def temperature_grid_K(
     count = int(round((t_max - t_min) / t_step))
     values = [round(t_min + i * t_step, 10) for i in range(count + 1)]
     if include_user_story_slice and USER_STORY_T_K not in values:
-        if VAPOROCK_T_MIN_K <= USER_STORY_T_K <= VAPOROCK_T_MAX_K:
+        if vaporock_temperature_in_domain(USER_STORY_T_K):
             values.append(USER_STORY_T_K)
             values.sort()
     return tuple(values)

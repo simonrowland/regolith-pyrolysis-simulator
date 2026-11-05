@@ -16,6 +16,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+import engines.engine_commissioning as engine_commissioning_module
 from engines.builtin import vapor_pressure as vapor_pressure_module
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.accounting.formulas import resolve_species_formula
@@ -34,7 +35,6 @@ from simulator.melt_backend.openimcc_bridge import (
     evaluate_cleaned_melt,
 )
 import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
-from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
 from simulator.run_executor import RunExecutor
 from simulator.runner import (
     PyrolysisRun,
@@ -48,8 +48,8 @@ ImccNonconvergenceError = _openimcc.ImccNonconvergenceError
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 REPO_ROOT = DATA_DIR.parent
-CAP_PLUS_T_K = VAPOROCK_T_MAX_K + 0.1
-CAP_MINUS_T_K = VAPOROCK_T_MAX_K - 0.1
+CAP_PLUS_T_K = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 0.1
+CAP_MINUS_T_K = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K - 0.1
 
 BASE_MELT_MOL = {
     "Na2O": 0.20,
@@ -591,7 +591,12 @@ def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     assert selected(temperature_K=1850.0, controls={})
     assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
     assert not selected(temperature_K=1950.0, controls={}, quantity_class="vapour")
-    assert selected(temperature_K=CAP_PLUS_T_K, controls={}, quantity_class="vapour")
+    assert selected(
+        temperature_K=(
+            vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 0.1
+        ),
+        controls={}, quantity_class="vapour",
+    )
     shifted = _provider().dispatch(_request(BASE_MELT_MOL, 1800.0))
     assert "high_t_melt_activity" not in shifted.diagnostic
     assert _physics(shifted) == _physics(_provider().dispatch(_request(
@@ -600,10 +605,48 @@ def test_binding_reads_lower_edge_from_default_pack(monkeypatch) -> None:
     monkeypatch.setattr(openimcc_bridge_module, "_load_pack", lambda _: pack)
     assert selected(temperature_K=1800.0, controls={})
     assert not selected(temperature_K=1800.0, controls={}, quantity_class="vapour")
-    assert selected(temperature_K=CAP_PLUS_T_K, controls={}, quantity_class="vapour")
+    assert selected(
+        temperature_K=(
+            vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 0.1
+        ),
+        controls={}, quantity_class="vapour",
+    )
     assert selected(
         temperature_K=openimcc_bridge_module._temperature_domain_K()[0], controls={},
     )
+
+
+def test_vaporock_band_move_does_not_move_vapour_channel_switch(monkeypatch) -> None:
+    shifted_max = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 100.0
+    monkeypatch.setattr(
+        engine_commissioning_module, "VAPOROCK_T_MAX_K", shifted_max,
+    )
+    monkeypatch.setattr(
+        vapor_pressure_module, "VAPOROCK_T_MAX_K", shifted_max, raising=False,
+    )
+
+    temperature_K = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 50.0
+    assert engine_commissioning_module.vaporock_temperature_in_domain(
+        temperature_K
+    ) is True
+    assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K, controls={}, quantity_class="vapour",
+    ) is True
+
+
+def test_vapour_channel_switch_move_does_not_move_vaporock_band(monkeypatch) -> None:
+    shifted_switch = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K + 100.0
+    monkeypatch.setattr(
+        vapor_pressure_module, "BUILTIN_VAPOUR_CHANNEL_SWITCH_K", shifted_switch,
+    )
+
+    temperature_K = vapor_pressure_module.BUILTIN_VAPOUR_CHANNEL_SWITCH_K - 50.0
+    assert vapor_pressure_module.openimcc_binding_selected_by_inputs(
+        temperature_K=temperature_K, controls={}, quantity_class="vapour",
+    ) is False
+    notice = engine_commissioning_module.vaporock_temperature_notice(temperature_K)
+    assert notice is not None
+    assert notice["certified_band"] == {"temperature_K": [1350.0, 1950.0]}
 
 
 def test_refused_openimcc_at_1800_k_keeps_existing_fallback_notice(monkeypatch) -> None:

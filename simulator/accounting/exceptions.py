@@ -9,6 +9,21 @@ class UnknownSpeciesError(AccountingError):
     """Raised when a species has no usable formula."""
 
 
+class UnparseableCompositionComponent(UnknownSpeciesError):
+    """A component name that neither formula parser accepts.
+
+    ``parse_formula`` raised ``AccountingError`` and JANAF
+    ``formula_composition`` returned no atoms. Decimal subscripts that
+    JANAF accepts (``FeO1.5``, ``KO0.5``) are not this error.
+    ``component`` is that name. ``predict_with_engine`` refuses the row.
+    Callers that already catch ``UnknownSpeciesError`` still catch this.
+    """
+
+    def __init__(self, component: str) -> None:
+        self.component = component
+        super().__init__(f"unparseable composition component {component!r}")
+
+
 class UnbalancedTransitionError(AccountingError):
     """Raised when a transition does not conserve atoms or mass."""
 

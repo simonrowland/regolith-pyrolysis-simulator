@@ -147,12 +147,12 @@ pdf_page,printed_table,row,column,printed_cell,confirmation
 7,3,155,ΔNa/(Na_init·t),4.28,MinerU + pdftotext; printed mantissa checked against 300 dpi render; inherits ×10^-3 column multiplier
 7,3,156,ΔNa/(Na_init·t),2.46,MinerU + pdftotext; printed mantissa checked against 300 dpi render; inherits ×10^-3 column multiplier
 7,3,157,ΔNa/(Na_init·t),2.38,MinerU + pdftotext; printed mantissa checked against 300 dpi render; inherits ×10^-3 column multiplier
-2,,"1250°C, Na2O·2SiO2",Na2O activity,6.56e-8,pdftotext; cell checked against PDF p. 2 render (MinerU did not cover pp. 1–5)
-2,,"1350°C, Na2O·2SiO2",Na2O activity,1.98e-7,pdftotext; cell checked against PDF p. 2 render (MinerU did not cover pp. 1–5)
-3,,"1250°C, xSiO2=0.5, Callow",Na2O activity,1.1e-7,pdftotext; cell checked against PDF p. 3 render (MinerU did not cover pp. 1–5)
-3,,"1250°C, xSiO2=0.67, Callow",Na2O activity,6.6e-9,pdftotext; cell checked against PDF p. 3 render (MinerU did not cover pp. 1–5)
-3,,"1250°C, xSiO2=0.5, Charles",Na2O activity,1.6e-6,pdftotext; cell checked against PDF p. 3 render (MinerU did not cover pp. 1–5)
-3,,"1250°C, xSiO2=0.67, Charles",Na2O activity,1.7e-8,pdftotext; cell checked against PDF p. 3 render (MinerU did not cover pp. 1–5)
+2,,1 250 °C,Na2O activity,6.56e-8,"PDF pp. 2–3; melt composition at PDF p. 3: Na2O·2SiO2; standard state at PDF p. 2: relative to the liquid standard state for Na2O·2SiO2 glass melt; ref. 22 as printed: D. M. Sanders and W. K. Haller: J. Amer. Ceram. Soc., 60 (1977), 138."
+2,,1 350 °C,Na2O activity,1.98e-7,"PDF pp. 2–3; melt composition at PDF p. 3: Na2O·2SiO2; standard state at PDF p. 2: relative to the liquid standard state for Na2O·2SiO2 glass melt; ref. 22 as printed: D. M. Sanders and W. K. Haller: J. Amer. Ceram. Soc., 60 (1977), 138."
+3,,xSiO2=0.5; 1 250 °C,Na2O activity,1.1e-7,"pdftotext; ref. 29 as printed: R.J. Callow: Trans. Faraday Soc., 46 (1950), 663.; standard state not printed; Na2O value estimated by Inoue and Suito"
+3,,xSiO2=0.67; 1 250 °C,Na2O activity,6.6e-9,"pdftotext; ref. 29 as printed: R.J. Callow: Trans. Faraday Soc., 46 (1950), 663.; standard state not printed; Na2O value estimated by Inoue and Suito"
+3,,xSiO2=0.5; 1 250 °C,Na2O activity,1.6e-6,"pdftotext; ref. 30 as printed: R. J. Charles: J. Amer. Ceram. Soc., 50 (1967), 631.; standard state not printed; Na2O value estimated by Inoue and Suito"
+3,,xSiO2=0.67; 1 250 °C,Na2O activity,1.7e-8,"pdftotext; ref. 30 as printed: R. J. Charles: J. Amer. Ceram. Soc., 50 (1967), 631.; standard state not printed; Na2O value estimated by Inoue and Suito"
 6,1,15,"slag SiO2, wt%",37.78,MinerU + pdftotext; row/column layout checked against page render
 6,1,16,"slag SiO2, wt%",40.66,MinerU + pdftotext; row/column layout checked against page render
 6,1,20,"slag SiO2, wt%",47.45,MinerU + pdftotext; row/column layout checked against page render
@@ -374,7 +374,7 @@ pdf_page,printed_table,row,column,printed_cell,confirmation
 6,2,151,Na2O/SiO2 (mole ratio),.36,MinerU + pdftotext; cell checked against 300 dpi page-6 render
 6,2,105,Na2O/SiO2 (mole ratio),.31,MinerU + pdftotext; cell checked against 300 dpi page-6 render
 6,2,106,Na2O/SiO2 (mole ratio),.56,MinerU + pdftotext; cell checked against 300 dpi page-6 render
-3,,xSiO2=.50; Callow,SiO2(l) activity,.13,pdftotext; prose value checked against 300 dpi page-3 render
-3,,xSiO2=.67; Callow,SiO2(l) activity,.6,pdftotext; prose value checked against 300 dpi page-3 render
-3,,xSiO2=.50; Charles,SiO2(l) activity,.009,pdftotext; prose value checked against 300 dpi page-3 render
-3,,xSiO2=.67; Charles,SiO2(l) activity,.38,pdftotext; prose value checked against 300 dpi page-3 render
+3,,xSiO2=0.5; 1 250 °C; Callow,SiO2(l) activity,.13,"pdftotext; ref. 29 as printed: R.J. Callow: Trans. Faraday Soc., 46 (1950), 663.; standard state not printed"
+3,,xSiO2=0.67; 1 250 °C; Callow,SiO2(l) activity,.6,"pdftotext; ref. 29 as printed: R.J. Callow: Trans. Faraday Soc., 46 (1950), 663.; standard state not printed"
+3,,xSiO2=0.5; 1 250 °C; Charles,SiO2(l) activity,.009,"pdftotext; ref. 30 as printed: R. J. Charles: J. Amer. Ceram. Soc., 50 (1967), 631.; standard state not printed"
+3,,xSiO2=0.67; 1 250 °C; Charles,SiO2(l) activity,.38,"pdftotext; ref. 30 as printed: R. J. Charles: J. Amer. Ceram. Soc., 50 (1967), 631.; standard state not printed"

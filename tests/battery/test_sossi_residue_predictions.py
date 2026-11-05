@@ -623,15 +623,22 @@ def test_sossi_below_liquid_floor_reaches_the_scored_notice(
     assert "1600" in (notice.band or "")
     assert "3000" not in (notice.band or "")
 
-    other_id = next(
-        str(experiment_id)
-        for experiment_id in {
-            row.experiment_id.rsplit("::", 1)[-1]
-            for row in context.observations.values()
-            if row.source_id == "kems-012-sossi-2019"
+    # Pick the comparison run from runs that actually carry an Mn residual, in
+    # sorted order: iterating a set of ids is hash-order dependent, and some
+    # Sossi rows have the source id itself as their short experiment id.
+    mn_run_ids = sorted(
+        {
+            reference.experiment_id.rsplit("::", 1)[-1]
+            for residual in residuals
+            if (reference := context.observations.get(residual.reference))
+            is not None
+            and reference.source_id == "kems-012-sossi-2019"
+            and reference.identity.species.formula == "Mn"
         }
-        if experiment_id != below_floor_run["id"]
+        - {below_floor_run["id"]}
     )
+    assert mn_run_ids
+    other_id = mn_run_ids[0]
     unflagged = manganese(other_id)
     assert unflagged.numeric is not None
     assert all(

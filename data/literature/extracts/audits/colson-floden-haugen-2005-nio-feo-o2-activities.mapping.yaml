@@ -1,0 +1,58 @@
+source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+source:
+  citation: Colson, R. O., Floden, A. M., Haugen, T. R., Malum, K. M., Sawarynski, M., Nermoe, M. K. B., Jacobs,
+    K. E., & Holder, D. (2005). Activities of NiO, FeO, and O2− in silicate melts. Geochimica et Cosmochimica Acta,
+    69(12), 3061–3073.
+extraction:
+  method: MinerU drafts reconciled against pdftotext and page renders
+  date: '2026-11-02'
+  worker: w1103co-co05
+review_status: draft
+tables:
+- page: 4
+  table_index: 2
+  type: activity_coefficient
+  quantity: FeO_voltammetric_peak_potential_Epk_as_printed
+  evidence_class: measured_direct
+  unit: mV
+  phase: l
+  published_page: 3064
+  rows: all
+  temperature:
+    as_printed: T (°C) for FeO experiments
+    unit: °C
+    locator:
+      page: 4
+      pdf_page_index: 3
+      published_page: 3064
+      table: '2'
+      column: T (°C) for FeO expts
+  values:
+  - column: 3
+    species: FeO
+    quantity: FeO_voltammetric_peak_potential_Epk_as_printed
+    evidence_class: measured_direct
+    unit: mV
+  render_verified:
+  - row: 4
+    column: 1
+    text: ggᵃ
+- page: 7
+  table_index: 3
+  type: activity_coefficient
+  quantity: activity_coefficient
+  evidence_class: author_derived
+  unit: dimensionless
+  phase: l
+  published_page: 3067
+  rows: all
+  values:
+  - column: 4
+    species: FeO
+    quantity: activity_coefficient
+    evidence_class: author_derived
+    unit: dimensionless
+  render_verified:
+  - row: 17
+    column: 4
+    text: 0.42ᵇ

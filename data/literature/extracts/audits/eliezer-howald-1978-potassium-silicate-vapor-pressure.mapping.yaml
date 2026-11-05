@@ -1,0 +1,37 @@
+source_id: eliezer-howald-1978-potassium-silicate-vapor-pressure
+source:
+  citation: 'Eliezer, N., Howald, R. A., Marinkovic, M., and Eliezer, I. (1978), Vapor Pressure Measurements, Thermodynamic Parameters, and Phase Diagram for the System Potassium Oxide-Silicon Oxide at High Temperatures.'
+extraction:
+  method: MinerU table drafts reconciled to pdftotext; PDF render used for table row and column placement and the Table II footnote-marked label.
+  date: '2026-11-02'
+  worker: w1103eh-eh78
+review_status: draft
+tables:
+- page: 3
+  table_index: 1
+  type: gibbs_table
+  quantity: partial_molar_enthalpy
+  evidence_class: author_derived
+  unit: kcal mol-1
+  phase: l
+  rows:
+  - 2
+  - 3
+  values:
+  - column: 2
+    species: KO0.5
+    quantity: partial_molar_enthalpy
+- page: 3
+  table_index: 1
+  type: gibbs_table
+  quantity: partial_molar_enthalpy
+  evidence_class: author_derived
+  unit: kcal mol-1
+  phase: l
+  rows:
+  - 2
+  - 3
+  values:
+  - column: 4
+    species: KO0.5
+    quantity: partial_molar_enthalpy

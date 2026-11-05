@@ -100,6 +100,7 @@ from simulator.battery.source_oxygen import (
     source_oxygen_closure_notice,
 )
 from simulator.battery.phase_field import is_outside_single_liquid_field_reason
+from simulator.physical_constants import GAS_CONSTANT
 from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
@@ -116,6 +117,8 @@ from simulator.battery.migrate import (
     fe3_fe2_ratio_from_oxide_wt_pct,
     observation_matches_source_tokens,
     path_matches_source_tokens,
+    _phase_for_sample_description,
+    _phase_for_recorded_vapour_sample,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -540,6 +543,202 @@ class EnginePrediction:
     refusal_detail: Mapping[str, object] = field(default_factory=dict)
     identity: Identity | None = None
     version: str | None = None
+
+
+@dataclass(frozen=True)
+class _FeOActivityStandard:
+    name: str
+    offset_j_mol: Decimal
+
+
+_INTERNAL_ANALYTICAL_FEO_STANDARD = _FeOActivityStandard(
+    name="JANAF-type",
+    offset_j_mol=Decimal(0),
+)
+_OPENIMCC_DEFAULT_PACK_VERSION = "1.0.3-d066-v1"
+_OPENIMCC_DEFAULT_PACK_DIGEST = (
+    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75"
+)
+_OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST = (
+    "b9c497901404b03b1d1e20bec58f2d4c0903f481af17ae82bfcf97ea7f4bf5e8"
+)
+_OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
+    "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
+)
+_OPENIMCC_DEFAULT_FEO_STANDARD = _FeOActivityStandard(
+    name="JANAF-type",
+    offset_j_mol=Decimal(0),
+)
+
+
+def _source_value(sources: Sequence[str], prefix: str) -> str | None:
+    return next(
+        (source[len(prefix):] for source in sources if source.startswith(prefix)),
+        None,
+    )
+
+
+def _resolve_feo_activity_standard(
+    engine: Engine,
+    coefficient_sources: Sequence[str],
+) -> tuple[_FeOActivityStandard | None, ResidualRefusal | None]:
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        return _INTERNAL_ANALYTICAL_FEO_STANDARD, None
+    if engine is not Engine.OPENIMCC:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "feo_activity_standard_not_declared",
+                "engine": engine.value,
+            },
+        )
+
+    condensate_digest = _source_value(
+        coefficient_sources,
+        "openimcc-condensate-table:sha256:",
+    )
+    if condensate_digest is not None and condensate_digest != (
+        _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+    ):
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "openimcc_feo_condensate_table_digest_mismatch",
+                "expected_condensate_table_digest": (
+                    _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+                ),
+                "actual_condensate_table_digest": condensate_digest,
+            },
+        )
+
+    gas_load_failure = _source_value(
+        coefficient_sources,
+        "openimcc-gas-datapack-load-failure:",
+    )
+    if gas_load_failure is not None and condensate_digest is None:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": (
+                    "openimcc_feo_gas_datapack_load_failed_"
+                    "condensate_identity_missing"
+                ),
+                "gas_load_failure": gas_load_failure,
+                "missing_identity": "condensate_table_digest",
+            },
+        )
+
+    redox_pack_digest = _source_value(
+        coefficient_sources,
+        "openimcc-redox-pack:sha256:",
+    )
+    if redox_pack_digest is not None:
+        if redox_pack_digest != _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST:
+            return None, ResidualRefusal(
+                RefusalReason.METRIC_DOMAIN,
+                {
+                    "reason": "openimcc_feo_redox_pack_digest_mismatch",
+                    "expected_redox_pack_digest": (
+                        _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST
+                    ),
+                    "actual_redox_pack_digest": redox_pack_digest,
+                },
+            )
+        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
+
+    pack_version = _source_value(
+        coefficient_sources,
+        "openimcc-pack-version:",
+    )
+    pack_digest = _source_value(
+        coefficient_sources,
+        "openimcc-pack-digest:",
+    )
+    if (
+        condensate_digest == _OPENIMCC_DEFAULT_CONDENSATE_TABLE_DIGEST
+        and pack_version == _OPENIMCC_DEFAULT_PACK_VERSION
+        and pack_digest == _OPENIMCC_DEFAULT_PACK_DIGEST
+    ):
+        return _OPENIMCC_DEFAULT_FEO_STANDARD, None
+
+    return None, ResidualRefusal(
+        RefusalReason.METRIC_DOMAIN,
+        {
+            "reason": "feo_activity_standard_not_declared",
+            "engine": engine.value,
+            "profile": pack_version or "unknown",
+        },
+    )
+
+
+def _canonical_log10_feo_activity(
+    log10_engine_activity: Decimal,
+    temperature_K: Decimal,
+    offset_j_mol: Decimal,
+) -> Decimal:
+    """Convert one FeO activity from its engine standard to JANAF Fe-019."""
+
+    if offset_j_mol == 0:
+        return log10_engine_activity
+    # Premise: μ = μ° + RT ln a for the same FeO chemical potential. With
+    # offset = G°(FeO,l | engine) - G°(FeO,l | JANAF Fe-019), equating the two
+    # μ values gives ln(a_canon) = ln(a_engine) + offset/(RT), then dividing
+    # by ln(10) gives log10(a_canon) = log10(a_engine) + offset/(RT ln 10).
+    # Unit check: J/mol divided by (J/(mol K) × K × ln 10) is dimensionless;
+    # the ln-to-log10 conversion is the explicit ln(10) divisor. Sanity:
+    # +9701.7 J/mol at 1649.15 K gives +0.3073 dex.
+    denominator = (
+        Decimal(str(GAS_CONSTANT))
+        * temperature_K
+        * Decimal(10).ln()
+    )
+    return log10_engine_activity + offset_j_mol / denominator
+
+
+def _canonicalize_feo_activity_prediction(
+    prediction: EnginePrediction,
+    *,
+    identity: Identity | None = None,
+) -> tuple[EnginePrediction | None, ResidualRefusal | None]:
+    if prediction.value is None:
+        return prediction, None
+    comparison_identity = prediction.identity or identity
+    if not isinstance(comparison_identity, Identity):
+        return prediction, None
+    if (
+        quantity_token(comparison_identity) is not Quantity.ACTIVITY
+        or comparison_identity.species is None
+        or comparison_identity.species.formula.strip().casefold() != "feo"
+    ):
+        return prediction, None
+
+    standard, refusal = _resolve_feo_activity_standard(
+        prediction.engine,
+        prediction.coefficient_sources,
+    )
+    if refusal is not None:
+        return None, refusal
+    assert standard is not None
+    if standard.offset_j_mol == 0:
+        return prediction, None
+
+    temperature_K = temperature_of(comparison_identity)
+    if temperature_K is None or temperature_K <= 0:
+        return None, ResidualRefusal(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "feo_activity_standard_temperature_missing",
+                "engine": prediction.engine.value,
+            },
+        )
+    if not prediction.value.is_finite() or prediction.value <= 0:
+        return prediction, None
+    log10_canonical = _canonical_log10_feo_activity(
+        prediction.value.log10(),
+        temperature_K,
+        standard.offset_j_mol,
+    )
+    return replace(prediction, value=Decimal(10) ** log10_canonical), None
 
 
 def _quantity_not_predicted_detail(quantity: Quantity) -> dict[str, str]:
@@ -1027,6 +1226,7 @@ SAMPLE_PHASE_NOT_MELT_ACTIVITY_OBSERVABLE = (
 SAMPLE_PHASE_CRYSTALLINE_VS_LIQUID_ENGINE = (
     "sample_phase_crystalline_vs_liquid_engine"
 )
+SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN = "liquid_model_vs_subsolidus_sample"
 
 
 def crystalline_sample_detail(
@@ -1071,22 +1271,37 @@ def melt_activity_sample_phase_refusal(
     )
 
 
-def _experiment_sample_phase(experiment: Experiment | None) -> Phase | None:
-    """Sample phase from ``experiment.sample.form`` through PHASE_MAP.
+def _experiment_sample_phase(
+    experiment: Experiment | None,
+    *,
+    include_characterization: bool = False,
+) -> Phase | None:
+    """Classify the recorded sample, optionally using its characterization.
 
-    The store does not carry a typed Phase on the experiment. A missing
-    form and untyped prose are None and stay on the scoring path.
+    The migration module owns the closed sample-phase vocabulary. The vapour
+    refusal keeps its existing form-only behavior; the additive domain notice
+    can also use a reviewed characterization when form is absent.
     """
 
     if experiment is None:
         return None
-    form = experiment.sample.form
-    if form is None or not form.state.is_value:
-        return None
-    value = form.state.value
-    if not isinstance(value, str):
-        return None
-    return phase_for_sample_form(value)
+    fields = [experiment.sample.form]
+    if include_characterization:
+        fields.append(experiment.sample.characterization)
+    for field in fields:
+        if field is None or not field.state.is_value:
+            continue
+        value = field.state.value
+        if not isinstance(value, str):
+            continue
+        phase = (
+            _phase_for_sample_description(value)
+            if include_characterization
+            else phase_for_sample_form(value)
+        )
+        if phase is not None:
+            return phase
+    return None
 
 
 def vapour_crystalline_sample_liquid_engine_refusal(
@@ -1136,6 +1351,57 @@ def vapour_crystalline_sample_liquid_engine_refusal(
             "compound": compound,
         }
     return detail
+
+
+def liquid_model_subsolidus_sample_notice(
+    identity: Identity,
+    *,
+    engine: Engine,
+    experiment: Experiment | None,
+    measured_condensed_form: object = None,
+    measured_sample_phase: object = None,
+    origin: str,
+) -> Notice | None:
+    """Nonblocking notice for a liquid model scored against a solid sample.
+
+    ``ENGINE_MODEL_CAVEAT`` carries this reason because the existing domain
+    kinds add flagged strata, which would change headline membership. The
+    notice preserves the current prediction, status, and eligibility.
+    """
+
+    if engine not in SINGLE_LIQUID_ENGINES:
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in _VAPOUR_EQUILIBRIUM:
+        return None
+    formula = identity.species.formula if identity.species is not None else ""
+    if rail_for_quantity(quantity, species_formula=formula) not in {
+        Rail.VAPOUR,
+        Rail.SIO_EVOLUTION,
+    }:
+        return None
+    row_phase_recorded, sample_phase = _phase_for_recorded_vapour_sample(
+        measured_condensed_form,
+        measured_sample_phase,
+    )
+    if not row_phase_recorded:
+        sample_phase = _experiment_sample_phase(
+            experiment,
+            include_characterization=True,
+        )
+    sample_phase_detail = crystalline_sample_detail(
+        sample_phase,
+        quantity=quantity,
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+    )
+    if sample_phase_detail is None:
+        return None
+    return Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=SAMPLE_PHASE_LIQUID_MODEL_OUT_OF_DOMAIN,
+        origin=origin,
+    )
 
 
 def _sample_phase_not_observable_prediction(
@@ -6121,6 +6387,8 @@ def _fe_redox_material(
             {"reason": "missing_input", "input": "composition"},
         )
     composition = composition_state.value
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         composition_wt = (
             {oxide: float(amount) for oxide, amount in composition.components}
@@ -6129,6 +6397,10 @@ def _fe_redox_material(
         )
         if composition_wt is None:
             raise ValueError("composition cannot be converted to oxide weights")
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        # predict_with_engine returns the typed row refusal.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
@@ -6321,17 +6593,30 @@ def _reported_engine_fe3_fe2_ratio(cell: object) -> Decimal | object | None:
 def _oxide_element_inventory(
     amounts: Mapping[str, object], *, amount_basis: AmountBasis
 ) -> dict[str, float]:
-    """Expand oxide amounts into element moles for the pinned openimcc solver."""
-    from simulator.accounting.formulas import parse_formula
+    """Expand oxide amounts into element moles for the pinned openimcc solver.
+
+    Atom counts are atoms_parse_formula_else_janaf. A mass-percent amount
+    is divided by oxide_molar_mass_g_mol, the same mass the weight map uses.
+    Both parsers failing raises UnparseableCompositionComponent.
+    """
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
     for oxide, amount in amounts.items():
-        formula = parse_formula(oxide, species=oxide)
+        name = str(oxide)
+        atoms = atoms_parse_formula_else_janaf(name)
+        if not atoms:
+            raise UnparseableCompositionComponent(name)
         formula_amount = float(amount)
         if amount_basis is AmountBasis.MASS_PERCENT:
-            formula_amount /= formula.molar_mass_g_mol
-        for element, atom_moles in formula.atom_moles(formula_amount).items():
-            inventory[element] = inventory.get(element, 0.0) + atom_moles
+            formula_amount /= oxide_molar_mass_g_mol(name)
+        for element, count in atoms:
+            inventory[element] = (
+                inventory.get(element, 0.0) + float(count) * formula_amount
+            )
     return inventory
 
 
@@ -6426,11 +6711,16 @@ def _predict_distin_closed_feo_activity(
             RefusalReason.IDENTITY_UNKNOWN,
             {"reason": "distin_closed_redox_temperature_missing"},
         )
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
     try:
         inventory = _oxide_element_inventory(
             dict(composition.components),
             amount_basis=composition.amount_basis,
         )
+    except UnparseableCompositionComponent:
+        # ValueError would relabel this invalid_redox_composition.
+        raise
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
         return refused(
             RefusalReason.INVALID_IDENTITY,
@@ -6508,6 +6798,12 @@ def _predict_distin_closed_feo_activity(
         identity,
         fO2_Pa=State.of(log10_fo2_to_pa(Decimal(str(fo2_log)))),
     )
+    # The pinned openimcc/data/packs/openimcc-redox-v1.json:294-318 row names
+    # JANAF Fe-019 and embeds its FeO(l) coefficients; its redox-pack digest
+    # therefore guards the standard used by this closed-redox result.
+    coefficient_sources = [
+        f"openimcc-redox-pack:sha256:{result.redox_pack_digest}"
+    ]
     return EnginePrediction(
         engine=engine,
         channel=channel,
@@ -6519,9 +6815,7 @@ def _predict_distin_closed_feo_activity(
         unit="dimensionless",
         authority=authority,
         notices=(*notices, oxygen_notice),
-        coefficient_sources=(
-            f"openimcc-redox-pack:sha256:{result.redox_pack_digest}",
-        ),
+        coefficient_sources=tuple(coefficient_sources),
         lineage_complete=False,
         certified_band={"temperature_K": band},
         identity=prediction_identity,
@@ -6651,11 +6945,16 @@ def _predict_fe_redox(
 
     if engine is Engine.OPENIMCC:
         assert fo2_log is not None
+        from simulator.accounting.exceptions import UnparseableCompositionComponent
+
         try:
             inventory = _oxide_element_inventory(
                 material.composition_wt,
                 amount_basis=AmountBasis.MASS_PERCENT,
             )
+        except UnparseableCompositionComponent:
+            # ValueError would relabel this invalid_redox_composition.
+            raise
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
             return refused(
                 RefusalReason.INVALID_IDENTITY,
@@ -8813,6 +9112,51 @@ def _predict_static_sodium_saturation(
     )
 
 
+def _engine_prediction_or_unparseable_component(
+    engine: Engine,
+    observation: Observation,
+    *,
+    handles: Mapping[str, object] | None = None,
+    isolated: bool | None = None,
+    experiment: Experiment | None = None,
+    bench: Bench | None = None,
+    fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
+) -> EnginePrediction:
+    """Return one prediction. One unparseable component refuses that row."""
+
+    from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+    try:
+        return _predict_with_engine(
+            engine,
+            observation,
+            handles=handles,
+            isolated=isolated,
+            experiment=experiment,
+            bench=bench,
+            fo2_mode=fo2_mode,
+        )
+    except UnparseableCompositionComponent as exc:
+        identity = (
+            observation.identity
+            if isinstance(observation.identity, Identity)
+            else None
+        )
+        return EnginePrediction(
+            engine=engine,
+            channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+            lineage_complete=False,
+            refusal_reason=RefusalReason.INVALID_SOURCE,
+            refusal_detail={
+                "reason": "unparseable_composition_component",
+                "component": exc.component,
+            },
+            identity=identity,
+        )
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -8826,7 +9170,7 @@ def predict_with_engine(
     """Dispatch one engine and close any handle opened for this call."""
 
     if isinstance(handles, dict):
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -8839,7 +9183,7 @@ def predict_with_engine(
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _predict_with_engine(
+        return _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -9886,6 +10230,14 @@ def _predict_with_engine(
                         ),
                         *openimcc_engine_identity_sources(
                             identity_block.get("engine_binding_identity")
+                        ),
+                        *(
+                            (
+                                "openimcc-gas-datapack-load-failure:"
+                                f"{identity_block['gas_load_failure']}",
+                            )
+                            if identity_block.get("gas_load_failure")
+                            else ()
                         ),
                         *(
                             f"{label}:{value}"
@@ -11540,6 +11892,24 @@ def compile_residual(
         approximate_value_notices,
         _quench_notices(reference),
     )
+    liquid_sample_domain_notice = (
+        liquid_model_subsolidus_sample_notice(
+            identity,
+            engine=engine,
+            experiment=experiment,
+            measured_condensed_form=(
+                (reference.provenance or {}).get("measured_condensed_form")
+            ),
+            measured_sample_phase=(
+                (reference.provenance or {}).get("measured_sample_phase")
+            ),
+            origin=reference.observation_id,
+        )
+        if isinstance(identity, Identity)
+        else None
+    )
+    if liquid_sample_domain_notice is not None:
+        notices = union_notices(notices, (liquid_sample_domain_notice,))
     if fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity is not None:
         from simulator.battery.fo2_ladder import engine_intrinsic_fo2_notice
 
@@ -12058,6 +12428,19 @@ def compile_residual(
         coefficient_sources=expanded_sources,
         lineage_complete=lineage_complete,
     )
+    if quantity is Quantity.ACTIVITY and formula.strip().casefold() == "feo":
+        canonical_prediction, standard_refusal = (
+            _canonicalize_feo_activity_prediction(prediction, identity=identity)
+        )
+        if standard_refusal is not None:
+            return _refused(
+                standard_refusal.reason,
+                standard_refusal.detail,
+                execution=prediction.execution,
+                extra_notices=prediction.notices,
+            )
+        assert canonical_prediction is not None
+        prediction = canonical_prediction
     from simulator.battery.compilation_tier import (
         is_compilation_evidence,
         uncertainty_text,

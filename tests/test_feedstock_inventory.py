@@ -1776,8 +1776,9 @@ def test_credit_line_k_product_route_is_removed_from_vapor_denominator():
         wall_route_species_order=("K",),
         wall_deposit_fraction_by_species={"K": 0.0},
         wall_deposit_account_fractions_by_species={"K": {}},
-        condensed_by_stage_species={4: {"K": 0.01}},
-        impurity_by_stage_species={4: {}},
+        condensed_by_stage_species={"stage_4b_k_trap": {"K": 0.01}},
+        impurity_by_stage_species={"stage_4b_k_trap": {}},
+        capture_kg_by_stage_identity={(4, 1): {"K": 0.01}},
     )
     sim._route_evaporated_species_to_condensation(route_result, "K", 0.01)
 

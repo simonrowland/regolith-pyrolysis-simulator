@@ -144,8 +144,8 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
 
     max(0.0, -1.0) is 0.0, which was written to melt.pO2_mbar and the
     C2A override and switched atmosphere to CONTROLLED_O2. The web path
-    already refuses pO2 < 0; this CLI/runner path must agree. inf is not
-    laundered by max(0, inf).
+    already refuses pO2 < 0; this CLI/runner path must agree. A valid
+    pO2 under the live total applies and does not raise that total.
     """
     from simulator.state import Atmosphere
 
@@ -163,15 +163,67 @@ def test_sio_wall_sweep_refuses_negative_pO2_before_floor() -> None:
         _current_melt_redox_fO2_log=lambda: -8.0,
         _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
     )
-    with pytest.raises(ValueError, match="non-negative"):
+    with pytest.raises(ValueError) as exc_info:
         _apply_sio_wall_sweep_controls(sim, pO2_mbar=-1.0)
+    assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_negative"
     assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.p_total_mbar == pytest.approx(10.0)
     assert sim.melt.atmosphere == "PN2_SWEEP"
     assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
 
     _apply_sio_wall_sweep_controls(sim, pO2_mbar=1.0)
     assert sim.melt.pO2_mbar == pytest.approx(1.0)
+    assert sim.melt.p_total_mbar == pytest.approx(10.0)
     assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+
+
+def test_sio_wall_sweep_refuses_nonfinite_po2_and_po2_above_total() -> None:
+    """NaN passes `value < 0`. pO2 above the live total used to raise it.
+
+    Both are refusals from the runtime pressure owner. A pO2 equal to
+    the total still applies and does not change p_total.
+    """
+    from simulator.state import Atmosphere
+
+    sim = SimpleNamespace(
+        campaign_mgr=SimpleNamespace(overrides={}),
+        melt=SimpleNamespace(
+            temperature_C=1450.0,
+            pO2_mbar=0.2,
+            p_total_mbar=0.2,
+            atmosphere="PN2_SWEEP",
+        ),
+        overhead=SimpleNamespace(composition={}),
+        _condensation_model=None,
+        _configure_overhead_headspace=lambda _campaign: None,
+        _current_melt_redox_fO2_log=lambda: -8.0,
+        _refresh_oxygen_reservoir_without_exchange=lambda **_kwargs: None,
+    )
+
+    for value in (float("nan"), float("inf")):
+        with pytest.raises(ValueError) as exc_info:
+            _apply_sio_wall_sweep_controls(sim, pO2_mbar=value)
+        assert exc_info.value.reason_code == "runtime_campaign_pO2_mbar_nonfinite"
+        assert sim.melt.pO2_mbar == pytest.approx(0.2)
+        assert sim.melt.p_total_mbar == pytest.approx(0.2)
+        assert sim.melt.atmosphere == "PN2_SWEEP"
+        assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+    with pytest.raises(ValueError) as exc_info:
+        _apply_sio_wall_sweep_controls(sim, pO2_mbar=1.0)
+    assert exc_info.value.reason_code == (
+        "runtime_campaign_pO2_mbar_exceeds_total"
+    )
+    assert sim.melt.pO2_mbar == pytest.approx(0.2)
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    assert "pO2_mbar" not in sim.campaign_mgr.overrides.get("C2A", {})
+
+    _apply_sio_wall_sweep_controls(sim, pO2_mbar=0.2)
+    assert sim.melt.pO2_mbar == pytest.approx(0.2)
+    assert sim.melt.p_total_mbar == pytest.approx(0.2)
+    assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert sim.campaign_mgr.overrides["C2A"]["pO2_mbar"] == pytest.approx(0.2)
+
 
 # Post 2026-05-20 Antoine P_sat refit: builtin SiO fallback fitted to VapoRock,
 # so evolved SiO dropped ~4700x to the activity-corrected magnitude.
@@ -586,12 +638,26 @@ def test_sio_yield_restored_capture_keeps_provenance_and_closure(feedstock):
     # therefore re-grounds the two cancellation residuals, not a free tuning
     # parameter; canonical atom-ledger closure remains independently bounded
     # at 5e-12 percent.
-    # 2026-11-01 merge re-pin from the production resolver after active-route
-    # gating skips Stage 3 once its purity gate diverts the parcel. The
-    # independent atom-ledger closure bound remains unchanged.
+    # t-1217 restores source-preserving causal capture and changes the bulk-
+    # inventory subtraction's roundoff path; b-850 parent-oxide alkali-dimer
+    # activities shift the SiO route, yielding midpoint-era 24-hour closure
+    # residuals of 6.164333585288513e-7% (lunar) and 2.2716051402658465e-7%
+    # (Mars). d-137fix4 integrates the Stage-3 band before applying the same
+    # excess-inventory balance; the production resolver now reports the pins
+    # below without relaxing the independent atom-ledger closure bound.
+    # The lunar pin is the studio-3 actual (pins2 log, tree 9666fc129 plus
+    # the de32c69ca runner regen). Lunar full runs diverge between the laptop
+    # and studio-3, so this value is not a laptop re-run.
+    # constack merge: repin on gate box
     expected_closure_error_pct = {
-        "lunar_mare_low_ti": 1.664998945735705e-6,
-        "mars_basalt": 4.4306088893138275e-7,
+        "lunar_mare_low_ti": 6.164333585288513e-7,
+        # r3's melt-to-headspace clamp advances fO2 only for oxygen committed
+        # from reservoir.fo2_buffer; the unbacked remainder is held and the
+        # resulting subtraction residual is reported by the production resolver.
+        # The piecewise segment solve changes the cancellation residual by
+        # 1.134167275e-14 percentage points from the single-exponential pin;
+        # canonical atom-ledger balance remains within 5e-12 percent.
+        "mars_basalt": 2.2716049134323923e-7,
     }
     assert diagnostics["closure_error_pct"] == pytest.approx(
         expected_closure_error_pct[feedstock], rel=1.0e-9, abs=1.0e-15
@@ -698,8 +764,9 @@ def test_band_aware_hkl_route_captures_sio_in_stage_3(
     )
 
     _assert_synthetic_sio_route_authority(route)
-    assert route.condensed_by_stage_species[3]["SiO"] > 0.0
-    assert 0.0 < route.condensed_by_stage_species[4]["SiO"] < 0.95
+    assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
+    assert 0.0 < route.condensed_by_stage_species[
+        "stage_4_alkali_mg_cyclone"]["SiO"] < 0.95
     # Cold-wall SiO now uses the Pound 1972 unity condensation gate below the
     # Wetzel/Gail evaporation-Arrhenius validity floor.
     # Production at ae5998456 explicitly reports P_sat=0 for that reactive
@@ -726,7 +793,7 @@ def test_synthetic_sio_route_without_carrier_authority_stays_unavailable():
     assert authority["authoritative_for_condensation"] is False
     assert refusal["upstream_authority_status"] == "missing"
     assert refusal["authoritative_for_condensation"] is False
-    assert route.condensed_by_stage_species[3]["SiO"] > 0.0
+    assert route.condensed_by_stage_species["stage_3_sio_zone"]["SiO"] > 0.0
     assert authority["authority_level"] == "extrapolated"
     assert authority["reason"] == "antoine_psat_unavailable_at_T"
     assert authority["valid_range_K"]
