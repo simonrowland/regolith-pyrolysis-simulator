@@ -2354,7 +2354,10 @@ class _MELTSBackendSupport(MeltBackend):
                        ALPHAMELTS_MAXT=str(start_T_C), ALPHAMELTS_CELSIUS_OUTPUT='true')
 
             def interact(process, deadline):
-                outputs = {'stdout': '', 'stderr': ''}
+                # One cooling path reads about 10k pipe chunks. Repeated str
+                # += copies the whole transcript each time, so the parent
+                # spends minutes in this loop. Append, and join once.
+                output_parts = {'stdout': [], 'stderr': []}
                 with selectors.DefaultSelector() as selector:
                     selector.register(process.stdout, selectors.EVENT_READ, 'stdout')
                     selector.register(process.stderr, selectors.EVENT_READ, 'stderr')
@@ -2363,9 +2366,15 @@ class _MELTSBackendSupport(MeltBackend):
                         if command is not None:
                             process.stdin.write(command)
                             process.stdin.flush()
-                        chunk = ''
+                        parts = []
+                        # The prompt can straddle two reads. Bytes already
+                        # scanned stay scanned; only the new read plus the
+                        # delimiter overlap is searched.
+                        marker = 'Your choice:'
+                        overlap = len(marker) - 1
+                        carry = ''
                         step_deadline = min(deadline, time.monotonic() + timeout_s)
-                        while 'Your choice:' not in chunk:
+                        while marker not in carry:
                             remaining = step_deadline - time.monotonic()
                             if remaining <= 0:
                                 raise subprocess.TimeoutExpired(process.args, timeout_s)
@@ -2373,10 +2382,15 @@ class _MELTSBackendSupport(MeltBackend):
                                 data = os.read(key.fileobj.fileno(), 65536).decode(errors='replace')
                                 if not data:
                                     raise ValueError('cooling process ended before completed row')
-                                outputs[key.data] += data
+                                output_parts[key.data].append(data)
                                 if key.data == 'stdout':
-                                    chunk += data
-                        return chunk
+                                    parts.append(data)
+                                    window = carry + data
+                                    if marker in window:
+                                        carry = marker
+                                    else:
+                                        carry = window[-overlap:]
+                        return ''.join(parts)
 
                     menu()
                     menu('1\ninput.melts\n')
@@ -2417,7 +2431,10 @@ class _MELTSBackendSupport(MeltBackend):
                     process.stdin.write('x\n')
                     process.stdin.flush()
                     stdout, stderr = process.communicate(timeout=max(.001, deadline-time.monotonic()))
-                    return outputs['stdout'] + stdout, outputs['stderr'] + stderr
+                    return (
+                        ''.join(output_parts['stdout']) + stdout,
+                        ''.join(output_parts['stderr']) + stderr,
+                    )
 
             try:
                 result = _run_alphamelts_subprocess(
