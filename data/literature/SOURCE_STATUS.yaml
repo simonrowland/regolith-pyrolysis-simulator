@@ -11,8 +11,8 @@ counts:
   sources: 2295
   by_stage:
     located: 209
-    inbox: 1265
-    in_progress: 231
+    inbox: 1262
+    in_progress: 234
     ingested_partial: 143
     ingested_complete: 130
     wired: 0
@@ -40,7 +40,7 @@ anti_loss:
     - 47f287c968f5ff395ee02d576f791832fe76c84f
   extract_mirror_parity:
     simulator_only:
-      count: 321
+      count: 324
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -225,6 +225,9 @@ anti_loss:
       - muan-1959-manganese-silica-air
       - mueller-2004-alkali-oxide-activity-coal-ash
       - myers-jacobson-2015-volatile-metal-hydroxides-presentation
+      - mysen-1984-alkaline-earth-redox
+      - mysen-1985-cmas-redox
+      - mysen-virgo-1989-nas-redox
       - naess-2014-liquid-silicon-oxidation-fume-flux
       - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
       - nagata-1989-emf-calcium-aluminates
@@ -24162,232 +24165,22 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mysen-1984-alkaline-earth-redox
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/mysen-1984-alkaline-earth-redox/SOURCE.md
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/DONE
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/mineru.log
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/056e9470b36ee0215208279ce50d18271e6fa8962fa78ee0122be4ddae0de602.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/0e001e7fe4bc2474a8ce9d5764a7d338e9f7d80f0d6a2021de8d90cb8c479898.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/0f5c3e884106939075f07723d5a92406fce27d7e0ab5ee809bca60f61a6e2208.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/2785d9dafe6d12380375e1d51164af44b3d49a00ba75ebfaad49f20c24ac17e8.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/2d98b871372cfe4a5ea5af72db02895cf23d2b1889e69960873aa302760e57d9.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/3106c7ce61dea64a8042022c5c582d9af9a8693f55acb538d49f6c96b40fd4d7.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/35d0a0c19682bd8b542edc545650764af5a5c61ec0f64609f51201e5f790e992.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/3f9c16a6de85542002ab400280a94f5804a16cadd8ff0eb398e87d87e50ce9c6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/4aa2a49441e19e05f99c6e649746241e6c7e2ebfa71262d703eaefaff8f3c699.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/4f6ad898ddcd321dd8d8b870db9bd1cd6583dc72bd62f77dbfd63f01702fc50c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/53d0ddaf2539999947062771b156020ba94595233b7621993fba09d73ead84a5.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/593d2f130b1d0b30be729e31dab5ae8484eb1b81206a1fda046a9aeb87ec3dd2.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/5bee77b837985669312405aac5657836d4826be5dc2e8431154042aec0eb8e9f.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/5d51ff112864ffa1bc48af1ca7ce3046a9b2380fe65cd95ce0e3b5ff8412ada1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/68de6ab0e5ab60a7fc908df52738d3265cc7ca9ef2f579b2f8c95b9a8a4b41af.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/6d3d222b0a395559abebeb9311bf4cf72dd06aafd4b2e12cce9c2cd9b47be3a0.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/72f3daedb9f5dd6135c6496c882fcbf0b35cd69a96bcf80f243cb6d443a075a1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/741b300e883c97238366097c170bed9ca7520ba6f0e9c123a29814a8a8a2318d.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/7bbe0a04dd475090420aaa9302d4f285b976aff29ff11a90a922786e0e019f90.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/815055b652518a59c3497769c36d22058cfaa4db63b7add512a24f185d1cf838.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/85e088e6f37d78c319bfdc81f9b35e19d5e5de0ea45334f18d02b398044eb6a1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/8d2856c29fc5aef489107ac0cbc72b0e90548807690cc3925ee19ba01f98bcb6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/920ac26cf20f3f64a5227ccf1c3eb21fd067fab1b982a67b105a927fbbc47976.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/9886abaa656ff9747ff5eb491028077eb4d0d5654af2c2cc64f1084472f52127.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/a363c8fcf5f5db5d2c76b2ace67918faa2b5cc89135f1de7d514a6d6730aa42c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/ad7aa82d34f15b0a2ba142fa22544c11b942efe0fdeed3b0516991f1ca8a60b6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/bc99ef5bb483d8e6be6f80400cdb995a04fe4a8e4d8a3eb55ce96ccbdf2871bb.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/c3d42ca37b6c3743816f1049b409f17b0908bd9c8dc7d7e9b15992851063ff20.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/c4f1e3fd3b27776c583fbbe51a67d1d05e15fb49230a0a2d39d1294015974a14.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/c7a74201adc95c11eda05f750c6775802007a867ecec0f034f7a4c6fead29f78.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/ce8933664e7340a2fc25d9504837b6beee3dab5b44477ee7b0473327e8e7257a.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/cf9a1771bba20803f0ea8e2c4a8e79448acb00aae73a3e3a354727f2abe786f6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/d2262975c100f6ca42c07a3c1d429a6220dc1d1eafb6984d0a9dcd4e40a6c0be.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/db6ebc960868095d5aff8acf900a1cd01d9ea6ca4220dfb693e62f86f47e415c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/ddb9c4ae47b61b57b67bee78e1d7cb763996c02b0c110c1cc6952682a07680af.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/e576385ed4d45eef57d2b3ed2469b0c2c2b373e95d40db47b199e0f7866e989e.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/e5b4ef5a7f44c6738dae43fa18483defdcc69b35560af5cd51b30bb7fdac904a.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/ea6094e066678d6ab2bbd3170e497185e3eeb3478439eaa0aa5329fc38544cf9.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/eb28fb48288c8732609eadb15205d7a90f2c1cf4cc8dafbfda26bce8d486b6c5.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/f6d39097dae1916acf706d90425af1eb640e0e8cc971d2819eb42a5107e88d58.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/images/fdb09c136b1d25959a2a6904c08cf3fdf679e857487fca3e1e6402dab70a3946.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/src-mysen-1984-alkaline-earth-redox-p001-p014.md
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/src-mysen-1984-alkaline-earth-redox-p001-p014_content_list.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/src-mysen-1984-alkaline-earth-redox-p001-p014_content_list_v2.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/src-mysen-1984-alkaline-earth-redox-p001-p014_middle.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru/AM69_834/p001-p014/out/src-mysen-1984-alkaline-earth-redox-p001-p014/vlm/src-mysen-1984-alkaline-earth-redox-p001-p014_model.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/DONE
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/mineru.log
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/056e9470b36ee0215208279ce50d18271e6fa8962fa78ee0122be4ddae0de602.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/0e001e7fe4bc2474a8ce9d5764a7d338e9f7d80f0d6a2021de8d90cb8c479898.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/0f5c3e884106939075f07723d5a92406fce27d7e0ab5ee809bca60f61a6e2208.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/2785d9dafe6d12380375e1d51164af44b3d49a00ba75ebfaad49f20c24ac17e8.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/2d98b871372cfe4a5ea5af72db02895cf23d2b1889e69960873aa302760e57d9.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/3106c7ce61dea64a8042022c5c582d9af9a8693f55acb538d49f6c96b40fd4d7.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/35d0a0c19682bd8b542edc545650764af5a5c61ec0f64609f51201e5f790e992.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/3f9c16a6de85542002ab400280a94f5804a16cadd8ff0eb398e87d87e50ce9c6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/4aa2a49441e19e05f99c6e649746241e6c7e2ebfa71262d703eaefaff8f3c699.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/4f6ad898ddcd321dd8d8b870db9bd1cd6583dc72bd62f77dbfd63f01702fc50c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/53d0ddaf2539999947062771b156020ba94595233b7621993fba09d73ead84a5.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/593d2f130b1d0b30be729e31dab5ae8484eb1b81206a1fda046a9aeb87ec3dd2.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/5bee77b837985669312405aac5657836d4826be5dc2e8431154042aec0eb8e9f.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/5d51ff112864ffa1bc48af1ca7ce3046a9b2380fe65cd95ce0e3b5ff8412ada1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/68de6ab0e5ab60a7fc908df52738d3265cc7ca9ef2f579b2f8c95b9a8a4b41af.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/6d3d222b0a395559abebeb9311bf4cf72dd06aafd4b2e12cce9c2cd9b47be3a0.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/72f3daedb9f5dd6135c6496c882fcbf0b35cd69a96bcf80f243cb6d443a075a1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/741b300e883c97238366097c170bed9ca7520ba6f0e9c123a29814a8a8a2318d.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/7bbe0a04dd475090420aaa9302d4f285b976aff29ff11a90a922786e0e019f90.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/815055b652518a59c3497769c36d22058cfaa4db63b7add512a24f185d1cf838.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/85e088e6f37d78c319bfdc81f9b35e19d5e5de0ea45334f18d02b398044eb6a1.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/8d2856c29fc5aef489107ac0cbc72b0e90548807690cc3925ee19ba01f98bcb6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/920ac26cf20f3f64a5227ccf1c3eb21fd067fab1b982a67b105a927fbbc47976.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/9886abaa656ff9747ff5eb491028077eb4d0d5654af2c2cc64f1084472f52127.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/a363c8fcf5f5db5d2c76b2ace67918faa2b5cc89135f1de7d514a6d6730aa42c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/ad7aa82d34f15b0a2ba142fa22544c11b942efe0fdeed3b0516991f1ca8a60b6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/bc99ef5bb483d8e6be6f80400cdb995a04fe4a8e4d8a3eb55ce96ccbdf2871bb.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/c3d42ca37b6c3743816f1049b409f17b0908bd9c8dc7d7e9b15992851063ff20.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/c4f1e3fd3b27776c583fbbe51a67d1d05e15fb49230a0a2d39d1294015974a14.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/c7a74201adc95c11eda05f750c6775802007a867ecec0f034f7a4c6fead29f78.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/ce8933664e7340a2fc25d9504837b6beee3dab5b44477ee7b0473327e8e7257a.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/cf9a1771bba20803f0ea8e2c4a8e79448acb00aae73a3e3a354727f2abe786f6.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/d2262975c100f6ca42c07a3c1d429a6220dc1d1eafb6984d0a9dcd4e40a6c0be.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/db6ebc960868095d5aff8acf900a1cd01d9ea6ca4220dfb693e62f86f47e415c.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/ddb9c4ae47b61b57b67bee78e1d7cb763996c02b0c110c1cc6952682a07680af.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/e576385ed4d45eef57d2b3ed2469b0c2c2b373e95d40db47b199e0f7866e989e.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/e5b4ef5a7f44c6738dae43fa18483defdcc69b35560af5cd51b30bb7fdac904a.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/ea6094e066678d6ab2bbd3170e497185e3eeb3478439eaa0aa5329fc38544cf9.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/eb28fb48288c8732609eadb15205d7a90f2c1cf4cc8dafbfda26bce8d486b6c5.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/f6d39097dae1916acf706d90425af1eb640e0e8cc971d2819eb42a5107e88d58.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/images/fdb09c136b1d25959a2a6904c08cf3fdf679e857487fca3e1e6402dab70a3946.jpg
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014.md
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014_content_list.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014_content_list_v2.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014_middle.json
-    - raw/mysen-1984-alkaline-earth-redox/mineru-AM69_834/p001-p014/out/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014/vlm/src--mysen-1984-alkaline-earth-redox--AM69_834-p001-p014_model.json
-    - raw/mysen-1984-alkaline-earth-redox/mysen-1984-alkaline-earth-redox.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mysen-1985-cmas-redox
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/mysen-1985-cmas-redox/SOURCE.md
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/DONE
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/mineru.log
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/00497631942865934527c2662d784580d9aaaab8cc46ffcbb64063f295fe033f.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/049fe2d274cbf1e0de85093cbef16cd237b26e302aa44e967ca368ecfffedd27.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/04b6b68c9d0a684a8f8cc65cdcf8b7b074a54e21f6006861a659e60d212fb1af.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/081094ce0c16b00fdaf140cd7fd768db74a96aee7381e44ba393bddf3a967128.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/0a1ba7993d39729da9a0782625489116ca5b09f3fb722f99940e2cd1e22369b0.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/0b3d53ec8c68353689a970b4b0c97d1f75fdc2d2911281483a8cd0f933ce1b39.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/14b5acf189a6aff197ed0e11e01078029fed3a26ca1c84b2a92f7ba39c601f6e.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/1b6f40fee250c999a52b9b6387d87d88ed93823d9df8055dee0a71c2a9f35564.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/2d32ef92bff708ec2064d108020567ac99d5fd9fe1b45deb1553a2d04b6115d3.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/2fd70ba1ff70eaff846d86d86ffff43479b3d269d69d8b4d5b851e93232f660d.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/3e91173326cfae59c52bc45e0e3133e4536bf3fd49b631eb2074076f9a820db4.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/3ffa2f5e153f8b3df514926821f155c0154f2a204fe8291de186ed72a19309dc.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/40806acbef7754cf2d18505d16dcbdcfd343bd9e377c66d79eb39c46fd51942f.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/4ad0627e34611ecdadee3dd581c4ae947ea21958d65483f784fd2038d4ff30dc.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/4be4dc37ca20806cc75a110820b444ba578609f10510bea0a863110ed44691e8.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/4d2862b320632ed46dd1fe2c39441e91a20c9692ac7218a3d016a2c0e9272cb9.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/50589434afa37c05b4d42060f2e3e4d3884f71874637c9fbcbd7b14ed74dad8f.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/54294b2d83782f2c3faf7ed7e67b16c67f90b13d0ab4679cdc4974ad633b7ccd.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/569f8558997d2ff04fb239a53442a27cf0b86ca95fa3b3c84ac3b859872e559a.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/5b6d83bc177815860a367c4cafeb4d85a87eeac22531e766a0793bf206f1fb44.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/5db1e085581b70b9a1fcbcf71d9f329480207c8d56d8a2044a7d3fff4e512c50.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/635ed6bdc43b013fed3b956badb564ddbcc673c010a8623fcdc77f9e3fabad67.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/6613964d685af57d7a4fe65783004cdc7535dc127809ad00df6c93f82640f941.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/6836415bc49eeaea9d656db2d3a77ec38f72547c16a493e77f4be0539843340a.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/68e0f17b14a382ebba6612d22824e4562553216a8add4d3455908f4c13c96397.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/6b83b6903eb50843076b0d53a13637fdae88c9bd0850b7d4009eb92c4c7da17d.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/6d928e2d7ee0625e10a95b602aa45006f551e2faffa56b99c4f76fdc8f043b8e.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/6f976ec8b4bc367b94cc9e78156772aad54775ac9a28bf7f90a4bb4973bc83fa.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/742d37cfa5071e32b766e7034a09c51803d567526c74d45c9b376203222bec6e.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/820626c237dc05c1c59c841916b31f3264e9b75e362d5ce5709e023913236a48.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/9410be9db4401b6739b0840e9c07cf8f5c2273391e02045958dbb56d5eaeb27f.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/9714c862bd257a85edb9c3b439ef5dcada6a9903d9f20e1bdcd573d2fad44111.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/9cf5ee94c4bcab69dcc4b41a8203b29613f5bad73873796aa02f2987eddd2f5c.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/a0478e4b3c5c15d0dcf7f6555f87b8e1dad62a7b67e4af654062b1df290dbe84.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/a3bedb8719aa4ff6bf25168111081c3256bba33d3fa148b89002c0c96d374324.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/a95136fc407cfa5cfbbd33c59ed7a0cb583d2ccef73162a0226be4a72a2a4d5a.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/aa6ffd013b1f458dd37b147f469fdd9774eaad049ec3af7466fb51eb95eeb41f.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/c304256381806208a3867c4e0cce3f87c2173430ebcd794f4cba866a653f6adc.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/c75f4e7d018ec6bccd7350c2ad3837965e82679ad7c6a73ea2e61a0c69a09f7e.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/cb6d5f858f12613f774681bdc726d6590060d8a6757df3b2646eba83ae9d7221.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/e645cb7c957ce605531803e3cf7512279ab90e5e459ca6c445c00a8463624da0.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/ed7140776d930bcd5630031f976b3267b9217a0371108ef06be816a710ab00cf.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/f71c879acd58ca0b002468a3de6d711c7c1c70b98a100bb4336cf38fd44c5cf7.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/f927c549cbba48edb52c3ea6c1d0a2751cf234858376e4727882c21f4a88d9b8.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/f991bbc46bab9e03400adb1b67d4d0b8b8000f9a8c5fcbeee8190f55d86149e3.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/fc7001bbfd9ffebfa14b4ef8acc35700753ca172c1bb8d6ebf2d0467219bc496.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/fc9773ed765490fb5ae7f53e56945dcd4638b68651cddc4f8c4683eb417cb567.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/fe0445366334831fd5f6d75967b0cc5dbddefd34377429fab683f14b230f0cb7.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/images/fe3de8afbf0c11951b5ff763dcb46990040e78520d25fe7388ceb9cc4e57ed85.jpg
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/src-mysen-1985-cmas-redox-p001-p015.md
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/src-mysen-1985-cmas-redox-p001-p015_content_list.json
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/src-mysen-1985-cmas-redox-p001-p015_content_list_v2.json
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/src-mysen-1985-cmas-redox-p001-p015_middle.json
-    - raw/mysen-1985-cmas-redox/mineru/AM70_317/p001-p015/out/src-mysen-1985-cmas-redox-p001-p015/vlm/src-mysen-1985-cmas-redox-p001-p015_model.json
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/DONE
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/mineru.log
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/00497631942865934527c2662d784580d9aaaab8cc46ffcbb64063f295fe033f.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/049fe2d274cbf1e0de85093cbef16cd237b26e302aa44e967ca368ecfffedd27.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/04b6b68c9d0a684a8f8cc65cdcf8b7b074a54e21f6006861a659e60d212fb1af.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/081094ce0c16b00fdaf140cd7fd768db74a96aee7381e44ba393bddf3a967128.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/0a1ba7993d39729da9a0782625489116ca5b09f3fb722f99940e2cd1e22369b0.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/0b3d53ec8c68353689a970b4b0c97d1f75fdc2d2911281483a8cd0f933ce1b39.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/14b5acf189a6aff197ed0e11e01078029fed3a26ca1c84b2a92f7ba39c601f6e.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/1b6f40fee250c999a52b9b6387d87d88ed93823d9df8055dee0a71c2a9f35564.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/2d32ef92bff708ec2064d108020567ac99d5fd9fe1b45deb1553a2d04b6115d3.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/2fd70ba1ff70eaff846d86d86ffff43479b3d269d69d8b4d5b851e93232f660d.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/3e91173326cfae59c52bc45e0e3133e4536bf3fd49b631eb2074076f9a820db4.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/3ffa2f5e153f8b3df514926821f155c0154f2a204fe8291de186ed72a19309dc.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/40806acbef7754cf2d18505d16dcbdcfd343bd9e377c66d79eb39c46fd51942f.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/4ad0627e34611ecdadee3dd581c4ae947ea21958d65483f784fd2038d4ff30dc.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/4be4dc37ca20806cc75a110820b444ba578609f10510bea0a863110ed44691e8.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/4d2862b320632ed46dd1fe2c39441e91a20c9692ac7218a3d016a2c0e9272cb9.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/50589434afa37c05b4d42060f2e3e4d3884f71874637c9fbcbd7b14ed74dad8f.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/54294b2d83782f2c3faf7ed7e67b16c67f90b13d0ab4679cdc4974ad633b7ccd.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/569f8558997d2ff04fb239a53442a27cf0b86ca95fa3b3c84ac3b859872e559a.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/5b6d83bc177815860a367c4cafeb4d85a87eeac22531e766a0793bf206f1fb44.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/5db1e085581b70b9a1fcbcf71d9f329480207c8d56d8a2044a7d3fff4e512c50.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/635ed6bdc43b013fed3b956badb564ddbcc673c010a8623fcdc77f9e3fabad67.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/6613964d685af57d7a4fe65783004cdc7535dc127809ad00df6c93f82640f941.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/6836415bc49eeaea9d656db2d3a77ec38f72547c16a493e77f4be0539843340a.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/68e0f17b14a382ebba6612d22824e4562553216a8add4d3455908f4c13c96397.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/6b83b6903eb50843076b0d53a13637fdae88c9bd0850b7d4009eb92c4c7da17d.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/6d928e2d7ee0625e10a95b602aa45006f551e2faffa56b99c4f76fdc8f043b8e.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/6f976ec8b4bc367b94cc9e78156772aad54775ac9a28bf7f90a4bb4973bc83fa.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/742d37cfa5071e32b766e7034a09c51803d567526c74d45c9b376203222bec6e.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/820626c237dc05c1c59c841916b31f3264e9b75e362d5ce5709e023913236a48.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/9410be9db4401b6739b0840e9c07cf8f5c2273391e02045958dbb56d5eaeb27f.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/9714c862bd257a85edb9c3b439ef5dcada6a9903d9f20e1bdcd573d2fad44111.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/9cf5ee94c4bcab69dcc4b41a8203b29613f5bad73873796aa02f2987eddd2f5c.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/a0478e4b3c5c15d0dcf7f6555f87b8e1dad62a7b67e4af654062b1df290dbe84.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/a3bedb8719aa4ff6bf25168111081c3256bba33d3fa148b89002c0c96d374324.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/a95136fc407cfa5cfbbd33c59ed7a0cb583d2ccef73162a0226be4a72a2a4d5a.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/aa6ffd013b1f458dd37b147f469fdd9774eaad049ec3af7466fb51eb95eeb41f.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/c304256381806208a3867c4e0cce3f87c2173430ebcd794f4cba866a653f6adc.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/c75f4e7d018ec6bccd7350c2ad3837965e82679ad7c6a73ea2e61a0c69a09f7e.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/cb6d5f858f12613f774681bdc726d6590060d8a6757df3b2646eba83ae9d7221.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/e645cb7c957ce605531803e3cf7512279ab90e5e459ca6c445c00a8463624da0.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/ed7140776d930bcd5630031f976b3267b9217a0371108ef06be816a710ab00cf.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/f71c879acd58ca0b002468a3de6d711c7c1c70b98a100bb4336cf38fd44c5cf7.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/f927c549cbba48edb52c3ea6c1d0a2751cf234858376e4727882c21f4a88d9b8.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/f991bbc46bab9e03400adb1b67d4d0b8b8000f9a8c5fcbeee8190f55d86149e3.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/fc7001bbfd9ffebfa14b4ef8acc35700753ca172c1bb8d6ebf2d0467219bc496.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/fc9773ed765490fb5ae7f53e56945dcd4638b68651cddc4f8c4683eb417cb567.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/fe0445366334831fd5f6d75967b0cc5dbddefd34377429fab683f14b230f0cb7.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/images/fe3de8afbf0c11951b5ff763dcb46990040e78520d25fe7388ceb9cc4e57ed85.jpg
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/src--mysen-1985-cmas-redox--AM70_317-p001-p015.md
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/src--mysen-1985-cmas-redox--AM70_317-p001-p015_content_list.json
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/src--mysen-1985-cmas-redox--AM70_317-p001-p015_content_list_v2.json
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/src--mysen-1985-cmas-redox--AM70_317-p001-p015_middle.json
-    - raw/mysen-1985-cmas-redox/mineru-AM70_317/p001-p015/out/src--mysen-1985-cmas-redox--AM70_317-p001-p015/vlm/src--mysen-1985-cmas-redox--AM70_317-p001-p015_model.json
-    - raw/mysen-1985-cmas-redox/mysen-1985-cmas-redox.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/mysen-1985-cmas-redox.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -24546,163 +24339,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: mysen-virgo-1989-nas-redox
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/mysen-virgo-1989-nas-redox/SOURCE.md
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/DONE
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/mineru.log
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/051535b9147518e1c962be994c2bbdd46fb9dbd477db140bb995f0c6bb3c3495.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/12dcb5e17fd586effd7213715dfc1f2fe377405b002be43e634f04b27c22d367.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/12fb095ae877f6031c2fcf5a93a1b7a5fcea488fb0d7cf7b9a0df26ce7e457a1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/16b1fcde3fa849c2fe1a6d1b543c5e74b2f6ea0c1e42845611594a7812ec46cc.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/17170ab4732721efbf952a56076cc73514ae1b4b622cc9da5cd84d2432879a24.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/20c8bcb330694fb9ba48a48a95defb78c306898b24c3459076fd4e6bf180fdde.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/212ed7ea7583fa185324c84fa8fc289d3a5a20b8b639a65411128dd61c9bf3ad.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/21af70870442299aa56773ed0bf3f586815a0c5d2fe29e3059a2da57feb47177.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/2b565372844ca9ecb51b0403116b7fdf90b007f103c4e0018c069ffe16e3ee1e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/2ffba741489fba222ebf2282c717c97bafc00b3ccf9947aaa9070f8795825763.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/3538257316b39e684123ff14bea5a0571704e0b08d02e84f82e8ead7d3651998.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/3a78be4de0ea89e90e3f4c2205c4c3e242092fce847738769ed8b97090ce5233.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/3dbb763dd81490c5606beaf5d64be8891163b768f5400c4e3059fb32c9b4846d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/3ee46fd0073c317fef03facc175a7921570ddd3e00bc7eeb7d751ed56cedc92c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/4154d5aea1f85bac5c1f3446cc80f7463dc1037740b5b6dcaea14d37f1e5a0f8.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/44fd7ad92b4a523bd9ee4eaf69dbda9faef558d8ae9e1f36cc3bdabb6eed270e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/478ba61ae5087e00e6e9b762419e6cf7604718005f4a82d54ff9f7ef2e590653.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/4b4ffe053329fcdd3235e30188fe281186a4332e16db334c30204aaddcf727da.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/5032e438c5f9b46a3359cb88ec23dc8960fe5db4d2a0e0a4ebaa75e9efb824c2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/51d8e7a30a551e5de77b70ca6c295dd6601d9eb8c823160167256408ae21d220.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/53329b20cc40fba46c46799df7f5e334084729ee87acb7f833c96ae1c3bb4bc2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/5f4763d83cb2363e4fc3f748ecf867f5628a9803b629352a793dcafa6b46afc9.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/60313b1f56ce01b014f54c7c0ed2becd2eb59be4ffeba57826d594743dd665ef.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/6163a312ad183dfe3b25c741418c59f5cfa262561da582386ef0f3460c813e8e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/6525f96362bac444cf2ef785f82289d1110350035790ee457a2bff3b8c9f9020.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/663be8d074e46437e769a8fdca98d79153c7a7dbac10ac703a64e9a92e13cdee.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/720be081f44b767ba6c0e9df2c4ea9eb81901bef7e3822dcc3a45bcc4cce972d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/76c7824d3e4b50fb44034df8a036671fe2e97ff7b83d2f6343a84533ad704368.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/7d199731ce1856a1e0426006603c534199b895ae3ce08a75297f5076bcf55c47.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/8115ab9cac6a98ef997b0ef8a2e9e004de95a6b313c9ae30e3e70f95de48ec05.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/895994fe523ab2f393532d44c687197c45977d7d5ae10ca8351ab037d46840d1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/90cf3aa1b04a7ad7c84f43694050b6786abed832ad979c47ec9196e2959fb4f8.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/9b70835a2497a6d2235064d8bc72f60fe2e637c39a1e4cc5e0419fe67c46df9f.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/9e1a2b078587d75d531b0f5a6ae7872b9ba49ef1186aae392b1aaab5747c9cbf.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a1070028d13c7b8ec3be24ef4652f574b0a35c46d77fdbf2bf14fe34c931ebeb.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a2846fa6e4831fd9a4d2698fa571b3cc0e398e05b216c9904a60cb1a513995dc.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a3945fa9ff2a7a802e7a8fc0210d7d0ecdb7a39258b1f30493548e401d92fbf2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a509509937a5238d0727bfafc12489bf6fcd4fd096971d4e2af2cfe18886d33f.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a6bc093122a263cf16a097ccd0b7e3665bd84c17d1aff812fb09229377ae9b84.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a776350055e75e7420584a8f13abaeb6ddab60fe1ddcd23655a6e27aee5877a0.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a90ee9daabd03a524847400e13ce1638a6b5de4dd15856a7314d8ef86aafd2d7.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/a971197ea7fc9bbd8dabada187fe9284c4ca142c227345489a49e50262124a52.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/aabdb940fe3db3bac45b773be57d8eabd09bead0b0b51a48be3199020e89ebec.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/b03c7004bac00b006af3367529b2f1be67ce134497543bdc4a2a7eb891720820.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/b10c9cbe182904f3bea05c93e161fa3cc764cd21b1efe04ef37ea3b280a6e9b5.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/b55278aeccc735b696c354b09840733e71e28d39cf9463aebd4c544d9e3d1314.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/b9f8cd8443c00c0166505a3f0e0a806d3a9d32164f56d4038ad9917922538a6d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/ba41ca1fc73102237444682812d457b073b8f6703e1955cbb797d14c274c1e2c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/ba7298cfd23ac9f665588dae7f51c8f44125bafed059772b1bbc36c47fe33f85.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/bc7a3c055d3cc4c24b79f02ce35eff3587ad7aeee0f30ee341cdd27d02e92f05.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/bcbc7bbc1a17c2b5c7ffcc9cc77ef75601259befa29ab91627432249957c6322.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/c2f1c86a770af907510451f082bd7c5896cba0349134b8301a9d5e341b2bddf1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/c9c193584f9a4bf86deb1617ed9b62ec726212ccf2a76b3fb4a631311ea549b2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/cb55f76874acff521aa3dc156377c9f63a48be720d06964ff7f6b6fa74c80786.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/d271e28129df04c6d1c3df1538419fe916939a12bb2ba8f5d5325805fafcaac3.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/d52f554ae428e5db68669b7278f22412a195ca1365a0e4a1ef56c18095523766.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/df40513483b841f6553121652a771a703fc85f674f4cccf23d88a86f36a48c74.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/e167edd8c9b022a71cbdc1aae1d36d7c268c33fd2de03ea54c5875c5595d6650.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/e1ddf92a69f466e00eeeeebe8397057d1a9cd171c0400ad3eea82bc860811b30.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/e77dae00a1dde94794a03c97d6f89fd2b754ae2d7dcc2faeb0aa0ad2c70d224c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/e9b3775dd54f999af40443e03bbd02f2dd28d798dfb7462ed4834c685afdc8b5.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/ebb41c524ddf68c0eb617762bae3991ca6fc542b0ef66339e73955bdc3e2a96c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/ee32832ed0d987005797dd703d79ebb37104351e50edff387cfa2dd07592db38.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/f210e7156afc6317bc23c0fa723fc4b7f1ce6622a271918875bac3dda905adf3.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/f33e93ae5d21fdbe9c87daf04a56a63d049f0d7e0b5d5f801b553f0fdea26019.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/fcaaa3af33c579455883313822711a9309a6241c9edb7f08392e2034835d4abf.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/fe6ef84ba77ca82a0c12ce2a8d2cba6c631436c7aa37205d8ed194be32022c91.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/images/ff6c0aa8a1f02e6c00139a577d468f51dc67cd76b2a3afb6d9916415a8f08c2a.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/src-mysen-virgo-1989-nas-redox-p001-p019.md
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/src-mysen-virgo-1989-nas-redox-p001-p019_content_list.json
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/src-mysen-virgo-1989-nas-redox-p001-p019_content_list_v2.json
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/src-mysen-virgo-1989-nas-redox-p001-p019_middle.json
-    - raw/mysen-virgo-1989-nas-redox/mineru/AM74_58/p001-p019/out/src-mysen-virgo-1989-nas-redox-p001-p019/vlm/src-mysen-virgo-1989-nas-redox-p001-p019_model.json
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/DONE
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/mineru.log
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/051535b9147518e1c962be994c2bbdd46fb9dbd477db140bb995f0c6bb3c3495.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/12dcb5e17fd586effd7213715dfc1f2fe377405b002be43e634f04b27c22d367.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/12fb095ae877f6031c2fcf5a93a1b7a5fcea488fb0d7cf7b9a0df26ce7e457a1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/16b1fcde3fa849c2fe1a6d1b543c5e74b2f6ea0c1e42845611594a7812ec46cc.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/17170ab4732721efbf952a56076cc73514ae1b4b622cc9da5cd84d2432879a24.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/20c8bcb330694fb9ba48a48a95defb78c306898b24c3459076fd4e6bf180fdde.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/212ed7ea7583fa185324c84fa8fc289d3a5a20b8b639a65411128dd61c9bf3ad.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/21af70870442299aa56773ed0bf3f586815a0c5d2fe29e3059a2da57feb47177.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/2b565372844ca9ecb51b0403116b7fdf90b007f103c4e0018c069ffe16e3ee1e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/2ffba741489fba222ebf2282c717c97bafc00b3ccf9947aaa9070f8795825763.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/3538257316b39e684123ff14bea5a0571704e0b08d02e84f82e8ead7d3651998.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/3a78be4de0ea89e90e3f4c2205c4c3e242092fce847738769ed8b97090ce5233.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/3dbb763dd81490c5606beaf5d64be8891163b768f5400c4e3059fb32c9b4846d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/3ee46fd0073c317fef03facc175a7921570ddd3e00bc7eeb7d751ed56cedc92c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/4154d5aea1f85bac5c1f3446cc80f7463dc1037740b5b6dcaea14d37f1e5a0f8.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/44fd7ad92b4a523bd9ee4eaf69dbda9faef558d8ae9e1f36cc3bdabb6eed270e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/478ba61ae5087e00e6e9b762419e6cf7604718005f4a82d54ff9f7ef2e590653.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/4b4ffe053329fcdd3235e30188fe281186a4332e16db334c30204aaddcf727da.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/5032e438c5f9b46a3359cb88ec23dc8960fe5db4d2a0e0a4ebaa75e9efb824c2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/51d8e7a30a551e5de77b70ca6c295dd6601d9eb8c823160167256408ae21d220.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/53329b20cc40fba46c46799df7f5e334084729ee87acb7f833c96ae1c3bb4bc2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/5f4763d83cb2363e4fc3f748ecf867f5628a9803b629352a793dcafa6b46afc9.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/60313b1f56ce01b014f54c7c0ed2becd2eb59be4ffeba57826d594743dd665ef.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/6163a312ad183dfe3b25c741418c59f5cfa262561da582386ef0f3460c813e8e.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/6525f96362bac444cf2ef785f82289d1110350035790ee457a2bff3b8c9f9020.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/663be8d074e46437e769a8fdca98d79153c7a7dbac10ac703a64e9a92e13cdee.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/720be081f44b767ba6c0e9df2c4ea9eb81901bef7e3822dcc3a45bcc4cce972d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/76c7824d3e4b50fb44034df8a036671fe2e97ff7b83d2f6343a84533ad704368.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/7d199731ce1856a1e0426006603c534199b895ae3ce08a75297f5076bcf55c47.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/8115ab9cac6a98ef997b0ef8a2e9e004de95a6b313c9ae30e3e70f95de48ec05.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/895994fe523ab2f393532d44c687197c45977d7d5ae10ca8351ab037d46840d1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/90cf3aa1b04a7ad7c84f43694050b6786abed832ad979c47ec9196e2959fb4f8.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/9b70835a2497a6d2235064d8bc72f60fe2e637c39a1e4cc5e0419fe67c46df9f.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/9e1a2b078587d75d531b0f5a6ae7872b9ba49ef1186aae392b1aaab5747c9cbf.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a1070028d13c7b8ec3be24ef4652f574b0a35c46d77fdbf2bf14fe34c931ebeb.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a2846fa6e4831fd9a4d2698fa571b3cc0e398e05b216c9904a60cb1a513995dc.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a3945fa9ff2a7a802e7a8fc0210d7d0ecdb7a39258b1f30493548e401d92fbf2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a509509937a5238d0727bfafc12489bf6fcd4fd096971d4e2af2cfe18886d33f.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a6bc093122a263cf16a097ccd0b7e3665bd84c17d1aff812fb09229377ae9b84.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a776350055e75e7420584a8f13abaeb6ddab60fe1ddcd23655a6e27aee5877a0.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a90ee9daabd03a524847400e13ce1638a6b5de4dd15856a7314d8ef86aafd2d7.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/a971197ea7fc9bbd8dabada187fe9284c4ca142c227345489a49e50262124a52.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/aabdb940fe3db3bac45b773be57d8eabd09bead0b0b51a48be3199020e89ebec.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/b03c7004bac00b006af3367529b2f1be67ce134497543bdc4a2a7eb891720820.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/b10c9cbe182904f3bea05c93e161fa3cc764cd21b1efe04ef37ea3b280a6e9b5.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/b55278aeccc735b696c354b09840733e71e28d39cf9463aebd4c544d9e3d1314.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/b9f8cd8443c00c0166505a3f0e0a806d3a9d32164f56d4038ad9917922538a6d.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/ba41ca1fc73102237444682812d457b073b8f6703e1955cbb797d14c274c1e2c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/ba7298cfd23ac9f665588dae7f51c8f44125bafed059772b1bbc36c47fe33f85.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/bc7a3c055d3cc4c24b79f02ce35eff3587ad7aeee0f30ee341cdd27d02e92f05.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/bcbc7bbc1a17c2b5c7ffcc9cc77ef75601259befa29ab91627432249957c6322.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/c2f1c86a770af907510451f082bd7c5896cba0349134b8301a9d5e341b2bddf1.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/c9c193584f9a4bf86deb1617ed9b62ec726212ccf2a76b3fb4a631311ea549b2.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/cb55f76874acff521aa3dc156377c9f63a48be720d06964ff7f6b6fa74c80786.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/d271e28129df04c6d1c3df1538419fe916939a12bb2ba8f5d5325805fafcaac3.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/d52f554ae428e5db68669b7278f22412a195ca1365a0e4a1ef56c18095523766.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/df40513483b841f6553121652a771a703fc85f674f4cccf23d88a86f36a48c74.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/e167edd8c9b022a71cbdc1aae1d36d7c268c33fd2de03ea54c5875c5595d6650.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/e1ddf92a69f466e00eeeeebe8397057d1a9cd171c0400ad3eea82bc860811b30.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/e77dae00a1dde94794a03c97d6f89fd2b754ae2d7dcc2faeb0aa0ad2c70d224c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/e9b3775dd54f999af40443e03bbd02f2dd28d798dfb7462ed4834c685afdc8b5.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/ebb41c524ddf68c0eb617762bae3991ca6fc542b0ef66339e73955bdc3e2a96c.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/ee32832ed0d987005797dd703d79ebb37104351e50edff387cfa2dd07592db38.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/f210e7156afc6317bc23c0fa723fc4b7f1ce6622a271918875bac3dda905adf3.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/f33e93ae5d21fdbe9c87daf04a56a63d049f0d7e0b5d5f801b553f0fdea26019.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/fcaaa3af33c579455883313822711a9309a6241c9edb7f08392e2034835d4abf.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/fe6ef84ba77ca82a0c12ce2a8d2cba6c631436c7aa37205d8ed194be32022c91.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/images/ff6c0aa8a1f02e6c00139a577d468f51dc67cd76b2a3afb6d9916415a8f08c2a.jpg
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019.md
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019_content_list.json
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019_content_list_v2.json
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019_middle.json
-    - raw/mysen-virgo-1989-nas-redox/mineru-AM74_58/p001-p019/out/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019/vlm/src--mysen-virgo-1989-nas-redox--AM74_58-p001-p019_model.json
-    - raw/mysen-virgo-1989-nas-redox/mysen-virgo-1989-nas-redox.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/mysen-virgo-1989-nas-redox.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null

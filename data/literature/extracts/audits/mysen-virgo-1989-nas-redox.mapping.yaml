@@ -1,0 +1,36 @@
+source_id: mysen-virgo-1989-nas-redox
+source:
+  citation: 'Mysen, B. O. and Virgo, D. (1989). Redox equilibria, structure, and properties of Fe-bearing
+    aluminosilicate melts: Relationships among temperature, composition, and oxygen fugacity in the system
+    Na2O-Al2O3-SiO2-Fe-O. American Mineralogist, 74, 58–76.'
+extraction:
+  method: Table 2 columns 1-3 map to printed sample label, T_C, and absolute log10(fO2/bar), respectively;
+    column 10 maps to Fe3+/ΣFe as a valence_ratio fraction for Fe in quenched glass, measured_reduced
+    from fitted Mössbauer spectra. Table 2's numeric cells are not phase-qualified, so their cell locator
+    phase is null for the table comparator while the measured observation phase remains glass. Table 1
+    rows 2-5 and 7-10 map the oxide components SiO2, Al2O3, Na2O, and Fe2O3; sample columns 2-8 and 2-7
+    map by label to each Table 2 sample's nominal composition condition. Table 1's NAS-VII, NAS-VIII,
+    NAS-XII, NAS-XIII labels match Table 2 NASVII, NASVIII, NASXII, NASXIII after removing the Table 1
+    hyphen. Total pressure is unprinted and remains unknown.
+  review_status: draft
+tables:
+- page: 3
+  published_page: 60
+  table_index: 2
+  type: concentration_series
+  quantity: valence_ratio
+  evidence_class: measured_reduced
+  unit: fraction
+  phase: glass
+  regime: quenched_glass_analysis
+  rows: all
+  temperature:
+    column: 2
+    unit: C
+  values:
+  - column: 10
+    species: Fe
+    phase: glass
+    quantity: valence_ratio
+    evidence_class: measured_reduced
+    unit: fraction

@@ -1,0 +1,122 @@
+source_id: mysen-1984-alkaline-earth-redox
+tables:
+- page: 2
+  table: '1'
+  caption: Mössbauer results
+  row_count_printed: 34
+  extract_rows: 34
+  species: Fe
+  phase: glass
+  quantity: valence_ratio
+  valence_basis:
+    numerator_oxidation_states:
+    - 3
+    denominator_kind: total_element
+    value_form: fraction
+  method_class: measured_reduced
+  columns:
+    composition_as_published: 1
+    T_C: 2
+    minus_log_fO2_as_published: 3
+    values.value_Fe3_over_sum_Fe: 10
+  transcription_audit: 'Table 1 render checked at 600 dpi on physical PDF page 2. Table QA pre-screen: 82.9%
+    numeric agreement, 48 numeric mismatches and 35 comma/dot flags; no stored cells remain unresolved.'
+  composition_decode: The code gives the molar SiO2/metal-oxide molar ratio and Fe2O3 wt% added to the binary
+    starting material. Nominal mole fractions are computed from one mole of metal oxide, the printed SiO2 ratio,
+    and the Fe2O3 mass addition per 100 mass units of binary starting material using oxide molar masses. The
+    result is normalized to mole fraction and passed through the existing composition_mol path. Numerical microprobe
+    analyses are not published.
+  fO2_decode: The printed −log fO2 value is retained verbatim. The identity mapper receives its signed negative
+    as log10 fO2 and the existing 1 bar reference convention, which is explicitly marked unprinted. No total
+    pressure is assigned.
+  evidence_decision: 'Measured_reduced: the paper reports Fe3+/ΣFe from fitted Mössbauer doublet areas. The
+    numeric raw spectra are not published; Figure 1 shows selected spectra only.'
+  quench: All samples were quenched in either liquid nitrogen or water. The source does not state Fe redox
+    preservation, so every glass row is quench_state=not_stated, located to the experimental-methods text.
+  numeric_cell_audit: For each of the 34 rows, cells in columns 2, 3, and 10 are listed in the companion CSV;
+    each was confirmed by render (b), physical PDF page 2. Column 1 composition labels were also checked against
+    the render and decoded per the printed footnote.
+  draft_compare_coordinates: The MinerU grid has two header rows, so body rows 1–34 map to grid rows 3–36.
+    table_column_number 10 is the printed Fe3+/ΣFe column. These coordinates are only for the draft compare;
+    row labels and the printed table number remain the source locators.
+- page: 9
+  table: '3'
+  caption: Summary of relative areas (intensities) of Raman bands and their assignments
+  row_count_printed: 10
+  redox_cells_checked: 6
+  new_redox_rows: 0
+  transcription_audit: Table 3 has ten body rows. Its six unambiguous Fe3+/ΣFe cells were checked against a
+    600 dpi render of physical PDF page 9; all repeat Table 1 values to two decimals and are recorded in the
+    companion CSV as duplicate-only. Row 10 (CS.8F5) prints 0.71 under the 1150 cm−1 relative-area column;
+    its Fe3+/ΣFe cell is an ellipsis. The audit records both cells separately and excludes 0.71 from redox
+    evidence. The printed column placement gives no basis to infer a typesetting error.
+  ambiguous_cells:
+  - row: CS.8F5
+    table_row_number: 10
+    relative_area_column: '1150 cm−1'
+    relative_area_value: '0.71'
+    Fe3+/ΣFe_cell: '...'
+    interpretation: The printed 0.71 is a relative-area value, not an Fe redox fraction; the Fe3+/ΣFe cell is unreported.
+- page: 5
+  table: '2'
+  caption: Average values of hyperfine parameters
+  redox_cells_checked: 0
+  new_redox_rows: 0
+  transcription_audit: Table 2 reports hyperfine parameters and no Fe3+/ΣFe values.
+figure_read_candidates:
+- figure: '1'
+  page: 3
+  quantity: Mössbauer spectral intensities
+  reason: Selected plotted spectra are raw fit inputs, not tabulated redox points; numeric spectra are not
+    digitized.
+- figure: '4'
+  page: 4
+  quantity: log(Fe2+/Fe3+) versus log fO2
+  reason: The plotted series are not read from axes. The table-backed points are extracted separately; plotted
+    detail remains deferred.
+- figure: 2–8
+  page: 4
+  quantity: other composition, structure, and liquidus relations
+  reason: No figure-only point values are digitized in this wave.
+isolated_migration:
+  method: Migrator._migrate_extract on this extract, then finalize
+  observations: 34
+  registry_issues: 0
+  hard_issues: 0
+  unavailable_values: 0
+  quantity_unknown: 0
+  phase_unknown: 0
+  point_conditions:
+    all_34_rows_have_located:
+    - T_C
+    - fO2_log
+    - composition
+    - quench_state
+    total_pressure_Pa: The source extract marks it unknown at page 2. The migrator removes unknown pressure
+      from observation point conditions; identity remains unknown.
+  required_identity_axes_samples:
+  - observation_id: mysen_1984_table1_r01_cs2f23
+    temperature_K: '1998.15'
+    fO2_Pa: '20892.96130854039483122233736'
+    total_pressure_Pa: 'unknown: no total_pressure_Pa mapped from source'
+    composition_mole_fraction:
+      SiO2: '0.661072977864'
+      CaO: '0.330536488932'
+      Fe2O3: '0.008390533204'
+  - observation_id: mysen_1984_table1_r09_cs14f5
+    temperature_K: '1823.15'
+    fO2_Pa: '0.100000'
+    total_pressure_Pa: 'unknown: no total_pressure_Pa mapped from source'
+    composition_mole_fraction:
+      SiO2: '0.572855742833'
+      CaO: '0.409182673452'
+      Fe2O3: '0.017961583715'
+  - observation_id: mysen_1984_table1_r32_bs12f5
+    temperature_K: '1823.15'
+    fO2_Pa: '20892.96130854039483122233736'
+    total_pressure_Pa: 'unknown: no total_pressure_Pa mapped from source'
+    composition_mole_fraction:
+      SiO2: '0.528498493089'
+      BaO: '0.440415410907'
+      Fe2O3: '0.031086096004'
+  pressure_migration_rule: simulator/battery/migrate.py::_without_unprinted_total_pressure
