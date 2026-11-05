@@ -2,6 +2,7 @@ import json
 import math
 import subprocess
 import time
+from dataclasses import fields
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -31,7 +32,7 @@ from simulator.accounting.queries import (
 )
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT
+from simulator.runner import RUNNER_MASS_BALANCE_LIMIT_PCT, PyrolysisRun
 from tests._cpu_budget import DEFAULT_CPU_BUDGET_SECONDS
 from web.events import _clear_simulation_state, _simulations
 from web.run_store import RunArtifactStore
@@ -533,10 +534,18 @@ def test_headless_full_run_ledgers_and_product_story_web(
         status="ok",
     )
     assert artifact["terminal"]["final_state"] == runner["final_state"]
+    # 2f7b45e93 removed the shipped false leaf. The runner writes the key
+    # only when the field is true, so a default run leaves it absent.
     assert (
-        sim.setpoints["chemistry_kernel"]["allow_unmeasured_alpha_fallback"]
-        is False
+        "allow_unmeasured_alpha_fallback"
+        not in sim.setpoints["chemistry_kernel"]
     )
+    fallback_field = next(
+        item
+        for item in fields(PyrolysisRun)
+        if item.name == "allow_unmeasured_alpha_fallback"
+    )
+    assert fallback_field.default is False
     assert completion["products"] == {
         species: round(value, 2)
         for species, value in sim.product_ledger().items()
