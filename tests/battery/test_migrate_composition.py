@@ -76,6 +76,32 @@ _SAMPLE_CODE_FORMULA = re.compile(r"(?i)^(MLS[-_]?|MS)\d")
 _MARKOVA_VI_PREFIX = (
     "kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite"
 )
+
+
+def _projection_notice_from_printed_map(
+    wt,
+    *,
+    closure_context,
+    quantity,
+    origin,
+    declared_component_map=None,
+):
+    context = closure_context if closure_context is not None else wt
+    declared = declared_component_map if declared_component_map is not None else wt
+    composition = migrate_module._mass_percent_composition_located(
+        wt,
+        basis="printed_oxides",
+        locator=None,
+        closure_context=context,
+        declared_component_map=declared,
+    )
+    return migrate_module._composition_projection_notice(
+        composition,
+        quantity=quantity,
+        origin=origin,
+    )
+
+
 _SWEPT_COMPOSITION_MAPS = (
     # Zhang repeats a 99.32 wt% starting-glass map in twelve rows; each is in
     # b-704's accepted 95–102 wt% kept-sum interval.
@@ -1102,10 +1128,10 @@ def test_declared_unknown_trace_projects_with_notice() -> None:
         declared_map=True,
     )
     assert wt == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         wt,
         closure_context=source,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
         declared_component_map=source["composition_wt_pct"],
     )
@@ -1177,10 +1203,10 @@ def test_nested_printed_composition_walk_metadata_is_value_aware() -> None:
     )
     # Green accepted the oxide map without reading the nested note; m1 accepts and discloses its trace.
     assert refusal is None and trace is not None
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")},
         closure_context=trace_context,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
     )
     assert notice is not None and notice.dropped == ("note",)
@@ -1227,10 +1253,10 @@ def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
     }
     parsed = _oxide_map_from_mapping(trace, declared_map=True)
     assert parsed == {"SiO2": Decimal("50.2"), "MgO": Decimal("49.5")}
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         parsed,
         closure_context=trace,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
         declared_component_map=trace,
     )
@@ -1268,10 +1294,10 @@ def test_formula_unknown_trace_projects_with_notice() -> None:
     wt = _initial_oxide_map_from_values(source, declared_map=True)
     assert wt == {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")}
 
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         wt,
         closure_context=source,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
         declared_component_map=source["composition_wt_pct"],
     )
@@ -1344,10 +1370,10 @@ def test_named_initial_map_unknown_mass_is_refused_and_trace_is_noticed() -> Non
     }
     parsed = _initial_oxide_map_from_values(trace, declared_map=True)
     assert parsed == {"SiO2": Decimal("59.7"), "MgO": Decimal("40")}
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         parsed,
         closure_context=trace,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
         declared_component_map=trace["composition_wt_pct"],
     )
@@ -1983,24 +2009,40 @@ def test_exploded_activity_child_renormalizes_high_mass_percent_composition(
         else wt_pct_to_mole_fraction(composition.as_map())
     )
     assert actual == expected
-    projection_notice = next(
+    projection_notices = [
         notice
         for notice in child.notices
         if notice.kind is NoticeKind.COMPOSITION_PROJECTED
-    )
+    ]
+    assert len(projection_notices) == 1
+    projection_notice = projection_notices[0]
     assert projection_notice.dropped == ("XxO",)
-    renormalization_notice = next(
+    renormalization_notices = [
         notice
         for notice in child.notices
         if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and notice.band == "95-102 wt% kept oxide total"
-    )
+    ]
+    assert len(renormalization_notices) == 1
+    renormalization_notice = renormalization_notices[0]
     assert renormalization_notice.original == Decimal("102.8")
     assert renormalization_notice.affected_quantities == (
         Quantity.ACTIVITY_COEFFICIENT,
     )
     assert "renormalized to 100 wt%" in renormalization_notice.reason
     assert "d-336 item 2" in renormalization_notice.reason
+    carried = child.point_conditions["composition"]
+    assert carried.inference is not None
+    assert any(
+        item.startswith(
+            "projected trace components omitted from engine composition: XxO=0.2 wt%"
+        )
+        for item in carried.inference.inputs
+    )
+    assert any(
+        item.startswith("projected trace mass fraction: ")
+        for item in carried.inference.inputs
+    )
     assert result.validation is not None
     assert not result.validation.hard_issues
     assert condition.locator is not None
@@ -2086,7 +2128,8 @@ def test_exploded_children_recompute_renormalization_notice_after_closure(
     assert inherited_notices[0].original == Decimal("104")
 
     assert refused.identity.composition is not None
-    assert refused.identity.composition.is_unknown
+    refused_condition = refused.point_conditions["composition"]
+    assert refused_condition.state.is_unknown
     assert not any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and notice.band == "95-102 wt% kept oxide total"
@@ -2744,7 +2787,7 @@ def test_b1128_renormalization_input_is_additive_to_base_store_load(
     )
 
 
-def test_b1128_taniguchi_407_composition_load_matches_base() -> None:
+def test_taniguchi_407_composition_load_preserves_projection_inference() -> None:
     extract_path = (
         REPO_ROOT
         / "data/literature/extracts/taniguchi-1997-feo-cas.yaml"
@@ -2762,7 +2805,7 @@ def test_b1128_taniguchi_407_composition_load_matches_base() -> None:
     written = (observation.point_conditions or {})["composition"]
     serialized = to_plain(written)
     assert isinstance(serialized, dict)
-    # Removing inference reproduces the base loader's output for this payload.
+    # The serialized inference carries the dropped Fe trace through store load.
     base_payload = {
         key: value for key, value in serialized.items() if key != "inference"
     }
@@ -2774,12 +2817,23 @@ def test_b1128_taniguchi_407_composition_load_matches_base() -> None:
         serialized, key="composition"
     )
 
-    assert loaded == base_loaded
+    assert loaded.state == base_loaded.state
+    assert loaded.locator == base_loaded.locator
     assert loaded.state.is_value
     assert loaded.state.value.basis == "printed_oxides"
     assert loaded.state.value.amount_basis is AmountBasis.MOLE_FRACTION
     assert loaded.state.value.components == base_loaded.state.value.components
-    assert loaded.inference == base_loaded.inference
+    assert loaded.inference is not None
+    assert any(
+        item.startswith(
+            "projected trace components omitted from engine composition: Fe=0.0524 wt%"
+        )
+        for item in loaded.inference.inputs
+    )
+    assert any(
+        item.startswith("projected trace mass fraction: ")
+        for item in loaded.inference.inputs
+    )
 
 
 def test_b1128_kept_total_and_notice_include_printed_volatile() -> None:
@@ -2821,7 +2875,7 @@ def test_refused_high_kept_total_has_no_projection_notice() -> None:
 
     assert converted is None
     assert refusal is not None
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         printed,
         closure_context=printed,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
@@ -4358,10 +4412,10 @@ def test_b704_projection_fraction_uses_as_printed_alias_total() -> None:
     )
     assert wt is not None
 
-    notice = migrate_module._composition_projection_notice(
+    notice = _projection_notice_from_printed_map(
         wt,
         closure_context=source,
-        quantity=migrate_module.Quantity.ACTIVITY,
+        quantity=Quantity.ACTIVITY,
         origin="fixture",
         declared_component_map=source["composition_wt_pct"],
     )
@@ -6071,10 +6125,6 @@ def test_markova_1984_live_mass_loss_identity_uses_its_own_panel_initial_charge(
     assert "kept sum=91.43 wt%" in (residual.state.reason or "")
 
 
-@pytest.mark.xfail(
-    reason="projection notice derivation pending the b-1128 carried-composition mechanism",
-    strict=True,
-)
 def test_taniguchi_1997_live_sample_401_slag_drops_fe_with_notice() -> None:
     # These rows carry composition from the sample panel, not a row-local map.
     # The projection still needs a notice when that carried identity is emitted.
@@ -6113,6 +6163,16 @@ def test_taniguchi_1997_live_sample_401_slag_drops_fe_with_notice() -> None:
             "CaO": "39.9",
             "Al2O3": "59.6",
         }
+        carried = observation.point_conditions["composition"]
+        assert carried.state == composition
+        assert carried.locator == printed.locator
+        assert carried.inference is not None
+        assert any(
+            item.startswith(
+                "projected trace components omitted from engine composition: Fe=0.435 wt%"
+            )
+            for item in carried.inference.inputs
+        )
         projected = [
             notice
             for notice in observation.notices
@@ -6887,14 +6947,14 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             True,
             id="m1-kept-total-below-95",
         ),
-        # (b) Green accepted the oxide map; m1 found 102.1 wt% kept mass.
+        # (b) Green accepted the oxide map; m1 found 105.1 wt% kept mass.
         pytest.param(
-            "over-limit-102.1",
-            {"SiO2": "60", "MgO": "42.1"},
+            "over-limit-105.1",
+            {"SiO2": "60", "MgO": "45.1"},
             None,
             None,
             True,
-            id="m1-kept-total-above-102",
+            id="m1-kept-total-above-105",
         ),
         # (b) Green ignores sibling Cl; m1 rejects recognized mass above the limit.
         pytest.param(
@@ -7037,10 +7097,10 @@ def test_mass_closure_refusal_check_order(
             "formula-unknown-trace",
             "unknown-component-trace",
         }:
-            notice = migrate_module._composition_projection_notice(
+            notice = _projection_notice_from_printed_map(
                 wt,
                 closure_context=closure_context,
-                quantity=migrate_module.Quantity.ACTIVITY,
+                quantity=Quantity.ACTIVITY,
                 origin="test",
                 declared_component_map=declared,
             )

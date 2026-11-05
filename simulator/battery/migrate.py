@@ -1678,11 +1678,26 @@ def _mass_percent_kept_total(
     """Return S from the oxide, volatile, and same-row closure analytes."""
 
     source_map = _printed_composition_source_map(closure_context)
-    analysis = source_map if source_map is not None else components
+    analysis = components
+    if source_map is not None:
+        try:
+            source_oxides = _oxide_mass_percent_components(source_map)
+        except ValueError as exc:
+            if "ambiguous total iron components" in str(exc):
+                return sum(components.values(), Decimal("0"))
+        else:
+            if source_oxides:
+                analysis = source_map
     try:
         kept = _oxide_mass_percent_components(analysis)
     except ValueError as exc:
-        if "ambiguous total iron components" not in str(exc):
+        if not any(
+            reason in str(exc)
+            for reason in (
+                "ambiguous total iron components",
+                "malformed printed oxide amount",
+            )
+        ):
             raise
         return sum(components.values(), Decimal("0"))
     kept.update(_printed_volatile_mass_percent(analysis, closure_context))
@@ -1894,6 +1909,7 @@ def _composition_located_from_plain(
             accepted_wt,
             locator,
             closure_context=composition_context,
+            declared_component_map=declared_component_map,
             source_note=_wt_percent_derivation_source_note(
                 wt, payload, declared_component_map=declared_component_map
             ),
@@ -1909,6 +1925,23 @@ def _composition_located_from_plain(
         )
         if renorm_input:
             derivation = replace(derivation, inputs=(*derivation.inputs, renorm_input))
+        projection_inputs = tuple(
+            item
+            for item in (serialized_inference.inputs if serialized_inference else ())
+            if item.startswith(
+                (
+                    "projected trace components omitted from engine composition: ",
+                    "projected trace mass fraction: ",
+                )
+            )
+        )
+        if projection_inputs:
+            derivation = replace(
+                derivation,
+                inputs=tuple(
+                    dict.fromkeys((*derivation.inputs, *projection_inputs))
+                ),
+            )
         return Located(
             State.of(composition),
             locator=locator,
@@ -4728,10 +4761,17 @@ def _wt_percent_derivation_source_note(
 
 
 def _source_printed_composition_values(
-    wt: Mapping[str, Any] | None, closure_context: object
+    wt: Mapping[str, Any] | None,
+    closure_context: object,
+    *,
+    declared_component_map: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     source_map = _printed_composition_source_map(closure_context)
-    declared_map = _declared_printed_composition_map(closure_context)
+    declared_map = (
+        declared_component_map
+        if declared_component_map is not None
+        else _declared_printed_composition_map(closure_context)
+    )
     declared_names = (
         {_mass_percent_component_key(str(name))[0] for name in declared_map}
         if declared_map is not None
@@ -4836,47 +4876,53 @@ def _preserve_printed_composition_context(
 
 
 def _composition_projection_notice(
-    wt: Mapping[str, Decimal] | None,
+    composition: object | None,
     *,
-    closure_context: object,
     quantity: Quantity | None,
     origin: str,
-    declared_component_map: Mapping[str, Any] | None = None,
 ) -> Notice | None:
-    if wt is None or quantity is None:
-        return None
-    dropped = _unrecognized_printed_chemical_components(
-        wt, closure_context, declared_component_map=declared_component_map
-    )
-    dropped_mass = sum(dropped.values(), Decimal("0"))
     if (
-        not dropped
-        or dropped_mass <= 0
-        or dropped_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+        not isinstance(composition, Located)
+        or not composition.state.is_value
+        or not isinstance(composition.state.value, Composition)
+        or composition.inference is None
+        or quantity is None
     ):
         return None
-    source = _source_printed_composition_values(wt, closure_context)
-    printed_total = sum(
+    detail = next(
         (
-            amount
-            for name, raw_amount in source.items()
-            if name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-            and (amount := _printed_mass_percent_number(raw_amount)) is not None
+            item.split(": ", 1)[1]
+            for item in composition.inference.inputs
+            if item.startswith(
+                "projected trace components omitted from engine composition: "
+            )
         ),
-        Decimal("0"),
+        None,
     )
-    if printed_total <= 0:
+    mass_fraction = next(
+        (
+            _as_dec_or_none(item.split(": ", 1)[1])
+            for item in composition.inference.inputs
+            if item.startswith("projected trace mass fraction: ")
+        ),
+        None,
+    )
+    if not detail or mass_fraction is None:
         return None
-    detail = ", ".join(
-        f"{name}={amount} wt%" for name, amount in dropped.items()
+    dropped = tuple(
+        item.split("=", 1)[0].strip()
+        for item in detail.split(", ")
+        if item.split("=", 1)[0].strip()
     )
+    if not dropped:
+        return None
     return Notice(
         kind=NoticeKind.COMPOSITION_PROJECTED,
         affected_quantities=(quantity,),
         reason=f"unrecognized trace component(s) omitted from engine composition: {detail}",
         origin=origin,
-        dropped=tuple(dropped),
-        dropped_mass_fraction=dropped_mass / printed_total,
+        dropped=dropped,
+        dropped_mass_fraction=mass_fraction,
     )
 
 
@@ -4885,6 +4931,7 @@ def _mass_percent_composition_derivation(
     locator: Locator | None,
     *,
     closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
     source_note: object = None,
     admitted: bool = True,
 ) -> Derivation:
@@ -4899,7 +4946,7 @@ def _mass_percent_composition_derivation(
         < kept_total
         <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
     ):
-        return replace(
+        derivation = replace(
             derivation,
             inputs=(
                 *derivation.inputs,
@@ -4907,6 +4954,44 @@ def _mass_percent_composition_derivation(
                 "(d-336 item 2)",
             ),
         )
+    dropped = _unrecognized_printed_chemical_components(
+        wt,
+        closure_context,
+        declared_component_map=declared_component_map,
+    )
+    dropped_mass = sum(dropped.values(), Decimal("0"))
+    if (
+        dropped
+        and Decimal("0") < dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
+    ):
+        source = _source_printed_composition_values(
+            wt,
+            closure_context,
+            declared_component_map=declared_component_map,
+        )
+        printed_total = sum(
+            (
+                amount
+                for name, raw_amount in source.items()
+                if name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
+                and (amount := _printed_mass_percent_number(raw_amount)) is not None
+            ),
+            Decimal("0"),
+        )
+        if printed_total > 0:
+            detail = ", ".join(
+                f"{name}={amount} wt%" for name, amount in dropped.items()
+            )
+            derivation = replace(
+                derivation,
+                inputs=(
+                    *derivation.inputs,
+                    "projected trace components omitted from engine composition: "
+                    + detail,
+                    "projected trace mass fraction: "
+                    + str(dropped_mass / printed_total),
+                ),
+            )
     return derivation
 
 
@@ -5904,6 +5989,7 @@ def _mass_percent_composition_located(
             _oxide_mass_percent_components(wt),
             locator,
             closure_context=closure_context,
+            declared_component_map=declared_component_map,
         )
         if state.is_value
         else None
@@ -6489,6 +6575,7 @@ def _catalogue_composition_located_from_values(
             wt,
             locator,
             closure_context=values,
+            declared_component_map=declared_component_map,
             source_note=values.get("composition_derivation"),
         ),
     )
@@ -6754,6 +6841,7 @@ def _composition_located_from_values(
         wt,
         locator,
         closure_context=composition_context,
+        declared_component_map=declared_component_map,
         source_note="; ".join(derivation_notes) or None,
         admitted=composition_state.is_value,
     )
@@ -6887,6 +6975,7 @@ def _located_printed_and_initial(
             conversion_map,
             locator,
             closure_context=closure_context,
+            declared_component_map=declared_component_map,
             source_note=_wt_percent_derivation_source_note(
                 wt,
                 closure_context,
@@ -7144,20 +7233,6 @@ def _apply_equilibrium_starting_bulk(
         and isinstance(printed.state.value, Mapping)
         else None
     )
-    if (
-        initial.inference is not None
-        and initial.inference.relation == "wt_pct_to_mole_fraction"
-        and printed_values is not None
-    ):
-        projection_notice = _composition_projection_notice(
-            _mass_percent_components(printed_values),
-            closure_context=printed_values,
-            quantity=Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-            origin=origin,
-            declared_component_map=printed_values,
-        )
-        if projection_notice is not None:
-            notices.append(projection_notice)
     causes = _open_system_starting_bulk_causes(experiment)
     if causes:
         notices.append(
@@ -20592,18 +20667,6 @@ class Migrator:
         total_iron_notice = _total_iron_reported_as_feo_notice(
             projected_oxide_map, q_token, obs_id
         )
-        projection_notice = _composition_projection_notice(
-            projected_oxide_map or initial_oxide_map,
-            closure_context=projected_closure_context,
-            quantity=q_token if isinstance(q_token, Quantity) else None,
-            origin=obs_id,
-            declared_component_map=_named_printed_composition_map(
-                projected_closure_context
-            ),
-        )
-        projection_notices = (
-            () if projection_notice is None else (projection_notice,)
-        )
         composition_role_refusal: list[str] = []
         if (
             composition_role is None
@@ -21665,6 +21728,9 @@ class Migrator:
                         projected_oxide_map,
                         projected_oxide_locator or locator,
                         closure_context=projected_closure_context,
+                        declared_component_map=_named_printed_composition_map(
+                            projected_closure_context
+                        ),
                         admitted=projected_state.is_value,
                         source_note=_omitted_trace_component_source_note(
                             projected_oxide_map,
@@ -22639,7 +22705,6 @@ class Migrator:
                             if total_iron_notice is None
                             else (total_iron_notice,)
                         ),
-                        *projection_notices,
                         *validity_notices,
                     ),
                     equipment=obs.get("equipment"),
@@ -22837,7 +22902,6 @@ class Migrator:
                                 if total_iron_notice is None
                                 else (total_iron_notice,)
                             ),
-                            *projection_notices,
                             *validity_notices,
                         ),
                         equipment=obs.get("equipment"),
@@ -22919,7 +22983,13 @@ class Migrator:
         )
         if renormalization_notice is not None:
             observation_notices.append(renormalization_notice)
-        observation_notices.extend(projection_notices)
+        projection_notice = _composition_projection_notice(
+            (point_conditions or {}).get("composition"),
+            quantity=(q_token if isinstance(q_token, Quantity) else None),
+            origin=obs_id,
+        )
+        if projection_notice is not None:
+            observation_notices.append(projection_notice)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
@@ -24925,22 +24995,6 @@ class Migrator:
                         identity, total_pressure_Pa=State.of(pressure)
                     )
         child_notices = list(notices)
-        projection_notice = _composition_projection_notice(
-            point_oxide_map,
-            closure_context=point_composition_context,
-            quantity=(
-                q_token_point if isinstance(q_token_point, Quantity) else None
-            ),
-            origin=point_id,
-            declared_component_map=point_declared_component_map,
-        )
-        if projection_notice is not None and not any(
-            notice.kind is NoticeKind.COMPOSITION_PROJECTED
-            and notice.dropped == projection_notice.dropped
-            and notice.reason == projection_notice.reason
-            for notice in child_notices
-        ):
-            child_notices.append(projection_notice)
         identity, point_conditions, child_notices = (
             _initial_charge_only_missing_composition(
                 identity,
@@ -24975,6 +25029,15 @@ class Migrator:
         )
         if renormalization_notice is not None:
             child_notices.append(renormalization_notice)
+        projection_notice = _composition_projection_notice(
+            (point_conditions or {}).get("composition"),
+            quantity=(
+                q_token_point if isinstance(q_token_point, Quantity) else None
+            ),
+            origin=point_id,
+        )
+        if projection_notice is not None:
+            child_notices.append(projection_notice)
         parent_hold_notice = _hold_reason_notice(
             parent_reason,
             quantity=q_token_point,
