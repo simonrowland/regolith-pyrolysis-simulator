@@ -240,12 +240,12 @@
       ],
       "warnings": [],
       "stage_area_m2_by_stage": {
-        "fe_stage1": 0.236,
+        "fe_stage1": 0.2828,
         "cr_stage2": 0.050893800988154644,
         "sio_stage3": 0.06785840131753954,
         "alkali_stage4": 0.05099999999999999,
         "terminal": 0.02261946710584651,
-        "k_stage4b": 0.064
+        "k_stage4b": 14.7388
       },
       "stage_area_geometry_provenance_notice": {
         "severity": "warning",
@@ -263,12 +263,12 @@
         ],
         "stage_area_ratio_provenance_by_stage": {
           "fe_stage1": {
-            "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-            "source_class": "owner-ruling-d137",
+            "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+            "source_class": "owner-ruling-d335",
             "status": "sourced",
             "output_status": "sourced",
             "stage": "fe_stage1",
-            "ratio": 20.866981427604056,
+            "ratio": 25.005009947993337,
             "usage": "condensation_surface_area",
             "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
           },
@@ -313,12 +313,12 @@
             "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
           },
           "k_stage4b": {
-            "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+            "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
             "source_class": "owner-ruling-d137",
             "status": "provisional",
             "output_status": "status_bearing",
             "stage": "k_stage4b",
-            "ratio": 5.658842421045168,
+            "ratio": 1303.1960418015706,
             "usage": "condensation_surface_area",
             "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
           }
@@ -2104,6 +2104,14 @@
         "class_total_kg": 0.0,
         "estimated_contributions": []
       },
+      "alkali_cartridge_solid_residue": {
+        "label": "Stage-4 cartridge solid residue (unseparated)",
+        "kg_by_species": {},
+        "class_total_kg": 0.0,
+        "account": "process.alkali_cartridge_solid_residue",
+        "disposition": "captured_unseparated",
+        "note": "Mixed condensate captured on the Stage-4 freeze-out cartridge. It is not a separated metal product."
+      },
       "process_inventory_spent_reductant": {
         "kg_by_species": {},
         "class_total_kg": 0.0,
@@ -3050,7 +3058,7 @@
     },
     "stage_4b_k_trap": {
       "stage_number": 4,
-      "label": "K Cold Trap",
+      "label": "Alkali freeze-out cartridge",
       "accepted_species": [
         "K"
       ],
@@ -23676,12 +23684,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -23726,12 +23734,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -27299,12 +27307,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -27349,12 +27357,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -30922,12 +30930,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -30972,12 +30980,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -34545,12 +34553,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -34595,12 +34603,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -38168,12 +38176,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -38218,12 +38226,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -41791,12 +41799,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -41841,12 +41849,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -49542,12 +49550,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -49592,12 +49600,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -57433,12 +57441,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -57483,12 +57491,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -65324,12 +65332,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -65374,12 +65382,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -73215,12 +73223,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -73265,12 +73273,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -81106,12 +81114,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -81156,12 +81164,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }
@@ -88997,12 +89005,12 @@
               ],
               "stage_area_ratio_provenance_by_stage": {
                 "fe_stage1": {
-                  "source": "owner-ruling-d137: parallel-plate Fe collector, area 0.236 m2, sized for 95% of the C2A Fe window",
-                  "source_class": "owner-ruling-d137",
+                  "source": "owner-ruling-d335: parallel-plate Fe collector, area 0.2828 m2, wall 1100 C, Dh 0.020 m unchanged; condesign Option 1, docs-private/research/2026-11-03-condenser-design/condesign-report.md",
+                  "source_class": "owner-ruling-d335",
                   "status": "sourced",
                   "output_status": "sourced",
                   "stage": "fe_stage1",
-                  "ratio": 20.866981427604056,
+                  "ratio": 25.005009947993337,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
@@ -89047,12 +89055,12 @@
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 },
                 "k_stage4b": {
-                  "source": "owner-ruling-d137: K cold trap, area 0.064 m2, t-1217 law at f_eq ~ 1 and alpha 1; provisional on b-588 and b-599",
+                  "source": "owner-ruling-d137: area 0.064 m2 kept for the alkali freeze-out cartridge; t1636 replaces the t-1217 capture law and does not resize the area; provisional on b-588 and b-599",
                   "source_class": "owner-ruling-d137",
                   "status": "provisional",
                   "output_status": "status_bearing",
                   "stage": "k_stage4b",
-                  "ratio": 5.658842421045168,
+                  "ratio": 1303.1960418015706,
                   "usage": "condensation_surface_area",
                   "message": "Condenser stage wall-deposit surface area follows the configured stage-area ratio; provisional geometry makes deposit/coating readouts status-bearing, not refused."
                 }

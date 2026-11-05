@@ -118,8 +118,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
         # constack merge: repin on gate box
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        "flux_maps_sha256": "75be8cdf429296d6eb66b69d568c2f4eeb9c528635b4bb06b4960d0b31562ee6",
+        "ledger_sha256": "85df2fc8d3dcf4639ecd900358c55851b1be5cf19af52fa6e3104ee57a083160",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
