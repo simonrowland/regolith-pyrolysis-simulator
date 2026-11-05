@@ -274,25 +274,27 @@ def test_default_k_route_allocation_numeric_pin():
         EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1650.0),
     )
-    # constack merge: repin on gate box
+    # e-NTU moved 0.001928 kg of K off the 250 C collector onto the trap.
+    # The areas here are 1.0 m2 per stage number, not the shipped cartridge.
+    # Collector plus trap plus the two tails plus the remainder is 1.0 kg.
     assert route.condensed_by_stage_species == {
-        NA_COLLECTOR_STAGE_KEY: {'K': 0.9169775631320057},
-        K_TRAP_STAGE_KEY: {'K': 0.0830224074230584},
-        'stage_5_vortex_dust_filter': {'K': 2.9101495551411142e-08},
-        'stage_6_turbine_compressor': {'K': 3.434399382784235e-10},
+        NA_COLLECTOR_STAGE_KEY: {'K': 0.9150497441336476},
+        K_TRAP_STAGE_KEY: {'K': 0.08495022573769165},
+        'stage_5_vortex_dust_filter': {'K': 2.9777245606193804e-08},
+        'stage_6_turbine_compressor': {'K': 3.514147709359471e-10},
     }
     assert route.capture_kg_by_stage_identity[(4, 0)] == {
-        'K': 0.9169775631320057,
+        'K': 0.9150497441336476,
     }
     assert route.capture_kg_by_stage_identity[(4, 1)] == {
-        'K': 0.0830224074230584,
+        'K': 0.08495022573769165,
     }
-    assert route.remaining_by_species == {'K': 3.7485254416350975e-16}
+    assert route.remaining_by_species == {'K': 3.8355679188638026e-16}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        NA_COLLECTOR_STAGE_KEY: {'K': 0.9169775631320057},
-        'stage_5_vortex_dust_filter': {'K': 2.9101495551411142e-08},
-        'stage_6_turbine_compressor': {'K': 3.434399382784235e-10},
+        NA_COLLECTOR_STAGE_KEY: {'K': 0.9150497441336476},
+        'stage_5_vortex_dust_filter': {'K': 2.9777245606193804e-08},
+        'stage_6_turbine_compressor': {'K': 3.514147709359471e-10},
     }
 
 
