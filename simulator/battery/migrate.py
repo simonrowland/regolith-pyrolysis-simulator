@@ -4611,41 +4611,56 @@ def _composition_projection_notice(
 def _printed_volatile_mass_percent(
     *payloads: object,
     diagnostics: list[tuple[str, str]] | None = None,
+    green_read_maps: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Decimal]:
     """Read numeric volatile amounts attached to this composition row only."""
 
-    scopes: list[Mapping[str, Any]] = []
+    green_read_map = next(
+        (payload for payload in payloads if isinstance(payload, Mapping)), None
+    )
+    scopes: list[tuple[Mapping[str, Any], str]] = []
+    scopes.extend(
+        (component_map, _GREEN_READ_OXIDE_MAP)
+        for component_map in green_read_maps
+    )
     for payload in payloads:
         if not isinstance(payload, Mapping):
             continue
-        scopes.append(payload)
+        source = (
+            _GREEN_READ_OXIDE_MAP
+            if payload is green_read_map
+            else _M1_ONLY_CLOSURE_CONTRIBUTOR
+        )
+        scopes.append((payload, source))
         source_map = _printed_composition_source_map(payload)
         if source_map is not None:
-            scopes.append(source_map)
+            scopes.append((source_map, source))
         point_conditions = payload.get("point_conditions")
         if isinstance(point_conditions, Mapping):
-            scopes.append(point_conditions)
+            scopes.append((point_conditions, _M1_ONLY_CLOSURE_CONTRIBUTOR))
             printed = _printed_composition_map(
                 point_conditions.get("printed_composition")
             )
             if printed is not None:
-                scopes.append(printed)
+                scopes.append((printed, _M1_ONLY_CLOSURE_CONTRIBUTOR))
         for key in _PRINTED_COMPOSITION_MAP_KEYS:
             nested = payload.get(key)
             if isinstance(nested, Mapping):
                 composition_map = _printed_composition_map(nested)
                 if composition_map is not None:
-                    scopes.append(composition_map)
+                    scopes.append((composition_map, _M1_ONLY_CLOSURE_CONTRIBUTOR))
 
     selected: dict[str, tuple[int, Decimal]] = {}
     reported: set[str] = set()
 
-    def reject(reason: str) -> None:
+    def reject(reason: str, component: str, source: str) -> None:
+        if component not in _COMPOSITION_COMPONENTS:
+            source = _M1_ONLY_CLOSURE_CONTRIBUTOR
         if diagnostics is not None and reason not in reported:
-            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, reason))
+            diagnostics.append((source, reason))
             reported.add(reason)
 
-    for scope in scopes:
+    for scope, source in scopes:
         for name, raw_amount in scope.items():
             alias = _volatile_closure_component(str(name))
             if alias is None:
@@ -4660,7 +4675,9 @@ def _printed_volatile_mass_percent(
             if kind == "malformed":
                 reject(
                     "malformed printed volatile component amount for "
-                    f"{name!r}: {raw_amount!r}"
+                    f"{name!r}: {raw_amount!r}",
+                    component,
+                    source,
                 )
                 continue
             if amount is None:
@@ -4668,7 +4685,9 @@ def _printed_volatile_mass_percent(
             if not amount.is_finite() or amount < 0:
                 reject(
                     "printed volatile component has negative or non-finite "
-                    f"amount for {name!r}: {raw_amount!r}"
+                    f"amount for {name!r}: {raw_amount!r}",
+                    component,
+                    source,
                 )
             current = selected.get(component)
             if current is None or priority < current[0]:
@@ -4708,6 +4727,7 @@ def _oxide_mass_percent_components(
     wt: Mapping[str, Any],
     *,
     validation_maps: Sequence[Mapping[str, Any]] = (),
+    green_read_maps: Sequence[Mapping[str, Any]] = (),
     diagnostics: list[tuple[str, str]] | None = None,
 ) -> dict[str, Decimal]:
     names = {_mass_percent_component_key(str(name))[0] for name in wt}
@@ -4718,7 +4738,9 @@ def _oxide_mass_percent_components(
             raise ValueError(reason)
         diagnostics.append((_GREEN_READ_OXIDE_MAP, reason))
 
-    def record_raw_cell_rejection(raw_name: str, raw_amount: Any) -> None:
+    def record_raw_cell_rejection(
+        raw_name: str, raw_amount: Any, source: str
+    ) -> None:
         if diagnostics is None:
             return
         name, _has_mass_suffix = _mass_percent_component_key(raw_name)
@@ -4727,15 +4749,20 @@ def _oxide_mass_percent_components(
             or raw_name == "locator"
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or _is_composition_condition_key(name)
-            or _volatile_closure_component(raw_name) is not None
-            or _volatile_closure_component(name) is not None
+            or (
+                (
+                    _volatile_closure_component(raw_name) is not None
+                    or _volatile_closure_component(name) is not None
+                )
+                and name not in _COMPOSITION_COMPONENTS
+            )
         ):
             return
         kind, amount = _classify_composition_cell(raw_amount)
         if kind == "malformed":
             diagnostics.append(
                 (
-                    _GREEN_READ_OXIDE_MAP,
+                    source,
                     "malformed printed component amount for "
                     f"{raw_name!r}: {raw_amount!r}",
                 )
@@ -4746,7 +4773,7 @@ def _oxide_mass_percent_components(
         if not amount.is_finite() or amount < 0:
             diagnostics.append(
                 (
-                    _GREEN_READ_OXIDE_MAP,
+                    source,
                     "printed component has negative or non-finite amount for "
                     f"{raw_name!r}: {raw_amount!r}",
                 )
@@ -4755,12 +4782,19 @@ def _oxide_mass_percent_components(
         for component_map in validation_maps:
             if component_map is wt:
                 continue
+            source = (
+                _GREEN_READ_OXIDE_MAP
+                if any(component_map is item for item in green_read_maps)
+                else _M1_ONLY_CLOSURE_CONTRIBUTOR
+            )
             for raw_name, raw_amount in component_map.items():
-                record_raw_cell_rejection(str(raw_name), raw_amount)
+                record_raw_cell_rejection(str(raw_name), raw_amount, source)
 
     components: dict[str, Decimal] = {}
     for raw_name, amount in wt.items():
-        record_raw_cell_rejection(str(raw_name), amount)
+        record_raw_cell_rejection(
+            str(raw_name), amount, _GREEN_READ_OXIDE_MAP
+        )
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
             continue
@@ -4993,6 +5027,11 @@ def _wt_percent_conversion_or_refusal(
             source_map is not item for item in declared_maps
         ):
             declared_maps.append(source_map)
+        green_read_maps = (
+            (declared_component_map,)
+            if declared_component_map is not None
+            else ()
+        )
 
         # Collect invalid-cell diagnostics from every closure contributor before
         # evaluating the new closure checks; the final decision gives these
@@ -5009,6 +5048,7 @@ def _wt_percent_conversion_or_refusal(
             oxide_wt = _oxide_mass_percent_components(
                 wt,
                 validation_maps=component_maps,
+                green_read_maps=green_read_maps,
                 diagnostics=diagnostics,
             )
         except (ArithmeticError, ValueError) as exc:
@@ -5060,7 +5100,10 @@ def _wt_percent_conversion_or_refusal(
             )
 
         volatile_wt = _printed_volatile_mass_percent(
-            wt, closure_context, diagnostics=diagnostics
+            wt,
+            closure_context,
+            diagnostics=diagnostics,
+            green_read_maps=green_read_maps,
         )
 
         closure_only_wt = _printed_composition_closure_components(
@@ -5613,7 +5656,22 @@ def _oxide_map_from_mapping(
             continue
         oxide, _factor = equivalent
         comps[oxide] = comps.get(oxide, Decimal("0")) + amount
-    accepted = checked(comps)
+    green_component_map = {
+        str(name): value
+        for name, value in obj.items()
+        if (
+            not _is_composition_condition_key(
+                _mass_percent_component_key(str(name))[0]
+            )
+            and _is_printed_chemical_component_name(
+                _mass_percent_component_key(str(name))[0]
+            )
+        )
+    }
+    accepted = checked(
+        comps,
+        declared_component_map or green_component_map,
+    )
     if not accepted and not preserve_refused_map:
         return None
     return comps if len(comps) >= 2 else None
@@ -23363,12 +23421,12 @@ class Migrator:
             )
         elif (
             point_composition_refusal
-            and point_composition_located is None
-            and point_catalogue is None
             and (
                 not point_mass_closure_refused
                 or (
-                    point_oxide_map is not None
+                    point_composition_located is None
+                    and point_catalogue is None
+                    and point_oxide_map is not None
                     and q_token_point
                     in {Quantity.DENSITY, Quantity.VALENCE_RATIO}
                     and not (

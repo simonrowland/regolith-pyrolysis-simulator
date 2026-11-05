@@ -1848,6 +1848,95 @@ def test_exploded_activity_child_keeps_mass_percent_closure_refusal(
     assert condition.locator.page == 3
 
 
+@pytest.mark.parametrize(
+    ("identity_fields", "catalogue"),
+    (
+        # Green refused the parallel ambiguous mass map and wrote unknown identity.
+        pytest.param(
+            {"composition_mol": {"SiO2": "0.5", "MgO": "0.5"}},
+            False,
+            id="green-refusal-overwrites-mole-identity",
+        ),
+        # Green refused the parallel ambiguous mass map and wrote unknown identity.
+        pytest.param(
+            {
+                "composition_from_sample_catalog": True,
+                "composition_source": "fixture catalogue source",
+                "sample_oxide_composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+            },
+            True,
+            id="green-refusal-overwrites-catalogue-identity",
+        ),
+    ),
+)
+def test_unflagged_mass_refusal_overwrites_parallel_point_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    identity_fields: dict[str, object],
+    catalogue: bool,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    parent = extract["species"]["Na"]["observations"][0]
+    parent.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        **identity_fields,
+                        "composition_wt_pct": {
+                            "SiO2": "50",
+                            "FeO": "20",
+                            "FeOT": "30",
+                        },
+                    }
+                ],
+            },
+        }
+    )
+    catalogue_calls: list[object] = []
+    if catalogue:
+        valid_catalogue = _catalogue_composition_located_from_values(
+            {
+                "composition_from_sample_catalog": True,
+                "sample_oxide_composition_wt_pct": {"SiO2": "50", "MgO": "50"},
+            },
+            None,
+        )
+        assert valid_catalogue is not None
+
+        def return_catalogue(values: object, locator: Locator | None):
+            catalogue_calls.append(values)
+            return replace(valid_catalogue, locator=locator)
+
+        monkeypatch.setattr(
+            migrate_module,
+            "_catalogue_composition_located_from_values",
+            return_catalogue,
+        )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    child = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    )
+
+    if catalogue:
+        assert catalogue_calls
+    assert child.identity.composition is not None
+    assert child.identity.composition.is_unknown
+    assert child.identity.composition.reason == (
+        "ambiguous total iron components: FeOT with FeO"
+    )
+
+
 def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
     tmp_path: Path,
 ) -> None:
@@ -5861,6 +5950,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             False,
             id="green-malformed-oxide-cell",
         ),
+        # (a) Green read S inside the converted map because S is a component key.
+        pytest.param(
+            "malformed-map-sulfur",
+            {"SiO2": "50", "MgO": "50", "S": "unreadable"},
+            None,
+            None,
+            False,
+            id="green-malformed-sulfur-in-oxide-map",
+        ),
         # (b) Green accepted the oxide map; m1 found a missing major oxide.
         pytest.param(
             "missing-major",
@@ -5926,6 +6024,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             None,
             True,
             id="m1-malformed-sibling-volatile",
+        ),
+        # (b) Green did not read sibling S outside the converted map; m1 rejects it.
+        pytest.param(
+            "sibling-sulfur-malformed",
+            {"SiO2": "50", "MgO": "50"},
+            {"S": "unreadable"},
+            None,
+            True,
+            id="m1-malformed-sibling-sulfur",
         ),
         # (b) Green did not read the nested printed volatile.
         pytest.param(
@@ -6035,6 +6142,10 @@ def test_mass_closure_refusal_check_order(
         assert "negative or non-finite amount" in refusal.reason
     if case == "sibling-volatile-malformed":
         assert "malformed printed volatile component amount" in refusal.reason
+    if case == "malformed-map-sulfur":
+        assert "malformed printed component amount for 'S'" in refusal.reason
+    if case == "sibling-sulfur-malformed":
+        assert "malformed printed component amount for 'S'" in refusal.reason
     if case == "nested-printed-volatile-malformed":
         assert "malformed printed volatile component amount" in refusal.reason
     if case == "closure-only-negative":
