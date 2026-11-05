@@ -516,10 +516,17 @@ def _history_request(composition, temperature_K, hour, previous=None):
 
 def test_successful_openimcc_physics_is_bit_identical() -> None:
     result = _provider().dispatch(_history_request(BASE_MELT_MOL, 2400.65, 61))
-    # At 2400.65 K (2127.50 C), a490c6011 leaves the numeric payload unchanged
-    # (7d93eda6...dfc8) but changes the metadata digest from
-    # 934e52dd...4cc9 to b5c99ba3...885e because this is above the 1600 C
-    # anchor and now carries the extrapolation notice.
+    # At 2400.65 K (2127.50 C), above the old clamp, a490c6011 leaves the
+    # numeric payload SHA unchanged (7d93eda6...dfc8) but changes the combined
+    # digest 934e52dd...4cc9 -> b5c99ba3...885e. In openimcc_seam for both
+    # Fe and FeO_association_gas, below_cap_activity moves
+    # 0.29953718588799605 -> 0.22491304690427424 (-0.0746241389837218);
+    # ratio_dex_openimcc_over_below_cap, ratio_dex_selected_over_below_cap,
+    # and would_be_openimcc_step_dex each move -0.33164558960761337 ->
+    # -0.20720949327994248 (+0.12443609632767089 dex). The metadata also
+    # records the above-anchor extrapolation. The 33348ffc1^ in-process payload
+    # already includes a490c6011, so its metadata matches the tip; the old
+    # 934e52dd... hash is the pre-a490 baseline.
     # Re-measured after merging green a822c275f: d-173 moves the engine pin
     # from e975edd to e1423d8. Keep the numeric maps separate from metadata;
     # the historical digest excludes only b-813's new temperature notice
@@ -550,8 +557,11 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     )
     # At 1800 K (1526.85 C), a490c6011 changes the numeric payload inside the
     # 1300-1600 C anchor span: SHA-256 61e9be01...cf2b1 ->
-    # e295de86...f473903. The paired digest also moves to the decoded current
-    # payload hash below (delta is a payload change, not an extrapolation flag).
+    # e295de86...f473903. The paired digest moves 7f0cbcb9...ea102 ->
+    # f961836b...586d8; this is an in-band payload change, not an
+    # extrapolation notice. By comparison, at 2400.65 K the numeric SHA stays
+    # 7d93eda6...dfc8 while the combined digest changes via openimcc_seam
+    # metadata (decoded in test_successful_openimcc_physics_is_bit_identical).
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "e295de86e5004b2c5b69b69ad7dc23ed3f6458685ce28e929a1a1cbbff473903"

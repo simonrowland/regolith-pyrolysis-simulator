@@ -638,13 +638,14 @@ def test_cost_rollup_empty_electrical_breakdown_mapping_means_zero():
 def test_cost_rollup_metadata_is_golden_neutral_for_runner_fixture(
     runner_golden_loader,
 ):
-    # The studio lunar C0 fixture was rebaselined for a490c6011's Holzheid
-    # 1/T interpolation: staged silica +2.591784458e-9 kg, staged products
-    # Fe +3.235920243e-7 kg, Na +5.525418062e-8 kg, and Stage-3 Fe
-    # +3.214090775e-8 kg at the 1750 C staged hot hold, above the old clamp
-    # (derived copies move with those fields). The C0 source fixture also shifts
-    # at 1425 C inside the band and extrapolates at 1750 C and 1150-1190 C.
-    # This checks that the cost projection adds no difference beyond those pins.
+    # The Studio lunar C0 fixture SHA changes edd0c75b...f1c34 ->
+    # 7ea530a8...10386 for a490c6011's Holzheid 1/T interpolation. Its Stage-3
+    # Fe value moves +2.049305103e-8 kg at hour 16 (1750 C, above the old
+    # clamp); the same fixture first shifts at hour 13 (1425 C, inside), then
+    # at 1150-1190 C in hours 17-24 (below). These are lunar-C0 deltas, not the
+    # staged-C2A pin-report deltas. See worker-report-goldens-r4.md for the
+    # field-level fixture comparison. This checks that cost projection adds no
+    # difference beyond the fixture change.
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md

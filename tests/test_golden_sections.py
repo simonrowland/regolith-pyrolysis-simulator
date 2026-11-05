@@ -40,12 +40,12 @@ def test_runner_byte_roundtrip_on_current_fixture(
     scenario, generated_runner_sections, runner_golden_loader,
 ):
     # The lunar C0 fixture SHA-256 moves edd0c75b...f1c34 ->
-    # 7ea530a8...10386 for a490c6011's Holzheid 1/T interpolation; its staged
-    # silica / products-Fe / products-Na / Stage-3-Fe deltas are
-    # +2.591784458e-9 / +3.235920243e-7 / +5.525418062e-8 /
-    # +3.214090775e-8 kg at 1750 C above the old clamp. The lunar C0 fixture
-    # also first shifts at 1425 C inside the band, then extrapolates at 1750 C
-    # and 1150-1190 C. Mars and CI remain byte-identical.
+    # 7ea530a8...10386 for a490c6011's Holzheid 1/T interpolation. Its Stage-3
+    # Fe value moves +2.049305103e-8 kg at hour 16 (1750 C, above the old
+    # clamp); the first changed row is hour 13 (1425 C, inside), followed by
+    # hours 17-24 at 1150-1190 C (below). These lunar-C0 fixture deltas are
+    # separate from the staged-C2A pin-report values; see
+    # worker-report-goldens-r4.md. Mars and CI remain byte-identical.
     path = f"tests/fixtures/runner/{scenario['fixture']}"
     current = (ROOT / path).read_bytes()
     generated_current, directory = generated_runner_sections[scenario["name"]]

@@ -160,11 +160,14 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
     # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
     # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
     # diverge between the laptop and studio-3, so this pin is not a laptop re-run.
-    # The 33348ffc1 gate run re-pins all six route maps for a490c6011: the C0
-    # trajectory first differs at 1425 C inside the anchor span, then
-    # extrapolates above the old clamp at 1750 C and below it at 1150-1190 C.
-    # SiO Stage 3/4 move +7.8558002e-6/+1.0078889e-5 kg; remaining field
-    # deltas are reported.
+    # Path "A" maps to continuous C2A in data/setpoints.yaml with a 1050-1843 C
+    # span, covering below, inside, and above the old 1300-1600 C band. The
+    # exact contributing hours are not decoded. Base-to-tip runtime changes
+    # are confined to simulator/fe_redox.py and simulator/battery/score.py;
+    # this runner path does not import the scorer, so all full-lunar deltas
+    # come from a490c6011's Holzheid multiplier. SiO Stage 3/4 move
+    # +7.8558002e-6/+1.0078889e-5 kg; all route-field deltas and the exclusion
+    # evidence are in worker-report-goldens-r4.md.
     # The production band pin records the controller's intended area-weighted
     # cutoff: 33 equal strips span 900-1200 C, and only 17 strips at/below the
     # inclusive 1050 C SiO reactive-product cutoff capture. The other 16 pass

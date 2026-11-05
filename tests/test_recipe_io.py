@@ -476,13 +476,13 @@ def test_runner_malformed_recipe_cli_fails_loud(tmp_path: Path) -> None:
 def test_no_recipe_run_matches_committed_golden_text(
     runner_golden_loader,
 ) -> None:
-    # The studio lunar C0 text SHA-256 moves edd0c75b...f1c34 ->
-    # 7ea530a8...10386 for a490c6011's Holzheid 1/T interpolation. The pin
-    # deltas include staged silica +2.591784458e-9 kg, products Fe
-    # +3.235920243e-7 kg, products Na +5.525418062e-8 kg, and Stage-3 Fe
-    # +3.214090775e-8 kg at 1750 C above the old clamp. The C0 fixture first
-    # shifts at 1425 C inside the band and extrapolates at 1750 C and
-    # 1150-1190 C; CLI serialization remains byte-for-byte.
+    # The Studio lunar C0 text SHA-256 moves edd0c75b...f1c34 ->
+    # 7ea530a8...10386 for a490c6011's Holzheid 1/T interpolation. Its Stage-3
+    # Fe value moves +2.049305103e-8 kg at hour 16 (1750 C, above the old
+    # clamp); the first changed row is hour 13 (1425 C, inside), followed by
+    # hours 17-24 at 1150-1190 C (below). These lunar-C0 fixture deltas are
+    # separate from the staged-C2A pin-report values; see
+    # worker-report-goldens-r4.md. CLI serialization remains byte-for-byte.
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md

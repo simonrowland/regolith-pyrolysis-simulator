@@ -29,10 +29,12 @@ _STOLYAROVA = (
 )
 # value, solved pO2 bar. Costa's internal-analytical species pressure uses the
 # offer 20 r8 vapour route at the same solved pO2.
-# The Costa prediction shift is the d-321 scorer frame in 2b2a8d2bc: the
-# printed Holzheid wustite-to-stoichiometric FeO conversion replaces the D&G
-# fallback at 1700.48 K (1427.33 C). It is not the a490c6011 runtime gamma
-# interpolation; the value moves by -0.00049122904043269 (-0.353646%).
+# a490c6011's runtime gamma interpolation causes the Costa move at 1700.48 K
+# (1427.33 C), inside the 1300-1600 C band. The multiplier changes
+# 1.9017380000000002 -> 1.895012577929151 (ratio 0.9964635391043092), matching
+# the pin ratio 0.13841290560764033 / 0.13890413464807302 = 0.9964635391043091;
+# delta -0.00049122904043269 (-0.353646%). The d-321 scorer-frame change does
+# not contribute: the reference conversion rejects partial-pressure quantities.
 _PIN = {
     (_COSTA, Engine.INTERNAL_ANALYTICAL): (
         Decimal("0.13841290560764033"),
