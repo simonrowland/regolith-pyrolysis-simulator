@@ -143,6 +143,47 @@ def test_kress_table1_redox_rows_project_printed_conditions() -> None:
         assert row.identity.composition is not None
         assert row.identity.composition.is_value
     assert observed_runs == set(by_run)
+    assert all(
+        _composition(row).input_provenance == SCORED_PHASE_ANALYSIS
+        for row in redox_rows
+    )
+
+
+def test_exploded_child_phase_overrides_parent_phase(tmp_path: Path) -> None:
+    extract = yaml.safe_load(KRESS.read_text(encoding="utf-8"))
+    series = next(
+        item
+        for item in extract["species"]["Fe"]["observations"]
+        if item["observation_id"] == "kress_1988_table1_measured_redox_series"
+    )
+    first_row = series["values"]["rows"][0]
+    first_row["phase"] = "silicate melt"
+    series["phase_as_analyzed"] = (
+        "quenched silicate glass by electron microprobe analysis"
+    )
+    mutated = tmp_path / KRESS.name
+    mutated.write_text(yaml.safe_dump(extract, sort_keys=False), encoding="utf-8")
+
+    result = _migrate(mutated)
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "kress-carmichael-1988-iron-oxidation-stoichiometry"
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value.value == "fe3_fe2_ratio"
+    ]
+    first_child = next(
+        row
+        for row in redox_rows
+        if row.point_conditions["temperature_K"].locator.record
+        == str(first_row["experiment_id"])
+    )
+    assert _composition(first_child).input_provenance is None
+    assert all(
+        _composition(row).input_provenance == SCORED_PHASE_ANALYSIS
+        for row in redox_rows
+        if row is not first_child
+    )
 
 
 def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:

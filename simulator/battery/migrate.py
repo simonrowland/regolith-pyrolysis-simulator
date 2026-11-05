@@ -21270,6 +21270,12 @@ class Migrator:
             obs, values, provenance, quantity=q_token
         )
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
+        parent_phase_text = _phase_evidence_text(
+            phase_raw,
+            obs.get("phase_as_measured"),
+            values.get("phase_as_measured"),
+        )
+        parent_analysed_phase_text = _analysed_phase_text(obs, values)
         observation_provenance = _provenance_with_printed_phase(
             observation_provenance, phase_raw
         )
@@ -23157,12 +23163,8 @@ class Migrator:
             derivation_relation=(
                 value_derivation.relation if value_derivation is not None else None
             ),
-            phase_text=_phase_evidence_text(
-                phase_raw,
-                obs.get("phase_as_measured"),
-                values.get("phase_as_measured") if isinstance(values, Mapping) else None,
-            ),
-            analysed_phase_text=_analysed_phase_text(obs, values),
+            phase_text=parent_phase_text,
+            analysed_phase_text=parent_analysed_phase_text,
         )
         identity = fill_identity(
             quantity,
@@ -23345,6 +23347,8 @@ class Migrator:
                     parent_values=values,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    parent_phase_text=parent_phase_text,
+                    parent_analysed_phase_text=parent_analysed_phase_text,
                 )
             if (
                 self._count(source_key).observations_out > before
@@ -23472,6 +23476,8 @@ class Migrator:
                         parent_values=values,
                         provenance=observation_provenance,
                         parent_point_conditions=point_conditions,
+                        parent_phase_text=parent_phase_text,
+                        parent_analysed_phase_text=parent_analysed_phase_text,
                         source_point_oxide_map=_mass_loss_oxide_map_from_mapping(
                             raw_item
                         ),
@@ -23602,6 +23608,8 @@ class Migrator:
                     parent_values=values,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    parent_phase_text=parent_phase_text,
+                    parent_analysed_phase_text=parent_analysed_phase_text,
                 )
                 if not child_carries_value:
                     children_carry_values = False
@@ -23793,6 +23801,8 @@ class Migrator:
                         parent_point_conditions=(
                             point_parent_conditions if non_yield_points else point_conditions
                         ),
+                        parent_phase_text=parent_phase_text,
+                        parent_analysed_phase_text=parent_analysed_phase_text,
                         content_stable_id=True,
                         use_printed_point_species=non_yield_points,
                     )
@@ -24331,6 +24341,8 @@ class Migrator:
         parent_values: object = None,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
+        parent_phase_text: str | None = None,
+        parent_analysed_phase_text: str | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         content_stable_id: bool = False,
         ordinal_point_id: str | None = None,
@@ -24881,6 +24893,15 @@ class Migrator:
             child_map_locator = _printed_oxide_map_locator(
                 parent_values if isinstance(parent_values, Mapping) else None
             )
+        row_phase_text = _phase_evidence_text(
+            printed_phase_text,
+            raw_item.get("phase_as_measured") if isinstance(raw_item, Mapping) else None,
+            raw_item.get("phase") if isinstance(raw_item, Mapping) else None,
+        )
+        row_analysed_phase_text = _analysed_phase_text(raw_item)
+        row_has_phase_evidence = (
+            row_phase_text is not None or row_analysed_phase_text is not None
+        )
         _finalize_input_provenance(
             ident_kwargs,
             quantity=q_token_point if isinstance(q_token_point, Quantity) else None,
@@ -24889,12 +24910,14 @@ class Migrator:
             row_locator=point_locator,
             map_locator=child_map_locator,
             point_conditions=parent_point_conditions,
-            phase_text=_phase_evidence_text(
-                printed_phase_text,
-                raw_item.get("phase_as_measured") if isinstance(raw_item, Mapping) else None,
-                raw_item.get("phase") if isinstance(raw_item, Mapping) else None,
+            phase_text=(
+                row_phase_text if row_has_phase_evidence else parent_phase_text
             ),
-            analysed_phase_text=_analysed_phase_text(raw_item, parent_values),
+            analysed_phase_text=(
+                row_analysed_phase_text
+                if row_has_phase_evidence
+                else parent_analysed_phase_text
+            ),
         )
         identity = fill_identity(quantity, species, **ident_kwargs)
         converted: Derivation | None = None
