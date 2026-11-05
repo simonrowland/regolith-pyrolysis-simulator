@@ -6,6 +6,7 @@ import math
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -20,6 +21,7 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
     AdmissionStatus,
+    CellMaterial,
     RefusalReason,
 )
 from simulator.battery.identity import Identity
@@ -277,6 +279,84 @@ def _assert_internal_activity_residual_matches_production(
     return residual
 
 
+def test_internal_analytical_scored_vapour_keeps_gamma_source_authority(
+    monkeypatch,
+) -> None:
+    composition = _composition(("MgO", "0.5"), ("SiO2", "0.5"))
+    experiment, bench, observation = _case(
+        composition=composition,
+        formula="MgO",
+        quantity=Quantity.P_PARTIAL,
+        temperature=Value.point_of(Decimal("1873")),
+    )
+    bench = replace(bench, cell_materials=(F.located(CellMaterial.PT),))
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            species=Species("Mg", Phase.G),
+        ),
+    )
+    activity = melt_oxide_activity(
+        "MgO",
+        {name: float(amount) for name, amount in composition.components},
+        temperature_K=1873.0,
+    )
+    assert activity is not None
+    assert activity.source_composition_range_notice is not None
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        lambda name: SimpleNamespace(
+            name=name,
+            available=True,
+            unavailable_reason=None,
+            supports_intrinsic_fO2=False,
+        ),
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        lambda *_args, **_kwargs: SimpleNamespace(
+            status="ok",
+            refusal_reason=None,
+            gas_partial_pressures_Pa={"Mg": 0.125},
+            melt_activities={},
+            melt_activity_coefficients={},
+            notices=[
+                {
+                    "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                    "reason": activity.source_composition_range_notice,
+                    "authority": Authority.BRIDGE.value,
+                }
+            ],
+            hostname="test",
+            exit_code=0,
+            exit_signal=None,
+            authority=None,
+            certified_band=None,
+        ),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        bench=bench,
+        handles={},
+        isolated=False,
+    )
+
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("0.125")
+    source_notice = next(
+        notice
+        for notice in prediction.notices
+        if notice.reason == activity.source_composition_range_notice
+    )
+    assert source_notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+    assert source_notice.authority is Authority.BRIDGE
+
+
 def test_internal_analytical_scores_guo_2021_mgo_row() -> None:
     # d3285901c restores Table 5 measured activities and 2f342093c restores
     # their printed slag compositions. Table 5 p. 2728 row 2 has a(MgO)=0.5121
@@ -450,6 +530,9 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
+                        # The generic tier fallback keeps reason
+                        # "melt_oxide_activity has no certified evidence tier";
+                        # the separate d144_fusion_conversion notice owns BRIDGE.
                         reason="melt_oxide_activity has no certified evidence tier",
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
@@ -463,22 +546,6 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                             "authority=bridge|reason=JANAF tabulates the liquid "
                             "phase below its solid-liquid Gibbs crossing; this is "
                             "JANAF's metastable (supercooled) liquid branch|"
-                            "certified_band_K=[298.15, 3600]"
-                        ),
-                        origin=(
-                            "simulator.chemistry.melt_activity.melt_oxide_activity"
-                        ),
-                        band="[298.15, 3600] K",
-                        authority=Authority.BRIDGE,
-                    ),
-                    Notice(
-                        kind=NoticeKind.FALLBACK,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            "d144_fusion_conversion|oxide=CaO|temperature_K=1873|"
-                            "authority=bridge|reason=JANAF tabulates the liquid phase "
-                            "below its solid-liquid Gibbs crossing; this is JANAF's "
-                            "metastable (supercooled) liquid branch|"
                             "certified_band_K=[298.15, 3600]"
                         ),
                         origin=(
@@ -499,6 +566,9 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                     Notice(
                         kind=NoticeKind.FALLBACK,
                         affected_quantities=(Quantity.ACTIVITY,),
+                        # The generic tier fallback keeps reason
+                        # "melt_oxide_activity has no certified evidence tier";
+                        # the separate d144_fusion_conversion notice owns BRIDGE.
                         reason="melt_oxide_activity has no certified evidence tier",
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
@@ -512,22 +582,6 @@ def test_internal_analytical_kume_sample_207_mgo_matches_liquid_reference() -> N
                             "authority=bridge|reason=JANAF tabulates the liquid "
                             "phase below its solid-liquid Gibbs crossing; this is "
                             "JANAF's metastable (supercooled) liquid branch|"
-                            "certified_band_K=[298.15, 4000]"
-                        ),
-                        origin=(
-                            "simulator.chemistry.melt_activity.melt_oxide_activity"
-                        ),
-                        band="[298.15, 4000] K",
-                        authority=Authority.BRIDGE,
-                    ),
-                    Notice(
-                        kind=NoticeKind.FALLBACK,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=(
-                            "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
-                            "authority=bridge|reason=JANAF tabulates the liquid phase "
-                            "below its solid-liquid Gibbs crossing; this is JANAF's "
-                            "metastable (supercooled) liquid branch|"
                             "certified_band_K=[298.15, 4000]"
                         ),
                         origin=(
