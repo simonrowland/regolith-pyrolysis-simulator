@@ -134,6 +134,15 @@ def test_zhang_cell_two_comparison_is_pinned_to_page_five_render() -> None:
         "range."
     ) in audit
     assert (
+        "the present cell-I emf result is in good agreement with Zhang et al.'s "
+        "rederived emf data for the same configuration, assuming equilibrium "
+        "between α-Na2Fe2O4 and α-Fe2O3 and using α-Al2O3 + Na-β-Al2O3 as the "
+        "reference electrode (absolute PDF page 5, printed page 179, left "
+        "column; the sentence begins on absolute PDF page 4, printed page "
+        "178). This is a qualitative statement with no comparison temperature "
+        "or numeric residual."
+    ) in audit
+    assert (
         "That relative band has no temperature range in the sentence, and no "
         "absolute cell-2 value or residual was calculated."
     ) in audit
