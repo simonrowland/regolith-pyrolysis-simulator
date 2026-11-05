@@ -359,12 +359,18 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         sample = printed[run_id]
         source = source_rows[row.observation_id.rsplit("::", 1)[-1]]
         assert source["values"]["sample_id"] == sample["sample_id"]
-        expected = wt_pct_to_mole_fraction(
+        printed_composition = wt_pct_to_mole_fraction(
             {
                 key: Decimal(value)
                 for key, value in sample.items()
                 if key not in {"sample_id", "T_K"}
             }
+        )
+        # Table S-1 redox row, Table S-2 oxide map. phase_map_provenance
+        # stamps printed_starting_bulk when those tables differ. The point
+        # composition stays the unstamped conversion, same as the 1800-30 row.
+        expected = replace(
+            printed_composition, input_provenance=PRINTED_STARTING_BULK
         )
         assert _composition(row) == expected
         assert row.identity.temperature_K.is_value
@@ -376,7 +382,7 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         assert point["fO2_log"].state.value == Decimal("-0.68")
         assert point["fO2_log"].locator.table == "S-1"
         assert point["composition"].state.is_value
-        assert point["composition"].state.value == expected
+        assert point["composition"].state.value == printed_composition
         assert point["composition"].locator.table == "S-2"
 
 
