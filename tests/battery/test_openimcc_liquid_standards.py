@@ -316,9 +316,7 @@ def test_score_melt_unsupported_inventory_basis_still_refuses(
     assert prediction.refusal_detail["reason"] == "initial_composition_basis_not_supported"
 
 
-def test_score_preflight_result_carries_standard_conversion_notice(
-    monkeypatch: Any,
-) -> None:
+def _openimcc_k_pressure_observation(observation_id: str) -> Any:
     from simulator.battery.enums import (
         AdmissionStatus,
         EvidenceClass,
@@ -336,17 +334,10 @@ def test_score_preflight_result_carries_standard_conversion_notice(
         Uncertainty,
         Value,
     )
-    from simulator.diagnostic_helpers.binary_pot_battery import (
-        _OpenImccBatteryBackend,
-    )
 
-    components = {"K2O": 20.0, "SiO2": 80.0}
     composition = Composition(
         basis="oxide_wt_pct",
-        components=tuple(
-            (oxide, Decimal(str(amount)))
-            for oxide, amount in components.items()
-        ),
+        components=(("K2O", Decimal("20")), ("SiO2", Decimal("80"))),
         amount_basis=AmountBasis.MASS_PERCENT,
     )
     identity = Identity(
@@ -358,14 +349,27 @@ def test_score_preflight_result_carries_standard_conversion_notice(
         composition=State.of(composition),
     )
     observation = Observation(
-        observation_id="liquid-standard-preflight-refusal",
-        experiment_id="liquid-standard-preflight-refusal",
+        observation_id=observation_id,
+        experiment_id=observation_id,
         identity=identity,
         value=Value(ValueKind.POINT, point=Decimal("1e-6")),
         uncertainty=Uncertainty(UncertaintyKind.NONE),
         evidence=Evidence(State.of(EvidenceClass.MEASURED_DIRECT)),
         admission=Admission(AdmissionStatus.ADMITTED, "test"),
         notices=(),
+    )
+    return observation
+
+
+def test_score_preflight_result_carries_standard_conversion_notice(
+    monkeypatch: Any,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+
+    observation = _openimcc_k_pressure_observation(
+        "liquid-standard-preflight-refusal"
     )
     pack = _load_pack("published-core")
     backend = _OpenImccBatteryBackend("openimcc")
@@ -392,8 +396,56 @@ def test_score_preflight_result_carries_standard_conversion_notice(
     assert "oxide=K2O" in conversion_notice.reason
     assert "standard_id=FC87-Glushko-K2O" in conversion_notice.reason
     assert "active_standard_id=K-012" in conversion_notice.reason
+    assert "temperature_K=1800.0" in conversion_notice.reason
     assert "log10_offset=" in conversion_notice.reason
     assert conversion_notice.origin == "engine:openimcc"
+
+
+def test_scored_missing_openimcc_liquid_standard_preserves_category_one_refusal(
+    monkeypatch: Any,
+) -> None:
+    from simulator.battery.enums import ExecutionState
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _OpenImccBatteryBackend,
+    )
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        LiquidStandardMissingError,
+    )
+
+    observation = _openimcc_k_pressure_observation("missing-liquid-standard")
+    backend = _OpenImccBatteryBackend("openimcc")
+    backend._pack = _load_pack("default")
+    error = LiquidStandardMissingError(
+        "K2O", "missing-K2O-standard", "no G0(T) row or recorded translation"
+    )
+    monkeypatch.setattr(
+        backend,
+        "equilibrate",
+        lambda **_kwargs: (_ for _ in ()).throw(error),
+    )
+    handle = SimpleNamespace(
+        name=Engine.OPENIMCC.value,
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+        backend=backend,
+        identity=backend._identity,
+    )
+
+    prediction = score._predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        handles={Engine.OPENIMCC.value: handle},
+    )
+
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.execution.state is ExecutionState.NOT_PROBED
+    assert prediction.refusal_detail["reason"] == "missing_input"
+    assert prediction.refusal_detail["category"] == 1
+    assert prediction.refusal_detail["invalid_input"] is True
+    failure = prediction.refusal_detail["standard_failures"][0]
+    assert failure["standard_id"] == "missing-K2O-standard"
 
 
 def test_closed_redox_result_carries_dependent_standard_notices(

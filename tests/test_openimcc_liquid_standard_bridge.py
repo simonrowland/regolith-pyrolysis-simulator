@@ -352,6 +352,35 @@ def test_production_vapor_pressure_caller_converts_published_pack_activity(
     )
 
 
+def test_d066_k2o_translation_flags_extrapolation_and_reports_fit_band() -> None:
+    from openimcc import gas
+
+    from simulator.melt_backend.openimcc_liquid_standards import (
+        convert_parent_activities_for_gas,
+    )
+
+    published_pack = _load_pack("published-core")
+    active_gas_pack = gas.load_gas_datapack()
+    for temperature_K, expected_extrapolated in (
+        (1600.0, True),
+        (2200.0, False),
+    ):
+        _activities, conversion_notices = convert_parent_activities_for_gas(
+            {"K2O": 1.0, "SiO2": 1.0},
+            temperature_K,
+            published_pack,
+            active_gas_pack,
+        )
+        notice = next(
+            item
+            for item in conversion_notices
+            if item["oxide"] == "K2O"
+        )
+        assert notice["temperature_K"] == temperature_K
+        assert notice["extrapolated"] is expected_extrapolated
+        assert notice["temperature_domain_K"] == [1700.0, 3000.0]
+
+
 def test_default_bridge_returns_only_composition_dependent_flag_records() -> None:
     records = openimcc_bridge.evaluate(
         composition_mol=_default_composition(),
