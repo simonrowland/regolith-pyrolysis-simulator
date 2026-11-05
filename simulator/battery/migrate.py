@@ -24978,6 +24978,7 @@ class Migrator:
                     point_locator,
                 ),
             }
+        notice_composition_located = None
         if identity.composition is None or not identity.composition.is_value:
             located_composition = (point_conditions or {}).get("composition")
             mass_percent_refusal = (
@@ -25042,14 +25043,13 @@ class Migrator:
                         identity = replace(
                             identity, composition=converted_composition.state
                         )
-                        point_conditions = {
-                            **(point_conditions or {}),
-                            "composition": _relocated(
-                                converted_composition.state,
-                                converted_composition,
-                                point_locator,
-                            ),
-                        }
+                        # Keep the printed condition map intact; notices use
+                        # the converted composition's carried inference.
+                        notice_composition_located = _relocated(
+                            converted_composition.state,
+                            converted_composition,
+                            point_locator,
+                        )
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
             or not identity.total_pressure_Pa.is_value
@@ -25088,21 +25088,31 @@ class Migrator:
                 origin=point_id,
             )
         )
+        if notice_composition_located is None:
+            notice_composition_located = (point_conditions or {}).get(
+                "composition"
+            )
         if malformed_composition_amount is not None:
             identity = replace(
                 identity,
                 composition=State.unknown(malformed_composition_amount),
             )
+        notice_point_conditions = point_conditions
+        if notice_composition_located is not None:
+            notice_point_conditions = {
+                **(point_conditions or {}),
+                "composition": notice_composition_located,
+            }
         renormalization_notice = _mass_percent_renormalization_notice(
             identity,
-            point_conditions,
+            notice_point_conditions,
             quantity=q_token_point,
             origin=point_id,
         )
         if renormalization_notice is not None:
             child_notices.append(renormalization_notice)
         projection_notice = _composition_projection_notice(
-            (point_conditions or {}).get("composition"),
+            notice_composition_located,
             quantity=(
                 q_token_point if isinstance(q_token_point, Quantity) else None
             ),
