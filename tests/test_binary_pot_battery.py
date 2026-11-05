@@ -9,6 +9,7 @@ import signal
 import resource
 import subprocess
 import sys
+import threading
 import time
 from functools import partial
 from pathlib import Path
@@ -613,6 +614,83 @@ def test_refusing_engine_yields_typed_refusal_row_not_exception() -> None:
     )
     assert timeout_cell.status == "refusal"
     assert timeout_cell.refusal_reason == REFUSAL_TIMEOUT
+
+
+def test_internal_analytical_outer_cap_refuses_a_hung_call_deterministically(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import threading
+
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    entered = threading.Event()
+    release = threading.Event()
+    real_thread = threading.Thread
+    threads: list[threading.Thread] = []
+    observed_join_timeouts: list[float] = []
+
+    class _DeadlineExpiredThread(real_thread):
+        def start(self) -> None:
+            super().start()
+            assert entered.wait(timeout=10.0)
+
+        def join(self, timeout: float | None = None) -> None:
+            if not observed_join_timeouts:
+                assert timeout is not None
+                observed_join_timeouts.append(float(timeout))
+                assert self.is_alive()
+                return
+            super().join(timeout=timeout)
+
+        def __init__(self, *args, **kwargs) -> None:
+            super().__init__(*args, **kwargs)
+            threads.append(self)
+
+    class _HungInternalAnalyticalBackend:
+        def equilibrate(self, **_kwargs):
+            entered.set()
+            release.wait()
+
+    monkeypatch.setattr(battery.threading, "Thread", _DeadlineExpiredThread)
+    timeout_s = battery._ENGINE_OUTER_TIMEOUT_S["internal-analytical"]
+    handle = EngineHandle(
+        name="internal-analytical",
+        backend=_HungInternalAnalyticalBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    pot = BinaryPot(
+        pot_id="hung-internal-analytical",
+        kato_1993_table4_system=None,
+        why="deterministic timeout test",
+        composition_wt_pct={"SiO2": 50.0, "Al2O3": 50.0},
+    )
+
+    try:
+        cell = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1600.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            isolated=False,
+        )
+        assert entered.is_set()
+        assert threads[0].is_alive()
+    finally:
+        release.set()
+        for thread in threads:
+            thread.join()
+
+    assert observed_join_timeouts == [timeout_s]
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_TIMEOUT
+    assert cell.engine_status == "TimeoutError"
+    assert cell.engine_reason == (
+        f"equilibrate exceeded hard timeout of {timeout_s:g}s"
+    )
+    assert timeout_s == 120.0
 
 
 def test_classify_out_of_domain_and_no_liquid() -> None:
@@ -2540,6 +2618,164 @@ def _fake_isolated_cell_handler(_resource, request, _diagnostic_log):
         arm=request["arm"],
     )
     return cell.as_payload()
+
+
+class _InternalAnalyticalBudgetBackend:
+    def __init__(self, mode: str) -> None:
+        self.mode = mode
+
+    def equilibrate(self, **_kwargs):
+        if self.mode == "cpu_hang":
+            while True:
+                pass
+        if self.mode == "idle_then_short_compute":
+            time.sleep(6.0)
+            cpu_deadline = time.process_time() + 0.4
+            while time.process_time() < cpu_deadline:
+                pass
+        if self.mode == "short_compute":
+            cpu_deadline = time.process_time() + 0.025
+            while time.process_time() < cpu_deadline:
+                pass
+        from simulator.melt_backend.base import EquilibriumResult
+
+        return EquilibriumResult(
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 50.0}},
+        )
+
+
+def _internal_analytical_budget_bootstrap(
+    _engine: str, *, mode: str, cpu_budget_s: float | None
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    if cpu_budget_s is not None:
+        battery._INTERNAL_ANALYTICAL_CPU_BUDGET_S = cpu_budget_s
+    handle = battery.EngineHandle(
+        name="internal-analytical",
+        backend=_InternalAnalyticalBudgetBackend(mode),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    return battery._IsolatedCellEngine(handle), "internal-analytical-budget-test"
+
+
+def _install_internal_analytical_budget_worker(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    mode: str,
+    cpu_budget_s: float | None = 0.1,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    monkeypatch.setattr(
+        battery,
+        "_bootstrap_isolated_cell_engine",
+        partial(
+            _internal_analytical_budget_bootstrap,
+            mode=mode,
+            cpu_budget_s=cpu_budget_s,
+        ),
+    )
+    if cpu_budget_s is not None:
+        monkeypatch.setattr(
+            battery,
+            "_INTERNAL_ANALYTICAL_CPU_BUDGET_S",
+            cpu_budget_s,
+            raising=False,
+        )
+    return battery
+
+
+def test_internal_analytical_cpu_budget_refuses_a_cpu_hung_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_internal_analytical_budget_worker(
+        monkeypatch, mode="cpu_hang"
+    )
+    try:
+        cell = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-cpu-budget",
+            engine="internal-analytical",
+            timeout_s=1.0,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_TIMEOUT
+    assert cell.engine_status == "TimeoutError"
+    assert cell.engine_reason == "equilibrate exceeded hard CPU budget of 0.1s"
+
+
+def test_internal_analytical_wall_backstop_refuses_a_blocked_child(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator.engine_pool import EngineWorkerTimeout
+
+    fake_wall = [0.0]
+    worker = battery._IsolatedCellWorker("internal-analytical")
+
+    def block_until_deadline(_payload, *, timeout_s: float):
+        fake_wall[0] += timeout_s + 0.01
+        raise EngineWorkerTimeout(
+            "internal-analytical battery cell", timeout_s, phase="job"
+        )
+
+    monkeypatch.setattr(worker._worker, "call", block_until_deadline)
+    try:
+        with pytest.raises(battery._IsolatedCellWorkerFailure) as raised:
+            worker.request({"pot_id": "worker-wall-budget"}, timeout_s=0.1)
+    finally:
+        worker.close()
+
+    assert fake_wall[0] > 0.1
+    assert raised.value.timed_out is True
+    assert raised.value.timeout_reason is None
+
+
+def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_internal_analytical_budget_worker(
+        monkeypatch, mode="idle_then_short_compute", cpu_budget_s=None
+    )
+    handle = EngineHandle(
+        name="internal-analytical",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=False,
+    )
+    pot = BinaryPot(
+        pot_id="worker-cpu-budget-idle-then-compute",
+        kato_1993_table4_system=None,
+        why="worker-test",
+        composition_wt_pct={"SiO2": 20.0, "FeO": 48.0, "MgO": 32.0},
+    )
+    try:
+        # Leave timeout_s unset so equilibrate_cell uses production defaults.
+        # Green's 5 s wall cap refused this during the 6 s idle, despite only
+        # 0.4 s of process CPU being used.
+        cpu_budget_cell = battery.equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1700.0,
+            po2=Po2Request(mode="engine_default", po2_bar=None),
+            isolated=True,
+        )
+    finally:
+        battery._close_isolated_cell_workers()
+
+    assert cpu_budget_cell.status == "ok"
+    assert cpu_budget_cell.refusal_reason is None
 
 
 def _nested_warm_hang_handler(_resource, _request, _diagnostic_log):
