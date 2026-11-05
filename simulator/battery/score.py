@@ -2463,8 +2463,11 @@ def _decide_omitted_reference_polymorph(
     """
 
     from simulator.battery.generators.janaf import (
+        JANAF_SINGLE_POLYMORPH_IDENTITY_D144,
+        JANAF_SINGLE_POLYMORPH_IDENTITY_D144_OXIDES,
         JANAFFusionPolymorphUnavailable,
         _FUSION_TABLES,
+        _JANAF_POLYMORPH_BY_TABLE,
         _janaf_fusion_energy_for_pair,
         _janaf_stable_crystal_set,
         janaf_solid_stability_transitions,
@@ -2518,15 +2521,23 @@ def _decide_omitted_reference_polymorph(
             band=f"JANAF fusion data for {formula}: {detail}",
         )
 
+    d144_table_id = JANAF_SINGLE_POLYMORPH_IDENTITY_D144.get(formula)
+    if formula in JANAF_SINGLE_POLYMORPH_IDENTITY_D144_OXIDES and d144_table_id is None:
+        return None, missing("d-144 single-polymorph identity table entry is absent")
+
     try:
         stability = _janaf_stable_crystal_set(formula, temperature_K)
     except JANAFFusionPolymorphUnavailable as exc:
         return None, missing(f"incomplete JANAF stability candidate set: {exc}")
 
     try:
-        _default_solid, liquid_table = _FUSION_TABLES[formula]
+        default_solid, liquid_table = _FUSION_TABLES[formula]
     except KeyError:
         return None, missing(f"no JANAF fusion table pair for {formula}")
+    if d144_table_id is not None and default_solid != d144_table_id:
+        return None, missing(
+            f"d-144 table {d144_table_id} does not match JANAF fusion table {default_solid}"
+        )
 
     try:
         fusion = _janaf_fusion_energy_for_pair(
@@ -2578,6 +2589,17 @@ def _decide_omitted_reference_polymorph(
         )
 
     selected = stability.selected
+    if formula in JANAF_SINGLE_POLYMORPH_IDENTITY_D144_OXIDES:
+        d144_polymorph = _JANAF_POLYMORPH_BY_TABLE.get(d144_table_id)
+        if (
+            d144_polymorph is None
+            or selected.table_id != d144_table_id
+            or selected.polymorph is not d144_polymorph
+            or stability.alternatives
+        ):
+            return None, missing(
+                "d-144 table entry does not match the sole JANAF solid table"
+            )
     # Premise: the source named a pure solid oxide and no polymorph. The
     # comparison standard is the crystal with the lowest formation G in this
     # JANAF table at T.
@@ -2624,22 +2646,35 @@ def _decide_omitted_reference_polymorph(
         payload["dimer_formula"] = formula
         payload["dimer_solid_activity"] = str(reference.value.point)
         payload["printed_formula"] = mapped_from
+    if d144_table_id is not None:
+        reason = (
+            "single_polymorph_identity_d144; "
+            f"formula={formula}; phase={selected.polymorph.value}; "
+            f"table_id={d144_table_id}"
+        )
+        band = (
+            f"d-144 identity {formula} -> {selected.polymorph.value}; "
+            f"table={d144_table_id}"
+        )
+        certification = "NIST-JANAF closed single-polymorph identity table"
+    else:
+        reason = (
+            f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
+            + json.dumps(payload, sort_keys=True)
+        )
+        band = (
+            f"JANAF stable polymorph {selected.polymorph.value} "
+            f"table {selected.table_id}"
+        )
+        certification = "NIST-JANAF solid formation Gibbs energies compared at T"
     notices = [
         _reference_polymorph_notice(
             reference,
             kind=NoticeKind.DERIVATION_USES_COMPILATION,
-            reason=(
-                f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
-                + json.dumps(payload, sort_keys=True)
-            ),
-            band=(
-                f"JANAF stable polymorph {selected.polymorph.value} "
-                f"table {selected.table_id}"
-            ),
+            reason=reason,
+            band=band,
             authority=Authority.CERTIFIED,
-            certification=(
-                "NIST-JANAF solid formation Gibbs energies compared at T"
-            ),
+            certification=certification,
         )
     ]
     if _omitted_reason_states_inferred_solid(reason_text):
@@ -2892,10 +2927,20 @@ def _janaf_fusion_energy_for_reference(
 
 
 def _inferred_reference_polymorph(notices: Sequence[Notice]) -> Polymorph | None:
-    """Polymorph d-338 wrote onto the working comparison, if it did."""
+    """Polymorph identity d-144 or inference d-338 wrote on comparison."""
 
     prefix = f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
     for notice in notices:
+        if notice.reason.startswith("single_polymorph_identity_d144;"):
+            phase = next(
+                (
+                    field.removeprefix("phase=")
+                    for field in notice.reason.split("; ")
+                    if field.startswith("phase=")
+                ),
+                None,
+            )
+            return None if phase is None else Polymorph(phase)
         if not notice.reason.startswith(prefix):
             continue
         payload = json.loads(notice.reason[len(prefix) :])
@@ -4349,10 +4394,14 @@ def fusion_comparison_reference(
                 notices=union_notices(reference.notices, notices),
             )
 
-    # For the same chemical potential, mu = G° + RT ln(a) gives
+    # d-144 premise: the closed JANAF table fixes CaO(s) as lime (Ca-027)
+    # and MgO(s) as periclase (Mg-008), each the sole solid polymorph below
+    # fusion. Their solid-to-liquid conversion is the fusion term alone.
+    # Algebra: for equal chemical potential, mu = G° + RT ln(a) gives
     # a_l = a_s*exp(-DeltaG/RT), where DeltaG=G_l-G_s per mole of oxide.
     # J/mol over J/(mol K)*K is dimensionless, and DeltaG=0 at the crossing
-    # leaves the activity unchanged. In log10 units,
+    # leaves the activity unchanged. As a sanity check, the JANAF owner gives
+    # a -0.90911 dex CaO shift at 1873 K. In log10 units,
     # log10(a_l/a_s) = -DeltaG/(RT ln(10)); JANAF reports DeltaG in kJ/mol,
     # so multiply by 1000 and use R=8.31441 J/(mol*K). For CaO,
     # JANAF interpolation gives DeltaG_fus=33.80370 and 32.59870 kJ/mol at

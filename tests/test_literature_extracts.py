@@ -318,7 +318,7 @@ def test_kume_2000_solid_reference_does_not_infer_unprinted_polymorph() -> None:
         and row["values"].get("method_class") == "measured_reduced"
         and row["values"]["activity"] > 0
     ]
-    assert len(targets) == 126
+    assert len(targets) == 144
     for row in targets:
         endmember = row["standard_state"]["state"]["value"]["endmember"]
         assert endmember["phase"] == {"tag": "value", "value": "cr"}

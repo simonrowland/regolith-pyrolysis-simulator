@@ -529,8 +529,12 @@ def test_inferred_polymorph_is_a_flagged_stratum_for_magemin() -> None:
         _omitted_solid("CaO", Decimal("1873"), "polymorph not named"),
         engine=Engine.MAGEMIN,
     )
-    assert FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED in flagged_strata(
+    assert FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED not in flagged_strata(
         lime.notices
+    )
+    assert any(
+        item.reason.startswith("single_polymorph_identity_d144;")
+        for item in lime.notices
     )
     assert lime.value.point == Decimal("0.3")
     assert lime.identity.reference_state.value.endmember.phase.value is Phase.CR

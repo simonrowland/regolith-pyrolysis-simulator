@@ -13630,16 +13630,13 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
 @pytest.mark.parametrize(
     "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
+def test_unnamed_cao_reference_uses_d144_identity_for_the_only_janaf_solid(
     temperature: Decimal,
 ) -> None:
-    """CaO has one JANAF crystal below its melting point, so the omission is sized 'not sized'."""
-
-    import json
+    """CaO's sole closed-table crystal is an identity, not an inference."""
 
     from simulator.battery.generators.janaf import _janaf_stable_crystal_set
     from simulator.battery.score import (
-        REFERENCE_POLYMORPH_INFERRED_REASON,
         fusion_comparison_reference,
     )
 
@@ -13668,18 +13665,12 @@ def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
     notice = next(
         item
         for item in converted.notices
-        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        if item.reason.startswith("single_polymorph_identity_d144;")
     )
-    detail = json.loads(notice.reason.split(":", 1)[1])
 
     assert stable.alternatives == ()
-    assert detail == {
-        "comparison_phase": None,
-        "comparison_table_id": None,
-        "phase": stable.selected.polymorph.value,
-        "sizing_dex": "not sized",
-        "table_id": stable.selected.table_id,
-    }
+    assert f"phase={stable.selected.polymorph.value}" in notice.reason
+    assert f"table_id={stable.selected.table_id}" in notice.reason
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.value.point != reference.value.point
     assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
@@ -14186,12 +14177,7 @@ def test_unnamed_silica_reference_with_row_band_still_infers_the_stable_crystal(
 
 
 def test_unnamed_cao_reference_phase_converts_on_the_only_janaf_solid() -> None:
-    import json
-
-    from simulator.battery.score import (
-        REFERENCE_POLYMORPH_INFERRED_REASON,
-        fusion_comparison_reference,
-    )
+    from simulator.battery.score import fusion_comparison_reference
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14224,17 +14210,107 @@ def test_unnamed_cao_reference_phase_converts_on_the_only_janaf_solid() -> None:
     benchmark_comparison = fusion_comparison_reference(
         benchmark, engine=Engine.OPENIMCC
     )
-    detail = json.loads(
-        next(
-            notice.reason
-            for notice in comparison.notices
-            if notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
-        ).split(":", 1)[1]
+    notice = next(
+        notice
+        for notice in comparison.notices
+        if notice.reason.startswith("single_polymorph_identity_d144;")
     )
 
-    assert detail["sizing_dex"] == "not sized"
+    assert "phase=lime" in notice.reason
+    assert "table_id=Ca-027" in notice.reason
     assert comparison.value.point == benchmark_comparison.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+@pytest.mark.parametrize(
+    "formula", ("CaO", "MgO")
+)
+def test_d144_missing_identity_table_entry_is_a_typed_missing_input(
+    formula: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import fusion_comparison_reference
+
+    monkeypatch.delitem(janaf.JANAF_SINGLE_POLYMORPH_IDENTITY_D144, formula)
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula=formula,
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis=formula,
+        ),
+        None,
+    )
+    reference = F.observation(
+        f"missing-d144-entry-{formula}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-d144-entry",
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=_predict(reference.value.point, identity),
+    )
+
+    assert comparison.value.point == reference.value.point
+    assert any(
+        notice.reason.startswith(
+            f"fusion conversion missing input for {formula}:"
+        )
+        and "d-144 single-polymorph identity table entry is absent"
+        in notice.reason
+        for notice in comparison.notices
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["reason"] == (
+        "solid_liquid_reference_conversion_missing_input"
+    )
+
+
+@pytest.mark.parametrize("formula", ("CaO", "MgO"))
+def test_d144_missing_fusion_pair_is_a_typed_missing_input(
+    formula: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import fusion_comparison_reference
+
+    monkeypatch.delitem(janaf._FUSION_TABLES, formula)
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula=formula,
+            T_K=Decimal("1873"),
+            endmember_phase=Phase.CR,
+            component_basis=formula,
+        ),
+        None,
+    )
+    reference = F.observation(
+        f"missing-d144-fusion-pair-{formula}",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-d144-fusion-pair",
+    )
+
+    comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert any(
+        notice.reason
+        == f"fusion conversion missing input for {formula}: no JANAF fusion table pair for {formula}"
+        for notice in comparison.notices
+    )
 
 
 @pytest.mark.parametrize(
@@ -14932,12 +15008,10 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     if polymorph is None:
-        from simulator.battery.score import REFERENCE_POLYMORPH_INFERRED_REASON
-
         assert comparison.value.point != reference.value.point
         assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+            notice.reason.startswith("single_polymorph_identity_d144;")
             for notice in comparison.notices
         )
         return
@@ -17215,8 +17289,19 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1995_rows)
 
 
-def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
-    tmp_path: Path,
+@pytest.mark.parametrize(
+    ("observation_suffix", "formula", "table_id"),
+    (
+        ("::kume_2000_table2_sample_101", "CaO", "Ca-027"),
+        (
+            "::kume_2000_table4_sample_310_mgo_activity",
+            "MgO",
+            "Mg-008",
+        ),
+    ),
+)
+def test_kume_real_migrated_activity_scores_with_d144_identity(
+    tmp_path: Path, observation_suffix: str, formula: str, table_id: str
 ) -> None:
     pytest.importorskip("openimcc", reason="openimcc is not importable")
     from tests.battery.test_migrate import _migrate_real_extract
@@ -17228,7 +17313,7 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     observation_id = next(
         observation_id
         for observation_id in result.observations
-        if observation_id.endswith("::kume_2000_table2_sample_101")
+        if observation_id.endswith(observation_suffix)
     )
     context = load_score_context(
         tmp_path / "tree", sources=("kume-2000-cao-activities",)
@@ -17252,7 +17337,9 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
         != "fusion_source_reference_phase_unprinted"
     )
     assert any(
-        notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+        notice.reason.startswith("single_polymorph_identity_d144;")
+        and f"formula={formula}" in notice.reason
+        and f"table_id={table_id}" in notice.reason
         for notice in residual.notices
     )
     assert not any(

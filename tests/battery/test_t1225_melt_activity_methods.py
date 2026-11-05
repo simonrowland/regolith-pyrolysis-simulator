@@ -116,9 +116,9 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         )
         assert converted.identity.reference_state is not None
         assert converted.identity.reference_state.is_value
-        # d-338: CaO(s) with no polymorph is the only JANAF solid (lime).
-        # The liquid activity is the pre-d-165 fusion pin of the printed
-        # 0.000228. The record itself stays unknown.
+        # d-144: CaO(s) maps to the closed lime table identity. The liquid
+        # activity keeps the d-338 JANAF fusion shift of printed 0.000228;
+        # the record itself stays unknown.
         assert observation.value.point == Decimal("0.000228")
         assert (
             observation.identity.reference_state.value.endmember.polymorph.is_unknown
@@ -128,11 +128,8 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
             "0.00002451128698546067397078399944"
         )
         assert any(
-            notice.reason.startswith(
-                'reference_polymorph_inferred_stable_phase:'
-                '{"comparison_phase": null, "comparison_table_id": null, '
-                '"phase": "lime", "sizing_dex": "not sized", "table_id": "Ca-027"}'
-            )
+            notice.reason
+            == "single_polymorph_identity_d144; formula=CaO; phase=lime; table_id=Ca-027"
             for notice in converted.notices
         )
         own_row = scored[observation.observation_id]
@@ -142,7 +139,7 @@ def test_printed_quench_equilibration_reaches_melt_activity_rows(
         assert own_row.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
         assert own_row.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
         assert any(
-            notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+            notice.reason.startswith("single_polymorph_identity_d144;")
             for notice in own_row.notices
         )
 

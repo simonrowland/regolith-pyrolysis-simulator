@@ -2615,6 +2615,15 @@ _JANAF_POLYMORPH_BY_TABLE = {
     },
 }
 
+# d-144's closed set: these 1-bar oxides have one JANAF solid table below
+# fusion. The oxide set preserves the closed scope when a table row is absent;
+# such a gap must become typed missing input, not fall through to d-338.
+JANAF_SINGLE_POLYMORPH_IDENTITY_D144_OXIDES = frozenset({"CaO", "MgO"})
+JANAF_SINGLE_POLYMORPH_IDENTITY_D144 = {
+    "CaO": "Ca-027",
+    "MgO": "Mg-008",
+}
+
 
 class JANAFFusionPolymorphUnavailable(ValueError):
     """No unique JANAF solid table represents the stated fusion polymorph."""
