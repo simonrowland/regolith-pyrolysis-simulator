@@ -467,7 +467,6 @@ species:
           ilmenite reduction for pressures below ~10^{-5} Torr. A vacuum pyrolysis processing plant on
           the lunar surface would operate around 10^{-7} Torr.
     - observation_id: cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
-      quote: Cardiff et al. (2007), HSC Gibbs free-energy minimization output
       type: psat_series
       locator:
         figure: '6'
@@ -480,11 +479,22 @@ species:
       standard_state: percent composition vs T (C)
       regime: HSC_gibbs_minimization_model
       units: percent composition as published
+      derivation:
+        relation: >-
+          The authors modeled MLS-1A vaporization chemistry by minimizing Gibbs free energy with the HSC analysis package; the reported equilibrium-composition curve is at 10^-1 Torr.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        method:
+          state: {tag: value, value: Gibbs free-energy minimization with the HSC analysis package}
+          locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        references:
+        - 'none_printed: The Modeling section does not identify a thermodynamic database or reference-data source for the calculation.'
       uncertainty:
         note: figure-only; not digitised
       values:
         quantity: equilibrium_composition
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: figure_only
         semantics: bound_not_point_ordering
         axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 7; treated as C and converted T_K =
@@ -492,7 +502,6 @@ species:
         P_Torr_as_printed: 10^{-1}
         software: HSC analysis package; minimization of the Gibbs free energy
     - observation_id: cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
-      quote: Cardiff et al. (2007), HSC Gibbs free-energy minimization output
       type: psat_series
       locator:
         figure: '7'
@@ -505,11 +514,22 @@ species:
       standard_state: percent composition vs T (C)
       regime: HSC_gibbs_minimization_model
       units: percent composition as published
+      derivation:
+        relation: >-
+          The authors modeled MLS-1A vaporization chemistry by minimizing Gibbs free energy with the HSC analysis package; the reported equilibrium-composition curve is at 10^-7 Torr.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        method:
+          state: {tag: value, value: Gibbs free-energy minimization with the HSC analysis package}
+          locator: {page: 49, pdf_page_index: 5, section: MODELING}
+        references:
+        - 'none_printed: The Modeling section does not identify a thermodynamic database or reference-data source for the calculation.'
       uncertainty:
         note: figure-only; not digitised
       values:
         quantity: equilibrium_composition
-        method_class: quoted_attributed
+        method_class: model_derived
         admission_status: figure_only
         semantics: bound_not_point_ordering
         axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 6; treated as C and converted T_K =

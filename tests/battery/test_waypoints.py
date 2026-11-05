@@ -894,6 +894,46 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
     }
 
 
+def test_printed_mineral_mole_fraction_is_not_filtered_as_an_oxide() -> None:
+    """Mg2SiO4 is a charge formula, not an oxide-table reject."""
+
+    result = normalized_composition(
+        replace(factories.kems_experiment(), sample=_charge(single=False)),
+        _bench(),
+    )
+    assert result.selected is not None
+    assert set(result.selected.value) == {"Mg2SiO4", "SiO2"}
+    assert result.selected.notice is None
+
+
+def test_oxide_wt_derivation_names_components_the_charge_cannot_use() -> None:
+    """H2O and Ag2O stay in the stored map and are named on the engine charge."""
+
+    converted = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("90"), "H2O": Decimal("5"), "Ag2O": Decimal("5")}
+    )
+    stored = dict(converted.components)
+    sample = Sample(
+        initial_composition=Located(
+            factories.State.of(converted),
+            factories.loc(),
+            Derivation(
+                "wt_pct_to_mole_fraction", ("wt_pct",), (), "mole_fraction"
+            ),
+        )
+    )
+    result = normalized_composition(
+        replace(factories.kems_experiment(), sample=sample), _bench()
+    )
+    assert result.selected is not None
+    assert set(result.selected.value) == {"SiO2"}
+    assert result.selected.value["SiO2"] == Decimal(1)
+    notice = result.selected.notice or ""
+    assert "excluded_unsupported_composition_components:" in notice
+    assert f"H2O {stored['H2O']}" in notice
+    assert f"Ag2O {stored['Ag2O']}" in notice
+
+
 def test_inferred_molar_inventory_never_printed_and_loses_to_printed_wt() -> None:
     """A molar inventory carrying an inference marker is a derivation: it must
     not acquire printed authority, and a printed wt% derivation outranks it."""

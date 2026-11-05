@@ -6,7 +6,8 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Phase, Quantity
+from simulator.battery.enums import MethodToken, Phase, Quantity
+from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.factories import migrate_one_extract
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,9 +78,28 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
         assert endmember["phase"]["value"] == "cr"
         assert endmember["polymorph"]["tag"] == "unknown"
     for experiment, ratio in zip(extract["experiments"], ("1/10", "1/18")):
+        assert experiment["method"] == "quench_equilibration"
+        assert experiment["locator"]["page"] == 2
+        assert experiment["locator"]["published_page"] == 13
+        assert experiment["locator"]["section"] == "Experimental"
         assert experiment["fO2_control"]["channel"]["value"] == "gas_mix"
         assert ratio in experiment["fO2_control"]["buffer"]["state"]["value"]
         assert experiment["fO2_control"]["buffer"]["locator"]["page"] == 2
+
+    activity_coefficients = [
+        item
+        for item in result.observations.values()
+        if item.identity.quantity.is_value
+        and item.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT
+    ]
+    assert len(activity_coefficients) == 50
+    for item in activity_coefficients:
+        experiment = result.experiments[item.experiment_id]
+        assert experiment.method.is_value
+        assert experiment.method.value is MethodToken.QUENCH_EQUILIBRATION
+        assert underdetermined_apparatus(
+            experiment, Quantity.ACTIVITY_COEFFICIENT, observation=item
+        ).passed
 
     counts = Counter(
         item.identity.quantity.value

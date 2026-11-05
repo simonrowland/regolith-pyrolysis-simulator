@@ -193,6 +193,53 @@ def test_model_derived_prose_values_are_explicitly_parked() -> None:
 
 
 def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature() -> None:
+    document = _document()
+    source_observations = {
+        observation["observation_id"]: observation
+        for _, observation in _observations(document)
+    }
+    table1_assemblages = {
+        observation["assemblage_id"]: (
+            observation["assemblage_as_printed"],
+            observation["locator"],
+        )
+        for observation in source_observations.values()
+        if observation["locator"]["table"] == "1"
+    }
+    assert len(table1_assemblages) == 100
+    expected_printed_assemblages = {
+        "gran_2012_sample_010": "L, 2CS",
+        "gran_2012_sample_011": "L, 2CS",
+        "gran_2012_sample_014": "L,2CS",
+        "gran_2012_sample_015": "L, 2CS",
+        "gran_2012_sample_071": "L,M, MA",
+        "gran_2012_sample_098": "L,M,MA",
+        "gran_2012_sample_100": "L,M, C",
+    }
+    assert {
+        sample_id: table1_assemblages[sample_id][0]
+        for sample_id in expected_printed_assemblages
+    } == expected_printed_assemblages
+    for observation in source_observations.values():
+        run_composition = observation["point_conditions"]["composition"]
+        assert run_composition["state"] == {
+            "tag": "unknown",
+            "reason": "run_composition_not_reported_per_sample",
+        }
+        assert run_composition["locator"] == {"pdf_page_index": 1}
+        oxygen = observation["point_conditions"]["fO2_log"]
+        assert oxygen["state"] == {"tag": "unknown", "reason": "fo2_not_reported"}
+        assert oxygen["locator"] == {"pdf_page_index": 1}
+        printed_assemblage, assemblage_locator = table1_assemblages[
+            observation["assemblage_id"]
+        ]
+        phase_assemblage = observation["point_conditions"]["phase_assemblage"]
+        assert phase_assemblage["state"] == {
+            "tag": "value",
+            "value": printed_assemblage,
+        }
+        assert phase_assemblage["locator"] == assemblage_locator
+
     migrator = Migrator(root=REPO_ROOT, index={}, aliases={})
     migrator._migrate_extract(EXTRACT)
     migrator.finalize()
@@ -208,6 +255,66 @@ def test_isolated_migration_has_no_hard_issues_and_preserves_every_temperature()
         assert condition.locator is not None
         assert observation.identity.temperature_K.is_value
         assert condition.state.value == observation.identity.temperature_K.value
+        run_composition = observation.point_conditions["composition"]
+        assert run_composition.state.is_unknown
+        assert run_composition.state.reason == "run_composition_not_reported_per_sample"
+        assert run_composition.locator is not None
+        assert run_composition.locator.pdf_page_index == 1
+        assert observation.identity.composition is not None
+        assert observation.identity.composition.is_unknown
+        oxygen = observation.point_conditions["fO2_log"]
+        assert oxygen.state.is_unknown
+        assert oxygen.state.reason == "fo2_not_reported"
+        assert oxygen.locator is not None
+        assert oxygen.locator.pdf_page_index == 1
+        source_id = observation.observation_id.split("::", 1)[1].split("::rows:", 1)[0]
+        source_row = source_observations[source_id]
+        printed_assemblage = table1_assemblages[source_row["assemblage_id"]][0]
+        phase_assemblage = observation.point_conditions["phase_assemblage"]
+        assert phase_assemblage.state.is_value
+        assert phase_assemblage.state.value == printed_assemblage
+        assert phase_assemblage.locator is not None
+        assert phase_assemblage.locator.pdf_page_index == 3
+
+    expected_phases = {
+        "gran_2012_t1_s006_liquid": ("L", "l", "melt"),
+        "gran_2012_t2_s001_liquid": ("Liquid", "l", "melt"),
+        "gran_2012_t2_s001_mgo": ("MgO", "cr", None),
+        "gran_2012_t2_s012_cao": ("CaO", "cr", None),
+        "gran_2012_t2_s006_spinel": ("Spinel", "cr", None),
+    }
+    for source_id, (printed_phase, stored_phase, role) in expected_phases.items():
+        source_row = source_observations[source_id]
+        assert source_row["phase_as_printed"] == printed_phase
+        assert source_row["phase"] == stored_phase
+        if role is not None:
+            assert source_row["values"]["phase_label"] == role
+            assert source_row["values"]["basis"] == "wt_percent"
+        else:
+            assert "phase_label" not in source_row["values"]
+        children = [
+            observation
+            for observation in observations
+            if observation.observation_id.startswith(
+                f"gran-sichen-2012-molten12-ladle-slag-liquidus::{source_id}::rows:"
+            )
+        ]
+        assert len(children) == 4
+        assert all(
+            observation.identity.species.phase.is_value
+            and observation.identity.species.phase.value.value == stored_phase
+            for observation in children
+        )
+        if role is not None:
+            assert all(
+                observation.identity.phase_role is not None
+                and observation.identity.phase_role.is_value
+                and observation.identity.phase_role.value.value == role
+                for observation in children
+            )
+        else:
+            assert all(observation.identity.phase_role is None for observation in children)
+
     calcium_point = next(
         observation
         for observation in observations

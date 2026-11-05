@@ -46,14 +46,14 @@ fidelity_samples:
     row: 2-14
 experiments:
 - experiment_id: li_2005_table_1_equilibration
-  method: chemical_equilibration_slag_metal
+  method: quench_equilibration
   method_as_printed: chemical equilibration of 6 g slag and 8 g electrolytic iron in an MgO crucible;
     equilibrium approached from both dephosphorization and phosphorization sides
   locator:
-    page: 3
-    published_page: 14
-    table: '1'
-    note: Table 1 conditions and experimental results
+    page: 2
+    published_page: 13
+    section: Experimental
+    note: The chemical equilibration technique was employed in the present study; samples were quenched with argon stream.
   fO2_control:
     channel:
       tag: value
@@ -89,14 +89,14 @@ experiments:
         note: Table 1 caption prints pO2 = 6.40e-5 Pa
     gas_ratio_as_published: CO2/CO = 1/10
 - experiment_id: li_2005_table_2_equilibration
-  method: chemical_equilibration_slag_metal
+  method: quench_equilibration
   method_as_printed: chemical equilibration of 6 g slag and 8 g electrolytic iron in an MgO crucible;
     equilibrium approached from both dephosphorization and phosphorization sides
   locator:
-    page: 3
-    published_page: 14
-    table: '2'
-    note: Table 2 conditions and experimental results
+    page: 2
+    published_page: 13
+    section: Experimental
+    note: The chemical equilibration technique was employed in the present study; samples were quenched with argon stream.
   fO2_control:
     channel:
       tag: value

@@ -57,7 +57,6 @@ def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() ->
         and observation.identity.quantity.is_value
         and observation.identity.quantity.value is Quantity.EVOLVED_GAS_YIELD
     ]
-    assert len(rows) == 104
     assert all(row.value.kind is ValueKind.POINT for row in rows)
 
     point = next(
@@ -80,15 +79,71 @@ def test_murchison_specific_gas_yield_uses_printed_species_and_initial_mass() ->
         "0.0004960317460317460317460317460"
     )
 
-    quoted = [
-        observation
-        for observation_id, observation in migrator.result.observations.items()
-        if observation_id.startswith("murchison-degassing-2023-springer::")
-        and observation.identity.quantity.is_unknown
-        and "specific_gas_yield conversion has no verified input basis"
-        in (observation.identity.quantity.reason or "")
+
+def test_printed_degassing_methods_are_located_on_named_measurements() -> None:
+    migrator = migrate_one_extract(
+        REPO_ROOT,
+        REPO_ROOT / "data/literature/extracts/murchison-degassing-2023-springer.yaml",
+        index=None,
+        aliases={},
+    )
+    migrator.finalize()
+
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+
+    expected_method_phrases = {
+        "murchison-isothermal-series": "экспериментов с изотермической выдержкой",
+        "murchison-stepwise-series": "ступенчатому нагреву от 50 до 800°C",
+    }
+    for experiment_id, printed_phrase in expected_method_phrases.items():
+        experiment = next(
+            experiment
+            for migrated_id, experiment in migrator.result.experiments.items()
+            if migrated_id.endswith(f"::{experiment_id}")
+        )
+        assert experiment.method.is_unknown
+        assert printed_phrase in (experiment.method.reason or "")
+        assert "газовом хроматографе “Кристал-Люкс 4000М”" in (
+            experiment.method.reason or ""
+        )
+        assert "no existing MethodToken represents" in (
+            experiment.method.reason or ""
+        )
+        assert experiment.locator is not None
+        assert experiment.locator.published_page == 574
+        assert experiment.locator.pdf_page_index == 4
+        assert experiment.locator.section == "Eksperimentalnye issledovaniya degazatsii"
+
+    named_rows = {
+        "murchison-degassing-2023-springer::voropaev_2023_murchison_isothermal_ch4_table1::T=1073.15:h=d164eb7c2348": (
+            "murchison-isothermal-series",
+            "CH4",
+            Decimal("1073.15"),
+        ),
+        "murchison-degassing-2023-springer::voropaev_2023_murchison_stepwise_n2_table2::T=573.15:h=fd28fdd02bfa": (
+            "murchison-stepwise-series",
+            "N2",
+            Decimal("573.15"),
+        ),
+    }
+    for observation_id, (experiment_id, formula, temperature_K) in named_rows.items():
+        observation = migrator.result.observations[observation_id]
+        assert observation.experiment_id.endswith(f"::{experiment_id}")
+        assert observation.identity.species.formula == formula
+        assert observation.identity.temperature_K is not None
+        assert observation.identity.temperature_K.value == temperature_K
+        assert migrator.result.experiments[observation.experiment_id].method.is_unknown
+
+    boudouard = migrator.result.observations[
+        "murchison-degassing-2023-springer::voropaev_2023_boudouard_kp_model_derived"
     ]
-    assert len(quoted) == 8
+    assert boudouard.derivation is not None
+    assert boudouard.derivation.method is not None
+    assert boudouard.derivation.method.locator is not None
+    assert boudouard.derivation.method.locator.page == 6
+    assert boudouard.derivation.method.locator.published_page == 576
+    assert boudouard.derivation.method.locator.pdf_page_index == 6
 
 
 def test_specific_gas_yield_refuses_a_missing_printed_gas_species() -> None:

@@ -99,7 +99,11 @@ from simulator.environment import (
     DEFAULT_VACUUM_FLOOR_BAR,
     vacuum_floor_bar_for_environment,
 )
-from simulator.feedstock_composition import iron_oxide_values, total_fe
+from simulator.feedstock_composition import (
+    _TOTAL_IRON_AS_FEO_KEYS,
+    iron_oxide_values,
+    total_fe,
+)
 from simulator.fe_redox import RedoxState, normalize_redox_state
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
@@ -2959,6 +2963,33 @@ class _MELTSBackendSupport(MeltBackend):
         normalized_basis = {oxide: 0.0 for oxide in MELTS_OXIDE_BASIS}
         feo_total = 0.0
         feo, fe2o3 = iron_oxide_values(comp_wt)
+        # Premise: iron_oxide_values reads FeOt, FeOT, FeO_T, and FeO* as
+        # FeO-equivalent total iron when FeO and Fe2O3 are absent. The alias
+        # table also sends the spelling "feot" (FeOt and FeOT) to FeO_total,
+        # and the loop below would add that same mass again.
+        # Algebra: iron_oxide_values keeps the first of those keys. If this
+        # loop classifies that same key as FeO_total, drop feo here. The
+        # FeO_total policy below (explicit Fe3+/Fe_total ratio, redox buffer
+        # with no split, or a typed refusal) then adds the mass once.
+        # A real FeO/Fe2O3 split is not this case: those keys make
+        # iron_oxide_values ignore the total-iron spellings, and the loop
+        # skips FeO and Fe2O3, so each spelling is still counted once.
+        # Unit check: feo and the FeO_total addition are both wt% of this
+        # input map. Dropping the duplicated term leaves one wt% of iron.
+        # Sanity: {SiO2: 80, FeOt: 10} under QFM is 10 wt% FeO before the
+        # renormalisation to 100 (FeO = 100 * 10/90), not FeO 20.
+        consumed_total_iron = None
+        if "FeO" not in comp_wt and "Fe2O3" not in comp_wt:
+            for key in _TOTAL_IRON_AS_FEO_KEYS:
+                if key in comp_wt:
+                    consumed_total_iron = key
+                    break
+        if (
+            consumed_total_iron is not None
+            and self._canonical_oxide_name(consumed_total_iron) == "FeO_total"
+        ):
+            feo = 0.0
+            fe2o3 = 0.0
 
         for raw_name, raw_wt in comp_wt.items():
             oxide = self._canonical_oxide_name(raw_name)

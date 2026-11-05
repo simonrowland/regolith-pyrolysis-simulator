@@ -8,15 +8,15 @@ scan:
   - 'wired computes to 0: chunk-2 scorer residual ledger absent (data/literature/residuals-v2/ or data/literature/battery_residuals.yaml);
     not faked'
 counts:
-  sources: 2297
+  sources: 2312
   by_stage:
     located: 209
-    inbox: 1262
-    in_progress: 237
-    ingested_partial: 143
-    ingested_complete: 130
+    inbox: 1250
+    in_progress: 244
+    ingested_partial: 151
+    ingested_complete: 133
     wired: 0
-    unknown: 316
+    unknown: 325
 anti_loss:
   corpus_uncommitted:
     count: 0
@@ -3058,6 +3058,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: banya-hino-takezoe-1985-na-fe-silicate-redox
+  stage: ingested_partial
+  evidence:
+    decided_by: ingested_partial
+    artefacts:
+    - data/literature/extracts-v2/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
+    reason: v2.1 store present; 26/46 rows battery-usable
+  usable_rows: 26
+  total_rows: 46
+  inbox_exclusion_reason: null
 - source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
   stage: in_progress
   evidence:
@@ -5035,13 +5045,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: carrillo-sanchez-2020-phosphorus-ablation
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/carrillo-sanchez-2020-phosphorus-ablation/SOURCE.md
-    - raw/carrillo-sanchez-2020-phosphorus-ablation/carrillo-sanchez-2020-phosphorus-ablation.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/carrillo-sanchez-2020-phosphorus-ablation.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -5154,6 +5163,17 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: charles-1967-alkali-silicate-activities
+  stage: unknown
+  evidence:
+    decided_by: unknown
+    artefacts:
+    - data/literature/extracts-v2/charles-1967-alkali-silicate-activities.yaml
+    reason: v2.1 store present but 0 of 120 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
+  usable_rows: 0
+  total_rows: 120
+  inbox_exclusion_reason: null
 - source_id: charnoz-2023-hydrogen-magma-ocean
   stage: in_progress
   evidence:
@@ -5163,6 +5183,17 @@ sources:
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: chatain-2021-nacro2-thermodynamics
+  stage: unknown
+  evidence:
+    decided_by: unknown
+    artefacts:
+    - data/literature/extracts-v2/chatain-2021-nacro2-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 26 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
+  usable_rows: 0
+  total_rows: 26
   inbox_exclusion_reason: null
 - source_id: chaudary-1997-v-redox-binary-silicate
   stage: in_progress
@@ -5293,13 +5324,12 @@ sources:
   total_rows: 198
   inbox_exclusion_reason: null
 - source_id: chen-2022-sio2-mno-slag-activities
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/chen-2022-sio2-mno-slag-activities/SOURCE.md
-    - raw/chen-2022-sio2-mno-slag-activities/chen-2022-sio2-mno-slag-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/chen-2022-sio2-mno-slag-activities.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -6277,6 +6307,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/dai-seetharaman-staffansson-1984-fe-na-o-thermochemistry.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: dans-loffler-1930-na-silicate-zirconia-phase-equilibria
   stage: in_progress
   evidence:
@@ -6381,14 +6421,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: de-maria-1969-rend-lincei
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - extracts/de-maria-1969-rend-lincei.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/de-maria-1969-rend-lincei.yaml
+    reason: v2.1 store present; 125/149 rows battery-usable
+  usable_rows: 125
+  total_rows: 149
   inbox_exclusion_reason: null
 - source_id: deca-2015-lunar-anomaly-ipic3d
   stage: inbox
@@ -6757,12 +6797,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: dohmen-1998-olivine-fe-gas
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/dohmen-1998-olivine-fe-gas/dohmen-1998-olivine-fe-gas.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/dohmen-1998-olivine-fe-gas.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -6908,6 +6948,26 @@ sources:
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: doyle-1988-feo-activity-multicomponent-magma
+  stage: ingested_partial
+  evidence:
+    decided_by: ingested_partial
+    artefacts:
+    - data/literature/extracts-v2/doyle-1988-feo-activity-multicomponent-magma.yaml
+    reason: v2.1 store present; 129/130 rows battery-usable
+  usable_rows: 129
+  total_rows: 130
+  inbox_exclusion_reason: null
+- source_id: doyle-1989-tio2-feo-activity-magma
+  stage: ingested_complete
+  evidence:
+    decided_by: ingested_complete
+    artefacts:
+    - data/literature/extracts-v2/doyle-1989-tio2-feo-activity-magma.yaml
+    reason: v2.1 store present; 167/167 rows battery-usable
+  usable_rows: 167
+  total_rows: 167
   inbox_exclusion_reason: null
 - source_id: drowart-1960-al2o3-kems
   stage: ingested_complete
@@ -7653,12 +7713,12 @@ sources:
   total_rows: 6
   inbox_exclusion_reason: null
 - source_id: filsinger-1990-silica-silicon-carbothermic-kinetics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/filsinger-1990-silica-silicon-carbothermic-kinetics/filsinger-1990-silica-silicon-carbothermic-kinetics.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/filsinger-1990-silica-silicon-carbothermic-kinetics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -8016,6 +8076,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: frischat-oel-1966-sodium-calcium-silicate-transport
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/frischat-oel-1966-sodium-calcium-silicate-transport.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: fruchter-1973-apollo15-clastic-materials
   stage: inbox
   evidence:
@@ -8069,14 +8139,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: fujisawa-1994-na-sn-carbonate-thermodynamics
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/fujisawa-1994-na-sn-carbonate-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 20 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 20
   inbox_exclusion_reason: null
 - source_id: fujita-maruhashi-1969-tetsu-iron-oxide-silica-slag-activities
   stage: inbox
@@ -8241,14 +8312,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: gail-2013-sio-nucleation-silicate-dust
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/gail-2013-sio-nucleation-silicate-dust/.url
-    - raw/gail-2013-sio-nucleation-silicate-dust/SOURCE.md
-    - raw/gail-2013-sio-nucleation-silicate-dust/gail-2013-sio-nucleation-silicate-dust.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/gail-2013-sio-nucleation-silicate-dust.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -9953,12 +10022,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: hashimoto-1990-forsterite-evaporation-kinetics
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/hashimoto-1990-forsterite-evaporation-kinetics/hashimoto-1990-forsterite-evaporation-kinetics.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/hashimoto-1990-forsterite-evaporation-kinetics.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -11750,13 +11819,12 @@ sources:
   total_rows: 2
   inbox_exclusion_reason: null
 - source_id: iwahashi-2021-cr-oxide-solid-activities
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/iwahashi-2021-cr-oxide-solid-activities/SOURCE.md
-    - raw/iwahashi-2021-cr-oxide-solid-activities/iwahashi-2021-cr-oxide-solid-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/iwahashi-2021-cr-oxide-solid-activities.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -11841,14 +11909,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: jacquet-2026-alkali-recondensation
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/jacquet-2026-alkali-recondensation.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/jacquet-2026-alkali-recondensation.yaml
+    reason: v2.1 store present but 0 of 32 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 32
   inbox_exclusion_reason: null
 - source_id: jacquinot-1992-joint
   stage: inbox
@@ -14546,12 +14615,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kassis-frischat-1981-mixed-alkali-vapor-pressures
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/kassis-frischat-1981-mixed-alkali-vapor-pressures/kassis-frischat-1981-mixed-alkali-vapor-pressures.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/kassis-frischat-1981-mixed-alkali-vapor-pressures.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -16544,14 +16613,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: kelley-1953-alkali-aluminosilicate-thermodynamics
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kelley-1953-alkali-aluminosilicate-thermodynamics.yaml
+    reason: v2.1 store present; 434/507 rows battery-usable
+  usable_rows: 434
+  total_rows: 507
   inbox_exclusion_reason: null
 - source_id: kelley-1960-usbm-b584
   stage: unknown
@@ -19711,14 +19780,14 @@ sources:
   total_rows: 375
   inbox_exclusion_reason: null
 - source_id: kunisada-1986-na-silicate-dephosphorization
-  stage: inbox
+  stage: ingested_partial
   evidence:
-    decided_by: inbox
+    decided_by: ingested_partial
     artefacts:
-    - raw/kunisada-1986-na-silicate-dephosphorization/kunisada-1986-na-silicate-dephosphorization.pdf
-    reason: document in corpus raw/; no extract
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/kunisada-1986-na-silicate-dephosphorization.yaml
+    reason: v2.1 store present; 197/278 rows battery-usable
+  usable_rows: 197
+  total_rows: 278
   inbox_exclusion_reason: null
 - source_id: kupcak-malis-1992-na2o-sio2-oxygen-probe-emf
   stage: in_progress
@@ -20671,14 +20740,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: li-2005-na-al-phosphate-fe-activities
-  stage: in_progress
+  stage: ingested_partial
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_partial
     artefacts:
-    - data/literature/extracts/li-2005-na-al-phosphate-fe-activities.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/li-2005-na-al-phosphate-fe-activities.yaml
+    reason: v2.1 store present; 320/370 rows battery-usable
+  usable_rows: 320
+  total_rows: 370
   inbox_exclusion_reason: null
 - source_id: li-2017-numerical-modeling
   stage: inbox
@@ -21985,14 +22054,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: masuda-tanaka-1979-vacuum-condensates
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/masuda-tanaka-1979-vacuum-condensates.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/masuda-tanaka-1979-vacuum-condensates.yaml
+    reason: v2.1 store present; 13/13 rows battery-usable
+  usable_rows: 13
+  total_rows: 13
   inbox_exclusion_reason: null
 - source_id: mathieu-2009-sodium-solubility-molten-silicates
   stage: inbox
@@ -22013,6 +22082,16 @@ sources:
     reason: v2.1 store present; 421/421 rows battery-usable
   usable_rows: 421
   total_rows: 421
+  inbox_exclusion_reason: null
+- source_id: mathieu-2011-na2o-cms-solubility
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/mathieu-2011-na2o-cms-solubility.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: matlack-2010-high-alumina-glass-dm100
   stage: inbox
@@ -23914,32 +23993,12 @@ sources:
   total_rows: 14
   inbox_exclusion_reason: null
 - source_id: nagahara-1993-sio2-evaporation-equilibrium-vacuum
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/.url
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/SOURCE.md
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/DONE
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/mineru.log
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/images/5464f8e077fad993f16f655d5939ce07a8dec7e1cb4c03e393a4fa74a5d93412.jpg
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/images/5620f47546a5bdf5480395d352aa83229968e13620b0a28f6cac38ff447ebb60.jpg
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002.md
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002_content_list.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002_content_list_v2.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002_middle.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru/1993LPI....24.1045N/p001-p002/out/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002/vlm/src-nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2-p001-p002_model.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/DONE
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/mineru.log
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/images/5464f8e077fad993f16f655d5939ce07a8dec7e1cb4c03e393a4fa74a5d93412.jpg
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/images/5620f47546a5bdf5480395d352aa83229968e13620b0a28f6cac38ff447ebb60.jpg
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002.md
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002_content_list.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002_content_list_v2.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002_middle.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/mineru-1993LPI....24.1045N/p001-p002/out/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002/vlm/src--nagahara-1993-lpsc-sio2-evaporation-equilibrium-vacuum-h2--1993LPI....24.1045N-p001-p002_model.json
-    - raw/nagahara-1993-sio2-evaporation-equilibrium-vacuum/nagahara-1993-sio2-evaporation-equilibrium-vacuum.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/nagahara-1993-sio2-evaporation-equilibrium-vacuum.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -24491,6 +24550,16 @@ sources:
     reason: v2.1 store present; 148/148 rows battery-usable
   usable_rows: 148
   total_rows: 148
+  inbox_exclusion_reason: null
+- source_id: neudorf-elliott-1980-na2o-cao-silicate-activities
+  stage: ingested_partial
+  evidence:
+    decided_by: ingested_partial
+    artefacts:
+    - data/literature/extracts-v2/neudorf-elliott-1980-na2o-cao-silicate-activities.yaml
+    reason: v2.1 store present; 1/29 rows battery-usable
+  usable_rows: 1
+  total_rows: 29
   inbox_exclusion_reason: null
 - source_id: neuman-2021-k-cu-evaporation-isotope-fractionation
   stage: inbox
@@ -25809,6 +25878,16 @@ sources:
     reason: document in corpus raw/; no extract
   usable_rows: 0
   total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: pankratz-1968-ri7201-sodium-calcium-silicates
+  stage: ingested_partial
+  evidence:
+    decided_by: ingested_partial
+    artefacts:
+    - data/literature/extracts-v2/pankratz-1968-ri7201-sodium-calcium-silicates.yaml
+    reason: v2.1 store present; 73/186 rows battery-usable
+  usable_rows: 73
+  total_rows: 186
   inbox_exclusion_reason: null
 - source_id: pankratz-1982-usbm-b672
   stage: inbox
@@ -30374,6 +30453,16 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: seetharaman-2013-cr-thin-film-volatilization
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/seetharaman-2013-cr-thin-film-volatilization.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
 - source_id: segnit-1953-na2o-cao-sio2-phase-equilibria
   stage: inbox
   evidence:
@@ -30809,14 +30898,12 @@ sources:
   total_rows: 36
   inbox_exclusion_reason: null
 - source_id: shi-2025-mno-activity-eaf-spinel
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/shi-2025-mno-activity-eaf-spinel/SOURCE.md
-    - raw/shi-2025-mno-activity-eaf-spinel/receipt.json
-    - raw/shi-2025-mno-activity-eaf-spinel/shi-2025-mno-activity-eaf-spinel.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/shi-2025-mno-activity-eaf-spinel.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -31880,7 +31967,7 @@ sources:
   evidence:
     decided_by: in_progress
     artefacts:
-    - extracts/shornikov-2025-ca-al-inclusion-evaporation.yaml
+    - data/literature/extracts/shornikov-2025-ca-al-inclusion-evaporation.yaml
     reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
@@ -32127,14 +32214,14 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: simeonov-sano-1985-na-bearing-mno-activities
-  stage: in_progress
+  stage: ingested_complete
   evidence:
-    decided_by: in_progress
+    decided_by: ingested_complete
     artefacts:
-    - data/literature/extracts/simeonov-sano-1985-na-bearing-mno-activities.yaml
-    reason: extract present; no v2.1 store work
-  usable_rows: 0
-  total_rows: 0
+    - data/literature/extracts-v2/simeonov-sano-1985-na-bearing-mno-activities.yaml
+    reason: v2.1 store present; 5/5 rows battery-usable
+  usable_rows: 5
+  total_rows: 5
   inbox_exclusion_reason: null
 - source_id: simon-sutton-2017-apollo14-redox
   stage: inbox
@@ -32777,9 +32864,9 @@ sources:
     decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/stolyarova-1996-cao-alumina-silica-kems.yaml
-    reason: v2.1 store present; 251/312 rows battery-usable
+    reason: v2.1 store present; 251/589 rows battery-usable
   usable_rows: 251
-  total_rows: 312
+  total_rows: 589
   inbox_exclusion_reason: null
 - source_id: stolyarova-2000-oxide-melt-kems-review
   stage: inbox
@@ -34162,6 +34249,17 @@ sources:
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
+- source_id: takeda-1986-liquid-copper-soda-slag
+  stage: unknown
+  evidence:
+    decided_by: unknown
+    artefacts:
+    - data/literature/extracts-v2/takeda-1986-liquid-copper-soda-slag.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
+  usable_rows: 0
+  total_rows: 1
+  inbox_exclusion_reason: null
 - source_id: takeda-1990-sn-slag-matertrans
   stage: unknown
   evidence:
@@ -35281,10 +35379,10 @@ sources:
     decided_by: unknown
     artefacts:
     - data/literature/extracts-v2/visscher-fegley-2013-debris-disks.yaml
-    reason: v2.1 store present but 0 of 13 rows are battery-usable (measured evidence class AND known
+    reason: v2.1 store present but 0 of 12 rows are battery-usable (measured evidence class AND known
       quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 13
+  total_rows: 12
   inbox_exclusion_reason: null
 - source_id: viswanathan-2014-te-se-vaporization
   stage: inbox
@@ -35794,14 +35892,15 @@ sources:
   total_rows: 516
   inbox_exclusion_reason: null
 - source_id: wang-2017-sodium-stannate-formation-emf
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/wang-2017-sodium-stannate-formation-emf.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/wang-2017-sodium-stannate-formation-emf.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: wang-2022-super-high-alumina-slag-viscosity
   stage: inbox
@@ -35864,6 +35963,16 @@ sources:
     artefacts:
     - raw/wang-2026-mercury-boundary-protons/wang-2026-mercury-boundary-protons.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: wang-seetharaman-2010-cr-oxidation-original
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/wang-seetharaman-2010-cr-oxidation-original.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -36016,6 +36125,16 @@ sources:
     - raw/washburn-1963-vaporization-iron-oxides/mineru-qt41v0q16v/p029-p029/out/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029/vlm/src--washburn-1963-vaporization-iron-oxides--qt41v0q16v-p029-p029_model.json
     - raw/washburn-1963-vaporization-iron-oxides/washburn-1963-vaporization-iron-oxides.pdf
     reason: document in corpus raw/; no extract
+  usable_rows: 0
+  total_rows: 0
+  inbox_exclusion_reason: null
+- source_id: watne-1977-potassium-vapor-pressure-furnace
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/watne-1977-potassium-vapor-pressure-furnace.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -36284,12 +36403,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: wetzel-2012-heidelberg-thesis
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/wetzel-2012-heidelberg-thesis/wetzel-2012-heidelberg-thesis.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/wetzel-2012-heidelberg-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -36425,14 +36544,15 @@ sources:
   total_rows: 15
   inbox_exclusion_reason: null
 - source_id: willenborg-2006-alkali-removal-thermodynamics
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/willenborg-2006-alkali-removal-thermodynamics.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/willenborg-2006-alkali-removal-thermodynamics.yaml
+    reason: v2.1 store present but 0 of 2 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 2
   inbox_exclusion_reason: null
 - source_id: williams-1971-fe-mgo-sio2-o2-reaction-constants
   stage: inbox
@@ -36643,14 +36763,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: witthohn-2000-coal-slag-alkali-vaporisation
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/witthohn-2000-coal-slag-alkali-vaporisation.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/witthohn-2000-coal-slag-alkali-vaporisation.yaml
+    reason: v2.1 store present but 0 of 7 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 7
   inbox_exclusion_reason: null
 - source_id: woelfer-2025-ge-evaporation-dataset-v2
   stage: inbox
@@ -37154,14 +37275,15 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: yamaguchi-1984-na2o-activity-sodium-beta-alumina
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - data/literature/extracts/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/yamaguchi-1984-na2o-activity-sodium-beta-alumina.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: yamashita-2008-redox-glass-thesis
   stage: inbox
@@ -37605,6 +37727,16 @@ sources:
     reason: v2.1 store present; 81/110 rows battery-usable
   usable_rows: 81
   total_rows: 110
+  inbox_exclusion_reason: null
+- source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+  stage: in_progress
+  evidence:
+    decided_by: in_progress
+    artefacts:
+    - data/literature/extracts/zaitsev-2006-magnesium-silicate-thermodynamics.yaml
+    reason: extract present; no v2.1 store work
+  usable_rows: 0
+  total_rows: 0
   inbox_exclusion_reason: null
 - source_id: zak-2012-tektite-volatiles-review
   stage: inbox

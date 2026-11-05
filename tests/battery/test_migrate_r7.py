@@ -714,17 +714,23 @@ def test_g1_jacobson_keeps_category_and_quantity_reason(tmp_path):
         if oid.startswith(parent_id + "::")
     ]
     assert len(points) == 21
-    assert {obs.identity.species.formula for obs in points} >= {"PO2", "SiO"}
+    printed_species = [
+        "PO2", "SiO", "Fe", "Na", "PO", "K", "FeO", "O", "O2", "Mg",
+        "SiO2", "TiO2", "P", "KO", "TiO", "Ca", "CaO", "Al", "Si", "K2", "Ti",
+    ]
+    assert [obs.identity.species.formula for obs in points] == printed_species
     assert all(
         obs.identity.quantity.is_unknown
         and "predicted_partial_pressure" in obs.identity.quantity.reason
         and obs.value.kind is ValueKind.UNAVAILABLE
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
-        and obs.evidence.attribution
-        == "Jacobson et al. 2024, Table 1, calculated with FactSage (ref. 115, Bale et al. 2002)"
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+        and obs.derivation is not None
+        and obs.derivation.references == ("Bale et al. [115]", "Snyder et al. [117]")
         and (obs.point_conditions or {}).get("temperature_K") is not None
         and obs.point_conditions["temperature_K"].state.value == Decimal("2500.0")
+        and obs.point_conditions["temperature_K"].locator is not None
+        and obs.point_conditions["temperature_K"].locator.table == "1"
         and rail_for_quantity(
             quantity_token(obs.identity),
             species_formula=obs.identity.species.formula,

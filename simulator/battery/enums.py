@@ -99,6 +99,7 @@ class Quantity(StrEnum):
     EVAPORATION_RATE = "evaporation_rate"
     MASS_LOSS_RATE = "mass_loss_rate"
     WALL_DEPOSIT_MASS = "wall_deposit_mass"
+    WALL_DEPOSIT_AREAL_RATE = "wall_deposit_areal_rate"
     TRANSITION_TEMPERATURE = "transition_temperature"
     VISCOSITY = "viscosity"
     DENSITY = "density"
@@ -190,6 +191,24 @@ class RefusalReason(StrEnum):
     OPENIMCC_NOT_IMPORTABLE = "openimcc_not_importable"
     OUTSIDE_SUPPORTED_SPECIES = "outside_supported_species"
     COEFFICIENT_BASIS_MISMATCH = "coefficient_basis_mismatch"
+    # SC-458. The engine bulk was built from the phase analysis this row
+    # scores. Not a basis mismatch and not an incomplete identity.
+    # same_run_initial_analysed_melt uses this reason with detail
+    # input_is_same_run_analysed_melt.
+    INPUT_COMPOSITION_IS_SCORED_PHASE_ANALYSIS = (
+        "input_composition_is_scored_phase_analysis"
+    )
+    # d-323. A non-input melt observable whose run text does not say the
+    # charge was a single melt. Crystal-bearing runs use the crystalline token.
+    INPUT_PHASE_ASSEMBLAGE_UNSTATED = "input_phase_assemblage_unstated"
+    INPUT_PHASE_ASSEMBLAGE_CRYSTALLINE = "input_phase_assemblage_crystalline"
+    # d-325. Printed bulk scored on a phase composition when the engine
+    # result is a single liquid. 100% liquid is the engine liquid mass
+    # fraction, not a phase name.
+    SINGLE_PHASE_BULK_IDENTITY = "single_phase_bulk_identity"
+    SINGLE_PHASE_BULK_IDENTITY_ASSEMBLAGE_UNSTATED = (
+        "single_phase_bulk_identity_assemblage_unstated"
+    )
     ENGINE_DOES_NOT_REPORT_FE_REDOX = "engine_does_not_report_fe_redox"
     ENGINE_DOES_NOT_REPORT_FUSION = "engine_does_not_report_fusion"
     ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
@@ -197,7 +216,16 @@ class RefusalReason(StrEnum):
     )
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
+    # t-1625. The charge kept elemental metals. This engine's accepted
+    # inputs do not include those metals. The metal is not dropped and
+    # not rewritten as an oxide.
+    ENGINE_CANNOT_ACCEPT_METAL = "engine_cannot_accept_metal"
     CAPACITY_DEFINITION_NOT_IMPLEMENTED = "capacity_definition_not_implemented"
+    # Measured oxygen lies outside the Fe2+–Fe3+ oxide span. The observation
+    # stays stored; this is the engine-input refusal, not a clip.
+    OXYGEN_EXCESS_OUTSIDE_OXIDE_COMPONENT_SPACE = (
+        "oxygen_excess_outside_oxide_component_space"
+    )
 
 
 class CellMaterial(StrEnum):
@@ -257,6 +285,7 @@ class NoticeKind(StrEnum):
     )
     TOTAL_IRON_REPORTED_AS_FEO = "total_iron_reported_as_feo"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
+    TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE = "total_pressure_ambient_open_furnace"
     SOURCE_DISAGREEMENT = "source_disagreement"
     # A nonblocking limitation of an engine model or how it is applied. The
     # reason carries detail; it adds no stratum and does not change authority.
@@ -264,6 +293,7 @@ class NoticeKind(StrEnum):
     # An input was left out because this row does not take it. The reason
     # says which input and why. Not a blocking qualification.
     INPUT_OMITTED = "input_omitted"
+    FO2_FRAME_FROM_PRINTED_ATMOSPHERE = "fo2_frame_from_printed_atmosphere"
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
     PREDICTION_OUTSIDE_PHYSICAL_RANGE = "prediction_outside_physical_range"
@@ -271,6 +301,9 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
+    # t-1593: a named material's cited bulk analysis varies by lot
+    # (JSC-1 vs JSC-1A). Advisory. Not a flagged stratum.
+    LOT_VARIABILITY = "lot_variability"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
@@ -282,6 +315,11 @@ class NoticeKind(StrEnum):
     FIGURE_ONLY = "figure_only"
     APPROXIMATE_VALUE = "approximate_value"
     REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
+    # Fe3+/sum Fe from measured oxygen, assigning every excess O atom to Fe.
+    # The reason lists any other redox-variable element that was printed.
+    REDOX_FROM_MEASURED_OXYGEN_FE_ONLY_ASSUMPTION = (
+        "redox_from_measured_oxygen_fe_only_assumption"
+    )
     # t-1123a: printed point sits between printed liquidus positions; scored as
     # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
     LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
@@ -291,6 +329,37 @@ class NoticeKind(StrEnum):
     # Advisory. The reason is the parser sentence (phase, field, raw token).
     # It is not a flagged stratum and does not void the decision band.
     UNREQUESTED_PHASE_NONFINITE = "unrequested_phase_nonfinite"
+    # t-1598: printed vol% or vol-ppm of an ideal gas, stored as a mole fraction.
+    IDEAL_GAS_VOLUME_FRACTION_AS_MOLE_FRACTION = (
+        "ideal_gas_volume_fraction_as_mole_fraction"
+    )
+    # t-1597: p_bulk < p_sat(T_wall). The model predicts zero net deposition
+    # (net evaporation). The miss against a measured deposit stays scored.
+    # Not a flagged stratum.
+    UNDERSATURATED_WALL_NET_EVAPORATION = "undersaturated_wall_net_evaporation"
+    # t-1619 / d-324. A printed buffer offset was converted with the
+    # calibration the paper names. Advisory. Not a flagged stratum.
+    BUFFER_RELATIVE_FO2_CONVERTED = "buffer_relative_fo2_converted"
+    # The extract did not name a calibration the buffer owner has, so the
+    # canonical curve was used. Advisory. Not a flagged stratum.
+    BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED = (
+        "buffer_calibration_not_printed_canonical_used"
+    )
+    # The paper says this ΔIW is ideal FeO and metal Fe (or x_FeO/x_Fe).
+    # Advisory. Not a flagged stratum. Extrapolation still uses
+    # out_of_certified_band, which is the flagged stratum.
+    DELTA_IW_FROM_IDEAL_FEO_FE_RATIO = "delta_iw_from_ideal_feo_fe_ratio"
+    # d-326: a printed study-level orifice interval. Advisory. The coded
+    # p/d regime check uses both ends of the interval. Case 1 carries no
+    # value band; a raw-rate reduction puts the propagated dex band on
+    # Notice.band. Not a flagged stratum.
+    APPARATUS_GEOMETRY_INTERVAL_PRINTED = "apparatus_geometry_interval_printed"
+    # t-1624 / d-324 extension. T is past every table and fit that sizes
+    # this buffer. The central curve is still evaluated. The band is not a
+    # number. Advisory. out_of_certified_band remains the flagged stratum.
+    BUFFER_BAND_UNSIZED_BEYOND_ALL_CALIBRATIONS = (
+        "buffer_band_unsized_beyond_all_calibrations"
+    )
 
 
 class ReferenceStateConvention(StrEnum):
@@ -376,6 +445,9 @@ class Polymorph(StrEnum):
     MARCASITE = "marcasite"
     PYRITE = "pyrite"
     HEMATITE = "hematite"
+    # JANAF Cr-014 prints "Chromium Oxide" with no mineral qualifier.
+    # Eskolaite is that crystal, assigned the way lime and periclase are.
+    ESKOLAITE = "eskolaite"
     MAGNETITE = "magnetite"
     ANATASE = "anatase"
     RUTILE = "rutile"
@@ -471,6 +543,13 @@ class ExperimentKind(StrEnum):
     SYNTHETIC = "synthetic"
 
 
+class AmbientPressureEvidenceClass(StrEnum):
+    GAS_FLOW = "gas_flow"
+    GAS_MIXING = "gas_mixing"
+    VENTED = "vented"
+    ATMOSPHERIC_PRESSURE_STATEMENT = "atmospheric_pressure_statement"
+
+
 class FO2Channel(StrEnum):
     COMMANDED = "commanded"
     INTRINSIC = "intrinsic"
@@ -495,8 +574,13 @@ class Authority(StrEnum):
     CERTIFIED = "certified"
     BRIDGE = "bridge"
     EXTRAPOLATED = "extrapolated"
+    # d-333: a saturation composition supplied by the score-time owner, or by a
+    # recorded reduction of the source's own analyses. Not a scoring eligibility
+    # token; authority_allowed does not treat it as certified.
+    DERIVED = "derived"
     CONVENTION = "convention"
     REFUSED = "refused"
+    DERIVED_FROM_APPARATUS = "derived_from_apparatus"
 
 
 class ResidualStatus(StrEnum):
@@ -621,6 +705,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVAPORATION_RATE: "kg_per_s",
     Quantity.MASS_LOSS_RATE: "kg_per_s",
     Quantity.WALL_DEPOSIT_MASS: "kg",
+    Quantity.WALL_DEPOSIT_AREAL_RATE: "kg_per_m2_s",
     Quantity.TRANSITION_TEMPERATURE: "K",
     Quantity.VISCOSITY: "Pa_s",
     Quantity.DENSITY: "kg_per_m3",
@@ -690,12 +775,65 @@ PHASE_ROW_QUANTITIES = PHASE_COMPOSITION_QUANTITIES | PRINTED_CAPACITY_QUANTITIE
 # with a free-text basis and are not in this set. ppm_mass is the printed
 # mass-ppm scale; it is not a weight percent and is not stored converted.
 # element_ppm_by_mass is the residue ppm subtype, a different quantity.
+# element_wt_percent stores printed elemental wt% with measured O. The
+# cation relabel (all Fe as FeO) is a separate step and does not rebuild O.
+ELEMENT_WT_PERCENT_BASIS = "element_wt_percent"
 PHASE_BASIS_TOKENS = frozenset({
     "wt_percent",
     "mole_fraction",
     "element_ppm_by_mass",
     "ppm_mass",
+    ELEMENT_WT_PERCENT_BASIS,
 })
+
+# Hero-chart funnel 1a. Exact printed subtypes from the funnelrule top
+# groups, plus nothing else. A free-text basis outside this set stays
+# quantity_not_predicted. These strings are weight percent already; they
+# are not a pattern and they do not rename a different observable.
+# The funnelrule table cuts three labels before the clause the extract
+# stores. Each cut count (381, 194, 59) is one stored sentence, so that
+# sentence is a member. The shorter table text stays a member too.
+# "X mass percent in Y phase", "X wt% in silicate glass", and "oxide wt.%"
+# are different wordings and are not members.
+PROSE_WT_PERCENT_PHASE_SUBTYPES = frozenset({
+    "oxide wt%",
+    "oxide mass percent in liquid phase",
+    "Electron-microprobe wt.% as printed",
+    "Electron-microprobe wt.% as printed; elemental component in quenched silicate glass.",
+    "Analyzed glass composition, mass%",
+    "Analyzed glass composition, mass%; each glass composition is normalized to 100%.",
+    "S content in silicate melt (Gl), wt.%",
+    "Cu2O mass percent in Metal phase",
+    "Cu2O mass percent in Slag phase",
+    "ICP-OES measured oxide wt.% as printed",
+    "ICP-OES measured oxide wt.% as printed.",
+})
+
+# Hero-chart funnel 1b. Exact mole-percent subtypes. The value is mol% on
+# a 0–100 scale. The mapped oxide is the component the prose names. None
+# means the subtype does not name an oxide, so the species formula is the
+# component. A formula that disagrees with a named oxide is not this map.
+PROSE_MOLE_PERCENT_PHASE_COMPONENT = {
+    "SiO2 mol pct in the phase, Table 5": "SiO2",
+    "CaO mol pct in the phase, Table 5": "CaO",
+    "FeO1.5 mol pct in the phase, Table 5": "FeO1.5",
+    "oxide mole percent in solid phase": None,
+}
+
+
+def effective_phase_basis(subtype: str | None) -> str | None:
+    """Closed phase-basis token, or the wt% / mole-percent prose it names.
+
+    Anything else is None. Callers do not pattern-match free text.
+    """
+
+    if subtype in PHASE_BASIS_TOKENS:
+        return subtype
+    if subtype in PROSE_WT_PERCENT_PHASE_SUBTYPES:
+        return "wt_percent"
+    if subtype in PROSE_MOLE_PERCENT_PHASE_COMPONENT:
+        return "mole_percent"
+    return None
 
 # 1 wt% = 1 mass part per 100. 1 ppm by mass = 1 mass part per 1_000_000.
 # 1e6 / 1e2 = 1e4, so 1 wt% = 10_000 ppm and wt% = ppm / 1e4.

@@ -23,6 +23,14 @@ def test_masuda_tables_render_pins_and_residue_migration() -> None:
     assert check_all_fidelity_samples_match(document, label=SID) == []
     table1 = document["species"]["SiO2"]["context"][0]
     table2 = document["species"]["SiO2"]["context"][1]
+    enrichment = next(
+        context
+        for context in document["species"]["SiO2"]["context"]
+        if context["observation_id"] == "masuda_tanaka_1979_table2_enrichment_factors_typed_refusal"
+    )
+    assert enrichment["values"]["method_class"] == "measured_reduced"
+    assert enrichment["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert enrichment["values"]["derivation"]["raw_inputs"]["locator"]["table"] == "1"
     assert table1["values"]["row_count_as_printed"] == 22
     assert len(table1["values"]["rows_as_published"]) == 22
     assert table2["values"]["row_count_as_printed"] == 21

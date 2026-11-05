@@ -12,7 +12,7 @@ from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from fractions import Fraction
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -2596,10 +2596,18 @@ _FUSION_TABLES = {
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
+    # Cr-014 (cr) and Cr-015 (l). The printed CRYSTAL <--> LIQUID row is 2603 K.
+    "Cr2O3": ("Cr-014", "Cr-015"),
 }
 
 _JANAF_POLYMORPH_BY_TABLE = {
-    **{"Ca-027": Polymorph.LIME, "Mg-008": Polymorph.PERICLASE},
+    **{
+        "Ca-027": Polymorph.LIME,
+        "Mg-008": Polymorph.PERICLASE,
+        # Cr-014's title does not print a crystal qualifier, so the dictionary
+        # row that names hematite for Fe-030 does not exist for eskolaite.
+        "Cr-014": Polymorph.ESKOLAITE,
+    },
     **{
         table_id: JANAF_CRYSTAL_DICTIONARY[key]
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
@@ -2797,6 +2805,135 @@ def _janaf_stable_fusion_polymorph(
     )
 
 
+@dataclass(frozen=True)
+class JANAFSolidStabilityTransition:
+    """Temperature where the lowest-G JANAF crystal changes identity.
+
+    ``stable_below`` is the crystal selected just below the crossing and
+    ``stable_above`` the crystal selected just above it. A Gibbs crossing of
+    two crystals that are both above a third is not in this list. The
+    crystal/liquid melting crossing is not here either; fusion owns that
+    boundary.
+    """
+
+    temperature_K: Decimal
+    stable_below: JANAFCrystalGibbs
+    stable_above: JANAFCrystalGibbs
+
+
+def _crystal_gibbs_overlap(
+    left_points: tuple[tuple[Decimal, Decimal], ...],
+    right_points: tuple[tuple[Decimal, Decimal], ...],
+    left_missing: tuple[Decimal, ...],
+    right_missing: tuple[Decimal, ...],
+) -> tuple[Decimal, ...]:
+    overlap = sorted(
+        {t for t, _ in left_points if right_points[0][0] <= t <= right_points[-1][0]}
+        | {t for t, _ in right_points if left_points[0][0] <= t <= left_points[-1][0]}
+    )
+    return tuple(
+        temperature
+        for temperature in overlap
+        if _missing_node_for_interpolation(left_points, left_missing, temperature)
+        is None
+        and _missing_node_for_interpolation(right_points, right_missing, temperature)
+        is None
+    )
+
+
+def _stability_probe_width(
+    temperature_K: Decimal, crossings: Sequence[Decimal]
+) -> Decimal:
+    """Stay on one side of this crossing and short of the next one.
+
+    One kelvin is inside a JANAF linear segment (nodes are 100 K apart) and
+    is only a probe of tabulated G, not a physics margin. A closer neighbouring
+    crossing shrinks the probe so the two sides are not swapped.
+    """
+
+    gaps = [
+        abs(temperature_K - other)
+        for other in crossings
+        if other != temperature_K and abs(temperature_K - other) > 0
+    ]
+    if not gaps:
+        return Decimal(1)
+    return min(Decimal(1), min(gaps) / Decimal(10))
+
+
+@lru_cache(maxsize=None)
+def janaf_solid_stability_transitions(
+    oxide: str,
+) -> tuple[JANAFSolidStabilityTransition, ...]:
+    """Solid-solid temperatures where the stable JANAF crystal changes.
+
+    Pairwise formation-G crossings come from the crystal tables
+    ``_janaf_stable_crystal_set`` reads. A crossing is kept only when the
+    lowest-G polymorph on the two sides differs. Melting is a crystal/liquid
+    crossing and is not returned.
+    """
+
+    tables: list[tuple[str, Polymorph]] = []
+    for formula, table_id, polymorph in _janaf_pure_solid_table_index():
+        if formula != oxide or polymorph is None:
+            continue
+        tables.append((table_id, polymorph))
+    if len(tables) < 2:
+        return ()
+
+    loaded: list[
+        tuple[str, Polymorph, tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]
+    ] = []
+    for table_id, polymorph in tables:
+        try:
+            points, _digest = _fusion_table_points(table_id)
+            missing = _fusion_missing_gibbs_temperatures(table_id)
+        except (KeyError, ValueError) as exc:
+            raise JANAFFusionPolymorphUnavailable(
+                f"{table_id}: stability data unavailable for {oxide}: {exc}"
+            ) from exc
+        loaded.append((table_id, polymorph, points, missing))
+
+    crossings: list[Decimal] = []
+    for index, (table_id, _polymorph, points, missing) in enumerate(loaded):
+        for other_id, _other_polymorph, other_points, other_missing in loaded[
+            index + 1 :
+        ]:
+            grid = _crystal_gibbs_overlap(points, other_points, missing, other_missing)
+            if len(grid) < 2:
+                continue
+
+            def difference(
+                temperature: Decimal,
+                left: tuple[tuple[Decimal, Decimal], ...] = points,
+                right: tuple[tuple[Decimal, Decimal], ...] = other_points,
+            ) -> Decimal:
+                return _interpolate_formation_gibbs(
+                    left, temperature
+                ) - _interpolate_formation_gibbs(right, temperature)
+
+            for root in _bracketed_signed_roots(difference, grid):
+                if root not in crossings:
+                    crossings.append(root)
+    crossings.sort()
+
+    transitions: list[JANAFSolidStabilityTransition] = []
+    for temperature_K in crossings:
+        probe = _stability_probe_width(temperature_K, crossings)
+        below = _janaf_stable_crystal_set(oxide, temperature_K - probe)
+        above = _janaf_stable_crystal_set(oxide, temperature_K + probe)
+        if below.selected.polymorph is above.selected.polymorph:
+            continue
+        transitions.append(
+            JANAFSolidStabilityTransition(
+                temperature_K=temperature_K,
+                stable_below=below.selected,
+                stable_above=above.selected,
+            )
+        )
+    return tuple(transitions)
+
+
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
@@ -2811,12 +2948,17 @@ _FUSION_NODE_SET_SHA256 = {
     "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    # Cr-014 shares the 0–3000 K crystal node set; Cr-015 the 0–4500 K liquid set.
+    "Cr-014": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
+    # JANAF Cr-014/Cr-015 print CRYSTAL <--> LIQUID at 2603 K.
+    "Cr2O3": Decimal("2603"),
 }
 
 
@@ -3017,11 +3159,15 @@ def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
 
 
 def _interpolate_formation_gibbs(
-    points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
+    points: tuple[tuple[Decimal, Decimal], ...],
+    temperature_K: Decimal,
+    missing_temperatures: tuple[Decimal, ...] = (),
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
-    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    missing_node = _missing_node_for_interpolation(
+        points, missing_temperatures, temperature_K
+    )
     if missing_node is not None:
         raise ValueError(
             f"JANAF formation Gibbs interpolation spans missing grid node "
@@ -3238,6 +3384,52 @@ def janaf_tabulated_gas_thermo(
     )
 
 
+def _bracketed_signed_roots(
+    difference: Callable[[Decimal], Decimal],
+    grid: Sequence[Decimal],
+) -> tuple[Decimal, ...]:
+    """Linear roots of ``difference`` on a sorted grid, including endpoint zeros.
+
+    The same bracket the crystal/liquid fusion crossing uses: a sign change
+    is interpolated, and a grid node where the difference is already zero is
+    itself a root. This is table arithmetic, not a second stability rule.
+    """
+
+    roots: list[Decimal] = []
+    for left, right in zip(grid, grid[1:]):
+        d_left = difference(left)
+        d_right = difference(right)
+        if d_left == 0:
+            roots.append(left)
+        elif d_left * d_right < 0:
+            roots.append(left - d_left * (right - left) / (d_right - d_left))
+    if grid and difference(grid[-1]) == 0:
+        roots.append(grid[-1])
+    return tuple(roots)
+def _janaf_gas_formation_gibbs_J_per_mol(
+    formula: str, temperature_K: Decimal
+) -> Decimal:
+    """Hash-checked JANAF ΔfG°(T) for the unique neutral gas table."""
+
+    table_ids = _janaf_gas_table_ids().get(formula, ())
+    if not table_ids:
+        raise ValueError(f"no JANAF gas table for {formula}")
+    if len(table_ids) != 1:
+        raise ValueError(
+            f"ambiguous JANAF gas tables for {formula}: {', '.join(table_ids)}"
+        )
+    table_id = table_ids[0]
+    points, _digest, missing = _fusion_property_points(
+        table_id, "formation_gibbs_energy"
+    )
+    # JANAF cells are kJ/mol; convert the owning table result to J/mol for
+    # reaction ΔG/(R T) calculations. Missing nodes and out-of-range T refuse.
+    return (
+        _interpolate_formation_gibbs(points, Decimal(temperature_K), missing)
+        * 1000
+    )
+
+
 def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:
     """Read ΔG_fus and its own cr/l table crossing from hash-checked JANAF rows."""
 
@@ -3290,15 +3482,7 @@ def _janaf_fusion_energy_for_pair(
             liquid, t
         ) - _interpolate_formation_gibbs(crystal, t)
 
-    crossings: list[Decimal] = []
-    for left, right in zip(overlap, overlap[1:]):
-        d_left, d_right = difference(left), difference(right)
-        if d_left == 0:
-            crossings.append(left)
-        elif d_left * d_right < 0:
-            crossings.append(left - d_left * (right - left) / (d_right - d_left))
-    if overlap and difference(overlap[-1]) == 0:
-        crossings.append(overlap[-1])
+    crossings = _bracketed_signed_roots(difference, overlap)
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]

@@ -210,6 +210,22 @@ def test_tables_match_600_dpi_render_pins_and_row_counts() -> None:
     _table_pins(_document())
 
 
+def test_table2_standard_gibbs_energies_are_model_derived():
+    document = _document()
+    row = _observation(
+        document,
+        "MgO",
+        "shornikov_2020_mgo_feo_melts_p002_t03_r03_c02",
+    )
+    assert row["values"]["method_class"] == "model_derived"
+    derivation = row["derivation"]
+    assert derivation["raw_inputs"]["state"]["value"] == "not_printed"
+    assert "semi-empirical model" in derivation["method"]["state"]["value"].lower()
+    assert derivation["method"]["locator"]["page"] == 3
+    assert derivation["method"]["locator"]["section"] == "Theoretical calculations"
+    assert derivation["references"] == ["Shornikov (2019)"]
+
+
 def test_figure_reads_match_literal_render_pins() -> None:
     _figure_pins(_document())
 
@@ -336,7 +352,6 @@ def test_isolated_migration_preserves_conditions_for_all_observations() -> None:
     assert sum(row.value.kind is ValueKind.POINT for row in observations) == 127
     assert sum(row.value.kind is ValueKind.UNAVAILABLE for row in observations) == 19
     assert result.validation is not None
-    assert result.validation.hard_issues == ()
     source_rows = {row["observation_id"]: row for row in _observations(document)}
     for row in observations:
         assert row.point_conditions is not None
@@ -352,3 +367,4 @@ def test_isolated_migration_preserves_conditions_for_all_observations() -> None:
             assert temperature.state.is_value or temperature.state.value is None
         for condition in row.point_conditions.values():
             assert condition.locator is not None
+    assert result.validation.hard_issues == ()

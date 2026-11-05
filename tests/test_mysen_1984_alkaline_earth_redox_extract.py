@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.battery.identity import profile_for
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import Migrator
 from simulator.battery.records import phase_token
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
@@ -155,7 +157,10 @@ def test_table1_render_pins_and_migrated_conditions():
         assert identity.temperature_K.is_value
         assert identity.fO2_Pa.is_value
         assert identity.composition.is_value
-        assert conditions["composition"].state.value == identity.composition.value
+        point_composition = conditions["composition"].state.value
+        assert identity.composition.value == replace(
+            point_composition, input_provenance=PRINTED_STARTING_BULK
+        )
         assert source["locator"]["table"] == "1"
         assert source["locator"]["page"] == 2
         assert source["locator"]["table_row_number"] >= 3

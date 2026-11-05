@@ -99,6 +99,7 @@ def series_row_extra(raw_item: Any, *, include_locator: bool = True) -> str | No
         "quote",
         "composition_role",
         "derived_from",
+        "duplicate_of_observation_id",
     }
     printed_species = raw_item.get("species_as_printed")
     if isinstance(printed_species, str) and printed_species in (

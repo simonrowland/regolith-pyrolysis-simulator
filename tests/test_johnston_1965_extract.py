@@ -64,6 +64,15 @@ def _assert_render_pins(doc: dict) -> None:
         }
 
 
+def _assert_fe_apparent_enthalpy_class_pin(doc: dict) -> None:
+    fe_enthalpy = _observations(doc)["johnston_1965_t2_fe_apparent_delta_h"]
+    assert fe_enthalpy["values"]["method_class"] == "measured_reduced"
+    assert fe_enthalpy["values"]["admission_status"] == "typed_refusal"
+    assert fe_enthalpy["values"]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert fe_enthalpy["values"]["derivation"]["raw_inputs"]["locator"]["figure"] == "5"
+    assert fe_enthalpy["values"]["points"][0]["method_class"] == "measured_reduced"
+
+
 def test_johnston_table_i_rows_conditions_and_render_pins() -> None:
     doc = _load_extract()
     observations = _observations(doc)
@@ -89,7 +98,8 @@ def test_johnston_table_i_rows_conditions_and_render_pins() -> None:
         assert row["values"]["points"][0]["point_conditions"] == row["point_conditions"]
 
     assert sum(row["values"]["method_class"] == "model_derived" for row in table_ii) == 6
-    assert sum(row["values"]["method_class"] == "quoted_attributed" for row in table_ii) == 1
+    assert sum(row["values"]["method_class"] == "measured_reduced" for row in table_ii) == 1
+    _assert_fe_apparent_enthalpy_class_pin(doc)
     ce = observations["johnston_1965_t1_ce_r01"]
     assert "NaSbO3" not in ce["quench_statement"]
     assert "devitrified during quenching" in ce["quench_statement"]
@@ -108,6 +118,15 @@ def test_johnston_table_i_rows_conditions_and_render_pins() -> None:
             "no_quantity_token_for_printed_v4_and_v5_wt_percent_pair"
         )
     _assert_render_pins(doc)
+
+
+def test_johnston_fe_apparent_enthalpy_class_pin_rejects_quoted_reversion() -> None:
+    doc = _load_extract()
+    fe_enthalpy = _observations(doc)["johnston_1965_t2_fe_apparent_delta_h"]
+    fe_enthalpy["values"]["method_class"] = "quoted_attributed"
+
+    with pytest.raises(AssertionError):
+        _assert_fe_apparent_enthalpy_class_pin(doc)
 
 
 def test_johnston_render_pin_fails_after_value_mutation() -> None:

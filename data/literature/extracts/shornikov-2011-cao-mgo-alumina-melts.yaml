@@ -232,7 +232,22 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: &shornikov_2011_table1_lineage
+          relation: Table 1 Gibbs energies calculated in the present study using the ideal associated solutions theory and Gibbs energy minimization.
+          method:
+            state: {tag: value, value: ideal associated solutions theory with Gibbs energy minimization}
+            locator: {page: 1, pdf_page_index: 0, table: '1', section: Method discussion following Table 1}
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 1
+              pdf_page_index: 0
+              table: '1'
+          references:
+          - Glushko et al. (1978–1982)
+          - Allibert et al. (1979)
+          - Shornikov et al. (1997)
+        method_class: model_derived
         T_K: '1960'
         value: '-1046.788'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -252,7 +267,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r03_c04
       type: gibbs_table
       locator:
@@ -265,7 +280,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-1029.796'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -285,7 +301,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c06
       type: gibbs_table
       locator:
@@ -298,7 +314,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-407.794'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -318,7 +335,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_fig1_c_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -964,7 +981,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '89.605'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -984,7 +1002,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   CaO:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c02
@@ -999,7 +1017,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-425.847'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1019,7 +1038,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r04_c04
       type: gibbs_table
       locator:
@@ -1032,7 +1051,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-413.472'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1052,7 +1072,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c06
       type: gibbs_table
       locator:
@@ -1065,7 +1085,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-72.634'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1085,7 +1106,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_fig1_a_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -1632,7 +1653,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-72.492'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1652,7 +1674,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   CaAl2O4:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c02
@@ -1667,7 +1689,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-1533.967'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1687,7 +1710,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c04
       type: gibbs_table
       locator:
@@ -1700,7 +1723,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-1536.789'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1720,7 +1744,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   AlO2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r05_c06
@@ -1735,7 +1759,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-99.299'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1755,7 +1780,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   CaAl4O7:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c02
@@ -1770,7 +1795,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-2596.897'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1790,7 +1816,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Al2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r06_c06
@@ -1805,7 +1831,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '196.232'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1825,7 +1852,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   CaAl12O19:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c02
@@ -1840,7 +1867,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-6795.323'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1860,7 +1888,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Al2O:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r07_c06
@@ -1875,7 +1903,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-280.491'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1895,7 +1924,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Ca3Al2O6:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c02
@@ -1910,7 +1939,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-2400.664'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1930,7 +1960,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Al2O2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r08_c06
@@ -1945,7 +1975,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-387.192'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -1965,7 +1996,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Ca5Al6O14:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r09_c02
@@ -1980,7 +2011,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-5489.050'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2000,7 +2032,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Ca12Al14O33:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c02
@@ -2015,7 +2047,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-12932.929'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2035,7 +2068,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c04
       type: gibbs_table
       locator:
@@ -2048,7 +2081,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-13005.601'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2068,7 +2102,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Ca:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r10_c06
@@ -2083,7 +2117,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-17.589'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2103,7 +2138,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Ca3MgAl4O10:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c02
@@ -2118,7 +2153,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-3885.890'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2138,7 +2174,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r11_c04
       type: gibbs_table
       locator:
@@ -2151,7 +2187,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-3885.257'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2171,7 +2208,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     context:
     - observation_id: shornikov_2011_text_ca3mgal4o10_composition
       type: composition
@@ -2201,7 +2238,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-1471.685'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2221,7 +2259,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c04
       type: gibbs_table
       locator:
@@ -2234,7 +2272,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-1434.364'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2254,7 +2293,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   Mg:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r12_c06
@@ -2269,7 +2308,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-53.734'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2289,7 +2329,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   MgO:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c02
@@ -2304,7 +2344,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-381.143'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2324,7 +2365,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c04
       type: gibbs_table
       locator:
@@ -2337,7 +2378,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-359.587'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2357,7 +2399,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r13_c06
       type: gibbs_table
       locator:
@@ -2370,7 +2412,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '-106.108'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -2390,7 +2433,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
     - observation_id: shornikov_2011_fig1_b_allibert_marker_01
       type: activity_coefficient
       locator:
@@ -3126,7 +3169,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '124.333'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -3146,7 +3190,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   O2:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r15_c06
@@ -3161,7 +3205,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '0.000'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -3181,7 +3226,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   O3:
     observations:
     - observation_id: shornikov_2011_cao_mgo_alumina_melts_p001_t01_r16_c06
@@ -3196,7 +3241,8 @@ species:
       mineru_flags: []
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        derivation: *shornikov_2011_table1_lineage
+        method_class: model_derived
         T_K: '1960'
         value: '271.522'
         attribution: 'Table 1 caption: values calculated in the present study according to data [Glushko et al.,
@@ -3216,7 +3262,7 @@ species:
             table: '1'
             note: 1960 K is printed in both Gibbs-energy column headers.
       experiment: shornikov_2011_table1_present_calculation
-      evidence_class: quoted_attributed
+      evidence_class: model_derived
   CaO-MgO-Al2O3_melt:
     observations:
     - observation_id: shornikov_2011_text_minimum_delta_fG1960_melt
@@ -3232,12 +3278,39 @@ species:
       standard_state: Gibbs energy of melt formation from oxides, as stated in the source text.
       values:
         quantity: delta_fG
-        method_class: quoted_attributed
+        method_class: model_derived
         value_as_printed: '−31.5'
         value: '-31.5'
+        derivation:
+          relation: >-
+            The minimum melt Gibbs energy of formation is calculated in the
+            present study using ideal associated solutions theory and Gibbs
+            energy minimization.
+          method:
+            state: {tag: value, value: ideal associated solutions theory with Gibbs energy minimization}
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Results
+              figure: '1'
+              note: Panel d, the Gibbs-energy result.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 2
+              pdf_page_index: 1
+              section: Results
+              figure: '1'
+              note: >-
+                Fig. 1d, panel d; series 3 is calculated in the present study;
+                numerical input rows are not printed.
+          references:
+          - Glushko et al. (1978–1982)
+          - Allibert et al. (1979)
+          - Shornikov et al. (1997)
         T_K: '1960'
         composition_Al2O3_mole_pct_as_printed: '45'
-        attribution: Final paragraph reports the minimum melt Gibbs energy of formation from oxides and cites prior thermodynamic data.
+        attribution: Present-study minimum from the Gibbs-energy calculation in Fig. 1d.
       point_conditions:
         temperature_K:
           state:

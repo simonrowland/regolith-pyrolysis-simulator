@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
 from simulator.battery.enums import NoticeKind
+from simulator.battery.input_provenance import (
+    PRINTED_STARTING_BULK,
+    SCORED_PHASE_ANALYSIS,
+)
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
 
 REPO = Path(__file__).resolve().parents[2]
@@ -25,6 +30,7 @@ AITHALA_ALLF_RUNS = {
     "aithala-2026-2000-120",
     "aithala-2026-2100-30",
 }
+JAYASURIYA = REPO / "data/literature/extracts/jayasuriya-2004-iron-mossbauer.yaml"
 
 
 def _migrate(path: Path):
@@ -155,10 +161,14 @@ def test_sossi_redox_row_projects_its_printed_glass_analysis() -> None:
         "SO2": Decimal("0.00"),
         "Total": Decimal("99.39"),
     }
-    expected = wt_pct_to_mole_fraction(printed)
+    printed_composition = wt_pct_to_mole_fraction(printed)
+    expected = replace(
+        printed_composition,
+        input_provenance=SCORED_PHASE_ANALYSIS,
+    )
     assert _composition(observation) == expected
     point = observation.point_conditions["composition"]
-    assert point.state.is_value and point.state.value == expected
+    assert point.state.is_value and point.state.value == printed_composition
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_value and f_o2.state.value == Decimal("0.00")
     redox_rows = [
@@ -215,10 +225,14 @@ def test_aithala_redox_row_projects_experiment_glass_analysis_and_f_o2() -> None
         "K2O": Decimal("0.029"),
         "P2O5": Decimal("0.13"),
     }
-    expected = wt_pct_to_mole_fraction(printed)
+    printed_composition = wt_pct_to_mole_fraction(printed)
+    expected = replace(
+        printed_composition,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
     assert _composition(observation) == expected
     point = observation.point_conditions["composition"]
-    assert point.state.is_value and point.state.value == expected
+    assert point.state.is_value and point.state.value == printed_composition
     f_o2 = observation.point_conditions["fO2_log"]
     assert f_o2.state.is_value and f_o2.state.value == Decimal("0.0")
     redox_rows = [
@@ -345,12 +359,18 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         sample = printed[run_id]
         source = source_rows[row.observation_id.rsplit("::", 1)[-1]]
         assert source["values"]["sample_id"] == sample["sample_id"]
-        expected = wt_pct_to_mole_fraction(
+        printed_composition = wt_pct_to_mole_fraction(
             {
                 key: Decimal(value)
                 for key, value in sample.items()
                 if key not in {"sample_id", "T_K"}
             }
+        )
+        # Table S-1 redox row, Table S-2 oxide map. phase_map_provenance
+        # stamps printed_starting_bulk when those tables differ. The point
+        # composition stays the unstamped conversion, same as the 1800-30 row.
+        expected = replace(
+            printed_composition, input_provenance=PRINTED_STARTING_BULK
         )
         assert _composition(row) == expected
         assert row.identity.temperature_K.is_value
@@ -362,7 +382,7 @@ def test_aithala_vf_redox_rows_project_printed_sample_compositions() -> None:
         assert point["fO2_log"].state.value == Decimal("-0.68")
         assert point["fO2_log"].locator.table == "S-1"
         assert point["composition"].state.is_value
-        assert point["composition"].state.value == expected
+        assert point["composition"].state.value == printed_composition
         assert point["composition"].locator.table == "S-2"
 
 
@@ -489,4 +509,33 @@ def test_feot_notice_follows_row_local_and_joined_compositions() -> None:
             for notice in row.notices
         )
         for row in sossi_rows
+    )
+
+
+def test_jayasuriya_redox_rows_project_the_printed_bar_frame() -> None:
+    extract = yaml.safe_load(JAYASURIYA.read_text(encoding="utf-8"))
+    points = [
+        point
+        for observation in extract["species"]["Fe"]["observations"]
+        for point in observation["values"]["points"]
+    ]
+    assert len(points) == 38
+    assert all(
+        point["point_conditions"]["fO2_log"]["units"] == "log10(bar)"
+        for point in points
+    )
+
+    result = _migrate(JAYASURIYA)
+    rows = [
+        row
+        for row in result.observations.values()
+        if row.source_id == "jayasuriya-2004-iron-mossbauer"
+    ]
+    assert len(rows) == len(points)
+    assert all(row.identity.temperature_K.is_value for row in rows)
+    assert all(row.identity.fO2_Pa.is_value for row in rows)
+    assert all(
+        row.point_conditions["temperature_K"].state.is_value
+        and row.point_conditions["fO2_log"].state.is_value
+        for row in rows
     )

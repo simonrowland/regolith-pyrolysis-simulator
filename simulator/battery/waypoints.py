@@ -9,7 +9,13 @@ from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
+from simulator.battery.composition import (
+    excluded_component_notice_reason,
+    partition_engine_components,
+)
 from simulator.battery.migrate import (
+    _COMPOSITION_COMPONENTS,
+    _COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
@@ -370,6 +376,40 @@ def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
     return dict(pairs)
 
 
+def _oxide_wt_derivation(located: Located) -> bool:
+    """True when this composition was converted from an oxide wt% print.
+
+    A printed mineral mole fraction (Mg2SiO4) has no such inference and is
+    already the charge. H2O, Cl, Ag2O, I2O, Re, and CO2 arrive only through
+    this conversion.
+    """
+
+    relation = located.inference.relation if located.inference is not None else ""
+    return (
+        relation == "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction"
+        or relation.endswith("wt_pct_to_mole_fraction")
+    )
+
+
+def _melts_oxide_split(
+    components: Mapping[str, object],
+) -> tuple[tuple[tuple[str, Decimal], ...], tuple[tuple[str, Decimal], ...]]:
+    """Split a stored map into the MELTS oxide table and the named exclusions.
+
+    ``retain_components`` is the whole historical table, so an oxide the
+    MELTS flag marks false stays. A formula the table does not list is
+    excluded with its amount. This does not rescale.
+    """
+
+    return partition_engine_components(
+        components,
+        engine_components=tuple(
+            name for name, spec in _COMPOSITION_COMPONENTS.items() if spec[2]
+        ),
+        retain_components=_COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
+    )
+
+
 def charge_moles_by_species(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> SpeciesWaypoints:
@@ -444,8 +484,24 @@ def charge_moles_by_species(
                     2,
                 )
         elif mass is not None and comp.amount_basis is AmountBasis.MOLE_FRACTION:
-            masses = [(species, _molar_mass_kg_mol(species), fraction) for species, fraction in comp.components]
+            pairs = list(comp.components)
+            excluded_names: set[str] = set()
+            if _oxide_wt_derivation(composition):
+                # Cl is passed only when the oxide table lists it (t-1609).
+                # The stored map keeps the formula; this charge does not.
+                _, _excluded = _melts_oxide_split(
+                    {species: fraction for species, fraction in pairs}
+                )
+                excluded_names = {name for name, _amount in _excluded}
+                dropped.extend(name for name, _amount in _excluded)
+            masses = [
+                (species, _molar_mass_kg_mol(species), fraction)
+                for species, fraction in pairs
+            ]
             if all(item[1] is not None for item in masses):
+                # Mean molar mass uses every stored component, including a
+                # formula this charge will not emit. Dropping it from the
+                # sum would assign its mass to the oxides.
                 mean_molar_mass = sum(
                     fraction * molar_mass  # type: ignore[operator]
                     for _, molar_mass, fraction in masses
@@ -453,6 +509,8 @@ def charge_moles_by_species(
                 total_moles = _divide(mass, Value.point_of(mean_molar_mass))
                 if total_moles is not None:
                     for species, _, fraction in masses:
+                        if species in excluded_names:
+                            continue
                         value = _multiply(total_moles, Value.point_of(fraction))
                         if value is not None:
                             # Premise: x_i=n_i/n_tot and m=n_tot*Σ(x_i*M_i).
@@ -912,6 +970,26 @@ def normalized_composition(
                     # molar masses (0.094196 and 0.060084 kg/mol).
             elif raw.amount_basis in (AmountBasis.MOL_INVENTORY, AmountBasis.MOLE_FRACTION):
                 amounts = raw.as_map()
+                # A printed mole fraction (Mg2SiO4, SiO2) is already the
+                # charge. Only an oxide-wt derivation can now carry a formula
+                # the converter accepts and the oxide table does not list
+                # (H2O, Cl, Ag2O, I2O, Re). Those stay on the stored map and
+                # are named here when this MELTS-centric charge cannot use them.
+                if _oxide_wt_derivation(located):
+                    _kept, _excluded = _melts_oxide_split(amounts)
+                    if _excluded:
+                        amounts = {name: amount for name, amount in _kept}
+                        _unit = (
+                            "mole_fraction"
+                            if raw.amount_basis is AmountBasis.MOLE_FRACTION
+                            else "mol"
+                        )
+                        _note = excluded_component_notice_reason(
+                            _excluded, unit=_unit
+                        )
+                        basis_notice = (
+                            f"{basis_notice}; {_note}" if basis_notice else _note
+                        )
             else:
                 raise ValueError("unsupported composition basis")
             if not amounts or any(not n.is_finite() or n < 0 for n in amounts.values()):

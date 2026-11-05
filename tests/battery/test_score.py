@@ -81,7 +81,13 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
 )
-from simulator.battery.validity import run_validity_gates, underdetermined_apparatus
+from simulator.battery.validity import (
+    apparatus_geometry_interval_notice,
+    effusion_regime_unverified,
+    knudsen_effusion_pressure_from_mass_rate,
+    run_validity_gates,
+    underdetermined_apparatus,
+)
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -229,9 +235,9 @@ def _with_activity_reference_polymorph(
 def _without_activity_reference_polymorph(identity: Identity) -> Identity:
     """Pure solid whose polymorph axis was never set.
 
-    An omitted source polymorph (``State.unknown``) stays on the printed
-    number (d-165, c1ec62344). ``polymorph is None`` is the melt-benchmark
-    solid, and 800194114 still converts it with the stable JANAF crystal.
+    ``polymorph is None`` is the melt-benchmark solid. An omitted source
+    polymorph (``State.unknown``) is the printed record and is decided by
+    d-338, not by this helper.
     """
 
     reference_state = identity.reference_state
@@ -6632,6 +6638,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6677,6 +6684,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             "reference_converted_via_fusion;probe",
         ),
         (
+            FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
+        ),
+        (
             FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
             NoticeKind.DERIVATION_USES_COMPILATION,
             "source_flagged_less_reliable:probe",
@@ -6719,6 +6731,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -6744,6 +6757,10 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
+        ),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            'reference_polymorph_inferred_stable_phase:{"phase": "quartz"}',
         ),
         (
             NoticeKind.DERIVATION_USES_COMPILATION,
@@ -6776,6 +6793,7 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED,
         FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE,
         FLAGGED_STRATUM_FIGURE_ONLY,
         FLAGGED_STRATUM_APPROXIMATE_VALUE,
@@ -13612,10 +13630,18 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
 @pytest.mark.parametrize(
     "temperature", (Decimal("1823"), Decimal("1873"))
 )
-def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
+def test_unnamed_cao_reference_phase_infers_the_only_janaf_solid(
     temperature: Decimal,
 ) -> None:
-    from simulator.battery.score import fusion_comparison_reference
+    """CaO has one JANAF crystal below its melting point, so the omission is sized 'not sized'."""
+
+    import json
+
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -13636,15 +13662,27 @@ def test_unnamed_cao_reference_phase_is_a_missing_fusion_input(
         source_id="synthetic-unknown-cao-polymorph",
     )
     assert reference.admission.status is AdmissionStatus.ADMITTED
+    stable = _janaf_stable_crystal_set("CaO", temperature)
 
     converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert converted.value.point == reference.value.point
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
+    notice = next(
+        item
         for item in converted.notices
+        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
     )
+    detail = json.loads(notice.reason.split(":", 1)[1])
+
+    assert stable.alternatives == ()
+    assert detail == {
+        "comparison_phase": None,
+        "comparison_table_id": None,
+        "phase": stable.selected.polymorph.value,
+        "sizing_dex": "not sized",
+        "table_id": stable.selected.table_id,
+    }
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point != reference.value.point
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def test_stated_silica_polymorph_is_not_reinferred() -> None:
@@ -13724,25 +13762,45 @@ def test_solid_reference_without_temperature_remains_a_missing_input_refusal(
     )
 
 
-def test_kume_2000_silica_unnamed_phase_is_not_converted() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_kume_2000_silica_unnamed_phase_infers_the_stable_crystal() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+        temperature_of,
+    )
 
     context = load_score_context(sources=("kume-2000-cao-activities",))
     reference = context.observations[
         "kume-2000-cao-activities::kume_2000_table1_sample_1_sio2_activity"
     ]
+    temperature = temperature_of(reference.identity)
+    assert temperature is not None
+    stable = _janaf_stable_crystal_set("SiO2", temperature)
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
 
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
-        for notice in comparison.notices
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    notice = next(
+        item
+        for item in comparison.notices
+        if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
     )
+    detail = json.loads(notice.reason.split(":", 1)[1])
+    nearest = min(
+        stable.alternatives,
+        key=lambda item: abs(item.gibbs_kJ_per_mol - stable.selected.gibbs_kJ_per_mol),
+    )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert detail["comparison_phase"] == nearest.polymorph.value
+    assert detail["comparison_table_id"] == nearest.table_id
+    assert detail["janaf_tridymite"] == "absent"
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
-def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
+def test_unnamed_source_phase_scores_with_the_inferred_polymorph_flag() -> None:
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
@@ -13770,26 +13828,37 @@ def test_unprinted_source_phase_is_typed_and_cannot_be_scored() -> None:
         source_id="synthetic-valid-method-solid-reference",
     )
     context = _context(F.work(), experiment, reference, review="reviewed")
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
+    converted = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     residual, candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
-        prediction=_predict(Decimal("0.3"), identity),
+        prediction=_predict(converted.value.point, converted.identity),
     )
 
+    # Prediction is the converted liquid point, so the residual is zero.
+    # The row is still NO_BAND: the inference flag is a flagged stratum and
+    # the JANAF fusion sigma is unprinted.
     assert residual.status is ResidualStatus.NO_BAND
-    assert residual.numeric is not None
     assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.numeric.value == Decimal("0")
     assert residual.refusal is not None
-    assert residual.refusal.detail["reason"] == (
-        "fusion_source_reference_phase_unprinted"
-    )
+    assert residual.refusal.reason is RefusalReason.DECISION_RULE_MISSING
+    assert residual.refusal.detail["reason"] == "conversion_uncertainty_unprinted"
     assert candidate is not None
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
         for notice in residual.notices
     )
+    assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
     quartz_identity = _with_activity_reference_polymorph(identity, "quartz")
     mismatched, _candidate = compile_residual(
@@ -13851,19 +13920,26 @@ def test_unnamed_reference_phase_above_crossing_is_not_selected_from_temperature
     assert comparison.value.point == reference.value.point
     assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in comparison.notices
     )
 
 
-def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_silica_reference_phase_selects_the_stable_janaf_table() -> None:
+    import json
 
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
+
+    temperature = Decimal("1823")
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="SiO2",
-            T_K=Decimal("1823"),
+            T_K=temperature,
             endmember_phase=Phase.CR,
             component_basis="SiO2",
         ),
@@ -13877,17 +13953,30 @@ def test_unnamed_silica_reference_phase_does_not_select_a_janaf_table() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-ambiguous-solid-reference",
     )
+    stable = _janaf_stable_crystal_set("SiO2", temperature)
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
-        for item in comparison.notices
+    detail = json.loads(
+        next(
+            item.reason
+            for item in comparison.notices
+            if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
+    )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+def test_kang_silica_unnamed_reference_phase_infers_the_stable_crystal() -> None:
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+        temperature_of,
     )
 
-
-def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
     source = "kang-2007-sio2-activity-cas-low-silica"
     context = load_score_context(sources=(source,))
     rows = [
@@ -13899,20 +13988,24 @@ def test_kang_silica_unprinted_reference_phase_has_typed_refusal() -> None:
     ]
     assert len(rows) == 22
 
-    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
-        for reference in rows:
-            residual, _candidate = compile_residual(
-                reference, engine, context=context
+    for reference in rows:
+        temperature = temperature_of(reference.identity)
+        assert temperature is not None
+        stable = _janaf_stable_crystal_set(
+            reference.identity.reference_state.value.endmember.formula,
+            temperature,
+        )
+        comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert any(
+            notice.reason.startswith(
+                f"{REFERENCE_POLYMORPH_INFERRED_REASON}:"
             )
-
-            assert residual.status is ResidualStatus.REFUSED
-            assert residual.execution.state is ExecutionState.NOT_PROBED
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-            assert (
-                residual.refusal.detail["reason"]
-                == "fusion_source_reference_phase_unprinted"
-            )
+            and stable.selected.polymorph.value in notice.reason
+            and stable.selected.table_id in notice.reason
+            for notice in comparison.notices
+        )
+        assert reference.identity.reference_state.value.endmember.polymorph.is_unknown
 
 
 def _quartz_silica_activity_observation():
@@ -14005,14 +14098,21 @@ def test_corrupt_o037_activity_candidate_is_counted_by_score_store_census(
     }
 
 
-def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_alumina_reference_phase_infers_the_stable_crystal() -> None:
+    import json
 
+    from simulator.battery.generators.janaf import _janaf_stable_crystal_set
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
+
+    temperature = Decimal("1800")
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
             formula="Al2O3",
-            T_K=Decimal("1800"),
+            T_K=temperature,
             endmember_phase=Phase.CR,
             component_basis="Al2O3",
         ),
@@ -14026,18 +14126,27 @@ def test_unnamed_alumina_reference_phase_is_not_inferred() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-ambiguous-solid-reference",
     )
+    stable = _janaf_stable_crystal_set("Al2O3", temperature)
 
     comparison = fusion_comparison_reference(reference)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
-        for item in comparison.notices
+    detail = json.loads(
+        next(
+            item.reason
+            for item in comparison.notices
+            if item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
     )
+    assert detail["phase"] == stable.selected.polymorph.value
+    assert detail["table_id"] == stable.selected.table_id
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_silica_reference_with_row_band_still_infers_the_stable_crystal() -> None:
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14068,16 +14177,21 @@ def test_unnamed_silica_reference_with_row_band_keeps_missing_phase_reason() -> 
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        item.reason == "fusion_source_reference_phase_unprinted"
+        item.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
         for item in comparison.notices
     )
 
 
-def test_unnamed_cao_reference_phase_is_not_converted() -> None:
-    from simulator.battery.score import fusion_comparison_reference
+def test_unnamed_cao_reference_phase_converts_on_the_only_janaf_solid() -> None:
+    import json
+
+    from simulator.battery.score import (
+        REFERENCE_POLYMORPH_INFERRED_REASON,
+        fusion_comparison_reference,
+    )
 
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
@@ -14097,15 +14211,30 @@ def test_unnamed_cao_reference_phase_is_not_converted() -> None:
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="synthetic-cao-reference",
     )
+    benchmark = F.observation(
+        "single-table-cao-reference-benchmark",
+        experiment.experiment_id,
+        _without_activity_reference_polymorph(identity),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-cao-reference",
+    )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
-    assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
-        for notice in comparison.notices
+    benchmark_comparison = fusion_comparison_reference(
+        benchmark, engine=Engine.OPENIMCC
     )
+    detail = json.loads(
+        next(
+            notice.reason
+            for notice in comparison.notices
+            if notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
+        ).split(":", 1)[1]
+    )
+
+    assert detail["sizing_dex"] == "not sized"
+    assert comparison.value.point == benchmark_comparison.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
 @pytest.mark.parametrize(
@@ -14630,7 +14759,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
         is Phase.CR
     )
     assert any(
-        notice.reason == "fusion_source_reference_phase_unprinted"
+        notice.reason == "printed_solid_reference_above_melting"
         for notice in before_comparison.notices
     )
     assert (
@@ -14802,14 +14931,19 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
     comparison = fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
     if polymorph is None:
+        from simulator.battery.score import REFERENCE_POLYMORPH_INFERRED_REASON
+
+        assert comparison.value.point != reference.value.point
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            notice.reason == "fusion_source_reference_phase_unprinted"
+            notice.reason.startswith(f"{REFERENCE_POLYMORPH_INFERRED_REASON}:")
             for notice in comparison.notices
         )
         return
+
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
 
     assert not any(
         notice.reason.startswith("reference_converted_via_fusion;")
@@ -16525,6 +16659,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and observation.admission.status is AdmissionStatus.ADMITTED
     }
     assert len(fresh_stolyarova_1996_pressures) == 55
+    # 606aedd6f relabelled these columns measured_reduced and the cell
+    # oxygen lineage became untyped. Table 2 footnote a and Eqs. (7)–(9)
+    # print calculated pressures; the ion-current inputs are not printed.
     assert all(
         observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
@@ -16617,19 +16754,21 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         if key in stolyarova_atomic_oxygen_pressures
     }
     assert set(fresh_stolyarova_pressures) == stolyarova_atomic_oxygen_pressures
+    # d-342: Table Ib prints P_O as calculated from equilibrium (1). It is
+    # not an m/z 16 ion current corrected for O2 fragmentation, so the
+    # row stays quoted_attributed. The source-oxygen command is unchanged.
     assert all(
         observation.admission.status is AdmissionStatus.ADMITTED
         and observation.evidence.class_.is_value
         and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         for observation in fresh_stolyarova_pressures.values()
     )
-    # 4e0819f6d and 3de591b81 type the calculated oxygen columns quoted_attributed.
-    # The parents are not printed, so the rows are not model_derived.
-    # b162's 1995 model_derived count of 26 describes the pre-car extract,
-    # which this car retyped. The 1996 count of 55 is the quoted population.
+    # 1995 calculated oxygen stays measured_reduced. The 1996 Table 2
+    # columns are quoted_attributed: footnote a and Eqs. (7)–(9) calculate
+    # them, and the row ion currents are not printed.
     assert len(stolyarova_1995_derived_pressures) == 0
     assert len(stolyarova_1996_derived_pressures) == 0
-    stolyarova_1995_quoted_pressures = {
+    stolyarova_1995_measured_pressures = {
         key
         for key, obs in observations.items()
         if obs.source_id == "stolyarova-1995-cao-alumina-kems"
@@ -16637,9 +16776,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
-        and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        and obs.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
     }
-    stolyarova_1996_quoted_pressures = {
+    stolyarova_1996_measured_pressures = {
         key
         for key, obs in observations.items()
         if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
@@ -16650,12 +16789,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         and obs.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
     }
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9).
-    assert len(stolyarova_1995_quoted_pressures) == 26
+    assert len(stolyarova_1995_measured_pressures) == 26
     # Table 2's calculated 1933 K oxygen-pressure columns: 30 pO, 10 p'O, 15 p''O.
-    assert len(stolyarova_1996_quoted_pressures) == 55
+    assert len(stolyarova_1996_measured_pressures) == 55
     assert {
         observations[key].observation_id.split("::")[1]
-        for key in stolyarova_1996_quoted_pressures
+        for key in stolyarova_1996_measured_pressures
     } == {
         "stolyarova_1996_table2_pO_1933k",
         "stolyarova_1996_table2_pO_prime_1933k",
@@ -16664,7 +16803,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
     assert [
         sum(
             observations[key].observation_id.split("::")[1] == observation_id
-            for key in stolyarova_1996_quoted_pressures
+            for key in stolyarova_1996_measured_pressures
         )
         for observation_id in (
             "stolyarova_1996_table2_pO_1933k",
@@ -16748,6 +16887,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         )
         for residual in model_derived_residuals
     )
+    # d-342 leaves the nine Table Ib points quoted_attributed, outside
+    # MEASURED_EVIDENCE, so they carry the same measured-evidence exclusion
+    # as the other diagnostic references.
     assert all(
         "reference_measured_evidence" in residual.exclusions
         for residual in headline_diagnostic_residuals
@@ -16869,7 +17011,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
         assert len(allibert_cao_rows) == 8
         assert all(
             any(
-                notice.reason == "fusion_source_reference_phase_unprinted"
+                notice.reason.startswith(
+                    "reference_polymorph_inferred_stable_phase:"
+                )
                 for notice in row.notices
             )
             for row in allibert_cao_rows
@@ -16899,7 +17043,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             row.refusal is not None
             and row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
             and "fusion_source_reference_phase_unprinted"
-            in row.refusal.detail.get("secondary_reasons", ())
+            not in row.refusal.detail.get("secondary_reasons", ())
+            and any(
+                notice.reason.startswith(
+                    "reference_polymorph_inferred_stable_phase:"
+                )
+                for notice in row.notices
+            )
             for row in affected_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
@@ -16920,17 +17070,15 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
                 assert "source polymorph is unknown" not in conversion_notice.reason
             else:
                 assert polymorph.is_unknown
-                missing_input_notice = next(
-                    notice
+                assert any(
+                    notice.reason.startswith(
+                        "reference_polymorph_inferred_stable_phase:"
+                    )
                     for notice in row.notices
-                    if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-                    and notice.reason.startswith("fusion conversion missing input:")
                 )
-                assert "JANAF solid table Al-096 represents polymorph corundum" in (
-                    missing_input_notice.reason
-                )
-                assert "measured reference polymorph is unknown" in (
-                    missing_input_notice.reason
+                assert any(
+                    notice.reason.startswith("reference_converted_via_fusion;")
+                    for notice in row.notices
                 )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
@@ -16942,7 +17090,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             row
             for row in residuals
             if row.reference
-            in stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
+            in stolyarova_1996_derived_pressures | stolyarova_1996_measured_pressures
             and row.key.rsplit("::", 1)[-1] == engine.value
         )
         unavailable_stolyarova_refs = {
@@ -16966,8 +17114,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             observation.observation_id
             for observation in score_module.comparison_candidates(filtered)
             if observation.source_id
-            in {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"}
-        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_quoted_pressures
+            in {
+                "kems-053-stolyarova-1991",
+                "stolyarova-1995-cao-alumina-kems",
+            }
+        } | unavailable_stolyarova_refs | stolyarova_1996_derived_pressures | stolyarova_1996_measured_pressures
         assert {row.reference for row in stolyarova_rows} == expected_stolyarova_refs
         assert len(stolyarova_rows) == len(expected_stolyarova_refs)
         activity_rows = [
@@ -16995,32 +17146,32 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine(
             if row.reference in stolyarova_1996_derived_pressures
         ]
         assert len(stolyarova_1996_rows) == 0
-        stolyarova_1996_quoted_rows = [
+        stolyarova_1996_measured_rows = [
             row
             for row in stolyarova_rows
-            if row.reference in stolyarova_1996_quoted_pressures
+            if row.reference in stolyarova_1996_measured_pressures
         ]
-        assert len(stolyarova_1996_quoted_rows) == 55
+        assert len(stolyarova_1996_measured_rows) == 55
         assert all(
-            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_quoted_rows
+            row.status is ResidualStatus.REFUSED for row in stolyarova_1996_measured_rows
         )
-        assert all(not row.score_eligible for row in stolyarova_1996_quoted_rows)
+        assert all(not row.score_eligible for row in stolyarova_1996_measured_rows)
         assert all(
             observations[row.reference].evidence.class_.is_value
             and observations[row.reference].evidence.class_.value
             is EvidenceClass.QUOTED_ATTRIBUTED
-            and any(
-                notice.kind is NoticeKind.FIGURE_ONLY
-                and notice.reason == "evidence_class:quoted_attributed"
-                for notice in row.notices
-            )
-            for row in stolyarova_1996_quoted_rows
+            for row in stolyarova_1996_measured_rows
         )
+        # Quoted oxygen is outside MEASURED_EVIDENCE, so the apparatus gate
+        # (including effusion regime) does not apply. The rows still refuse
+        # identity_incomplete.
         assert {
             row.refusal.reason
-            for row in stolyarova_1996_quoted_rows
+            for row in stolyarova_1996_measured_rows
             if row.refusal is not None
-        } == {RefusalReason.IDENTITY_INCOMPLETE}
+        } == {
+            RefusalReason.IDENTITY_INCOMPLETE,
+        }
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as
@@ -17094,10 +17245,17 @@ def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
     )
     residual = next(row for row in residuals if row.reference == observation_id)
 
-    assert residual.numeric is None
-    assert residual.status is ResidualStatus.REFUSED
     assert residual.score_eligible is False
+    assert residual.refusal is None or (
+        residual.refusal.reason is not RefusalReason.IDENTITY_INCOMPLETE
+        or residual.refusal.detail.get("reason")
+        != "fusion_source_reference_phase_unprinted"
+    )
     assert any(
+        notice.reason.startswith("reference_polymorph_inferred_stable_phase:")
+        for notice in residual.notices
+    )
+    assert not any(
         notice.reason == "fusion_source_reference_phase_unprinted"
         for notice in residual.notices
     )
@@ -18398,3 +18556,673 @@ def test_filtered_score_context_resolves_cross_source_validation_parent(
     assert filtered.hard_issues_by_observation.get(child_id) == (
         full.hard_issues_by_observation.get(child_id)
     )
+
+
+def _duplicate_of_score_fixture(
+    *,
+    duplicate_target: str | None = "primary",
+    primary_status: AdmissionStatus = AdmissionStatus.ADMITTED,
+    include_primary: bool = True,
+):
+    primary_id = "primary-source::primary"
+    twin_id = "secondary-source::twin"
+    experiment = F.tabulation_experiment()
+    identity = F.o2_identity()
+    primary = F.observation(
+        primary_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=primary_status,
+        source_id="primary-source",
+    )
+    twin = F.observation(
+        twin_id,
+        experiment.experiment_id,
+        identity,
+        Decimal("-100"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="secondary-source",
+    )
+    if duplicate_target is not None:
+        twin = replace(
+            twin,
+            provenance={"duplicate_of_observation_id": duplicate_target},
+        )
+    observations = (primary, twin) if include_primary else (twin,)
+    context = _context(
+        F.work(), experiment, *observations, review="reviewed"
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=lambda _engine, point, **_kwargs: _predict(
+            point.value.point, point.identity
+        ),
+    )
+    return context, residuals
+
+
+def test_duplicate_of_scores_one_twin_and_keeps_typed_primary_reference() -> None:
+    context, residuals = _duplicate_of_score_fixture()
+
+    assert "secondary-source::twin" not in {
+        observation.observation_id
+        for observation in score_mod.comparison_candidates(context)
+    }
+    by_reference = {row.reference: row for row in residuals}
+    assert set(by_reference) == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+    assert by_reference["primary-source::primary"].numeric is not None
+    twin = by_reference["secondary-source::twin"]
+    assert twin.numeric is None
+    assert twin.score_eligible is False
+    assert twin.refusal is not None
+    assert twin.refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    assert twin.refusal.detail == {
+        "reason": "duplicate_of",
+        "primary_observation_id": "primary-source::primary",
+        "resolution": "excluded",
+    }
+
+
+def test_identical_unlinked_observation_still_scores_independently() -> None:
+    _context_without_link, residuals = _duplicate_of_score_fixture(
+        duplicate_target=None
+    )
+
+    assert {row.reference for row in residuals if row.numeric is not None} == {
+        "primary-source::primary",
+        "secondary-source::twin",
+    }
+
+
+@pytest.mark.parametrize(
+    ("include_primary", "primary_status", "resolution"),
+    (
+        (False, AdmissionStatus.ADMITTED, "primary_missing"),
+        (True, AdmissionStatus.PENDING, "primary_not_admitted"),
+    ),
+)
+def test_duplicate_of_missing_or_unadmitted_primary_refuses_without_dropping(
+    include_primary: bool,
+    primary_status: AdmissionStatus,
+    resolution: str,
+) -> None:
+    _context_with_bad_link, residuals = _duplicate_of_score_fixture(
+        primary_status=primary_status,
+        include_primary=include_primary,
+    )
+
+    twins = [
+        row for row in residuals if row.reference == "secondary-source::twin"
+    ]
+    assert len(twins) == 1
+    assert twins[0].numeric is None
+    assert twins[0].refusal is not None
+    assert twins[0].refusal.reason is RefusalReason.REFERENTIAL_INTEGRITY
+    expected_detail = {
+        "reason": "duplicate_of",
+        "primary_observation_id": (
+            "primary" if resolution == "primary_missing" else "primary-source::primary"
+        ),
+        "resolution": resolution,
+    }
+    if resolution == "primary_not_admitted":
+        expected_detail["primary_admission_status"] = "pending"
+    assert twins[0].refusal.detail == expected_detail
+def _printed_diameter_experiment(
+    diameter: Value,
+    *,
+    kn: Decimal | None = None,
+    inference: Derivation | None = None,
+    located: bool = True,
+    calibrated: bool = False,
+    clausing: Decimal | None = None,
+):
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=kn, calibrated=calibrated
+    )
+    assert experiment.apparatus is not None
+    page = F.loc(page=221, section="Experimental")
+    return replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            geometry=ApparatusGeometry(
+                orifice_diameter_m=Located(
+                    State.of(diameter),
+                    locator=page if located else None,
+                    inference=inference,
+                ),
+                clausing_factor=(
+                    None
+                    if clausing is None
+                    else Located(State.of(clausing), locator=page)
+                ),
+            ),
+        ),
+    )
+
+
+def _cell_total_pressure_observation(experiment, pressure: Decimal):
+    identity = replace(
+        F.psat_identity("Ca"),
+        quantity=Quantity.P_PARTIAL,
+        total_pressure_Pa=State.of(pressure),
+    )
+    return F.observation(
+        f"cell-pressure-{pressure}",
+        experiment.experiment_id,
+        identity,
+        pressure,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+
+def test_shornikov_2025_printed_orifice_interval_passes_apparatus_geometry_gate() -> None:
+    """Shornikov 2025 prints 0.25-0.30 mm (p. 221). Calibrated KEMS has no value band."""
+
+    from simulator.battery.migrate import (
+        experiment_from_plain,
+        load_yaml,
+        observation_from_plain,
+    )
+    from simulator.battery.score import flagged_strata
+
+    root = Path(__file__).resolve().parents[2]
+    work = load_yaml(
+        root / "data/literature/works/10.1007_978-3-031-80664-3_20.yaml"
+    )
+    experiments = {
+        item["experiment_id"]: experiment_from_plain(item)
+        for item in work["experiments"]
+    }
+    store = load_yaml(
+        root
+        / "data/literature/extracts-v2/shornikov-2025-calcium-oxide-evaporation.yaml"
+    )
+    kems_rows = []
+    for payload in store["observations"]:
+        observation = observation_from_plain(payload)
+        quantity = quantity_token(observation.identity)
+        experiment = experiments.get(observation.experiment_id)
+        evidence = observation.evidence.class_
+        if (
+            quantity not in {Quantity.P_PARTIAL, Quantity.P_SAT}
+            or experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or not evidence.is_value
+            or evidence.value
+            not in {
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_TABULATED,
+                EvidenceClass.MEASURED_REDUCED,
+            }
+        ):
+            continue
+        kems_rows.append((experiment, observation, quantity))
+
+    # 14 series x 15 temperatures = 210 pressures. The 75 model_derived
+    # series are outside the apparatus gate. 105 tabulated + 30 reduced
+    # = 135 measured KEMS rows.
+    assert len(store["observations"]) == 210
+    assert len(kems_rows) == 135
+    assert (
+        sum(
+            observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
+            for _experiment, observation, _quantity in kems_rows
+        )
+        == 105
+    )
+    assert (
+        sum(
+            observation.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+            for _experiment, observation, _quantity in kems_rows
+        )
+        == 30
+    )
+    for experiment, observation, quantity in kems_rows:
+        gate = underdetermined_apparatus(
+            experiment, quantity, observation=observation
+        )
+        assert gate.passed, (observation.observation_id, gate)
+        geometry = next(
+            check for check in gate.checks if check.name == "geometry_determinants"
+        )
+        assert geometry.detail["missing"] == []
+        assert geometry.detail["apparatus_geometry_interval_printed"] is True
+        assert geometry.detail["regime_checked_at"] == "both_ends"
+        assert geometry.detail["value_band"] is None
+        notice = apparatus_geometry_interval_notice(
+            experiment, quantity, origin=observation.observation_id
+        )
+        assert notice is not None
+        assert notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+        assert notice.band is None
+        assert "effusion regime checked at both ends" in notice.reason
+        assert "d_max" not in notice.reason
+        assert "no value band" in notice.reason
+        assert flagged_strata((notice,)) == ()
+        assert observation.value.kind is ValueKind.POINT
+        assert observation.uncertainty.kind is UncertaintyKind.NONE
+
+    experiment, observation, quantity = kems_rows[0]
+    residual, _candidate = _compile(
+        observation,
+        experiment,
+        _predict(observation.value.point, observation.identity),
+    )
+    interval_notices = tuple(
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+    )
+    assert len(interval_notices) == 1
+    assert interval_notices[0].band is None
+    assert interval_notices[0].origin == observation.observation_id
+    assert flagged_strata(interval_notices) == ()
+
+
+def test_knudsen_raw_rate_interval_evaluates_at_geometric_mean_diameter() -> None:
+    """0.25-0.30 mm -> d_gm = 0.2739 mm and +/-0.079 dex (d-326)."""
+
+    from simulator.battery.score import flagged_strata
+    from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
+
+    d_min = Decimal("0.00025")
+    d_max = Decimal("0.00030")
+    rate = Decimal("1e-10")
+    temperature = Decimal("1800")
+    molar_mass = Decimal("0.040078")
+    diameter = Located(
+        State.of(
+            Value(ValueKind.INTERVAL, interval_low=d_min, interval_high=d_max)
+        ),
+        locator=F.loc(page=221, section="Experimental"),
+    )
+    result = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        clausing_factor=Decimal("1"),
+        origin="synthetic-knudsen-interval",
+    )
+    d_gm = (d_min * d_max).sqrt()
+    # Ruling identity: (d_max / d_gm)^2 = d_max / d_min = 1.20.
+    assert d_max / d_min == Decimal("1.2")
+    assert abs((d_max / d_gm) ** 2 - (d_max / d_min)) < Decimal("1e-20")
+    assert (d_gm * Decimal("1000")).quantize(Decimal("0.0001")) == Decimal("0.2739")
+    assert result.evaluation_diameter_m == d_gm
+    ruling_band = Decimal("1.20").ln() / Decimal(10).ln()
+    assert result.band_dex is not None
+    assert abs(result.band_dex - ruling_band) < Decimal("1e-12")
+    assert result.band_dex.quantize(Decimal("0.001")) == Decimal("0.079")
+
+    # Independent of this reducer: invert the existing float kinetic coefficient.
+    coefficient = hertz_knudsen_k_kg_s_m2_pa(float(temperature), float(molar_mass))
+    area = math.pi * (float(result.evaluation_diameter_m) / 2) ** 2
+    independent_Pa = (float(rate) / area) / coefficient
+    assert abs(float(result.pressure_Pa) - independent_Pa) / independent_Pa < 1e-9
+
+    at_mean = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        d_gm,
+        clausing_factor=Decimal("1"),
+        origin="synthetic-knudsen-point-mean",
+    )
+    assert at_mean.pressure_Pa == result.pressure_Pa
+    assert at_mean.band_dex is None
+    assert at_mean.notice is None
+
+    constant_clausing = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        clausing_factor=Decimal("0.8"),
+        origin="synthetic-knudsen-constant-clausing",
+    )
+    assert abs(constant_clausing.band_dex - result.band_dex) < Decimal("1e-20")
+    assert abs(constant_clausing.band_dex - ruling_band) < Decimal("1e-12")
+    assert (
+        abs(constant_clausing.pressure_Pa * Decimal("0.8") - result.pressure_Pa)
+        / result.pressure_Pa
+        < Decimal("1e-24")
+    )
+    ideal = knudsen_effusion_pressure_from_mass_rate(
+        rate,
+        temperature,
+        molar_mass,
+        diameter,
+        origin="synthetic-knudsen-ideal-orifice",
+    )
+    assert ideal.pressure_Pa == result.pressure_Pa
+
+    assert result.notice is not None
+    assert result.notice.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+    assert result.notice.band == f"+/-{result.band_dex} dex"
+    assert "geometric mean" in result.notice.reason
+    assert "effusion regime checked" not in result.notice.reason
+    assert "d_max" not in result.notice.reason
+    assert flagged_strata((result.notice,)) == ()
+
+    with pytest.raises(ValueError, match="missing clausing_factor"):
+        knudsen_effusion_pressure_from_mass_rate(
+            rate,
+            temperature,
+            molar_mass,
+            diameter,
+            orifice_channel_length_m=Located(
+                State.of(Value.point_of("0.001")),
+                locator=F.loc(page=222),
+            ),
+            origin="synthetic-knudsen-length-without-clausing",
+        )
+
+    experiment = _printed_diameter_experiment(
+        Value(ValueKind.INTERVAL, interval_low=d_min, interval_high=d_max)
+    )
+    gate = underdetermined_apparatus(experiment, Quantity.MASS_LOSS_RATE)
+    assert gate.passed, gate
+
+
+def test_point_orifice_geometry_is_unchanged_by_interval_rule() -> None:
+    from simulator.battery.score import flagged_strata
+
+    diameter = Decimal("0.00030")
+    experiment = _printed_diameter_experiment(Value.point_of(diameter))
+    gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+    assert gate.passed
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert "apparatus_geometry_interval_printed" not in geometry.detail
+    assert apparatus_geometry_interval_notice(
+        experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+    ) is None
+
+    # Point limit stays min(10 Pa, d_mm). 0.30 mm -> 0.30 Pa.
+    passing = _cell_total_pressure_observation(experiment, Decimal("0.30"))
+    passing_gate = effusion_regime_unverified(
+        experiment, Quantity.P_PARTIAL, observation=passing
+    )
+    assert passing_gate.passed
+    passing_check = next(
+        check
+        for check in passing_gate.checks
+        if check.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(passing_check.detail["pressure_limit_Pa"]) == Decimal("0.30")
+    assert Decimal(passing_check.detail["orifice_diameter_m"]) == diameter
+    failing = _cell_total_pressure_observation(experiment, Decimal("0.31"))
+    failing_gate = effusion_regime_unverified(
+        experiment, Quantity.P_PARTIAL, observation=failing
+    )
+    assert failing_gate.passed is False
+    assert failing_gate.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    reduced = knudsen_effusion_pressure_from_mass_rate(
+        Decimal("1e-10"),
+        Decimal("1800"),
+        Decimal("0.040078"),
+        diameter,
+        origin="point-geometry-row",
+    )
+    assert reduced.evaluation_diameter_m == diameter
+    assert reduced.band_dex is None
+    assert reduced.notice is None
+
+    identity = replace(F.psat_identity("Ca"), quantity=Quantity.P_PARTIAL)
+    reference = F.observation(
+        "point-geometry-kems",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.01"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    residual, _candidate = _compile(
+        reference, experiment, _predict(Decimal("0.01"), identity)
+    )
+    assert not any(
+        item.kind is NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED
+        for item in residual.notices
+    )
+    assert NoticeKind.APPARATUS_GEOMETRY_INTERVAL_PRINTED.value not in flagged_strata(
+        residual.notices
+    )
+
+    bound = _printed_diameter_experiment(
+        Value(
+            ValueKind.BOUND,
+            bound_operator="<=",
+            bound_value=Decimal("0.00030"),
+        )
+    )
+    bound_gate = underdetermined_apparatus(bound, Quantity.P_PARTIAL)
+    assert bound_gate.passed is False
+    assert bound_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    missing = next(
+        check.detail["missing"]
+        for check in bound_gate.checks
+        if check.name == "geometry_determinants"
+    )
+    assert missing == ["orifice_diameter_m"]
+
+
+def test_effusion_regime_failure_at_d_max_still_refuses() -> None:
+    """Interval 0.25-0.30 mm must pass the coded p/d limit at both ends.
+
+    The limit is min(10 Pa, d_m * 1000): 0.25 Pa at 0.25 mm and 0.30 Pa at
+    0.30 mm. 0.28 Pa passes the loose end and fails the strict end, so the
+    interval refuses. 0.25 Pa passes both ends. 1 Pa fails both. A point
+    0.30 mm row keeps the 0.30 Pa limit in the point-geometry test.
+    """
+
+    experiment = _printed_diameter_experiment(
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.00025"),
+            interval_high=Decimal("0.00030"),
+        )
+    )
+    refused = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("1")),
+    )
+    assert refused.passed is False
+    assert refused.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    check = next(
+        item for item in refused.checks if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(check.detail["orifice_diameter_low_m"]) == Decimal("0.00025")
+    assert Decimal(check.detail["orifice_diameter_high_m"]) == Decimal("0.00030")
+    assert check.detail["regime_checked_at"] == "both_ends"
+    assert Decimal(check.detail["orifice_diameter_m"]) == Decimal("0.00025")
+    assert Decimal(check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+
+    borderline = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+    )
+    assert borderline.passed is False
+    assert borderline.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    borderline_check = next(
+        item
+        for item in borderline.checks
+        if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(borderline_check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+    assert Decimal(borderline_check.detail["in_cell_total_pressure_Pa"]) > Decimal(
+        borderline_check.detail["pressure_limit_Pa"]
+    )
+
+    passed = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.25")),
+    )
+    assert passed.passed
+    passed_check = next(
+        item
+        for item in passed.checks
+        if item.name == "orifice_pressure_to_diameter"
+    )
+    assert Decimal(passed_check.detail["pressure_limit_Pa"]) == Decimal("0.25")
+    assert Decimal(passed_check.detail["in_cell_total_pressure_Pa"]) <= Decimal(
+        passed_check.detail["pressure_limit_Pa"]
+    )
+
+
+def _geometry_missing(outcome) -> list[str]:
+    return next(
+        check.detail["missing"]
+        for check in outcome.checks
+        if check.name == "geometry_determinants"
+    )
+
+
+def test_unprinted_diameter_interval_stays_underdetermined_apparatus() -> None:
+    """An interval is geometry only when printed, and only for case 1 or case 2.
+
+    Activity, activity coefficient, log10 Kf, and reference pressure keep a
+    point orifice. A point diameter does not satisfy the kinetic area
+    determinant. An area interval is not a point area.
+    """
+
+    interval = Value(
+        ValueKind.INTERVAL,
+        interval_low=Decimal("0.00025"),
+        interval_high=Decimal("0.00030"),
+    )
+    for experiment in (
+        _printed_diameter_experiment(
+            interval,
+            inference=Derivation("diameter read from a figure", (), (), "m"),
+        ),
+        _printed_diameter_experiment(interval, located=False),
+    ):
+        gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+        assert gate.passed is False
+        assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        assert _geometry_missing(gate) == ["orifice_diameter_m"]
+        geometry = next(
+            check for check in gate.checks if check.name == "geometry_determinants"
+        )
+        assert "apparatus_geometry_interval_printed" not in geometry.detail
+        assert (
+            apparatus_geometry_interval_notice(
+                experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+            )
+            is None
+        )
+        identity = replace(F.psat_identity("Ca"), quantity=Quantity.P_PARTIAL)
+        observation = F.observation(
+            "unprinted-interval",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.01"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        regime = effusion_regime_unverified(
+            experiment, Quantity.P_PARTIAL, observation=observation
+        )
+        assert regime.passed is False
+        pressure = next(
+            check
+            for check in regime.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert Decimal(pressure.detail["pressure_limit_Pa"]) == Decimal("10")
+        assert pressure.detail["limit_basis"].startswith("Drowart_standalone")
+
+    activity = _printed_diameter_experiment(
+        interval, calibrated=True, clausing=Decimal("0.8")
+    )
+    for quantity in (
+        Quantity.ACTIVITY,
+        Quantity.ACTIVITY_COEFFICIENT,
+        Quantity.LOG10_KF,
+        Quantity.P_REFERENCE,
+    ):
+        gate = underdetermined_apparatus(activity, quantity)
+        assert gate.passed is False, quantity
+        assert _geometry_missing(gate) == ["orifice_area_m2"], quantity
+
+    point_diameter = _printed_diameter_experiment(Value.point_of(Decimal("0.00030")))
+    point_rate = underdetermined_apparatus(point_diameter, Quantity.MASS_LOSS_RATE)
+    assert point_rate.passed is False
+    assert _geometry_missing(point_rate) == ["orifice_area_m2"]
+
+    inferred_rate = underdetermined_apparatus(
+        _printed_diameter_experiment(
+            interval,
+            inference=Derivation("diameter read from a figure", (), (), "m"),
+        ),
+        Quantity.MASS_LOSS_RATE,
+    )
+    assert inferred_rate.passed is False
+    assert _geometry_missing(inferred_rate) == ["orifice_area_m2"]
+
+    area_host = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    assert area_host.apparatus is not None
+    area_interval = replace(
+        area_host,
+        apparatus=replace(
+            area_host.apparatus,
+            geometry=ApparatusGeometry(
+                orifice_area_m2=Located(
+                    State.of(interval),
+                    locator=F.loc(page=221, section="Experimental"),
+                )
+            ),
+        ),
+    )
+    area_gate = underdetermined_apparatus(area_interval, Quantity.P_PARTIAL)
+    assert area_gate.passed is False
+    assert _geometry_missing(area_gate) == ["orifice_area_m2"]
+
+
+def test_printed_knudsen_number_notice_does_not_claim_both_ends() -> None:
+    """A printed orifice Kn is the regime check. Do not claim the diameter path."""
+
+    experiment = _printed_diameter_experiment(
+        Value(
+            ValueKind.INTERVAL,
+            interval_low=Decimal("0.00025"),
+            interval_high=Decimal("0.00030"),
+        ),
+        kn=Decimal("20"),
+    )
+    notice = apparatus_geometry_interval_notice(
+        experiment, Quantity.P_PARTIAL, origin=experiment.experiment_id
+    )
+    assert notice is not None
+    assert "Knudsen" in notice.reason
+    assert "both ends" not in notice.reason
+    assert "d_max" not in notice.reason
+    assert notice.band is None
+    gate = underdetermined_apparatus(experiment, Quantity.P_PARTIAL)
+    assert gate.passed
+    geometry = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert geometry.detail["regime_checked_at"] == "printed_orifice_kn"
+    regime = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=_cell_total_pressure_observation(experiment, Decimal("0.28")),
+    )
+    assert regime.passed
+    assert regime.checks[0].name == "orifice_knudsen"

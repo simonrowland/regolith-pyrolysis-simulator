@@ -179,8 +179,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -193,6 +193,17 @@ species:
         T_K: '1523'
         printed_standard_state: pure solid SnO2(s)
         method: Activity reduced from Sn distribution equilibrium in molten copper using equations (12)-(15).
+        derivation: &fujisawa_sn_t2_reduction
+          relation: >-
+            SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 5
+              published_page: 418
+              table: '2'
+              note: >-
+                The underlying distribution measurements are reported as row values, but the raw instrument readings used in the reduction are not listed as separate observations.
         point_conditions:
           temperature_K:
             state:
@@ -222,7 +233,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.427'
           units: Pa
@@ -283,8 +293,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -304,7 +314,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '1.070'
           units: Pa
@@ -312,6 +321,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -365,8 +375,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -389,7 +399,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '1.260'
           units: Pa
@@ -397,6 +406,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -450,8 +460,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -469,7 +479,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.562'
           units: Pa
@@ -477,6 +486,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -530,8 +540,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -549,7 +559,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.550'
           units: Pa
@@ -557,6 +566,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -610,8 +620,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -634,7 +644,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.014'
           units: Pa
@@ -642,6 +651,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -695,8 +705,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -718,7 +728,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.021'
           units: Pa
@@ -726,6 +735,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -779,8 +789,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -799,7 +809,6 @@ species:
           locator:
             page: 5
             table: '2'
-        attribution: Fujisawa et al. (1994), Table 2
         oxygen_partial_pressure:
           value: '0.019'
           units: Pa
@@ -807,6 +816,7 @@ species:
             page: 5
             published_page: 418
             table: '2'
+        derivation: *fujisawa_sn_t2_reduction
       point_conditions:
         temperature_K:
           state:
@@ -860,8 +870,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -875,6 +885,17 @@ species:
         slag_Sn_mass_percent_as_printed: '0.268'
         T_K: '1523'
         printed_standard_state: pure solid SnO2(s)
+        derivation: &fujisawa_sn_t3_reduction
+          relation: >-
+            SnO2 activity was reduced from the authors’ Sn distribution measurements in molten copper using equations (12)–(15).
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 6
+              published_page: 419
+              table: '3'
+              note: >-
+                The underlying distribution measurements are reported as row values, but the raw instrument readings used in the reduction are not listed as separate observations.
         point_conditions:
           temperature_K:
             state:
@@ -904,7 +925,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0091'
           units: Pa
@@ -965,8 +985,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -987,7 +1007,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0091'
           units: Pa
@@ -995,6 +1014,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1048,8 +1068,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1071,7 +1091,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0091'
           units: Pa
@@ -1079,6 +1098,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1132,8 +1152,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1155,7 +1175,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0081'
           units: Pa
@@ -1163,6 +1182,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1216,8 +1236,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1238,7 +1258,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0123'
           units: Pa
@@ -1246,6 +1265,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1299,8 +1319,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1321,7 +1341,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0112'
           units: Pa
@@ -1329,6 +1348,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1382,8 +1402,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1404,7 +1424,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0977'
           units: Pa
@@ -1412,6 +1431,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1465,8 +1485,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1487,7 +1507,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0832'
           units: Pa
@@ -1495,6 +1514,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1548,8 +1568,8 @@ species:
       values:
         quantity_as_published: log a_SnO2(s)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: Authors report a logarithmic activity reduced from distribution measurements; the inputs are not
@@ -1571,7 +1591,6 @@ species:
           locator:
             page: 6
             table: '3'
-        attribution: Fujisawa et al. (1994), Table 3
         oxygen_partial_pressure:
           value: '0.0195'
           units: Pa
@@ -1579,6 +1598,7 @@ species:
             page: 6
             published_page: 419
             table: '3'
+        derivation: *fujisawa_sn_t3_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1661,13 +1681,12 @@ species:
       values:
         quantity_as_published: log a_NaO0.5(l)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
           inputs are not stored separately.
-        attribution: Fujisawa et al. (1994), Table 2
         log10_activity_as_printed: '-1.960'
         P_CO2_MPa_as_printed: '0.08'
         T_K: '1523'
@@ -1688,6 +1707,17 @@ species:
             page: 2
             published_page: 415
             section: II. Activity of NaO0.5(l)
+        derivation: &fujisawa_na_group_reduction
+          relation: >-
+            NaO0.5 activity was determined by the authors’ EMF method using equations (1)–(5); Table 2 reports group means of those determinations.
+          raw_inputs:
+            state: {tag: value, value: not_printed}
+            locator:
+              page: 5
+              published_page: 418
+              table: '2'
+              note: >-
+                Individual EMF readings used to calculate the reported group summaries are not printed as separate observations.
       point_conditions:
         temperature_K:
           state:
@@ -1749,13 +1779,12 @@ species:
       values:
         quantity_as_published: log a_NaO0.5(l)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
           inputs are not stored separately.
-        attribution: Fujisawa et al. (1994), Table 2
         log10_activity_as_printed: '-1.765'
         P_CO2_MPa_as_printed: '0.03'
         T_K: '1523'
@@ -1776,6 +1805,7 @@ species:
             page: 2
             published_page: 415
             section: II. Activity of NaO0.5(l)
+        derivation: *fujisawa_na_group_reduction
       point_conditions:
         temperature_K:
           state:
@@ -1837,13 +1867,12 @@ species:
       values:
         quantity_as_published: log a_NaO0.5(l)
         quantity: activity
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: typed_refusal
         status: typed_refusal
         reason: The table prints group log-activity summaries; this schema has no log-activity form and the row-wise
           inputs are not stored separately.
-        attribution: Fujisawa et al. (1994), Table 2
         log10_activity_as_printed: '-1.530'
         P_CO2_MPa_as_printed: '0.01'
         T_K: '1523'
@@ -1864,6 +1893,7 @@ species:
             page: 2
             published_page: 415
             section: II. Activity of NaO0.5(l)
+        derivation: *fujisawa_na_group_reduction
       point_conditions:
         temperature_K:
           state:

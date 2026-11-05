@@ -1,0 +1,97 @@
+source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+source:
+  citation: >-
+    Zaitsev, A. I., Arutyunyan, N. A., Shaposhnikov, N. G., Zaitseva, N. E., and Burtsev, V. T. (2006).
+    Experimental Study and Modeling of the Thermodynamic Properties of Magnesium Silicates.
+    Russian Journal of Physical Chemistry, 80(3), 335–343.
+  year: 2006
+extraction:
+  method: Born-digital pdftotext-layout transcription cross-checked against MinerU drafts and page renders.
+  date: '2026-11-03'
+  worker: w1103cw3-za06
+review_status: draft
+tables:
+  - page: 3
+    table_index: 1
+    published_page: 337
+    type: gibbs_table
+    quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+    unit: fit coefficients and temperature range as printed
+    evidence_class: measured_reduced
+    phase: cr
+    row_predicate: >-
+      All 3 printed phase-field rows; column 2 is the temperature interval, column 3 is n,
+      column 4 is A ± ΔA, and column 5 is −B ± ΔB. Each row is retained as one typed-unavailable fit record.
+    temperature:
+      column: 2
+      unit: K
+    values:
+      - column: 4
+        species: MgO
+        quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+        evidence_class: measured_reduced
+      - column: 5
+        species: MgO
+        quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+        evidence_class: measured_reduced
+  - page: 4
+    table_index: 2
+    published_page: 338
+    type: activity_coefficient
+    quantity: activity
+    unit: dimensionless activity
+    evidence_class: measured_reduced
+    phase: l
+    temperature:
+      as_printed: '1873'
+      unit: K
+    values:
+      - column: 2
+        species: SiO2
+        evidence_class: measured_reduced
+      - column: 3
+        species: MgO
+        evidence_class: measured_reduced
+      - column: 5
+        species: SiO2
+        evidence_class: measured_reduced
+      - column: 6
+        species: MgO
+        evidence_class: measured_reduced
+    render_verified:
+      - row: 2
+        column: 1
+        text: '0.486*'
+  - page: 7
+    table_index: 4
+    published_page: 341
+    type: gibbs_table
+    quantity: delta_fG
+    unit: J/mol
+    evidence_class: quoted_attributed
+    phase: cr
+    row_predicate: the two printed ΔfG(298 K) property rows only
+    temperature:
+      as_printed: '298'
+      unit: K
+    values:
+      - column: 3
+        species: MgSiO3
+        evidence_class: quoted_attributed
+        attribution: '[31]'
+      - column: 4
+        species: MgSiO3
+        evidence_class: model_derived
+    render_verified:
+      - row: 13
+        column: 3
+        text: '−32 143 [31]'
+      - row: 13
+        column: 4
+        text: '−32 150'
+      - row: 53
+        column: 3
+        text: '−23 914 [31]'
+      - row: 53
+        column: 4
+        text: '−23 882'
