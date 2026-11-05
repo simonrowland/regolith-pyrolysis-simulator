@@ -2511,6 +2511,27 @@ def test_typed_mass_percent_blank_volatile_is_absent_to_composition_readers() ->
     assert set(dict(identity.composition.value.components)) == {"SiO2", "MgO"}
 
 
+def test_typed_mass_percent_as_printed_echo_is_ignored_before_classification() -> None:
+    payload = {
+        "basis": "printed_oxides",
+        "amount_basis": "mass_percent",
+        "components": [
+            ["SiO2", "100"],
+            ["H2O", "0"],
+            ["H2O_wt_pct_as_printed", "″"],
+        ],
+    }
+
+    located = migrate_module._composition_located_from_plain(payload)
+    wt = migrate_module._mass_percent_components(payload)
+
+    assert located.state.is_value
+    assert wt == {"SiO2": Decimal("100"), "H2O": Decimal("0")}
+    assert migrate_module._printed_volatile_mass_percent(
+        {"composition_mass_percent": payload}
+    ) == {"H2O": Decimal("0")}
+
+
 def test_typed_mass_percent_printed_map_keeps_uncertainty_text_verbatim() -> None:
     payload = {
         "basis": "printed_oxides",

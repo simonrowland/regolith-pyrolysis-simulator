@@ -1465,6 +1465,8 @@ def _percent_pairs(
         if not isinstance(item, (list, tuple)) or len(item) != 2:
             return None
         name = str(item[0])
+        if _is_as_printed_provenance_echo(name):
+            continue
         if amount_basis is AmountBasis.MASS_PERCENT:
             name, _has_mass_suffix = _mass_percent_component_key(name)
         kind, amount = _classify_composition_cell(item[1])
@@ -4561,6 +4563,8 @@ def _printed_mass_percent_number(value: object) -> Decimal | None:
 
 
 def _is_skipped_composition_map_walk_key(name: object, value: object) -> bool:
+    if _is_as_printed_provenance_echo(name):
+        return True
     kind, _amount = _classify_composition_cell(value)
     # Numeric cells under walker keys are unsupported components in explicit maps.
     return (
@@ -5480,6 +5484,8 @@ def _missing_major_oxide_names(
     for candidate in candidates:
         for raw_name, raw_amount in candidate.items():
             name = str(raw_name)
+            if _is_as_printed_provenance_echo(name):
+                continue
             kind, _amount = _classify_composition_cell(raw_amount)
             if kind == "number":
                 continue
@@ -5688,6 +5694,8 @@ def _wt_percent_conversion_or_refusal(
                 else _M1_ONLY_CLOSURE_CONTRIBUTOR
             )
             for raw_name, raw_amount in component_map.items():
+                if _is_as_printed_provenance_echo(raw_name):
+                    continue
                 name, _has_mass_suffix = _mass_percent_component_key(
                     str(raw_name)
                 )
@@ -6273,6 +6281,8 @@ def _oxide_map_from_mapping(
         return None
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
+        if _is_as_printed_provenance_echo(key):
+            continue
         name, _has_mass_suffix = _mass_percent_component_key(str(key))
         kind, amount = _classify_composition_cell(value)
         if kind != "number" or amount is None:
