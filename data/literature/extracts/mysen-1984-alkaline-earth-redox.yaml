@@ -1,0 +1,4803 @@
+schema_version: literature_extract.v1
+source_id: mysen-1984-alkaline-earth-redox
+source:
+  citation: 'Mysen, B.O., Virgo, D. & Seifert, F.A. (1984), Redox equilibria of iron in alkaline earth silicate
+    melts: relationships between melt structure, oxygen fugacity, temperature and properties of iron-bearing
+    silicate liquids. American Mineralogist 69, 834–847.'
+  year: 1984
+  provenance_path: raw/mysen-1984-alkaline-earth-redox/mysen-1984-alkaline-earth-redox.pdf
+extraction:
+  method: Table 1 machine text transcribed from MinerU and pdftotext; all stored row labels, temperatures,
+    −log fO2 values, and Fe3+/ΣFe fractions were checked against a 600 dpi render of physical PDF page 2. Table
+    3's seven Fe3+/ΣFe entries were checked against a 600 dpi render of physical PDF page 9 and match rounded
+    Table 1 rows. Table 2 contains no Fe redox fraction. Table 1 reports quenched glasses. The paper states
+    that the fO2 reference frame is not printed; the signed log is carried through the existing 1 bar reference
+    convention for identity conversion, while total experimental pressure remains unknown. Nominal composition
+    maps decode the printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added to starting material; the paper
+    says glass analyses agree within 2% relative uncertainty but does not print the microprobe values. Figures
+    1–8 are not digitized.
+  date: '2026-11-04'
+  worker: w1104fer-m84
+  audit_files:
+  - data/literature/extracts/audits/mysen-1984-alkaline-earth-redox.mapping.yaml
+  - data/literature/extracts/audits/mysen-1984-alkaline-earth-redox.cells.csv
+  - data/literature/extracts/audits/mysen-1984-alkaline-earth-redox.compare.txt
+review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[mysen_1984_table1_r01_cs2f23].values.value
+  value: '0.249'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 835
+    table: '1'
+    row: CS2F2.3
+- path: species.Fe.observations[mysen_1984_table1_r09_cs14f5].values.value
+  value: '0.000'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 835
+    table: '1'
+    row: CS1.4F5
+    column: Fe3+/ΣFe
+    note: fourth CS1.4F5 row; −log fO2=6.00
+- path: species.Fe.observations[mysen_1984_table1_r32_bs12f5].values.value
+  value: '0.771'
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 835
+    table: '1'
+    row: BS1.2F5
+- path: species.Fe.observations[mysen_1984_table1_r09_cs14f5].values.value
+  value: '0.000'
+  locator:
+    page: 9
+    pdf_page_index: 8
+    published_page: 842
+    table: '3'
+    row: CS1.4F5
+    column: Fe3+/ΣFe
+    note: Table 3 prints 0.00 at −log fO2=6.0 for the same sample; Table 1 prints the full-precision 0.000
+      stored in this observation.
+experiments:
+- experiment_id: mysen_1984_alkaline_earth_redox
+  series: Mössbauer Fe redox measurements in CaO-, MgO-, SrO-, and BaO–SiO2 melts, quenched from controlled
+    oxygen fugacity.
+  method: CO–CO2 gas mixing controlled furnace oxygen fugacity; Mössbauer spectra were fitted to determine
+    Fe3+/ΣFe.
+  locator: &id001
+    page: 2
+    pdf_page_index: 1
+    published_page: 835
+    section: Experimental methods
+species:
+  Fe:
+    observations:
+    - observation_id: mysen_1984_table1_r01_cs2f23
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS2F2.3
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 3
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.249'
+        value_as_published: '0.249'
+        sample_as_published: CS2F2.3
+        T_C: '1725'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS2F2.3
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '2.3'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 2 molar and Fe2O3 = 2.3 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.661072977864'
+          CaO: '0.330536488932'
+          Fe2O3: '0.008390533204'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1725'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F2.3
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F2.3
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.661072977864'
+              - - CaO
+                - '0.330536488932'
+              - - Fe2O3
+                - '0.008390533204'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F2.3
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 2 molar
+              and Fe2O3 = 2.3 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r02_cs2f46
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS2F4.6
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 4
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.396'
+        value_as_published: '0.396'
+        sample_as_published: CS2F4.6
+        T_C: '1725'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS2F4.6
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '4.6'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 2 molar and Fe2O3 = 4.6 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.655572376076'
+          CaO: '0.327786188038'
+          Fe2O3: '0.016641435886'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1725'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F4.6
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F4.6
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.655572376076'
+              - - CaO
+                - '0.327786188038'
+              - - Fe2O3
+                - '0.016641435886'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F4.6
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 2 molar
+              and Fe2O3 = 4.6 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r03_cs2f91
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS2F9.1
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 5
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.443'
+        value_as_published: '0.443'
+        sample_as_published: CS2F9.1
+        T_C: '1725'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS2F9.1
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '9.1'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 2 molar and Fe2O3 = 9.1 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.645070838574'
+          CaO: '0.322535419287'
+          Fe2O3: '0.032393742139'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1725'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F9.1
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F9.1
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.645070838574'
+              - - CaO
+                - '0.322535419287'
+              - - Fe2O3
+                - '0.032393742139'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F9.1
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 2 molar
+              and Fe2O3 = 9.1 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r04_cs2f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 6
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.584'
+        value_as_published: '0.584'
+        sample_as_published: CS2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.654625080310'
+          CaO: '0.327312540155'
+          Fe2O3: '0.018062379535'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.654625080310'
+              - - CaO
+                - '0.327312540155'
+              - - Fe2O3
+                - '0.018062379535'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r05_cs2f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 7
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.247'
+        value_as_published: '0.247'
+        sample_as_published: CS2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.654625080310'
+          CaO: '0.327312540155'
+          Fe2O3: '0.018062379535'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.654625080310'
+              - - CaO
+                - '0.327312540155'
+              - - Fe2O3
+                - '0.018062379535'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r06_cs14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 8
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.614'
+        value_as_published: '0.614'
+        sample_as_published: CS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.572855742833'
+          CaO: '0.409182673452'
+          Fe2O3: '0.017961583715'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.572855742833'
+              - - CaO
+                - '0.409182673452'
+              - - Fe2O3
+                - '0.017961583715'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r07_cs14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 9
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.288'
+        value_as_published: '0.288'
+        sample_as_published: CS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.572855742833'
+          CaO: '0.409182673452'
+          Fe2O3: '0.017961583715'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.572855742833'
+              - - CaO
+                - '0.409182673452'
+              - - Fe2O3
+                - '0.017961583715'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r08_cs14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 10
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.117'
+        value_as_published: '0.117'
+        sample_as_published: CS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '4.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.572855742833'
+          CaO: '0.409182673452'
+          Fe2O3: '0.017961583715'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-4.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 4.00; signed log10 fO2 is -4.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.572855742833'
+              - - CaO
+                - '0.409182673452'
+              - - Fe2O3
+                - '0.017961583715'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r09_cs14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 11
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.000'
+        value_as_published: '0.000'
+        sample_as_published: CS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '6.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.572855742833'
+          CaO: '0.409182673452'
+          Fe2O3: '0.017961583715'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-6.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 6.00; signed log10 fO2 is -6.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.572855742833'
+              - - CaO
+                - '0.409182673452'
+              - - Fe2O3
+                - '0.017961583715'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r10_cs12f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 12
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.638'
+        value_as_published: '0.638'
+        sample_as_published: CS1.2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.535682312404'
+          CaO: '0.446401927003'
+          Fe2O3: '0.017915760593'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.535682312404'
+              - - CaO
+                - '0.446401927003'
+              - - Fe2O3
+                - '0.017915760593'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r11_cs12f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 13
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.356'
+        value_as_published: '0.356'
+        sample_as_published: CS1.2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.535682312404'
+          CaO: '0.446401927003'
+          Fe2O3: '0.017915760593'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.535682312404'
+              - - CaO
+                - '0.446401927003'
+              - - Fe2O3
+                - '0.017915760593'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r12_csf5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CSF5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 14
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.675'
+        value_as_published: '0.675'
+        sample_as_published: CSF5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CSF5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.491069616399'
+          CaO: '0.491069616399'
+          Fe2O3: '0.017860767202'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.491069616399'
+              - - CaO
+                - '0.491069616399'
+              - - Fe2O3
+                - '0.017860767202'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r13_csf5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CSF5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 15
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.417'
+        value_as_published: '0.417'
+        sample_as_published: CSF5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CSF5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.491069616399'
+          CaO: '0.491069616399'
+          Fe2O3: '0.017860767202'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.491069616399'
+              - - CaO
+                - '0.491069616399'
+              - - Fe2O3
+                - '0.017860767202'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r14_csf5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CSF5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 16
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.228'
+        value_as_published: '0.228'
+        sample_as_published: CSF5
+        T_C: '1550'
+        minus_log_fO2_as_published: '4.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CSF5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.491069616399'
+          CaO: '0.491069616399'
+          Fe2O3: '0.017860767202'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-4.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: −log fO2
+            note: Printed −log fO2 = 4.00; signed log10 fO2 is -4.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.491069616399'
+              - - CaO
+                - '0.491069616399'
+              - - Fe2O3
+                - '0.017860767202'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CSF5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r15_cs8f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS.8F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 17
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.710'
+        value_as_published: '0.710'
+        sample_as_published: CS.8F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS.8F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '0.8'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 0.8 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.436536202360'
+          CaO: '0.545670252950'
+          Fe2O3: '0.017793544690'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.436536202360'
+              - - CaO
+                - '0.545670252950'
+              - - Fe2O3
+                - '0.017793544690'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 0.8 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r16_cs8f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS.8F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 18
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.472'
+        value_as_published: '0.472'
+        sample_as_published: CS.8F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS.8F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '0.8'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 0.8 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.436536202360'
+          CaO: '0.545670252950'
+          Fe2O3: '0.017793544690'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.436536202360'
+              - - CaO
+                - '0.545670252950'
+              - - Fe2O3
+                - '0.017793544690'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.8F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 0.8 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r17_cs7f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS.7F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 19
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.823'
+        value_as_published: '0.823'
+        sample_as_published: CS.7F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS.7F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '0.7'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 0.7 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.404454236225'
+          CaO: '0.577791766036'
+          Fe2O3: '0.017753997739'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.7F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.7F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.404454236225'
+              - - CaO
+                - '0.577791766036'
+              - - Fe2O3
+                - '0.017753997739'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS.7F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 0.7 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r18_cs14f10
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F10
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 20
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.677'
+        value_as_published: '0.677'
+        sample_as_published: CS1.4F10
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F10
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '10'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.562747899328'
+          CaO: '0.401962785234'
+          Fe2O3: '0.035289315438'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.562747899328'
+              - - CaO
+                - '0.401962785234'
+              - - Fe2O3
+                - '0.035289315438'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r19_cs14f10
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F10
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 21
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.397'
+        value_as_published: '0.397'
+        sample_as_published: CS1.4F10
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F10
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '10'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.562747899328'
+          CaO: '0.401962785234'
+          Fe2O3: '0.035289315438'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.562747899328'
+              - - CaO
+                - '0.401962785234'
+              - - Fe2O3
+                - '0.035289315438'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r20_cs14f10
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: CS1.4F10
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 22
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.231'
+        value_as_published: '0.231'
+        sample_as_published: CS1.4F10
+        T_C: '1550'
+        minus_log_fO2_as_published: '4.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: CS1.4F10
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '10'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO
+          = 1.4 molar and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.562747899328'
+          CaO: '0.401962785234'
+          Fe2O3: '0.035289315438'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-4.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: −log fO2
+            note: Printed −log fO2 = 4.00; signed log10 fO2 is -4.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.562747899328'
+              - - CaO
+                - '0.401962785234'
+              - - Fe2O3
+                - '0.035289315438'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: CS1.4F10
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/CaO = 1.4 molar
+              and Fe2O3 = 10 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r21_ms14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 23
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.523'
+        value_as_published: '0.523'
+        sample_as_published: MS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.574015736932'
+          MgO: '0.410011240666'
+          Fe2O3: '0.015973022402'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.574015736932'
+              - - MgO
+                - '0.410011240666'
+              - - Fe2O3
+                - '0.015973022402'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r22_ms14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 24
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.188'
+        value_as_published: '0.188'
+        sample_as_published: MS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.574015736932'
+          MgO: '0.410011240666'
+          Fe2O3: '0.015973022402'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.574015736932'
+              - - MgO
+                - '0.410011240666'
+              - - Fe2O3
+                - '0.015973022402'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r23_ms14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 25
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.065'
+        value_as_published: '0.065'
+        sample_as_published: MS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '4.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.574015736932'
+          MgO: '0.410011240666'
+          Fe2O3: '0.015973022402'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-4.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 4.00; signed log10 fO2 is -4.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.574015736932'
+              - - MgO
+                - '0.410011240666'
+              - - Fe2O3
+                - '0.015973022402'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r24_ms14f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 26
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.000'
+        value_as_published: '0.000'
+        sample_as_published: MS1.4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '6.00'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.574015736932'
+          MgO: '0.410011240666'
+          Fe2O3: '0.015973022402'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-6.00'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: −log fO2
+            note: Printed −log fO2 = 6.00; signed log10 fO2 is -6.00. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.574015736932'
+              - - MgO
+                - '0.410011240666'
+              - - Fe2O3
+                - '0.015973022402'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r25_ms12f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 27
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.482'
+        value_as_published: '0.482'
+        sample_as_published: MS1.2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.536865916992'
+          MgO: '0.447388264160'
+          Fe2O3: '0.015745818848'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.536865916992'
+              - - MgO
+                - '0.447388264160'
+              - - Fe2O3
+                - '0.015745818848'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r26_ms12f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: MS1.2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 28
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.222'
+        value_as_published: '0.222'
+        sample_as_published: MS1.2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '2.50'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: MS1.2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO
+          = 1.2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.536865916992'
+          MgO: '0.447388264160'
+          Fe2O3: '0.015745818848'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-2.50'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: −log fO2
+            note: Printed −log fO2 = 2.50; signed log10 fO2 is -2.50. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.536865916992'
+              - - MgO
+                - '0.447388264160'
+              - - Fe2O3
+                - '0.015745818848'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: MS1.2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/MgO = 1.2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r27_srsf5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: SrSF5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 29
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.746'
+        value_as_published: '0.746'
+        sample_as_published: SrSF5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: SrSF5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/SrO
+          = 1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.487505918779'
+          SrO: '0.487505918779'
+          Fe2O3: '0.024988162442'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: SrSF5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: SrSF5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.487505918779'
+              - - SrO
+                - '0.487505918779'
+              - - Fe2O3
+                - '0.024988162442'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: SrSF5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/SrO = 1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r28_bs4f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS4F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 30
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.684'
+        value_as_published: '0.684'
+        sample_as_published: BS4F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS4F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '4'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 4 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.780752994159'
+          BaO: '0.195188248540'
+          Fe2O3: '0.024058757301'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS4F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS4F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.780752994159'
+              - - BaO
+                - '0.195188248540'
+              - - Fe2O3
+                - '0.024058757301'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS4F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 4 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r29_bs3f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS3F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 31
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.684'
+        value_as_published: '0.684'
+        sample_as_published: BS3F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS3F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '3'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 3 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.730914629285'
+          BaO: '0.243638209762'
+          Fe2O3: '0.025447160953'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS3F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS3F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.730914629285'
+              - - BaO
+                - '0.243638209762'
+              - - Fe2O3
+                - '0.025447160953'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS3F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 3 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r30_bs2f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 32
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.699'
+        value_as_published: '0.699'
+        sample_as_published: BS2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.648165060531'
+          BaO: '0.324082530266'
+          Fe2O3: '0.027752409203'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS2F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.648165060531'
+              - - BaO
+                - '0.324082530266'
+              - - Fe2O3
+                - '0.027752409203'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r31_bs15f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS1.5F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 33
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.731'
+        value_as_published: '0.731'
+        sample_as_published: BS1.5F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS1.5F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.5'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 1.5 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.582246737752'
+          BaO: '0.388164491835'
+          Fe2O3: '0.029588770413'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.5F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.5F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.582246737752'
+              - - BaO
+                - '0.388164491835'
+              - - Fe2O3
+                - '0.029588770413'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.5F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 1.5 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r32_bs12f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS1.2F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 34
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.771'
+        value_as_published: '0.771'
+        sample_as_published: BS1.2F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS1.2F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.2'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 1.2 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.528498493089'
+          BaO: '0.440415410907'
+          Fe2O3: '0.031086096004'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.2F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.2F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.528498493089'
+              - - BaO
+                - '0.440415410907'
+              - - Fe2O3
+                - '0.031086096004'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.2F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 1.2 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r33_bs11f5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BS1.1F5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 35
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.784'
+        value_as_published: '0.784'
+        sample_as_published: BS1.1F5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BS1.1F5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1.1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 1.1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3
+          amount is converted from this mass addition using the printed binary ratio and oxide molar masses,
+          then normalized to mole fraction. The paper says glass analyses agree with nominal values within
+          2% relative uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.507215765574'
+          BaO: '0.461105241431'
+          Fe2O3: '0.031678992995'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.1F5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.1F5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.507215765574'
+              - - BaO
+                - '0.461105241431'
+              - - Fe2O3
+                - '0.031678992995'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BS1.1F5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 1.1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
+    - observation_id: mysen_1984_table1_r34_bsf5
+      admission_status: admitted
+      experiment: mysen_1984_alkaline_earth_redox
+      type: concentration_series
+      locator:
+        page: 2
+        pdf_page_index: 1
+        published_page: 835
+        table: '1'
+        row: BSF5
+        column: composition, T, −log fO2, Fe3+/ΣFe
+        table_row_number: 36
+        table_column_number: 10
+      phase: glass
+      units: fraction
+      values:
+        quantity: valence_ratio
+        valence_basis:
+          numerator_oxidation_states:
+          - 3
+          denominator_kind: total_element
+          denominator_oxidation_state: null
+          value_form: fraction
+        method_class: measured_reduced
+        method_as_printed: Mössbauer spectroscopy; Fe3+/ΣFe reported from fitted Mössbauer doublet areas.
+        value: '0.833'
+        value_as_published: '0.833'
+        sample_as_published: BSF5
+        T_C: '1550'
+        minus_log_fO2_as_published: '0.68'
+        minus_log_fO2_form_as_published: −log fO2
+        minus_log_fO2_reference_as_published: not stated
+        nominal_composition_as_published: BSF5
+        nominal_SiO2_to_metal_oxide_molar_ratio: '1'
+        nominal_Fe2O3_added_wt_pct: '5'
+        composition_derivation: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO
+          = 1 molar and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+          is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+          normalized to mole fraction. The paper says glass analyses agree with nominal values within 2% relative
+          uncertainty but does not publish numerical microprobe analyses.'
+        reported_quantity_as_published: Fe3+/ΣFe fraction
+        composition_mol:
+          basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per 100
+            mass units of binary starting material
+          SiO2: '0.483834828915'
+          BaO: '0.483834828915'
+          Fe2O3: '0.032330342170'
+      derivation:
+        relation: Fe3+/ΣFe is the ferric Mössbauer spectral area divided by the total iron area from the fitted
+          spectrum.
+        output_unit: fraction
+        method:
+          state:
+            tag: value
+            value: Lorentzian line-shape fits were applied to digitized Mössbauer spectrometer output.
+          locator: *id001
+        raw_inputs:
+          state:
+            tag: value
+            value: not_printed
+          locator:
+            page: 3
+            pdf_page_index: 2
+            published_page: 836
+            figure: '1'
+            note: Figure 1 shows selected spectra; the numeric spectral data fitted for all Table 1 rows are
+              not published.
+      point_conditions:
+        T_C:
+          state:
+            tag: value
+            value: '1550'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BSF5
+            column: Temp., °C
+        fO2_log:
+          reference_pressure:
+            value: 1
+            units: bar
+            basis: convention
+            printed: false
+          state:
+            tag: value
+            value: '-0.68'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BSF5
+            column: −log fO2
+            note: Printed −log fO2 = 0.68; signed log10 fO2 is -0.68. Reference frame is not printed.
+        total_pressure_Pa:
+          state:
+            tag: unknown
+            reason: The source does not state total experimental pressure.
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            section: Experimental methods
+            note: CO–CO2 gas mixing is stated; no total pressure is stated.
+        composition:
+          state:
+            tag: value
+            value:
+              basis: nominal mole fractions from printed SiO2/metal-oxide molar ratio and Fe2O3 wt% added per
+                100 mass units of binary starting material
+              amount_basis: mole_fraction
+              components:
+              - - SiO2
+                - '0.483834828915'
+              - - BaO
+                - '0.483834828915'
+              - - Fe2O3
+                - '0.032330342170'
+          locator:
+            page: 2
+            pdf_page_index: 1
+            published_page: 835
+            table: '1'
+            row: BSF5
+            column: Composition
+            note: 'Nominal starting-material mole fractions decoded from the printed code: SiO2/BaO = 1 molar
+              and Fe2O3 = 5 wt% added per 100 mass units of the binary starting material. The Fe2O3 amount
+              is converted from this mass addition using the printed binary ratio and oxide molar masses, then
+              normalized to mole fraction. The paper says glass analyses agree with nominal values within 2%
+              relative uncertainty but does not publish numerical microprobe analyses.'
+        quench_state:
+          state:
+            tag: value
+            value: not_stated
+            note: All samples were quenched in either liquid nitrogen or water; the source does not state whether
+              Fe redox is preserved or altered on quench.
+          locator: *id001
