@@ -536,9 +536,13 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
     # TiO2 species records here); K2O's domain warning loses only its appended
     # reference-state reason. The projected warnings lose those same notice
     # reasons.
+    # 9f781b5bb's projected notices are now deduplicated at their owner. At
+    # 2400.65 K, the K2O domain warning falls from three copies to one and
+    # out_of_range_conservative_continuation falls from 20 copies to one;
+    # per-species provenance is unchanged.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "007bdfa6c2468442e4a65ca3216c9008b36498b56e44ebca2312d1da7d33ec2a"
+    ).hexdigest() == "67229670652480bf5e639e05bbc75f3558b38fabec56cbd0e1608ce0f11ee16a"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:
@@ -550,6 +554,24 @@ def test_1800_k_pre_switch_physics_pin() -> None:
         result,
         exclude_b813_temperature_notices=True,
     )
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]
+    fusion_warnings = tuple(
+        warning
+        for warning in result.warnings
+        if warning.startswith("d144_fusion_conversion|")
+    )
+    assert len(result.warnings) == len(set(result.warnings))
+    assert fusion_warnings == (
+        provenance["Mg"]["melt_oxide_activity_warning"],
+        provenance["Ca"]["melt_oxide_activity_warning"],
+    )
+    assert {
+        species
+        for species, row in provenance.items()
+        if str(row.get("melt_oxide_activity_warning") or "").startswith(
+            "d144_fusion_conversion|"
+        )
+    } == {"Ca", "Ca2", "CaO_gas", "Mg", "Mg2", "MgO_gas"}
     # Re-decoded against R3 (443ec6ed6): the numeric payload is bit-identical.
     # The metadata delta is the R4 split of oxide reference-state reasons from
     # melt_oxide_activity_warning into the structured
@@ -560,15 +582,16 @@ def test_1800_k_pre_switch_physics_pin() -> None:
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "81eff0369d7c3cfed06705c05b9d6dd697cde2869bcc1f647263320c8971d69a"
-    # Re-decoded after f9adcc63b: the numeric payload is bit-identical. The
-    # projected metadata carries d-144 fusion-conversion bridge warnings for
-    # CaO and MgO at 1800 K. Their JANAF metastable-liquid reasons carry bands
-    # [298.15, 3600] and [298.15, 4000] K; the provenance payload contains the
-    # same warnings on the Ca/Ca2/CaO_gas and Mg/Mg2/MgO_gas species records.
-    # The changed digest is therefore notice/provenance only.
+    # 9f781b5bb introduced the d-144 bridge warnings. The projected warnings
+    # now keep one copy in first-seen order: CaO and MgO fusion reasons each
+    # fall from three copies to one, Na2O and K2O domain reasons do the same,
+    # and out_of_range_conservative_continuation falls from four to one. The
+    # Ca/Ca2/CaO_gas and Mg/Mg2/MgO_gas provenance records remain intact. At
+    # 1800 K the JANAF metastable-liquid reasons carry bands [298.15, 3600]
+    # and [298.15, 4000] K. The decoded digest move is warning metadata only.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "d891ffba61c564a5249ae9580e1abbc30fd956c5da569ef7ccf0fc2631ce18d6"
+    ).hexdigest() == "03ee957b0e26bd578c79171089375f5e3ad4fa84e3e26f2bc2ebdd2b0da25438"
 
 
 @pytest.mark.parametrize("temperature_K, expected", [(1650.0, False), (1800.0, True)])
