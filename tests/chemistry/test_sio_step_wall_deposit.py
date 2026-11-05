@@ -28,6 +28,56 @@ from tests.studio_pin_support import sio_pin_values, sio_wall_report_at_temperat
 from simulator.state import EvaporationFlux, MeltState, PipeSegment
 
 
+def _dalton_partial_pa(
+    *,
+    inlet_partial_mbar: float,
+    total_mbar: float,
+    rate_kg_hr: float,
+    remaining_kg_hr: float,
+) -> float:
+    """Partial pressure after upstream capture, on the persisting carrier.
+
+    y_i,0 = p_i,0/P and r = m_remaining/m_inlet. The mass ratio is the
+    molar-flow ratio for one species. y_c = 1 - y_i,0, so
+    y_i = (y_i,0 * r) / (y_c + y_i,0 * r) and p_i = y_i * P.
+    r <= 0 leaves no vapour. mbar/mbar cancels; total_mbar * 100 is Pa.
+    """
+
+    if remaining_kg_hr <= 0.0 or rate_kg_hr <= 0.0:
+        return 0.0
+    remaining_ratio = remaining_kg_hr / rate_kg_hr
+    inlet_mole_fraction = inlet_partial_mbar / total_mbar
+    carrier_mole_fraction = 1.0 - inlet_mole_fraction
+    denominator = (
+        carrier_mole_fraction + inlet_mole_fraction * remaining_ratio
+    )
+    if denominator <= 0.0:
+        return 0.0
+    return (
+        total_mbar
+        * 100.0
+        * (inlet_mole_fraction * remaining_ratio)
+        / denominator
+    )
+
+
+def _cr_remaining_at_lab_wall_kg(result, rate_kg_hr: float, wall_index: int) -> float:
+    """Cr still flowing at wall_N.
+
+    Lab segments bind to stage 1. Captures with stage_number < 1, then
+    earlier walls on that stage, have already left the stream.
+    """
+
+    captured = 0.0
+    for identity, species_kg in result.capture_kg_by_stage_identity.items():
+        if int(identity[0]) < 1:
+            captured += float(species_kg.get("Cr", 0.0))
+    deposits = result.wall_deposit_by_segment_species
+    for index in range(1, wall_index):
+        captured += float(deposits.get(f"wall_{index}", {}).get("Cr", 0.0))
+    return max(0.0, rate_kg_hr - captured)
+
+
 @lru_cache(maxsize=None)
 def _report_at_wall_T(
     liner_temperature_c: float,
@@ -733,25 +783,27 @@ def test_wall_route_depletes_partial_pressure_after_upstream_wall_capture(
         "wall_1"
     ]["Cr"]
     assert first_wall_deposit_kg > 0.0
-    remaining_ratio = 1.0 - first_wall_deposit_kg / rate_kg_hr
-    inlet_mole_fraction = partial_pressure_mbar / 10.0
-    carrier_mole_fraction = 1.0 - inlet_mole_fraction
-    # With complete wall capture and no carrier, no gas remains: p_Cr=0.
-    # Otherwise Dalton's fraction is n_Cr/(n_Cr+n_carrier), dimensionless.
-    expected_second_partial_pa = 0.0 if remaining_ratio == 0.0 else (
-        1000.0
-        * (inlet_mole_fraction * remaining_ratio)
-        / (
-            carrier_mole_fraction
-            + inlet_mole_fraction * remaining_ratio
+    # b1113: Cr is no longer isolated to its harvester. Lab walls bind to
+    # stage 1, so the hot duct (stage_number < 1) has already captured.
+    # Dalton's fraction at a wall is the flowing mass there, not the inlet.
+    # y_i,0 = p_i,0/P, r = m_remaining/m_inlet, y_c = 1-y_i,0,
+    # p_i = y_i,0*r / (y_c + y_i,0*r) * P. r = 0 leaves p_i = 0.
+    # Pa = mbar * 100. A zero upstream capture recovers the inlet partial.
+    for wall_index in (1, 2):
+        remaining_kg_hr = _cr_remaining_at_lab_wall_kg(
+            result, rate_kg_hr, wall_index,
         )
-    )
-    assert model.wall_species_partial_pressures_pa_by_segment["wall_1"][
-        "Cr"
-    ] == pytest.approx(partial_pressure_mbar * 100.0)
-    assert model.wall_species_partial_pressures_pa_by_segment["wall_2"][
-        "Cr"
-    ] == pytest.approx(expected_second_partial_pa, rel=1.0e-6)
+        assert model.wall_species_partial_pressures_pa_by_segment[
+            f"wall_{wall_index}"
+        ]["Cr"] == pytest.approx(
+            _dalton_partial_pa(
+                inlet_partial_mbar=partial_pressure_mbar,
+                total_mbar=10.0,
+                rate_kg_hr=rate_kg_hr,
+                remaining_kg_hr=remaining_kg_hr,
+            ),
+            rel=1.0e-6,
+        )
 
 
 def test_wall_deposition_saturation_and_hot_alkali_limits() -> None:
