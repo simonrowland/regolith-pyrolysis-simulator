@@ -1737,6 +1737,14 @@ def _mass_percent_printed_from_plain(
         if _mass_percent_pairs(payload) is not None:
             return _located_from_plain(payload, lambda value: value)
         return None
+    # H2O, Cl, Ag2O, I2O, and Re stay in the stored printed body. Flattening
+    # them into an oxide wt% map makes the charge read them as engine input.
+    # MELTS lists none of them; the mole-fraction conversion still stores them
+    # and the engine split drops them.
+    if any(name in _COMPOSITION_COMPONENTS_REQUIRING_ENGINE_LISTING for name in wt):
+        if _mass_percent_pairs(payload) is not None:
+            return _located_from_plain(payload, lambda value: value)
+        return None
     locator = (
         _locator_from_plain(payload.get("locator"))
         if isinstance(payload, Mapping)
@@ -4536,8 +4544,11 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
             continue
         component = _COMPOSITION_COMPONENTS.get(name)
         if component is None:
+            # Numeric names that are not integer non-aliases were refused
+            # above. A remaining key (locator, a total already skipped) is
+            # not a composition component.
             if not _integer_non_alias_component(name):
-                raise ValueError(unidentified_component_refusal([name]))
+                continue
             canonical_name = name
         else:
             canonical_name = component[1]
