@@ -281,7 +281,10 @@ def test_default_classification_source_accounted_digest():
     digest = hashlib.sha256(
         json.dumps(result, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    # Pins the complete runner payload after the merged source-accounted
-    # product classifier and car1's flagged CrO/partial-silica projections.
-    assert digest.startswith("f8bf8d329059")
-    assert digest.endswith("3e18cf8c6163a")
+    # The condenser stack (film-temperature diffusivity, cold-stage
+    # capture of every species, e-NTU bulk temperature, and the d-344
+    # cartridge) moves the payload. The full digest is
+    # 2c1e06d28b3dc5608de3c8ac1556c454b5fe4d53bf7fa2ea325f3cf40374cafb,
+    # reproduced on this seat and on the studio gate.
+    assert digest.startswith("2c1e06d28b3d")
+    assert digest.endswith("5f3cf40374cafb")
