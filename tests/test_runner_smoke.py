@@ -115,8 +115,12 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "87508c1755a8c9521e7396ca37168f20c55088b6464763cea51514ce6443767d",
-        "ledger_sha256": "d40bc5f8c7d221c2ba7216a43448cb2139e7d3039b59d9bd5f0f42b9aa39a5db",
+        # t-1591 r5 studio-3 actuals at 33348ffc1 (receipt t1591rcptg3). The
+        # cause is a490c6011's Holzheid 1/T runtime move, the same change as
+        # the lunar C0 fixture rebaseline in f63cbecd9. These remain studio-3
+        # values because lunar full runs diverge between laptop and studio-3.
+        "flux_maps_sha256": "ab4e2d3494dcf64306134bf6dad8267ac5c6bf183a9eb3badd7391cd5dc3474e",
+        "ledger_sha256": "4dccc2b89236e18b5914b7494698547b6c271335be6cfbc326f51fef2521e734",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
