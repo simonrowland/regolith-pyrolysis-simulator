@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 from types import SimpleNamespace
@@ -312,16 +313,31 @@ def test_merge_equal_severity_carriers_preserves_source_extrapolation_notices(
     extra = merged.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
     assert extra["extrapolation_notice"]["reason"] == "outside source band"
     assert extra["extrapolation_notice"]["valid_range_K"] == (701.0, 1361.0)
-    assert {notice["temperature_K"] for notice in extra["extrapolation_notices"]} == {
-        notice["temperature_K"] for notice in expected
-    }
-    assert all(notice["reason"] == "outside source band"
-               and notice["valid_range_K"] == (701.0, 1361.0)
-               and notice["authority_level"] == "extrapolated"
-               for notice in extra["extrapolation_notices"])
+    temperatures = [notice["temperature_K"] for notice in expected]
+    assert len(extra["extrapolation_notices"]) == 1
+    group = extra["extrapolation_notices"][0]
+    low = min(temperatures)
+    high = max(temperatures)
+    assert group["temperature_K"] == (low if low == high else {"min": low, "max": high})
+    assert group["occurrences"] == len(temperatures)
+    assert group["probe_ids_first"] == "evaporation"
+    assert group["probe_ids_last"] == (
+        "evaporation" if len(temperatures) == 1 else f"evaporation#{len(temperatures)}"
+    )
+    assert group["reason"] == "outside source band"
+    assert group["valid_range_K"] == (701.0, 1361.0)
+    assert group["authority_level"] == "extrapolated"
     repeated, _ = merge_run_snapshot(merged, snapshots[1])
-    repeated_extra = repeated.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
-    assert repeated_extra["extrapolation_notices"] == extra["extrapolation_notices"]
+    repeated_group = repeated.wall_deposit_sticking_authority[
+        "vapour_carrier_authority_by_species"
+    ]["Mg"]["extra"]["extrapolation_notices"][0]
+    repeated_notice = snapshots[1].wall_deposit_sticking_authority[
+        "vapour_carrier_authority_by_species"
+    ]["Mg"].get("extra", {}).get("extrapolation_notice")
+    added = 1 if isinstance(repeated_notice, Mapping) else 0
+    assert repeated_group["occurrences"] == group["occurrences"] + added
+    assert repeated_group["temperature_K"] == group["temperature_K"]
+    assert repeated_group["reason"] == "outside source band"
 
 
 @pytest.mark.parametrize("later_status", ("proven_zero", "refused"))
@@ -498,6 +514,46 @@ def _record_transport(model: SimpleNamespace, record: dict[str, object], *, spec
         "evaporation",
         record,
     )
+
+
+def test_collapse_probed_notices_keeps_float_span_and_probe_range() -> None:
+    from simulator.wall_deposition import collapse_probed_notices
+
+    def notice(temperature_K: float, *, reason: str = "outside source band") -> dict:
+        return {
+            "authority_level": "extrapolated",
+            "temperature_K": temperature_K,
+            "valid_range_K": [701.0, 1361.0],
+            "reason": reason,
+        }
+
+    collapsed = collapse_probed_notices([
+        notice(500.0),
+        notice(500.0),
+        notice(900.0),
+    ])
+    assert len(collapsed) == 1
+    group = collapsed[0]
+    assert group["temperature_K"] == {"min": 500.0, "max": 900.0}
+    assert group["occurrences"] == 3
+    assert group["probe_ids_first"] == "evaporation"
+    assert group["probe_ids_last"] == "evaporation#3"
+    assert group["valid_range_K"] == [701.0, 1361.0]
+
+    again = collapse_probed_notices(collapsed)
+    assert again == collapsed
+
+    widened = collapse_probed_notices([*collapsed, notice(400.0)])
+    assert widened[0]["temperature_K"] == {"min": 400.0, "max": 900.0}
+    assert widened[0]["occurrences"] == 4
+    assert widened[0]["probe_ids_last"] == "evaporation#4"
+
+    split = collapse_probed_notices([notice(500.0), notice(500.0, reason="other")])
+    assert len(split) == 2
+    assert split[0]["temperature_K"] == 500.0
+    assert split[0]["occurrences"] == 1
+    assert split[1]["reason"] == "other"
+    assert split[1]["probe_ids_first"] == "evaporation#2"
 
 
 def test_evaporation_transport_notice_collapses_probe_floats() -> None:

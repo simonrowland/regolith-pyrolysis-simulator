@@ -23,24 +23,25 @@ sys.path.insert(0, str(ROOT))
 from simulator.runner import PyrolysisRun
 
 
-# Recorded at ffec48bd3 (before the series-law replay) and checked at the
-# replay tree. A digest change means the shortcut moved a product or a
-# solved partial, which the replay is not allowed to do.
+# Re-recorded on review/b773merge (fd0e31a79). Landings after ffec48bd3
+# moved the digests. The carrier-notice collapse does not: the same
+# command on the parent production files prints these hashes. A later
+# digest change means a product or a solved partial moved.
 C2A_PRODUCT_LEDGER_SHA256 = (
-    "00d08f19ac23e64096b12546d7fa4aacc00ce11cf3c337aebf432bf8ef55848a"
+    "cbe6602244716053985cb6d4b3b07ebc87b3cd316dabe83eb29f37d5c92a1351"
 )
 C2A_HEADSPACE_PARTIALS_SHA256 = (
-    "db243325831384731bb4de5324c66d8484f895c36609e1c61178244a63a11350"
+    "fc734f75199a55e297df3669d1e2d70ac7b173938704c7cb8a3bfbf63d31be55"
 )
 C2A_HEADSPACE_PARTIAL_HOURS = 21
 
-# ffec48bd3 lunar_mare_low_ti_C0_24h, same runner inputs as the golden
+# fd0e31a79 lunar_mare_low_ti_C0_24h, same runner inputs as the golden
 # scenario, float.hex of product_ledger() and of each solved partial map.
 C0_PRODUCT_LEDGER_SHA256 = (
-    "ba5a12ed88c41d328136de57725d0840141f7f5af1040c56342fd1e067dbbadb"
+    "33cc5c8d02ef415c85523a2bc616f9d095bb1659cb251937e61b44cbb7e9ad08"
 )
 C0_HEADSPACE_PARTIALS_SHA256 = (
-    "9afec3b33df54cfa1a72b42ec35f7d23b6fc4ade0e27fe999daea6eae8ff8907"
+    "a18950d478e22c561e2d1107c8bea71a100471b1705b0595cd43d49b1d3d3968"
 )
 C0_HEADSPACE_PARTIAL_HOURS = 19
 

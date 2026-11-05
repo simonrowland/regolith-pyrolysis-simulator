@@ -246,6 +246,93 @@ def merge_collapsed_evaporation_transport_notices(
         _merge_species_transport_notices(current, by_segment, segment=segment)
 
 
+def collapse_probed_notices(
+    notices: Any,
+    *,
+    segment: str = "evaporation",
+) -> list[dict[str, Any]]:
+    """Store one content group per identity.
+
+    Identity is every non-float field plus the float field names. Equal
+    floats stay a scalar; differing floats become ``{min, max}``. Each
+    group keeps ``occurrences`` and the probe-id span.
+    """
+
+    rows = [
+        item for item in notices
+        if isinstance(item, Mapping)
+    ] if isinstance(notices, (list, tuple)) else []
+    if not rows:
+        return []
+    next_ordinal = 1
+    for record in rows:
+        for label in (
+            record.get("probe_ids_first"),
+            record.get("probe_ids_last"),
+        ):
+            ordinal = _probe_ordinal(str(label or ""), segment)
+            if ordinal is not None:
+                next_ordinal = max(next_ordinal, ordinal + 1)
+    incoming: dict[str, Any] = {}
+    for record in rows:
+        plain = dict(record)
+        # The merge reads probe ids from the record, not from the dict key.
+        # Stamp a raw notice before it joins a group or the span stays put.
+        stamped = bool(plain.get("probe_ids_first")) or "occurrences" in plain
+        if stamped:
+            key = str(plain.get("probe_ids_first") or segment)
+        else:
+            key = _probe_label(segment, next_ordinal)
+            next_ordinal += 1
+            plain["occurrences"] = 1
+            plain["probe_ids_first"] = key
+            plain["probe_ids_last"] = key
+        while key in incoming:
+            key = _probe_label(segment, next_ordinal)
+            next_ordinal += 1
+            if not stamped:
+                plain["probe_ids_first"] = key
+                plain["probe_ids_last"] = key
+        incoming[key] = plain
+    grouped: dict[str, Any] = {}
+    _merge_species_transport_notices(grouped, incoming, segment=segment)
+
+    def _order(item: tuple[str, Any]) -> tuple[bool, int, str]:
+        key, record = item
+        ordinal = _probe_ordinal(
+            str(record.get("probe_ids_first") or key),
+            segment,
+        )
+        return (ordinal is None, 0 if ordinal is None else ordinal, key)
+
+    return [record for _, record in sorted(grouped.items(), key=_order)]
+
+
+def with_collapsed_carrier_notices(
+    record: Mapping[str, Any],
+) -> Mapping[str, Any]:
+    """Return ``record`` with its extrapolation-notice list collapsed.
+
+    The singular ``extrapolation_notice`` is the selected carrier's display
+    copy and is left unchanged. No list means the record is returned as-is.
+    """
+
+    extra = record.get("extra")
+    if not isinstance(extra, Mapping):
+        return record
+    listed = extra.get("extrapolation_notices")
+    if not isinstance(listed, (list, tuple)):
+        return record
+    collapsed = collapse_probed_notices(listed)
+    if not collapsed:
+        return record
+    copied = dict(record)
+    copied_extra = dict(extra)
+    copied_extra["extrapolation_notices"] = collapsed
+    copied["extra"] = copied_extra
+    return copied
+
+
 def _record_collapsed_transport_notice(
     model: Any,
     species: str,

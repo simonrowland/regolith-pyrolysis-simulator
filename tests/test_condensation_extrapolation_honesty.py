@@ -1179,15 +1179,51 @@ def test_carrier_merge_keeps_notices_on_both_severity_paths(path: str) -> None:
         "vapour_carrier_authority_by_species"
     ][species]
     extra = stored["extra"]
-    expected_temperatures = {
+    expected_temperatures = [
         notice["temperature_K"]
         for record in (prior, current)
         for notice in record["extra"]["extrapolation_notices"]
-    }
-    stored_temperatures = {
-        notice["temperature_K"] for notice in extra["extrapolation_notices"]
-    }
+    ]
     assert stored["pressure"]["kind"] == winner_pressure_kind
     assert extra["extrapolation_notice"]["temperature_K"] == winner_temperature_K
-    assert stored_temperatures == expected_temperatures
-    assert extra["extrapolation_notice"] in extra["extrapolation_notices"]
+    assert len(extra["extrapolation_notices"]) == 1
+    group = extra["extrapolation_notices"][0]
+    assert group["temperature_K"] == {
+        "min": min(expected_temperatures),
+        "max": max(expected_temperatures),
+    }
+    assert group["occurrences"] == len(expected_temperatures)
+    assert group["probe_ids_first"] == "evaporation"
+    assert group["probe_ids_last"] == f"evaporation#{len(expected_temperatures)}"
+    assert group["reason"] == "outside source band"
+    assert group["temperature_K"]["min"] <= winner_temperature_K <= group["temperature_K"]["max"]
+
+
+def test_published_carrier_maps_collapse_notice_lists() -> None:
+    from simulator.diagnostics import wall_deposit_sticking_authority_status
+
+    temperatures = (500.0, 900.0, 700.0)
+    record = _carrier_with_notices(
+        "P2",
+        refused=True,
+        singular_K=temperatures[0],
+        also_K=temperatures[1:],
+    )
+    record["refusal_code"] = "inapplicable_by_declared_predicate"
+    payload = wall_deposit_sticking_authority_status(
+        {},
+        {"vapour_carrier_authority_by_species": {"P2": record}},
+    )
+    for key in (
+        "vapour_carrier_authority_by_species",
+        "not_applicable_by_species",
+    ):
+        notices = payload[key]["P2"]["extra"]["extrapolation_notices"]
+        assert len(notices) == 1
+        assert notices[0]["temperature_K"] == {"min": 500.0, "max": 900.0}
+        assert notices[0]["occurrences"] == 3
+        assert notices[0]["probe_ids_first"] == "evaporation"
+        assert notices[0]["probe_ids_last"] == "evaporation#3"
+    assert payload["vapour_carrier_authority_by_species"]["P2"]["extra"][
+        "extrapolation_notice"
+    ]["temperature_K"] == 500.0

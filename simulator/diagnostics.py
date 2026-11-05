@@ -1200,11 +1200,13 @@ def _uncertified_alpha_species(
 def _vapour_carrier_authority_by_species(
     notice: Mapping[str, Any],
 ) -> dict[str, Mapping[str, Any]]:
+    from simulator.wall_deposition import with_collapsed_carrier_notices
+
     raw = notice.get("vapour_carrier_authority_by_species")
     if not isinstance(raw, Mapping):
         return {}
     return {
-        str(species): record
+        str(species): with_collapsed_carrier_notices(record)
         for species, record in raw.items()
         if isinstance(record, Mapping)
     }
@@ -1220,9 +1222,13 @@ def _inapplicable_carrier_records(
             result[species] = _plain_mapping(record)
     raw = notice.get("not_applicable_by_species")
     if isinstance(raw, Mapping):
+        from simulator.wall_deposition import with_collapsed_carrier_notices
+
         for species, record in raw.items():
             if isinstance(record, Mapping):
-                result[str(species)] = _plain_mapping(record)
+                result[str(species)] = _plain_mapping(
+                    with_collapsed_carrier_notices(record)
+                )
     return result
 
 

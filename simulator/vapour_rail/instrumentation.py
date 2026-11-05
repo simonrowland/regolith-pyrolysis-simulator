@@ -109,6 +109,28 @@ def merge_vapour_carrier_lineage(
     return list(merged)
 
 
+def _carrier_extrapolation_notice_rows(carrier: Any) -> list[Mapping[str, Any]]:
+    """Rows to merge for one carrier.
+
+    A stored list is the collapsed history and already covers the singular
+    display notice. Counting that singular again would add the same probe
+    on every later merge.
+    """
+
+    extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
+    if not isinstance(extra, Mapping):
+        return []
+    listed = extra.get("extrapolation_notices")
+    if isinstance(listed, (list, tuple)):
+        rows = [item for item in listed if isinstance(item, Mapping)]
+        if rows:
+            return rows
+    singular = extra.get("extrapolation_notice")
+    if isinstance(singular, Mapping):
+        return [singular]
+    return []
+
+
 def merge_vapour_carrier_extrapolation_notices(
     selected_record: Mapping[str, Any],
     *source_records: Any,
@@ -121,18 +143,17 @@ def merge_vapour_carrier_extrapolation_notices(
     merged_extra = copy.deepcopy(dict(extra)) if isinstance(extra, Mapping) else {}
     notices: list[dict[str, Any]] = []
     for carrier in (selected_record, *source_records):
-        carrier_extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
-        if not isinstance(carrier_extra, Mapping):
-            continue
-        candidates = [carrier_extra.get("extrapolation_notice")]
-        candidates.extend(carrier_extra.get("extrapolation_notices", ()))
-        for notice in candidates:
-            if isinstance(notice, Mapping) and notice not in notices:
+        for notice in _carrier_extrapolation_notice_rows(carrier):
+            if notice not in notices:
                 notices.append(copy.deepcopy(dict(notice)))
     if notices:
         merged_extra.setdefault("extrapolation_notice", notices[0])
         if include_all_notices:
-            merged_extra["extrapolation_notices"] = notices
+            from simulator.wall_deposition import collapse_probed_notices
+
+            merged_extra["extrapolation_notices"] = collapse_probed_notices(
+                notices,
+            )
         merged_record["extra"] = merged_extra
     return merged_record
 
