@@ -6368,13 +6368,58 @@ def _stage_temp_band_C(stage: CondensationStage) -> tuple[float, float]:
     return float(lo_C), float(hi_C)
 
 
-def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
+def _ordered_stage_band_C(stage: CondensationStage) -> tuple[float, float]:
+    """Finite cold-to-hot stage band.
+
+    Capture's midpoint and the fog cold end both refuse a non-finite or
+    reversed band before they convert a Celsius sample to kelvin.
+    """
+
     lo_C, hi_C = _stage_temp_band_C(stage)
     if not all(math.isfinite(value) for value in (lo_C, hi_C)) or lo_C > hi_C:
-        raise DepositionInputRefusal('stage_temperature', (lo_C, hi_C), 'finite ordered band required')
+        raise DepositionInputRefusal(
+            'stage_temperature', (lo_C, hi_C), 'finite ordered band required',
+        )
+    return lo_C, hi_C
+
+
+def _stage_midpoint_temperature_K(stage: CondensationStage) -> float:
+    lo_C, hi_C = _ordered_stage_band_C(stage)
     temperature_K = (lo_C + hi_C) / 2.0 + CELSIUS_TO_KELVIN_OFFSET
     if temperature_K <= 0.0:
         raise DepositionInputRefusal('T_surface_K', temperature_K, 'must be above absolute zero')
+    return temperature_K
+
+
+def _stage_cold_end_temperature_K(stage: CondensationStage) -> float:
+    """Cold end of the declared band, for the fog clearance only.
+
+    Premise. The band declares every wall from its cold end to its hot
+    end. Nucleation along that wall is limited by the cold end. Capture,
+    the film temperature, and the heat-exchanger wall stay on
+    ``_stage_midpoint_temperature_K``.
+
+    Algebra. T_cold [K] = min(temp_range_C) + 273.15. The ordered band
+    makes the first endpoint that minimum. An isothermal band has equal
+    ends, so this temperature is that single wall.
+
+    Units. The endpoints are degrees Celsius. The offset is the exact
+    Celsius definition, so the result is kelvin.
+
+    Limits. A non-finite or reversed band raises through
+    ``_ordered_stage_band_C``, the same refusal as the midpoint. A cold
+    end at or below 0 K raises here. That absolute-zero check stays on
+    this temperature: a midpoint above 0 K does not make the cold end
+    above 0 K. The film temperature and the capture-band sample loop
+    keep their own copies for their own temperatures.
+    """
+
+    lo_C, hi_C = _ordered_stage_band_C(stage)
+    temperature_K = min(lo_C, hi_C) + CELSIUS_TO_KELVIN_OFFSET
+    if temperature_K <= 0.0:
+        raise DepositionInputRefusal(
+            'T_surface_K', temperature_K, 'must be above absolute zero',
+        )
     return temperature_K
 
 
@@ -6479,17 +6524,21 @@ def _stage_vapour_fog_notice(
     The area-mean bulk temperature stays ``bulk_temperature_K``. It is
     the integral of the stage energy balance
     (``_stage_bulk_mean_temperature_K``), not the film. The cold-wall
-    claim is also evaluated at the stage wall temperature, the band
-    midpoint, at the same partial pressure. That wall is the coldest
-    gas the stream touches. The notice code is the worse of the two:
-    fog, then unevaluable, then clear. Both temperatures are reported
-    with their basis.
+    claim is evaluated at the cold end of the declared band,
+    ``min(temp_range_C)``, at the same partial pressure. That end is
+    the coldest wall the stream is declared to touch. The notice code
+    is the worse of the bulk and that cold wall: fog, then
+    unevaluable, then clear. Both temperatures are reported with their
+    basis.
 
-    A hot bulk undersaturates sodium even on a cold wall: 5.89 Pa at
-    250 C gives J ~ 187 m^-3 s^-1, and the same partial at the melt
-    temperature is undersaturated, so J is 0. The 250 C sample is what
-    decides the cold-wall claim. A wide wall band is not scanned again:
-    Stage 5's wall is its midpoint, not a third sample at the cold end.
+    A hot bulk undersaturates sodium even when the cold end fogs.
+    5.89 Pa at 250 C gives J ~ 187 m^-3 s^-1, and the same partial at
+    the melt temperature is undersaturated, so J is 0. On an isothermal
+    band the cold end is that wall, so the 250 C sample decides the
+    cold-wall claim. A wide band is not represented by its midpoint:
+    Stage 5 is [200, 350] C, and this wall sample is 200 C. Capture's
+    film temperature still uses the band midpoint. This sample does
+    not replace it.
 
     The returned eta is unchanged. When the worse J exceeds the fog
     threshold the notice marks that eta as an upper bound, not as the
@@ -6503,7 +6552,7 @@ def _stage_vapour_fog_notice(
     when either sample is outside its band.
     """
 
-    wall_temperature_K = _stage_midpoint_temperature_K(stage)
+    wall_temperature_K = _stage_cold_end_temperature_K(stage)
     notice: dict[str, Any] = {
         'code': NOTICE_UNEVALUABLE,
         'stage_number': int(stage.stage_number),
@@ -6733,8 +6782,9 @@ def _stage_bulk_mean_temperature_K(
         integral_0^1 T(xi) d xi
     because the approach is exponential. NTU -> 0 makes LMTD -> T_in - T_wall,
     so T_mean -> T_in. The fog notice keeps this mean as the bulk
-    temperature. The cold-wall clearance is a second sample at the stage
-    wall, in ``_stage_vapour_fog_notice``.
+    temperature. Its cold-wall clearance is a second sample at the cold
+    end of the stage band, in ``_stage_vapour_fog_notice``. This
+    exchanger wall stays the band midpoint.
     """
 
     gas_inlet_K, wall_K, ntu = _exchanger_state(gas_inlet_K, wall_K, ntu)
