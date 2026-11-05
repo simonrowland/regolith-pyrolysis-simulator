@@ -3632,8 +3632,8 @@ def test_b704_volatile_cells_are_classified_before_closure(
         assert refusal is None
     else:
         assert refusal is not None
-        assert not refusal.closure_refusal
-        # Invalid volatile cells are checked before any closure refusal.
+        assert refusal.closure_refusal
+        # green never read this contributor; m1 reports its bad cell.
         assert (
             "malformed printed volatile component amount for 'H2O'"
             in refusal.reason
@@ -5835,7 +5835,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             True,
             id="m1-missing-major",
         ),
-        # Invalid cells in every closure contributor precede closure checks.
+        # green never read this sibling volatile contributor.
         pytest.param(
             "sibling-volatile-negative",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5848,10 +5848,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "H2O_wt_pct": "-1",
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            False,
+            True,
             id="negative-sibling-volatile-precedes-missing-major",
         ),
-        # Unparseable sibling volatile cells use the same early validation.
+        # green never read this sibling volatile contributor.
         pytest.param(
             "sibling-volatile-malformed",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5864,10 +5864,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "H2O_wt_pct": "unreadable",
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            False,
+            True,
             id="malformed-sibling-volatile-precedes-missing-major",
         ),
-        # Nested printed-composition volatile cells also contribute to closure.
+        # green never read this nested printed volatile contributor.
         pytest.param(
             "nested-printed-volatile-malformed",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5887,10 +5887,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 }
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            False,
+            True,
             id="malformed-nested-printed-volatile-precedes-missing-major",
         ),
-        # Closure-only cells are checked before missing-major closure rules.
+        # green never read this closure-only contributor.
         pytest.param(
             "closure-only-negative",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5903,10 +5903,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "_migrate_closure_only_components": {"S": "-1"},
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            False,
+            True,
             id="negative-closure-component-precedes-missing-major",
         ),
-        # Validate every alias even when a higher-priority alias is numeric.
+        # green never read either volatile alias, even when one is numeric.
         pytest.param(
             "duplicate-volatile-alias-malformed",
             {"SiO2": "100"},
@@ -5918,7 +5918,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 },
             },
             {"SiO2": "100"},
-            False,
+            True,
             id="malformed-duplicate-volatile-alias",
         ),
         pytest.param(

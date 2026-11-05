@@ -4183,7 +4183,6 @@ _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
 _MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("102")
 _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("0.5")
 _GREEN_READ_OXIDE_MAP = "green-read oxide map"
-_EARLY_CLOSURE_CELL_VALIDATION = "early closure-cell validation"
 _M1_ONLY_CLOSURE_CONTRIBUTOR = "m1-only closure contributor"
 _PRINTED_FORMULA_TOKEN = r"(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?|\.\d+)?)+"
 _PRINTED_FORMULA_COMPONENT_RE = re.compile(rf"^{_PRINTED_FORMULA_TOKEN}$")
@@ -4643,7 +4642,7 @@ def _printed_volatile_mass_percent(
 
     def reject(reason: str) -> None:
         if diagnostics is not None and reason not in reported:
-            diagnostics.append((_EARLY_CLOSURE_CELL_VALIDATION, reason))
+            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, reason))
             reported.add(reason)
 
     for scope in scopes:
@@ -4695,7 +4694,7 @@ def _printed_composition_closure_components(
         if kind == "malformed" and diagnostics is not None:
             diagnostics.append(
                 (
-                    _EARLY_CLOSURE_CELL_VALIDATION,
+                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
                     "malformed printed closure component amount for "
                     f"{name!r}: {value!r}",
                 )
@@ -5079,7 +5078,7 @@ def _wt_percent_conversion_or_refusal(
             if not amount.is_finite() or amount < 0:
                 diagnostics.append(
                     (
-                        _EARLY_CLOSURE_CELL_VALIDATION,
+                        _M1_ONLY_CLOSURE_CONTRIBUTOR,
                         "printed closure component has negative or non-finite "
                         f"amount for {name!r}: {amount!r}",
                     )
@@ -5165,14 +5164,13 @@ def _wt_percent_conversion_or_refusal(
                 )
             )
 
-        # Green oxide-map failures and invalid cells in any closure contributor
-        # take precedence; only the remaining m1 closure checks are flagged.
-        early_reason = next(
+        # Only Green-read oxide-map failures are unflagged; all m1-only
+        # contributor and closure-check failures are flagged.
+        green_reason = next(
             (
                 reason
                 for source, reason in diagnostics
-                if source
-                in {_GREEN_READ_OXIDE_MAP, _EARLY_CLOSURE_CELL_VALIDATION}
+                if source == _GREEN_READ_OXIDE_MAP
             ),
             None,
         )
@@ -5184,9 +5182,9 @@ def _wt_percent_conversion_or_refusal(
             ),
             None,
         )
-        if early_reason is not None:
+        if green_reason is not None:
             return None, _CompositionRefusal(
-                f"mass-percent composition is not usable: {early_reason}"
+                f"mass-percent composition is not usable: {green_reason}"
             )
         if m1_reason is not None:
             return None, _CompositionRefusal(
