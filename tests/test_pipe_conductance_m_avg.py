@@ -631,7 +631,12 @@ def test_setpoint_condenser_geometry_defaults_anchor_throat_and_stage_areas():
     assert model.pipe_diameter_m == pytest.approx(0.12)
     assert model.stage_area_m2("fe_stage1") == pytest.approx(0.2828, abs=0.0)
     assert model.stage_area_m2("alkali_stage4") == pytest.approx(0.051, abs=1e-15)
-    assert model.stage_area_m2("k_stage4b") == pytest.approx(0.064, abs=0.0)
+    # d-344: area is the shipped throat times the k_stage4b ratio, not the
+    # pre-ruling 0.064 m2. The product is 14.7388 m2 at the 0.120 m throat.
+    assert model.stage_area_m2("k_stage4b") == pytest.approx(
+        throat_area_m2 * float(ratios["k_stage4b"]),
+        abs=0.0,
+    )
     assert "k_stage4b" not in model.stage_hydraulic_diameter_m
     assert model.stage_hydraulic_diameter_m["fe_stage1"] == pytest.approx(0.020)
     assert "cr_stage2" not in model.stage_hydraulic_diameter_m
@@ -811,16 +816,19 @@ def test_default_stage_geometry_provenance_reaches_coating_authority():
     assert fe_source.startswith("owner-ruling-d335:")
     assert "0.2828 m2" in fe_source
     assert "provisional" not in fe_source
-    for key, area_text in (
-        ("alkali_stage4", "0.051 m2"),
-        ("k_stage4b", "0.064 m2"),
-    ):
-        source = by_stage[key]["source"]
-        assert source.startswith("owner-ruling-d137:")
-        assert "provisional" in source
-        assert "b-588" in source and "b-599" in source
-        assert area_text in source
-        assert by_stage[key]["status"] == "provisional"
+    alkali_source = by_stage["alkali_stage4"]["source"]
+    assert alkali_source.startswith("owner-ruling-d137:")
+    assert "provisional" in alkali_source
+    assert "b-588" in alkali_source and "b-599" in alkali_source
+    assert "0.051 m2" in alkali_source
+    assert by_stage["alkali_stage4"]["status"] == "provisional"
+    cartridge_source = by_stage["k_stage4b"]["source"]
+    cartridge_area_m2 = overhead.stage_area_m2("k_stage4b")
+    assert cartridge_source.startswith("owner-ruling-d344:")
+    assert "provisional" in cartridge_source
+    assert "b-588" in cartridge_source and "b-599" in cartridge_source
+    assert f"{cartridge_area_m2:.4f} m2" in cartridge_source
+    assert by_stage["k_stage4b"]["status"] == "provisional"
 
 
 def test_legacy_headspace_conductance_alias_survives_new_none_key():
