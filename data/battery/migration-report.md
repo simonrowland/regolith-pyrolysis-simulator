@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 89571
-records out (observations): 179531
-works: 756
-experiments: 6874
-queue size: 120477
+rows in: 89661
+records out (observations): 179718
+works: 759
+experiments: 6878
+queue size: 120579
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 754
+index sources: 757
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,10 +197,10 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 753 (mismatch) |
+| citations | 147 | 756 (mismatch) |
 | doi_works | 56 | 408 (mismatch) |
-| no_doi_works | 91 | 348 (mismatch) |
-| admission_statuses | 374 | 30757 (mismatch) |
+| no_doi_works | 91 | 351 (mismatch) |
+| admission_statuses | 374 | 30794 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1369 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
@@ -208,7 +208,7 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
 | formulas | 1625 | 22022 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15688 (mismatch) |
+| absent_admissions | 3511 | 15741 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
 | range_only_T | 3125 | 2921 (mismatch) |
 | system_like_phases | 1065 | 3809 (mismatch) |
@@ -19434,6 +19434,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 115 | 81 |
 | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 42 | 83 |
 | `data/literature/extracts/myers-jacobson-2015-volatile-metal-hydroxides-presentation.yaml` | 4 | 4 | 4 |
+| `data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml` | 34 | 34 | 34 |
+| `data/literature/extracts/mysen-1985-cmas-redox.yaml` | 3 | 100 | 15 |
+| `data/literature/extracts/mysen-virgo-1989-nas-redox.yaml` | 53 | 53 | 53 |
 | `data/literature/extracts/naess-2014-liquid-silicon-oxidation-fume-flux.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/nagabayashi-hino-banya-1989-phosphorus.yaml` | 10 | 14 | 48 |
 | `data/literature/extracts/nagahara-2000-metsoc63-5166.yaml` | 0 | 0 | 1 |
@@ -19854,8 +19857,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 297057
+advisory issues: 297280
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 297057 |
+| `identity_incomplete` | 297280 |
