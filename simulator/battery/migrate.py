@@ -4244,6 +4244,14 @@ def _printed_mass_percent_number(value: object) -> Decimal | None:
     return amount
 
 
+def _is_skipped_composition_map_walk_key(name: object, value: object) -> bool:
+    kind, _amount = _classify_composition_cell(value)
+    # Numeric cells under walker keys are unsupported components in explicit maps.
+    return (
+        str(name) in _WALK_SKIP_KEYS or str(name) == "locator"
+    ) and kind != "number"
+
+
 def _printed_composition_map(payload: object) -> Mapping[str, Any] | None:
     if not isinstance(payload, Mapping):
         return None
@@ -4259,20 +4267,19 @@ def _printed_composition_map(payload: object) -> Mapping[str, Any] | None:
         return {
             str(key): value
             for key, value in components.items()
-            if key not in _WALK_SKIP_KEYS and key != "locator"
+            if not _is_skipped_composition_map_walk_key(key, value)
         }
     if isinstance(components, (list, tuple)):
         return {
             str(pair[0]): pair[1]
             for pair in components
             if isinstance(pair, (list, tuple)) and len(pair) == 2
-            and str(pair[0]) not in _WALK_SKIP_KEYS
-            and str(pair[0]) != "locator"
+            and not _is_skipped_composition_map_walk_key(pair[0], pair[1])
         }
     return {
         str(key): value
         for key, value in payload.items()
-        if key not in _WALK_SKIP_KEYS and key != "locator"
+        if not _is_skipped_composition_map_walk_key(key, value)
     }
 
 
@@ -4779,7 +4786,7 @@ def _oxide_mass_percent_components(
             return
         name, _has_mass_suffix = _mass_percent_component_key(raw_name)
         if (
-            raw_name == "locator"
+            _is_skipped_composition_map_walk_key(raw_name, raw_amount)
             or _is_composition_map_noncomponent_name(
                 raw_name, explicit_map_value=raw_amount
             )
@@ -15297,7 +15304,7 @@ def _printed_fingerprint(raw: object) -> PrintedFingerprint | None:
         return None
     pairs: list[tuple[str, str | None]] = []
     for key, value in raw.items():
-        if key in _WALK_SKIP_KEYS or key == "locator":
+        if _is_skipped_composition_map_walk_key(key, value):
             continue
         kind, number = _classify_composition_cell(value)
         pairs.append(

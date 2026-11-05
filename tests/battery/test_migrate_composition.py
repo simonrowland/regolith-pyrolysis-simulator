@@ -1166,6 +1166,58 @@ def test_numeric_metadata_in_explicit_map_uses_unsupported_trace_policy() -> Non
     }
 
 
+def test_nested_printed_composition_walk_metadata_is_value_aware() -> None:
+    rejected_context = {
+        "point_conditions": {
+            "printed_composition": {"SiO2": "50", "MgO": "50", "note": "1"}
+        }
+    }
+    converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context=rejected_context,
+    )
+    # Green accepted the oxide map because it never read this nested note; m1 flags its >0.5 wt% contribution.
+    assert converted is None
+    assert refusal is not None and refusal.closure_refusal
+    assert "note=1 wt%" in refusal.reason
+
+    trace_context = {
+        "point_conditions": {
+            "printed_composition": {
+                "SiO2": "49.85",
+                "MgO": "49.85",
+                "note": "0.3",
+            }
+        }
+    }
+    trace, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")},
+        closure_context=trace_context,
+    )
+    # Green accepted the oxide map without reading the nested note; m1 accepts and discloses its trace.
+    assert refusal is None and trace is not None
+    notice = migrate_module._composition_projection_notice(
+        {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")},
+        closure_context=trace_context,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+    )
+    assert notice is not None and notice.dropped == ("note",)
+    assert "note=0.3 wt%" in notice.reason
+
+    text_context = {
+        "point_conditions": {
+            "printed_composition": {"SiO2": "50", "MgO": "50", "note": "text"}
+        }
+    }
+    text_result, refusal = migrate_module._wt_percent_conversion_or_refusal(
+        {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+        closure_context=text_context,
+    )
+    # Green accepted the oxide map without reading this non-numeric nested note; m1 ignores the metadata.
+    assert refusal is None and text_result is not None
+
+
 def test_declared_flat_map_counts_numeric_unsupported_entries() -> None:
     rejected = {
         "SiO2": "50",
