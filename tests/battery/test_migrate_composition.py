@@ -2801,6 +2801,7 @@ def test_migrate_keeps_ilmenite_and_drops_sample_code(tmp_path: Path) -> None:
                                 {
                                     "test": "2b",
                                     "sample": "FeTiO3",
+                                    "species_as_printed": "FeTiO3",
                                     "mass_loss_pct": 16.0,
                                     "Tmax_C": 800,
                                 },

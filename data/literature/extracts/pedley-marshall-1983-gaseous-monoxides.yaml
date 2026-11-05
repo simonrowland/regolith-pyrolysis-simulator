@@ -18,10 +18,10 @@ scope_assessment:
   note: This review reports no new experiment. Table values are the authors' assessed compilation, not measurements made in this work.
 fidelity_samples:
   - path: species.gaseous_monoxide_assessments.observations[0].values.rows[0]
-    value: {'sample': 'AgO', 'delta_fH': 75.0}
+    value: {'sample': 'AgO', 'species_as_printed': 'AgO', 'delta_fH': 75.0}
     locator: {published_page: 982, table: 4}
   - path: species.gaseous_monoxide_assessments.observations[1].values.rows[65]
-    value: {'sample': 'ZrO', 'delta_fH': 82}
+    value: {'sample': 'ZrO', 'species_as_printed': 'ZrO', 'delta_fH': 82}
     locator: {published_page: 983, table: 5}
   - species: gaseous_monoxide_assessments
     observation_id: pedley_marshall_1983_appendix_ii_page_1017_molecular_parameters
@@ -851,72 +851,72 @@ species:
             Table 4 is printed in kcal/mol; migration stores delta_fH in kJ/mol through the exact thermochemical ×4.184 conversion. Table 5 is the printed kJ/mol assessment.
           quantity: delta_fH
           rows:
-            - {"sample": "AgO", "delta_fH": 75.0}
-            - {"sample": "AlO", "delta_fH": 16.0}
-            - {"sample": "AuO", "delta_fH": 94.5}
-            - {"sample": "BO", "delta_fH": 0.0}
-            - {"sample": "BaO", "delta_fH": -32.0}
-            - {"sample": "BeO", "delta_fH": 33.0}
-            - {"sample": "BiO", "delta_fH": 29.0}
-            - {"sample": "CaO", "delta_fH": 6.0}
-            - {"sample": "CdO", "delta_fH": 30.0, "method_class": "author_estimate"}
-            - {"sample": "CeO", "delta_fH": -32.0}
-            - {"sample": "CoO", "delta_fH": 70.0}
-            - {"sample": "CrO", "delta_fH": 52.0}
-            - {"sample": "CsO", "delta_fH": 7.0}
-            - {"sample": "CuO", "delta_fH": 76.0}
-            - {"sample": "DyO", "delta_fH": -18.0}
-            - {"sample": "ErO", "delta_fH": -10.0}
-            - {"sample": "EuO", "delta_fH": -14.0}
-            - {"sample": "FeO", "delta_fH": 65.5}
-            - {"sample": "GaO", "delta_fH": 40.0}
-            - {"sample": "GdO", "delta_fH": -16.5}
-            - {"sample": "GeO", "delta_fH": -8.5}
-            - {"sample": "HfO", "delta_fH": 16.0}
-            - {"sample": "HoO", "delta_fH": -14.5}
-            - {"sample": "IrO", "delta_fH": 120.5}
-            - {"sample": "KO", "delta_fH": 14.5}
-            - {"sample": "LaO", "delta_fH": -29.0}
-            - {"sample": "LiO", "delta_fH": 18.0}
-            - {"sample": "LuO", "delta_fH": 0.5}
-            - {"sample": "MgO", "delta_fH": 8.0}
-            - {"sample": "MnO", "delta_fH": 31.0}
-            - {"sample": "MoO", "delta_fH": 83.0}
-            - {"sample": "NaO", "delta_fH": 24.0}
-            - {"sample": "NbO", "delta_fH": 47.5}
-            - {"sample": "NdO", "delta_fH": -30.0}
-            - {"sample": "NiO", "delta_fH": 71.0}
-            - {"sample": "NpO", "delta_fH": -1.0}
-            - {"sample": "OsO", "delta_fH": 105.0, "method_class": "author_estimate"}
-            - {"sample": "PO", "delta_fH": -8.0}
-            - {"sample": "PbO", "delta_fH": 15.0}
-            - {"sample": "PdO", "delta_fH": 58.5, "method_class": "author_estimate"}
-            - {"sample": "PrO", "delta_fH": -34.0}
-            - {"sample": "PtO", "delta_fH": 101.0}
-            - {"sample": "PuO", "delta_fH": -29.0}
-            - {"sample": "ReO", "delta_fH": 95.0, "method_class": "author_estimate"}
-            - {"sample": "RhO", "delta_fH": 95.0}
-            - {"sample": "RuO", "delta_fH": 89.0}
-            - {"sample": "SO", "delta_fH": 1.0}
-            - {"sample": "SbO", "delta_fH": 19.0}
-            - {"sample": "ScO", "delta_fH": -13.0}
-            - {"sample": "SeO", "delta_fH": 2.0}
-            - {"sample": "SiO", "delta_fH": -24.0}
-            - {"sample": "SmO", "delta_fH": -28.0}
-            - {"sample": "SnO", "delta_fH": 4.5}
-            - {"sample": "SrO", "delta_fH": -3.0}
-            - {"sample": "TaO", "delta_fH": 55.5}
-            - {"sample": "TbO", "delta_fH": -17.0}
-            - {"sample": "TeO", "delta_fH": 16.5}
-            - {"sample": "ThO", "delta_fH": -7.5}
-            - {"sample": "TiO", "delta_fH": 12.0}
-            - {"sample": "TmO", "delta_fH": -7.0}
-            - {"sample": "UO", "delta_fH": 6.0}
-            - {"sample": "VO", "delta_fH": 33.0}
-            - {"sample": "WO", "delta_fH": 102.0}
-            - {"sample": "YO", "delta_fH": -11.0}
-            - {"sample": "YbO", "delta_fH": -4.0}
-            - {"sample": "ZrO", "delta_fH": 19.5}
+            - {"sample": "AgO", "species_as_printed": "AgO", "delta_fH": 75.0}
+            - {"sample": "AlO", "species_as_printed": "AlO", "delta_fH": 16.0}
+            - {"sample": "AuO", "species_as_printed": "AuO", "delta_fH": 94.5}
+            - {"sample": "BO", "species_as_printed": "BO", "delta_fH": 0.0}
+            - {"sample": "BaO", "species_as_printed": "BaO", "delta_fH": -32.0}
+            - {"sample": "BeO", "species_as_printed": "BeO", "delta_fH": 33.0}
+            - {"sample": "BiO", "species_as_printed": "BiO", "delta_fH": 29.0}
+            - {"sample": "CaO", "species_as_printed": "CaO", "delta_fH": 6.0}
+            - {"sample": "CdO", "species_as_printed": "CdO", "delta_fH": 30.0, "method_class": "author_estimate"}
+            - {"sample": "CeO", "species_as_printed": "CeO", "delta_fH": -32.0}
+            - {"sample": "CoO", "species_as_printed": "CoO", "delta_fH": 70.0}
+            - {"sample": "CrO", "species_as_printed": "CrO", "delta_fH": 52.0}
+            - {"sample": "CsO", "species_as_printed": "CsO", "delta_fH": 7.0}
+            - {"sample": "CuO", "species_as_printed": "CuO", "delta_fH": 76.0}
+            - {"sample": "DyO", "species_as_printed": "DyO", "delta_fH": -18.0}
+            - {"sample": "ErO", "species_as_printed": "ErO", "delta_fH": -10.0}
+            - {"sample": "EuO", "species_as_printed": "EuO", "delta_fH": -14.0}
+            - {"sample": "FeO", "species_as_printed": "FeO", "delta_fH": 65.5}
+            - {"sample": "GaO", "species_as_printed": "GaO", "delta_fH": 40.0}
+            - {"sample": "GdO", "species_as_printed": "GdO", "delta_fH": -16.5}
+            - {"sample": "GeO", "species_as_printed": "GeO", "delta_fH": -8.5}
+            - {"sample": "HfO", "species_as_printed": "HfO", "delta_fH": 16.0}
+            - {"sample": "HoO", "species_as_printed": "HoO", "delta_fH": -14.5}
+            - {"sample": "IrO", "species_as_printed": "IrO", "delta_fH": 120.5}
+            - {"sample": "KO", "species_as_printed": "KO", "delta_fH": 14.5}
+            - {"sample": "LaO", "species_as_printed": "LaO", "delta_fH": -29.0}
+            - {"sample": "LiO", "species_as_printed": "LiO", "delta_fH": 18.0}
+            - {"sample": "LuO", "species_as_printed": "LuO", "delta_fH": 0.5}
+            - {"sample": "MgO", "species_as_printed": "MgO", "delta_fH": 8.0}
+            - {"sample": "MnO", "species_as_printed": "MnO", "delta_fH": 31.0}
+            - {"sample": "MoO", "species_as_printed": "MoO", "delta_fH": 83.0}
+            - {"sample": "NaO", "species_as_printed": "NaO", "delta_fH": 24.0}
+            - {"sample": "NbO", "species_as_printed": "NbO", "delta_fH": 47.5}
+            - {"sample": "NdO", "species_as_printed": "NdO", "delta_fH": -30.0}
+            - {"sample": "NiO", "species_as_printed": "NiO", "delta_fH": 71.0}
+            - {"sample": "NpO", "species_as_printed": "NpO", "delta_fH": -1.0}
+            - {"sample": "OsO", "species_as_printed": "OsO", "delta_fH": 105.0, "method_class": "author_estimate"}
+            - {"sample": "PO", "species_as_printed": "PO", "delta_fH": -8.0}
+            - {"sample": "PbO", "species_as_printed": "PbO", "delta_fH": 15.0}
+            - {"sample": "PdO", "species_as_printed": "PdO", "delta_fH": 58.5, "method_class": "author_estimate"}
+            - {"sample": "PrO", "species_as_printed": "PrO", "delta_fH": -34.0}
+            - {"sample": "PtO", "species_as_printed": "PtO", "delta_fH": 101.0}
+            - {"sample": "PuO", "species_as_printed": "PuO", "delta_fH": -29.0}
+            - {"sample": "ReO", "species_as_printed": "ReO", "delta_fH": 95.0, "method_class": "author_estimate"}
+            - {"sample": "RhO", "species_as_printed": "RhO", "delta_fH": 95.0}
+            - {"sample": "RuO", "species_as_printed": "RuO", "delta_fH": 89.0}
+            - {"sample": "SO", "species_as_printed": "SO", "delta_fH": 1.0}
+            - {"sample": "SbO", "species_as_printed": "SbO", "delta_fH": 19.0}
+            - {"sample": "ScO", "species_as_printed": "ScO", "delta_fH": -13.0}
+            - {"sample": "SeO", "species_as_printed": "SeO", "delta_fH": 2.0}
+            - {"sample": "SiO", "species_as_printed": "SiO", "delta_fH": -24.0}
+            - {"sample": "SmO", "species_as_printed": "SmO", "delta_fH": -28.0}
+            - {"sample": "SnO", "species_as_printed": "SnO", "delta_fH": 4.5}
+            - {"sample": "SrO", "species_as_printed": "SrO", "delta_fH": -3.0}
+            - {"sample": "TaO", "species_as_printed": "TaO", "delta_fH": 55.5}
+            - {"sample": "TbO", "species_as_printed": "TbO", "delta_fH": -17.0}
+            - {"sample": "TeO", "species_as_printed": "TeO", "delta_fH": 16.5}
+            - {"sample": "ThO", "species_as_printed": "ThO", "delta_fH": -7.5}
+            - {"sample": "TiO", "species_as_printed": "TiO", "delta_fH": 12.0}
+            - {"sample": "TmO", "species_as_printed": "TmO", "delta_fH": -7.0}
+            - {"sample": "UO", "species_as_printed": "UO", "delta_fH": 6.0}
+            - {"sample": "VO", "species_as_printed": "VO", "delta_fH": 33.0}
+            - {"sample": "WO", "species_as_printed": "WO", "delta_fH": 102.0}
+            - {"sample": "YO", "species_as_printed": "YO", "delta_fH": -11.0}
+            - {"sample": "YbO", "species_as_printed": "YbO", "delta_fH": -4.0}
+            - {"sample": "ZrO", "species_as_printed": "ZrO", "delta_fH": 19.5}
       - observation_id: pedley_marshall_1983_table_5_assessed_formation_enthalpies
         type: gibbs_table
         locator: {published_page: 983, table: 5, note: Standard enthalpy of formation of gaseous monoxides at 298 K.}
@@ -930,69 +930,69 @@ species:
           evidence_class: compilation_assessed
           quantity: delta_fH
           rows:
-            - {"sample": "AgO", "delta_fH": 314}
-            - {"sample": "AlO", "delta_fH": 67}
-            - {"sample": "AuO", "delta_fH": 395}
-            - {"sample": "BO", "delta_fH": 0}
-            - {"sample": "BaO", "delta_fH": -134}
-            - {"sample": "BeO", "delta_fH": 138}
-            - {"sample": "BiO", "delta_fH": 121}
-            - {"sample": "CaO", "delta_fH": 25}
-            - {"sample": "CdO", "delta_fH": 126, "method_class": "author_estimate"}
-            - {"sample": "CeO", "delta_fH": -134}
-            - {"sample": "CoO", "delta_fH": 293}
-            - {"sample": "CrO", "delta_fH": 218}
-            - {"sample": "CsO", "delta_fH": 29}
-            - {"sample": "CuO", "delta_fH": 318}
-            - {"sample": "DyO", "delta_fH": -75}
-            - {"sample": "ErO", "delta_fH": -42}
-            - {"sample": "EuO", "delta_fH": -59}
-            - {"sample": "FeO", "delta_fH": 274}
-            - {"sample": "GaO", "delta_fH": 167}
-            - {"sample": "GdO", "delta_fH": -69}
-            - {"sample": "GeO", "delta_fH": -36}
-            - {"sample": "HfO", "delta_fH": 67}
-            - {"sample": "HoO", "delta_fH": -61}
-            - {"sample": "IrO", "delta_fH": 504}
-            - {"sample": "KO", "delta_fH": 61}
-            - {"sample": "LaO", "delta_fH": -121}
-            - {"sample": "LiO", "delta_fH": 75}
-            - {"sample": "LuO", "delta_fH": 2}
-            - {"sample": "MgO", "delta_fH": 33}
-            - {"sample": "MnO", "delta_fH": 130}
-            - {"sample": "MoO", "delta_fH": 347}
-            - {"sample": "NaO", "delta_fH": 100}
-            - {"sample": "NbO", "delta_fH": 199}
-            - {"sample": "NdO", "delta_fH": -126}
-            - {"sample": "NiO", "delta_fH": 297}
-            - {"sample": "NpO", "delta_fH": -4}
-            - {"sample": "OsO", "delta_fH": 439, "method_class": "author_estimate"}
-            - {"sample": "PO", "delta_fH": -33}
-            - {"sample": "PbO", "delta_fH": 63}
-            - {"sample": "PdO", "delta_fH": 245, "method_class": "author_estimate"}
-            - {"sample": "PrO", "delta_fH": -142}
-            - {"sample": "PtO", "delta_fH": 423}
-            - {"sample": "PuO", "delta_fH": -121}
-            - {"sample": "ReO", "delta_fH": 397, "method_class": "author_estimate"}
-            - {"sample": "RhO", "delta_fH": 397}
-            - {"sample": "RuO", "delta_fH": 372}
-            - {"sample": "SO", "delta_fH": 4}
-            - {"sample": "SbO", "delta_fH": 79}
-            - {"sample": "ScO", "delta_fH": -54}
-            - {"sample": "SeO", "delta_fH": 8}
-            - {"sample": "SiO", "delta_fH": -100}
-            - {"sample": "SmO", "delta_fH": -117}
-            - {"sample": "SnO", "delta_fH": 19}
-            - {"sample": "SrO", "delta_fH": -13}
-            - {"sample": "TaO", "delta_fH": 232}
-            - {"sample": "TbO", "delta_fH": -71}
-            - {"sample": "TeO", "delta_fH": 69}
-            - {"sample": "ThO", "delta_fH": -31}
-            - {"sample": "TiO", "delta_fH": 50}
-            - {"sample": "TmO", "delta_fH": -29}
-            - {"sample": "UO", "delta_fH": 25}
-            - {"sample": "VO", "delta_fH": 138}
-            - {"sample": "WO", "delta_fH": 427}
-            - {"sample": "YO", "delta_fH": -46}
-            - {"sample": "YbO", "delta_fH": -17}
-            - {"sample": "ZrO", "delta_fH": 82}
+            - {"sample": "AgO", "species_as_printed": "AgO", "delta_fH": 314}
+            - {"sample": "AlO", "species_as_printed": "AlO", "delta_fH": 67}
+            - {"sample": "AuO", "species_as_printed": "AuO", "delta_fH": 395}
+            - {"sample": "BO", "species_as_printed": "BO", "delta_fH": 0}
+            - {"sample": "BaO", "species_as_printed": "BaO", "delta_fH": -134}
+            - {"sample": "BeO", "species_as_printed": "BeO", "delta_fH": 138}
+            - {"sample": "BiO", "species_as_printed": "BiO", "delta_fH": 121}
+            - {"sample": "CaO", "species_as_printed": "CaO", "delta_fH": 25}
+            - {"sample": "CdO", "species_as_printed": "CdO", "delta_fH": 126, "method_class": "author_estimate"}
+            - {"sample": "CeO", "species_as_printed": "CeO", "delta_fH": -134}
+            - {"sample": "CoO", "species_as_printed": "CoO", "delta_fH": 293}
+            - {"sample": "CrO", "species_as_printed": "CrO", "delta_fH": 218}
+            - {"sample": "CsO", "species_as_printed": "CsO", "delta_fH": 29}
+            - {"sample": "CuO", "species_as_printed": "CuO", "delta_fH": 318}
+            - {"sample": "DyO", "species_as_printed": "DyO", "delta_fH": -75}
+            - {"sample": "ErO", "species_as_printed": "ErO", "delta_fH": -42}
+            - {"sample": "EuO", "species_as_printed": "EuO", "delta_fH": -59}
+            - {"sample": "FeO", "species_as_printed": "FeO", "delta_fH": 274}
+            - {"sample": "GaO", "species_as_printed": "GaO", "delta_fH": 167}
+            - {"sample": "GdO", "species_as_printed": "GdO", "delta_fH": -69}
+            - {"sample": "GeO", "species_as_printed": "GeO", "delta_fH": -36}
+            - {"sample": "HfO", "species_as_printed": "HfO", "delta_fH": 67}
+            - {"sample": "HoO", "species_as_printed": "HoO", "delta_fH": -61}
+            - {"sample": "IrO", "species_as_printed": "IrO", "delta_fH": 504}
+            - {"sample": "KO", "species_as_printed": "KO", "delta_fH": 61}
+            - {"sample": "LaO", "species_as_printed": "LaO", "delta_fH": -121}
+            - {"sample": "LiO", "species_as_printed": "LiO", "delta_fH": 75}
+            - {"sample": "LuO", "species_as_printed": "LuO", "delta_fH": 2}
+            - {"sample": "MgO", "species_as_printed": "MgO", "delta_fH": 33}
+            - {"sample": "MnO", "species_as_printed": "MnO", "delta_fH": 130}
+            - {"sample": "MoO", "species_as_printed": "MoO", "delta_fH": 347}
+            - {"sample": "NaO", "species_as_printed": "NaO", "delta_fH": 100}
+            - {"sample": "NbO", "species_as_printed": "NbO", "delta_fH": 199}
+            - {"sample": "NdO", "species_as_printed": "NdO", "delta_fH": -126}
+            - {"sample": "NiO", "species_as_printed": "NiO", "delta_fH": 297}
+            - {"sample": "NpO", "species_as_printed": "NpO", "delta_fH": -4}
+            - {"sample": "OsO", "species_as_printed": "OsO", "delta_fH": 439, "method_class": "author_estimate"}
+            - {"sample": "PO", "species_as_printed": "PO", "delta_fH": -33}
+            - {"sample": "PbO", "species_as_printed": "PbO", "delta_fH": 63}
+            - {"sample": "PdO", "species_as_printed": "PdO", "delta_fH": 245, "method_class": "author_estimate"}
+            - {"sample": "PrO", "species_as_printed": "PrO", "delta_fH": -142}
+            - {"sample": "PtO", "species_as_printed": "PtO", "delta_fH": 423}
+            - {"sample": "PuO", "species_as_printed": "PuO", "delta_fH": -121}
+            - {"sample": "ReO", "species_as_printed": "ReO", "delta_fH": 397, "method_class": "author_estimate"}
+            - {"sample": "RhO", "species_as_printed": "RhO", "delta_fH": 397}
+            - {"sample": "RuO", "species_as_printed": "RuO", "delta_fH": 372}
+            - {"sample": "SO", "species_as_printed": "SO", "delta_fH": 4}
+            - {"sample": "SbO", "species_as_printed": "SbO", "delta_fH": 79}
+            - {"sample": "ScO", "species_as_printed": "ScO", "delta_fH": -54}
+            - {"sample": "SeO", "species_as_printed": "SeO", "delta_fH": 8}
+            - {"sample": "SiO", "species_as_printed": "SiO", "delta_fH": -100}
+            - {"sample": "SmO", "species_as_printed": "SmO", "delta_fH": -117}
+            - {"sample": "SnO", "species_as_printed": "SnO", "delta_fH": 19}
+            - {"sample": "SrO", "species_as_printed": "SrO", "delta_fH": -13}
+            - {"sample": "TaO", "species_as_printed": "TaO", "delta_fH": 232}
+            - {"sample": "TbO", "species_as_printed": "TbO", "delta_fH": -71}
+            - {"sample": "TeO", "species_as_printed": "TeO", "delta_fH": 69}
+            - {"sample": "ThO", "species_as_printed": "ThO", "delta_fH": -31}
+            - {"sample": "TiO", "species_as_printed": "TiO", "delta_fH": 50}
+            - {"sample": "TmO", "species_as_printed": "TmO", "delta_fH": -29}
+            - {"sample": "UO", "species_as_printed": "UO", "delta_fH": 25}
+            - {"sample": "VO", "species_as_printed": "VO", "delta_fH": 138}
+            - {"sample": "WO", "species_as_printed": "WO", "delta_fH": 427}
+            - {"sample": "YO", "species_as_printed": "YO", "delta_fH": -46}
+            - {"sample": "YbO", "species_as_printed": "YbO", "delta_fH": -17}
+            - {"sample": "ZrO", "species_as_printed": "ZrO", "delta_fH": 82}
