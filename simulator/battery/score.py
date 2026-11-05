@@ -5595,6 +5595,7 @@ def cell_notices(
                     affected_quantities=(quantity,),
                     reason=str(row.get("reason") or kind),
                     origin=f"engine:{engine.value}",
+                    authority=notice_authority,
                 )
             )
         elif kind == NoticeKind.INPUT_OMITTED.value:
@@ -10037,7 +10038,6 @@ def _predict_with_engine(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
-                        authority=Authority.BRIDGE,
                     )
                 )
             activity_sources = tuple(
