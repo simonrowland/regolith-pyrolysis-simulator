@@ -4862,9 +4862,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             control_audit=control_audit,
             diagnostic=diagnostic,
             warnings=tuple(
-                _antoine_skip_notices_for_omitted_species(
-                    warnings,
-                    vapor_pressures,
+                dict.fromkeys(
+                    _antoine_skip_notices_for_omitted_species(
+                        warnings,
+                        vapor_pressures,
+                    )
                 )
             ),
         )
