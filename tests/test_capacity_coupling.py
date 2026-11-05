@@ -1048,7 +1048,7 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
     from tests.studio_pin_support import capacity_pin_values
 
     pins = capacity_pin_values(snapshot)
-    # d-144 (5b5d2a080) multiplies solid-reference gamma by
+    # b-1119's d-144 (5b5d2a080) multiplies solid-reference gamma by
     # exp(-DeltaGfus/RT). At the resulting 1673.15 K step, the CaO and MgO
     # factors are 0.06790255 (-1.168114 dex) and 0.09493137 (-1.022590 dex).
     # This lowers Ca/Mg vapor terms and their coupled melt-composition
@@ -1107,7 +1107,13 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         # Studio pin report keys capacity_total_kg_hr,
         # capacity_transport_saturation_pct, and capacity_melt_mass_kg pin
         # this d-144-adjusted head result; the Ar cover and ramp put the step
-        # at 1400 C and set its transport saturation.
+        # at 1400 C and set its transport saturation. The green a6d75d8b4 ->
+        # restacked a93958edc reports move total flux 0.06423670196107581 ->
+        # 0.06422943778094445 kg/hr (-7.26418013136e-6, -0.0113085%),
+        # saturation 2.4701307994323103 -> 2.4698591005232133%
+        # (-0.000271698909 percentage points), and melt mass
+        # 998.7072055554551 -> 998.7072128196352 kg (+7.26418011254e-6),
+        # from the CaO/MgO liquid reference via d-144 fusion.
         (
             1,
             1400.0,
@@ -1118,9 +1124,10 @@ def test_default_off_preserves_hot_fe_redox_split_head_result(monkeypatch):
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # Studio pin key capacity_head_result.n_transitions; the below-gate CaO_gas
-    # channel contributes no evaporation or condensation transitions.
-    assert len(sim.atom_ledger.transitions) == 33
+    # b-1119's CaO/MgO liquid reference via d-144 fusion moves the studio
+    # capacity_head_result.n_transitions pin 26 -> 25; below-gate CaO_gas adds
+    # no evaporation or condensation transition.
+    assert len(sim.atom_ledger.transitions) == 25
     ca_ti_reasons = {
         transition.reason for transition in sim.atom_ledger.transitions
     }
