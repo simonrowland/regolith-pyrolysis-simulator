@@ -117,10 +117,25 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
         return original_evaluate_redox(*args, **kwargs)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture_redox_call)
-    prediction = predict_with_engine(Engine.OPENIMCC, observation)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=context.experiments[observation.experiment_id],
+    )
 
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.refusal_reason is None
+    quench = [
+        notice.reason
+        for notice in prediction.notices
+        if notice.reason.startswith("single_melt_evidence_quench_glass")
+    ]
+    assert quench == [
+        "single_melt_evidence_quench_glass: "
+        "observation.phase: quenched peridotite glass; "
+        "experiment.thermal_schedule.cooling_or_quench: "
+        "Laser switched off; reported cooling rate approximately 800 °C/s"
+    ]
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert prediction.authority is Authority.BRIDGE
     assert len(calls) == 1
@@ -180,9 +195,19 @@ def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
             notice
             for notice in prediction.notices
             if notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+            and notice.origin == "openimcc.evaluate_redox"
+        )
+        quench_notices = tuple(
+            notice
+            for notice in prediction.notices
+            if notice.reason.startswith("single_melt_evidence_quench_glass")
         )
         assert flags
         assert tuple(notice.reason for notice in flag_notices) == flags
+        if observation_id.startswith("sossi-2020-"):
+            assert len(quench_notices) == 1
+        else:
+            assert quench_notices == ()
         assert all(
             notice.origin == "openimcc.evaluate_redox"
             and notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
@@ -223,7 +248,7 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         ),
     ):
         assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 130
+        assert backlog["engine_model_caveat"] == 142
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
@@ -479,9 +504,14 @@ def test_internal_analytical_sossi_aithala_redox_outputs_remain_byte_identical()
     # and carries the source unit text.
     # b-979 / d-053: source_relation on all 18 residuals moves from
     # independent to unknown. Kress attribution stays UNKNOWN unless both
-    # walks are complete. No numeric field moved.
+    # walks are complete.
+    # d-342 retarget. At b1cb2dec4 the payload hashed to
+    # 1ab48f4d30da838c5ae5a6445b3a773bee1c04738637e2693f7b2e17263d46b2
+    # and the twelve Sossi rows were refused input_phase_assemblage_unstated.
+    # Those twelve now score. The six Aithala rows are byte-identical.
+    # The previous pin was already stale at that base.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "11313cf08df6b900eb17e50da8ab69b4387ac75d91956105d34e50cfcdee33d5"
+        "5035aea8b78ad081fda458e8565b4f1bb49fd2e9381af7fedc68d111ae93dd23"
     )
 
 

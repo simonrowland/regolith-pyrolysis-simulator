@@ -39,6 +39,28 @@ def _assert_render_pins(document: dict) -> None:
     assert len(table2) == 24
     assert table2[0]["composition_wt_pct"]["MoO2"] == "32.39"
 
+    acr_rows = [
+        row
+        for row in document["species"]["Cr"]["observations"]
+        if row["observation_id"].startswith("liu23_t3_a_cr_")
+    ]
+    assert len(acr_rows) == 12
+    assert all(row["values"]["method_class"] == "model_derived" for row in acr_rows)
+    assert all(row["values"]["evidence_class"] == "model_derived" for row in acr_rows)
+    assert acr_rows[0]["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+    assert acr_rows[0]["derivation"]["method"]["locator"]["section"] == (
+        "3.3. Activity of Chromium Oxide in Slags"
+    )
+    assert acr_rows[0]["derivation"]["references"] == [
+        "Y. Kobayashi, K. Morita and N. Sano: Metall. Mater. Trans. B, 26 (1995), 557. [27]"
+    ]
+    crox = document["species"]["CrOx"]["observations"][0]
+    assert crox["values"]["method_class"] == "model_derived"
+    assert crox["values"]["evidence_class"] == "model_derived"
+    assert crox["derivation"]["method"]["locator"]["equation"] == "15"
+    assert len(crox["derived_from"]) == 24
+    assert crox["derivation"]["inputs"] == crox["derived_from"]
+
     cro15 = document["species"]["CrO1.5"]["observations"]
     assert len(cro15) == 12
     row1 = cro15[0]["values"]["points"][0]
@@ -84,6 +106,23 @@ def test_render_pin_detects_a_mutated_cell():
     point["activity"] = 3.262
     with pytest.raises(AssertionError):
         _assert_render_pins(mutated)
+
+    mutated_class = deepcopy(_document())
+    acr = next(
+        row
+        for row in mutated_class["species"]["Cr"]["observations"]
+        if row["observation_id"] == "liu23_t3_a_cr_row01"
+    )
+    acr["values"]["method_class"] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_class)
+
+    mutated_crox_class = deepcopy(_document())
+    mutated_crox_class["species"]["CrOx"]["observations"][0]["values"][
+        "evidence_class"
+    ] = "quoted_attributed"
+    with pytest.raises(AssertionError):
+        _assert_render_pins(mutated_crox_class)
 
 
 def test_real_migrator_receives_each_rows_conditions_and_lineage():
@@ -140,6 +179,17 @@ def test_real_migrator_receives_each_rows_conditions_and_lineage():
         "Cu-Cr alloy is not tabulated"
         in representatives["Cr"].point_conditions["composition"].state.reason
     )
+    chromium_activity = [
+        observation
+        for observation in admitted
+        if observation.identity.species.formula == "Cr"
+    ]
+    assert len(chromium_activity) == 12
+    for observation in chromium_activity:
+        assert observation.evidence.class_.value == "model_derived"
+        assert observation.derivation is not None
+        assert observation.derivation.raw_inputs is not None
+        assert observation.derivation.raw_inputs.state.value.value == "not_printed"
     for species in ("CrO1.5", "CrO"):
         composition = representatives[species].identity.composition
         assert composition.is_value
@@ -289,9 +339,15 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
 
     from simulator.battery import migrate as migrate_module
 
+    # CrO, CaF2, and MoO2 are integer formulas whose mapped canonical key is
+    # the printed spelling. The integer fallback stores that same key when
+    # the map entry is absent, so deleting those entries does not change the
+    # stored identity and cannot catch an alias. CrO1.5 is the alias: its
+    # canonical key is Cr2O3, and without the map entry the fractional
+    # formula is refused instead of stored raw.
     removed = {
         name: migrate_module._COMPOSITION_COMPONENTS.pop(name)
-        for name in ("CrO", "CrO1.5", "CaF2", "MoO2")
+        for name in ("CrO1.5",)
     }
     try:
         migrator = Migrator(root=ROOT)
@@ -306,5 +362,15 @@ def test_cr_oxide_formula_unit_mapping_and_component_mutation():
         ]
         assert len(observations) == 24
         assert all(o.identity.composition.is_unknown for o in observations)
+        assert all(
+            o.identity.composition.reason.startswith(
+                "printed oxide wt% map has unsupported numeric component(s): "
+            )
+            and any(
+                component in o.identity.composition.reason
+                for component in ("CrO", "CrO1.5")
+            )
+            for o in observations
+        )
     finally:
         migrate_module._COMPOSITION_COMPONENTS.update(removed)

@@ -6061,6 +6061,42 @@ def test_normalize_measured_split_reads_both_iron_oxides_through_owner():
     assert normalized["Fe2O3"] == pytest.approx(5.0)
 
 
+def test_normalize_literal_feot_under_qfm_counts_total_iron_once():
+    """A literal FeOt key under QFM is total iron once, then scaled to 100%.
+
+    SiO2 80 and FeOt 10 have no other iron spelling. The single iron mass is
+    10, the oxide sum is 90, and the MELTS basis is 100 * those masses / 90.
+    Counting FeOt again would leave FeO at 20 and SiO2 at 80.
+    """
+
+    backend = AlphaMELTSBackend()
+    backend._redox_buffer = "QFM"
+
+    comp = backend._normalize_composition_to_melts_basis({
+        "SiO2": 80.0,
+        "FeOt": 10.0,
+    })
+
+    assert comp["FeO"] == pytest.approx(100.0 * 10.0 / 90.0)
+    assert comp["SiO2"] == pytest.approx(100.0 * 80.0 / 90.0)
+    assert comp["Fe2O3"] == pytest.approx(0.0)
+    assert sum(comp.values()) == pytest.approx(100.0)
+    assert any(
+        "FeO_total treated as FeOt with QFM" in warning
+        for warning in backend._last_normalization_warnings
+    )
+
+
+def test_normalize_literal_feot_without_policy_still_refuses():
+    backend = AlphaMELTSBackend()
+
+    with pytest.raises(ValueError, match="FeO_total requires explicit redox policy"):
+        backend._normalize_composition_to_melts_basis({
+            "SiO2": 80.0,
+            "FeOt": 10.0,
+        })
+
+
 def test_normalize_composition_refuses_feo_total_without_policy():
     backend = AlphaMELTSBackend()
 

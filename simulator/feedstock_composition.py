@@ -155,11 +155,35 @@ def total_fe(feedstock_or_composition: Mapping[str, Any]) -> float:
     return feo + fe2o3 * FEOT_FROM_FE2O3
 
 
+# Already FeO-equivalent wt%. Read only when the FeO/Fe2O3 split is absent.
+# The d-323 construction that builds FeO_T from the split lives in
+# simulator.battery.input_provenance and uses 143.69/159.69, not FEOT_FROM_FE2O3.
+_TOTAL_IRON_AS_FEO_KEYS = ("FeO_T", "FeOT", "FeOt", "FeO*")
+
+
 def iron_oxide_values(
     feedstock_or_composition: Mapping[str, Any],
 ) -> tuple[float, float]:
-    """Read canonical FeO and Fe2O3 values through the iron owner."""
+    """Read canonical FeO and Fe2O3 values through the iron owner.
+
+    A map that has neither FeO nor Fe2O3 may carry total iron already
+    expressed as FeO (FeO_T, FeOT, FeOt, FeO*). That value is returned as
+    the FeO weight and the Fe2O3 weight is zero. When the split is present
+    those total-iron keys are ignored, so an existing split is unchanged.
+    """
     composition = _composition_map(feedstock_or_composition)
+    if "FeO" not in composition and "Fe2O3" not in composition:
+        for key in _TOTAL_IRON_AS_FEO_KEYS:
+            if key not in composition:
+                continue
+            total = _representative_number(
+                composition.get(key), f"composition_wt_pct.{key}"
+            )
+            if total is None:
+                raise ValueError(
+                    f"invalid feedstock declaration composition_wt_pct.{key}"
+                )
+            return total, 0.0
     raw_feo = composition.get("FeO")
     raw_fe2o3 = composition.get("Fe2O3")
     feo = _representative_number(raw_feo, "composition_wt_pct.FeO")

@@ -54,9 +54,8 @@ species:
       units: ratio as CI-normalized
       values:
         quantity: ci_normalized_alkali_ratios
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: 'Jacquet et al. (2026), Table 3; underlying mesostasis compilation, normalized to Lodders (2003) CI.'
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: typed_refusal
         refusal_reason: 'No schema token represents CI-normalized Na/Al and K/Al ratios with group means and standard errors.'
         schema_gap: ci_normalized_alkali_ratios
@@ -67,6 +66,18 @@ species:
         - {group: CMO, Na_Al_mean: '0.19', Na_Al_SE: '0.02', K_Al_mean: '0.19', K_Al_SE: '0.02', n: 75, value: '0.19', table_row_number: 4, locator: {page: 34, table: '3', row: CMO}}
         - {group: CR, Na_Al_mean: '0.13', Na_Al_SE: '0.02', K_Al_mean: '0.26', K_Al_SE: '0.09', n: 58, value: '0.13', table_row_number: 5, locator: {page: 34, table: '3', row: CR}}
         - {group: CHB, Na_Al_mean: '0.16', Na_Al_SE: '0.02', K_Al_mean: '0.09', K_Al_SE: '0.02', n: 39, value: '0.16', table_row_number: 6, locator: {page: 34, table: '3', row: CHB}}
+      derivation:
+        relation: >-
+          Table 3 reports the authors' averages of their compiled chondrule mesostasis compositions, normalized to Lodders (2003) CI; the printed errors are one standard error of the mean.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', section: '5.2. NC/C comparison; Table 3 caption'}
+        method:
+          state: {tag: value, value: averaging compiled chondrule mesostasis compositions and CI-normalizing to Lodders (2003)}
+          locator: {page: 34, published_page: 34, pdf_page_index: 33, table: '3', section: '5.2. NC/C comparison; Table 3 caption'}
+        references:
+        - 'Lodders (2003), CI normalization.'
+        - 'none_printed: Table 3 does not list the input-paper references for its compiled mesostasis analyses row by row.'
   Li:
     observations:
     - observation_id: jacquet_2026_li_table2_quoted_isotope_data
@@ -224,9 +235,8 @@ species:
       units: dimensionless
       values:
         quantity: activity_coefficient
-        method_class: quoted_attributed
-        evidence_class: quoted_attributed
-        attribution: 'Mathieu (2009), Table V.5 experiments; Jacquet et al. (2026) calculated these coefficients using Eq. (A.3).'
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: typed_refusal
         refusal_reason: 'The table conditions each value by optical basicity rather than a full melt composition; no composition identity can be constructed without inventing unprinted oxide proportions.'
         component: NaO0.5
@@ -285,3 +295,14 @@ species:
             total_pressure_Pa: {state: {tag: unknown, reason: not_printed}, locator: {page: 37, table: A.5}}
             composition: {state: {tag: unknown, reason: 'only optical basicity Lambda printed'}, locator: {page: 37, table: A.5}}
           locator: {page: 37, table: A.5, row: Lambda 0.72}
+      derivation:
+        relation: >-
+          The authors calculated the activity coefficients from the initial slopes in Mathieu (2009), Fig. V.18, using the action mass law as Eq. (A.3), with experiments in Mathieu (2009), Table V.5.
+        raw_inputs:
+          state: {tag: value, value: not_printed}
+          locator: {page: 37, published_page: 37, pdf_page_index: 36, section: Appendix A. Calculation of activity coefficients, equation: '(A.3)', table: A.5}
+        method:
+          state: {tag: value, value: 'calculation using the action mass law and initial slopes from Mathieu (2009), Fig. V.18'}
+          locator: {page: 37, published_page: 37, pdf_page_index: 36, section: Appendix A. Calculation of activity coefficients, equation: '(A.3)'}
+        references:
+        - 'Mathieu (2009), Fig. V.18 and Table V.5.'

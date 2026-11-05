@@ -247,39 +247,44 @@ derivation:
 
 When the source does not print raw inputs, omit `inputs` entirely. The paper
 is never an input, and no invented observation may stand in for the unprinted
-inputs. For `model_derived`, the derivation must also carry its method as a
-located `method` field whose value describes the printed calculation. Its
-locator identifies the printed equation and physical page, and `references`
-is a typed list naming at least one compiled reference used. For example:
+inputs. When printed parent observations resolve, name them in `inputs` and
+`derived_from`; `raw_inputs` is not needed. For `model_derived`, describe the
+printed model or calculation in a `method` field and locate it by physical page
+and section. Record a printed equation in the locator when available, but a
+located prose description is sufficient. `references` names the input
+references as printed. If the source names none, use `none_printed` and add a
+notice explaining that absence. If no method can be located, keep the
+`model_derived` class and add a `method_unknown` notice; do not infer a method
+or relabel the value as quoted. For example:
 
 ```yaml
 derivation:
-  relation: "author calculation using the printed equilibrium equation"
+  relation: "author calculation using the printed equilibrium model"
   output_unit: Pa
   method:
-    state: {tag: value, value: "Eqs. (7)–(9) calculate K_ref from unprinted ion-current ratios"}
+    state: {tag: value, value: "Gibbs energy minimisation with the authors' model"}
     locator:
       page: 19
-      equation: "7–9"
+      section: '3.2'
   references:
-    - "Gurvich K°(T)"
-    - "Mann cross-sections"
+    - "Shornikov et al. (2008)"
   raw_inputs:
     state: {tag: value, value: not_printed}
     locator:
       page: 19
-      equation: "7–9"
+      section: '3.2'
       note: "The row-wise ion currents are not printed."
 ```
 
 `raw_inputs` is a typed status with its own source locator. `not_printed` is
-valid for `measured_reduced`, and for `model_derived` only when a nonempty
-method with an equation and physical-page locator and at least one named
-compiled reference is supplied. It cannot appear with derivation `inputs` or
-observation `derived_from`. A model-derived method locator does not replace
-the observation's required method locator. A located `not_printed` declaration
-that meets those conditions supplies lineage, so `derived_from` is not
-required. `printed_unresolved` does not supply lineage.
+valid for `measured_reduced` and `model_derived` when the source does not print
+the inputs and no printed parent observations resolve. For `model_derived`, a
+`not_printed` declaration needs a method named as printed and located by page
+and section, or a `method_unknown` notice if no method can be located. Record
+input references as printed, or use `none_printed` with a notice when the
+source names none. An equation is optional. `raw_inputs` cannot appear with
+derivation `inputs` or observation `derived_from`; resolved parents supply
+lineage without it. `printed_unresolved` does not supply lineage.
 
 `printed_unresolved` means every derivation input was printed prose and none
 of it resolves to a record id or asset. `inputs` is then empty. The verbatim
@@ -646,7 +651,23 @@ are not measurements of a charge; retain their original evidence without
 pretending they are runs. Derived fits from this work can reference their
 underlying measurement series; their `model_derived` evidence class stays intact.
 
-The migrator defaults missing pressure evidence to unknown. When supplied,
+Missing pressure remains unknown unless the experiment has positive printed
+evidence of an open or flowing-gas furnace. Record that evidence once on the
+experiment, beside its apparatus and atmosphere fields:
+
+```yaml
+ambient_pressure_evidence:
+  evidence_class: gas_flow # gas_flow | gas_mixing | vented | atmospheric_pressure_statement
+  quote: "The sample was heated in a furnace with a continuous gas flow."
+  locator: {page: 3, section: Experimental method}
+```
+
+The quote is verbatim and the locator identifies its page, section, or table.
+This evidence lets the migrator use `total_pressure_Pa = 101325` with
+`derived_from_apparatus` authority when the observation requires total
+pressure and no printed point pressure is present. It does not override a
+printed pressure or apply to sealed, vacuum, Knudsen, or high-pressure
+apparatus. Without this field, missing pressure remains unknown. When supplied,
 `pressure_environment` requires `total_pressure_Pa` and `sweep_gas` as
 Located values, and `regime.regime_class` as a State. Do not confuse cell-side
 chamber pressure with sample vapour pressure. For `knudsen_effusion`, the experiment-level `total_pressure_Pa` is the chamber background consumed by the validity gates. It is not inherited into observation identity, engine-point system pressure, or sample oxygen-condition derivations used for prediction (including the vacuum total-pressure upper-bound route). There is no dedicated base-pressure

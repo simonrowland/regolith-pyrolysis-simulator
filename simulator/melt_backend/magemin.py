@@ -3239,7 +3239,17 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         allowed = set(self._MAGEMIN_INPUT_BASIS)
         source: Dict[str, float] = {}
         unknown: List[str] = []
-        feo, fe2o3 = iron_oxide_values(composition_wt_pct)
+        # FeOt is already MAGEMin's total-iron slot and is folded from
+        # ``source`` below. Keep that engine key out of the feedstock alias
+        # resolver, where FeOt means total iron expressed as FeO.
+        iron_oxide_input = composition_wt_pct
+        if 'FeOt' in composition_wt_pct:
+            iron_oxide_input = {
+                name: amount
+                for name, amount in composition_wt_pct.items()
+                if name != 'FeOt'
+            }
+        feo, fe2o3 = iron_oxide_values(iron_oxide_input)
         for component, raw_value in composition_wt_pct.items():
             name = str(component)
             if name in ('FeO', 'Fe2O3'):
@@ -3257,7 +3267,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 + ', '.join(sorted(unknown))
             )
 
-        feot = source.pop('FeOt', 0.0) + total_fe(composition_wt_pct)
+        feot = source.pop('FeOt', 0.0) + total_fe(iron_oxide_input)
         excess_o = source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:

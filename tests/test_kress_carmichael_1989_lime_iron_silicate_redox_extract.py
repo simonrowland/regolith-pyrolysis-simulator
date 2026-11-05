@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import (
     Migrator,
     _BARE_LOG_BAR_NOTICE,
@@ -208,9 +208,22 @@ def _assert_bare_log_identity(observation, sample: str, log_fo2: str) -> None:
         assert any(notice.reason == _BAR_NOTICE for notice in observation.notices)
     else:
         assert log_fo2 == "-0.68"
-        assert oxygen.is_unknown
-        assert oxygen.reason == _SCALE_UNKNOWN
-        assert all(notice.reason != _BAR_NOTICE for notice in observation.notices)
+        assert oxygen.is_value
+        assert oxygen.value == log10_fo2_to_pa(
+            Decimal(log_fo2), Decimal("100000")
+        )
+        assert any(
+            notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+            for notice in observation.notices
+        )
+
+
+def _assert_composition_components(actual, expected) -> None:
+    # Migration also carries source-selection provenance on Composition; this
+    # assertion pins the transcribed vector independently of that metadata.
+    assert actual.basis == expected.basis
+    assert actual.amount_basis is expected.amount_basis
+    assert actual.components == expected.components
 
 
 def test_isolated_migration_binds_every_value_condition_and_render_locator():
@@ -254,11 +267,16 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
             assert observation.value.point == Decimal(composition[oxide])
             assert observation.identity.temperature_K.value == expected_temperature
             _assert_bare_log_identity(observation, sample, log_fo2)
-            assert observation.identity.composition.value == expected_composition
+            _assert_composition_components(
+                observation.identity.composition.value, expected_composition
+            )
             assert observation.identity.total_pressure_Pa.is_unknown
             assert observation.point_conditions["temperature_K"].state.value == expected_temperature
             assert observation.point_conditions["fO2_log"].state.value == Decimal(log_fo2)
-            assert observation.point_conditions["composition"].state.value == expected_composition
+            _assert_composition_components(
+                observation.point_conditions["composition"].state.value,
+                expected_composition,
+            )
             assert observation.point_conditions["total_pressure_Pa"].state.is_unknown
             assert observation.point_conditions["quench_state"].state.value.value == "asserted_preserved"
             assert observation.locator.page == 3
@@ -276,11 +294,16 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
         )
         assert ratio.identity.temperature_K.value == expected_temperature
         _assert_bare_log_identity(ratio, sample, log_fo2)
-        assert ratio.identity.composition.value == expected_composition
+        _assert_composition_components(
+            ratio.identity.composition.value, expected_composition
+        )
         assert ratio.identity.total_pressure_Pa.is_unknown
         assert ratio.point_conditions["temperature_K"].state.value == expected_temperature
         assert ratio.point_conditions["fO2_log"].state.value == Decimal(log_fo2)
-        assert ratio.point_conditions["composition"].state.value == expected_composition
+        _assert_composition_components(
+            ratio.point_conditions["composition"].state.value,
+            expected_composition,
+        )
         # The migrator removes an unprinted total-pressure point condition from
         # valence-ratio rows; its required identity axis remains explicitly unknown.
         assert "total_pressure_Pa" not in ratio.point_conditions
@@ -325,10 +348,13 @@ def test_isolated_migration_binds_every_value_condition_and_render_locator():
     }
     assert len(context["kc89_table3_measured_predicted_residual_comparison"]["values"]["rows"]) == 52
     assert len(context["kc89_table5_dingwell_brearley_comparison"]["values"]["rows"]) == 18
-    assert context["kc89_methods_conditions_and_quench_context"]["values"]["experiment_gases_as_printed"] == [
+    source_doc = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    atmosphere_evidence = source_doc["experiments"][0]["atmosphere_evidence"]
+    assert atmosphere_evidence["experiment_gases_as_printed"] == [
         "air",
         "CO-CO2 gas mixture",
     ]
+    assert atmosphere_evidence["locator"]["published_page"] == 2884
     assert context["kc89_figure_read_candidates"]["values"]["digitisation"] == "undigitised"
 
     # The source-calculated Fe2O3 cells have unprinted total-iron inputs, so

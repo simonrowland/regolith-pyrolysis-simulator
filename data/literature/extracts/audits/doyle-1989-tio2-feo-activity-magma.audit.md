@@ -30,6 +30,26 @@ The layout text mangles the model equations in the theory section. The PDF p. 2 
 
 ## Activity method and controller ruling
 
+### Scoring-gap review (2026-11-03)
+
+The paper does print the method for the 167 Table 1A activities. The controlled
+oxygen-fugacity equilibration and metallic-iron activity statements are on PDF
+p. 2 / printed p. 2632, under “Control of the activity of FeO.” Equation (8)
+and the molten Fe0.947O standard state are on PDF p. 3 / printed p. 2633.
+“Furnace arrangement” on that page prints the Fe-wire loop, CO2-H2-N2 gas,
+quench furnace, and that hot-zone fugacities are calculated by Brinkley’s
+method. The Table 1B caption on PDF p. 6 / printed p. 2636 reads “Compositions
+of the input gases (c.c./min).” Each clause is stored with its own page or
+table locator in the experiment and every row’s derivation. This is gas
+equilibration with an iron buffer, not Knudsen effusion.
+Controller ruling seq. 2 directs `experiment.method: quench_equilibration`;
+no schema change is needed. The shared experiment and all 167 rows carry the
+located method detail, including the printed metal superscript in
+`a_Fe^{metal} = 1`. The standard-state values remain verbatim and are not
+rebased. Doyle 1988 stores
+`gas_metal_equilibration` as free text; that sibling extract is outside this
+task and the controller will queue it separately.
+
 Equation (8) is printed as `a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837)` and specifies absolute temperature. The text says that the activity follows from equilibrium of metallic Fe with O2/FeO and a known equilibrium constant. Gas fugacities are calculated by Brinkley's method using the Van Zeggern and Storey algorithm; the paper assumes ideal gases. The standard state is explicitly “molten Fe0.947O.” Temperature accuracy is better than ±2 K; Tables 1A and 1B caption the experiments at 1600±2 K.
 
 Table 1A has 167 activity cells and per-row run-product glass compositions. Its caption says all melts coexist with metallic iron and a CO2-H2-N2 gas (Table 1B). Table 1B gives five `-log10 fO2` values keyed by the same printed a_FeO values. Controller ruling seq 8 approves joining the Table 1B condition to each Table 1A row with the exact same printed a_FeO key because of the explicit caption cross-reference. No fuzzy match is used; the exact key and cross-reference basis are recorded in each joined fO2 locator. All 167 Table 1A keys match one of the five setpoints. The positive printed `-log10 fO2` and its shared ±0.02 header are also retained in the Table 1B context row. The pressure reference is unstated; each value has two decimal places, so the requested migrator bar default is applicable, with that unstated reference retained in the row note.
@@ -48,10 +68,10 @@ Table 2 reports author-recalculated mole fractions within a normalized `Matrix` 
 
 ## Isolated migration and verification
 
-The updated isolated migration validates the extract with 0 document issues and returns 167 numeric activity observations, 0 unavailable activity values, 0 hard issues, 0 registry issues, and 334 queue entries. The queued axes are the untyped non-stoichiometric reference state and unstated measurement method; the former is the documented schema gap, and the latter remains unknown because no method token is printed. There are 0 quantity-unknown observations and 0 phase-unknown observations. Three inspected Table 1A rows map phase `l`, 1600 K, their own composition, and fO2 through the exact-key join; total pressure remains unknown. Their reference state remains unknown in identity with the verbatim print and schema gap retained. The Table 1B two-decimal `-log10 fO2` values map via the instructed bar default.
+The updated isolated production migration validates the extract with 0 document issues and returns 167 numeric activity observations, 0 unavailable activity observations, 0 hard issues, 0 registry issues, and 334 queue entries. All observations link to the declared `quench_equilibration` experiment, and every row carries a located derivation method. The extraction queue still has 167 row-level method-missing entries because observation `regime`/`values.method` remain absent; these are distinct from the typed experiment method that resolves the worklist field. The other 167 queue entries are the documented non-stoichiometric reference-state schema gap. There are 0 quantity-unknown observations and 0 phase-unknown observations. Three inspected Table 1A rows map phase `l`, 1600 K, their own composition, and fO2 through the exact-key join; total pressure remains unknown. Their reference state remains unknown in identity with the verbatim print and schema gap retained. The Table 1B two-decimal `-log10 fO2` values map via the instructed bar default.
 
-The focused test `tests/test_doyle_1989_tio2_feo_activity_magma_extract.py` passes (2 tests). It pins all 167 Table 1A observations and their six composition cells, all Table 1B setpoint values and uncertainties, all Table 2 row values and source markers, the no-suffix finding, and both printed and joined fO2 uncertainty. Its interior mutations of a Table 1A activity and fO2 condition both fail as expected. The isolated real migrator is exercised by this test.
+The focused test `tests/test_doyle_1989_tio2_feo_activity_magma_extract.py` passes (2 tests), including the isolated production migration. It pins all 167 Table 1A observations and their six composition cells, all Table 1B setpoint values and uncertainties, all Table 2 row values and source markers, the no-suffix finding, both printed and joined fO2 uncertainty, and the new experiment and derivation method bindings. Its interior mutations of a Table 1A activity and fO2 condition both fail as expected.
 
-`tests/test_yaml_flow_scalar_commas.py` passes (17 tests). In `tests/test_literature_extracts.py`, the source-inclusive `test_repo_extracts_validate_green` passes (1 selected, 880 deselected), so the Doyle extract validates with the repository's literature extract set. The full file was also attempted locally but exceeded the required 300-second cap after 159 tests passed; the remaining tests are UNVERIFIED-local. Both the source-specific Chatain `test_isolated_real_migration_and_j01_series_census` and `tests/battery/test_migrate.py::test_j01_store_census_series_numeric_matches_declared_field` pass (1 each).
+`tests/test_yaml_flow_scalar_commas.py` passes (17 tests). The selected `tests/test_literature_extracts.py -k repo_extracts_validate_green` run was interrupted after 440 seconds, exceeding the dispatch 300-second cap, and is UNVERIFIED-local. The optional `ps` process inspection was denied by the sandbox.
 
-Expected store delta: 167 numeric activity observations and 0 unavailable activity observations; 20 context records (five Table 1B setpoints, nine Table 2 rows, two equation records, one Table 2 schema-gap record, and three figure records). No battery-store regeneration was performed.
+Expected store delta: one declared experiment (`quench_equilibration`) with 167 activity observations linked to it, and 167 located derivation-method annotations. The 167 numeric activity values and existing context set stay unchanged. No battery-store regeneration was performed.

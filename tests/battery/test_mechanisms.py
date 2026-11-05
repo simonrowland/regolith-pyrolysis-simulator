@@ -1272,6 +1272,7 @@ def _model_derived_without_raw_parent(
     method: Located | None = None,
     references: tuple[str, ...] = (),
     derived_from: tuple[str, ...] | None = None,
+    notices: tuple[Notice, ...] = (),
 ) -> Observation:
     experiment = F.tabulation_experiment()
     observation = F.observation(
@@ -1285,6 +1286,7 @@ def _model_derived_without_raw_parent(
     return replace(
         observation,
         derived_from=derived_from,
+        notices=notices,
         derivation=replace(
             observation.derivation,
             inputs=(),
@@ -1330,7 +1332,7 @@ def test_model_derived_unprinted_inputs_with_located_method_passes() -> None:
         ),
         method=Located(
             State.of("calculated with the printed equilibrium equations"),
-            locator=F.loc(page=164, equation="7"),
+            locator=F.loc(page=164, section="3.2", equation="7"),
         ),
         references=("Gurvich K°(T)", "Mann cross-sections"),
     )
@@ -1338,6 +1340,80 @@ def test_model_derived_unprinted_inputs_with_located_method_passes() -> None:
         [F.work()], [F.tabulation_experiment()], [observation]
     ).hard_issues
     assert issues == ()
+
+
+def test_model_derived_prose_method_without_equation_passes() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of(
+                "Gibbs energy minimisation with the authors' ideal-associated-solution model"
+            ),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("Shornikov et al. (2008)",),
+    )
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
+def test_model_derived_none_printed_references_are_noticed() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("none_printed",),
+        notices=(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="input_references_none_printed: source names no input references",
+                origin="model-with-raw-input-declaration",
+            ),
+        ),
+    )
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+    assert report.hard_issues == ()
+    assert observation.derivation is not None
+    assert observation.derivation.references == ("none_printed",)
+
+
+def test_model_derived_without_located_method_stays_model_derived_with_notice() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        references=("Shornikov et al. (2008)",),
+        notices=(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(Quantity.DELTA_FG,),
+                reason="method_unknown: no model method located in the source",
+                origin="model-with-raw-input-declaration",
+            ),
+        ),
+    )
+    report = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    )
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert any(
+        notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        and notice.reason.startswith("method_unknown:")
+        for notice in observation.notices
+    )
 
 
 def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -> None:
@@ -1353,7 +1429,7 @@ def test_model_derived_unprinted_inputs_rejects_page_only_placeholder_method() -
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.method")
-        and "equation and physical page locator" in issue.detail
+        and "requires a method_unknown notice" in issue.detail
         for issue in issues
     )
 
@@ -1373,12 +1449,12 @@ def test_model_derived_unprinted_inputs_requires_named_references() -> None:
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.references")
-        and "requires named compiled references" in issue.detail
+        and "requires named references or none_printed with a notice" in issue.detail
         for issue in issues
     )
 
 
-def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
+def test_model_derived_without_method_requires_method_unknown_notice() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
@@ -1389,14 +1465,68 @@ def test_model_derived_raw_inputs_not_printed_requires_method() -> None:
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.method")
-        and issue.detail == (
-            "model_derived raw_inputs not_printed declaration requires a method"
-        )
+        and issue.detail
+        == "model_derived without a located method requires a method_unknown notice"
         for issue in issues
     )
 
 
-def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
+def test_model_derived_with_resolved_parent_and_prose_method_passes() -> None:
+    experiment = F.tabulation_experiment()
+    parent = F.observation(
+        "raw-1",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observation = F.observation(
+        "model-derived-with-printed-parent",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+    )
+    assert observation.derivation is not None
+    observation = replace(
+        observation,
+        derivation=replace(
+            observation.derivation,
+            method=Located(
+                State.of("Gibbs energy minimisation with the authors' model"),
+                locator=F.loc(page=164, section=2.2),
+            ),
+            references=("Shornikov et al. (2008)",),
+            raw_inputs=None,
+        ),
+    )
+    report = validate_corpus([F.work()], [experiment], [parent, observation])
+    assert report.hard_issues == ()
+    assert observation.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
+def test_model_derived_none_printed_references_without_notice_are_rejected() -> None:
+    observation = _model_derived_without_raw_parent(
+        declaration=Located(
+            State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
+        ),
+        method=Located(
+            State.of("Gibbs energy minimisation with the authors' model"),
+            locator=F.loc(page=164, section="3.2"),
+        ),
+        references=("none_printed",),
+    )
+    issues = validate_corpus(
+        [F.work()], [F.tabulation_experiment()], [observation]
+    ).hard_issues
+    assert any(
+        issue.path.endswith(".derivation.references")
+        and "requires named references or none_printed with a notice" in issue.detail
+        for issue in issues
+    )
+
+
+def test_model_derived_unlocated_method_requires_method_unknown_notice() -> None:
     observation = _model_derived_without_raw_parent(
         declaration=Located(
             State.of(RawInputStatus.NOT_PRINTED), locator=F.loc(page=164)
@@ -1408,7 +1538,8 @@ def test_model_derived_raw_inputs_not_printed_requires_method_locator() -> None:
     ).hard_issues
     assert any(
         issue.path.endswith(".derivation.method")
-        and issue.detail == "model_derived raw_inputs method requires a locator"
+        and issue.detail
+        == "model_derived without a located method requires a method_unknown notice"
         for issue in issues
     )
 

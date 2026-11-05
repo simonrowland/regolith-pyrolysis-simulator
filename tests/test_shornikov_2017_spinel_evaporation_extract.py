@@ -25,7 +25,7 @@ EXTRACT = (
 )
 EXPECTED_COMPOSITION = {"MgO": Decimal("0.5"), "Al2O3": Decimal("0.5")}
 
-_QUOTED_MODEL_INPUTS = {
+_MODEL_DERIVED_INPUTS = {
     14: (
         "K10(T)",
         (
@@ -47,10 +47,7 @@ _QUOTED_MODEL_INPUTS = {
             "shornikov_2017_table2_al_partial_pressure",
         ),
     ),
-    17: (
-        "K13(T)",
-        ("shornikov_2017_table2_o2_partial_pressure",),
-    ),
+    17: ("K13(T)", ("shornikov_2017_table2_o2_partial_pressure",)),
 }
 def _observations(document: dict) -> list[dict]:
     return [
@@ -60,9 +57,9 @@ def _observations(document: dict) -> list[dict]:
     ]
 
 
-def _assert_quoted_model_lineage(document: dict) -> None:
+def _assert_model_derived_lineage(document: dict) -> None:
     observations = _observations(document)
-    for equation, (constant, pressure_parents) in _QUOTED_MODEL_INPUTS.items():
+    for equation, (constant, parents) in _MODEL_DERIVED_INPUTS.items():
         row = next(
             item
             for item in observations
@@ -70,17 +67,23 @@ def _assert_quoted_model_lineage(document: dict) -> None:
             == f"shornikov_2017_table3_o_pressure_eq{equation}"
         )
         values = row["values"]
-        assert values["method_class"] == "quoted_attributed"
+        assert values["method_class"] == "model_derived"
         assert values["equation_as_printed"] == f"({equation})"
         assert values["thermochemical_data_reference_as_printed"] == "[10]"
-        assert values["attribution"] == (
-            f"Shornikov (2017) reports this author-calculated Eq. ({equation}) "
-            f"value using {constant} from the Glushko handbook [10]; the "
-            "numeric constant is not stored in the corpus."
-        )
-        assert "not stored" in values["note"]
-        assert "derivation" not in row
-        assert row["derived_from"] == list(pressure_parents)
+        assert "attribution" not in values
+        relation = row["derivation"]["relation"]
+        assert constant in relation
+        assert "not printed in the method prose (p. 12" in relation
+        assert "raw_inputs" not in row["derivation"]
+        assert row["derived_from"] == list(parents)
+        assert row["derivation"]["inputs"] == list(parents)
+        method = row["derivation"]["method"]
+        assert method["state"]["value"] == "thermochemical equilibrium calculation"
+        assert method["locator"]["page"] == 3
+        assert row["derivation"]["references"] == [
+            "Glushko et al. (1978–1982), Thermodynamical Properties of Individual Substances [10]"
+        ]
+        assert "equilibrium constants" in values["note"]
         assert len(values["points"]) == (10 if equation == 16 else 12)
 
 
@@ -95,8 +98,8 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
     assert sum(not row["values"].get("points") for row in table_2) == 11
     assert sum(len(row["values"].get("points", [])) for row in table_3) == 58
     assert sum(not row["values"].get("points") for row in table_3) == 2
-    _assert_quoted_model_lineage(document)
-    for equation, (constant, _parents) in _QUOTED_MODEL_INPUTS.items():
+    _assert_model_derived_lineage(document)
+    for equation in _MODEL_DERIVED_INPUTS:
         row = next(
             item
             for item in table_3
@@ -109,22 +112,36 @@ def test_table_cells_and_render_pins_are_complete_and_mutation_sensitive() -> No
             for item in _observations(mutated)
             if item["observation_id"] == row["observation_id"]
         )
-        mutated_row["values"]["attribution"] = (
-            mutated_row["values"]["attribution"]
-            .replace(constant, "K99(T)")
-            .replace("[10]", "[999]")
-        )
+        mutated_row["values"]["method_class"] = "quoted_attributed"
         with pytest.raises(AssertionError):
-            _assert_quoted_model_lineage(mutated)
+            _assert_model_derived_lineage(mutated)
         mutated = copy.deepcopy(document)
         mutated_row = next(
             item
             for item in _observations(mutated)
             if item["observation_id"] == row["observation_id"]
         )
-        mutated_row["derived_from"][0] = "not_a_stored_pressure_parent"
+        mutated_row["derivation"]["references"][0] = "unlisted data source"
         with pytest.raises(AssertionError):
-            _assert_quoted_model_lineage(mutated)
+            _assert_model_derived_lineage(mutated)
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["derived_from"][0] = "unrelated-observation"
+        with pytest.raises(AssertionError):
+            _assert_model_derived_lineage(mutated)
+        mutated = copy.deepcopy(document)
+        mutated_row = next(
+            item
+            for item in _observations(mutated)
+            if item["observation_id"] == row["observation_id"]
+        )
+        mutated_row["derivation"]["inputs"][0] = "unrelated-observation"
+        with pytest.raises(AssertionError):
+            _assert_model_derived_lineage(mutated)
     eq8_9 = next(
         row
         for row in table_3
@@ -174,8 +191,8 @@ def test_isolated_migration_resolves_lineage_and_keeps_rows_unchanged() -> None:
     assert sum(record.value.kind is ValueKind.UNAVAILABLE for record in records) == 13
     assert result.validation is not None
     # The measured-reduced row records its located not-printed raw-input
-    # declaration. Quoted model outputs retain their known pressure parents and
-    # identify the unstored thermochemical constant in their attribution.
+    # declaration. Model outputs locate the handbook equilibrium constants
+    # used in the calculation.
     assert result.validation.hard_issues == ()
     assert result.registry_issues == []
     evidence_counts = Counter(
@@ -184,8 +201,7 @@ def test_isolated_migration_resolves_lineage_and_keeps_rows_unchanged() -> None:
     assert evidence_counts == {
         EvidenceClass.MEASURED_DIRECT: 84,
         EvidenceClass.MEASURED_REDUCED: 12,
-        EvidenceClass.QUOTED_ATTRIBUTED: 46,
-        EvidenceClass.MODEL_DERIVED: 2,
+        EvidenceClass.MODEL_DERIVED: 48,
     }
     for record in records:
         if "eq16_not_reported" not in record.observation_id:

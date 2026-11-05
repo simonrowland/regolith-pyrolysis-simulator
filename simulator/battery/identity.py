@@ -1125,6 +1125,26 @@ def profile_for(identity: Identity) -> QuantityProfile:
             # flux per area may omit area from equality only after recorded
             # normalization; sample mass still required for extensive rates.
             pass
+    elif q is Quantity.WALL_DEPOSIT_AREAL_RATE:
+        req(
+            "temperature_K",
+            "per",
+            "composition",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "wall",
+        )
+        na(
+            "subtype",
+            "standard_pressure_Pa",
+            "reaction",
+            "formation_elements",
+            "reference_state",
+            "reservoir",
+            "fO2_Pa",
+            "exposure",
+            "sample_mass_kg",
+        )
     elif q is Quantity.TRANSITION_TEMPERATURE:
         req("subtype", "total_pressure_Pa")
         # no duplicate T coordinate
@@ -1808,6 +1828,8 @@ def _values_compare(
         if left.component_basis != right.component_basis:
             return _mismatch(name)
         if left.reference_pressure_bar != right.reference_pressure_bar:
+            return _mismatch(name)
+        if left.iron_saturation_composition != right.iron_saturation_composition:
             return _mismatch(name)
         nested = _species_equal(
             left.endmember,

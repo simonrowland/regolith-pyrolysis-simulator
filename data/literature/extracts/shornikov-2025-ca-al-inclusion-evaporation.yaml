@@ -1,0 +1,501 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2025-ca-al-inclusion-evaporation
+source:
+  citation: >-
+    Shornikov, S. I., and O. I. Yakovlev (2025), Evaporation Features of the
+    Melts of Ca–Al–Inclusions in Chondrites: Experimental Data and Their
+    Implications, Geochemistry International, 63(7), 551–561.
+  year: 2025
+  doi: 10.1134/S0016702925600178
+  corpus_asset: raw/shornikov-2025-ca-al-inclusion-evaporation/shornikov-2025-ca-al-inclusion-evaporation.pdf
+  corpus_sha256: d5ba248fdd6a6a0d4a117e93c41d54854d168f087f4c548a6bb970e668fe13e8
+extraction:
+  method: >-
+    Table 1 was transcribed from the MinerU content-list table and checked
+    against pdftotext-layout. The MinerU table QA numeric agreement is 1.000.
+    Its four data rows and all 32 numeric cells were checked against the 600 dpi
+    render of PDF page 2; 28 nonduplicate cells are retained here. The four
+    Murchison cells are cited in the table context but not repeated because the
+    same source values are already in shornikov-2023-cai-melt-evaporation.
+    Figures 3–8 are represented as context only. No plotted coordinates were
+    digitized; Figure 4 pressures and Figure 5 residue compositions remain
+    figure-read candidates. Figure 4 shows Ca, Mg, Al, and SiO, while Na, K, and
+    Fe appear only in the detected-ion list, without pressure curves.
+  date: '2026-11-02'
+  worker: w1103cw2-sk25
+review_status: draft
+fidelity_samples:
+  - path: species.CaO.context[shornikov_2025_table1_initial_compositions].values.rows[0].A_nazarov_1984_mol_pct
+    value: '43.4'
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      table: '1'
+      note: Table 1, CaO row, type A Nazarov et al. column; checked against the 600 dpi render.
+  - path: species.CaO.context[shornikov_2025_table1_initial_compositions].values.rows[1].B_grossman_2000_mol_pct_range
+    value: '12.7–27.4'
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      table: '1'
+      note: Table 1, MgO row, type B Grossman et al. column; checked against the 600 dpi render.
+  - path: species.CaO.context[shornikov_2025_table1_initial_compositions].values.rows[3].FUN1_mendybaev_2013_mol_pct
+    value: '33.1'
+    locator:
+      page: 2
+      published_page: 552
+      pdf_page_index: 1
+      table: '1'
+      note: Table 1, SiO2 row, FUN1 Mendybaev et al. column; checked against the 600 dpi render.
+species:
+  CaO:
+    observations: []
+    context:
+      - observation_id: shornikov_2025_table1_initial_compositions
+        type: initial_sample_composition_table
+        locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          table: '1'
+          note: >-
+            Table 1. Composition (mol %) of CAIs of type A and B, Murchison,
+            and FUN1 CAIs according to the cited studies.
+        units: mol % as printed
+        values:
+          quantity: initial_sample_compositions_as_printed
+          species_scope_as_printed: CaO, MgO, Al2O3, SiO2
+          source_type_note: >-
+            Table 1 contains compositions attributed to earlier studies. They
+            are background compositions, not numeric bulk compositions measured
+            for the individual Efremovka charges used in this experiment, and
+            are not assigned to the KEMS rows as conditions.
+          row_count: 4
+          source_numeric_cell_count: 32
+          numeric_cell_count: 28
+          duplicate_column_not_repeated:
+            sample: Murchison
+            attribution: Dyakonova et al. (1979)
+            reason: >-
+              The four Murchison cells are already recorded in
+              shornikov-2023-cai-melt-evaporation. This paper labels the table
+              mol %, while that extract preserves the earlier paper's printed
+              wt % label; neither basis is converted or silently reconciled.
+          column_sources:
+            A_nazarov_1984: Nazarov et al. (1984)
+            A_grossman_2000: Grossman et al. (2000)
+            A_ivanova_2023: Ivanova (2023)
+            B_nazarov_1984: Nazarov et al. (1984)
+            B_grossman_2000: Grossman et al. (2000)
+            B_ivanova_2023: Ivanova (2023)
+            FUN1_mendybaev_2013: Mendybaev et al. (2013)
+          rows:
+            - row_number: 1
+              oxide: CaO
+              method_class: quoted_attributed
+              A_nazarov_1984_mol_pct: '43.4'
+              A_grossman_2000_mol_pct_range: '34.9–48.1'
+              A_ivanova_2023_mol_pct_range: '39.5–44.7'
+              B_nazarov_1984_mol_pct: '31.4'
+              B_grossman_2000_mol_pct_range: '22.3–37.7'
+              B_ivanova_2023_mol_pct_range: '33.0–39.2'
+              FUN1_mendybaev_2013_mol_pct: '2.0'
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                table: '1'
+                note: Table 1 row 1, CaO.
+            - row_number: 2
+              oxide: MgO
+              method_class: quoted_attributed
+              A_nazarov_1984_mol_pct: '8.4'
+              A_grossman_2000_mol_pct_range: '4.1–16.3'
+              A_ivanova_2023_mol_pct_range: '6.8–11.9'
+              B_nazarov_1984_mol_pct: '18.0'
+              B_grossman_2000_mol_pct_range: '12.7–27.4'
+              B_ivanova_2023_mol_pct_range: '10.4–17.0'
+              FUN1_mendybaev_2013_mol_pct: '63.5'
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                table: '1'
+                note: Table 1 row 2, MgO.
+            - row_number: 3
+              oxide: Al2O3
+              method_class: quoted_attributed
+              A_nazarov_1984_mol_pct: '25.2'
+              A_grossman_2000_mol_pct_range: '14.5–31.2'
+              A_ivanova_2023_mol_pct_range: '23.8–25.4'
+              B_nazarov_1984_mol_pct: '20.2'
+              B_grossman_2000_mol_pct_range: '14.0–25.4'
+              B_ivanova_2023_mol_pct_range: '16.5–23.0'
+              FUN1_mendybaev_2013_mol_pct: '1.4'
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                table: '1'
+                note: Table 1 row 3, Al2O3.
+            - row_number: 4
+              oxide: SiO2
+              method_class: quoted_attributed
+              A_nazarov_1984_mol_pct: '23.0'
+              A_grossman_2000_mol_pct_range: '17.6–33.5'
+              A_ivanova_2023_mol_pct_range: '22.3–25.7'
+              B_nazarov_1984_mol_pct: '30.4'
+              B_grossman_2000_mol_pct_range: '21.6–37.9'
+              B_ivanova_2023_mol_pct_range: '25.9–33.9'
+              FUN1_mendybaev_2013_mol_pct: '33.1'
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                table: '1'
+                note: Table 1 row 4, SiO2.
+      - observation_id: shornikov_2025_experimental_method_context
+        type: experimental_method_context
+        locator:
+          page: 2
+          published_page: 552
+          pdf_page_index: 1
+          section: Experimental
+        units: printed units retained per field
+        values:
+          quantity: experimental_conditions_and_species_as_printed
+          method_class: measured_reduced
+          method_as_printed: Knudsen effusion mass spectrometry
+          sample_as_printed: Natural CAIs of types A and B from the Efremovka CV3 chondrite.
+          sample_mass_mg_as_printed: '10–15'
+          experiment_temperature_range_C_as_printed: '1000–2400'
+          temperature_ramp_C_per_min_as_printed: '~3'
+          temperature_measurement_as_printed: >-
+            EOP-66 optical pyrometer through a pyrometric window; the text says
+            accuracy 10 at 1800°C but prints no unit after 10.
+          cell_as_printed: Tungsten cylindrical Knudsen effusion cell.
+          cell_dimensions_as_printed: d = 15 mm, h = 16 mm
+          sample_liner_as_printed: Rhenium liner
+          effusion_orifice_to_evaporation_surface_area_ratio_as_printed: '1:400'
+          ionizing_electron_energy_eV_as_printed: '28'
+          pressure_reduction_as_printed: >-
+            Equation (1) calculates each molecular partial pressure from the
+            measured ion-current ratio, the gold standard partial pressure,
+            ionization cross sections, and isotope-partition coefficients.
+          standard_as_printed: Gold partial-pressure data of Paule and Mandel (1972).
+          detected_ions_as_printed:
+            - Ca+
+            - Mg+
+            - Al+
+            - AlO+
+            - Al2O+
+            - SiO+
+            - SiO2+
+            - O2+
+            - K+
+            - Na+
+            - SO2+
+            - Fe+
+            - Ni+
+            - Cr+
+            - TiO+
+            - TiO2+
+            - CaWO3+
+            - CaWO4+
+          detected_tungsten_oxide_ions_as_printed:
+            - WO2+
+            - WO3+
+          stated_unmeasured_run_conditions:
+            total_pressure:
+              state: {tag: unknown, reason: not_printed_as_an_experiment_condition}
+              locator:
+                page: 3
+                published_page: 553
+                pdf_page_index: 2
+                section: Experimental
+                note: >-
+                  The printed upper limit on vapor pressure over the melt is
+                  not the chamber pressure.
+            fO2:
+              state: {tag: unknown, reason: not_printed_as_an_experiment_condition}
+              locator:
+                page: 3
+                published_page: 553
+                pdf_page_index: 2
+                section: Experimental
+                note: Figure 8 reports oxygen in the vapor; no imposed fO2 is stated.
+            sample_composition:
+              state: {tag: unknown, reason: actual_experimental_charge_composition_not_printed}
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                section: Experimental
+                note: Table 1 gives cited typical compositions, not compositions of individual experimental charges.
+            sweep_gas:
+              state: {tag: unknown, reason: not_printed}
+              locator:
+                page: 2
+                published_page: 552
+                pdf_page_index: 1
+                section: Experimental
+                note: No sweep gas is stated for the Knudsen effusion experiment.
+          output_bound_not_a_condition:
+            printed_statement: >-
+              did not allow the total vapor pressure over the melts to increase
+              above 10^-4 atm
+            locator:
+              page: 3
+              published_page: 553
+              pdf_page_index: 2
+              section: Experimental
+              note: The authors use this calculated output bound to justify an ideal-gas approximation.
+      - observation_id: shornikov_2025_residue_prose_model_summary
+        type: text_stated_result_context
+        locator:
+          page: 5
+          published_page: 555
+          pdf_page_index: 4
+          section: Results
+        units: as printed per fact
+        values:
+          quantity: residue_component_composition
+          method_class: model_derived
+          attribution: >-
+            Shornikov and Yakovlev's prose summary of their Figure 5 calculations;
+            the underlying figure coordinates and calculation inputs are not
+            stored as numeric rows in this extract.
+          facts:
+            - fact: Residual-melt MgO content decreases to zero at 2000°C.
+              value_as_printed: zero
+              unit_as_printed: mol % (Figure 5 vertical axis)
+              locator:
+                page: 5
+                published_page: 555
+                pdf_page_index: 4
+                section: Results
+            - fact: Residual-melt silica remains detectable to 2300°C, at low content.
+              value_as_printed: detectable
+              unit_as_printed: mol % (Figure 5 vertical axis)
+              locator:
+                page: 5
+                published_page: 555
+                pdf_page_index: 4
+                section: Results
+            - fact: Type-A residual melt contains approximately 20 mol % silica when Mg evaporates completely.
+              value_as_printed: '~20'
+              unit_as_printed: mol %
+              sample_type_as_printed: A
+              locator:
+                page: 6
+                published_page: 556
+                pdf_page_index: 5
+                section: Results
+            - fact: Type-B residual melt contains approximately 16.5 mol % silica when Mg evaporates completely.
+              value_as_printed: '~16.5'
+              unit_as_printed: mol %
+              sample_type_as_printed: B
+              locator:
+                page: 6
+                published_page: 556
+                pdf_page_index: 5
+                section: Results
+      - observation_id: shornikov_2025_oxygen_ratio_prose_measurement_summary
+        type: text_stated_result_context
+        locator:
+          page: 9
+          published_page: 559
+          pdf_page_index: 8
+          section: Oxygen at CAI evaporation
+        units: as printed per fact
+        values:
+          quantity: oxygen_ratio
+          method_class: measured_reduced
+          attribution: >-
+            Shornikov and Yakovlev's prose summary of their KEMS-derived Figure 8
+            O2/O trend.
+          facts:
+            - fact: At 1800–2000°C, the vapor O2/O ratio decreases by one order of magnitude.
+              value_as_printed: one order of magnitude
+              temperature_range_C_as_printed: '1800–2000'
+              locator:
+                page: 9
+                published_page: 559
+                pdf_page_index: 8
+                section: Oxygen at CAI evaporation
+      - observation_id: shornikov_2025_fig1_knudsen_effusion_apparatus_schematic
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          figure: '1'
+        units: schematic; no numeric data extracted
+        values:
+          quantity: apparatus_schematic
+          caption_as_printed: >-
+            Schematic representation of the Knudsen effusion mass spectrometric
+            method: (1) base and (2) lead of the tungsten effusion cell; (3)
+            rhenium insert; (4) test sample; (5) pyrometric window; (6) gas
+            molecules; (7) blocker of the molecular beam; (8) ionization box;
+            (9) ionized molecules; (10) channel of magnetic separator; (11) ion
+            detector; (12) vacuum system.
+          digitisation: not_applicable; schematic only.
+      - observation_id: shornikov_2025_fig2_temperature_time_schedule
+        type: figure_record
+        locator:
+          page: 3
+          published_page: 553
+          pdf_page_index: 2
+          figure: '2'
+        units: T, °C and time as printed
+        values:
+          quantity: temperature_time_schedule
+          samples_as_printed: '(1) CAIs of type A, (2) CAIs of type B and (3) the Murchison chondrite'
+          caption_as_printed: >-
+            Temperature regimes of the evaporation experiments with (1) CAIs of
+            type A, (2) CAIs of type B and (3) the Murchison chondrite.
+          digitisation: deferred; no figure coordinates are stored.
+      - observation_id: shornikov_2025_fig3_murchison_comparison
+        type: figure_record
+        locator:
+          page: 4
+          published_page: 554
+          pdf_page_index: 3
+          figure: '3'
+        units: log partial pressure in atm and residual composition in mol % as printed
+        values:
+          quantity: partial_pressure
+          method_class: quoted_attributed
+          species_as_printed: Ca, Mg, Al, SiO, CaO, MgO, Al2O3, SiO2
+          sample_as_printed: Murchison chondrite
+          axes_as_printed:
+            x: T, °C
+            y_a: log p_i, atm
+            y_b: x_i, mol %
+          caption_as_printed: >-
+            Figure 3 plots gas partial pressures over Murchison residue and the
+            residual composition during evaporation; the comparison data are
+            attributed in the text to Yakovlev et al. (1987).
+          attribution: Yakovlev et al. (1987), as cited in the article.
+          digitisation: deferred; no figure coordinates are stored.
+      - observation_id: shornikov_2025_fig4_cai_partial_pressure_curves
+        type: figure_record
+        locator:
+          page: 5
+          published_page: 555
+          pdf_page_index: 4
+          figure: '4'
+        units: log p_i, atm as printed
+        values:
+          quantity: partial_pressure
+          method_class: measured_reduced
+          gas_species_as_printed: Ca, Mg, Al, SiO
+          samples_as_printed: CAIs of types A and B
+          phase_as_printed: gas over residual melt
+          axes_as_printed:
+            x: T, °C
+            y: log p_i, atm
+          caption_as_printed: >-
+            Temperature dependences of partial pressures of gaseous species over
+            melts of CAIs of type A and type B at evaporation; series are Ca,
+            Mg, Al, and SiO.
+          attribution: This work; the partial pressures are reduced from KEMS ion currents by Equation (1).
+          digitisation: deferred; no figure coordinates are stored.
+          not_plotted_as_pressure: Na, K, Fe
+      - observation_id: shornikov_2025_fig5_residual_composition_curves
+        type: figure_record
+        locator:
+          page: 5
+          published_page: 555
+          pdf_page_index: 4
+          figure: '5'
+        units: x_i, mol % as printed
+        values:
+          quantity: residue_component_composition
+          method_class: model_derived
+          species_as_printed: CaO, MgO, Al2O3, SiO2
+          samples_as_printed: CAIs of types A and B
+          phase_as_printed: residual melt
+          axes_as_printed:
+            x: T, °C
+            y: x_i, mol %
+          weight_loss_axis_as_printed: none; the figure plots composition against temperature.
+          caption_as_printed: >-
+            Evolution of the composition of residual melts of CAIs of type A and
+            type B during evaporation.
+          attribution: >-
+            This work. The text describes Figure 5 as calculations based on
+            experimental data; the plotted values are not transcribed here.
+          digitisation: deferred; no figure coordinates are stored.
+      - observation_id: shornikov_2025_fig6_cai_type_a_mineral_activities
+        type: figure_record
+        locator:
+          page: 7
+          published_page: 557
+          pdf_page_index: 6
+          figure: '6'
+        units: log a_i
+        values:
+          quantity: activity
+          method_class: model_derived
+          species_as_printed: gehlenite and anorthite end members
+          sample_as_printed: CAI type A
+          phase_as_printed: residual melt
+          axes_as_printed:
+            x: T, °C
+            y: log a_i
+          caption_as_printed: Temperature dependences of gehlenite and anorthite end-member activities in the type-A residual melt.
+          attribution: This work; activities are calculated from experimental data and cited thermodynamic data.
+          digitisation: deferred; no figure coordinates are stored.
+      - observation_id: shornikov_2025_fig7_cai_type_b_mineral_activities
+        type: figure_record
+        locator:
+          page: 8
+          published_page: 558
+          pdf_page_index: 7
+          figure: '7'
+        units: activity and activity ratios as printed
+        values:
+          quantity: calculated_activity_and_activity_ratios
+          method_class: model_derived
+          species_as_printed: MgAl2O4, Ca2MgSi2O7, Ca2Al2SiO7
+          sample_as_printed: CAI type B
+          phase_as_printed: residual melt
+          axes_as_printed:
+            x: Al2O3, mol %
+            y_a: activity
+            y_b: activity ratios
+          caption_as_printed: >-
+            Activities of spinel, akermanite, and gehlenite end members and
+            ratios of gehlenite activity to spinel and akermanite activities.
+          attribution: This work; activities and ratios are calculated.
+          digitisation: deferred; no figure coordinates are stored.
+      - observation_id: shornikov_2025_fig8_oxygen_pressure_and_ratio
+        type: figure_record
+        locator:
+          page: 9
+          published_page: 559
+          pdf_page_index: 8
+          figure: '8'
+        units: oxygen pressure in atm and O2/O ratio as printed
+        values:
+          quantity: partial_pressure
+          method_class: measured_reduced
+          species_as_printed: O and O2
+          samples_as_printed: CAIs of types A and B; Murchison comparison
+          axes_as_printed:
+            x: T, °C
+            y_a: log(pO + pO2), atm
+            y_b: O2/O
+          caption_as_printed: Temperature dependences of oxygen pressure and O2/O ratio in vapor over the melts.
+          attribution: >-
+            Type-A and type-B measurements are this work. Murchison comparison
+            data are attributed in the text to Yakovlev et al. (1987).
+          series_attribution:
+            '1': {sample: CAI type A, method_class: measured_reduced}
+            '2': {sample: CAI type B, method_class: measured_reduced}
+            '3': {sample: Murchison, method_class: quoted_attributed, attribution: Yakovlev et al. (1987)}
+          digitisation: deferred; no figure coordinates are stored.

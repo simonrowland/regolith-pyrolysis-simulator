@@ -1,0 +1,2586 @@
+schema_version: literature_extract.v1
+source_id: zaitsev-2006-magnesium-silicate-thermodynamics
+source:
+  citation: >-
+    Zaitsev, A. I., Arutyunyan, N. A., Shaposhnikov, N. G., Zaitseva, N. E., and Burtsev, V. T. (2006).
+    Experimental Study and Modeling of the Thermodynamic Properties of Magnesium Silicates.
+    Russian Journal of Physical Chemistry, 80(3), 335–343.
+  year: 2006
+extraction:
+  method: >-
+    Born-digital pdftotext-layout transcription cross-checked against MinerU table drafts;
+    the printed table layouts and flagged cells were checked against page renders.
+  date: '2026-11-03'
+  worker: w1103cw3-za06
+  scope_note: >-
+    The paper reports KEMS ion-current ratios and activities but no numeric absolute partial-pressure series.
+    Table 1's three least-squares fits are retained as typed refusals because the closed schema has no
+    coefficient-function form for the fitted ln{I(Mg+)/I(SiO+)} values. Figure 2 and Figure 3 contain
+    figure-read KEMS series and are not digitized in this extraction. The 10^-4 Pa statement is for sample
+    preparation only and is not transferred to the KEMS measurements.
+review_status: draft
+fidelity_samples:
+  - path: species.MgO.observations[zaitsev_2006_table2_mgo_x_sio2_0p486].values.activity
+    value: '0.181'
+    locator:
+      page: 4
+      published_page: 338
+      pdf_page_index: 3
+      table: '2'
+      row: 'x(SiO2) = 0.486*'
+      note: Table 2, a(MgO); render confirms 0.181 and the footnote marker on x(SiO2).
+  - path: species.SiO2.observations[zaitsev_2006_table2_sio2_x_sio2_0p563].values.activity
+    value: '1.0'
+    locator:
+      page: 4
+      published_page: 338
+      pdf_page_index: 3
+      table: '2'
+      row: 'x(SiO2) = 0.563'
+      note: Table 2, a(SiO2); render confirms 1.0.
+  - path: species.MgSiO3.observations[zaitsev_2006_table4_enstatite_calculated_delta_fG].values.delta_fG
+    value: '-32150'
+    locator:
+      page: 7
+      published_page: 341
+      pdf_page_index: 6
+      table: '4'
+      row: 'Enstatite MgSiO3; ΔfG(298 K); Calculated'
+      note: Render confirms −32 150 J/mol.
+  - path: species.MgSiO3.observations[zaitsev_2006_eq8_mgsio3_gibbs_fit].values.equation_as_published
+    value: 'ΔfG(MgSiO3) = −(30842 ± 413) + (0.14 ± 0.29)T'
+    locator:
+      page: 3
+      published_page: 337
+      pdf_page_index: 2
+      equation: '8'
+      note: Render confirms the intercept, slope, signs, and uncertainties.
+species:
+  MgO:
+    observations:
+      - observation_id: zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          table: '1'
+          row: 'MgO + Mg2SiO4'
+        regime: knudsen_effusion
+        phase: cr
+        units: fit coefficients and range as printed
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgO + Mg2SiO4'
+          composition:
+            state:
+              tag: unknown
+              reason: The row names a two-phase field but gives no single mixture composition.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgO + Mg2SiO4'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgO + Mg2SiO4'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgO + Mg2SiO4'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+        derivation:
+          relation: >-
+            The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints the points graphically; their numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+          output_unit: fit coefficients as printed
+        values:
+          quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact quantity-form token represents least-squares coefficients of a temperature-dependent
+            log ion-intensity ratio. Quantity.ION_INTENSITY_RATIO covers the measured ratio, not its fit
+            coefficients; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is for activity-coefficient fits.
+            QUANTITY_ALIASES has no exact ratio-fit token and gibbs_table defaults to delta_fG through
+            TYPE_QUANTITY. See simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES,
+            simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          method_as_published: >-
+            Knudsen mass spectrometry; ln{I(Mg+)/I(SiO+)} was fitted as A/T + B by least squares.
+          T_range_K:
+            - '1584'
+            - '1835'
+          phase_field_as_printed: MgO + Mg2SiO4
+          number_of_measurements_as_printed: '95'
+          A_plus_uncertainty_as_printed: '14190 ± 68'
+          minus_B_plus_uncertainty_as_printed: '5.455 ± 0.040'
+          uncertainty_confidence_level: not stated
+      - observation_id: zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          table: '1'
+          row: 'MgSiO3 + Mg2SiO4'
+        regime: knudsen_effusion
+        phase: cr
+        units: fit coefficients and range as printed
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + Mg2SiO4'
+          composition:
+            state:
+              tag: unknown
+              reason: The row names a two-phase field but gives no single mixture composition.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + Mg2SiO4'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + Mg2SiO4'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + Mg2SiO4'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+        derivation:
+          relation: >-
+            The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints the points graphically; their numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+          output_unit: fit coefficients as printed
+        values:
+          quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact quantity-form token represents least-squares coefficients of a temperature-dependent
+            log ion-intensity ratio. Quantity.ION_INTENSITY_RATIO covers the measured ratio, not its fit
+            coefficients; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is for activity-coefficient fits.
+            QUANTITY_ALIASES has no exact ratio-fit token and gibbs_table defaults to delta_fG through
+            TYPE_QUANTITY. See simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES,
+            simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          method_as_published: >-
+            Knudsen mass spectrometry; ln{I(Mg+)/I(SiO+)} was fitted as A/T + B by least squares.
+          T_range_K:
+            - '1571'
+            - '1824'
+          phase_field_as_printed: MgSiO3 + Mg2SiO4
+          number_of_measurements_as_printed: '95'
+          A_plus_uncertainty_as_printed: '2592 ± 56'
+          minus_B_plus_uncertainty_as_printed: '4.680 ± 0.040'
+          uncertainty_confidence_level: not stated
+      - observation_id: zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          table: '1'
+          row: 'MgSiO3 + SiO2'
+        regime: knudsen_effusion
+        phase: cr
+        units: fit coefficients and range as printed
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Table 1 reports a temperature interval for this fit, not a single point temperature.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + SiO2'
+          composition:
+            state:
+              tag: unknown
+              reason: The row names a two-phase field but gives no single mixture composition.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + SiO2'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + SiO2'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              table: '1'
+              row: 'MgSiO3 + SiO2'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+        derivation:
+          relation: >-
+            The Table 1 least-squares coefficients reduce the authors' measured KEMS ion-current ratios. Figure 2 prints the points graphically; their numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig2_kems_ratio_series
+          output_unit: fit coefficients as printed
+        values:
+          quantity: ln_mg_to_sio_ion_intensity_ratio_fit_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact quantity-form token represents least-squares coefficients of a temperature-dependent
+            log ion-intensity ratio. Quantity.ION_INTENSITY_RATIO covers the measured ratio, not its fit
+            coefficients; Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT is for activity-coefficient fits.
+            QUANTITY_ALIASES has no exact ratio-fit token and gibbs_table defaults to delta_fG through
+            TYPE_QUANTITY. See simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES,
+            simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          method_as_published: >-
+            Knudsen mass spectrometry; ln{I(Mg+)/I(SiO+)} was fitted as A/T + B by least squares.
+          T_range_K:
+            - '1578'
+            - '1808'
+          phase_field_as_printed: MgSiO3 + SiO2
+          number_of_measurements_as_printed: '92'
+          A_plus_uncertainty_as_printed: '2905 ± 57'
+          minus_B_plus_uncertainty_as_printed: '5.164 ± 0.040'
+          uncertainty_confidence_level: not stated
+      - observation_id: zaitsev_2006_eq6_mgo_partial_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          equation: '6'
+        regime: knudsen_effusion
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Equation 6 is a temperature-dependent relation, not a point value.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '6'
+          composition:
+            state:
+              tag: unknown
+              reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '6'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not report an oxygen fugacity for these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '6'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '6'
+        derived_from:
+          - zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+          - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+        derivation:
+          relation: >-
+            Equation 4 subtracts the MgO + Mg2SiO4 (prime) ratio fit from the MgSiO3 + Mg2SiO4
+            (double-prime) ratio fit to reduce the measured KEMS ion-current ratio to the partial Gibbs
+            energy of MgO.
+          inputs:
+            - zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+            - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+          output_unit: J/mol
+        values:
+          quantity: partial_gibbs_energy_temperature_function_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact quantity token or coefficient-function observation form represents a partial Gibbs-energy
+            temperature function. Quantity has partial molar enthalpy but no partial molar Gibbs energy;
+            QUANTITY_ALIASES has no partial-Gibbs token and TYPE_QUANTITY maps gibbs_table to delta_fG.
+            OBSERVATION_TYPES contains no partial-Gibbs function type. The row keeps a descriptive non-token
+            quantity; see simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES,
+            simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          method_as_published: Knudsen mass spectrometry; ln{I(Mg+)/I(SiO+)} was reduced using equations 4 and 5.
+          phase_field_as_printed: MgSiO3 + Mg2SiO4
+          relative_reference_as_printed: crystalline MgO and β-cristobalite
+          equation_as_published: ΔG''(MgO) = −(32144 ± 245) + (2.15 ± 0.16)T
+          coefficients_as_published:
+            intercept: '−(32144 ± 245)'
+            T: '2.15 ± 0.16'
+          uncertainty_confidence_level: not stated
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p486
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 2
+          table_column_number: 3
+          phase: liquid
+          row: 'x(SiO2) = 0.486*'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.514'
+                  - - SiO2
+                    - '0.486'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.181'
+          activity_as_printed: '0.181'
+          x_SiO2_as_printed: '0.486'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.514'
+            SiO2: '0.486'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          footnote_as_printed: '* The region of melt coexistence with Mg2SiO4.'
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p498
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 3
+          table_column_number: 3
+          phase: liquid
+          row: 'x(SiO2) = 0.498'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.502'
+                  - - SiO2
+                    - '0.498'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.171'
+          activity_as_printed: '0.171'
+          x_SiO2_as_printed: '0.498'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.502'
+            SiO2: '0.498'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p511
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 4
+          table_column_number: 3
+          phase: liquid
+          row: 'x(SiO2) = 0.511'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.489'
+                  - - SiO2
+                    - '0.511'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.158'
+          activity_as_printed: '0.158'
+          x_SiO2_as_printed: '0.511'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.489'
+            SiO2: '0.511'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p528
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 2
+          table_column_number: 6
+          phase: liquid
+          row: 'x(SiO2) = 0.528'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.472'
+                  - - SiO2
+                    - '0.528'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.144'
+          activity_as_printed: '0.144'
+          x_SiO2_as_printed: '0.528'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.472'
+            SiO2: '0.528'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p550
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 3
+          table_column_number: 6
+          phase: liquid
+          row: 'x(SiO2) = 0.550'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.450'
+                  - - SiO2
+                    - '0.550'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.129'
+          activity_as_printed: '0.129'
+          x_SiO2_as_printed: '0.550'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.450'
+            SiO2: '0.550'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+      - observation_id: zaitsev_2006_table2_mgo_x_sio2_0p563
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 4
+          table_column_number: 6
+          phase: liquid
+          row: 'x(SiO2) = 0.563'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: unknown
+                  reason: The paper identifies crystalline MgO without naming its polymorph.
+              component_basis: MgO
+          inferred: false
+          note: Table 2 caption specifies crystalline MgO.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.437'
+                  - - SiO2
+                    - '0.563'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+        derived_from:
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The MgO activity uses the Eq. 9 boundary value and the SiO2 activity series, then Gibbs–Duhem integration of the measured KEMS ion-current ratios (Eq. 10). The numeric Figure 3 ratio curve is not stored.
+          inputs:
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: MgO
+          T_K: '1873'
+          activity: '0.122'
+          activity_as_printed: '0.122'
+          x_SiO2_as_printed: '0.563'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.437'
+            SiO2: '0.563'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            MgO activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10); the initial value uses Eq. 9 and the SiO2 activity.
+    context:
+      - observation_id: zaitsev_2006_fig2_kems_ratio_series
+        type: source_input_series
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          figure: '2'
+        units: ln{I(Mg+)/I(SiO+)} as plotted
+        candidate_quantities:
+          - ion_intensity_ratio
+        reason: >-
+          Figure 2 plots the KEMS ion-current-ratio measurements used for the Table 1 temperature fits.
+          Numeric figure values are a figure-read candidate and were not digitized in this extraction.
+        values:
+          numeric_values_extracted: false
+          input_to_observations:
+            - zaitsev_2006_table1_mgo_mg2sio4_ratio_fit
+            - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+            - zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+      - observation_id: zaitsev_2006_fig3_kems_ratio_series
+        type: source_input_series
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          figure: '3'
+        units: ln{I(Mg+)/I(SiO+)} as plotted
+        candidate_quantities:
+          - ion_intensity_ratio
+        reason: >-
+          Figure 3 plots the KEMS ion-current-ratio curve used in the Gibbs–Duhem activity reductions.
+          Numeric figure values are a figure-read candidate and were not digitized in this extraction.
+        values:
+          numeric_values_extracted: false
+          input_to_observations:
+            - zaitsev_2006_table2_mgo_x_sio2_0p486
+            - zaitsev_2006_table2_mgo_x_sio2_0p498
+            - zaitsev_2006_table2_mgo_x_sio2_0p511
+            - zaitsev_2006_table2_mgo_x_sio2_0p528
+            - zaitsev_2006_table2_mgo_x_sio2_0p550
+            - zaitsev_2006_table2_mgo_x_sio2_0p563
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+  SiO2:
+    observations:
+      - observation_id: zaitsev_2006_eq7_sio2_partial_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          equation: '7'
+        regime: knudsen_effusion
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: Equation 7 is a temperature-dependent relation, not a point value.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '7'
+          composition:
+            state:
+              tag: unknown
+              reason: The equation applies to the MgSiO3 + Mg2SiO4 two-phase field without a single bulk composition.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '7'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not report an oxygen fugacity for these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '7'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during these KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '7'
+        derived_from:
+          - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+          - zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+        derivation:
+          relation: >-
+            Equation 5 subtracts the MgSiO3 + Mg2SiO4 (double-prime) ratio fit from the MgSiO3 + SiO2
+            (triple-prime) ratio fit to reduce the measured KEMS ion-current ratio to the partial Gibbs
+            energy of SiO2.
+          inputs:
+            - zaitsev_2006_table1_mgsio3_mg2sio4_ratio_fit
+            - zaitsev_2006_table1_mgsio3_sio2_ratio_fit
+          output_unit: J/mol
+        values:
+          quantity: partial_gibbs_energy_temperature_function_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            No exact quantity token or coefficient-function observation form represents a partial Gibbs-energy
+            temperature function. Quantity has partial molar enthalpy but no partial molar Gibbs energy;
+            QUANTITY_ALIASES has no partial-Gibbs token and TYPE_QUANTITY maps gibbs_table to delta_fG.
+            OBSERVATION_TYPES contains no partial-Gibbs function type. The row keeps a descriptive non-token
+            quantity; see simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES,
+            simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+          method_as_published: Knudsen mass spectrometry; ln{I(Mg+)/I(SiO+)} was reduced using equations 4 and 5.
+          phase_field_as_printed: MgSiO3 + Mg2SiO4
+          relative_reference_as_published: crystalline MgO and β-cristobalite
+          equation_as_published: ΔG''(SiO2) = (1302 ± 332) + (2.01 ± 0.24)T
+          coefficients_as_published:
+            intercept: '(1302 ± 332)'
+            T: '2.01 ± 0.24'
+          uncertainty_confidence_level: not stated
+          sign_consistency_note: "The printed +(2.01 ± 0.24)T slope has the opposite sign from the Table 1 fit and Eq. 5; Eq. 8's slope 0.14 = 2.15 − 2.01. Coefficients remain exactly as printed."
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p486
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 2
+          table_column_number: 2
+          phase: liquid
+          row: 'x(SiO2) = 0.486*'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.514'
+                  - - SiO2
+                    - '0.486'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.486*'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '0.693'
+          activity_as_printed: '0.693'
+          x_SiO2_as_printed: '0.486'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.514'
+            SiO2: '0.486'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          footnote_as_printed: '* The region of melt coexistence with Mg2SiO4.'
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p498
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 3
+          table_column_number: 2
+          phase: liquid
+          row: 'x(SiO2) = 0.498'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.502'
+                  - - SiO2
+                    - '0.498'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.498'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '0.737'
+          activity_as_printed: '0.737'
+          x_SiO2_as_printed: '0.498'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.502'
+            SiO2: '0.498'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p511
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 4
+          table_column_number: 2
+          phase: liquid
+          row: 'x(SiO2) = 0.511'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.489'
+                  - - SiO2
+                    - '0.511'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.511'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '0.797'
+          activity_as_printed: '0.797'
+          x_SiO2_as_printed: '0.511'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.489'
+            SiO2: '0.511'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p528
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 2
+          table_column_number: 5
+          phase: liquid
+          row: 'x(SiO2) = 0.528'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.472'
+                  - - SiO2
+                    - '0.528'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.528'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '0.865'
+          activity_as_printed: '0.865'
+          x_SiO2_as_printed: '0.528'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.472'
+            SiO2: '0.528'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p550
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 3
+          table_column_number: 5
+          phase: liquid
+          row: 'x(SiO2) = 0.550'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.450'
+                  - - SiO2
+                    - '0.550'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.550'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '0.951'
+          activity_as_printed: '0.951'
+          x_SiO2_as_printed: '0.550'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.450'
+            SiO2: '0.550'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+      - observation_id: zaitsev_2006_table2_sio2_x_sio2_0p563
+        type: activity_coefficient
+        locator:
+          page: 4
+          published_page: 338
+          pdf_page_index: 3
+          table: '2'
+          table_row_number: 4
+          table_column_number: 5
+          phase: liquid
+          row: 'x(SiO2) = 0.563'
+        regime: knudsen_effusion
+        phase: l
+        units: dimensionless activity
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: SiO2
+                phase:
+                  tag: value
+                  value: cr
+                polymorph:
+                  tag: value
+                  value: cristobalite_high
+              component_basis: SiO2
+          inferred: false
+          note: Table 2 caption specifies β-cristobalite.
+          locator:
+            page: 4
+            published_page: 338
+            pdf_page_index: 3
+            table: '2'
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '1873'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          composition:
+            state:
+              tag: value
+              value:
+                basis: printed_mole_fraction
+                amount_basis: mole_fraction
+                components:
+                  - - MgO
+                    - '0.437'
+                  - - SiO2
+                    - '0.563'
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 4
+              published_page: 338
+              pdf_page_index: 3
+              table: '2'
+              row: 'x(SiO2) = 0.563'
+        derived_from:
+          - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+        derivation:
+          relation: >-
+            The SiO2 activity was obtained by Gibbs–Duhem integration in terms of the measured KEMS ion-current ratios (Eq. 10). Figure 3 prints the ratio curve graphically; its numeric values are outside this extraction.
+          inputs:
+            - zaitsev-2006-magnesium-silicate-thermodynamics::context::zaitsev_2006_fig3_kems_ratio_series
+          output_unit: dimensionless activity
+        values:
+          quantity: activity
+          method_class: measured_reduced
+          admission_status: admitted
+          component_as_printed: SiO2
+          T_K: '1873'
+          activity: '1.0'
+          activity_as_printed: '1.0'
+          x_SiO2_as_printed: '0.563'
+          composition_mol:
+            basis: printed_mole_fraction
+            MgO: '0.437'
+            SiO2: '0.563'
+          composition_derivation: >-
+            The binary system is MgO–SiO2; x(MgO) is the complement of the printed x(SiO2).
+          calculation_as_published: >-
+            SiO2 activity was obtained by integrating the Gibbs–Duhem equation in terms of KEMS ion-current
+            intensity ratios (Eq. 10).
+  MgSiO3:
+    observations:
+      - observation_id: zaitsev_2006_eq8_mgsio3_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          equation: '8'
+        regime: knudsen_effusion
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The source prints a temperature-dependent relation, not a single point temperature.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '8'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '8'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '8'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '8'
+        derived_from:
+          - zaitsev_2006_eq6_mgo_partial_gibbs_fit
+          - zaitsev_2006_eq7_sio2_partial_gibbs_fit
+        derivation:
+          relation: >-
+            The authors state that the measured partial thermodynamic characteristics of the MgSiO3 + Mg2SiO4 field were used to calculate these integral formation Gibbs-energy functions.
+          inputs:
+            - zaitsev_2006_eq6_mgo_partial_gibbs_fit
+            - zaitsev_2006_eq7_sio2_partial_gibbs_fit
+          output_unit: J/mol
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity: gibbs_energy_of_formation_temperature_function_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            The printed result is a ΔfG(T) coefficient function, not point-valued delta_fG. Quantity.DELTA_FG
+            represents point values; neither it nor QUANTITY_ALIASES has an exact function-coefficient token.
+            TYPE_QUANTITY maps gibbs_table to delta_fG, so this row uses a descriptive non-token label to prevent
+            inference. OBSERVATION_TYPES has no function-coefficient form. See simulator/battery/enums.py::Quantity.DELTA_FG,
+            simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES. No values were evaluated from the fit.
+          equation_as_published: 'ΔfG(MgSiO3) = −(30842 ± 413) + (0.14 ± 0.29)T'
+          T_range_K_from_input_table:
+            - '1571'
+            - '1824'
+          uncertainty_confidence_level: not stated
+          method_as_published: >-
+            KEMS measurement; the fitted ion-current ratios were used to calculate component partial Gibbs
+            energies and then the MgSiO3 formation relation.
+      - observation_id: zaitsev_2006_table4_enstatite_experimental_delta_fG
+        type: gibbs_table
+        locator:
+          page: 7
+          published_page: 341
+          pdf_page_index: 6
+          table: '4'
+          table_row_number: 13
+          table_column_number: 3
+          phase: solid
+          row: 'Enstatite MgSiO3; ΔfG(298 K); Experimental'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298'
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 4 reports no experimental total pressure.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          column_as_printed: Experimental
+          quantity: delta_fG
+          method_class: quoted_attributed
+          admission_status: admitted
+          attribution: '[31]'
+          T_K: '298'
+          delta_fG: '-32143'
+          delta_fG_as_printed: '−32 143'
+          phase_as_printed: Enstatite
+      - observation_id: zaitsev_2006_table4_enstatite_calculated_delta_fG
+        type: gibbs_table
+        locator:
+          page: 7
+          published_page: 341
+          pdf_page_index: 6
+          table: '4'
+          table_row_number: 13
+          table_column_number: 4
+          phase: solid
+          row: 'Enstatite MgSiO3; ΔfG(298 K); Calculated'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298'
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 4 reports no experimental total pressure.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Enstatite MgSiO3; ΔfG(298 K)'
+        derived_from:
+          - zaitsev_2006_eq17_mgsio3_model_function
+        derivation:
+          relation: Calculated column of Table 4; the paper reports optimized thermodynamic properties.
+          inputs:
+            - zaitsev_2006_eq17_mgsio3_model_function
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          column_as_printed: Calculated
+          quantity: delta_fG
+          method_class: model_derived
+          admission_status: admitted
+          T_K: '298'
+          delta_fG: '-32150'
+          delta_fG_as_printed: '−32 150'
+          phase_as_printed: Enstatite
+      - observation_id: zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+        type: gibbs_table
+        locator:
+          page: 7
+          published_page: 341
+          pdf_page_index: 6
+          table: '4'
+          table_row_number: 53
+          table_column_number: 3
+          phase: solid
+          row: 'Protoenstatite MgSiO3; ΔfG(298 K); Experimental'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298'
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 4 reports no experimental total pressure.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          column_as_printed: Experimental
+          quantity: delta_fG
+          method_class: quoted_attributed
+          admission_status: admitted
+          attribution: '[31]'
+          T_K: '298'
+          delta_fG: '-23914'
+          delta_fG_as_printed: '−23 914'
+          phase_as_printed: Protoenstatite
+      - observation_id: zaitsev_2006_table4_protoenstatite_calculated_delta_fG
+        type: gibbs_table
+        locator:
+          page: 7
+          published_page: 341
+          pdf_page_index: 6
+          table: '4'
+          table_row_number: 53
+          table_column_number: 4
+          phase: solid
+          row: 'Protoenstatite MgSiO3; ΔfG(298 K); Calculated'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value:
+                kind: point
+                point: '298'
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: Table 4 reports no experimental total pressure.
+            locator:
+              page: 7
+              published_page: 341
+              pdf_page_index: 6
+              table: '4'
+              row: 'Protoenstatite MgSiO3; ΔfG(298 K)'
+        derived_from:
+          - zaitsev_2006_eq17_mgsio3_model_function
+        derivation:
+          relation: Calculated column of Table 4; the paper reports optimized thermodynamic properties.
+          inputs:
+            - zaitsev_2006_eq17_mgsio3_model_function
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          column_as_printed: Calculated
+          quantity: delta_fG
+          method_class: model_derived
+          admission_status: admitted
+          T_K: '298'
+          delta_fG: '-23882'
+          delta_fG_as_printed: '−23 882'
+          phase_as_printed: Protoenstatite
+      - observation_id: zaitsev_2006_eq17_mgsio3_model_function
+        type: gibbs_table
+        locator:
+          page: 9
+          published_page: 343
+          pdf_page_index: 8
+          equation: '17'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The source prints a temperature-dependent relation, not a single point temperature or range.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '17'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '17'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '17'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: This is a thermodynamic model output; the paper gives no total-pressure condition.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '17'
+        derived_from:
+          - zaitsev_2006_eq8_mgsio3_gibbs_fit
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_mgo_x_sio2_0p486
+          - zaitsev_2006_table2_mgo_x_sio2_0p498
+          - zaitsev_2006_table2_mgo_x_sio2_0p511
+          - zaitsev_2006_table2_mgo_x_sio2_0p528
+          - zaitsev_2006_table2_mgo_x_sio2_0p550
+          - zaitsev_2006_table2_mgo_x_sio2_0p563
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev_2006_table4_enstatite_experimental_delta_fG
+          - zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+        derivation:
+          relation: >-
+            Statistical-thermodynamic optimization of the MgO–SiO2 liquid and crystalline phases, using
+            thermochemical and phase-equilibrium data; this is the authors' optimized MgSiO3 formation function.
+          inputs:
+            - zaitsev_2006_eq8_mgsio3_gibbs_fit
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_mgo_x_sio2_0p486
+            - zaitsev_2006_table2_mgo_x_sio2_0p498
+            - zaitsev_2006_table2_mgo_x_sio2_0p511
+            - zaitsev_2006_table2_mgo_x_sio2_0p528
+            - zaitsev_2006_table2_mgo_x_sio2_0p550
+            - zaitsev_2006_table2_mgo_x_sio2_0p563
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev_2006_table4_enstatite_experimental_delta_fG
+            - zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity: gibbs_energy_of_formation_temperature_function_coefficients
+          method_class: model_derived
+          admission_status: typed_unavailable
+          schema_gap: >-
+            The printed result is a ΔfG(T) coefficient function, not point-valued delta_fG. Quantity.DELTA_FG
+            represents point values; neither it nor QUANTITY_ALIASES has an exact function-coefficient token.
+            TYPE_QUANTITY maps gibbs_table to delta_fG, so this row uses a descriptive non-token label to prevent
+            inference. OBSERVATION_TYPES has no function-coefficient form. See simulator/battery/enums.py::Quantity.DELTA_FG,
+            simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES. No values were evaluated from the fit.
+          equation_as_published: >-
+            ΔfG(MgSiO3) = −10550 − 154.69T + 20.5939T ln T − 5.7672 × 10−3 T² − 2.115 × 10−7 T³
+            − 1369674/T + 8.6833 × 10−11 T⁴
+          coefficients_as_published:
+            intercept: '−10550'
+            T: '−154.69'
+            T ln T: '20.5939'
+            T^2: '−5.7672 × 10−3'
+            T^3: '−2.115 × 10−7'
+            1/T: '−1369674'
+            T^4: '8.6833 × 10−11'
+  Mg2SiO4:
+    observations:
+      - observation_id: zaitsev_2006_eq9_mg2sio4_gibbs_fit
+        type: gibbs_table
+        locator:
+          page: 3
+          published_page: 337
+          pdf_page_index: 2
+          equation: '9'
+        regime: knudsen_effusion
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The source prints a temperature-dependent relation, not a single point temperature.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '9'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '9'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '9'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The paper does not state the total pressure during the KEMS measurements.
+            locator:
+              page: 3
+              published_page: 337
+              pdf_page_index: 2
+              equation: '9'
+        derived_from:
+          - zaitsev_2006_eq6_mgo_partial_gibbs_fit
+          - zaitsev_2006_eq7_sio2_partial_gibbs_fit
+        derivation:
+          relation: >-
+            The authors state that the measured partial thermodynamic characteristics of the MgSiO3 + Mg2SiO4 field were used to calculate these integral formation Gibbs-energy functions.
+          inputs:
+            - zaitsev_2006_eq6_mgo_partial_gibbs_fit
+            - zaitsev_2006_eq7_sio2_partial_gibbs_fit
+          output_unit: J/mol
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity: gibbs_energy_of_formation_temperature_function_coefficients
+          method_class: measured_reduced
+          admission_status: typed_unavailable
+          schema_gap: >-
+            The printed result is a ΔfG(T) coefficient function, not point-valued delta_fG. Quantity.DELTA_FG
+            represents point values; neither it nor QUANTITY_ALIASES has an exact function-coefficient token.
+            TYPE_QUANTITY maps gibbs_table to delta_fG, so this row uses a descriptive non-token label to prevent
+            inference. OBSERVATION_TYPES has no function-coefficient form. See simulator/battery/enums.py::Quantity.DELTA_FG,
+            simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES. No values were evaluated from the fit.
+          equation_as_published: 'ΔfG(Mg2SiO4) = −(62986 ± 592) + (2.19 ± 0.40)T'
+          T_range_K_from_input_table:
+            - '1571'
+            - '1824'
+          uncertainty_confidence_level: not stated
+          method_as_published: >-
+            KEMS measurement; the fitted ion-current ratios were used to calculate component partial Gibbs
+            energies and then the Mg2SiO4 formation relation.
+      - observation_id: zaitsev_2006_eq16_mg2sio4_model_function
+        type: gibbs_table
+        locator:
+          page: 9
+          published_page: 343
+          pdf_page_index: 8
+          equation: '16'
+        phase: cr
+        units: J/mol
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The source prints a temperature-dependent relation, not a single point temperature or range.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '16'
+          composition:
+            state:
+              tag: unknown
+              reason: The source does not print a bulk MgO–SiO2 composition for this compound thermochemical datum.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '16'
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: The source does not state an oxygen-fugacity condition for this row.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '16'
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: This is a thermodynamic model output; the paper gives no total-pressure condition.
+            locator:
+              page: 9
+              published_page: 343
+              pdf_page_index: 8
+              equation: '16'
+        derived_from:
+          - zaitsev_2006_eq8_mgsio3_gibbs_fit
+          - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+          - zaitsev_2006_table2_mgo_x_sio2_0p486
+          - zaitsev_2006_table2_mgo_x_sio2_0p498
+          - zaitsev_2006_table2_mgo_x_sio2_0p511
+          - zaitsev_2006_table2_mgo_x_sio2_0p528
+          - zaitsev_2006_table2_mgo_x_sio2_0p550
+          - zaitsev_2006_table2_mgo_x_sio2_0p563
+          - zaitsev_2006_table2_sio2_x_sio2_0p486
+          - zaitsev_2006_table2_sio2_x_sio2_0p498
+          - zaitsev_2006_table2_sio2_x_sio2_0p511
+          - zaitsev_2006_table2_sio2_x_sio2_0p528
+          - zaitsev_2006_table2_sio2_x_sio2_0p550
+          - zaitsev_2006_table2_sio2_x_sio2_0p563
+          - zaitsev_2006_table4_enstatite_experimental_delta_fG
+          - zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+        derivation:
+          relation: >-
+            Statistical-thermodynamic optimization of the MgO–SiO2 liquid and crystalline phases, using
+            thermochemical and phase-equilibrium data; this is the authors' optimized Mg2SiO4 formation function.
+          inputs:
+            - zaitsev_2006_eq8_mgsio3_gibbs_fit
+            - zaitsev_2006_eq9_mg2sio4_gibbs_fit
+            - zaitsev_2006_table2_mgo_x_sio2_0p486
+            - zaitsev_2006_table2_mgo_x_sio2_0p498
+            - zaitsev_2006_table2_mgo_x_sio2_0p511
+            - zaitsev_2006_table2_mgo_x_sio2_0p528
+            - zaitsev_2006_table2_mgo_x_sio2_0p550
+            - zaitsev_2006_table2_mgo_x_sio2_0p563
+            - zaitsev_2006_table2_sio2_x_sio2_0p486
+            - zaitsev_2006_table2_sio2_x_sio2_0p498
+            - zaitsev_2006_table2_sio2_x_sio2_0p511
+            - zaitsev_2006_table2_sio2_x_sio2_0p528
+            - zaitsev_2006_table2_sio2_x_sio2_0p550
+            - zaitsev_2006_table2_sio2_x_sio2_0p563
+            - zaitsev_2006_table4_enstatite_experimental_delta_fG
+            - zaitsev_2006_table4_protoenstatite_experimental_delta_fG
+        values:
+          formation_basis_as_published: >-
+            Formation from crystalline MgO and β-cristobalite, as identified in the Figure 4 caption and the optimized-function text.
+          quantity: gibbs_energy_of_formation_temperature_function_coefficients
+          method_class: model_derived
+          admission_status: typed_unavailable
+          schema_gap: >-
+            The printed result is a ΔfG(T) coefficient function, not point-valued delta_fG. Quantity.DELTA_FG
+            represents point values; neither it nor QUANTITY_ALIASES has an exact function-coefficient token.
+            TYPE_QUANTITY maps gibbs_table to delta_fG, so this row uses a descriptive non-token label to prevent
+            inference. OBSERVATION_TYPES has no function-coefficient form. See simulator/battery/enums.py::Quantity.DELTA_FG,
+            simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES. No values were evaluated from the fit.
+          equation_as_published: >-
+            ΔfG(Mg2SiO4) = −54239 − 99.19T + 14.3851T ln T − 0.0053247T² − 8.85833 × 10−7 T³
+            − 1286088/T + 1.73667 × 10−10 T⁴
+          coefficients_as_published:
+            intercept: '−54239'
+            T: '−99.19'
+            T ln T: '14.3851'
+            T^2: '−0.0053247'
+            T^3: '−8.85833 × 10−7'
+            1/T: '−1286088'
+            T^4: '1.73667 × 10−10'

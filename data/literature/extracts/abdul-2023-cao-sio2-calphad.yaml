@@ -564,8 +564,8 @@ species:
           title_as_printed: Functions for the melt phase used for the C-S phase diagram
           liquid_model: associate model; two-state liquid end-member descriptions
           rows:
-            - {parameter: GC, expression_as_printed: 'GC = GCaO,Liquid [6]', method_class: quoted_attributed, reference: '[6]', numeric_parameters: []}
-            - {parameter: GS, expression_as_printed: 'GS = GSiO2,Liquid [7]', method_class: quoted_attributed, reference: '[7]', numeric_parameters: []}
+            - {parameter: GC, expression_as_printed: 'GC = GCaO,Liquid [6]', method_class: quoted_attributed, reference: '[6]', attribution: 'G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan & A. Pisch, Thermodynamic modelling of the Ca–O system including 3rd generation description of CaO and CaO2, Calphad 69 (2020) 101764. doi:10.1016/j.calphad.2020.101764.', numeric_parameters: []}
+            - {parameter: GS, expression_as_printed: 'GS = GSiO2,Liquid [7]', method_class: quoted_attributed, reference: '[7]', attribution: 'I. Bajenova, A. Khvan, A. Dinsdale & A. Kondratiev, Implementation of the extended Einstein and two-state liquid models for thermodynamic description of pure SiO2 at 1 atm, Calphad 68 (2020) 101716. doi:10.1016/j.calphad.2019.101716.', numeric_parameters: []}
             - {parameter: GC2S, expression_as_printed: 'GC2S = 2GCaO,Liquid + GSiO2,Liquid − 185132.188472035 − 1.6*T', method_class: model_derived, numeric_parameters: [-185132.188472035, -1.6]}
             - {parameter: GCS, expression_as_printed: 'GCS = GCaO,Liquid + GSiO2,Liquid − 131793.447600044 + 12.6747313767583*T', method_class: model_derived, numeric_parameters: [-131793.447600044, 12.6747313767583]}
             - {parameter: 'LCS,S,0', expression_as_printed: 'LCS,S,0 = 206415.921620474 − 107.044648799784*T', method_class: model_derived, numeric_parameters: [206415.921620474, -107.044648799784]}
@@ -673,6 +673,7 @@ species:
           quote: 'However, corrections for the CaO side are required due to the dramatic change in the melting point of CaO in the recent reassessment [10].'
           reference_10: 'M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21 (1990) 303–312. doi:10.1007/BF02664198.'
           evidence_class: quoted_attributed
+          attribution: 'M. Hillert, B. Sundman & X. Wang, An assessment of the CaO-SiO2 system, Metallurgical Transactions B 21 (1990) 303–312. doi:10.1007/BF02664198.'
       - observation_id: abdul_2023_fit_data_and_model_comparison_context
         type: assessment_context
         locator: {page: '3-10', published_pages: '2-9', sections: ['2. Literature review of the solid phases', '3. Literature review of the liquid and melt phases', '4. Thermodynamic modelling', '6. Results and discussion'], table: 'A.2'}

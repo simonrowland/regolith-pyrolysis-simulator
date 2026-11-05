@@ -124,6 +124,26 @@ def test_series_row_extra_preserves_species_annotation_identity() -> None:
     assert series_row_extra(different) != series_row_extra(row)
 
 
+def test_series_row_extra_ignores_duplicate_of_link() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    row = {
+        "row_as_printed": "9",
+        "T_K": "1173",
+        "activity": "4.67e-11",
+        "composition_mol": {"Na2O": "0.329", "SiO2": "0.671"},
+    }
+    linked = {
+        **row,
+        "duplicate_of_observation_id": "primary::printed-row-9",
+    }
+
+    assert series_row_extra(linked) == series_row_extra(row)
+    assert series_row_extra(linked, include_locator=False) == series_row_extra(
+        row, include_locator=False
+    )
+
+
 def test_series_row_extra_uses_sample_and_content_fingerprint() -> None:
     from simulator.battery.stable_ids import series_point_id, series_row_extra
 

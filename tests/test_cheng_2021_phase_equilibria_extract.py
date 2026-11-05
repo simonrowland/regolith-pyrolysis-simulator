@@ -44,6 +44,37 @@ RENDER_PINS = (
     ("cheng21_table3_a_liq_cao", 27.6, 11),
 )
 
+CHENG_RUN_COMPOSITION_REASON = (
+    "The paper does not identify a Table 2 starting mixture (A–D) for this "
+    "Table 5 experiment, so its run composition cannot be bound."
+)
+CHENG_LIQUID_LABELS = {"Liq", "Liq 1", "Liq 2", "Liq1", "Liq2"}
+
+
+def _assert_cheng_scoring_source_bindings(row: dict) -> None:
+    printed_phase = row["values"]["printed_phase_label"]
+    expected_phase = "l" if printed_phase in CHENG_LIQUID_LABELS else "cr"
+    assert row["phase"] == expected_phase
+
+    run_composition = row["point_conditions"]["composition"]
+    assert run_composition["state"] == {
+        "tag": "unknown",
+        "reason": CHENG_RUN_COMPOSITION_REASON,
+    }
+    assert run_composition["locator"] == row["locator"]
+
+    assert "oxygen_partial_pressure" in row["values"]
+    oxygen = row["values"]["oxygen_partial_pressure"]
+    assert oxygen["value"] == "0.21"
+    assert oxygen["units"] == "atm"
+    assert oxygen["locator"]["page"] == 7
+    assert oxygen["locator"]["section"] == "2. EXPERIMENTAL METHODOLOGY"
+
+    assemblage = row["values"]["phase_assemblage_as_printed"]
+    condition_assemblage = row["point_conditions"]["phase_assemblage"]
+    assert condition_assemblage["state"] == {"tag": "value", "value": assemblage}
+    assert condition_assemblage["locator"] is not None
+
 
 def _assert_render_pins(document: dict) -> None:
     for observation_id, expected, pdf_page in RENDER_PINS:
@@ -81,18 +112,28 @@ def test_cheng_table_rows_and_600_dpi_render_pins() -> None:
             if observation.get("uncertainty"):
                 assert float(observation["uncertainty"]["value"]) > 0
 
-    paired = [
-        observation
-        for block in document["species"].values()
-        for observation in block["observations"]
-        if observation["observation_id"].startswith("cheng21_t5_e119_")
-        and observation["phase"] in {"Liq 1", "Liq 2"}
-    ]
-    assert {observation["phase"] for observation in paired} == {"Liq 1", "Liq 2"}
-    assert {
-        observation["point_conditions"]["tie_line_id"]["state"]["value"]
-        for observation in paired
-    } == {"cheng21_t5_e119::tie-line"}
+    assert (
+        _observation(document, "cheng21_t5_e119_liq_1_sio2")["values"][
+            "printed_phase_label"
+        ]
+        == "Liq 1"
+    )
+    assert (
+        _observation(document, "cheng21_t5_e119_liq_2_sio2")["values"][
+            "printed_phase_label"
+        ]
+        == "Liq 2"
+    )
+    for observation_id in (
+        "cheng21_t5_e119_liq_1_sio2",
+        "cheng21_t5_e119_liq_2_sio2",
+    ):
+        assert (
+            _observation(document, observation_id)["point_conditions"][
+                "tie_line_id"
+            ]["state"]["value"]
+            == "cheng21_t5_e119::tie-line"
+        )
 
 
 def test_cheng_render_pin_rejects_a_changed_cell() -> None:
@@ -105,7 +146,7 @@ def test_cheng_render_pin_rejects_a_changed_cell() -> None:
 def test_cheng_all_locators_use_printed_pages_and_zero_based_pdf_indices() -> None:
     document = _document()
     locators = list(iter_locators(document))
-    assert len(locators) == 9172
+    assert len(locators) == 11008
     assert all(
         locator["published_page"] == locator["page"]
         and locator["pdf_page_index"] == locator["page"] - 1
@@ -160,7 +201,11 @@ def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: P
         assert Decimal("99.7") <= total_pct <= Decimal("100.3")
         assert printed["basis"] == "printed_mole_fraction"
         observation = migrated_by_id[observation_id]
-        assert observation.identity.composition.is_not_applicable
+        if source_row["experiment"].startswith("cheng21_t5_e"):
+            assert observation.identity.composition.is_unknown
+            assert observation.identity.composition.reason == CHENG_RUN_COMPOSITION_REASON
+        else:
+            assert observation.identity.composition.is_not_applicable
         composition, omitted = _mole_fraction_composition_from_values(source_row["values"])
         assert composition is not None
         assert not omitted
@@ -217,3 +262,108 @@ def test_cheng_isolated_migration_carries_temperature_and_conditions(tmp_path: P
         for key in ("temperature_K", "fO2_Pa"):
             assert conditions[key].state.is_value
             assert conditions[key].locator is not None
+
+
+def test_cheng_phase_run_composition_fo2_and_assemblage_bindings(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "cheng-2021-fe-ca-si-o-phase-equilibria.yaml"
+    )
+    assert result.validation is not None
+    assert not result.validation.hard_issues
+
+    document = _document()
+    table5_rows = [
+        row
+        for block in document["species"].values()
+        for row in block["observations"]
+        if row.get("type") == "equilibrium_phase_composition"
+        and row.get("experiment", "").startswith("cheng21_t5_e")
+    ]
+    worklist_rows = [
+        row
+        for row in table5_rows
+        if isinstance(row["values"].get("composition_mol"), dict)
+    ]
+    assert len(table5_rows) == 921
+    assert len(worklist_rows) == 918
+    assert (
+        _observation(document, "cheng21_t5_e124_hematite_cao")["values"][
+            "printed_phase_label"
+        ]
+        == "Hematite"
+    )
+    assert (
+        _observation(document, "cheng21_t5_e114_c2s_cao")["values"][
+            "printed_phase_label"
+        ]
+        == "α'-C2S(**)"
+    )
+
+    migrated_by_id = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in result.observations.values()
+    }
+    run_assemblages: dict[str, set[str]] = {}
+    phase_counts: dict[str, int] = {}
+    identity_fo2_count = 0
+    for source_row in worklist_rows:
+        _assert_cheng_scoring_source_bindings(source_row)
+        observation_id = source_row["observation_id"]
+        migrated = migrated_by_id[observation_id]
+        expected_phase = source_row["phase"]
+        assert migrated.identity.species is not None
+        phase = migrated.identity.species.phase
+        assert phase.is_value and phase.value.value == expected_phase
+        phase_counts[expected_phase] = phase_counts.get(expected_phase, 0) + 1
+
+        if expected_phase == "l":
+            assert migrated.identity.phase_role is not None
+            assert migrated.identity.phase_role.is_value
+            assert migrated.identity.phase_role.value.value == "slag"
+        else:
+            assert migrated.identity.phase_role is None
+
+        composition = migrated.point_conditions["composition"]
+        assert composition.state.is_unknown
+        assert composition.state.reason == CHENG_RUN_COMPOSITION_REASON
+        assert composition.locator is not None
+        assert composition.locator.page == source_row["locator"]["page"]
+        assert composition.locator.table == source_row["locator"]["table"]
+
+        printed_oxygen = source_row["values"]["oxygen_partial_pressure"]
+        assert printed_oxygen["value"] == "0.21"
+        pressure = migrated.point_conditions["fO2_Pa"]
+        assert pressure.state.is_value
+        assert pressure.locator is not None
+        if migrated.identity.fO2_Pa is not None and migrated.identity.fO2_Pa.is_value:
+            identity_fo2_count += 1
+            assert migrated.identity.fO2_Pa.value == Decimal("21278.25")
+        assert migrated.point_conditions["temperature_K"].state.is_value
+        assert migrated.point_conditions["temperature_K"].locator is not None
+
+        phase_assemblage = migrated.point_conditions["phase_assemblage"]
+        assert phase_assemblage.state.is_value
+        printed_assemblage = source_row["values"]["phase_assemblage_as_printed"]
+        assert phase_assemblage.state.value == printed_assemblage
+        assert phase_assemblage.locator is not None
+        run_assemblages.setdefault(source_row["experiment"], set()).add(
+            printed_assemblage
+        )
+
+    assert phase_counts == {"l": 384, "cr": 534}
+    assert identity_fo2_count == 384
+    assert len(run_assemblages) == 128
+    assert all(len(assemblages) == 1 for assemblages in run_assemblages.values())
+    assert run_assemblages["cheng21_t5_e001"] == {"Liq + Spinel"}
+    assert run_assemblages["cheng21_t5_e007"] == {"Liq1 + Liq2"}
+    assert run_assemblages["cheng21_t5_e124"] == {
+        "Liq + Hematite + CS + Tridymite"
+    }
+
+
+def test_cheng_source_binding_pin_rejects_deleted_fo2_fact() -> None:
+    document = deepcopy(_document())
+    row = _observation(document, "cheng21_t5_e001_liq_cao")
+    del row["values"]["oxygen_partial_pressure"]
+    with pytest.raises(AssertionError):
+        _assert_cheng_scoring_source_bindings(row)

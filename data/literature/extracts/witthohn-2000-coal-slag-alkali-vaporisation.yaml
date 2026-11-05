@@ -953,8 +953,18 @@ species:
           method_as_published: >-
             FACT 2.1 thermodynamic modelling with the modified quasi-chemical
             model and the ChemSage delta-G minimiser.
-          method_class: quoted_attributed
-          attribution: Witthohn et al. (2000), Fig. 6; FACT calculation curves
+          method_class: model_derived
+          derivation:
+            relation: The authors calculated K2O activity with the FACT 2.1 database system, modified quasi-chemical model, and ChemSage ΔG-minimiser.
+            raw_inputs:
+              state: {tag: value, value: not_printed}
+              locator: {page: 10, section: Phase equilibrium modelling}
+            method:
+              state: {tag: value, value: FACT 2.1 database system with the modified quasi-chemical model and ChemSage ΔG-minimiser.}
+              locator: {page: 10, section: Phase equilibrium modelling}
+            references:
+              - 'Bale et al. (1996), F*A*C*T 2.1 User Manual.'
+              - 'Pelton and Blander (1984, 1986), modified quasi-chemical model.'
           status: typed_refusal
           reason: Figure-only model values are outside this extraction wave; no measured K2O activity data are tabulated.
           admission_status: rejected_no_figure_reading
