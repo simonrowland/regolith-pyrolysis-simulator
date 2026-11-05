@@ -1,0 +1,436 @@
+schema_version: literature_extract.v1
+source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+source:
+  citation: >-
+    Kale, G. M. and Srikanth, S. (1999). Electrochemical Determination of the Gibbs Energy of Formation of Na2Fe2O4 and Na3Fe5O9 Employing Na-β-Al2O3 Solid Electrolyte. Journal of the American Ceramic Society, 83(1), 175–180.
+  year: 1999
+  corpus_asset: raw/kale-srikanth-2000-sodium-ferrite-gibbs/kale-srikanth-2000-sodium-ferrite-gibbs.pdf
+extraction:
+  method: >-
+    Transcribed from the MinerU content-list table blocks and markdown, then checked against the born-digital pdftotext layout. Render checks resolved the Table I minus signs and footnote marker, confirmed table row and column assignments, checked all numeric cells in Table III after the table QA mismatch, and verified Eq. (10) and its uncertainty.
+  date: '2026-11-04'
+  worker: w1104nf-ks00
+  provenance_path: text/kale-srikanth-2000-sodium-ferrite-gibbs/pdftotext-layout.txt
+  source_note: >-
+    The task and source id label this work as 2000, but the paper itself gives Journal of the American Ceramic Society 83(1), pages 175–180 (1999) and a January 1999 issue date. The paper reports Gibbs-energy fits for Na2Fe2O4 from Na2O and Fe2O3, not elemental standard formation enthalpy, entropy, heat capacity, heat content, or fusion data. Its printed Na2Fe2O4 formula has the same elemental ratio as the requested NaFeO2 empirical formula; all values and the J/mol basis remain as printed, with no normalization or scaling.
+review_status: draft
+fidelity_samples:
+  - path: species.NaFeO2.observations[kale_srikanth_1999_table1_shaiu].values.equation_as_printed
+    value: '−171 970 − 9.456T'
+    locator:
+      page: 2
+      table: 'I'
+      row: Shaiu et al. [11]
+  - path: species.NaFeO2.observations[kale_srikanth_1999_table1_zhang_834_1004].values.equation_as_printed
+    value: '−247 086 + 89.435T‡'
+    locator:
+      page: 2
+      table: 'I'
+      row: Zhang et al. [1]
+  - path: species.NaFeO2.observations[kale_srikanth_1999_eq10_current].values.equation_as_printed
+    value: '−232 582 + 69.61T'
+    locator:
+      page: 4
+      equation: '10'
+  - path: species.NaFeO2.observations[kale_srikanth_1999_eq10_current].values.uncertainty_as_printed
+    value: ±5500 J/mol
+    locator:
+      page: 4
+      equation: '10'
+  - path: species.NaFeO2.context[kale_srikanth_1999_table3_equilibration].values.phase_equilibration_rows[5].equilibration_temperature_K
+    value: 1048
+    locator:
+      page: 3
+      table: 'III'
+      row: body row 6
+species:
+  NaFeO2:
+    observations:
+      - observation_id: kale_srikanth_1999_table1_shaiu
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Shaiu et al. [11]
+          published_page: 176
+        T_range_K: [795, 1048]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Shaiu et al. [11], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[11]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−171 970 − 9.456T'
+          T_range_as_printed: 795–1048 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_yamaguchi_930_1047
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Yamaguchi et al. [8], 930–1047 K
+          published_page: 176
+        T_range_K: [930, 1047]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[8]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−160 200 − 3.909T'
+          T_range_as_printed: 930–1047 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_yamaguchi_1047_1278
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Yamaguchi et al. [8], 1047–1278 K
+          published_page: 176
+        T_range_K: [1047, 1278]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[8]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−152 700 − 1.332T'
+          T_range_as_printed: 1047–1278 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_yamaguchi_1278_1405
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Yamaguchi et al. [8], 1278–1405 K
+          published_page: 176
+        T_range_K: [1278, 1405]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Yamaguchi et al. [8], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[8]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−147 300 − 13.37T'
+          T_range_as_printed: 1278–1405 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_zhang_635_785
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Zhang et al. [1], 635–785 K
+          published_page: 176
+        T_range_K: [635, 785]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Zhang et al. [1], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[1]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−237 425 + 83.1T'
+          T_range_as_printed: 635–785 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_zhang_834_1004
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Zhang et al. [1], 834–1004 K
+          published_page: 176
+        T_range_K: [834, 1004]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Zhang et al. [1], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[1]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−247 086 + 89.435T‡'
+          T_range_as_printed: 834–1004 K
+          table_header_marker_as_printed: '†'
+          equation_marker_as_printed: '‡'
+          table_footnote_as_printed: >-
+            The activity of Na2O in α-Al2O3 + Na-β-Al2O3 was taken from Kale [12].
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_table1_dai
+        type: gibbs_table
+        locator:
+          page: 2
+          table: 'I'
+          row: Dai et al. [10]
+          published_page: 176
+        T_range_K: [773, 1030]
+        phase: cr
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: quoted_attributed
+          attribution: Dai et al. [10], as cited in Table I by Kale and Srikanth
+          reference_as_printed: '[10]'
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Table I gives Gibbs energy in J/mol and names Na2Fe2O4 in its caption; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of Na2Fe2O4 from Na2O and Fe2O3
+          reference_state_as_printed: Na2O and Fe2O3
+          polymorph_as_printed: not stated in Table I
+          equation_as_printed: '−86 000 − 61.89T'
+          T_range_as_printed: 773–1030 K
+          table_header_marker_as_printed: '†'
+          table_footnote_as_printed: >-
+            Unless noted otherwise, α-Al2O3 + Na-β-Al2O3 was not used as a reference electrode; therefore, the activity of Na2O is not necessary for the calculations.
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is a fit attributed to earlier work, not the present authors' own measurement; it remains quoted_attributed.
+      - observation_id: kale_srikanth_1999_eq10_current
+        type: gibbs_table
+        locator:
+          page: 4
+          equation: '10'
+          published_page: 178
+        T_range_K: [930, 998]
+        phase: cr
+        condensed_form:
+          polymorph: alpha
+        units: J/mol
+        values:
+          quantity: delta_fG
+          method_class: measured_reduced
+          formula: Na2Fe2O4
+          formula_as_published: Na2Fe2O4
+          formula_basis_note: >-
+            Equation (10) gives Gibbs energy in J/mol for the Na2Fe2O4 formula named in the equation; no formula normalization or scaling has been applied.
+          property_as_printed: Gibbs energy of formation of α-Na2Fe2O4 from solid Na2O and α-Fe2O3
+          reference_state_as_printed: solid Na2O and α-Fe2O3
+          polymorph_as_printed: α-Na2Fe2O4
+          equation_as_printed: '−232 582 + 69.61T'
+          T_range_as_printed: 930–998 K
+          uncertainty_as_printed: ±5500 J/mol
+          uncertainty_kind_as_printed: standard error; the printed uncertainty limit is the sum of the reference-electrode thermodynamic-data and emf-measurement errors
+          confidence_level: not stated
+          status: typed_refused_schema_gap
+          schema_gap: >-
+            The source prints a coefficient-only Gibbs-energy function over a temperature interval. The extract preserves the equation and range, but this form is not interpreted as numeric point observations by the battery migrator.
+          method_class_reason: >-
+            This is the authors' reduction of their measured cell-I emf using the printed reference-electrode activity relation; it is measured_reduced, not quoted_attributed. The numeric emf readings are plotted but not tabulated.
+          derivation:
+            relation: >-
+              Equation (10) is calculated from the authors' cell-I emf measurements and the Na2O activity of the α-Al2O3 plus Na-β-Al2O3 reference electrode adopted from Kale [12].
+            raw_inputs:
+              state:
+                tag: value
+                value: not_printed
+              locator:
+                page: 3
+                figure: '2'
+                published_page: 177
+                note: >-
+                  Numeric cell-I emf readings are plotted in Figure 2 and are not tabulated; the activity relation is printed as Equation (8) on page 178.
+            output_unit: J/mol
+    context:
+      - observation_id: kale_srikanth_1999_table3_equilibration
+        type: phase_equilibration_context
+        locator:
+          page: 3
+          table: 'III'
+          published_page: 177
+        units: >-
+          K for equilibration temperatures and h for equilibration times; phase labels are as printed.
+        values:
+          table_body_row_count_as_printed: 14
+          target_relevant_rows_stored: 13
+          phase_equilibration_rows:
+            - body_row_index: 1
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 923
+              equilibration_time_h: 24
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 2
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 948
+              equilibration_time_h: 48
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 3
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 973
+              equilibration_time_h: 24
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 4
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 998
+              equilibration_time_h: 48
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 5
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1023
+              equilibration_time_h: 24
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 6
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1048
+              equilibration_time_h: 24
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phases_as_printed: 'Na3Fe5O9, β-Na2Fe2O4'
+            - body_row_index: 7
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1073
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phases_as_printed: β-Na2Fe2O4
+            - body_row_index: 8
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1098
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 9
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1123
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 10
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1148
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 11
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1173
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 12
+              initial_composition_as_printed: 'α-Na2Fe2O4 + Fe2O3 (1:1)'
+              equilibration_temperature_K: 1198
+              equilibration_time_h: 48
+              major_phases_as_printed: 'Na3Fe5O9, Fe2O3'
+              minor_phase_cell_as_printed: blank
+            - body_row_index: 13
+              initial_composition_as_printed: 'Na2CO3 + Fe2O3 (1:2)'
+              equilibration_temperature_K: 973
+              equilibration_time_h: 72
+              major_phases_as_printed: 'α-Na2Fe2O4, Fe2O3'
+              minor_phases_as_printed: Na2CO3
+          out_of_scope_body_row_14: >-
+            Na2CO3 + Fe2O3 (1:2) at 1273 K for 72 h; only Na3Fe5O9 and Fe2O3 are listed after equilibration.
+          table_read_note: >-
+            The MinerU draft counts a repeated header as a body row (15); the rendered table and pdftotext contain 14 actual data rows. The stored 13 rows are those whose initial or final assemblage includes Na2Fe2O4; body row 14 contains only the other compound and Fe2O3.
+      - observation_id: kale_srikanth_1999_transition_context
+        type: phase_transition_context
+        locator:
+          page: 4
+          published_page: 178
+          section: Results and Discussion
+        units: >-
+          K for temperature values; reaction and phase labels are as printed.
+        values:
+          current_phase_equilibration_boundary_as_printed: 1048 ± 10 K
+          current_emf_segment_intersection_as_printed: 1028 ± 5 K
+          thery_boundary_as_cited: 1030 ± 5 K
+          current_phase_boundary_reaction_as_printed: 3Na2Fe2O4(s) + 2Fe2O3(s) ⇌ 2Na3Fe5O9(s)
+          interpretation_as_printed: >-
+            These temperatures concern the reaction between the lower-temperature Na2Fe2O4 and higher-temperature Na3Fe5O9 assemblages in the Na2Fe2O4–Fe2O3 system; they are not an intrinsic α-to-β or delta transition of NaFeO2.
+          stability_comparison_as_printed: >-
+            The authors say Na3Fe5O9 is not stable below 1073 ± 10 K in their results, contrary to Yamaguchi et al. [8], who found it stable down to 850 K.
+          beta_phase_observation_as_printed: >-
+            Table III lists β-Na2Fe2O4 as a minor phase at 1048 and 1073 K.
+          absent_requested_properties: >-
+            No δ phase near 1498 K, fusion temperature or enthalpy, standard formation enthalpy at 298 K, S298, Cp(T) equation or table, or H(T)-H298 values are printed for Na2Fe2O4 in this paper.
+          figure_read_candidate: >-
+            Figure 3 compares Gibbs-energy curves and Figure 4 compares Na3Fe5O9 data, but they are plots; no figure-only numeric values were digitized.
