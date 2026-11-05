@@ -50,6 +50,10 @@ TEMPERATURE_K = {
     "1400": Decimal("1673.15"),
     "1250": Decimal("1523.15"),
 }
+FIGURE_RECORDS = {
+    "mysen_virgo_1989_figure_9_fe_redox_deferred": ("9", 10, 67, 9),
+    "mysen_virgo_1989_figure_15_fe_redox_deferred": ("15", 13, 70, 12),
+}
 
 
 def _document() -> dict:
@@ -210,3 +214,31 @@ def test_isolated_migration_binds_all_conditions_and_keeps_printed_fraction() ->
         observation["values"]["spectrum_measurement_temperature_K"] == "77"
         for observation in starred
     )
+
+    source_figures = {
+        record["observation_id"]: record
+        for record in document["species"]["Fe"]["context"]
+        if record.get("type") == "figure_record"
+    }
+    migrated_figures = {
+        record["observation_id"]: record
+        for records in result.context_by_work.values()
+        for record in records
+        if record.get("source_id") == SID and record.get("type") == "figure_record"
+    }
+    assert set(source_figures) == set(migrated_figures) == set(FIGURE_RECORDS)
+    for observation_id, (figure, page, published_page, page_index) in FIGURE_RECORDS.items():
+        source = source_figures[observation_id]
+        migrated = migrated_figures[observation_id]
+        assert source["locator"] == {
+            "page": page,
+            "published_page": published_page,
+            "pdf_page_index": page_index,
+            "figure": figure,
+        }
+        assert source["values"]["digitisation"] == "deferred to a figure pass"
+        assert source["values"]["numeric_points"] == "none"
+        assert source["values"]["context_only_reason"]
+        assert migrated["locator"] == source["locator"]
+        assert migrated["values"] == source["values"]
+        assert migrated["context_id"] == f"{SID}::context::{observation_id}"

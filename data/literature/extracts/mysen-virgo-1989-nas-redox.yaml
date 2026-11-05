@@ -5650,3 +5650,44 @@ species:
             section: Experimental Methods
             note: The fitted doublet areas are not tabulated; Fig. 3 shows representative spectra, not
               a numeric area table.
+    context:
+    - observation_id: mysen_virgo_1989_figure_9_fe_redox_deferred
+      type: figure_record
+      locator:
+        page: 10
+        published_page: 67
+        pdf_page_index: 9
+        figure: '9'
+      panel: whole figure
+      units: figure axes as printed
+      values:
+        quantity: valence_ratio
+        method_class: figure_only
+        species: Fe
+        axes_as_printed:
+          composition: Al/(Al + Si)
+          dependencies: temperature and oxygen fugacity
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        context_only_reason: Figure-only Fe redox relationship; numeric coordinates are not tabulated and
+          are deferred by this extraction wave.
+    - observation_id: mysen_virgo_1989_figure_15_fe_redox_deferred
+      type: figure_record
+      locator:
+        page: 13
+        published_page: 70
+        pdf_page_index: 12
+        figure: '15'
+      panel: whole figure
+      units: figure axes as printed
+      values:
+        quantity: valence_ratio
+        method_class: figure_only
+        species: Fe
+        axes_as_printed:
+          x: log fO2
+          series_dimensions: temperature, NBO/T, and Al/(Al + Si)
+        digitisation: deferred to a figure pass
+        numeric_points: none
+        context_only_reason: Figure-only Fe redox relationship; numeric coordinates are not tabulated and
+          are deferred by this extraction wave.

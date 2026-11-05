@@ -29,11 +29,11 @@ The measured material is quenched glass, so all rows use phase `glass`. On PDF p
 
 ## Exclusions
 
-Table 3 reports average Fe3+/ΣFe and distribution percentages for natural rock groups compiled from Chayes data. It is not a set of sample-specific NAS melt experiments and has no matching experimental temperature or fO2, so it is not mixed into the Table 2 point set. Table 4 contains regression coefficients for Equation 11, not sample points. Their flagged numeric cells were render-checked, but neither table contributes observations. Figure-only redox relationships in Figures 9 and 15 are candidates for a separate figure pass; no plotted coordinates were digitized here. Figures 3–5 are representative spectra and are used only to locate the unprinted fit inputs.
+Table 3 reports average Fe3+/ΣFe and distribution percentages for natural rock groups compiled from Chayes data. It is not a set of sample-specific NAS melt experiments and has no matching experimental temperature or fO2, so it is not mixed into the Table 2 point set. Table 4 contains regression coefficients for Equation 11, not sample points. Their flagged numeric cells were render-checked, but neither table contributes observations. Figures 9 and 15 are recorded under `species.Fe.context` as typed `figure_record` deferrals with PDF-page locators, reasons, and `numeric_points: none`; their coordinates remain deferred to a figure pass. Figures 3–5 are representative spectra and are used only to locate the unprinted fit inputs.
 
 ## Isolated migration
 
-The real migrator produced 53 observations, 0 hard issues, 0 unavailable values, 0 quantity-unknown observations, and 0 phase-unknown observations. Identity axes after migration:
+The real migrator produced 53 observations and retained 2 Fe figure-context records, with 0 hard issues, 0 unavailable values, 0 quantity-unknown observations, and 0 phase-unknown observations. Identity axes after migration:
 
 | Table 2 row | composition | total_pressure_Pa | fO2_Pa | temperature_K |
 | --- | --- | --- | --- | --- |
@@ -49,4 +49,4 @@ The focused extract test passed (2 tests), including isolated migration and both
 
 ## Expected store effect
 
-Regeneration is not committed. The expected observation-store delta is +53 Fe valence-ratio observations; no battery-store files were regenerated or added to this change.
+Regeneration is not committed. The expected store delta is +53 Fe valence-ratio observations and +2 figure-context records; no battery-store files were regenerated or added to this change.
