@@ -1,13 +1,13 @@
 # Battery v2.1 migration report
 
-rows in: 89661
-records out (observations): 179718
-works: 759
-experiments: 6878
-queue size: 120579
+rows in: 89683
+records out (observations): 179816
+works: 762
+experiments: 6881
+queue size: 120697
 identical-payload dedupe aliases: 342
 metadata files: 50
-index sources: 757
+index sources: 760
 hard issues: 1687
 
 ## Unavailable input work census
@@ -197,20 +197,20 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 756 (mismatch) |
+| citations | 147 | 759 (mismatch) |
 | doi_works | 56 | 408 (mismatch) |
-| no_doi_works | 91 | 351 (mismatch) |
+| no_doi_works | 91 | 354 (mismatch) |
 | admission_statuses | 374 | 30794 (mismatch) |
 | supersedes | 422 | 636 (mismatch) |
 | series | 60 | 1369 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1917 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1242 (mismatch) |
 | gibbs_reference_101325 | 594 | 635 (mismatch) |
-| formulas | 1625 | 22022 (mismatch) |
+| formulas | 1625 | 22030 (mismatch) |
 | equipment_payloads | 670 | 950 (mismatch) |
-| absent_admissions | 3511 | 15741 (mismatch) |
+| absent_admissions | 3511 | 15763 (mismatch) |
 | absent_classes | 2174 | 2127 (mismatch) |
-| range_only_T | 3125 | 2921 (mismatch) |
+| range_only_T | 3125 | 2937 (mismatch) |
 | system_like_phases | 1065 | 3809 (mismatch) |
 | missing_phases | 237 | 1356 (mismatch) |
 | tabulated_lists | — | 6 |
@@ -245,12 +245,13 @@ Each count is page-grounding work keyed by the value's typed unavailable_reason.
 
 ## Unrecognised polymorph tokens
 
-degradations: 108
+degradations: 177
 
 Unrecognised printed spellings become State.unknown with the original spelling in the reason; they are never dropped and never invented. Each degradation is queued on species.polymorph.
 
 | token | count |
 |---|---:|
+| `SOL-B` | 69 |
 | `Cristobalite` | 33 |
 | `2MgO·SiO2` | 21 |
 | `TiO2` | 18 |
@@ -19062,6 +19063,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity.yaml` | 60 | 60 | 60 |
 | `data/literature/extracts/banya-watanabe-1977-feto-p2o5-solid-iron.yaml` | 87 | 87 | 324 |
 | `data/literature/extracts/barcza-1979-mn-slag-metal-equilibrium.yaml` | 12 | 12 | 4 |
+| `data/literature/extracts/barin-1995.yaml` | 13 | 89 | 93 |
 | `data/literature/extracts/basu-2008-feo-steelmaking.yaml` | 216 | 216 | 0 |
 | `data/literature/extracts/beckett-2002-silicate-melt-activities.yaml` | 14 | 14 | 84 |
 | `data/literature/extracts/beerkens-2001-industrial-glass-evaporation.yaml` | 4 | 4 | 4 |
@@ -19234,6 +19236,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/jsc-a16-special-samples.yaml` | 3 | 18 | 27 |
 | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` | 12 | 16 | 52 |
 | `data/literature/extracts/jugo-2010-sulfur-xanes.yaml` | 2 | 8 | 4 |
+| `data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml` | 8 | 8 | 24 |
 | `data/literature/extracts/kambayashi-kato-1984-mgo-sio2-1973k.yaml` | 77 | 77 | 15 |
 | `data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml` | 66 | 66 | 110 |
 | `data/literature/extracts/kassis-frischat-1981-silicate-glass-vapour.yaml` | 4 | 16 | 10 |
@@ -19680,6 +19683,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/stolyarova-2021-ti-al-kems-ru.yaml` | 205 | 205 | 26 |
 | `data/literature/extracts/stolyarova-vorozhtcov-lopatin-2023-sro-al2o3-kems-supplement.yaml` | 190 | 1037 | 6 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 33 |
+| `data/literature/extracts/stuve-pankratz-richardson-1971-ri7535-sodium-ferrite.yaml` | 1 | 1 | 1 |
 | `data/literature/extracts/su-2024-lunar-volatiles-thesis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 18 | 56 | 128 |
 | `data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml` | 32 | 32 | 80 |
@@ -19857,8 +19861,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 297280
+advisory issues: 297557
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 297280 |
+| `identity_incomplete` | 297557 |

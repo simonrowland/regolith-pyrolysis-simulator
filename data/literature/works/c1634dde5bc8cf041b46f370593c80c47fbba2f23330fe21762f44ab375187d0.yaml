@@ -1,0 +1,188 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  citation: Kale, G. M. and Srikanth, S. (1999). Electrochemical Determination of the Gibbs Energy of Formation of Na2Fe2O4
+    and Na3Fe5O9 Employing Na-β-Al2O3 Solid Electrolyte. Journal of the American Ceramic Society, 83(1), 175–180.
+  source_ids:
+  - kale-srikanth-2000-sodium-ferrite-gibbs
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 40906ea7d660e3dfb73b79e73fe04b832b9f25fb
+    files:
+    - asset_id: pdf:kale-srikanth-2000-sodium-ferrite-gibbs
+      role: pdf
+      path: raw/kale-srikanth-2000-sodium-ferrite-gibbs/kale-srikanth-2000-sodium-ferrite-gibbs.pdf
+      sha256:
+        tag: value
+        value: 08fd694484ae8488206bf7cef9241dbd3f4f5c9e564d86b51f7d8dc115ac21ab
+    - asset_id: pdftotext:kale-srikanth-2000-sodium-ferrite-gibbs
+      role: pdftotext
+      path: text/kale-srikanth-2000-sodium-ferrite-gibbs
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:kale-srikanth-2000-sodium-ferrite-gibbs
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0::kale-srikanth-2000-sodium-ferrite-gibbs
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  locator:
+    page: 2
+    published_page: 176
+    table: I
+    note: row=Shaiu et al. [11]
+context:
+- observation_id: kale_srikanth_1999_table3_equilibration
+  type: phase_equilibration_context
+  locator:
+    page: 3
+    table: III
+    published_page: 177
+  units: K for equilibration temperatures and h for equilibration times; phase labels are as printed.
+  values:
+    table_body_row_count_as_printed: 14
+    target_relevant_rows_stored: 13
+    phase_equilibration_rows:
+    - body_row_index: 1
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 923
+      equilibration_time_h: 24
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 2
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 948
+      equilibration_time_h: 48
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 3
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 973
+      equilibration_time_h: 24
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 4
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 998
+      equilibration_time_h: 48
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 5
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1023
+      equilibration_time_h: 24
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 6
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1048
+      equilibration_time_h: 24
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phases_as_printed: Na3Fe5O9, β-Na2Fe2O4
+    - body_row_index: 7
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1073
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phases_as_printed: β-Na2Fe2O4
+    - body_row_index: 8
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1098
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 9
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1123
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 10
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1148
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 11
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1173
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 12
+      initial_composition_as_printed: α-Na2Fe2O4 + Fe2O3 (1:1)
+      equilibration_temperature_K: 1198
+      equilibration_time_h: 48
+      major_phases_as_printed: Na3Fe5O9, Fe2O3
+      minor_phase_cell_as_printed: blank
+    - body_row_index: 13
+      initial_composition_as_printed: Na2CO3 + Fe2O3 (1:2)
+      equilibration_temperature_K: 973
+      equilibration_time_h: 72
+      major_phases_as_printed: α-Na2Fe2O4, Fe2O3
+      minor_phases_as_printed: Na2CO3
+    out_of_scope_body_row_14: Na2CO3 + Fe2O3 (1:2) at 1273 K for 72 h; only Na3Fe5O9 and Fe2O3 are listed after equilibration.
+    table_read_note: The MinerU draft counts a repeated header as a body row (15); the rendered table and pdftotext contain
+      14 actual data rows. The stored 13 rows are those whose initial or final assemblage includes Na2Fe2O4; body row 14 contains
+      only the other compound and Fe2O3.
+  context_id: kale-srikanth-2000-sodium-ferrite-gibbs::context::kale_srikanth_1999_table3_equilibration
+  work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  species: NaFeO2
+- observation_id: kale_srikanth_1999_transition_context
+  type: phase_transition_context
+  locator:
+    page: 4
+    published_page: 178
+    section: Results and Discussion
+  units: K for temperature values; reaction and phase labels are as printed.
+  values:
+    current_phase_equilibration_boundary_as_printed: 1048 ± 10 K
+    current_emf_segment_intersection_as_printed: 1028 ± 5 K
+    thery_boundary_as_cited: 1030 ± 5 K
+    current_phase_boundary_reaction_as_printed: 3Na2Fe2O4(s) + 2Fe2O3(s) ⇌ 2Na3Fe5O9(s)
+    interpretation_as_printed: These temperatures concern the reaction between the lower-temperature Na2Fe2O4 and higher-temperature
+      Na3Fe5O9 assemblages in the Na2Fe2O4–Fe2O3 system; they are not an intrinsic α-to-β or delta transition of NaFeO2.
+    stability_comparison_as_printed: The authors say Na3Fe5O9 is not stable below 1073 ± 10 K in their results, contrary to
+      Yamaguchi et al. [8], who found it stable down to 850 K.
+    beta_phase_observation_as_printed: Table III lists β-Na2Fe2O4 as a minor phase at 1048 and 1073 K.
+    absent_requested_properties: No δ phase near 1498 K, fusion temperature or enthalpy, standard formation enthalpy at 298
+      K, S298, Cp(T) equation or table, or H(T)-H298 values are printed for Na2Fe2O4 in this paper.
+    figure_read_candidate: Figure 3 compares Gibbs-energy curves and Figure 4 compares Na3Fe5O9 data, but they are plots;
+      no figure-only numeric values were digitized.
+  context_id: kale-srikanth-2000-sodium-ferrite-gibbs::context::kale_srikanth_1999_transition_context
+  work_id: c1634dde5bc8cf041b46f370593c80c47fbba2f23330fe21762f44ab375187d0
+  source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+  species: NaFeO2
