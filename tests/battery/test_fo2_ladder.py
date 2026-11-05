@@ -44,7 +44,11 @@ from simulator.battery.score import (
     residual_to_plain,
     score_store,
 )
-from simulator.battery.waypoints import ReadinessStatus, oxygen_condition
+from simulator.battery.waypoints import (
+    GapReason,
+    ReadinessStatus,
+    oxygen_condition,
+)
 from simulator.fe_redox import (
     intrinsic_melt_fO2,
     kress91_log10_fO2_from_fe3_over_sigma_fe,
@@ -217,16 +221,26 @@ def test_tier3_buffer_matches_the_oxygen_condition_point() -> None:
 def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> None:
     from simulator.battery.consumer_inputs import collect_consumer_inputs
     from simulator.battery.generators.bench import melt_activity_requests
-    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from pathlib import Path
 
-    _works, experiments, observations = load_migrated_store(
-        sources=("basu-2008-feo-steelmaking",)
+    from simulator.battery.migrate import Migrator
+
+    root = Path(__file__).resolve().parents[2]
+    migrator = Migrator(root=root, index={}, aliases={})
+    migrator._migrate_extract(
+        root / "data/literature/extracts/basu-2008-feo-steelmaking.yaml"
     )
+    migrator.finalize()
+    experiments = migrator.result.experiments
+    observations = migrator.result.observations
     observation = observations[
         "basu-2008-feo-steelmaking::basu_2008_tii_s01_a_feo_1873k"
     ]
     experiment = experiments[observation.experiment_id]
-    bench = load_migrated_benches()[experiment.bench_id]
+    bench = migrator.result.benches[experiment.bench_id]
+    composition = observation.identity.composition
+    assert composition.is_unknown
+    assert "kept sum=94.18 wt% is below 95 wt%" in composition.reason
     resolved = resolve_row_fo2(experiment, bench, observation)
     assert resolved is not None
     assert resolved.tier == 3
@@ -239,23 +253,34 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     assert notice.kind is NoticeKind.SOURCE_DISAGREEMENT
     assert flagged_strata((notice,)) == ()
 
+    partial_inputs = collect_consumer_inputs(experiment, bench, observation)
+    partial_waypoint = partial_inputs.waypoints["normalized_composition"]
+    assert partial_waypoint.selected is None
+    assert partial_waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     requests = melt_activity_requests(
-        collect_consumer_inputs(experiment, bench, observation),
+        partial_inputs,
         experiment=experiment,
         bench=bench,
         observation=observation,
     )
-    comparable = [
-        item for item in requests
-        if item.readiness.engine in _COMPARABLE and item.payload is not None
-    ]
-    assert comparable
-    assert all(not item.readiness.flags for item in comparable)
-    assert {item.payload["fO2_log"] for item in comparable} == {
-        resolved.log10_fO2_bar
+    blocked = [item for item in requests if item.readiness.engine in _COMPARABLE]
+    assert {item.readiness.engine for item in blocked} == set(_COMPARABLE)
+    assert all(item.payload is None for item in blocked)
+    expected_gaps = {
+        "alphamelts": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
+        "thermoengine": ("reference_state", GapReason.REFERENCE_STATE_MISMATCH),
+        "openimcc": ("normalized_composition", GapReason.UNSUPPORTED_PRINT_FORM),
+        "internal-analytical": (
+            "normalized_composition",
+            GapReason.UNSUPPORTED_PRINT_FORM,
+        ),
     }
-    assert {item.payload["fO2_tier"] for item in comparable} == {3}
-    assert {item.payload["fO2_route"] for item in comparable} == {resolved.route}
+    for item in blocked:
+        waypoint, reason = expected_gaps[item.readiness.engine]
+        assert any(
+            gap.waypoint == waypoint and gap.reason is reason
+            for gap in item.readiness.gaps
+        ), (item.readiness.engine, item.readiness.gaps)
 
     unavailable = replace(
         observation,
@@ -263,6 +288,9 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
     )
     assert resolve_row_fo2(experiment, bench, unavailable) is None
 
+    # The printed bulk map totals 94.18 wt%, below b-704's 95 wt% floor.
+    # Metal saturation still resolves from the printed activity above, but an
+    # activity engine also needs the whole melt and must retain that refusal.
     prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
         observation,
@@ -270,44 +298,97 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         bench=bench,
         isolated=False,
     )
-    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+
     context = ScoreContext(
-        works=_works,
+        works=migrator.result.works,
         experiments=experiments,
         observations=observations,
         extract_review={observation.source_id: "reviewed"},
         hostname="test",
-        benches={bench.id: bench},
+        benches=migrator.result.benches,
+        root=root,
     )
-    residual, _candidate = compile_residual(
-        observation,
+
+    # Solution 1's source-grounded print is below the b-704 closure floor.
+    # Keep the scoring-mode and notice integration pins on Solution 2, whose
+    # own Table II oxide map closes at 99.58 wt%.
+    closed_observation = observations[
+        "basu-2008-feo-steelmaking::basu_2008_tii_s02_a_feo_1873k"
+    ]
+    closed_experiment = experiments[closed_observation.experiment_id]
+    closed_bench = migrator.result.benches[closed_experiment.bench_id]
+    closed_printed = closed_observation.point_conditions["printed_composition"]
+    assert closed_printed.state.is_value
+    printed_total = sum(
+        (Decimal(str(amount)) for amount in closed_printed.state.value.values()),
+        Decimal("0"),
+    )
+    assert printed_total == Decimal("99.58")
+    closed_composition = closed_observation.identity.composition
+    assert closed_composition is not None and closed_composition.is_value
+
+    closed_resolved = resolve_row_fo2(
+        closed_experiment, closed_bench, closed_observation
+    )
+    assert closed_resolved is not None
+    assert "fo2 from printed a_FeO (circular for a_FeO rows)" in closed_resolved.route
+    closed_requests = melt_activity_requests(
+        collect_consumer_inputs(
+            closed_experiment, closed_bench, closed_observation
+        ),
+        experiment=closed_experiment,
+        bench=closed_bench,
+        observation=closed_observation,
+    )
+    comparable = [
+        item
+        for item in closed_requests
+        if item.readiness.engine in _COMPARABLE and item.payload is not None
+    ]
+    assert comparable
+    assert all(not item.readiness.flags for item in comparable)
+    assert {item.payload["fO2_log"] for item in comparable} == {
+        closed_resolved.log10_fO2_bar
+    }
+    assert {item.payload["fO2_route"] for item in comparable} == {
+        closed_resolved.route
+    }
+
+    closed_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        closed_observation,
+        experiment=closed_experiment,
+        bench=closed_bench,
+        isolated=False,
+    )
+    assert closed_prediction.value is not None, closed_prediction.refusal_detail
+    shared, _candidate = compile_residual(
+        closed_observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
-        prediction=prediction,
+        prediction=closed_prediction,
     )
-    assert residual.numeric is not None, residual.refusal
-    assert float(residual.numeric.value) == pytest.approx(
-        -0.3047447378614776, abs=1e-12
-    )
+    assert shared.numeric is not None, shared.refusal
     assert any(
         "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
-        for notice in residual.notices
+        for notice in shared.notices
     )
     assert FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND not in flagged_strata(
-        residual.notices
+        shared.notices
     )
 
     intrinsic, _candidate = compile_residual(
-        observation,
+        closed_observation,
         Engine.INTERNAL_ANALYTICAL,
         context=context,
         fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
     )
     assert intrinsic.numeric is not None, intrinsic.refusal
     assert intrinsic.fo2_mode is Fo2Mode.ENGINE_INTRINSIC
-    # Green 6f90106c6 internal-analytical result before the shared ladder.
-    assert float(intrinsic.numeric.value).hex() == "-0x1.380f012af8f98p-2"
-    assert intrinsic.fo2_mode is not residual.fo2_mode
+    assert shared.fo2_mode is Fo2Mode.SHARED_LADDER
+    assert shared.key != intrinsic.key
     assert not any(
         "fo2 from printed a_FeO (circular for a_FeO rows)" in notice.reason
         for notice in intrinsic.notices
@@ -317,27 +398,24 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         for notice in intrinsic.notices
     )
     assert any(
-        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in residual.notices
+        notice.fo2_mode is Fo2Mode.SHARED_LADDER for notice in shared.notices
     )
-    assert residual.fo2_mode is Fo2Mode.SHARED_LADDER
-    assert residual.numeric is not None
-    assert float(residual.numeric.value).hex() == float(intrinsic.numeric.value).hex()
-    assert residual.key != intrinsic.key
     assert residual_to_plain(intrinsic)["fo2_mode"] == "engine_intrinsic"
+    assert residual_to_plain(shared)["fo2_mode"] == "shared_ladder"
     assert any(
         notice.get("fo2_mode") == "engine_intrinsic"
         for notice in residual_to_plain(intrinsic)["notices"]
     )
     assert any(
         notice.get("fo2_mode") == "shared_ladder"
-        for notice in residual_to_plain(residual)["notices"]
+        for notice in residual_to_plain(shared)["notices"]
     )
 
     from simulator.battery.generators.bench import activity_request_for_engine
 
     intrinsic_request = activity_request_for_engine(
-        experiment,
-        observation,
+        closed_experiment,
+        closed_observation,
         Engine.INTERNAL_ANALYTICAL.value,
         fo2_mode=Fo2Mode.ENGINE_INTRINSIC,
     )
@@ -349,7 +427,9 @@ def test_basu_metal_saturation_uses_printed_activity_and_marks_circularity() -> 
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.MELT_ACTIVITY,
     )
-    paired = [item for item in scored if item.reference == observation.observation_id]
+    paired = [
+        item for item in scored if item.reference == closed_observation.observation_id
+    ]
     assert {item.fo2_mode for item in paired} == {
         Fo2Mode.ENGINE_INTRINSIC,
         Fo2Mode.SHARED_LADDER,

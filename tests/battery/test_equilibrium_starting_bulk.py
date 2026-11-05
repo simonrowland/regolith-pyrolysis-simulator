@@ -206,8 +206,12 @@ def test_dash_in_starting_bulk_is_not_zero(tmp_path: Path) -> None:
     oxides = tuple(
         (name, "-" if name == "MnO" else amount) for name, amount in _OXIDES
     )
-    with pytest.raises((ArithmeticError, ValueError, TypeError)):
-        _migrate_fixture(tmp_path, _extract(_initial(oxides)))
+    observation = _migrate_fixture(tmp_path, _extract(_initial(oxides)))
+    composition = observation.identity.composition
+    # A printed dash is retained as a missing major oxide and refuses the
+    # starting composition; it is never interpreted as zero wt%.
+    assert composition is not None and composition.is_unknown
+    assert "missing major oxides: MnO" in composition.reason
 
 
 def test_residue_row_does_not_take_the_starting_bulk(tmp_path: Path) -> None:
@@ -340,6 +344,96 @@ def test_gorojovsky_rows_do_not_gain_the_anhydrous_notice() -> None:
         for observation in rows
         for notice in observation.notices
     )
+    gorojovsky = next(
+        observation
+        for observation in rows
+        if observation.observation_id.endswith("::t2-r002-al2o3")
+    )
+    assert gorojovsky.identity.composition is not None
+    assert gorojovsky.identity.composition.is_value
+    assert "locator" not in dict(gorojovsky.identity.composition.value.components)
+
+
+def test_evans_equilibrium_composition_profile_keeps_composition_not_applicable() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/evans-2009-sulfur-mn-ni-w-xanes.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    evans = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::evans_2009_2c_al_composition::T=1673.15:row=b231205p1:h=1e9620f6f131"
+        )
+    )
+
+    assert evans.identity.composition is not None
+    assert evans.identity.composition.is_not_applicable
+
+
+def test_inoue_elemental_assay_keeps_composition_context_out_of_identity() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/inoue-1991-n-s-partition-cao-al2o3.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assay = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::inoue_1991_n_s_partition_cao_al2o3_p002_t01_r05_c03"
+        )
+    )
+
+    assert assay.identity.quantity.is_value
+    assert assay.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    assert assay.identity.composition is not None
+    assert assay.identity.composition.is_not_applicable
+    assert assay.point_conditions["composition"].state.is_unknown
+
+
+def test_unknown_quantity_does_not_infer_identity_composition_from_assay_map() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    assay = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::kang_2007_t2_sample_309_cu_assay"
+        )
+    )
+
+    assert assay.identity.quantity.is_unknown
+    assert assay.identity.composition is None
+
+
+def test_ivanova_scalar_starting_description_is_a_typed_refusal() -> None:
+    from simulator.battery.migrate import Migrator
+
+    extract = REPO / "data/literature/extracts/ivanova-2018-spinel-rich-cai-evaporation.yaml"
+    migrator = Migrator(root=REPO, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    ivanova = next(
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.observation_id.endswith(
+            "::ivanova_2018_table1_residue_composition::point:0"
+        )
+    )
+    starting = (ivanova.point_conditions or {}).get("starting_composition")
+
+    assert starting is not None
+    assert starting.state.is_unknown
+    assert "not a component map" in (starting.state.reason or "")
+    assert starting.locator is not None
 
 
 def test_wang_2001_residue_keeps_the_starting_charge_contextual() -> None:
@@ -431,3 +525,344 @@ def test_explicit_unknown_wins_over_shared_starting_bulk(tmp_path: Path) -> None
     identity = blank.identity.composition
     assert identity is not None and identity.is_unknown
     assert identity.reason == _BLANK_REASON
+
+
+def test_partial_equilibrium_phase_child_refusal_keeps_green_parent_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    parent_initial_charge = dict(_OXIDES)
+    parent_initial_charge["SiO2"] = "49.5"
+    parent_initial_charge["MgO"] = "10.6"
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = parent_initial_charge
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    root = _write_min_tree(tmp_path, extract=document)
+    result = migrate(root, write=False)
+    children = [
+        observation
+        for observation in result.observations.values()
+        if observation.identity.quantity.is_value
+        and observation.identity.quantity.value
+        is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ]
+    assert len(children) == 1
+    child = children[0]
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    # Green keeps the parent initial charge in identity; the refused child map
+    # belongs only in point_conditions for an equilibrium-phase row.
+    expected_charge = wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
+    )
+    assert identity_composition.value.components == expected_charge.components
+    assert identity_composition.value.basis == expected_charge.basis
+    assert identity_composition.value.amount_basis is expected_charge.amount_basis
+    assert identity_composition.value.proxy_flag == "initial_charge_only"
+
+    measured_composition = child.point_conditions["composition"]
+    assert measured_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (measured_composition.state.reason or "")
+
+
+def test_missing_major_equilibrium_child_keeps_green_parent_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    parent_initial_charge = dict(_OXIDES)
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = parent_initial_charge
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "MgO": "50",
+                "Al2O3": None,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    # Green keeps the parent X0 identity when the child has a blank major
+    # oxide; the closure refusal stays on the child point condition.
+    expected_charge = wt_pct_to_mole_fraction(
+        {name: Decimal(amount) for name, amount in parent_initial_charge.items()}
+    )
+    assert identity_composition.value.components == expected_charge.components
+    child_composition = child.point_conditions["composition"]
+    assert child_composition.state.is_unknown
+    assert "missing major oxides: Al2O3" in child_composition.state.reason
+
+
+def test_ambiguous_feot_mass_loss_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "mass_loss_fraction"
+    values.pop("component_amount")
+    values["mass_loss_fraction"] = "0.2"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "mass_loss_fraction": "0.2",
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "FeO": "25",
+                "FeOT": "25",
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green routes its preexisting ambiguous-FeOT refusal to identity even
+    # for mass-loss rows, replacing the parent's valid starting composition.
+    assert "ambiguous total iron components: FeOT with FeO" in (
+        identity_composition.reason or ""
+    )
+
+
+def test_negative_equilibrium_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_wt_pct": {"SiO2": "101", "MgO": "-1"},
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green rejects negative oxide amounts and replaces this parent's identity
+    # with the row's typed refusal.
+    assert "negative or non-finite amount" in (
+        identity_composition.reason or ""
+    )
+
+
+def test_ambiguous_feot_activity_child_keeps_green_unknown_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "activity"
+    values.pop("component_amount")
+    values["activity"] = "0.2"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "activity": "0.2",
+            "composition_wt_pct": {
+                "SiO2": "50",
+                "FeO": "25",
+                "FeOT": "25",
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(
+        observation
+        for observation in result.observations.values()
+        if "::T=1303" in observation.observation_id
+    )
+    identity_composition = child.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    # Green replaces the valid parent with its preexisting ambiguous-FeOT
+    # refusal for activity rows too.
+    assert "ambiguous total iron components: FeOT with FeO" in (
+        identity_composition.reason or ""
+    )
+
+
+def test_partial_mass_map_refusal_preserves_equal_valued_mole_datum(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial())
+    values = document["species"]["Al2O3"]["observations"][0]["values"]
+    values["quantity"] = "equilibrium_phase_composition"
+    values.pop("component_amount")
+    values["composition_role"] = "datum_state"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["points"] = [
+        {
+            "T_C": 1030,
+            "component_amount": _GLASS_AL2O3,
+            "composition_mol": {"SiO2": "0.5", "Al2O3": "0.5"},
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    child = next(iter(result.observations.values()))
+    assert child.identity.composition is not None
+    # Green keeps the child's explicit 0.5/0.5 mole map in identity even though
+    # its parallel partial mass-percent point map is refused by m1.
+    assert child.identity.composition.is_value
+    assert child.identity.composition.value.basis == "printed_mole_fraction"
+    assert dict(child.identity.composition.value.components) == {
+        "SiO2": Decimal("0.5"),
+        "Al2O3": Decimal("0.5"),
+    }
+    point_composition = child.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
+
+
+def test_partial_pressure_refusal_replaces_green_point_map_identity(
+    tmp_path: Path,
+) -> None:
+    document = _extract(_initial(), component="0.000001")
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values["quantity"] = "p_partial"
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_role"] = "initial_charge_only"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    assert observation.identity.composition is not None
+    # Green writes the converted P_PARTIAL point map into identity; m1 refuses
+    # that same target when its 68.75 wt% kept total fails closure.
+    assert observation.identity.composition.is_unknown
+    assert "kept sum=68.75 wt%" in (observation.identity.composition.reason or "")
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
+
+
+def test_partial_pressure_refusal_replaces_undeclared_measured_parent_map(
+    tmp_path: Path,
+) -> None:
+    document = _extract({}, quantity="p_partial", component="0.000001")
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_wt_pct"] = dict(_OXIDES)
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_wt_pct": {
+                "SiO2": "50.5",
+                "Al2O3": _GLASS_AL2O3,
+            },
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    # Green writes the P_PARTIAL child map into identity even when the parent
+    # has an undeclared-role measured map; closure refusal replaces that target.
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "kept sum=68.75 wt%" in (observation.identity.composition.reason or "")
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=68.75 wt%" in (point_composition.state.reason or "")
+
+
+def test_partial_pressure_accepted_datum_replaces_parent_starting_map(
+    tmp_path: Path,
+) -> None:
+    document = _extract(
+        _initial((
+            ("SiO2", "50"),
+            ("MgO", "50"),
+        )),
+        quantity="p_partial",
+        component="0.000001",
+    )
+    observation = document["species"]["Al2O3"]["observations"][0]
+    observation["units"] = "Pa"
+    values = observation["values"]
+    values.pop("component_amount")
+    values["p_Pa"] = "0.000001"
+    values["composition_role"] = "initial_charge_only"
+    values["series"] = [
+        {
+            "T_C": 1030,
+            "p_Pa": "0.000001",
+            "composition_role": "datum_state",
+            "composition_wt_pct": {"SiO2": "75", "MgO": "25"},
+        }
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract=document), write=False)
+    observation = next(iter(result.observations.values()))
+    expected = wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("75"), "MgO": Decimal("25")}
+    )
+    # Green replaces the 50/50 parent with the accepted 75/25 datum map.
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_value
+    assert observation.identity.composition.value == expected
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_value
+    assert point_composition.state.value == expected
