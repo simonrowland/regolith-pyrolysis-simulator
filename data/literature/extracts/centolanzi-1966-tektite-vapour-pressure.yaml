@@ -1,0 +1,579 @@
+schema_version: literature_extract.v1
+source_id: centolanzi-1966-tektite-vapour-pressure
+source:
+  citation: "Centolanzi, Frank J., and Dean R. Chapman (1966), \"Vapor Pressure of Tektite Glass and Its Bearing on Tektite Trajectories Determined from Aerodynamic Analysis,\" Journal of Geophysical Research 71(6):1735–1749."
+  doi: 10.1029/jz071i006p01735
+  url: https://doi.org/10.1029/jz071i006p01735
+  year: 1966
+  corpus_asset: raw/centolanzi-1966-tektite-vapour-pressure/centolanzi-1966-tektite-vapour-pressure.pdf
+experiments:
+  - experiment_id: centolanzi_1966_summary_fit_record
+    locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+    method: {tag: unknown, reason: 'Aggregate fit record, not a single experimental run.'}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: 'The fit states 1700 to 3000°K, not one point temperature.'}
+        locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: The aggregate fit combines several experiments and has no single pressure condition.}
+        locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+      sweep_gas:
+        state: {tag: unknown, reason: No single carrier gas is assigned to the aggregate fit.}
+        locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+      regime:
+        regime_class: {tag: unknown, reason: No single regime is assigned to the aggregate fit.}
+  - experiment_id: centolanzi_1966_fig7_furnace_series
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: '1700'}
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: '10.1325'}
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+      sweep_gas:
+        state:
+          tag: value
+          value:
+            species: argon
+            flow_sccm: {tag: unknown, reason: Furnace gas flow is not stated.}
+            partial_pressure_Pa: {tag: unknown, reason: No argon partial pressure is stated.}
+        locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+      regime:
+        regime_class: {tag: unknown, reason: The printed diffusion-controlled regime has no exact RegimeClass token.}
+  - experiment_id: centolanzi_1966_fig13b_no_boiling_test
+    locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(b)'}
+    conditions:
+      temperature_K:
+        state: {tag: value, value: '2310'}
+        locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(b)'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: '5066.25'}
+        locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(b)', note: 'printed P_s = 0.05 atm, converted exactly to Pa'}
+      sweep_gas:
+        state: {tag: unknown, reason: Arc-jet gas composition is not stated.}
+        locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(b)'}
+      regime:
+        regime_class: {tag: unknown, reason: No typed flow-regime class is stated for this arc-jet test.}
+  - experiment_id: quoted_chapman_larson_1963_relation
+    locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+    method: {tag: unknown, reason: 'The cited equation is attributed to Chapman and Larson [1963]; its experimental method is not restated.'}
+    conditions:
+      temperature_K:
+        state: {tag: unknown, reason: 'The equation gives a temperature variable, not a single experimental point.'}
+        locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: The cited prior fit has no experiment pressure stated in this paper.}
+        locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+      sweep_gas:
+        state: {tag: unknown, reason: The cited prior fit has no gas composition stated in this paper.}
+        locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+      regime:
+        regime_class: {tag: unknown, reason: The cited prior fit has no flow-regime statement in this paper.}
+extraction:
+  method: >-
+    Transcribed from the MinerU machine text and pdftotext-layout.txt, in that order.
+    The content lists contain no printed tables; their <details> chart tables are
+    generated readings and were ignored. The explicit Figure 7 rate labels, fit
+    equations, and boiling caption/prose values were checked against rendered PDF
+    pages. Figure-encoded points without printed numeric labels remain undigitised.
+  date: '2026-11-02'
+  worker: w1103ce-ce66
+  provenance_path: raw/centolanzi-1966-tektite-vapour-pressure/centolanzi-1966-tektite-vapour-pressure.pdf
+review_status: draft
+scope_assessment:
+  document_type: experimental tektite-glass vapor-pressure study using furnace vaporization and arc-jet ablation
+  typed_observations: 8
+  context_records: 13
+  vapor_species_as_printed: not stated; the reported tektite vapor pressure is not assigned to Na, K, or a gas molecule
+  composition_as_printed: tektite glass is described as composed mainly of silica; no numeric bulk composition is printed
+  carrier_gas_and_atmosphere: furnace atmosphere is argon at variable pressure; arc-jet gas composition is not stated
+  standard_state: no thermodynamic standard-state statement is printed
+  scope_gaps:
+    - No Na or K vapor species, partial pressures, equilibrium constants, ion intensities, or activities are printed.
+    - Figure-only series points were not digitized; see the audit for candidates.
+    - Total vapor pressure over the multi-species vapor is not represented by a species-specific p_sat identity.
+    - The printed areal mass-loss rates have no exact quantity token and remain typed refusals.
+fidelity_samples:
+  - species: unknown
+    observation_id: centolanzi_1966_fig7_silver_areal_mass_loss_rate
+    field: figure_legend_value_as_printed
+    value: '.19'
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: '600 dpi render; open circle legend cell'}
+  - species: unknown
+    observation_id: centolanzi_1966_fig7_gold_areal_mass_loss_rate
+    field: figure_legend_value_as_printed
+    value: '.036'
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: '600 dpi render; open square legend cell'}
+  - species: unknown
+    observation_id: centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+    field: figure_legend_value_as_printed
+    value: '1.3x10^-5'
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: '600 dpi render; open diamond legend cell'}
+  - species: unknown
+    observation_id: centolanzi_1966_fig7_silica_areal_mass_loss_rate
+    field: figure_legend_value_as_printed
+    value: '1.3x10^-5'
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: '600 dpi render; open triangle legend cell'}
+  - species: unknown
+    observation_id: centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+    field: conditional_rate_as_printed
+    value: '12'
+    locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: '600 dpi render; printed IF Pv = Pv(b) slope annotation'}
+  - species: unknown
+    observation_id: centolanzi_1966_tektite_vapor_pressure_fit
+    field: fit_equation_as_printed
+    value: 'P_v(atm) = exp[18.5 - 57,400/T(°K)]'
+    locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+  - species: unknown
+    observation_id: centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+    field: vapor_pressure_bound_as_printed
+    value: '<0.05 atm at 2310°K'
+    locator: {page: 10, pdf_page_index: 9, published_page: 1744, figure: '13(b)', note: 'rendered no-boiling inference'}
+species:
+  unknown:
+    observations:
+      - observation_id: centolanzi_1966_tektite_vapor_pressure_fit
+        type: psat_series
+        locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+        experiment: centolanzi_1966_summary_fit_record
+        phase: l
+        units: atm
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The fit gives a temperature range rather than a single point temperature.
+            locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The aggregate fit combines multiple experiments; no single total pressure is assigned to it.
+            locator: {page: 1, pdf_page_index: 0, published_page: 1735, section: Abstract}
+        values:
+          quantity: vapor_pressure
+          method_class: author_derived
+          gas_basis: TOTAL_PRESSURE_not_species
+          fit_equation_as_printed: 'P_v(atm) = exp[18.5 - 57,400/T(°K)]'
+          fit_method_as_printed: least-squares fit to the data
+          temperature_range_as_printed: 1700 to 3000°K
+          output_as_printed: total vapor pressure of tektite glass
+          vapor_species_as_printed: not stated
+          data_basis: Figure-only pressure points; undigitised
+          other_printed_forms:
+            - equation_as_printed: 'P_v(atm) = exp[18.50 - 57,400/T(°K)]'
+              locator: {page: 12, pdf_page_index: 11, published_page: 1746, figure: '14'}
+            - equation_as_printed: 'ln P_v(atm) = -57,400/T(°K) + 18.50'
+              locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+          schema_gap: >-
+            The paper reports total pressure over tektite-glass vapor without a named
+            gas species. The migrator refuses this as a species-specific saturation
+            pressure in simulator/battery/migrate.py::_quantity_contradiction.
+      - observation_id: centolanzi_1966_fig13b_tektite_vapor_pressure_upper_bound
+        type: psat_series
+        locator: {page: 10, pdf_page_index: 9, published_page: 1744, figure: '13(b)'}
+        experiment: centolanzi_1966_fig13b_no_boiling_test
+        T_K: '2310'
+        phase: l
+        units: atm
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '2310'}
+            locator: {page: 10, pdf_page_index: 9, published_page: 1744, figure: '13(b)'}
+          total_pressure_Pa:
+            state: {tag: value, value: '5066.25'}
+            locator: {page: 10, pdf_page_index: 9, published_page: 1744, figure: '13(b)', note: 'printed P_s = 0.05 atm, converted exactly to Pa'}
+        values:
+          quantity: vapor_pressure
+          method_class: author_derived
+          gas_basis: TOTAL_PRESSURE_not_species
+          total_pressure_atm: '0.05'
+          vapor_pressure_bound_as_printed: '<0.05 atm at 2310°K'
+          bound_operator: '<'
+          bound_value_as_printed: '0.05'
+          pressure_condition_as_printed: 'P_s = 0.05 atm'
+          brightness_temperature_as_printed: 2150°K
+          surface_temperature_as_printed: 2310°K
+          specific_gravity_as_printed: '2.452'
+          boiling_observation_as_printed: no boiling at stagnation point
+          schema_gap: >-
+            The reported bound is for total vapor pressure without a named vapor
+            species; the paper's measured P_s is retained as an experimental
+            condition and is not relabeled as the vapor-pressure output.
+      - observation_id: centolanzi_1966_fig7_tektite_areal_mass_loss_rate
+        type: rate_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        experiment: centolanzi_1966_fig7_furnace_series
+        T_K: '1700'
+        phase: l
+        units: g/cm² min
+        regime: furnace_vaporization_in_argon
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1700'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+          total_pressure_Pa:
+            state: {tag: value, value: '10.1325'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+          atmosphere:
+            state: {tag: value, value: argon}
+            locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        values:
+          quantity: areal_mass_loss_rate_as_printed
+          method_class: author_derived
+          total_pressure_atm: '0.0001'
+          sample_as_printed: tektite glass
+          vapor_species_as_printed: not stated
+          steady_state_mass_loss_rate_as_printed: '1.3 × 10^-5'
+          figure_legend_value_as_printed: '1.3x10^-5'
+          rate_unit_as_printed: g/cm² min
+          figure_legend_unit_as_printed: gm/cm² min
+          marker_as_printed: open diamond
+          pressure_as_printed: 10^-4 atm
+          schema_gap: >-
+            No exact quantity token represents the printed mass per area per time;
+            Quantity.MASS_LOSS_RATE is mass per time and Quantity.MASS_LOSS_AREAL_DENSITY
+            is mass per area without time. See simulator/battery/enums.py::Quantity.MASS_LOSS_RATE,
+            simulator/battery/enums.py::Quantity.MASS_LOSS_AREAL_DENSITY,
+            simulator/battery/migrate.py::_convert_rate_to_kg_per_s, and
+            tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+      - observation_id: centolanzi_1966_fig7_silver_areal_mass_loss_rate
+        type: rate_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        experiment: centolanzi_1966_fig7_furnace_series
+        T_K: '1700'
+        phase: l
+        units: g/cm² min
+        regime: furnace_vaporization_in_argon
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1700'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+          total_pressure_Pa:
+            state: {tag: value, value: '10.1325'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+          atmosphere:
+            state: {tag: value, value: argon}
+            locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        values:
+          quantity: areal_mass_loss_rate_as_printed
+          method_class: author_derived
+          total_pressure_atm: '0.0001'
+          sample_as_printed: silver
+          vapor_species_as_printed: not stated
+          steady_state_mass_loss_rate_as_printed: '0.19'
+          figure_legend_value_as_printed: '.19'
+          rate_unit_as_printed: g/cm² min
+          figure_legend_unit_as_printed: gm/cm² min
+          marker_as_printed: open circle
+          pressure_as_printed: 10^-4 atm
+          schema_gap: No exact quantity token represents mass per area per time; see the tektite-glass rate row and the audit.
+      - observation_id: centolanzi_1966_fig7_gold_areal_mass_loss_rate
+        type: rate_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        experiment: centolanzi_1966_fig7_furnace_series
+        T_K: '1700'
+        phase: l
+        units: g/cm² min
+        regime: furnace_vaporization_in_argon
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1700'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+          total_pressure_Pa:
+            state: {tag: value, value: '10.1325'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+          atmosphere:
+            state: {tag: value, value: argon}
+            locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        values:
+          quantity: areal_mass_loss_rate_as_printed
+          method_class: author_derived
+          total_pressure_atm: '0.0001'
+          sample_as_printed: gold
+          vapor_species_as_printed: not stated
+          steady_state_mass_loss_rate_as_printed: '0.036'
+          figure_legend_value_as_printed: '.036'
+          rate_unit_as_printed: g/cm² min
+          figure_legend_unit_as_printed: gm/cm² min
+          marker_as_printed: open square
+          pressure_as_printed: 10^-4 atm
+          schema_gap: No exact quantity token represents mass per area per time; see the tektite-glass rate row and the audit.
+      - observation_id: centolanzi_1966_fig7_silica_areal_mass_loss_rate
+        type: rate_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        experiment: centolanzi_1966_fig7_furnace_series
+        T_K: '1700'
+        phase: l
+        units: g/cm² min
+        regime: furnace_vaporization_in_argon
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1700'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+          total_pressure_Pa:
+            state: {tag: value, value: '10.1325'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+          atmosphere:
+            state: {tag: value, value: argon}
+            locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        values:
+          quantity: areal_mass_loss_rate_as_printed
+          method_class: author_derived
+          total_pressure_atm: '0.0001'
+          sample_as_printed: silica
+          vapor_species_as_printed: not stated
+          steady_state_mass_loss_rate_as_printed: '1.3 × 10^-5'
+          figure_legend_value_as_printed: '1.3x10^-5'
+          rate_unit_as_printed: g/cm² min
+          figure_legend_unit_as_printed: gm/cm² min
+          marker_as_printed: open triangle
+          pressure_as_printed: 10^-4 atm
+          schema_gap: No exact quantity token represents mass per area per time; see the tektite-glass rate row and the audit.
+      - observation_id: centolanzi_1966_fig7_tektite_rate_if_walter_bubble_pressure
+        type: rate_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        experiment: centolanzi_1966_fig7_furnace_series
+        T_K: '1700'
+        phase: l
+        units: gm/cm² min
+        regime: furnace_vaporization_in_argon
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state: {tag: value, value: '1700'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+          total_pressure_Pa:
+            state: {tag: value, value: '10.1325'}
+            locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7', note: 'printed P = 10^-4 atm, converted exactly to Pa'}
+          atmosphere:
+            state: {tag: value, value: argon}
+            locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        values:
+          quantity: areal_mass_loss_rate_as_printed
+          method_class: author_derived
+          total_pressure_atm: '0.0001'
+          sample_as_printed: tektite glass
+          conditional_rate_as_printed: '12'
+          rate_unit_as_printed: gm/cm² min
+          assumption_as_printed: If P_v = P_v(b), Walter's bubble-pressure function
+          body_occurrence_as_printed: 12 g/cm² min
+          body_occurrence_locator: {page: 6, pdf_page_index: 5, published_page: 1740}
+          schema_gap: >-
+            No exact quantity token represents the printed conditional mass per
+            area per time; it is retained separately from the observed Figure 7 rates.
+      - observation_id: centolanzi_1966_tektite_vapor_pressure_fit_old_comparison
+        type: psat_series
+        locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+        experiment: quoted_chapman_larson_1963_relation
+        phase: l
+        units: atm
+        admission_status: typed_refusal
+        point_conditions:
+          temperature_K:
+            state:
+              tag: unknown
+              reason: The equation gives a temperature variable, not an experimental point temperature.
+            locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+          total_pressure_Pa:
+            state:
+              tag: unknown
+              reason: The cited prior fit has no experiment pressure stated in this paper.
+            locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+        values:
+          quantity: vapor_pressure
+          method_class: quoted_attributed
+          attribution: Chapman and Larson [1963]
+          gas_basis: TOTAL_PRESSURE_not_species
+          equation_as_printed: 'ln P_v = -57,800/T + 19.1'
+          schema_gap: >-
+            This is an attributed prior total vapor-pressure fit; the source gives
+            no individual gas species for the tektite vapor.
+    context:
+      - observation_id: centolanzi_1966_furnace_atmosphere_and_range
+        type: experiment_series
+        locator: {page: 3, pdf_page_index: 2, published_page: 1737, section: Experimental Procedure}
+        units: atm and °K as printed
+        values:
+          method_class: measured_direct
+          atmosphere_as_printed: argon
+          furnace_pressure_range_as_printed: between 10^-4 and 1 atm
+          maximum_cavity_temperature_as_printed: about 2500°K
+          pressure_range_scope: variable furnace atmosphere pressure; no single pressure assigned to each run here
+      - observation_id: centolanzi_1966_standard_vaporization_conditions
+        type: experiment_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '5'}
+        units: °C, °K, and atm as printed
+        values:
+          method_class: measured_direct
+          temperature_as_printed: 22°C (295°K)
+          pressure_as_printed: 1 atm
+          reference_liquids_as_printed:
+            - iso-pentane
+            - acetone
+            - carbon tetrachloride
+            - benzene
+            - ethyl alcohol
+            - water
+            - amyl alcohol
+            - benzoyl chloride
+            - nitrobenzene
+            - benzyl acetate
+            - methyl salicylate
+            - eugenol
+          figure_data_status: Figure 5 plotted values are undigitised
+      - observation_id: centolanzi_1966_furnace_pressure_regime
+        type: experiment_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, section: Experimental Procedure}
+        units: atm and dimensionless as printed
+        values:
+          method_class: measured_direct
+          most_subsequent_data_pressure_as_printed: 1/2 atm
+          knudsen_number_as_printed: approximately 2 × 10^-5 at 1/2 atm
+          additional_pressure_check_as_printed: at 1700°K, 10^-4 atm and 1/2 atm determinations give essentially the same result
+      - observation_id: centolanzi_1966_fig7_printed_legend
+        type: experiment_series
+        locator: {page: 5, pdf_page_index: 4, published_page: 1739, figure: '7'}
+        units: gm/cm² min, °K, and atm as printed
+        values:
+          method_class: author_derived
+          sample_materials_not_vapor_species: [silver, gold, tektite glass, silica]
+          rate_header_as_printed: 'm-dot, gm/cm² min'
+          legend_entries:
+            - {material_as_printed: SILVER, marker_as_printed: open circle, rate_as_printed: '.19'}
+            - {material_as_printed: GOLD, marker_as_printed: open square, rate_as_printed: '.036'}
+            - {material_as_printed: TEKTITE, marker_as_printed: open diamond, rate_as_printed: '1.3x10^-5'}
+            - {material_as_printed: SILICA, marker_as_printed: open triangle, rate_as_printed: '1.3x10^-5'}
+          legend_unit_as_printed: gm/cm² min
+          condition_as_printed: 'T = 1700°K; P = 10^-4 atm'
+          marker_value_mapping_checked: 600 dpi page 5 render
+      - observation_id: centolanzi_1966_fig9_arc_jet_conditions
+        type: experiment_series
+        locator: {page: 7, pdf_page_index: 6, published_page: 1741, figure: '9'}
+        units: cal/g, atm, cal/cm² sec, cm as printed
+        values:
+          method_class: measured_direct
+          measured_materials_as_printed: synthetic and natural tektite glass
+          stagnation_enthalpy_as_printed: 1370 cal/g
+          pressure_as_printed: 0.35 atm
+          heating_rate_as_printed: 86 cal/cm² sec
+          radius_of_curvature_as_printed: 0.95 cm
+          plotted_temperature_series: measured brightness-temperature points and calculated temperature curves; undigitised
+      - observation_id: centolanzi_1966_fig10_arc_jet_conditions
+        type: experiment_series
+        locator: {page: 7, pdf_page_index: 6, published_page: 1741, figure: '10'}
+        units: cal/g, atm, cal/cm² sec, cm, mg, sec as printed
+        values:
+          method_class: measured_direct
+          measured_materials_as_printed: natural and synthetic tektite models
+          experiment_count_as_printed: 13
+          stagnation_enthalpy_as_printed: 2330 cal/g
+          pressure_as_printed: 0.37 atm
+          heating_rate_as_printed: 175 cal/cm² sec
+          radius_of_curvature_as_printed: 0.95 cm
+          measured_mass_loss_as_printed: about 1 to 3 mg, depending upon test time
+          bubble_pressure_calculated_mass_loss_as_printed: 120 mg at 8 sec; measurements are approximately 1 mg
+          figure_data_status: Figure 10 plotted points are undigitised
+      - observation_id: centolanzi_1966_fig11_arc_jet_conditions
+        type: experiment_series
+        locator: {page: 8, pdf_page_index: 7, published_page: 1742, figure: '11'}
+        units: cal/g, atm, cal/cm² sec, cm as printed
+        values:
+          method_class: measured_direct
+          stagnation_enthalpy_as_printed: 2700 cal/g
+          pressure_as_printed: 0.24 atm
+          heating_rate_as_printed: 156 cal/cm² sec
+          radius_of_curvature_as_printed: 0.95 cm
+          measured_materials_as_printed: synthetic and natural tektite glass
+          figure_data_status: recession and ablation points are undigitised
+      - observation_id: centolanzi_1966_fig12_arc_jet_conditions
+        type: experiment_series
+        locator: {page: 9, pdf_page_index: 8, published_page: 1743, figure: '12'}
+        units: cal/g, atm, cal/cm² sec, km/sec, and °K as printed
+        values:
+          method_class: measured_direct
+          stagnation_enthalpy_as_printed: 11000 cal/g
+          pressure_as_printed: 0.52 atm
+          heating_rate_as_printed: 760 cal/cm² sec
+          flight_velocity_as_printed: 9.6 km/sec
+          calculated_ablation_temperature_as_printed: 3040°K
+          closest_fit_pressure_relation_as_printed: approximately one-half the silica vapor pressure and about one-fourth P_v(m) for tektite glass
+          figure_data_status: measured ablation points are undigitised
+      - observation_id: centolanzi_1966_fig13a_no_boiling_conditions
+        type: experiment_series
+        locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(a)'}
+        units: specific gravity, atm, and °K as printed
+        values:
+          method_class: measured_direct
+          sample_as_printed: Rizalite, locality Pugad Babuy, Luzon
+          specific_gravity_as_printed: '2.437'
+          stagnation_pressure_as_printed: 0.08 atm
+          stagnation_temperature_as_printed: 2310°K
+          boiling_observation_as_printed: no boiling
+      - observation_id: centolanzi_1966_fig13c_boiling_at_shoulder_conditions
+        type: experiment_series
+        locator: {page: 11, pdf_page_index: 10, published_page: 1745, figure: '13(c)'}
+        units: specific gravity, atm, and °K as printed
+        values:
+          method_class: measured_direct
+          sample_as_printed: Australite, locality Lake Wilson–Mount Davies area
+          specific_gravity_as_printed: '2.423'
+          stagnation_pressure_as_printed: 0.022 atm
+          stagnation_temperature_as_printed: 2300°K
+          boiling_observation_as_printed: boiling at shoulder
+          local_shoulder_pressure_as_printed: not stated
+          pressure_relation_as_printed: vapor pressure at the shoulder temperature is greater than the shoulder pressure
+      - observation_id: centolanzi_1966_total_vapor_pressure_reference_equations
+        type: experiment_series
+        locator: {page: 6, pdf_page_index: 5, published_page: 1740, figure: '8', note: 'silica pressure equation is printed in the figure footnote'}
+        units: atm and °K as printed
+        values:
+          method_class: quoted_attributed
+          silica_equation_attribution: Hidalgo [1960]
+          silica_vapor_pressure_equation_as_printed: 'ln P_v(atm) = 18.5 - 57,800/T (°K)'
+          gas_species_as_printed: not stated for the silica vapor-pressure relation
+      - observation_id: centolanzi_1966_material_composition_and_volatile_species
+        type: experiment_series
+        locator: {page: 14, pdf_page_index: 13, published_page: 1748, section: Summary of Results and Concluding Remarks}
+        units: qualitative composition and species as printed; no numeric unit
+        values:
+          method_class: quoted_attributed
+          tektite_composition_as_printed: composed mainly of silica
+          dissolved_volatile_species_reported_as_evolving_when_heated_in_vacuum: [H2O, H2, CO2, CO]
+          volatile_species_scope_note: These are reported dissolved gases from prior observations, not identified tektite-vapor pressure species or partial-pressure measurements in this paper.
+          numeric_bulk_composition: not stated
+          carrier_gas_for_arc_jets: not stated
+          oxygen_fugacity: not stated
+          activity: not stated
+          equilibrium_constant: not stated
+          ion_intensity: not stated
+          thermodynamic_standard_state: not stated
+      - observation_id: centolanzi_1966_figures_not_digitized
+        type: experiment_series
+        locator: {page: 12, pdf_page_index: 11, published_page: 1746, figure: '14'}
+        units: plot-axis units vary by figure; plotted values are undigitised
+        values:
+          method_class: figure_only
+          undigitised_figure_candidates:
+            - {figure: '1', page: 2, published_page: 1736, content: Walter bubble-pressure and Centolanzi vapor-pressure plotted curves}
+            - {figure: '3', page: 3, published_page: 1737, content: mass-loss dependence on ambient pressure}
+            - {figure: '4', page: 4, published_page: 1738, content: mass loss versus time for reference liquids}
+            - {figure: '5', page: 5, published_page: 1739, content: vapor pressure versus reference-liquid mass-loss rate}
+            - {figure: '6', page: 5, published_page: 1739, content: tektite-glass mass-loss rate versus furnace pressure}
+            - {figure: '8', page: 6, published_page: 1740, content: pressure curves for tektite glass and four standards}
+            - {figure: '9', page: 7, published_page: 1741, content: measured brightness-temperature series and vapor-pressure calculations}
+            - {figure: '10', page: 8, published_page: 1742, content: measured and calculated mass loss}
+            - {figure: '11', page: 8, published_page: 1742, content: measured and calculated recession}
+            - {figure: '12', page: 9, published_page: 1743, content: measured and calculated ablation}
+            - {figure: '14', page: 12, published_page: 1746, content: summary vapor-pressure points and fitted line}
+          figure_13_scope: caption conditions and printed no-boiling/boiling statements are transcribed separately; no plotted point was digitized

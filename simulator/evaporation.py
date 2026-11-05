@@ -5265,8 +5265,22 @@ class EvaporationMixin:
         scale = credited_condensed_kg / intended_condensed_kg
         reaction = route_result.stage3_reactive_alkali_by_species.get(species, {})
         reactive_vapor_kg = float(reaction.get('committed_vapor_kg', 0.0))
+        from simulator.condensation_routing import (
+            K_TRAP_STAGE_NUMBER,
+            K_TRAP_SUB_ORDER,
+            STAGE_KEY_BY_NUMBER,
+            species_accepted_on_stage,
+            stage_index_for_visit_identity,
+            stage_list_index_for_destination,
+        )
+        stage3_key = STAGE_KEY_BY_NUMBER[3]
         if reaction.get('uptake_mol', 0.0) > 0.0:
-            ordinary_intended_kg = intended_condensed_kg - route_result.condensed_by_stage_species.get(3, {}).get(species, 0.0)
+            ordinary_intended_kg = (
+                intended_condensed_kg
+                - route_result.condensed_by_stage_species.get(
+                    stage3_key, {},
+                ).get(species, 0.0)
+            )
             scale = ((credited_condensed_kg - reactive_vapor_kg) / ordinary_intended_kg
                      if ordinary_intended_kg > 1e-12 else 0.0)
         product_scale = {
@@ -5274,14 +5288,6 @@ class EvaporationMixin:
             for product, kg in product_kg_by_species.items()
             if kg > 1e-12
         }
-        from simulator.condensation_routing import (
-            K_TRAP_STAGE_NUMBER,
-            K_TRAP_SUB_ORDER,
-            collection_stage_index,
-            species_accepted_on_stage,
-            stage_index_for_visit_identity,
-        )
-
         def book(stage_idx, stage_products, is_impurity):
             if stage_idx is None:
                 return
@@ -5375,15 +5381,17 @@ class EvaporationMixin:
             if (
                 not reactive_booked
                 and reaction.get('uptake_mol', 0.0) > 0.0
-                and 3 in route_result.condensed_by_stage_species
+                and stage3_key in route_result.condensed_by_stage_species
             ):
                 # A stage-3 bucket opened by another species still carries
                 # this species' oxide sink when its own vapor kg was not
-                # stored. Same condition as the stage-number path.
-                stage_idx = collection_stage_index(self.train, 3, species)
+                # stored. Same condition as the stage-key path.
+                stage_idx = stage_list_index_for_destination(
+                    self.train, stage3_key,
+                )
                 is_impurity = (
                     route_result.impurity_by_stage_species
-                    .get(3, {})
+                    .get(stage3_key, {})
                     .get(species, 0.0)
                     > 0.0
                 )
@@ -5394,23 +5402,28 @@ class EvaporationMixin:
                 )
             return
 
-        for stage_number, stage_species in (
+        for stage_key, stage_species in (
             route_result.condensed_by_stage_species.items()
         ):
             projected_kg = stage_species.get(species, 0.0) * scale
-            stage_products = (dict(reaction.get('committed_products_kg', {}))
-                              if stage_number == 3 and reaction.get('uptake_mol', 0.0) > 0.0
-                              else scaled_products(projected_kg))
+            stage_products = (
+                dict(reaction.get('committed_products_kg', {}))
+                if (
+                    stage_key == stage3_key
+                    and reaction.get('uptake_mol', 0.0) > 0.0
+                )
+                else scaled_products(projected_kg)
+            )
             if not any(kg > 1e-12 for kg in stage_products.values()):
                 continue
-            stage_idx = collection_stage_index(
-                self.train, int(stage_number), species,
+            stage_idx = stage_list_index_for_destination(
+                self.train, str(stage_key),
             )
             if stage_idx is None:
                 continue
             is_impurity = (
                 route_result.impurity_by_stage_species
-                .get(stage_number, {})
+                .get(stage_key, {})
                 .get(species, 0.0)
                 > 0.0
             )

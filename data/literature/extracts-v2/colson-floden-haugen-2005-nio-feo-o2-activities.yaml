@@ -1,0 +1,4208 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/colson-floden-haugen-2005-nio-feo-o2-activities.yaml
+observations:
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r03_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1852.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4453583246657281791505984332'
+        - - Al2O3
+          - '0.04337861227861909255161016068'
+        - - MgO
+          - '0.3525338268400329587229867703'
+        - - CaO
+          - '0.1587292362156197695748046359'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg; column=T (°C) for FeO expts; Epk for FeO experiments
+          (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg; column=T (°C) for FeO expts; Epk for FeO experiments
+      (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4453583246657281791505984332'
+          - - Al2O3
+            - '0.04337861227861909255161016068'
+          - - MgO
+            - '0.3525338268400329587229867703'
+          - - CaO
+            - '0.1587292362156197695748046359'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '25.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1852.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg; column=T (°C) for FeO expts; Epk for FeO experiments
+          (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1579'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg; column=T (°C) for FeO expts; Epk for
+                FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg; column=T (°C) for FeO expts; Epk for
+                FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r05_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4513080669991239415961001377'
+        - - Al2O3
+          - '0.0108024758133981313238300738'
+        - - MgO
+          - '0.376083132236008133795506282'
+        - - CaO
+          - '0.1618063249514697932845635066'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg2%Al-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg2%Al-A; column=T (°C) for FeO expts; Epk for FeO
+      experiments (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4513080669991239415961001377'
+          - - Al2O3
+            - '0.0108024758133981313238300738'
+          - - MgO
+            - '0.376083132236008133795506282'
+          - - CaO
+            - '0.1618063249514697932845635066'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '28.9'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.3'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg2%Al-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg2%Al-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg2%Al-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r07_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1848.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4537175999636776378136342115'
+        - - Al2O3
+          - '0.02092888886351417554134652298'
+        - - MgO
+          - '0.3626759421479551068676155206'
+        - - CaO
+          - '0.1626775690248530797774037446'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg4%Al-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg4%Al-A; column=T (°C) for FeO expts; Epk for FeO
+      experiments (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4537175999636776378136342115'
+          - - Al2O3
+            - '0.02092888886351417554134652298'
+          - - MgO
+            - '0.3626759421479551068676155206'
+          - - CaO
+            - '0.1626775690248530797774037446'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '27.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1848.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg4%Al-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1575'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg4%Al-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg4%Al-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r09_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4619875943850877480750600911'
+        - - Al2O3
+          - '0.04642850918594624839068817953'
+        - - MgO
+          - '0.3937368723892492644294919397'
+        - - CaO
+          - '0.09784702403971673910475978951'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg10Ca-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg10Ca-A; column=T (°C) for FeO expts; Epk for FeO
+      experiments (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4619875943850877480750600911'
+          - - Al2O3
+            - '0.04642850918594624839068817953'
+          - - MgO
+            - '0.3937368723892492644294919397'
+          - - CaO
+            - '0.09784702403971673910475978951'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '29.5'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg10Ca-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg10Ca-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg10Ca-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r10_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4519066201100130016024911391'
+        - - Al2O3
+          - '0.04420354108032039839283343814'
+        - - MgO
+          - '0.3627495232244354029128189715'
+        - - CaO
+          - '0.1411403155852311970918564518'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg14Ca-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg14Ca-A; column=T (°C) for FeO expts; Epk for FeO
+      experiments (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4519066201100130016024911391'
+          - - Al2O3
+            - '0.04420354108032039839283343814'
+          - - MgO
+            - '0.3627495232244354029128189715'
+          - - CaO
+            - '0.1411403155852311970918564518'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '26.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '14.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg14Ca-A; column=T (°C) for FeO expts; Epk for
+          FeO experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg14Ca-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg14Ca-A; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r11_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1866.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5270850684096423153797923571'
+        - - Al2O3
+          - '0.05232338381710597033469272217'
+        - - MgO
+          - '0.2323453139325414028014807264'
+        - - CaO
+          - '0.1882462338407103114840341946'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg17Mg; column=T (°C) for FeO expts; Epk for FeO
+          experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg17Mg; column=T (°C) for FeO expts; Epk for FeO experiments
+      (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5270850684096423153797923571'
+          - - Al2O3
+            - '0.05232338381710597033469272217'
+          - - MgO
+            - '0.2323453139325414028014807264'
+          - - CaO
+            - '0.1882462338407103114840341946'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '16.5'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1866.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg17Mg; column=T (°C) for FeO expts; Epk for FeO
+          experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1593'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg17Mg; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg17Mg; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r12_c03
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed'
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1869.15'
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4794681233140169670360046785'
+        - - Al2O3
+          - '0.04782305623546388446482583508'
+        - - MgO
+          - '0.2948057433569139743807927961'
+        - - CaO
+          - '0.1779030770936051741183766904'
+        amount_basis: mole_fraction
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'FeO_voltammetric_peak_potential_Epk_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg22Mg; column=T (°C) for FeO expts; Epk for FeO
+          experiments (mV)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 4
+    published_page: 3064
+    pdf_page_index: 3
+    table: '2'
+    note: FeO voltammetric peak potential; normalized for pure O2.; row=gg22Mg; column=T (°C) for FeO expts; Epk for FeO experiments
+      (mV)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4794681233140169670360046785'
+          - - Al2O3
+            - '0.04782305623546388446482583508'
+          - - MgO
+            - '0.2948057433569139743807927961'
+          - - CaO
+            - '0.1779030770936051741183766904'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '21.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: value
+        value: '1869.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: FeO voltammetric peak potential; normalized for pure O2.; row=gg22Mg; column=T (°C) for FeO expts; Epk for FeO
+          experiments (mV)
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1596'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg22Mg; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: FeO voltammetric peak potential; normalized for pure O2.; row=gg22Mg; column=T (°C) for FeO expts; Epk
+                for FeO experiments (mV)
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r02_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1852.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4453583246657281791505984332'
+        - - Al2O3
+          - '0.04337861227861909255161016068'
+        - - MgO
+          - '0.3525338268400329587229867703'
+        - - CaO
+          - '0.1587292362156197695748046359'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4453583246657281791505984332'
+          - - Al2O3
+            - '0.04337861227861909255161016068'
+          - - MgO
+            - '0.3525338268400329587229867703'
+          - - CaO
+            - '0.1587292362156197695748046359'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '48.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '25.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '16.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1579'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1852.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg; column=T (°C) for
+          FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1579'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r03_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4513080669991239415961001377'
+        - - Al2O3
+          - '0.0108024758133981313238300738'
+        - - MgO
+          - '0.376083132236008133795506282'
+        - - CaO
+          - '0.1618063249514697932845635066'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.99'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg2%Al-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg2%Al-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4513080669991239415961001377'
+          - - Al2O3
+            - '0.0108024758133981313238300738'
+          - - MgO
+            - '0.376083132236008133795506282'
+          - - CaO
+            - '0.1618063249514697932845635066'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '2.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '28.9'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.3'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1580'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg2%Al-A; column=T
+          (°C) for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg2%Al-A; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg2%Al-A; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r05_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1848.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4537175999636776378136342115'
+        - - Al2O3
+          - '0.02092888886351417554134652298'
+        - - MgO
+          - '0.3626759421479551068676155206'
+        - - CaO
+          - '0.1626775690248530797774037446'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.78'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg4%Al-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg4%Al-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4537175999636776378136342115'
+          - - Al2O3
+            - '0.02092888886351417554134652298'
+          - - MgO
+            - '0.3626759421479551068676155206'
+          - - CaO
+            - '0.1626775690248530797774037446'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '27.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1575'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1848.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg4%Al-A; column=T
+          (°C) for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1575'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg4%Al-A; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg4%Al-A; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r07_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4619875943850877480750600911'
+        - - Al2O3
+          - '0.04642850918594624839068817953'
+        - - MgO
+          - '0.3937368723892492644294919397'
+        - - CaO
+          - '0.09784702403971673910475978951'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.92'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg10Ca-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg10Ca-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4619875943850877480750600911'
+          - - Al2O3
+            - '0.04642850918594624839068817953'
+          - - MgO
+            - '0.3937368723892492644294919397'
+          - - CaO
+            - '0.09784702403971673910475978951'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '29.5'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '10.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1580'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg10Ca-A; column=T
+          (°C) for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg10Ca-A; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg10Ca-A; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r08_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1853.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4519066201100130016024911391'
+        - - Al2O3
+          - '0.04420354108032039839283343814'
+        - - MgO
+          - '0.3627495232244354029128189715'
+        - - CaO
+          - '0.1411403155852311970918564518'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '1.02'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg14Ca-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg14Ca-A; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4519066201100130016024911391'
+          - - Al2O3
+            - '0.04420354108032039839283343814'
+          - - MgO
+            - '0.3627495232244354029128189715'
+          - - CaO
+            - '0.1411403155852311970918564518'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '49.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '26.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '14.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1580'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1853.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg14Ca-A; column=T
+          (°C) for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1580'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg14Ca-A; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg14Ca-A; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r09_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1866.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5270850684096423153797923571'
+        - - Al2O3
+          - '0.05232338381710597033469272217'
+        - - MgO
+          - '0.2323453139325414028014807264'
+        - - CaO
+          - '0.1882462338407103114840341946'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.81'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg17Mg; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg17Mg; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5270850684096423153797923571'
+          - - Al2O3
+            - '0.05232338381710597033469272217'
+          - - MgO
+            - '0.2323453139325414028014807264'
+          - - CaO
+            - '0.1882462338407103114840341946'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '55.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '9.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '16.5'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '18.6'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1593'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1866.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg17Mg; column=T (°C)
+          for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1593'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg17Mg; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg17Mg; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r10_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: value
+      value: '1869.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.4794681233140169670360046785'
+        - - Al2O3
+          - '0.04782305623546388446482583508'
+        - - MgO
+          - '0.2948057433569139743807927961'
+        - - CaO
+          - '0.1779030770936051741183766904'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.7'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=gg22Mg; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=gg22Mg; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.4794681233140169670360046785'
+          - - Al2O3
+            - '0.04782305623546388446482583508'
+          - - MgO
+            - '0.2948057433569139743807927961'
+          - - CaO
+            - '0.1779030770936051741183766904'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '51.4'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '8.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '21.2'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '17.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    T_C:
+      state:
+        tag: value
+        value: '1596'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.
+    temperature_K:
+      state:
+        tag: value
+        value: '1869.15'
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg22Mg; column=T (°C)
+          for FeO expts
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1596'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg22Mg; column=T
+                (°C) for FeO expts
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 4
+              published_page: 3064
+              pdf_page_index: 3
+              table: '2'
+              note: Matched by the shared printed composition label; temperature is printed in Table 2.; row=gg22Mg; column=T
+                (°C) for FeO expts
+        output_unit: K
+        references: []
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities::colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r17_c04
+  experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  identity:
+    quantity:
+      tag: value
+      value: activity_coefficient
+    species:
+      formula: FeO
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: value
+      value: dimensionless
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: liquid wuestite of unstated stoichiometry (paper writes "FeO" in quotes); no exact ReferenceStateConvention
+        member; not substituted with pure liquid stoichiometric FeO.
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.5035899857248491720163590971'
+        - - Al2O3
+          - '0.0005299202464227058064644490992'
+        - - MgO
+          - '0.2386231199132347763604678039'
+        - - CaO
+          - '0.2572569741154933458167086502'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.42'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      relative_as_printed: ±13%
+      confidence_level: one_sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: w1103co-co05
+      date: '2026-11-02'
+      evidence:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+        note: row=Diop; column=γFeO, Liq wuestite (1σ = ±13%)
+  notices: []
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  locator:
+    page: 7
+    published_page: 3067
+    pdf_page_index: 6
+    table: '3'
+    note: row=Diop; column=γFeO, Liq wuestite (1σ = ±13%)
+  read_from: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+  point_conditions:
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - SiO2
+            - '0.5035899857248491720163590971'
+          - - Al2O3
+            - '0.0005299202464227058064644490992'
+          - - MgO
+            - '0.2386231199132347763604678039'
+          - - CaO
+            - '0.2572569741154933458167086502'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 3063
+        pdf_page_index: 2
+        table: '1'
+        note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+      inference:
+        relation: wt_pct_to_mole_fraction
+        inputs:
+        - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
+        - original_unit=wt_pct
+        parameters:
+        - - original_SiO2_wt_pct
+          - state:
+              tag: value
+              value: '56'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_SiO2_g_mol
+          - state:
+              tag: value
+              value: '60.083'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_Al2O3_wt_pct
+          - state:
+              tag: value
+              value: '0.1'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_Al2O3_g_mol
+          - state:
+              tag: value
+              value: '101.960077'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_MgO_wt_pct
+          - state:
+              tag: value
+              value: '17.8'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_MgO_g_mol
+          - state:
+              tag: value
+              value: '40.304'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - original_CaO_wt_pct
+          - state:
+              tag: value
+              value: '26.7'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        - - M_CaO_g_mol
+          - state:
+              tag: value
+              value: '56.077000000000005'
+            locator:
+              page: 3
+              published_page: 3063
+              pdf_page_index: 2
+              table: '1'
+              note: Four Table 1 solvent oxides, in wt%; row-specific FeO addition is not printed.
+        output_unit: mole_fraction
+        references: []
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '101325'
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Actual experimental fO2 varied and is not printed per row; Table 2 fO2 = 1 is a pure-O2 normalization, not
+          a run condition.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+    fO2_control:
+      state:
+        tag: unknown
+        reason: The source lists several gas atmospheres but does not assign one to this composition row.
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No temperature for the Diop FeO activity-coefficient row is printed.
+      locator:
+        page: 7
+        published_page: 3067
+        pdf_page_index: 6
+        table: '3'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+    parameters: []
+    output_unit: Pa
+    references: []

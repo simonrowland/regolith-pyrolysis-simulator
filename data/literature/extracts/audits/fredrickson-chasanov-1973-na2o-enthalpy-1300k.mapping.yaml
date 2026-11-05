@@ -1,0 +1,108 @@
+source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+source_read_order:
+  - MinerU table HTML and markdown, with absolute PDF pages resolved from the chunk start page
+  - pdftotext-layout machine text
+  - Rendered PDF pages 2, 3, and 4 only for flagged cells, footnote symbols, and row/column layout confirmation
+tables:
+  - table_key: p003-t01
+    printed_locator: {page: 3, published_page: 487, table: '1'}
+    printed_rows: 31
+    mapping: >-
+      Columns 1-6 are T/K, q (cal_th), q_o (cal_th), observed H°(T)-H°(298.15 K),
+      equation (1) or (2) H°(T)-H°(298.15 K), and δ as defined by the caption.
+      Columns 1-6 are retained respectively as point temperature, raw q input,
+      raw capsule correction q_o, measured enthalpy increment, fitted enthalpy
+      increment, and the printed δ percentage. Na2O is assigned to each row from
+      the table heading. The printed equation (2) divider is not a data row.
+    cell_audit: >-
+      All 31 data rows and all six numeric columns (186 cells) are listed in the
+      companion .cells.csv audit. MinerU and pdftotext agree on digits, sign,
+      and exponent for 181 cells; five cells were resolved from the page 3 render.
+      Row/column assignment was checked against the rendered table. The MinerU
+      body-row count of 32 includes the equation (2) divider; the printed count
+      and extracted count are both 31.
+    render_verified:
+      - {row: 7, column: 4, text: '5673.16', reason: 'pdftotext reads 5673,16; render confirms the decimal point.'}
+      - {row: 21, column: 3, text: '402.29', reason: 'pdftotext reads 402,29; render confirms the decimal point.'}
+      - {row: 21, column: 6, text: '−0.16', reason: 'pdftotext garbles the final digit as --0.•6; render confirms −0.16.'}
+      - {row: 33, column: 1, text: '1266.6', reason: 'pdftotext reads •266.6; render confirms 1266.6.'}
+      - {row: 34, column: 6, text: '+0.09', reason: 'pdftotext reads -t-0.09; render confirms +0.09.'}
+  - table_key: p004-t02
+    printed_locator: {page: 4, published_page: 488, table: '2'}
+    printed_rows: 12
+    mapping: >-
+      Stored columns 1-3 are T/K, H°(T)-H°(298.15 K), and Cp(T). The printed
+      entropy increment in column 4 is outside the requested extraction scope.
+      The 298.15 K Cp value is attributed to JANAF reference [8]; Cp from 300 to
+      900 K is derived from equation (3); values from 1000 to 1300 K are reported
+      as calculated directly from measured high-temperature enthalpies.
+    cell_audit: >-
+      All 12 rows and all three stored numeric columns (36 cells) are listed in
+      the companion .cells.csv audit. MinerU and pdftotext agree on digits,
+      sign, and exponent for 35 cells; the 400 K enthalpy was resolved from the
+      page 4 render. Row/column assignment was checked against the rendered table.
+    render_verified:
+      - {row: 4, column: 2, text: '1728.46', reason: 'pdftotext reads •728.46; render confirms 1728.46.'}
+  - table_key: p005-t03
+    printed_locator: {page: 5, published_page: 489, table: '3'}
+    printed_rows: 12
+    mapping: >-
+      Excluded from this extraction: Table 3 contains formation enthalpy,
+      formation Gibbs energy, and log K values, not H(T)-H(298.15 K), Cp, or
+      phase-transition enthalpy. No Table 3 numeric cells are stored.
+    cell_audit: Table 3 was read from MinerU and pdftotext for scope classification; no numeric cells were transcribed.
+context_audit:
+  page_2: >-
+    The sample formula is Na2O. It was heated under vacuum at 783 K for 40 h.
+    The titrimetric hydrolysis products were (99.9 ± 0.2) per cent of theoretical
+    NaOH from pure Na2O; this is not a Na2O mass-percent assay. The page 2 render
+    resolves the ± symbols dropped by pdftotext in the purity statement and the
+    (1046.24 ± 0.33) cal_th K−1 calorimeter energy equivalent. It also confirms
+    the sapphire-check uncertainty ±0.3 per cent and reference markers (5), (6),
+    and (7). The apparatus page states the calorimeter operated at 298.15 K.
+  page_3: >-
+    The procedure states that a 4.4438 g Na2O sample (M = 61.979 g mol−1) was
+    contained in the capsule and sealed under vacuum. Filling, weighing, and
+    sealing were done in a glove-box with flowing high-purity helium. The
+    empirical capsule-heat correction used separate empty-capsule experiments;
+    those raw calibration runs are not printed. The dagger footnote states
+    cal_th = 4.184 J and temperatures are based on IPTS-68.
+  page_1: >-
+    The introduction attributes DTA transitions at 1023 K and 1243 K to
+    Bouaziz, Papin, and Rollet [3]. No transition enthalpy is reported here.
+  page_4: >-
+    The page 4 render confirms equations (1)-(3), their printed validity ranges,
+    coefficients, superscript powers, and standard deviations: equation (1)
+    298-900 K, 41 cal_th mol−1 or 0.58 per cent; equation (2) 900-1300 K,
+    36 cal_th mol−1 or 0.25 per cent; equation (3) 300-900 K. The 298.15 K Cp
+    constraint carries reference marker (8). Present-work enthalpy data do not
+    indicate the cited transitions; the paper reports no measured transition
+    temperature or enthalpy.
+  page_5: >-
+    The discussion identifies the Na2O crystal structure as antifluorite but
+    does not assign a distinct polymorph to individual rows. A capsule pinhole
+    developed at 1453 K in preliminary experiments; this is not a reported
+    melting temperature and no liquid enthalpy series is reported.
+  conditions_and_phase: >-
+    Table rows are crystalline Na2O; the discussion identifies its antifluorite
+    crystal structure but gives no separate polymorph label. The paper states
+    vacuum preparation and capsule sealing but no numerical total pressure or
+    fO2. No liquid enthalpy series or Na2O melting temperature is reported;
+    1453 K is the preliminary capsule pinhole temperature, not a melting point.
+lineage_and_schema:
+  - Table 1 measured enthalpy points link to their row's stored q and q_o cells.
+  - Table 1 fits and Table 2 smooth enthalpy/Cp values link to the measured points that determine the applicable fit; Table 2 high-temperature Cp links to the measured high-temperature enthalpies.
+  - The q and q_o inputs remain typed quantity-unknown because no exact token represents total apparatus heat. See simulator/battery/enums.py::Quantity, simulator/battery/migrate.py::QUANTITY_ALIASES, simulator/battery/migrate.py::TYPE_QUANTITY, and tools/validate_literature_extracts.py::OBSERVATION_TYPES.
+figure_reads: none identified in the paper
+table_compare:
+  output: fredrickson-chasanov-1973-na2o-enthalpy-1300k.compare.csv
+  result: >-
+    compare mode reported matched=0 and two no-match transition values. The
+    output-series rows were not examined by tools/mineru_table_draft.py::_numeric_points,
+    which reads values.points and selected scalar values but not values.series.
+    The two no-match rows are prose values on page 1, not cells in the MinerU
+    tables. The companion .cells.csv audits all 222 numeric table cells, the
+    transition temperatures, sample and calibration numeric fields, and the
+    printed fit equations and their ranges. No mismatches remain after the
+    render checks.
+migration_census: 151 observations; 88 numeric; 63 unavailable; 0 hard issues. The 62 quantity-unknown rows are the q and q_o ancestry cells, and one unavailable row records that the present work reports no transition measurement.

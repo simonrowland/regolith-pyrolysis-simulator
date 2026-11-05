@@ -1,0 +1,822 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2005.02.005
+  citation: Colson, R. O., Floden, A. M., Haugen, T. R., Malum, K. M., Sawarynski, M., Nermoe, M. K. B., Jacobs, K. E., &
+    Holder, D. (2005). Activities of NiO, FeO, and O2− in silicate melts. Geochimica et Cosmochimica Acta, 69(12), 3061–3073.
+  source_ids:
+  - colson-floden-haugen-2005-nio-feo-o2-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8935c18298cc693945d95bf99f3f896beb867c50
+    files:
+    - asset_id: pdf:colson-floden-haugen-2005-nio-feo-o2-activities
+      role: pdf
+      path: raw/colson-floden-haugen-2005-nio-feo-o2-activities/colson-floden-haugen-2005-nio-feo-o2-activities.pdf
+      sha256:
+        tag: value
+        value: a8264684759301c4c830c586ab4e2dc44299e8ac244ae04d8733fa74b6220f21
+    - asset_id: pdftotext:colson-floden-haugen-2005-nio-feo-o2-activities
+      role: pdftotext
+      path: text/colson-floden-haugen-2005-nio-feo-o2-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:colson-floden-haugen-2005-nio-feo-o2-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.gca.2005.02.005
+experiments:
+- experiment_id: 10.1016/j.gca.2005.02.005::experiment::colson_2005_deltech_emf_series
+  kind: literature
+  method:
+    tag: value
+    value: emf_cell
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: row_specific_temperature_in_table_2
+      locator:
+        page: 4
+        published_page: 3064
+        pdf_page_index: 3
+        table: '2'
+        note: Temperature varies by composition and is retained on each observation.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '101325'
+          approximate: false
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+        note: Printed as Deltech 1-atm gas-mixing furnace.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: atmospheres_listed_without_row_assignments
+      locator:
+        page: 2
+        published_page: 3062
+        pdf_page_index: 1
+        section: 2.1. Description of Experimental Method and Electrochemical Technique
+        note: The paper lists several furnace atmospheres without assigning one to each composition row.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.1016/j.gca.2005.02.005
+  locator:
+    page: 2
+    published_page: 3062
+    pdf_page_index: 1
+    section: 2.1. Description of Experimental Method and Electrochemical Technique
+    note: The experiments were conducted in a Deltech 1-atm gas-mixing furnace.
+context:
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_conditions_and_models
+  type: thermodynamic_context
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 3062
+    section: 2.1. Description of Experimental Method and Electrochemical Technique
+  units: as printed
+  values:
+    quantity_as_printed: Experimental conditions, FeO standard state, and printed model relations
+    pressure_as_printed: Deltech 1-atm gas-mixing furnace
+    gas_atmospheres_as_printed: air, CO2, 25%CO-75%CO2, 80%CO-20%CO2, and 90%CO-10%CO2
+    FeO_addition_as_printed: 0.1–0.3 wt% for FeO (added as Fe2O3)
+    FeO_concentration_as_printed: values valid for low (Henry’s Law) concentrations of FeO
+    gas_assignment:
+      state: absent
+      reason: No row-to-gas assignment is printed.
+    table2_fO2_as_printed: calculated for fO2 = 1; normalized for conditions in pure O2
+    actual_fO2_as_printed: Actual experiments were done at a variety of values for fO2; values are not printed per row.
+    equation_6_as_printed: E* = Epk − (RT/nF) ln(Dr/Do)^(1/2) − ΔE/2 + RT/(4F) ln(fO2)
+    equation_6_locator:
+      page: 6
+      pdf_page_index: 5
+      published_page: 3066
+      equation: '6'
+    equation_6_definitions_as_printed: E* is the standard reduction potential in volts relative to the oxygen reference electrode
+      intrinsic to these silicate melt experiments; fO2 is the activity of oxygen in atmospheres.
+    FeO_activity_relation_as_printed: aFeO = (aO2−)(aFe2+)
+    FeO_activity_relation_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 3061
+      section: Abstract
+    oxide_ion_activity_model_as_printed: aO2− = 0.75 · NBO/BO relative to a standard state of melt with the composition of
+      diopside.
+    oxide_ion_activity_locator:
+      page: 1
+      pdf_page_index: 0
+      published_page: 3061
+      section: Abstract
+    table3_standard_states_as_printed:
+      constants: R = 8.315 J K−1 mol−1; F = 96485 C mol−1; n = 2; T is temperature in Kelvin.
+      oxide_ion: Activity for O2− is defined to equal 1 in melt of diopidic composition.
+      liquid_NiO: The free energy for this standard state is taken from Barin (1989) after Holzheid et al. (1997), their eqn.
+        7, as −185092 + 99.844 · T − 4.898 · T · ln(T).
+      liquid_wuestite_FeO: The free energy for this standard state is taken from Barin (1989) after Holzheid et al. (1997)
+        as = −244118 + 115.559 · T − 8.474 · T · ln(T).
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: footnote a
+    equation_23_as_printed: 1 / γFe2+ = A + B · XMgO + C · XCaO; R2 = 0.85; A = −3.48(0.96); B = 8.56(1.92); C = 13.94(2.56);
+      8 data points; uncertainties are 1σ.
+    equation_23_locator:
+      page: 11
+      pdf_page_index: 10
+      published_page: 3071
+      equation: '23'
+    equation_23_schema_gap: The fitted quantity is reciprocal Fe2+ activity coefficient as a function of composition; no exact
+      quantity token represents this form. It is retained as printed context, not relabeled as FeO gamma.
+    equation_23_schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity
+    - simulator/battery/migrate.py::QUANTITY_ALIASES
+    - simulator/battery/migrate.py::TYPE_QUANTITY
+    FeO_model_relation_as_printed: 'Values for the activity coefficient for FeO can be modeled analogously using Eqn. 14 and
+      23 and the expression: γFeO = aO2− · γFe2+.'
+    direct_FeO_activity_values:
+      state: absent
+      reason: No numeric FeO activity values are printed.
+    figure_read_candidates:
+    - figure: '3'
+      page: 3
+      published_page: 3063
+      quantity: FeO voltammetric peak curves
+      status: figure_only; undigitised
+    - figure: '4'
+      page: 5
+      published_page: 3065
+      quantity: smoothed diffusion coefficients
+      status: figure_only; undigitised
+    - figure: '10'
+      page: 11
+      published_page: 3071
+      quantity: reciprocal Fe2+ activity-coefficient fit
+      status: figure_only; undigitised
+  context_id: colson-floden-haugen-2005-nio-feo-o2-activities::context::colson-floden-haugen-2005-nio-feo-o2-activities_conditions_and_models
+  work_id: 10.1016/j.gca.2005.02.005
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  species: FeO
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_table1_compositions
+  type: thermodynamic_context
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 3063
+    table: '1'
+  units: wt% major oxides; NBO dimensionless
+  values:
+    quantity_as_printed: Experimental compositions and NBO
+    quantity_token: unavailable
+    table_rows:
+    - sample_as_published: diop
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '56.0'
+          Al2O3: '0.1'
+          MgO: '17.8'
+          CaO: '26.7'
+      NBO_as_printed: '0.66'
+    - sample_as_published: gg
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '48.4'
+          Al2O3: '8.0'
+          MgO: '25.7'
+          CaO: '16.1'
+      NBO_as_printed: '0.73'
+    - sample_as_published: gg2%Al-A
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '51.7'
+          Al2O3: '2.1'
+          MgO: '28.9'
+          CaO: '17.3'
+      NBO_as_printed: '0.69'
+    - sample_as_published: gg2%Al-B
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '55.2'
+          Al2O3: '2.4'
+          MgO: '29.9'
+          CaO: '11.6'
+      NBO_as_printed: '0.69'
+    - sample_as_published: gg4%Al-A
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '51.1'
+          Al2O3: '4.0'
+          MgO: '27.4'
+          CaO: '17.1'
+      NBO_as_printed: '0.70'
+    - sample_as_published: gg4%Al-B
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '53.5'
+          Al2O3: '4.6'
+          MgO: '29.5'
+          CaO: '11.2'
+      NBO_as_printed: '0.72'
+    - sample_as_published: gg10Ca-A
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '51.6'
+          Al2O3: '8.8'
+          MgO: '29.5'
+          CaO: '10.2'
+      NBO_as_printed: '0.58'
+    - sample_as_published: gg14Ca-A
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '49.4'
+          Al2O3: '8.2'
+          MgO: '26.6'
+          CaO: '14.4'
+      NBO_as_printed: '0.66'
+    - sample_as_published: gg17Mg
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '55.8'
+          Al2O3: '9.4'
+          MgO: '16.5'
+          CaO: '18.6'
+      NBO_as_printed: '0.78'
+    - sample_as_published: gg22Mg
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '51.4'
+          Al2O3: '8.7'
+          MgO: '21.2'
+          CaO: '17.8'
+      NBO_as_printed: '0.69'
+    - sample_as_published: gg46Si
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '45.5'
+          Al2O3: '8.3'
+          MgO: '27.3'
+          CaO: '17.7'
+      NBO_as_printed: '0.62'
+    - sample_as_published: gg52Si*
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '51.7'
+          Al2O3: '7.6'
+          MgO: '25.4'
+          CaO: '15.0'
+      NBO_as_printed: '0.60'
+      marker_as_printed: '*'
+    - sample_as_published: PiFo13
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '49.5'
+          Al2O3: '15.2'
+          MgO: '14.4'
+          CaO: '20.5'
+      NBO_as_printed: '0.65'
+    - sample_as_published: P3AN13
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '48.0'
+          Al2O3: '16.8'
+          MgO: '10.4'
+          CaO: '22.0'
+      NBO_as_printed: '0.64'
+    - sample_as_published: P2Fo14
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '49.9'
+          Al2O3: '11.2'
+          MgO: '18.6'
+          CaO: '18.8'
+      NBO_as_printed: '0.73'
+    - sample_as_published: PiWo1350
+      composition_as_published:
+        basis: wt%
+        components:
+          SiO2: '49.0'
+          Al2O3: '9.2'
+          MgO: '4.2'
+          CaO: '36.1'
+      NBO_as_printed: '0.69'
+    printed_row_count: 16
+    table_footnote_as_printed: Values in wt%. Except where noted by an asterisk, compositions are determined by electron microprobe.
+      Reported values are the average of five or more analysis points. With one exception, wt% totals, including NiO or FeO,
+      range from 98.5 to 100.6 (totals for P3AN13 are low at 97.5). The composition for gg52Si is calculated from the mixed
+      oxides (corrected for loss of H2O and CO2). NBO (nonbridging oxygen) = [2 · O − 4 · (SiO2 + 0.5 · AlO1.5)]/O.
+    schema_gap: Table 1 gives composition context rather than one scalar quantity. Numeric oxide components remain attached
+      to named composition rows and are copied onto each activity observation.
+  context_id: colson-floden-haugen-2005-nio-feo-o2-activities::context::colson-floden-haugen-2005-nio-feo-o2-activities_table1_compositions
+  work_id: 10.1016/j.gca.2005.02.005
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  species: FeO
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_table2_feo_rows
+  type: thermodynamic_context
+  locator:
+    page: 4
+    pdf_page_index: 3
+    published_page: 3064
+    table: '2'
+  units: °C and mV
+  values:
+    quantity_as_printed: FeO voltammetric peak-potential cells
+    table_rows:
+    - sample_as_published: diop
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: diop
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1579 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r03_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −388 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r03_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: ggᵃ
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: ggᵃ
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg2%Al-A
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1580 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r05_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −400 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r05_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg2%Al-A
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg2%Al-B
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg2%Al-B
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg4%Al-A
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1575 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r07_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −393 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r07_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg4%Al-A
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg4%Al-B
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg4%Al-B
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg10Ca-A
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1580 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r09_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −393 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r09_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg10Ca-A
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg14Ca-A
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1580 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r10_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −381 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r10_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg14Ca-A
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg17Mg
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1593 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r11_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −356 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r11_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg17Mg
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg22Mg
+      FeO_temperature_cell:
+        state: numeric_observation
+        value_as_printed: 1596 °C
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r12_c03
+      FeO_Epk_cell:
+        state: numeric_observation
+        value_as_printed: −386 mV
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p004_t02_r12_c03
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg22Mg
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg46Si
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg46Si
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: gg52Si
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: gg52Si
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: PiFo13
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: PiFo13
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: P3AN13
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: P3AN13
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: P2Fo14
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: P2Fo14
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    - sample_as_published: PiWo1350
+      FeO_temperature_cell:
+        state: absent
+        reason: blank cell in Table 2
+      FeO_Epk_cell:
+        state: absent
+        reason: blank cell in Table 2
+      locator:
+        page: 4
+        pdf_page_index: 3
+        published_page: 3064
+        table: '2'
+        row: PiWo1350
+        column: T (°C) for FeO expts; Epk for FeO experiments (mV)
+    printed_row_count: 17
+    numeric_rows: 7
+    blank_rows: 10
+    caption_as_printed: Composite Epk values measured in various experimental compositions, calculated for fO2 = 1.
+    normalization_note: The text states actual experiments used a variety of fO2 values; Table 2 is normalized for pure O2.
+    footnote_a_as_printed: Experiment done with the reference electrode in silicate melt of diopsidic composition.
+  context_id: colson-floden-haugen-2005-nio-feo-o2-activities::context::colson-floden-haugen-2005-nio-feo-o2-activities_table2_feo_rows
+  work_id: 10.1016/j.gca.2005.02.005
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  species: FeO
+- observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_table3_feo_rows
+  type: thermodynamic_context
+  locator:
+    page: 7
+    pdf_page_index: 6
+    published_page: 3067
+    table: '3'
+  units: dimensionless activity coefficient
+  values:
+    quantity_as_printed: FeO activity-coefficient column, relative to liquid wuestite
+    table_rows:
+    - sample_as_published: gg
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '1.00'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r02_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg2%Al-A
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '0.99'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r03_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg2%Al-A
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg2%Al-B
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg2%Al-B
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg4%Al-A
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '0.78'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r05_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg4%Al-A
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg4%Al-B
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg4%Al-B
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg10Ca-A
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '0.92'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r07_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg10Ca-A
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg14Ca-A
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '1.02'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r08_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg14Ca-A
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg17Mg
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '0.81'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r09_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg17Mg
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg22Mg
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: '0.70'
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r10_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg22Mg
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg46Si
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg46Si
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: gg52Si
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: gg52Si
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: PiFo13
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: PiFo13
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: P3AN13
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: P3AN13
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: P2Fo14
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: P2Fo14
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: PiWo1350
+      gamma_FeO_cell:
+        state: absent
+        reason: blank cell in Table 3
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: PiWo1350
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    - sample_as_published: Diop
+      gamma_FeO_cell:
+        state: numeric_observation
+        value_as_printed: 0.42ᵇ
+        observation_id: colson-floden-haugen-2005-nio-feo-o2-activities_p007_t03_r17_c04
+      locator:
+        page: 7
+        pdf_page_index: 6
+        published_page: 3067
+        table: '3'
+        row: Diop
+        column: γFeO, Liq wuestite (1σ = ±13%)
+    printed_row_count: 16
+    numeric_rows: 8
+    blank_rows: 8
+    uncertainty_as_printed: 1σ = ±13%
+    footnote_b_as_printed: Value calculated from measurements of Colson et al. (1990).
+  context_id: colson-floden-haugen-2005-nio-feo-o2-activities::context::colson-floden-haugen-2005-nio-feo-o2-activities_table3_feo_rows
+  work_id: 10.1016/j.gca.2005.02.005
+  source_id: colson-floden-haugen-2005-nio-feo-o2-activities
+  species: FeO

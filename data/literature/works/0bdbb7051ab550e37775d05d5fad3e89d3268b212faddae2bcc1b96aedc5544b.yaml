@@ -1,0 +1,815 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  citation: Doyle, C. D. (1989), Effect of substitution of TiO2 for SiO2 on f(FeO) in magma, Geochimica et Cosmochimica Acta
+    53, 2631–2638.
+  source_ids:
+  - doyle-1989-tio2-feo-activity-magma
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:doyle-1989-tio2-feo-activity-magma
+      role: pdf
+      path: raw/doyle-1989-tio2-feo-activity-magma/doyle-1989-tio2-feo-activity-magma.pdf
+      sha256:
+        tag: value
+        value: a5329971de012f487144ecf140e2b41b7c0a538379d677a2aa557549108a0eea
+    - asset_id: pdftotext:doyle-1989-tio2-feo-activity-magma
+      role: pdftotext
+      path: text/doyle-1989-tio2-feo-activity-magma
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:doyle-1989-tio2-feo-activity-magma
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b::doyle-1989-tio2-feo-activity-magma
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  locator:
+    page: 4
+    published_page: 2634
+    pdf_page_index: 3
+    table: 1A
+    note: row=1; panel=4A
+context:
+- observation_id: doyle_1989_equation_8_and_standard_state
+  type: equation_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2633
+    section: Control of the activity of FeO
+    equation: '8'
+  units: dimensionless activity; T in K
+  values:
+    equation_as_printed: a_FeO = f_O2^0.5 · exp(28719.2/T − 5.837)
+    temperature_basis_as_printed: T is the absolute temperature
+    standard_state_as_printed: molten Fe0.947O
+    method_as_printed: At equilibrium Fe + 0.5 O2 = FeO; the equilibrium constant is from Coughlin (1954), and metallic iron
+      is stated to be almost pure (a_Fe = 1).
+    fugacity_method_as_printed: Gas fugacities in the hot zone are calculated by Brinkley's (1946) method using the algorithm
+      of Van Zeggern and Storey (1970); all species are considered ideal gases.
+    locator_for_standard_state:
+      page: 3
+      pdf_page_index: 2
+      published_page: 2633
+      section: Control of the activity of FeO
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_equation_8_and_standard_state
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_equations_6_6a_and_interaction_fits
+  type: equation_record
+  locator:
+    page: 2
+    pdf_page_index: 1
+    published_page: 2632
+    section: Theory—The mixing of Si and Ti in magma
+    equation: '6'
+  units: dimensionless activity; w in KJ/mole
+  values:
+    equation_6_as_printed: a_FeO^R = a_FeO^si · exp(-w s t/RT)
+    equation_6a_as_printed: a_FeO^si = a_FeO^R / exp(-w s t/RT)
+    variables_as_printed: s and t are the mole fractions of SiO2 and TiO2 in melt R, respectively.
+    interaction_fit_values_as_printed:
+      figure_2_contours: w = 105 KJ/mole
+      figure_3_projection: w = 105 KJ/mole
+      figure_5A_projection: w = 42 KJ/mole
+      figure_5B_5C_projection: w = 105 KJ/mole
+    equation_6_locator:
+      page: 2
+      pdf_page_index: 1
+      published_page: 2632
+      section: Theory—The mixing of Si and Ti in magma
+      equation: '6'
+    equation_6a_locator:
+      page: 3
+      pdf_page_index: 2
+      published_page: 2633
+      section: Results
+      equation: 6a
+    fit_locators:
+    - page: 3
+      pdf_page_index: 2
+      published_page: 2633
+      figure: 2-3
+    - page: 5
+      pdf_page_index: 4
+      published_page: 2635
+      figure: '5'
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_equations_6_6a_and_interaction_fits
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_figure2_activity_contours
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2633
+    figure: '2'
+  units: dimensionless activity; figure-only
+  values:
+    quantity: activity
+    species: FeO
+    standard_state_as_printed: molten Fe0.947O
+    data_as_printed: Dashed contours calculated using Eqn. (6) assuming w = 105 KJ/mole; data attributed to Abdelkarim (1976),
+      Abdelkarim and Sommerville (1984), and Smith and Bell (1970).
+    digitisation: figure_only and undigitised
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_figure2_activity_contours
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_figure3_activity_curves
+  type: figure_record
+  locator:
+    page: 3
+    pdf_page_index: 2
+    published_page: 2633
+    figure: '3'
+  units: dimensionless activity; figure-only
+  values:
+    quantity: activity
+    species: FeO
+    temperature_as_printed: 1748±2 K
+    standard_state_as_printed: molten Fe0.947O
+    interaction_parameter_as_printed: 105 KJ/mole
+    data_as_printed: FeO-SiO2 and FeO-TiO2 curves; ternary data projected with Eqn. (6a).
+    digitisation: figure_only and undigitised
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_figure3_activity_curves
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_figures4_5_conditions_and_fits
+  type: figure_record
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 2635
+    figure: 4-5
+  units: dimensionless activity; figure-only captions and fits
+  values:
+    quantity: activity
+    species: FeO
+    temperature_as_printed: 1600±2 K
+    standard_state_as_printed: molten Fe0.947O
+    figure4_as_printed: Three systems contoured for a_FeO; runs at the same a_FeO have the same symbol; filled/open symbols
+      are initially FeO-richer/poorer materials.
+    table1a_activity_cell_suffix_audit: The 167 Table 1A a_FeO cells have no printed suffix; Hi/Lo is printed in the separate
+      SM column.
+    figure5_as_printed: Data from Fig. 4 are projected to Ti-free binaries using Eqn. (6a); w = 42 KJ/mole for 5A and 105
+      KJ/mole for 5B and 5C.
+    digitisation: Figure 4 points are represented in Table 1A; Figure 5 projected values are figure_only and undigitised.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_figures4_5_conditions_and_fits
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table1b_setpoint_020
+  type: typed_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: 1B
+    row: '1'
+    note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.20.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.20'
+    uncertainty_as_printed: '0.01'
+    minus_log10_fO2_as_printed: '11.92'
+    fO2_as_printed: -log10 fO2 = 11.92±0.02
+    fO2_uncertainty_as_printed: ±0.02
+    fO2_uncertainty_confidence: confidence level not stated
+    fO2_pressure_reference_as_printed: not stated
+    temperature_as_printed: 1600±2 K
+    gas_flows_cc_per_min_as_printed:
+      CO2: '15.0'
+      H2: '100.0'
+      N2: '150.0'
+    gas_mixture_as_printed: CO2:H2:N2 = 15.0:100.0:150.0 c.c.s/min
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-11.92'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '1'
+        note: Printed -log10 fO2 = 11.92±0.02; pressure reference unstated; two-decimal value uses the migrator bar default.
+      uncertainty_as_printed: ±0.02
+      uncertainty_note: confidence level not stated
+      uncertainty_locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        note: Shared header ±0.02 applies to every -log10 fO2 row.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the experimental total pressure.
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '1'
+        note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.20.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_020
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table1b_setpoint_030
+  type: typed_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: 1B
+    row: '2'
+    note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.30.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.30'
+    uncertainty_as_printed: '0.01'
+    minus_log10_fO2_as_printed: '11.57'
+    fO2_as_printed: -log10 fO2 = 11.57±0.02
+    fO2_uncertainty_as_printed: ±0.02
+    fO2_uncertainty_confidence: confidence level not stated
+    fO2_pressure_reference_as_printed: not stated
+    temperature_as_printed: 1600±2 K
+    gas_flows_cc_per_min_as_printed:
+      CO2: '21.6'
+      H2: '100.0'
+      N2: '150.0'
+    gas_mixture_as_printed: CO2:H2:N2 = 21.6:100.0:150.0 c.c.s/min
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-11.57'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '2'
+        note: Printed -log10 fO2 = 11.57±0.02; pressure reference unstated; two-decimal value uses the migrator bar default.
+      uncertainty_as_printed: ±0.02
+      uncertainty_note: confidence level not stated
+      uncertainty_locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        note: Shared header ±0.02 applies to every -log10 fO2 row.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the experimental total pressure.
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '2'
+        note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.30.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_030
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table1b_setpoint_040
+  type: typed_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: 1B
+    row: '3'
+    note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.40.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.40'
+    uncertainty_as_printed: '0.02'
+    minus_log10_fO2_as_printed: '11.32'
+    fO2_as_printed: -log10 fO2 = 11.32±0.02
+    fO2_uncertainty_as_printed: ±0.02
+    fO2_uncertainty_confidence: confidence level not stated
+    fO2_pressure_reference_as_printed: not stated
+    temperature_as_printed: 1600±2 K
+    gas_flows_cc_per_min_as_printed:
+      CO2: '27.6'
+      H2: '100.0'
+      N2: '150.0'
+    gas_mixture_as_printed: CO2:H2:N2 = 27.6:100.0:150.0 c.c.s/min
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-11.32'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '3'
+        note: Printed -log10 fO2 = 11.32±0.02; pressure reference unstated; two-decimal value uses the migrator bar default.
+      uncertainty_as_printed: ±0.02
+      uncertainty_note: confidence level not stated
+      uncertainty_locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        note: Shared header ±0.02 applies to every -log10 fO2 row.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the experimental total pressure.
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '3'
+        note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.40.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_040
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table1b_setpoint_050
+  type: typed_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: 1B
+    row: '4'
+    note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.50.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.50'
+    uncertainty_as_printed: '0.02'
+    minus_log10_fO2_as_printed: '11.12'
+    fO2_as_printed: -log10 fO2 = 11.12±0.02
+    fO2_uncertainty_as_printed: ±0.02
+    fO2_uncertainty_confidence: confidence level not stated
+    fO2_pressure_reference_as_printed: not stated
+    temperature_as_printed: 1600±2 K
+    gas_flows_cc_per_min_as_printed:
+      CO2: '33.6'
+      H2: '100.0'
+      N2: '150.0'
+    gas_mixture_as_printed: CO2:H2:N2 = 33.6:100.0:150.0 c.c.s/min
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-11.12'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '4'
+        note: Printed -log10 fO2 = 11.12±0.02; pressure reference unstated; two-decimal value uses the migrator bar default.
+      uncertainty_as_printed: ±0.02
+      uncertainty_note: confidence level not stated
+      uncertainty_locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        note: Shared header ±0.02 applies to every -log10 fO2 row.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the experimental total pressure.
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '4'
+        note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.50.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_050
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table1b_setpoint_060
+  type: typed_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: 1B
+    row: '5'
+    note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.60.
+  units: Table 1B values as printed
+  values:
+    activity_as_printed: '0.60'
+    uncertainty_as_printed: '0.02'
+    minus_log10_fO2_as_printed: '10.96'
+    fO2_as_printed: -log10 fO2 = 10.96±0.02
+    fO2_uncertainty_as_printed: ±0.02
+    fO2_uncertainty_confidence: confidence level not stated
+    fO2_pressure_reference_as_printed: not stated
+    temperature_as_printed: 1600±2 K
+    gas_flows_cc_per_min_as_printed:
+      CO2: '39.0'
+      H2: '100.0'
+      N2: '150.0'
+    gas_mixture_as_printed: CO2:H2:N2 = 39.0:100.0:150.0 c.c.s/min
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-10.96'
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '5'
+        note: Printed -log10 fO2 = 10.96±0.02; pressure reference unstated; two-decimal value uses the migrator bar default.
+      uncertainty_as_printed: ±0.02
+      uncertainty_note: confidence level not stated
+      uncertainty_locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        note: Shared header ±0.02 applies to every -log10 fO2 row.
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: The paper does not state the experimental total pressure.
+      locator:
+        page: 6
+        pdf_page_index: 5
+        published_page: 2636
+        table: 1B
+        row: '5'
+        note: Table 1B row, checked against the 600 dpi render; exact a_FeO key 0.60.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table1b_setpoint_060
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r01
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '1'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Tholeiitic Basalt
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.74'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.74'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.08'
+      Ca0.5AlO2: '0.16'
+    row_as_printed:
+      X_Matrix: '0.74'
+      SiO2: '0.74'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.08'
+      Ca0.5AlO2: '0.16'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r01
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r02
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '2'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Mid-Ocean Ridge Basalt
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.73'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.72'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.08'
+      Ca0.5AlO2: '0.18'
+    row_as_printed:
+      X_Matrix: '0.73'
+      SiO2: '0.72'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.08'
+      Ca0.5AlO2: '0.18'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r02
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r03
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '3'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Alkali Basalt
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.69'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.70'
+      TiO2: '0.03'
+      (Na,K)AlO2: '0.11'
+      Ca0.5AlO2: '0.18'
+    row_as_printed:
+      X_Matrix: '0.69'
+      SiO2: '0.70'
+      TiO2: '0.03'
+      (Na,K)AlO2: '0.11'
+      Ca0.5AlO2: '0.18'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r03
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r04
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '4'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Calc Alkali Basalt
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.79'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.70'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.09'
+      Ca0.5AlO2: '0.20'
+    row_as_printed:
+      X_Matrix: '0.79'
+      SiO2: '0.70'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.09'
+      Ca0.5AlO2: '0.20'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r04
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r05
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '5'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Basaltic Andesite
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.83'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.71'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.10'
+      Ca0.5AlO2: '0.19'
+    row_as_printed:
+      X_Matrix: '0.83'
+      SiO2: '0.71'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.10'
+      Ca0.5AlO2: '0.19'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r05
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r06
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '6'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Tholeiitic Picrite
+    source_marker_as_printed: a
+    attribution_as_printed: a - Nockolds (1954)
+    X_Matrix_as_printed: '0.59'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.78'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.05'
+      Ca0.5AlO2: '0.15'
+    row_as_printed:
+      X_Matrix: '0.59'
+      SiO2: '0.78'
+      TiO2: '0.02'
+      (Na,K)AlO2: '0.05'
+      Ca0.5AlO2: '0.15'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r06
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r07
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '7'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Komatiite
+    source_marker_as_printed: b
+    attribution_as_printed: b - Arndt (1977)
+    X_Matrix_as_printed: '0.50'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.83'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.15'
+    row_as_printed:
+      X_Matrix: '0.50'
+      SiO2: '0.83'
+      TiO2: '0.01'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.15'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r07
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r08
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '8'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: Low-TiO2 Mare Basalt
+    source_marker_as_printed: c
+    attribution_as_printed: c - Longhi et al. (1978)
+    X_Matrix_as_printed: '0.60'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.79'
+      TiO2: '0.03'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.17'
+    row_as_printed:
+      X_Matrix: '0.60'
+      SiO2: '0.79'
+      TiO2: '0.03'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.17'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r08
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_r09
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    row: '9'
+  units: dimensionless mole fractions; X_Matrix and matrix-normalized components
+  values:
+    magma_type_as_printed: High-TiO2 Mare Basalt
+    source_marker_as_printed: c
+    attribution_as_printed: c - Longhi et al. (1978)
+    X_Matrix_as_printed: '0.59'
+    Matrix_composition_mole_fraction_as_printed:
+      SiO2: '0.66'
+      TiO2: '0.17'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.16'
+    row_as_printed:
+      X_Matrix: '0.59'
+      SiO2: '0.66'
+      TiO2: '0.17'
+      (Na,K)AlO2: '0.01'
+      Ca0.5AlO2: '0.16'
+    schema_gap: Table 2 gives author's recalculated mole fractions of a normalized Matrix pseudocomponent, not the whole composition
+      of a measured physical phase. No exact quantity token exists for this pseudocomponent basis; see tools/validate_literature_extracts.py::OBSERVATION_TYPES,
+      simulator/battery/migrate.py::TYPE_QUANTITY and QUANTITY_ALIASES, simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+      and PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token and _phase_row_rejection.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_r09
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO
+- observation_id: doyle_1989_table2_schema_gap
+  type: table_context
+  locator:
+    page: 6
+    pdf_page_index: 5
+    published_page: 2636
+    table: '2'
+    note: caption and all nine magma rows
+  units: dimensionless mole fractions
+  values:
+    printed_row_count: 9
+    printed_basis_as_published: X_Matrix and proportions of the constituents in the Matrix component
+    schema_gap: The Table 2 cells are preserved in the nine row records. Matrix is a normalized pseudocomponent, not a phase
+      role. The closed phase-composition quantity and role paths cannot represent this subcomposition without changing its
+      meaning; see simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION, PHASE_BASIS_TOKENS, and simulator/battery/migrate.py::_phase_role_token.
+  context_id: doyle-1989-tio2-feo-activity-magma::context::doyle_1989_table2_schema_gap
+  work_id: 0bdbb7051ab550e37775d05d5fad3e89d3268b212faddae2bcc1b96aedc5544b
+  source_id: doyle-1989-tio2-feo-activity-magma
+  species: FeO

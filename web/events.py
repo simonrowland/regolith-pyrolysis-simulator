@@ -2041,6 +2041,12 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float | str
             if field_key == 'carrier_gas':
                 clean_fields[field_key] = field_value
                 continue
+            if field_key in {'p_total_mbar', 'pO2_mbar'}:
+                # Pressure sign and the pO2-above-total ceiling are owned by
+                # validate_runtime_campaign_overrides below. A raw value keeps
+                # a non-numeric override on that typed refusal.
+                clean_fields[field_key] = field_value
+                continue
             label = f'runtime_campaign_overrides.{campaign_name}.{field_key}'
             if field_value is None or field_value == '':
                 raise InputValidationError(f'{label} is required')
@@ -2051,11 +2057,6 @@ def _coerce_runtime_campaign_overrides(value) -> dict[str, dict[str, float | str
                 if message.startswith(f'{field_key} '):
                     message = f'{label}{message[len(field_key):]}'
                 raise InputValidationError(message) from exc
-            if field_key == 'pO2_mbar' and clean_value < 0.0:
-                raise InputValidationError(
-                    f'runtime_campaign_overrides.{campaign_name}.{field_key} '
-                    'must be >= 0'
-                )
             clean_fields[field_key] = clean_value
         if clean_fields:
             overrides[campaign_name] = clean_fields

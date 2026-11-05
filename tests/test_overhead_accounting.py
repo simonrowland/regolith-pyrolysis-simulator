@@ -1537,7 +1537,9 @@ def test_condensation_residual_drives_overhead_partial_pressures(monkeypatch):
         "route",
         lambda _flux, _melt: CondensationRouteResult(
             remaining_by_species={"Fe": 0.25, "FeO": 0.75},
-            condensed_by_stage_species={1: {"Fe": 0.75, "FeO": 0.25}},
+            condensed_by_stage_species={
+                "stage_1_fe_condenser": {"Fe": 0.75, "FeO": 0.25},
+            },
             wall_deposit_by_species={"Fe": 0.15},
             wall_deposit_fraction_by_species={"Fe": 0.2},
             wall_deposit_account_fractions_by_species={
@@ -1761,7 +1763,9 @@ def test_next_tick_p_bulk_uses_upstream_headspace_after_near_total_capture(
         "route",
         lambda _flux, _melt: CondensationRouteResult(
             remaining_by_species={"Fe": residual_kg},
-            condensed_by_stage_species={1: {"Fe": evolved_kg - residual_kg}},
+            condensed_by_stage_species={
+                "stage_1_fe_condenser": {"Fe": evolved_kg - residual_kg},
+            },
         ),
     )
     sim.melt.campaign = CampaignPhase.C2A

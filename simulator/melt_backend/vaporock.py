@@ -120,7 +120,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from engines.domain_reason import OutOfDomainReason
-from engines.engine_commissioning import assess_engine_commissioning
+from engines.engine_commissioning import (
+    VAPOROCK_T_MAX_K,
+    VAPOROCK_T_MIN_K,
+    assess_engine_commissioning,
+    vaporock_temperature_notice,
+)
 from simulator.engine_local_config import _load_thermoengine_phaseobjc_library
 from simulator.engine_pool import (
     EngineWorkerDied,
@@ -152,15 +157,13 @@ from simulator.scalar_boundary import is_declared_real_scalar
 # ---------------------------------------------------------------------------
 # External validation domain (DESIGN-REV5 §4.2.1; VR-5)
 # ---------------------------------------------------------------------------
-# Load-bearing gate: the 2026-07-31 probe
+# External-validation evidence: the 2026-07-31 probe
 # (docs-private/research/2026-07-31-vaporock-probe/findings.md) found zero
-# typed refusals from 1200 K through 10000 K. The checked-in
-# ~8.3e5 bar figure is that probe's stored finite-sum fixture, replayed
-# by tests through a fake System. It is not recomputed against the
-# current installed engine. A finite provider return is therefore no
-# evidence of domain validity.
-VAPOROCK_T_MIN_K = 1350.0
-VAPOROCK_T_MAX_K = 1950.0
+# typed refusals from 1200 K through 10000 K. Its checked-in ~8.3e5 bar
+# finite-sum fixture is replayed by tests through a fake System; it is not
+# recomputed against the current installed engine. Finite returns outside
+# the certified band are extrapolated predictions, still subject to the
+# independent sum-pressure ceiling below.
 _MELT_MODEL_ID = 'MELTS-v1.0'
 # In-domain mare totals are ≪ 1 bar even at 1950 K / reducing fO2. Ten bar
 # is a conservative sum-pressure sanity ceiling well below the 2026-07-31
@@ -245,6 +248,24 @@ _SPECIATION_STAT_KEYS = (
     'speciation_neginf_count',
     'speciation_other_nonfinite_count',
 )
+_VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE = (
+    'melts_endmember_transformed_oxide_component; '
+    'mu_i = mu_i0 + R*T*ln(a_i)'
+)
+
+
+def _oxide_activity_fields_for_speciation(
+    speciation_Pa: Optional[Mapping[str, Any]],
+    oxide_activity: Optional[Mapping[str, float]],
+    standard_state: Any,
+) -> Dict[str, Any]:
+    """Return the activity pair only when usable vapor speciation exists."""
+    if not speciation_Pa or not oxide_activity or not standard_state:
+        return {}
+    return {
+        'oxide_activity': dict(oxide_activity),
+        'oxide_activity_standard_state': standard_state,
+    }
 
 
 # VapoRock gas-species names carry a "(g)" phase suffix.  This pattern
@@ -349,17 +370,6 @@ _VAPOROCK_MELT_BASIS = tuple(dict.fromkeys((*OXIDE_SPECIES, 'H2O', 'CO2')))
 def temperature_C_to_K(temperature_C: float) -> float:
     """Convert the adapter's Celsius melt temperature to Kelvin."""
     return float(temperature_C) + 273.15
-
-
-def vaporock_temperature_in_domain(temperature_K: float) -> bool:
-    """True iff *temperature_K* lies in the admitted VapoRock envelope."""
-    try:
-        t = float(temperature_K)
-    except (TypeError, ValueError):
-        return False
-    if not math.isfinite(t):
-        return False
-    return VAPOROCK_T_MIN_K <= t <= VAPOROCK_T_MAX_K
 
 
 def vaporock_liquid_fraction_admitted(
@@ -886,6 +896,7 @@ def _call_system_eval_gas_abundances(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
     fO2_log: float,
+    include_oxide_activities: bool = False,
 ) -> Any:
     """Resolve and call VapoRock's System equilibrium methods."""
     composition = dict(composition_wt_pct)
@@ -899,10 +910,78 @@ def _call_system_eval_gas_abundances(
         # in _calc_liquid_chempot. This helper calls (T, logfO2) only, so
         # upstream stays at its default. Passing P is a golden-affecting
         # change and is not done here.
+        if include_oxide_activities:
+            full_output = eval_gas_abundances(
+                temperature, log_fO2, full_output=True
+            )
+            if not isinstance(full_output, tuple) or len(full_output) != 3:
+                raise VapoRockCallError(
+                    'VapoRockIncompatibleAPI',
+                    'System.eval_gas_abundances(full_output=True) did not '
+                    'return (logP, lnK, ln_activity)',
+                )
+            logP, _lnK, ln_activity = full_output
+            oxide_activity = _oxide_activities_from_full_output(
+                system,
+                ln_activity,
+                composition_wt_pct=composition,
+            )
+            return logP, oxide_activity
         logP = eval_gas_abundances(temperature, log_fO2)
     except Exception as exc:
+        if isinstance(exc, VapoRockCallError):
+            raise
         raise VapoRockCallError(exc) from exc
     return logP
+
+
+def _oxide_activities_from_full_output(
+    system: Any,
+    ln_activity: Any,
+    *,
+    composition_wt_pct: Mapping[str, float],
+) -> Dict[str, float]:
+    """Project VapoRock's full-output activity vector onto present oxides.
+
+    Upstream orders ``ln_activity`` like ``system.vapor.rxn_coefs.columns``:
+    O2 fugacity first, then liquid oxide activities.  The first entry is not
+    an oxide activity.  Zero-inventory oxides are omitted because VapoRock's
+    liquid model can return a fabricated chemical potential for them.
+    """
+    try:
+        columns = list(system.vapor.rxn_coefs.columns)
+        if not columns or str(columns[0]) != 'O2':
+            raise ValueError('reaction-coefficient axis does not start with O2')
+        if len(ln_activity) != len(columns):
+            raise ValueError(
+                f'ln_activity axis has {len(ln_activity)} values for '
+                f'{len(columns)} reaction-coefficient columns'
+            )
+        oxide_activity: Dict[str, float] = {}
+        for index, raw_oxide in enumerate(columns[1:], start=1):
+            oxide = str(raw_oxide)
+            if float(composition_wt_pct.get(oxide, 0.0) or 0.0) <= 0.0:
+                continue
+            row = ln_activity[index]
+            try:
+                log_activity = float(row[0])
+            except (TypeError, IndexError):
+                log_activity = float(row)
+            activity = math.exp(log_activity)
+            if not math.isfinite(activity) or activity <= 0.0:
+                raise ValueError(
+                    f'VapoRock returned invalid {oxide} activity '
+                    f'{activity!r}'
+                )
+            oxide_activity[oxide] = activity
+    except Exception as exc:
+        if isinstance(exc, VapoRockCallError):
+            raise
+        raise VapoRockCallError(
+            'VapoRockIncompatibleAPI',
+            f'could not map VapoRock full-output oxide activities: {exc}',
+        ) from exc
+    return oxide_activity
 
 
 def _construct_system(
@@ -1023,6 +1102,7 @@ def _handle_vaporock_request(
     composition_wt_pct = dict(request['composition_wt_pct'])
     temperature_K = float(request['temperature_K'])
     fO2_log = float(request['fO2_log'])
+    include_oxide_activities = request.get('include_oxide_activities') is True
     system_cls = resource.get('system_cls')
     if system_cls is None:
         raise VapoRockCallError(
@@ -1036,28 +1116,29 @@ def _handle_vaporock_request(
     reuse_mismatch: dict[str, Any] | None = None
     reuse_mode: str
 
+    def evaluate(system: Any) -> tuple[Dict[str, float], Dict[str, Any], Any]:
+        raw = _call_system_eval_gas_abundances(
+            system,
+            composition_wt_pct=composition_wt_pct,
+            temperature_K=temperature_K,
+            fO2_log=fO2_log,
+            include_oxide_activities=include_oxide_activities,
+        )
+        if include_oxide_activities:
+            raw_logP, oxide_activity = raw
+        else:
+            raw_logP, oxide_activity = raw, None
+        logP, stats = _serialize_log10_bar_pressures(raw_logP)
+        return logP, stats, oxide_activity
+
     if stored is not None:
         # Actual reuse path — optionally probe against a fresh System.
         checks_done = int(resource.get('reuse_equivalence_checks_done') or 0)
         probe = checks_done < int(VAPOROCK_REUSE_EQUIVALENCE_PROBE_LIMIT)
-        reused_log, reused_stats = _serialize_log10_bar_pressures(
-            _call_system_eval_gas_abundances(
-                stored,
-                composition_wt_pct=composition_wt_pct,
-                temperature_K=temperature_K,
-                fO2_log=fO2_log,
-            )
-        )
+        reused_log, reused_stats, reused_activity = evaluate(stored)
         if probe:
             fresh_system = _construct_system(system_cls, resource=resource)
-            fresh_log, fresh_stats = _serialize_log10_bar_pressures(
-                _call_system_eval_gas_abundances(
-                    fresh_system,
-                    composition_wt_pct=composition_wt_pct,
-                    temperature_K=temperature_K,
-                    fO2_log=fO2_log,
-                )
-            )
+            fresh_log, fresh_stats, fresh_activity = evaluate(fresh_system)
             resource['reuse_equivalence_checks_done'] = checks_done + 1
             if not _log10_bar_maps_equivalent(reused_log, fresh_log):
                 # Null hypothesis: if latch is absent, residue-carrying
@@ -1076,29 +1157,25 @@ def _handle_vaporock_request(
                 )
                 log10_bar = fresh_log
                 spec_stats = fresh_stats
+                oxide_activity = fresh_activity
                 reuse_mode = 'fresh_latched'
             else:
                 # Probe passed: keep the stored System as the reuse target.
                 # (fresh_system is discarded — construct count still rose.)
                 log10_bar = reused_log
                 spec_stats = reused_stats
+                oxide_activity = reused_activity
                 reuse_mode = 'reused_probed'
         else:
             log10_bar = reused_log
             spec_stats = reused_stats
+            oxide_activity = reused_activity
             reuse_mode = 'reused'
     else:
         system = _construct_system(system_cls, resource=resource)
         if want_reuse:
             resource['system'] = system
-        log10_bar, spec_stats = _serialize_log10_bar_pressures(
-            _call_system_eval_gas_abundances(
-                system,
-                composition_wt_pct=composition_wt_pct,
-                temperature_K=temperature_K,
-                fO2_log=fO2_log,
-            )
-        )
+        log10_bar, spec_stats, oxide_activity = evaluate(system)
         reuse_mode = 'fresh_latched' if latched else (
             'fresh_seed' if want_reuse else 'fresh'
         )
@@ -1113,6 +1190,11 @@ def _handle_vaporock_request(
         'reuse_mode': reuse_mode,
         'reuse_latched_fresh': bool(resource.get('reuse_latched_fresh')),
     }
+    if include_oxide_activities:
+        payload['oxide_activity'] = dict(oxide_activity or {})
+        payload['oxide_activity_standard_state'] = (
+            _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE
+        )
     if reuse_mismatch is not None:
         payload['reuse_mismatch'] = reuse_mismatch
     elif resource.get('reuse_mismatch_diagnostic') is not None:
@@ -1651,6 +1733,7 @@ class VapoRockBackend(MeltBackend):
         ] = None,
         species_formula_registry: Optional[Mapping[str, Any]] = None,
         liquid_fraction: Optional[float] = None,
+        include_oxide_activities: bool = False,
     ) -> EquilibriumResult:
         """
         Call VapoRock for vapor-melt equilibrium.
@@ -1662,14 +1745,14 @@ class VapoRockBackend(MeltBackend):
         is called (binding spec §7).  The melt composition is then
             projected to VapoRock's MELTS-compatible oxide/volatile wt% basis.
 
-        External domain gate (DESIGN-REV5 §4.2.1 / VR-5; load-bearing):
-        refuse outside 1350–1950 K, on liquid-fraction failure when a
-        fraction is supplied, on projection/non-basis failure, and on
-        sum-pressure sanity failure after the engine returns. Upstream
-        fabricates smooth finite garbage at extreme T (historical
-        2026-07-31 probe fixture ~8.3e5 bar total at 10000 K; that
-        number is not a current-engine recompute) and does not
-        self-refuse.
+        The external validation band is 1350–1950 K. Finite temperatures
+        outside it still reach VapoRock and carry an extrapolation notice;
+        non-finite temperature, liquid-fraction failure when a fraction is
+        supplied, projection/non-basis failure, and sum-pressure sanity
+        failure remain typed refusals. Upstream can return smooth finite
+        garbage at extreme T (the historical 2026-07-31 fixture is about
+        8.3e5 bar total at 10000 K; it is not a current-engine recompute),
+        so the independent 10 bar ceiling still applies after evaluation.
 
         ``pressure_bar`` remains diagnostic-only: the System path in this
         adapter does not pass total pressure through to the engine
@@ -1709,18 +1792,14 @@ class VapoRockBackend(MeltBackend):
 
         prior_warnings: List[str] = []
 
-        # --- HARD external temperature gate (before any engine call) ---
-        if not vaporock_temperature_in_domain(temperature_K):
+        # Non-finite temperatures cannot be evaluated or assigned a range notice.
+        if not math.isfinite(temperature_K):
             diagnostics = {
                 **melt_envelope_diagnostics,
                 'backend_status_reason': (
                     OutOfDomainReason.TEMPERATURE_RANGE.value
                 ),
-                **(
-                    {'temperature_K': float(temperature_K)}
-                    if math.isfinite(temperature_K)
-                    else {'temperature_input_category': 'non_finite'}
-                ),
+                'temperature_input_category': 'non_finite',
                 'vaporock_t_min_K': VAPOROCK_T_MIN_K,
                 'vaporock_t_max_K': VAPOROCK_T_MAX_K,
                 'requested_pressure_bar': float(pressure_bar),
@@ -1734,11 +1813,8 @@ class VapoRockBackend(MeltBackend):
                 phase_assemblage_available=False,
                 status='out_of_domain',
                 warnings=[
-                    f'VapoRock refused T={temperature_K:g} K outside '
-                    f'admitted domain '
-                    f'[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K '
-                    '(external domain gate; upstream fabricates finite '
-                    'garbage outside this envelope)'
+                    'VapoRock refused non-finite temperature '
+                    '(temperature_range)'
                 ],
                 diagnostics=diagnostics,
             )
@@ -1971,6 +2047,7 @@ class VapoRockBackend(MeltBackend):
             sio2_wt_pct=comp_wt.get('SiO2', 0.0),
             temperature_K=temperature_K,
         )
+        temperature_notice = vaporock_temperature_notice(temperature_K)
         if commissioning.notice is not None:
             notice = dict(commissioning.notice)
             projection_diagnostics = dict(projection_diagnostics)
@@ -1983,6 +2060,12 @@ class VapoRockBackend(MeltBackend):
                 'CommissioningNotice: out of certified band; '
                 f"authority={notice['authority']}; engine will run"
             )
+        if temperature_notice is not None:
+            projection_diagnostics = dict(projection_diagnostics)
+            projection_diagnostics['vaporock_temperature_notice'] = (
+                temperature_notice
+            )
+            prior_warnings.extend(temperature_notice['warnings'])
 
         temperature_value = (
             temperature_C + 273.15
@@ -1996,12 +2079,22 @@ class VapoRockBackend(MeltBackend):
         )
 
         try:
-            vaporock_full_speciation_Pa = self._call_vaporock(
+            vaporock_output = self._call_vaporock(
                 composition_wt_pct=comp_wt,
                 temperature=temperature_value,
                 pressure=pressure_value,
                 fO2_log=fO2_log,
+                include_oxide_activities=include_oxide_activities,
             )
+            if include_oxide_activities:
+                (
+                    vaporock_full_speciation_Pa,
+                    oxide_activity,
+                    oxide_activity_standard_state,
+                ) = vaporock_output
+            else:
+                vaporock_full_speciation_Pa = vaporock_output
+                oxide_activity = {}
         except VapoRockCallError as exc:
             # VapoRock is present but the call did not produce a usable result.
             external_type = exc.external_exception
@@ -2060,6 +2153,16 @@ class VapoRockBackend(MeltBackend):
                 ],
                 diagnostics=diagnostics,
             )
+
+        if include_oxide_activities:
+            activity_fields = _oxide_activity_fields_for_speciation(
+                vaporock_full_speciation_Pa,
+                oxide_activity,
+                oxide_activity_standard_state,
+            )
+            if activity_fields:
+                projection_diagnostics = dict(projection_diagnostics)
+                projection_diagnostics.update(activity_fields)
 
         pressure_authority_warning = self._last_pressure_authority_warning
         if pressure_authority_warning:
@@ -2225,7 +2328,8 @@ class VapoRockBackend(MeltBackend):
         temperature: float,
         pressure: float,
         fO2_log: float,
-    ) -> Dict[str, float]:
+        include_oxide_activities: bool = False,
+    ) -> Any:
         """
         Invoke the upstream VapoRock equilibrium entry point.
 
@@ -2268,6 +2372,7 @@ class VapoRockBackend(MeltBackend):
                 composition_wt_pct=composition_wt_pct,
                 temperature_K=temperature_K,
                 fO2_log=fO2_log,
+                include_oxide_activities=include_oxide_activities,
             )
 
         module = self._vaporock
@@ -2277,7 +2382,7 @@ class VapoRockBackend(MeltBackend):
             _vaporock_equilibrium_entrypoints(module)
         )
         last_attr_error: Optional[Exception] = None
-        for _name, fn in candidate_functions:
+        for _name, fn in (() if include_oxide_activities else candidate_functions):
             candidate_kwargs = {
                 'composition': composition_wt_pct,
                 'T_C': temperature if self._temperature_units == 'C' else None,
@@ -2350,11 +2455,12 @@ class VapoRockBackend(MeltBackend):
             # opt-in warm-worker flag with a finite reused-vs-fresh
             # prefix probe, not a proven admitted-grid equivalence.
             system = _construct_system(system_cls)
-            logP = _call_system_eval_gas_abundances(
+            system_output = _call_system_eval_gas_abundances(
                 system,
                 composition_wt_pct=composition_wt_pct,
                 temperature_K=temperature_K,
                 fO2_log=fO2_log,
+                include_oxide_activities=include_oxide_activities,
             )
             self._last_pressure_authority_warning = (
                 'This adapter calls System.eval_gas_abundances without '
@@ -2366,8 +2472,18 @@ class VapoRockBackend(MeltBackend):
             )
             # log10(bar) result is unit-unambiguous; convert directly
             # without the declared-unit dict path.
+            if include_oxide_activities:
+                logP, oxide_activity = system_output
+                pressures = self._log10_bar_pressures_to_pa(
+                    logP, composition_wt_pct=composition_wt_pct
+                )
+                return (
+                    pressures,
+                    oxide_activity,
+                    _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE,
+                )
             return self._log10_bar_pressures_to_pa(
-                logP, composition_wt_pct=composition_wt_pct
+                system_output, composition_wt_pct=composition_wt_pct
             )
 
         error = _vaporock_incompatible_api_error(last_attr_error)
@@ -2381,7 +2497,8 @@ class VapoRockBackend(MeltBackend):
         composition_wt_pct: Dict[str, float],
         temperature_K: float,
         fO2_log: float,
-    ) -> Dict[str, float]:
+        include_oxide_activities: bool = False,
+    ) -> Any:
         """Dispatch one request through the warm pool (fresh System default)."""
         pool = self._warm_pool
         if pool is None:
@@ -2393,6 +2510,8 @@ class VapoRockBackend(MeltBackend):
             'temperature_K': float(temperature_K),
             'fO2_log': float(fO2_log),
         }
+        if include_oxide_activities:
+            request['include_oxide_activities'] = True
         future = pool.submit(
             request, timeout_s=self._warm_call_timeout_s
         )
@@ -2434,11 +2553,19 @@ class VapoRockBackend(MeltBackend):
         )
         if 'log10_bar' not in payload:
             self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
-            return {}
+            return (
+                ({}, {}, _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE)
+                if include_oxide_activities
+                else {}
+            )
         log10_bar = payload.get('log10_bar')
         if log10_bar is None:
             self._latch_empty_speciation(EmptySpeciationCause.PAYLOAD_ABSENT)
-            return {}
+            return (
+                ({}, {}, _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE)
+                if include_oxide_activities
+                else {}
+            )
         if not isinstance(log10_bar, dict):
             raise RuntimeError(
                 f'VapoRock warm worker log10_bar has type {type(log10_bar)!r}'
@@ -2458,14 +2585,46 @@ class VapoRockBackend(MeltBackend):
                     'exception': str(payload['engine_exception']),
                     'message': str(payload.get('engine_exception_message', '')),
                 }
-            return {}
-        return self._log10_bar_pressures_to_pa(
+            return (
+                ({}, {}, _VAPOROCK_OXIDE_ACTIVITY_STANDARD_STATE)
+                if include_oxide_activities
+                else {}
+            )
+        pressures = self._log10_bar_pressures_to_pa(
             log10_bar,
             composition_wt_pct=composition_wt_pct,
             proven_empty_species=payload.get(
                 'proven_empty_inventory_species'
             ),
         )
+        if not include_oxide_activities:
+            return pressures
+        raw_activity = payload.get('oxide_activity')
+        if not isinstance(raw_activity, dict):
+            raise RuntimeError(
+                'VapoRock warm worker oxide_activity has type '
+                f'{type(raw_activity)!r}'
+            )
+        oxide_activity: Dict[str, float] = {}
+        for oxide, raw_value in raw_activity.items():
+            try:
+                activity = float(raw_value)
+            except (TypeError, ValueError) as exc:
+                raise RuntimeError(
+                    f'VapoRock warm worker returned invalid activity for {oxide}'
+                ) from exc
+            if not math.isfinite(activity) or activity <= 0.0:
+                raise RuntimeError(
+                    f'VapoRock warm worker returned invalid activity for {oxide}'
+                )
+            oxide_activity[str(oxide)] = activity
+        state = payload.get('oxide_activity_standard_state')
+        if not isinstance(state, str) or not state:
+            raise RuntimeError(
+                'VapoRock warm worker did not state the oxide activity '
+                'standard state'
+            )
+        return pressures, oxide_activity, state
 
     # ------------------------------------------------------------------
     # Composition / result projection

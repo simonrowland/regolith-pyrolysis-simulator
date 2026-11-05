@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Research-only VapoRock comparison against the SF04 MAGMA workbook grid.
 
-This deliberately bypasses the runtime adapter's 1950 K domain gate. It is a
-diagnostic probe for deciding that gate, never a runtime pressure source. The
-SF04 paper prints no numerical high-temperature species table; the anchor is
-the preserved ``Schaefer2004-MAGMA-valid.xlsx`` companion-workbook grid named
-by the reviewed extract.
+This calls upstream VapoRock directly, bypassing the adapter's extrapolation
+notice and post-call guards. It is a diagnostic comparison, never a runtime
+pressure source. The SF04 paper prints no numerical high-temperature species
+table; the anchor is the preserved ``Schaefer2004-MAGMA-valid.xlsx``
+companion-workbook grid named by the reviewed extract.
 """
 
 from __future__ import annotations

@@ -1,0 +1,518 @@
+schema_version: literature_extract.v1
+source_id: fredrickson-chasanov-1973-na2o-enthalpy-1300k
+source:
+  citation: 'Fredrickson, D. R. & Chasanov, M. G. (1973), “The enthalpy of sodium oxide Na2O to 1300 K by drop calorimetry”, Journal of Chemical Thermodynamics 5, 485–490.'
+  doi: null
+  url: null
+  year: 1973
+extraction:
+  method: MinerU and pdftotext table transcription; flagged cells and table layouts checked against rendered PDF pages
+  date: '2026-11-02'
+  worker: w1103fc-fc73
+  provenance_path: text/fredrickson-chasanov-1973-na2o-enthalpy-1300k/pdftotext-layout.txt
+  source_note: >-
+    The source reports 31 drop-calorimetry measurements of H°(T)−H°(298.15 K),
+    two least-squares equations, a differentiated heat-capacity equation, and
+    a 12-row smoothed enthalpy/heat-capacity/entropy table. The table 1 and
+    table 2 enthalpy and heat-capacity values requested here are stored in the
+    printed thermochemical calories, with no converted twins. The paper states
+    cal_th = 4.184 J and temperatures based on IPTS-68. Its table 3 contains
+    derived formation enthalpy, Gibbs energy, and log K values; those quantities
+    are outside this extraction's requested H(T)−H(298.15 K), Cp, and transition
+    data. Table 2 entropy increments are also outside the requested scope.
+    Table 1 has 31 drops (not 32; MinerU's extra body row is the equation (2)
+    subheading). Table 2 has 12 data rows. The measured table 1 range is
+    511.8–1285.1 K; the fitted ranges are 298–900 K and 900–1300 K.
+    Absolute PDF pages are 1–6; printed journal pages are 485–490.
+  method_token_note: >-
+    The authors call the method high-precision drop calorimetry. The calorimeter
+    output is corrected for the capsule heat and divided by the stated Na2O
+    sample amount; no dedicated drop-calorimetry MethodToken is required here.
+review_status: draft
+fidelity_samples:
+  - path: species.Na2O.observations[fredrickson_1973_table1_measured_low].values.series[4].enthalpy_increment
+    value: '5673.16'
+    locator: {page: 3, published_page: 487, table: '1', note: 'Table 1 row 614.1, column observed'}
+  - path: species.Na2O.observations[fredrickson_1973_table1_fit_high].values.series[17].enthalpy_increment
+    value: '20859.17'
+    locator: {page: 3, published_page: 487, table: '1', note: 'Table 1 row 1266.6, column equation (2)'}
+  - path: species.Na2O.observations[fredrickson_1973_table2_enthalpy_low].values.series[2].enthalpy_increment
+    value: '1728.46'
+    locator: {page: 4, published_page: 488, table: '2', note: 'Table 2 row 400, column H°(T)−H°(298.15 K)'}
+  - path: species.Na2O.observations[fredrickson_1973_table2_cp_high_measured_reduced].values.series[1].cp
+    value: '25.4'
+    locator: {page: 4, published_page: 488, table: '2', note: 'Table 2 row 1100, column Cp(T)'}
+species:
+  Na2O:
+    context:
+      - observation_id: fredrickson_1973_sample_and_drop_calorimetry
+        type: sample_and_method_context
+        locator: {page: 2, published_page: 486, section: Experimental}
+        units: as printed
+        values:
+          sample_formula_as_printed: Na2O
+          sample_purity_statement_as_printed: '(99.9 ± 0.2) per cent of the amount of NaOH that would be produced by pure Na2O'
+          sample_purity_reference_marker_as_printed: '(5)'
+          sample_purity_basis_note: >-
+            This is the titrimetric hydrolysis-product yield relative to the
+            theoretical NaOH amount from pure Na2O; it is not a printed Na2O
+            mass-percent assay. Confidence level for ±0.2 is not stated.
+          preparation_as_printed: >-
+            The sample was heated under vacuum at 783 K for 40 h to remove excess
+            sodium and any NaOH; it was then characterized by titrimetric analysis
+            and emission spectrography.
+          capsule_as_printed: '(platinum + 10 mass per cent of rhodium), 0.4 mm wall thickness, 1.25 cm diameter, 5 cm3 internal volume, 5 cm length'
+          apparatus_as_printed: 'Resistance-heated vacuum furnace; copper-block calorimeter operating at 298.15 K with a quartz-crystal thermometer.'
+          apparatus_procedure_reference_marker_as_printed: '(6)'
+          sapphire_check_reference_marker_as_printed: '(7)'
+          sapphire_check_as_printed: 'Six experiments using sapphire in a platinum + 10 mass per cent rhodium capsule covered 598 to 1010 K; results agreed with NBS certified values within ±0.3 per cent.'
+          calorimeter_energy_equivalent_as_printed: '(1046.24 ± 0.33) cal_th K−1'
+          calorimeter_energy_equivalent_marker_as_printed: '†'
+          calorimeter_energy_equivalent_confidence_note: confidence level not stated
+          atmosphere_and_pressure_note: >-
+            The source describes a resistance-heated vacuum furnace but gives no
+            numerical total pressure or fO2 for the experiment.
+      - observation_id: fredrickson_1973_sample_amount_and_procedure
+        type: sample_and_method_context
+        locator: {page: 3, published_page: 487, section: Experimental, subsection: Procedure}
+        units: as printed
+        values:
+          sample_mass_g: '4.4438'
+          molar_mass_g_mol: '61.979'
+          capsule_filling: 'The sample-containing capsule was sealed under vacuum.'
+          filling_weighing_sealing_as_printed: 'All filling, weighing, and sealing operations were carried out in a glove-box filled with flowing high-purity helium.'
+          capsule_correction_as_printed: >-
+            An empirical expression for the enthalpy of the Pt + 10 mass per cent
+            Rh capsule was determined from separate empty-capsule experiments
+            and used to correct the capsule heat at each experimental temperature.
+          capsule_correction_method_class: measured_reduced
+          capsule_correction_note: >-
+            The paper reports the empirical correction expression but not the raw
+            empty-capsule calibration runs; q_o is retained as a typed-refused
+            input for the measured enthalpy reductions.
+          capsule_sealed_under_vacuum_note: >-
+            The capsule was sealed under vacuum, but no numerical total pressure
+            is reported. The glove-box helium is stated for filling, weighing,
+            and sealing, not as a furnace atmosphere. No fO2 is reported.
+          unit_temperature_footnote_as_printed: 'Throughout this paper, cal_th = 4.184 J, and all temperatures are based on IPTS-68.'
+      - observation_id: fredrickson_1973_structure_and_melting_context
+        type: sample_and_method_context
+        locator: {page: 5, published_page: 489, section: Discussion}
+        units: as printed
+        values:
+          phase_as_printed: >-
+            The authors state that Na2O has an antifluorite crystal structure
+            (reference [9]); individual table rows do not name a distinct
+            polymorph. The typeable phase is crystalline (cr).
+          melting_limit_as_printed: >-
+            Measurements through melting were planned. A capsule developed a
+            pin-hole at 1453 K during preliminary vacuum-furnace experiments;
+            after removal, the sample was exposed to air and extensively
+            hydrolyzed. The paper does not report a Na2O melting temperature or
+            a measured liquid enthalpy series.
+    observations:
+      - observation_id: fredrickson_1973_table1_q_input
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 q input series'}
+        T_range_K: ['511.8', '1285.1']
+        phase: cr
+        units: cal
+        units_as_printed: cal_th
+        values:
+          quantity: total_calorimeter_heat_q_as_measured
+          quantity_as_printed: q
+          schema_gap: >-
+            No exact token represents the printed total calorimeter heat q or empirical empty-capsule heat correction q_o. The closed Quantity set in simulator/battery/enums.py::Quantity and token maps in simulator/battery/migrate.py::QUANTITY_ALIASES do not represent total apparatus heat; simulator/battery/migrate.py::TYPE_QUANTITY could infer H_minus_H298 from this generic series type, which would be semantically wrong; tools/validate_literature_extracts.py::OBSERVATION_TYPES has no separate calorimeter-input observation type. These source cells are retained as typed quantity-unknown ancestry points.
+          method_class: measured_direct
+          method_as_printed: >-
+            The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration runs are not printed.
+          series:
+            - {T_K: '511.8', value: '380.37', point_conditions: {temperature_K: {state: {tag: value, value: '511.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 511.8, column q'}}}}
+            - {T_K: '520.0', value: '394.46', point_conditions: {temperature_K: {state: {tag: value, value: '520.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 520.0, column q'}}}}
+            - {T_K: '567.5', value: '487.14', point_conditions: {temperature_K: {state: {tag: value, value: '567.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 567.5, column q'}}}}
+            - {T_K: '568.0', value: '488.04', point_conditions: {temperature_K: {state: {tag: value, value: '568.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 568.0, column q'}}}}
+            - {T_K: '614.1', value: '576.79', point_conditions: {temperature_K: {state: {tag: value, value: '614.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 614.1, column q'}}}}
+            - {T_K: '653.1', value: '658.16', point_conditions: {temperature_K: {state: {tag: value, value: '653.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 653.1, column q'}}}}
+            - {T_K: '697.1', value: '739.50', point_conditions: {temperature_K: {state: {tag: value, value: '697.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.1, column q'}}}}
+            - {T_K: '697.4', value: '741.52', point_conditions: {temperature_K: {state: {tag: value, value: '697.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.4, column q'}}}}
+            - {T_K: '709.7', value: '765.39', point_conditions: {temperature_K: {state: {tag: value, value: '709.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 709.7, column q'}}}}
+            - {T_K: '729.7', value: '808.21', point_conditions: {temperature_K: {state: {tag: value, value: '729.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 729.7, column q'}}}}
+            - {T_K: '802.5', value: '952.61', point_conditions: {temperature_K: {state: {tag: value, value: '802.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 802.5, column q'}}}}
+            - {T_K: '876.4', value: '1102.50', point_conditions: {temperature_K: {state: {tag: value, value: '876.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 876.4, column q'}}}}
+            - {T_K: '951.3', value: '1261.66', point_conditions: {temperature_K: {state: {tag: value, value: '951.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.3, column q'}}}}
+            - {T_K: '951.8', value: '1255.68', point_conditions: {temperature_K: {state: {tag: value, value: '951.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.8, column q'}}}}
+            - {T_K: '975.4', value: '1313.36', point_conditions: {temperature_K: {state: {tag: value, value: '975.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 975.4, column q'}}}}
+            - {T_K: '991.4', value: '1347.45', point_conditions: {temperature_K: {state: {tag: value, value: '991.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 991.4, column q'}}}}
+            - {T_K: '1007.0', value: '1381.17', point_conditions: {temperature_K: {state: {tag: value, value: '1007.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1007.0, column q'}}}}
+            - {T_K: '1025.5', value: '1422.36', point_conditions: {temperature_K: {state: {tag: value, value: '1025.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1025.5, column q'}}}}
+            - {T_K: '1050.1', value: '1478.21', point_conditions: {temperature_K: {state: {tag: value, value: '1050.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1050.1, column q'}}}}
+            - {T_K: '1074.9', value: '1532.01', point_conditions: {temperature_K: {state: {tag: value, value: '1074.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1074.9, column q'}}}}
+            - {T_K: '1099.9', value: '1595.07', point_conditions: {temperature_K: {state: {tag: value, value: '1099.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1099.9, column q'}}}}
+            - {T_K: '1123.4', value: '1649.29', point_conditions: {temperature_K: {state: {tag: value, value: '1123.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1123.4, column q'}}}}
+            - {T_K: '1149.3', value: '1715.16', point_conditions: {temperature_K: {state: {tag: value, value: '1149.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1149.3, column q'}}}}
+            - {T_K: '1176.4', value: '1781.54', point_conditions: {temperature_K: {state: {tag: value, value: '1176.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1176.4, column q'}}}}
+            - {T_K: '1200.8', value: '1852.99', point_conditions: {temperature_K: {state: {tag: value, value: '1200.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1200.8, column q'}}}}
+            - {T_K: '1216.8', value: '1896.28', point_conditions: {temperature_K: {state: {tag: value, value: '1216.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1216.8, column q'}}}}
+            - {T_K: '1234.5', value: '1943.68', point_conditions: {temperature_K: {state: {tag: value, value: '1234.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1234.5, column q'}}}}
+            - {T_K: '1243.5', value: '1974.00', point_conditions: {temperature_K: {state: {tag: value, value: '1243.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1243.5, column q'}}}}
+            - {T_K: '1254.4', value: '2003.12', point_conditions: {temperature_K: {state: {tag: value, value: '1254.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1254.4, column q'}}}}
+            - {T_K: '1266.6', value: '2039.28', point_conditions: {temperature_K: {state: {tag: value, value: '1266.6'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1266.6, column q'}}}}
+            - {T_K: '1285.1', value: '2092.55', point_conditions: {temperature_K: {state: {tag: value, value: '1285.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1285.1, column q'}}}}
+      - observation_id: fredrickson_1973_table1_q_o_input
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 q_o input series'}
+        T_range_K: ['511.8', '1285.1']
+        phase: cr
+        units: cal
+        units_as_printed: cal_th
+        values:
+          quantity: empty_capsule_heat_correction_q_o_as_reported
+          quantity_as_printed: q_o
+          schema_gap: >-
+            No exact token represents the printed total calorimeter heat q or empirical empty-capsule heat correction q_o. The closed Quantity set in simulator/battery/enums.py::Quantity and token maps in simulator/battery/migrate.py::QUANTITY_ALIASES do not represent total apparatus heat; simulator/battery/migrate.py::TYPE_QUANTITY could infer H_minus_H298 from this generic series type, which would be semantically wrong; tools/validate_literature_extracts.py::OBSERVATION_TYPES has no separate calorimeter-input observation type. These source cells are retained as typed quantity-unknown ancestry points.
+          method_class: measured_direct
+          method_as_printed: >-
+            The source reports the total q calorimeter heat and q_o capsule heat correction for each drop. The capsule correction represents empty-capsule calorimetry from a separate measured series and an empirical expression; its raw calibration runs are not printed.
+          series:
+            - {T_K: '511.8', value: '113.79', point_conditions: {temperature_K: {state: {tag: value, value: '511.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 511.8, column q_o'}}}}
+            - {T_K: '520.0', value: '118.28', point_conditions: {temperature_K: {state: {tag: value, value: '520.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 520.0, column q_o'}}}}
+            - {T_K: '567.5', value: '144.34', point_conditions: {temperature_K: {state: {tag: value, value: '567.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 567.5, column q_o'}}}}
+            - {T_K: '568.0', value: '144.62', point_conditions: {temperature_K: {state: {tag: value, value: '568.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 568.0, column q_o'}}}}
+            - {T_K: '614.1', value: '170.03', point_conditions: {temperature_K: {state: {tag: value, value: '614.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 614.1, column q_o'}}}}
+            - {T_K: '653.1', value: '191.63', point_conditions: {temperature_K: {state: {tag: value, value: '653.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 653.1, column q_o'}}}}
+            - {T_K: '697.1', value: '216.10', point_conditions: {temperature_K: {state: {tag: value, value: '697.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.1, column q_o'}}}}
+            - {T_K: '697.4', value: '216.28', point_conditions: {temperature_K: {state: {tag: value, value: '697.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.4, column q_o'}}}}
+            - {T_K: '709.7', value: '223.14', point_conditions: {temperature_K: {state: {tag: value, value: '709.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 709.7, column q_o'}}}}
+            - {T_K: '729.7', value: '234.31', point_conditions: {temperature_K: {state: {tag: value, value: '729.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 729.7, column q_o'}}}}
+            - {T_K: '802.5', value: '275.19', point_conditions: {temperature_K: {state: {tag: value, value: '802.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 802.5, column q_o'}}}}
+            - {T_K: '876.4', value: '316.99', point_conditions: {temperature_K: {state: {tag: value, value: '876.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 876.4, column q_o'}}}}
+            - {T_K: '951.3', value: '359.68', point_conditions: {temperature_K: {state: {tag: value, value: '951.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.3, column q_o'}}}}
+            - {T_K: '951.8', value: '359.97', point_conditions: {temperature_K: {state: {tag: value, value: '951.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.8, column q_o'}}}}
+            - {T_K: '975.4', value: '373.49', point_conditions: {temperature_K: {state: {tag: value, value: '975.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 975.4, column q_o'}}}}
+            - {T_K: '991.4', value: '382.67', point_conditions: {temperature_K: {state: {tag: value, value: '991.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 991.4, column q_o'}}}}
+            - {T_K: '1007.0', value: '391.64', point_conditions: {temperature_K: {state: {tag: value, value: '1007.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1007.0, column q_o'}}}}
+            - {T_K: '1025.5', value: '402.29', point_conditions: {temperature_K: {state: {tag: value, value: '1025.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1025.5, column q_o'}}}}
+            - {T_K: '1050.1', value: '416.49', point_conditions: {temperature_K: {state: {tag: value, value: '1050.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1050.1, column q_o'}}}}
+            - {T_K: '1074.9', value: '430.84', point_conditions: {temperature_K: {state: {tag: value, value: '1074.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1074.9, column q_o'}}}}
+            - {T_K: '1099.9', value: '445.33', point_conditions: {temperature_K: {state: {tag: value, value: '1099.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1099.9, column q_o'}}}}
+            - {T_K: '1123.4', value: '459.00', point_conditions: {temperature_K: {state: {tag: value, value: '1123.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1123.4, column q_o'}}}}
+            - {T_K: '1149.3', value: '474.09', point_conditions: {temperature_K: {state: {tag: value, value: '1149.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1149.3, column q_o'}}}}
+            - {T_K: '1176.4', value: '489.92', point_conditions: {temperature_K: {state: {tag: value, value: '1176.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1176.4, column q_o'}}}}
+            - {T_K: '1200.8', value: '504.22', point_conditions: {temperature_K: {state: {tag: value, value: '1200.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1200.8, column q_o'}}}}
+            - {T_K: '1216.8', value: '513.61', point_conditions: {temperature_K: {state: {tag: value, value: '1216.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1216.8, column q_o'}}}}
+            - {T_K: '1234.5', value: '524.01', point_conditions: {temperature_K: {state: {tag: value, value: '1234.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1234.5, column q_o'}}}}
+            - {T_K: '1243.5', value: '529.31', point_conditions: {temperature_K: {state: {tag: value, value: '1243.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1243.5, column q_o'}}}}
+            - {T_K: '1254.4', value: '535.73', point_conditions: {temperature_K: {state: {tag: value, value: '1254.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1254.4, column q_o'}}}}
+            - {T_K: '1266.6', value: '542.93', point_conditions: {temperature_K: {state: {tag: value, value: '1266.6'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1266.6, column q_o'}}}}
+            - {T_K: '1285.1', value: '553.86', point_conditions: {temperature_K: {state: {tag: value, value: '1285.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1285.1, column q_o'}}}}
+      - observation_id: fredrickson_1973_table1_measured_low
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 column observed'}
+        T_range_K: ['511.8', '876.4']
+        phase: cr
+        polymorph_notes: Na2O is identified as antifluorite in the discussion; no separate polymorph name is assigned to the table rows.
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K)
+          method_class: measured_reduced
+          method_as_printed: high-precision drop calorimetry with capsule-heat correction
+          standard_state: H°(T)−H°(298.15 K) for Na2O; temperatures based on IPTS-68
+          derivation:
+            relation: '(q − q_o) divided by the amount of Na2O in the sealed capsule; q and q_o are retained in each source row, and the stated sample mass and molar mass are retained in procedure context.'
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=511.8:h=fd76a8452e72', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=511.8:h=7f4a0594d5a0', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=520.0:h=c93329e01042', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=520.0:h=768424b43537', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=567.5:h=14a811a586cc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=567.5:h=65020162659a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=568.0:h=ed32b0e0fc3f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=568.0:h=725b8a71737a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=614.1:h=98a9aa458775', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=614.1:h=f1260fbc36ff', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=653.1:h=dc28181cba27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=653.1:h=fa9b8e1549cf', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.1:h=685a029117a4', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.1:h=d9ef4bd8b072', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.4:h=0043799f8454', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.4:h=b9ab18bd056d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=709.7:h=df353b41a622', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=709.7:h=ba8f9215abad', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=729.7:h=ab272baee327', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=729.7:h=0bf4375a6d74', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=802.5:h=0eb2f86655c8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=802.5:h=de451072b9df', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=876.4:h=4a0c78ec4073', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=876.4:h=a5b321e6549b']
+            output_unit: cal/mol
+          series:
+            - {T_K: '511.8', enthalpy_increment: '3718.04', q_cal_th: '380.37', q_o_cal_th: '113.79', delta_percent_as_printed: '+0.36', point_conditions: {temperature_K: {state: {tag: value, value: '511.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 511.8, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=511.8:h=fd76a8452e72', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=511.8:h=7f4a0594d5a0']}
+            - {T_K: '520.0', enthalpy_increment: '3851.94', q_cal_th: '394.46', q_o_cal_th: '118.28', delta_percent_as_printed: '+0.80', point_conditions: {temperature_K: {state: {tag: value, value: '520.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 520.0, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=520.0:h=c93329e01042', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=520.0:h=768424b43537']}
+            - {T_K: '567.5', enthalpy_increment: '4781.10', q_cal_th: '487.14', q_o_cal_th: '144.34', delta_percent_as_printed: −0.22, point_conditions: {temperature_K: {state: {tag: value, value: '567.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 567.5, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=567.5:h=14a811a586cc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=567.5:h=65020162659a']}
+            - {T_K: '568.0', enthalpy_increment: '4789.75', q_cal_th: '488.04', q_o_cal_th: '144.62', delta_percent_as_printed: −0.20, point_conditions: {temperature_K: {state: {tag: value, value: '568.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 568.0, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=568.0:h=ed32b0e0fc3f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=568.0:h=725b8a71737a']}
+            - {T_K: '614.1', enthalpy_increment: '5673.16', q_cal_th: '576.79', q_o_cal_th: '170.03', delta_percent_as_printed: −0.21, point_conditions: {temperature_K: {state: {tag: value, value: '614.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 614.1, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=614.1:h=98a9aa458775', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=614.1:h=f1260fbc36ff']}
+            - {T_K: '653.1', enthalpy_increment: '6506.79', q_cal_th: '658.16', q_o_cal_th: '191.63', delta_percent_as_printed: −1.31, point_conditions: {temperature_K: {state: {tag: value, value: '653.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 653.1, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=653.1:h=dc28181cba27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=653.1:h=fa9b8e1549cf']}
+            - {T_K: '697.1', enthalpy_increment: '7299.82', q_cal_th: '739.50', q_o_cal_th: '216.10', delta_percent_as_printed: −0.07, point_conditions: {temperature_K: {state: {tag: value, value: '697.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.1, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.1:h=685a029117a4', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.1:h=d9ef4bd8b072']}
+            - {T_K: '697.4', enthalpy_increment: '7325.63', q_cal_th: '741.52', q_o_cal_th: '216.28', delta_percent_as_printed: −0.34, point_conditions: {temperature_K: {state: {tag: value, value: '697.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=697.4:h=0043799f8454', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=697.4:h=b9ab18bd056d']}
+            - {T_K: '709.7', enthalpy_increment: '7562.87', q_cal_th: '765.39', q_o_cal_th: '223.14', delta_percent_as_printed: −0.19, point_conditions: {temperature_K: {state: {tag: value, value: '709.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 709.7, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=709.7:h=df353b41a622', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=709.7:h=ba8f9215abad']}
+            - {T_K: '729.7', enthalpy_increment: '8004.30', q_cal_th: '808.21', q_o_cal_th: '234.31', delta_percent_as_printed: −0.64, point_conditions: {temperature_K: {state: {tag: value, value: '729.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 729.7, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=729.7:h=ab272baee327', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=729.7:h=0bf4375a6d74']}
+            - {T_K: '802.5', enthalpy_increment: '9448.11', q_cal_th: '952.61', q_o_cal_th: '275.19', delta_percent_as_printed: '+0.10', point_conditions: {temperature_K: {state: {tag: value, value: '802.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 802.5, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=802.5:h=0eb2f86655c8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=802.5:h=de451072b9df']}
+            - {T_K: '876.4', enthalpy_increment: '10955.66', q_cal_th: '1102.50', q_o_cal_th: '316.99', delta_percent_as_printed: '+0.70', point_conditions: {temperature_K: {state: {tag: value, value: '876.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 876.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=876.4:h=4a0c78ec4073', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=876.4:h=a5b321e6549b']}
+      - observation_id: fredrickson_1973_table1_measured_high
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 column observed'}
+        T_range_K: ['951.3', '1285.1']
+        phase: cr
+        polymorph_notes: Na2O is identified as antifluorite in the discussion; no separate polymorph name is assigned to the table rows.
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K)
+          method_class: measured_reduced
+          method_as_printed: high-precision drop calorimetry with capsule-heat correction
+          standard_state: H°(T)−H°(298.15 K) for Na2O; temperatures based on IPTS-68
+          derivation:
+            relation: '(q − q_o) divided by the amount of Na2O in the sealed capsule; q and q_o are retained in each source row, and the stated sample mass and molar mass are retained in sample context.'
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.3:h=d5c15bac8399', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.3:h=e59436e26125', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.8:h=4a5085418604', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.8:h=d9def90324ab', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=975.4:h=52d88477cd62', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=975.4:h=4b4aad1f621a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=991.4:h=caad72995b2f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=991.4:h=27227180d77e', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1007.0:h=94a4e7cc0a87', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1007.0:h=de1fddc12080', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1025.5:h=ef36b7432b9e', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1025.5:h=bb2b6ae6ceaa', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1050.1:h=b72e78d93a98', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1050.1:h=febb371d3307', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1074.9:h=d291080f6a61', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1074.9:h=e36153aa036f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1099.9:h=e6d803e8df3f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1099.9:h=63e20364af76', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1123.4:h=e9b5f40a60b9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1123.4:h=fdf1a38b81f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1149.3:h=790834f2eabd', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1149.3:h=86a4b78c7bcd', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1176.4:h=eb8b7b445576', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1176.4:h=2bc53feb90de', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1200.8:h=1ede7def6b06', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1200.8:h=4a0ff6c0f338', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1216.8:h=4c46a97aad26', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1216.8:h=e0de76044847', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1234.5:h=e99c29587f8d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1234.5:h=a6e3694fc5e9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1243.5:h=14077c308d9a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1243.5:h=c9bde26d7097', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1254.4:h=448af84aff30', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1254.4:h=9c95869baf50', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1266.6:h=75a95526e88b', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1266.6:h=f2c4235dde4a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1285.1:h=a8e3865111f8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1285.1:h=250c546236f8']
+            output_unit: cal/mol
+          series:
+            - {T_K: '951.3', enthalpy_increment: '12578.56', q_cal_th: '1261.66', q_o_cal_th: '359.68', delta_percent_as_printed: '+0.03', point_conditions: {temperature_K: {state: {tag: value, value: '951.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.3, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.3:h=d5c15bac8399', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.3:h=e59436e26125']}
+            - {T_K: '951.8', enthalpy_increment: '12492.64', q_cal_th: '1255.68', q_o_cal_th: '359.97', delta_percent_as_printed: '+0.81', point_conditions: {temperature_K: {state: {tag: value, value: '951.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.8, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=951.8:h=4a5085418604', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=951.8:h=d9def90324ab']}
+            - {T_K: '975.4', enthalpy_increment: '13108.55', q_cal_th: '1313.36', q_o_cal_th: '373.49', delta_percent_as_printed: −0.12, point_conditions: {temperature_K: {state: {tag: value, value: '975.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 975.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=975.4:h=52d88477cd62', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=975.4:h=4b4aad1f621a']}
+            - {T_K: '991.4', enthalpy_increment: '13455.98', q_cal_th: '1347.45', q_o_cal_th: '382.67', delta_percent_as_printed: −0.12, point_conditions: {temperature_K: {state: {tag: value, value: '991.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 991.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=991.4:h=caad72995b2f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=991.4:h=27227180d77e']}
+            - {T_K: '1007.0', enthalpy_increment: '13801.17', q_cal_th: '1381.17', q_o_cal_th: '391.64', delta_percent_as_printed: −0.12, point_conditions: {temperature_K: {state: {tag: value, value: '1007.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1007.0, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1007.0:h=94a4e7cc0a87', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1007.0:h=de1fddc12080']}
+            - {T_K: '1025.5', enthalpy_increment: '14227.12', q_cal_th: '1422.36', q_o_cal_th: '402.29', delta_percent_as_printed: −0.16, point_conditions: {temperature_K: {state: {tag: value, value: '1025.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1025.5, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1025.5:h=ef36b7432b9e', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1025.5:h=bb2b6ae6ceaa']}
+            - {T_K: '1050.1', enthalpy_increment: '14808.02', q_cal_th: '1478.21', q_o_cal_th: '416.49', delta_percent_as_printed: −0.20, point_conditions: {temperature_K: {state: {tag: value, value: '1050.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1050.1, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1050.1:h=b72e78d93a98', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1050.1:h=febb371d3307']}
+            - {T_K: '1074.9', enthalpy_increment: '15358.23', q_cal_th: '1532.01', q_o_cal_th: '430.84', delta_percent_as_printed: '+0.13', point_conditions: {temperature_K: {state: {tag: value, value: '1074.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1074.9, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1074.9:h=d291080f6a61', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1074.9:h=e36153aa036f']}
+            - {T_K: '1099.9', enthalpy_increment: '16035.65', q_cal_th: '1595.07', q_o_cal_th: '445.33', delta_percent_as_printed: −0.19, point_conditions: {temperature_K: {state: {tag: value, value: '1099.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1099.9, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1099.9:h=e6d803e8df3f', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1099.9:h=63e20364af76']}
+            - {T_K: '1123.4', enthalpy_increment: '16601.21', q_cal_th: '1649.29', q_o_cal_th: '459.00', delta_percent_as_printed: '+0.09', point_conditions: {temperature_K: {state: {tag: value, value: '1123.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1123.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1123.4:h=e9b5f40a60b9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1123.4:h=fdf1a38b81f7']}
+            - {T_K: '1149.3', enthalpy_increment: '17309.45', q_cal_th: '1715.16', q_o_cal_th: '474.09', delta_percent_as_printed: '+0.04', point_conditions: {temperature_K: {state: {tag: value, value: '1149.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1149.3, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1149.3:h=790834f2eabd', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1149.3:h=86a4b78c7bcd']}
+            - {T_K: '1176.4', enthalpy_increment: '18014.48', q_cal_th: '1781.54', q_o_cal_th: '489.92', delta_percent_as_printed: '+0.35', point_conditions: {temperature_K: {state: {tag: value, value: '1176.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1176.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1176.4:h=eb8b7b445576', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1176.4:h=2bc53feb90de']}
+            - {T_K: '1200.8', enthalpy_increment: '18811.56', q_cal_th: '1852.99', q_o_cal_th: '504.22', delta_percent_as_printed: −0.11, point_conditions: {temperature_K: {state: {tag: value, value: '1200.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1200.8, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1200.8:h=1ede7def6b06', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1200.8:h=4a0ff6c0f338']}
+            - {T_K: '1216.8', enthalpy_increment: '19284.37', q_cal_th: '1896.28', q_o_cal_th: '513.61', delta_percent_as_printed: −0.05, point_conditions: {temperature_K: {state: {tag: value, value: '1216.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1216.8, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1216.8:h=4c46a97aad26', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1216.8:h=e0de76044847']}
+            - {T_K: '1234.5', enthalpy_increment: '19800.42', q_cal_th: '1943.68', q_o_cal_th: '524.01', delta_percent_as_printed: '+0.12', point_conditions: {temperature_K: {state: {tag: value, value: '1234.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1234.5, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1234.5:h=e99c29587f8d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1234.5:h=a6e3694fc5e9']}
+            - {T_K: '1243.5', enthalpy_increment: '20149.37', q_cal_th: '1974.00', q_o_cal_th: '529.31', delta_percent_as_printed: −0.20, point_conditions: {temperature_K: {state: {tag: value, value: '1243.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1243.5, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1243.5:h=14077c308d9a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1243.5:h=c9bde26d7097']}
+            - {T_K: '1254.4', enthalpy_increment: '20465.98', q_cal_th: '2003.12', q_o_cal_th: '535.73', delta_percent_as_printed: −0.03, point_conditions: {temperature_K: {state: {tag: value, value: '1254.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1254.4, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1254.4:h=448af84aff30', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1254.4:h=9c95869baf50']}
+            - {T_K: '1266.6', enthalpy_increment: '20869.89', q_cal_th: '2039.28', q_o_cal_th: '542.93', delta_percent_as_printed: −0.05, point_conditions: {temperature_K: {state: {tag: value, value: '1266.6'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1266.6, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1266.6:h=75a95526e88b', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1266.6:h=f2c4235dde4a']}
+            - {T_K: '1285.1', enthalpy_increment: '21460.41', q_cal_th: '2092.55', q_o_cal_th: '553.86', delta_percent_as_printed: '+0.09', point_conditions: {temperature_K: {state: {tag: value, value: '1285.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1285.1, column T/K'}}}, derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_input::T=1285.1:h=a8e3865111f8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_q_o_input::T=1285.1:h=250c546236f8']}
+      - observation_id: fredrickson_1973_table1_fit_low
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 column equation (1)'}
+        T_range_K: ['511.8', '876.4']
+        phase: cr
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K), equation (1)
+          method_class: model_derived
+          equation_as_printed: '{H°(T)−H°(298.15 K)}/cal_th mol−1 = 13.8814(T/K) + 4.4249 × 10⁻³(T/K)² − 4532.09'
+          equation_validity_range_as_printed: 298 to 900 K
+          equation_locator: {page: 4, published_page: 488, pdf_page_index: 3, equation: '1'}
+          standard_deviation_as_printed: 41 cal_th mol−1 or 0.58 per cent
+          fit_constraint_as_printed: H°(T)−H°(298.15 K) = 0 at 298.15 K
+          derivation:
+            relation: least-squares fit, equation (1)
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+            output_unit: cal/mol
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+          series:
+            - {T_K: '511.8', enthalpy_increment: '3731.48', point_conditions: {temperature_K: {state: {tag: value, value: '511.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 511.8, column T/K'}}}}
+            - {T_K: '520.0', enthalpy_increment: '3882.74', point_conditions: {temperature_K: {state: {tag: value, value: '520.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 520.0, column T/K'}}}}
+            - {T_K: '567.5', enthalpy_increment: '4770.69', point_conditions: {temperature_K: {state: {tag: value, value: '567.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 567.5, column T/K'}}}}
+            - {T_K: '568.0', enthalpy_increment: '4780.14', point_conditions: {temperature_K: {state: {tag: value, value: '568.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 568.0, column T/K'}}}}
+            - {T_K: '614.1', enthalpy_increment: '5661.21', point_conditions: {temperature_K: {state: {tag: value, value: '614.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 614.1, column T/K'}}}}
+            - {T_K: '653.1', enthalpy_increment: '6421.27', point_conditions: {temperature_K: {state: {tag: value, value: '653.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 653.1, column T/K'}}}}
+            - {T_K: '697.1', enthalpy_increment: '7294.93', point_conditions: {temperature_K: {state: {tag: value, value: '697.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.1, column T/K'}}}}
+            - {T_K: '697.4', enthalpy_increment: '7300.94', point_conditions: {temperature_K: {state: {tag: value, value: '697.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 697.4, column T/K'}}}}
+            - {T_K: '709.7', enthalpy_increment: '7548.27', point_conditions: {temperature_K: {state: {tag: value, value: '709.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 709.7, column T/K'}}}}
+            - {T_K: '729.7', enthalpy_increment: '7953.28', point_conditions: {temperature_K: {state: {tag: value, value: '729.7'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 729.7, column T/K'}}}}
+            - {T_K: '802.5', enthalpy_increment: '9457.42', point_conditions: {temperature_K: {state: {tag: value, value: '802.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 802.5, column T/K'}}}}
+            - {T_K: '876.4', enthalpy_increment: '11032.26', point_conditions: {temperature_K: {state: {tag: value, value: '876.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 876.4, column T/K'}}}}
+      - observation_id: fredrickson_1973_table1_fit_high
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 column equation (2)'}
+        T_range_K: ['951.3', '1285.1']
+        phase: cr
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K), equation (2)
+          method_class: model_derived
+          equation_as_printed: '{H°(T)−H°(298.15 K)}/cal_th mol−1 = 35.4157(T/K) − 2.80046 × 10⁻²(T/K)² + 1.42549 × 10⁻⁵(T/K)³ − 8036.87'
+          equation_validity_range_as_printed: 900 to 1300 K
+          equation_locator: {page: 4, published_page: 488, pdf_page_index: 3, equation: '2'}
+          standard_deviation_as_printed: 36 cal_th mol−1 or 0.25 per cent
+          derivation:
+            relation: least-squares fit, equation (2)
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+            output_unit: cal/mol
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+          series:
+            - {T_K: '951.3', enthalpy_increment: '12582.77', point_conditions: {temperature_K: {state: {tag: value, value: '951.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.3, column T/K'}}}}
+            - {T_K: '951.8', enthalpy_increment: '12593.19', point_conditions: {temperature_K: {state: {tag: value, value: '951.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 951.8, column T/K'}}}}
+            - {T_K: '975.4', enthalpy_increment: '13092.45', point_conditions: {temperature_K: {state: {tag: value, value: '975.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 975.4, column T/K'}}}}
+            - {T_K: '991.4', enthalpy_increment: '13439.55', point_conditions: {temperature_K: {state: {tag: value, value: '991.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 991.4, column T/K'}}}}
+            - {T_K: '1007.0', enthalpy_increment: '13785.07', point_conditions: {temperature_K: {state: {tag: value, value: '1007.0'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1007.0, column T/K'}}}}
+            - {T_K: '1025.5', enthalpy_increment: '14204.34', point_conditions: {temperature_K: {state: {tag: value, value: '1025.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1025.5, column T/K'}}}}
+            - {T_K: '1050.1', enthalpy_increment: '14778.76', point_conditions: {temperature_K: {state: {tag: value, value: '1050.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1050.1, column T/K'}}}}
+            - {T_K: '1074.9', enthalpy_increment: '15378.56', point_conditions: {temperature_K: {state: {tag: value, value: '1074.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1074.9, column T/K'}}}}
+            - {T_K: '1099.9', enthalpy_increment: '16005.56', point_conditions: {temperature_K: {state: {tag: value, value: '1099.9'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1099.9, column T/K'}}}}
+            - {T_K: '1123.4', enthalpy_increment: '16616.61', point_conditions: {temperature_K: {state: {tag: value, value: '1123.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1123.4, column T/K'}}}}
+            - {T_K: '1149.3', enthalpy_increment: '17315.75', point_conditions: {temperature_K: {state: {tag: value, value: '1149.3'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1149.3, column T/K'}}}}
+            - {T_K: '1176.4', enthalpy_increment: '18077.67', point_conditions: {temperature_K: {state: {tag: value, value: '1176.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1176.4, column T/K'}}}}
+            - {T_K: '1200.8', enthalpy_increment: '18791.66', point_conditions: {temperature_K: {state: {tag: value, value: '1200.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1200.8, column T/K'}}}}
+            - {T_K: '1216.8', enthalpy_increment: '19274.87', point_conditions: {temperature_K: {state: {tag: value, value: '1216.8'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1216.8, column T/K'}}}}
+            - {T_K: '1234.5', enthalpy_increment: '19823.76', point_conditions: {temperature_K: {state: {tag: value, value: '1234.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1234.5, column T/K'}}}}
+            - {T_K: '1243.5', enthalpy_increment: '20108.79', point_conditions: {temperature_K: {state: {tag: value, value: '1243.5'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1243.5, column T/K'}}}}
+            - {T_K: '1254.4', enthalpy_increment: '20459.45', point_conditions: {temperature_K: {state: {tag: value, value: '1254.4'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1254.4, column T/K'}}}}
+            - {T_K: '1266.6', enthalpy_increment: '20859.17', point_conditions: {temperature_K: {state: {tag: value, value: '1266.6'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1266.6, column T/K'}}}}
+            - {T_K: '1285.1', enthalpy_increment: '21480.21', point_conditions: {temperature_K: {state: {tag: value, value: '1285.1'}, locator: {page: 3, published_page: 487, pdf_page_index: 2, table: '1', note: 'Table 1 row 1285.1, column T/K'}}}}
+      - observation_id: fredrickson_1973_table2_enthalpy_low
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 column H°(T)−H°(298.15 K)'}
+        T_range_K: ['298.15', '900']
+        phase: cr
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K)
+          method_class: model_derived
+          derivation:
+            relation: smooth values tabulated from least-squares equation (1)
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+            output_unit: cal/mol
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+          series:
+            - {T_K: '298.15', enthalpy_increment: '0', point_conditions: {temperature_K: {state: {tag: value, value: '298.15'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 298.15, column T/K'}}}}
+            - {T_K: '300', enthalpy_increment: '30.58', point_conditions: {temperature_K: {state: {tag: value, value: '300'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 300, column T/K'}}}}
+            - {T_K: '400', enthalpy_increment: '1728.46', point_conditions: {temperature_K: {state: {tag: value, value: '400'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 400, column T/K'}}}}
+            - {T_K: '500', enthalpy_increment: '3514.85', point_conditions: {temperature_K: {state: {tag: value, value: '500'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 500, column T/K'}}}}
+            - {T_K: '600', enthalpy_increment: '5389.73', point_conditions: {temperature_K: {state: {tag: value, value: '600'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 600, column T/K'}}}}
+            - {T_K: '700', enthalpy_increment: '7353.11', point_conditions: {temperature_K: {state: {tag: value, value: '700'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 700, column T/K'}}}}
+            - {T_K: '800', enthalpy_increment: '9404.99', point_conditions: {temperature_K: {state: {tag: value, value: '800'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 800, column T/K'}}}}
+            - {T_K: '900', enthalpy_increment: '11545.37', point_conditions: {temperature_K: {state: {tag: value, value: '900'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 900, column T/K'}}}}
+      - observation_id: fredrickson_1973_table2_enthalpy_high
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 column H°(T)−H°(298.15 K)'}
+        T_range_K: ['1000', '1300']
+        phase: cr
+        reference_temperature_K: '298.15'
+        reference_phase: solid
+        per: mol_species
+        units: cal/mol
+        units_as_printed: cal_th mol−1
+        values:
+          quantity: H_minus_H298
+          quantity_as_printed: H°(T)−H°(298.15 K)
+          method_class: model_derived
+          derivation:
+            relation: smooth values tabulated from least-squares equation (2)
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+            output_unit: cal/mol
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+          series:
+            - {T_K: '1000', enthalpy_increment: '13629.14', point_conditions: {temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1000, column T/K'}}}}
+            - {T_K: '1100', enthalpy_increment: '16008.11', point_conditions: {temperature_K: {state: {tag: value, value: '1100'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1100, column T/K'}}}}
+            - {T_K: '1200', enthalpy_increment: '18767.82', point_conditions: {temperature_K: {state: {tag: value, value: '1200'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1200, column T/K'}}}}
+            - {T_K: '1300', enthalpy_increment: '21993.78', point_conditions: {temperature_K: {state: {tag: value, value: '1300'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1300, column T/K'}}}}
+      - observation_id: fredrickson_1973_table2_cp_29815_quoted
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 298.15, column Cp(T)'}
+        T_range_K: ['298.15', '298.15']
+        phase: cr
+        per: mol_species
+        units: cal/mol/K
+        units_as_printed: cal_th K−1 mol−1
+        values:
+          quantity: cp
+          quantity_as_printed: Cp(T)
+          method_class: quoted_attributed
+          attribution: JANAF Thermochemical Tables [8], as cited for the 298.15 K heat-capacity constraint
+          note: The value 16.52 cal_th K−1 mol−1 at 298.15 K is used as a constraint in the derived Cp equation; the paper marks the citation with superscript (8).
+          series:
+            - {T_K: '298.15', cp: '16.52', point_conditions: {temperature_K: {state: {tag: value, value: '298.15'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 298.15, column T/K'}}}}
+      - observation_id: fredrickson_1973_table2_cp_300_900_model_derived
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 column Cp(T)'}
+        T_range_K: ['300', '900']
+        phase: cr
+        per: mol_species
+        units: cal/mol/K
+        units_as_printed: cal_th K−1 mol−1
+        values:
+          quantity: cp
+          quantity_as_printed: Cp(T)
+          method_class: model_derived
+          equation_as_printed: 'Cp°(T)/cal_th K−1 mol−1 = 13.8814 + 8.8498 × 10⁻³(T/K)'
+          equation_validity_range_as_printed: 300 to 900 K
+          equation_locator: {page: 4, published_page: 488, pdf_page_index: 3, equation: '3'}
+          derivation:
+            relation: derivative of least-squares enthalpy equation (1)
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+            output_unit: cal/mol/K
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=511.8:h=678158ab39f7', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=520.0:h=a0c3a5af2ac6', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=567.5:h=542ba48d7744', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=568.0:h=93a8362452a8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=614.1:h=584722148603', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=653.1:h=409777051aa9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.1:h=184845c9784a', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=697.4:h=e6c81cf4f984', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=709.7:h=743bd9779e27', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=729.7:h=5abb534c10ca', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=802.5:h=55c85617a113', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_low::T=876.4:h=bb22df622bdf']
+          series:
+            - {T_K: '300', cp: '16.54', point_conditions: {temperature_K: {state: {tag: value, value: '300'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 300, column T/K'}}}}
+            - {T_K: '400', cp: '17.42', point_conditions: {temperature_K: {state: {tag: value, value: '400'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 400, column T/K'}}}}
+            - {T_K: '500', cp: '18.31', point_conditions: {temperature_K: {state: {tag: value, value: '500'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 500, column T/K'}}}}
+            - {T_K: '600', cp: '19.19', point_conditions: {temperature_K: {state: {tag: value, value: '600'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 600, column T/K'}}}}
+            - {T_K: '700', cp: '20.08', point_conditions: {temperature_K: {state: {tag: value, value: '700'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 700, column T/K'}}}}
+            - {T_K: '800', cp: '20.96', point_conditions: {temperature_K: {state: {tag: value, value: '800'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 800, column T/K'}}}}
+            - {T_K: '900', cp: '21.85', point_conditions: {temperature_K: {state: {tag: value, value: '900'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 900, column T/K'}}}}
+      - observation_id: fredrickson_1973_table2_cp_high_measured_reduced
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 column Cp(T)'}
+        T_range_K: ['1000', '1300']
+        phase: cr
+        per: mol_species
+        units: cal/mol/K
+        units_as_printed: cal_th K−1 mol−1
+        values:
+          quantity: cp
+          quantity_as_printed: Cp(T)
+          method_class: measured_reduced
+          method_as_printed: calculated directly from the measured enthalpies above 900 K
+          derivation:
+            relation: the authors calculate Cp values from their high-temperature measured enthalpies; the row-specific calculation method is not stated
+            inputs: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+            output_unit: cal/mol/K
+          derived_from: ['fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.3:h=0dc13daf42bc', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=951.8:h=b38767bbe4b8', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=975.4:h=a9a1cb148d90', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=991.4:h=62b78e66bee2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1007.0:h=57e0f78ae223', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1025.5:h=a4f0eb260db2', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1050.1:h=4499df486be5', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1074.9:h=7059a49fe4c9', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1099.9:h=2f43f8dafa28', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1123.4:h=f858cc1d7dfb', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1149.3:h=d51d8071a688', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1176.4:h=29f6f3ff443c', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1200.8:h=e69da485b9af', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1216.8:h=6594ffb3febe', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1234.5:h=a5b33509805d', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1243.5:h=f48753f45607', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1254.4:h=c0ee2a48ce97', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1266.6:h=45a200f22005', 'fredrickson-chasanov-1973-na2o-enthalpy-1300k::fredrickson_1973_table1_measured_high::T=1285.1:h=06b9ad907b9f']
+          series:
+            - {T_K: '1000', cp: '22.7', point_conditions: {temperature_K: {state: {tag: value, value: '1000'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1000, column T/K'}}}}
+            - {T_K: '1100', cp: '25.4', point_conditions: {temperature_K: {state: {tag: value, value: '1100'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1100, column T/K'}}}}
+            - {T_K: '1200', cp: '30.0', point_conditions: {temperature_K: {state: {tag: value, value: '1200'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1200, column T/K'}}}}
+            - {T_K: '1300', cp: '36.5', point_conditions: {temperature_K: {state: {tag: value, value: '1300'}, locator: {page: 4, published_page: 488, pdf_page_index: 3, table: '2', note: 'Table 2 row 1300, column T/K'}}}}
+      - observation_id: fredrickson_1973_bouaziz_dta_transition_1023K_quoted
+        type: phase_transition
+        locator: {page: 1, published_page: 485, pdf_page_index: 0, section: Introduction}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Bouaziz, Papin, and Rollet [3]
+          source_statement: Bouaziz et al. reported differential thermal analysis measurements on Na2O and found a transition at 1023 K.
+          transition_enthalpy_status: not reported in this paper
+          T_m_K: '1023'
+          transition_label_as_printed: transition
+      - observation_id: fredrickson_1973_bouaziz_dta_transition_1243K_quoted
+        type: phase_transition
+        locator: {page: 1, published_page: 485, pdf_page_index: 0, section: Introduction}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: quoted_attributed
+          attribution: Bouaziz, Papin, and Rollet [3]
+          source_statement: Bouaziz et al. reported differential thermal analysis measurements on Na2O and found a transition at 1243 K.
+          transition_enthalpy_status: not reported in this paper
+          T_m_K: '1243'
+          transition_label_as_printed: transition
+      - observation_id: fredrickson_1973_no_transition_indicated_by_enthalpy_data
+        type: phase_transition
+        locator: {page: 5, published_page: 489, pdf_page_index: 4, section: Discussion}
+        phase: cr
+        units: K
+        values:
+          quantity: transition_temperature
+          method_class: measured_direct
+          unavailable: true
+          reason: The authors state that their enthalpy data do not indicate the transitions at 1023 and 1243 K reported by Bouaziz et al.; no transition temperature or transition enthalpy is measured here.
+          attribution: Fredrickson and Chasanov, present work

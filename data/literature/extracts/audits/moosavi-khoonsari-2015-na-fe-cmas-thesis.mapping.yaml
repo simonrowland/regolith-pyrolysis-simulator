@@ -1,0 +1,182 @@
+source_id: moosavi-khoonsari-2015-na-fe-cmas-thesis
+input_order:
+- 'MinerU markdown/content_list: inspected; no table blocks for Table 7.1 or Table 7.2.'
+- 'pdftotext-layout: exact born-digital text used for all cell values and row labels.'
+- 'PDF renders: rendered physical pages 179 and 186-188; checked the full cell grid on 186-188 and reviewed prose/method
+  locators on pages 62, 174, 176, 179-181; page 70 for Figure 4.1.'
+tables:
+- table: '7.1'
+  caption: Experimental results of the Na2O-Fe2O3-Al2O3 system in air.
+  physical_pages:
+  - 186
+  - 187
+  printed_pages:
+  - 157
+  - 158
+  sample_rows: 16
+  phase_rows: 37
+  numeric_phase_rows: 36
+  typed_absence_rows: 1
+  columns:
+    starting_composition:
+    - N=Na2O
+    - A=Al2O3
+    - F=Fe2O3
+    - mol %
+    temperature: T (K)
+    duration: Duration (h)
+    phase: Phases
+    weight_composition:
+    - Na2O (1σ)
+    - Al2O3 (1σ)
+    - Fe2O3 (1σ)
+    - Total
+    mole_fraction_composition:
+    - Na2O (1σ)
+    - Al2O3 (1σ)
+    - Fe2O3 (1σ)
+- table: '7.2'
+  caption: Experimental results of the Na2O-FeO-Al2O3 system at metallic Fe saturation.
+  physical_pages:
+  - 188
+  printed_pages:
+  - 159
+  sample_rows: 11
+  phase_rows: 26
+  numeric_phase_rows: 22
+  typed_absence_rows: 4
+  columns:
+    starting_composition:
+    - N=Na2O
+    - A=Al2O3
+    - F=FeO
+    - mol %
+    temperature: T (K)
+    duration: Duration (h)
+    phase: Phases
+    weight_composition:
+    - Na2O (1σ)
+    - Al2O3 (1σ)
+    - FeO (1σ)
+    - Total
+    mole_fraction_composition:
+    - Na2O (1σ)
+    - Al2O3 (1σ)
+    - FeO (1σ)
+cell_audit:
+  path: moosavi-khoonsari-2015-na-fe-cmas-thesis.cell_audit.csv
+  numeric_cells: 889
+  phase_rows: 63
+  row_labels_and_typed_absences_included: true
+  confirmation: Each numeric cell and phase label is linked to its physical page/sample/phase row; printed text
+    comes from the born-digital pdftotext layer and every table cell was checked against the page render.
+compare_output:
+  path: moosavi-khoonsari-2015-na-fe-cmas-thesis.compare.csv
+  status_counts:
+    matched: 0
+    no_match: 0
+    mismatch: 0
+    presence_only: 0
+    needs_mapping: 0
+    locator_error: 0
+    unverifiable: 1607
+    total: 1607
+  interpretation: The partial MinerU draft has no target table cell blocks or printed-caption evidence for PDF pages
+    186-188. The compare output therefore marks every table-labeled source locator unverifiable; it reports no numeric
+    match or mismatch. The exact born-digital pdftotext cells and page renders were used for the complete transcription
+    audit.
+flagged_cell:
+  page: 186
+  table: '7.1'
+  sample: NAF13-2
+  phase: Spinel
+  cell: Na2O mole-fraction 1σ
+  printed: (.00)
+  render_check: PDF page render confirms the parenthesized uncertainty is .00; retained as .00.
+method_and_quench_locators:
+- page: 62
+  section: 4.1.1.1
+  render_check: preliminary DSC/DTG method and prose report about 25 h for CO2 loss; about 18% is the calculated
+    expected CO2 mass loss, not a digitized measurement
+- page: 174
+  section: 7.3.1
+  render_check: open Pt capsule, 1698/1583 K, 10 K/min, air, 1-168 h, liquid-N2 quench, EPMA/XRD method
+- page: 176
+  section: 7.3.2
+  render_check: air-run quench crystals are explicitly counted as glass in phase composition analysis
+- page: 179
+  section: 7.3.2
+  render_check: For NAF6-1, NAF7-1, and NAF7-2, EPMA area mapping included quench crystals; analyzed liquid compositions
+    matched starting compositions, and the source says quench crystals did not influence the analysis.
+- page: 180
+  section: 7.4.1
+  render_check: sealed low-carbon Fe capsule, external argon purge, 1473 K/12 h pretreatment, target 1673/1573 K
+    for 1 h, water quench
+- page: 181
+  section: 7.4.2
+  render_check: metal droplets confirm Fe saturation and Fe-rich quench crystals are observed in glass. Page 179
+    reports crystal-inclusive area mapping for NAF6-1, NAF7-1, and NAF7-2; the source does not state whether crystals
+    were included for other Table 7.2 samples.
+schema_gaps:
+- row_count: 45
+  kind: measured crystalline phase compositions
+  reason: 'Measured crystalline phase composition is retained as typed-refused context: simulator/battery/enums.py::PhaseRole
+    has no solid role. simulator/battery/enums.py::PHASE_BASIS_TOKENS includes wt_percent and mole_fraction; simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    and tools/validate_literature_extracts.py::OBSERVATION_TYPES support the exact quantity. simulator/battery/migrate.py::QUANTITY_ALIASES
+    has no extra alias needed for the explicit canonical token; simulator/battery/migrate.py::TYPE_QUANTITY has
+    no default for this observation type, so values.quantity is explicit. The composition cannot be emitted without
+    a closed phase role under simulator/battery/migrate.py::_phase_role_token and simulator/battery/migrate.py::_phase_row_rejection.
+    Existing glass/melt and metal examples are retained in data/literature/extracts/park-2021-vanadium-thermodynamics-thesis.yaml.'
+- row_count: 1
+  kind: measured mixed N(A,F)+ Glass phase row
+  reason: The printed phase label combines N(A,F) and glass, so one equilibrium_phase_composition observation cannot
+    name the measured phase. The measured cells are retained as typed-refused context rather than assigning a single
+    phase. The phase-role candidate set is simulator/battery/enums.py::PhaseRole and the closed row check is simulator/battery/migrate.py::_phase_row_rejection.
+typed_absence_rows:
+- table: '7.1'
+  sample: NAF0-1
+  phase: Glass
+  printed: Not determined
+  page: 186
+- table: '7.2'
+  sample: NAf4-1
+  phase: Glass
+  printed: Too small to be analyzed
+  page: 188
+- table: '7.2'
+  sample: NAf5-1
+  phase: Glass
+  printed: Too small to be analyzed
+  page: 188
+- table: '7.2'
+  sample: NAf6-1
+  phase: Glass
+  printed: Too small to be analyzed
+  page: 188
+- table: '7.2'
+  sample: NAf8-1
+  phase: Glass
+  printed: Too small to be analyzed
+  page: 188
+figure_read_candidates:
+- figure: '4.1'
+  page: 70
+  kind: preliminary DSC/DTG decarbonation curve
+  disposition: figure-only values not digitized; text summary retained in context
+- figure: '7.5'
+  page: 196
+  kind: NAF7 microstructural evolution at 5, 24, 48, 72 h
+  disposition: image values not digitized
+- figure: '7.6'
+  page: 197
+  kind: air phase diagrams
+  disposition: plot values not digitized
+- figure: '7.9'
+  page: 201
+  kind: Fe-saturation phase diagrams
+  disposition: plot values not digitized
+scope_review: Chapter 7 Tables 7.1 and 7.2 are the thesis's new measured phase-composition runs. Chapter 4 Fig.
+  4.1 is a preliminary decarbonation measurement and is retained only as a figure-read candidate. Tables 4.2/4.3
+  give rounded starting-composition views; Tables 7.1/7.2 contain the row-specific experimental compositions. Chapter
+  10 describes thermodynamic evaluation/optimization and states no systematic new experiments; Chapters 5, 6, 8,
+  9, and 11 are critical evaluations or models.

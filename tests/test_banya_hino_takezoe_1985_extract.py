@@ -113,11 +113,68 @@ def _assert_table_render_pins(document: dict) -> None:
         assert redox["locator"]["table"] == activity["locator"]["table"] == "2"
 
 
+def _assert_na2o_bound(document: dict) -> None:
+    rows = document["species"]["Na2O"]["observations"]
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["observation_id"] == "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"
+    assert row["type"] == "activity_coefficient"
+    assert row["locator"] == {
+        "page": 7,
+        "pdf_page_index": 6,
+        "published_page": 1771,
+        "section": "4.4.4",
+        "figure": "11",
+        "note": "The prose gives the bound for the displayed Figure 11 composition range; no point was read from a contour.",
+    }
+    assert row["phase"] == "l"
+    assert row["standard_state"]["state"]["value"]["convention"] == "raoultian_pure_endmember"
+    assert row["standard_state"]["state"]["value"]["endmember"]["formula"] == "Na2O"
+    assert row["standard_state"]["state"]["value"]["endmember"]["phase"]["value"] == "l"
+    assert row["standard_state"]["inferred"] is False
+    assert row["point_conditions"]["T_C"]["state"]["value"]["point"] == "1400"
+    assert row["point_conditions"]["composition"]["state"] == {
+        "tag": "unknown",
+        "reason": "not_published",
+    }
+    assert row["point_conditions"]["iron_saturation"]["state"]["value"] == (
+        "slag in equilibrium with liquid iron"
+    )
+
+    values = row["values"]
+    assert values["quantity"] == "activity"
+    assert values["method_class"] == "model_derived"
+    assert values["activity_upper_bound_as_printed"] == "10^-5.5"
+    assert values["inequality_as_printed"] == "≤"
+    assert values["activity"] == {
+        "kind": "bound",
+        "bound_operator": "<=",
+        "bound_value": "3.162277660168379331998893544432719e-6",
+        "approximate": True,
+    }
+    assert values["standard_state_as_printed"] == "Na2O(l)"
+    assert values["melt_system_as_printed"] == (
+        "FetO-SiO2-Na2O slags in equilibrium with liquid iron"
+    )
+    assert values["composition_domain_as_printed"] == (
+        "Displayed composition range in Figure 11; dotted line marks where the regular-solution model applies."
+    )
+    assert values["T_C_as_printed"] == "1400"
+    assert row["derivation"]["method"]["state"]["value"] == (
+        "Regular-solution relations from Eqs. (24), (26), and (33)."
+    )
+    assert row["derivation"]["references"] == [
+        "Reference [36]: D. N. Rego, G. K. Sigworth and W. O. Philbrook, Proc. of Japan-United States Seminer, Kyoto (1983), p. 87 [ISIJ]."
+    ]
+    assert row["derivation"]["raw_inputs"]["state"]["value"] == "not_printed"
+
+
 def test_all_printed_rows_match_render_pins_and_fidelity_samples() -> None:
     document = _document()
     assert document["review_status"] == "draft"
     assert check_all_fidelity_samples_match(document) == []
     _assert_table_render_pins(document)
+    _assert_na2o_bound(document)
 
     mutated = deepcopy(document)
     mutated["species"]["Fe"]["observations"][8]["values"][
@@ -138,7 +195,15 @@ def test_all_printed_rows_match_render_pins_and_fidelity_samples() -> None:
     with pytest.raises(AssertionError):
         _assert_table_render_pins(mutated_activity)
 
+    mutated_bound = deepcopy(document)
+    mutated_bound["species"]["Na2O"]["observations"][0]["values"][
+        "activity_upper_bound_as_printed"
+    ] = "10^-5.4"
+    with pytest.raises(AssertionError):
+        _assert_na2o_bound(mutated_bound)
+
     _assert_table_render_pins(document)
+    _assert_na2o_bound(document)
 
     table3 = next(
         row
@@ -152,10 +217,6 @@ def test_all_printed_rows_match_render_pins_and_fidelity_samples() -> None:
             "activity_coefficient_expressions_as_printed"
         ]
     ) == 4
-    na2o_bound = document["species"]["Na2O"]["context"][0]["values"]
-    assert na2o_bound["activity_upper_bound_as_printed"] == "10^-5.5"
-    assert na2o_bound["inequality_as_printed"] == "≤"
-
 
 def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
     document = _document()
@@ -174,13 +235,13 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
         f"hard={len(result.validation.hard_issues)}",
         f"unavailable={unavailable}",
     )
-    assert len(observations) == 45
+    assert len(observations) == 46
     assert unavailable == 0
 
     redox = [o for o in observations if o.identity.quantity.value is Quantity.VALENCE_RATIO]
     activity = [o for o in observations if o.identity.quantity.value is Quantity.ACTIVITY]
     assert len(redox) == 26
-    assert len(activity) == 19
+    assert len(activity) == 20
     assert not [
         o
         for o in observations
@@ -188,20 +249,25 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
     ]
 
     for observation in observations:
-        assert observation.value.kind is ValueKind.POINT
         assert observation.identity.temperature_K is not None
         assert observation.identity.temperature_K.is_value
         assert observation.identity.composition is not None
-        assert observation.identity.composition.is_value
+        assert observation.point_conditions["T_C"].state.is_value
         assert "total_pressure_Pa" not in observation.point_conditions
         assert "fO2_Pa" not in observation.point_conditions
         assert observation.identity.total_pressure_Pa is None or not (
             observation.identity.total_pressure_Pa.is_value
         )
         assert observation.identity.fO2_Pa is None or not observation.identity.fO2_Pa.is_value
-        assert observation.point_conditions["T_C"].state.is_value
-        assert observation.point_conditions["composition"].state.is_value
-        assert observation.point_conditions["gas_mix"].state.is_value
+        if observation.value.kind is ValueKind.BOUND:
+            assert not observation.identity.composition.is_value
+            assert not observation.point_conditions["composition"].state.is_value
+            assert observation.point_conditions["iron_saturation"].state.is_value
+        else:
+            assert observation.value.kind is ValueKind.POINT
+            assert observation.identity.composition.is_value
+            assert observation.point_conditions["composition"].state.is_value
+            assert observation.point_conditions["gas_mix"].state.is_value
 
     source_rows = {
         row["observation_id"]: row
@@ -216,6 +282,16 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
     for observation_id, row in source_rows.items():
         observation = migrated_by_id[observation_id]
         expected = row["values"].get("value", row["values"].get("activity"))
+        if observation.value.kind is ValueKind.BOUND:
+            assert observation_id == "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"
+            assert observation.value.bound_operator == "<="
+            assert str(observation.value.bound_value) == (
+                "0.000003162277660168379331998893544432719"
+            )
+            assert observation.value.approximate
+            assert row["values"]["activity_upper_bound_as_printed"] == "10^-5.5"
+            assert observation.point_conditions["T_C"].locator.page == 7
+            continue
         assert str(observation.value.point) == expected
         assert observation.point_conditions["T_C"].locator.page == 2
         assert observation.point_conditions["composition"].locator.page == 2
@@ -229,10 +305,19 @@ def test_isolated_migration_preserves_phase_conditions_and_identity() -> None:
         assert observation.identity.species.phase.value is Phase.GLASS
         assert observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
         assert observation.point_conditions["quench_state"].state.value == "not_stated"
-    for observation in activity:
+    activity_points = [o for o in activity if o.value.kind is ValueKind.POINT]
+    assert len(activity_points) == 19
+    for observation in activity_points:
         assert observation.identity.species.formula == "Fe_tO"
         assert observation.identity.species.phase.value is Phase.L
         assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+
+    na2o_bound = migrated_by_id["banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"]
+    assert na2o_bound.identity.species.formula == "Na2O"
+    assert na2o_bound.identity.species.phase.value is Phase.L
+    assert na2o_bound.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert na2o_bound.value.kind is ValueKind.BOUND
+    assert na2o_bound.value.bound_operator == "<="
 
     for observation in (
         redox[0],

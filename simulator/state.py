@@ -48,6 +48,26 @@ OXIDE_SPECIES = [
 
 PRESSURE_PARTIAL_TOTAL_TOL_MBAR = 1e-9
 
+
+def partial_pressure_exceeds_total(pO2_mbar: float, p_total_mbar: float) -> bool:
+    """Return whether pO2 is above p_total outside the shared tolerance.
+
+    Premise: a partial pressure cannot exceed the total. The comparison
+    needs a tolerance because configured pairs are often equal (C4 is
+    0.2 mbar and 0.2 mbar) and float subtraction of those equals is not
+    a physical excess.
+    Algebra: excess = pO2 - p_total. Admit the excess when it is at most
+    max(1e-9 mbar, 1e-12 * max(1 mbar, |pO2|, |p_total|)).
+    Unit check: every term is mbar. 1e-9 mbar is 1e-7 Pa.
+    Limiting case: an excess of 5e-10 mbar at 1 mbar total is admitted;
+    an excess of 0.1 mbar is not.
+    """
+    tolerance_mbar = max(
+        PRESSURE_PARTIAL_TOTAL_TOL_MBAR,
+        1e-12 * max(1.0, abs(pO2_mbar), abs(p_total_mbar)),
+    )
+    return (pO2_mbar - p_total_mbar) > tolerance_mbar
+
 # --- Metal products extracted from the melt ---
 # Each metal is obtained by reducing or evaporating its parent oxide.
 METAL_SPECIES = [
@@ -670,16 +690,14 @@ class MeltState:
                 "melt_pressure_invalid_negative: "
                 f"pO2_mbar={pO2:.12g} p_total_mbar={p_total:.12g}"
             )
-        tolerance = max(
-            PRESSURE_PARTIAL_TOTAL_TOL_MBAR,
-            1e-12 * max(1.0, abs(pO2), abs(p_total)),
-        )
-        if pO2 - p_total > tolerance:
-            raise MalformedRecipeError(
+        if partial_pressure_exceeds_total(pO2, p_total):
+            error = MalformedRecipeError(
                 "melt_pressure_partial_exceeds_total: "
                 f"pO2_mbar={pO2:.12g} > p_total_mbar={p_total:.12g}; "
                 "oxygen partial pressure cannot exceed total pressure"
             )
+            error.reason_code = "melt_pressure_partial_exceeds_total"
+            raise error
 
     def composition_wt_pct(self) -> Dict[str, float]:
         """Current composition as weight percent."""

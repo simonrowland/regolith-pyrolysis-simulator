@@ -1,0 +1,5358 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  citation: Sugawara, T.; Seto, M.; Kato, M.; Yoshida, S.; Matsuoka, J.; Miura, Y. (2013). Na2O activity and thermodynamic
+    mixing properties of SiO2–Na2O–CaO melt. Journal of Non-Crystalline Solids 371–372, 58–65.
+  source_ids:
+  - sugawara-2013-soda-lime-melt-na2o-activity
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 21e477f4e1862c1f36b39f9a8b23413d3e39edb2
+    files:
+    - asset_id: pdf:sugawara-2013-soda-lime-melt-na2o-activity
+      role: pdf
+      path: raw/sugawara-2013-soda-lime-melt-na2o-activity/sugawara-2013-soda-lime-melt-na2o-activity.pdf
+      sha256:
+        tag: value
+        value: e73b03894966d78af9bd94e458ad006630b4360ee6a5740d0a1078922abcd254
+    - asset_id: pdftotext:sugawara-2013-soda-lime-melt-na2o-activity
+      role: pdftotext
+      path: text/sugawara-2013-soda-lime-melt-na2o-activity
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:sugawara-2013-soda-lime-melt-na2o-activity
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/j.jnoncrysol.2013.03.031
+experiments:
+- experiment_id: 10.1016/j.jnoncrysol.2013.03.031::sugawara-2013-soda-lime-melt-na2o-activity
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  locator:
+    page: 4
+    table: '3'
+    note: log a(Na2O), T=1473 K, source table row 3; row=This study
+context:
+- observation_id: sugawara_2013_equations_1_to_14
+  type: equation_context
+  locator:
+    page: 2
+    section: 2.3. Calculation of the Na2O activity and thermodynamic relationship
+  units: as printed
+  values:
+    equation_count: 14
+    equations_as_printed:
+    - equation: '1'
+      equation_as_printed: 2FΔE1 = RT ln(aNa2O^Sample / aNa2O^Reference)
+      locator:
+        page: 2
+        equation: '1'
+    - equation: '2'
+      equation_as_printed: 2FΔE2 = RT ln(aNa2O^(70SiO2–30Na2O) / aNa2O^Reference)
+      locator:
+        page: 2
+        equation: '2'
+    - equation: '3'
+      equation_as_printed: RT ln aNa2O^Sample = 2F(ΔE1−ΔE2) − RT ln aNa2O^(70SiO2–30Na2O)
+      locator:
+        page: 2
+        equation: '3'
+      audit_note: Retained as printed; its minus sign on the final calibration term conflicts algebraically with Eqs. (1)
+        and (2), which would produce a plus sign. No correction or recomputation is made.
+    - equation: '4'
+      equation_as_printed: RT ln aNa2O = ∂(N GMix)/∂nNa2O
+      locator:
+        page: 2
+        equation: '4'
+    - equation: '5'
+      equation_as_printed: GMix = HMix − T SMix
+      locator:
+        page: 2
+        equation: '5'
+    - equation: '6'
+      equation_as_printed: RT ln aNa2O = (∂N HMix/∂nNa2O) − T(∂N SMix/∂nNa2O)
+      locator:
+        page: 2
+        equation: '6'
+    - equation: '7'
+      equation_as_printed: RT ln aNa2O = GMix + (1−XNa2O)(∂GMix/∂XNa2O) − XCaO(∂GMix/∂XCaO)
+      locator:
+        page: 2
+        equation: '7'
+    - equation: '8'
+      equation_as_printed: ∂(RT ln aNa2O)/∂XNa2O = (1−XNa2O)(∂²GMix/∂XNa2O²) − XCaO(∂²GMix/∂XCaO∂XNa2O)
+      locator:
+        page: 2
+        equation: '8'
+    - equation: '9'
+      equation_as_printed: ∂(RT ln aNa2O)/∂XCaO = (1−XNa2O)(∂²GMix/∂XNa2O∂XCaO) − XCaO(∂²GMix/∂XCaO²)
+      locator:
+        page: 2
+        equation: '9'
+    - equation: '10'
+      equation_as_printed: ∂²GMix/∂XNa2O² ≅ ∂²GMix/∂XCaO² ≅ ∂²GMix/∂XNa2O∂XCaO > 0
+      locator:
+        page: 4
+        equation: '10'
+    - equation: '11'
+      equation_as_printed: FeO + 0.5Na2O + 0.25O2 = NaFeO2
+      locator:
+        page: 7
+        equation: '11'
+    - equation: '12'
+      equation_as_printed: RT ln(XFe2+/XFe3+) = RT ln(XFeO/XNaFeO2) = ΔG + RT ln(γNaFeO2/γFeO) − 1/2 RT ln aNa2O − 1/4 RT
+        ln fO2
+      locator:
+        page: 7
+        equation: '12'
+    - equation: '13'
+      equation_as_printed: RT ln(XFe2+/XFe3+) = 2EpF
+      locator:
+        page: 7
+        equation: '13'
+    - equation: '14'
+      equation_as_printed: Ep(soda-lime silicate melt) − Ep(sodium silicate melt) = [RT ln aNa2O(soda-lime silicate melt)
+        − RT ln aNa2O(sodium silicate melt)]/(2F)
+      locator:
+        page: 7
+        equation: '14'
+    fit_equation: RT ln aNa2O = (∂N HMix/∂nNa2O) − T(∂N SMix/∂nNa2O)
+    fit_equation_locator:
+      page: 2
+      equation: '6'
+    equation_3_sign_note: Retained as printed; its minus sign on the final calibration term conflicts algebraically with Eqs.
+      (1) and (2), which would produce a plus sign. No correction or recomputation is made.
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_equations_1_to_14
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_experimental_conditions_and_calibration
+  type: method_context
+  locator:
+    page: 2
+    section: 2.1. Electromotive force measurement
+  units: as printed
+  values:
+    sample_mass_g_as_printed: '25'
+    reference_mass_g_as_printed: '3'
+    reagent_drying_temperature_K_as_printed: '333'
+    glass_fusion_temperature_K_as_printed: '1773'
+    glass_fusion_duration_as_printed: 1 h
+    furnace_maximum_temperature_K_as_printed: '1873'
+    initial_cell_temperature_K_as_printed: '1573'
+    temperature_range_K_as_printed:
+    - '1573'
+    - '1273'
+    cooling_interval_K_as_printed:
+    - '50'
+    - '100'
+    hold_duration_h_as_printed:
+    - '5'
+    - '10'
+    emf_record_interval_as_printed: 15 min
+    sample_temperature_gradient_as_printed: less than ±3 K
+    thermocouple_as_printed: Pt–PtRh13 thermocouple placed just above sample melt
+    measurement_atmosphere_as_printed: dry air
+    gas_flow_rate_as_printed: 150 ml/min
+    total_pressure_as_published:
+      state: absent
+      reason: no total pressure is stated; gas flow is not pressure
+    oxygen_fugacity_as_published:
+      state: absent
+      reason: no gas ratio or oxygen fugacity is stated
+    reference_melt_as_published: SiO2–Al2O3–Na2O
+    calibration_activity_as_published: 70SiO2–30Na2O
+    calibration_source_as_published: compilation [27]
+    measurement_composition_formulas_as_published:
+    - (100 − x)SiO2–xNa2O (x = 16, 20, 30, mol%)
+    - (100 − x − y)SiO2–xCaO–yNa2O (x = 5, 10, 12, 16, 22 and y = 12, 16, 30, mol%)
+    - (100 − x − y)SiO2–xNa2O–yCaO (x = 12–30; y = 5–22, mol%)
+    composition_notation_conflict: The abstract and experimental-method statement reverse the x/y assignments for Na2O and
+      CaO; both strings are preserved as printed.
+    quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+    quench_preservation_status: not_stated
+    quench_locator:
+      page: 2
+      section: 2.2. Sample preparation and EDX analyses
+    activity_error_as_printed: ±2.7 kJ/mol average RT ln a(Na2O) error, corresponding to ±0.1 in log aNa2O
+    reference_melt_nominal_composition_as_printed:
+      state: absent
+      reason: Table 1 and Table 2 give run-specific reference melt compositions; no single standard-state composition is declared.
+    standard_state_as_published:
+      state: absent
+      reason: No thermodynamic standard state is declared.
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_experimental_conditions_and_calibration
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_2_undigitised
+  type: figure_record
+  locator:
+    page: 3
+    figure: '2'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Temporal change of EMF for 70SiO2–30Na2O (Run 34) and 74SiO2–10CaO–16Na2O (Run 36) melts.
+    axes_as_printed: EMF as a function of time
+    numeric_values:
+      state: absent
+      reason: measured EMF vs time; plotted points not digitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_2_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_3_undigitised
+  type: figure_record
+  locator:
+    page: 5
+    figure: '3'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Comparison of RT ln aNa2O for SiO2–Al2O3–Na2O melts measured in this study and those by Ito and Yokokawa
+      [7].
+    axes_as_printed: Al2O3 / mol% versus RT ln a(Na2O)
+    numeric_values:
+      state: absent
+      reason: the table values are retained in Table 3; plotted values are not digitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_3_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_4_undigitised
+  type: figure_record
+  locator:
+    page: 6
+    figure: '4'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: RT ln aNa2O for soda-lime silicate melts as a function of temperature (a) Na2O = 30 mol%, (b) Na2O
+      = 16 mol%, and (c) Na2O = 12 mol%. Dashed lines represent the least-squares fit to the data.
+    axes_as_printed: temperature versus RT ln a(Na2O), panels by Na2O content
+    numeric_values:
+      state: absent
+      reason: Table 4 observations and fit coefficients are retained; plotted points and line are not digitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_4_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_5_undigitised
+  type: figure_record
+  locator:
+    page: 6
+    figure: '5'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Comparison of RT ln aNa2O for soda-lime silicate melt measured in this study and that by previous
+      works [18–20,27] (a) T = 1343 K, and (b) T = 1673 K. The values of this study are low-temperature (a) and high-temperature
+      (b) extrapolations for the data of Fig. 4. Dashed lines are guides to eye.
+    axes_as_printed: composition versus RT ln a(Na2O), 1343 K and 1673 K
+    numeric_values:
+      state: absent
+      reason: plot-only extrapolated values; undigitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_5_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_6_undigitised
+  type: figure_record
+  locator:
+    page: 7
+    figure: '6'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Comparison of RT ln aNa2O for SiO2–Na2O–RO (R = Ca, Al0.666, B0.666) melts at 1343 K and 30 mol% Na2O
+      [7,22]. The values for SiO2–Na2O–CaO melt are calculated using Eq. (6) and coefficients listed in Table 4. Dashed lines
+      are guides to eye.
+    axes_as_printed: composition and oxide identity versus RT ln a(Na2O), 1343 K and 30 mol% Na2O
+    numeric_values:
+      state: absent
+      reason: plot-only values; undigitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_6_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_7_undigitised
+  type: figure_record
+  locator:
+    page: 7
+    figure: '7'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Na2O activity of soda-lime silicate melts (this study), sodium-silicate melts [10,18,25,26] and sodium-borate
+      melts [5,25] at 1373 K. Dashed lines are guides to eye.
+    axes_as_printed: composition versus Na2O activity at 1373 K
+    numeric_values:
+      state: absent
+      reason: plot-only values; undigitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_7_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_8_undigitised
+  type: figure_record
+  locator:
+    page: 7
+    figure: '8'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Enthalpy of mixing of SiO2–Na2O [30,31], B2O3–Na2O [30,31] and SiO2–CaO [32] melts.
+    axes_as_printed: composition versus enthalpy of mixing
+    numeric_values:
+      state: absent
+      reason: literature plot; no values digitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_8_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_figure_9_undigitised
+  type: figure_record
+  locator:
+    page: 7
+    figure: '9'
+  units: as labelled in figure
+  values:
+    admission_status: figure_only
+    digitization_status: undigitised
+    figure_read_candidate: true
+    caption_as_printed: Partial molar entropy of mixing of Na2O for SiO2–Na2O [7,9], SiO2–Na2O–Al2O3 [7] and SiO2–Na2O–CaO
+      melts (this study) determined from EMF measurements. Solid line and dashed lines represent the (dNSMix/dnNa2O) calculated
+      from the thermodynamic equation by Sugawara et al. [27] and estimated error range in the model.
+    axes_as_printed: composition versus partial molar entropy of mixing
+    numeric_values:
+      state: absent
+      reason: plot-only values; undigitized
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_figure_9_undigitised
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_prose_activity_log10_minus_10_3
+  type: prose_context
+  locator:
+    page: 4
+    section: 4.1. The Na2O activity and Gibbs energy of mixing
+  units: log10 activity
+  values:
+    quantity_as_printed: log aNa2O
+    log10_activity_as_printed: −10.3
+    T_K_as_printed: '1373'
+    statement_as_published: With decreasing Na2O content, the Na2O activities for soda-lime silicate melt and soda silicate
+      melt become independent of Na2O and CaO contents and close to constant value (log aNa2O = −10.3 at 1373 K).
+    composition:
+      state: absent
+      reason: The sentence gives a trend, not a row-specific melt composition.
+    standard_state_as_published:
+      state: absent
+      reason: No thermodynamic standard state is stated.
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_prose_activity_log10_minus_10_3
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_redox_peak_potential_context
+  type: quoted_measurement_context
+  locator:
+    page: 7
+    section: 4.3. Effect of the Na2O activity on the redox reaction of iron
+  units: mV
+  values:
+    quantity_as_printed: voltammetry peak potential difference, Ep
+    schema_gap: The printed electrochemical potential lacks an exact quantity token and an electrochemical measurement observation
+      type.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    quoted_Ep_difference_as_printed: 78 ± 10 mV
+    quoted_compositions_as_printed:
+    - 80SiO2–10Na2O–10CaO
+    - 80SiO2–20Na2O
+    quoted_temperature_K_as_printed: '1574'
+    attribution: Rüssel [44,45]
+    calculated_Ep_difference_as_printed: 64 ± 25 mV
+    calculated_compositions_as_printed:
+    - 78SiO2–12Na2O–10CaO
+    - 80SiO2–20Na2O
+    calculated_reference_as_printed: activity data for 78SiO2–12Na2O–10CaO (Table 2) and 80SiO2–20Na2O [27], using Eq. (14)
+    calculated_difference_method_class: model_derived
+    confidence_level_as_published: not stated
+    total_pressure_as_published:
+      state: absent
+      reason: not stated
+    fO2_as_published:
+      state: absent
+      reason: not stated
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_redox_peak_potential_context
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_table1_glass_compositions
+  type: table_context
+  locator:
+    page: 3
+    table: '1'
+  units: mol%
+  values:
+    quantity_as_printed: chemical compositions of glasses
+    schema_gap: 'Table 1 prints oxide mole percent. The existing equilibrium phase composition quantity has no exact mole_percent
+      basis token: PHASE_BASIS_TOKENS includes mole_fraction and wt_percent, while _phase_row_rejection refuses unrecognized
+      bases. The component_amount migration preserves its decimal as supplied; it does not convert a printed mol% cell to
+      a mole fraction. Storing the printed number with basis mole_fraction would give a false fraction, and the extraction
+      rules forbid dividing by 100 by hand. The complete values are therefore retained as typed table context.'
+    schema_gap_symbols:
+    - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+    - simulator/battery/enums.py::Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    - simulator/battery/enums.py::AmountBasis.MOLE_FRACTION
+    - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+    - simulator/battery/migrate.py::QUANTITY_ALIASES
+    - simulator/battery/migrate.py::TYPE_QUANTITY
+    - simulator/battery/migrate.py::_phase_row_rejection
+    method_class: measured_direct for EDX before/after composition; nominal recipe composition is reported separately
+    printed_column_order:
+      sample_nominal:
+      - SiO2
+      - Na2O
+      - CaO
+      sample_before_after:
+      - SiO2
+      - Al2O3
+      - Na2O
+      - CaO
+      reference_nominal:
+      - SiO2
+      - Al2O3
+      - Na2O
+      reference_before_after:
+      - SiO2
+      - Al2O3
+      - Na2O
+      - CaO
+    row_count: 17
+    printed_numeric_cell_count: 376
+    EDX_numeric_cell_count: 272
+    rows_as_printed:
+    - source_row: '24'
+      draft_row: 4
+      locator:
+        page: 3
+        table: '1'
+        row: '24'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: absent
+          reason: blank cell in the printed table
+        Na2O:
+          state: absent
+          reason: blank cell in the printed table
+        CaO:
+          state: absent
+          reason: blank cell in the printed table
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '70.4'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '29.6'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '69.7'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '30.2'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '65'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 24
+        Al2O3:
+          state: value
+          value_as_printed: '5'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 24
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 24
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '64.4'
+        Al2O3:
+          state: value
+          value_as_printed: '4.8'
+        Na2O:
+          state: value
+          value_as_printed: '30.8'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '64.9'
+        Al2O3:
+          state: value
+          value_as_printed: '5.9'
+        Na2O:
+          state: value
+          value_as_printed: '29.1'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '34'
+      draft_row: 5
+      locator:
+        page: 3
+        table: '1'
+        row: '34'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '70'
+        Na2O:
+          state: value
+          value_as_printed: '30'
+        CaO:
+          state: absent
+          reason: blank cell in the printed table
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '68.6'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '69.1'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.9'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 34
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 34
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: printed reference nominal composition for run 34
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.7'
+        Al2O3:
+          state: value
+          value_as_printed: '9.7'
+        Na2O:
+          state: value
+          value_as_printed: '30.6'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60.3'
+        Al2O3:
+          state: value
+          value_as_printed: '9.7'
+        Na2O:
+          state: value
+          value_as_printed: '30.0'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '54'
+      draft_row: 6
+      locator:
+        page: 3
+        table: '1'
+        row: '54'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '70'
+          shared_cell_origin_as_printed: merged nominal sample composition cell shared with run 34
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged nominal sample composition cell shared with run 34
+        CaO:
+          state: absent
+          reason: blank cell in the printed table
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '69.5'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.5'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '69.4'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.6'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '57.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.7'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.2'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.9'
+        Al2O3:
+          state: value
+          value_as_printed: '10.1'
+        Na2O:
+          state: value
+          value_as_printed: '31.0'
+        CaO:
+          state: value
+          value_as_printed: '0.1'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '35'
+      draft_row: 7
+      locator:
+        page: 3
+        table: '1'
+        row: '35'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '80'
+        Na2O:
+          state: value
+          value_as_printed: '20'
+        CaO:
+          state: absent
+          reason: blank cell in the printed table
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '79.6'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '20.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '79.2'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '20.8'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.7'
+        Al2O3:
+          state: value
+          value_as_printed: '9.6'
+        Na2O:
+          state: value
+          value_as_printed: '31.7'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.2'
+        Na2O:
+          state: value
+          value_as_printed: '31.0'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '40'
+      draft_row: 8
+      locator:
+        page: 3
+        table: '1'
+        row: '40'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '84'
+        Na2O:
+          state: value
+          value_as_printed: '16'
+        CaO:
+          state: absent
+          reason: blank cell in the printed table
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '83.6'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '83.6'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.3'
+        Al2O3:
+          state: value
+          value_as_printed: '10.2'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.5'
+        Na2O:
+          state: value
+          value_as_printed: '30.7'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '44'
+      draft_row: 9
+      locator:
+        page: 3
+        table: '1'
+        row: '44'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '72'
+        Na2O:
+          state: value
+          value_as_printed: '12'
+        CaO:
+          state: value
+          value_as_printed: '16'
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '70.8'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '12.8'
+        CaO:
+          state: value
+          value_as_printed: '16.3'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '71.1'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '12.6'
+        CaO:
+          state: value
+          value_as_printed: '16.3'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.6'
+        Al2O3:
+          state: value
+          value_as_printed: '10.0'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.0'
+        Al2O3:
+          state: value
+          value_as_printed: '10.3'
+        Na2O:
+          state: value
+          value_as_printed: '30.7'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '53'
+      draft_row: 10
+      locator:
+        page: 3
+        table: '1'
+        row: '53'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '79'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        Na2O:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        CaO:
+          state: value
+          value_as_printed: '5'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '79.2'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '16.1'
+        CaO:
+          state: value
+          value_as_printed: '4.7'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '78.5'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.7'
+        CaO:
+          state: value
+          value_as_printed: '4.8'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.2'
+        Al2O3:
+          state: value
+          value_as_printed: '10.4'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.9'
+        Al2O3:
+          state: value
+          value_as_printed: '10.3'
+        Na2O:
+          state: value
+          value_as_printed: '29.6'
+        CaO:
+          state: value
+          value_as_printed: '0.1'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '36'
+      draft_row: 11
+      locator:
+        page: 3
+        table: '1'
+        row: '36'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '74'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        Na2O:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        CaO:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '74.1'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.9'
+        CaO:
+          state: value
+          value_as_printed: '9.1'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '73.8'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.8'
+        CaO:
+          state: value
+          value_as_printed: '9.4'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.1'
+        Al2O3:
+          state: value
+          value_as_printed: '10.3'
+        Na2O:
+          state: value
+          value_as_printed: '31.7'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.4'
+        Al2O3:
+          state: value
+          value_as_printed: '10.2'
+        Na2O:
+          state: value
+          value_as_printed: '30.1'
+        CaO:
+          state: value
+          value_as_printed: '0.3'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '38'
+      draft_row: 13
+      locator:
+        page: 3
+        table: '1'
+        row: '38'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '68'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        Na2O:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        CaO:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '66.0'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.9'
+        CaO:
+          state: value
+          value_as_printed: '17.1'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '66.9'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.3'
+        CaO:
+          state: value
+          value_as_printed: '16.8'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.5'
+        Al2O3:
+          state: value
+          value_as_printed: '10.1'
+        Na2O:
+          state: value
+          value_as_printed: '31.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.7'
+        Na2O:
+          state: value
+          value_as_printed: '30.4'
+        CaO:
+          state: value
+          value_as_printed: '0.1'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '39'
+      draft_row: 14
+      locator:
+        page: 3
+        table: '1'
+        row: '39'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '62'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        Na2O:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+        CaO:
+          state: value
+          value_as_printed: '22'
+          shared_cell_origin_as_printed: merged Na2O=16 mol% cell shared by runs 53, 36, 38, and 39
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '62.2'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '16.5'
+        CaO:
+          state: value
+          value_as_printed: '21.3'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '61.3'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '16.2'
+        CaO:
+          state: value
+          value_as_printed: '22.4'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '57.6'
+        Al2O3:
+          state: value
+          value_as_printed: '10.7'
+        Na2O:
+          state: value
+          value_as_printed: '31.7'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.6'
+        Al2O3:
+          state: value
+          value_as_printed: '10.4'
+        Na2O:
+          state: value
+          value_as_printed: '31.0'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '52'
+      draft_row: 15
+      locator:
+        page: 3
+        table: '1'
+        row: '52'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '65'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '5'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '64.5'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.8'
+        CaO:
+          state: value
+          value_as_printed: '4.8'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '64.0'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '31.1'
+        CaO:
+          state: value
+          value_as_printed: '4.8'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.7'
+        Al2O3:
+          state: value
+          value_as_printed: '9.6'
+        Na2O:
+          state: value
+          value_as_printed: '31.6'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.7'
+        Al2O3:
+          state: value
+          value_as_printed: '10.2'
+        Na2O:
+          state: value
+          value_as_printed: '31.0'
+        CaO:
+          state: value
+          value_as_printed: '0.2'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '46'
+      draft_row: 16
+      locator:
+        page: 3
+        table: '1'
+        row: '46'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60.0'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '29.5'
+        CaO:
+          state: value
+          value_as_printed: '10.5'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60.1'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '29.4'
+        CaO:
+          state: value
+          value_as_printed: '10.5'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.2'
+        Al2O3:
+          state: value
+          value_as_printed: '10.4'
+        Na2O:
+          state: value
+          value_as_printed: '30.4'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '55.9'
+        Al2O3:
+          state: value
+          value_as_printed: '11.3'
+        Na2O:
+          state: value
+          value_as_printed: '27.5'
+        CaO:
+          state: value
+          value_as_printed: '5.2'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '55'
+      draft_row: 17
+      locator:
+        page: 3
+        table: '1'
+        row: '55'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60.7'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.2'
+        CaO:
+          state: value
+          value_as_printed: '9.2'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.8'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '30.6'
+        CaO:
+          state: value
+          value_as_printed: '9.4'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.3'
+        Al2O3:
+          state: value
+          value_as_printed: '10.5'
+        Na2O:
+          state: value
+          value_as_printed: '30.2'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.4'
+        Na2O:
+          state: value
+          value_as_printed: '28.9'
+        CaO:
+          state: value
+          value_as_printed: '0.8'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '47'
+      draft_row: 18
+      locator:
+        page: 3
+        table: '1'
+        row: '47'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '54'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '55.5'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '28.3'
+        CaO:
+          state: value
+          value_as_printed: '16.1'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '52.2'
+        Al2O3:
+          state: value
+          value_as_printed: '3.8'
+        Na2O:
+          state: value
+          value_as_printed: '29.3'
+        CaO:
+          state: value
+          value_as_printed: '14.6'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.2'
+        Al2O3:
+          state: value
+          value_as_printed: '10.1'
+        Na2O:
+          state: value
+          value_as_printed: '30.8'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '55.8'
+        Al2O3:
+          state: value
+          value_as_printed: '10.0'
+        Na2O:
+          state: value
+          value_as_printed: '27.9'
+        CaO:
+          state: value
+          value_as_printed: '6.3'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '56'
+      draft_row: 19
+      locator:
+        page: 3
+        table: '1'
+        row: '56'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '54'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '16'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '55.2'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.3'
+        CaO:
+          state: value
+          value_as_printed: '14.5'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '53.6'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '29.9'
+        CaO:
+          state: value
+          value_as_printed: '16.3'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.4'
+        Al2O3:
+          state: value
+          value_as_printed: '11.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.6'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.5'
+        Al2O3:
+          state: value
+          value_as_printed: '10.2'
+        Na2O:
+          state: value
+          value_as_printed: '29.3'
+        CaO:
+          state: value
+          value_as_printed: '1.1'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '49'
+      draft_row: 20
+      locator:
+        page: 3
+        table: '1'
+        row: '49'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '48'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '22'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '47.8'
+        Al2O3:
+          state: value
+          value_as_printed: '0.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.6'
+        CaO:
+          state: value
+          value_as_printed: '21.6'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '46.8'
+        Al2O3:
+          state: value
+          value_as_printed: '1.4'
+        Na2O:
+          state: value
+          value_as_printed: '30.2'
+        CaO:
+          state: value
+          value_as_printed: '21.6'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '57.9'
+        Al2O3:
+          state: value
+          value_as_printed: '10.7'
+        Na2O:
+          state: value
+          value_as_printed: '31.3'
+        CaO:
+          state: value
+          value_as_printed: '0.1'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '58.6'
+        Al2O3:
+          state: value
+          value_as_printed: '10.1'
+        Na2O:
+          state: value
+          value_as_printed: '31.2'
+        CaO:
+          state: value
+          value_as_printed: '0.1'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    - source_row: '57'
+      draft_row: 21
+      locator:
+        page: 3
+        table: '1'
+        row: '57'
+      sample_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '48'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+        CaO:
+          state: value
+          value_as_printed: '22'
+          shared_cell_origin_as_printed: merged Na2O=30 mol% cell shared by runs 52, 46, 55, 47, 56, 49, and 57
+      sample_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '47.7'
+        Al2O3:
+          state: value
+          value_as_printed: '0.1'
+        Na2O:
+          state: value
+          value_as_printed: '30.4'
+        CaO:
+          state: value
+          value_as_printed: '21.8'
+      sample_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '46.4'
+        Al2O3:
+          state: value
+          value_as_printed: '1.0'
+        Na2O:
+          state: value
+          value_as_printed: '30.4'
+        CaO:
+          state: value
+          value_as_printed: '22.3'
+      reference_nominal_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+        Na2O:
+          state: value
+          value_as_printed: '30'
+          shared_cell_origin_as_printed: reference nominal 60/10/30
+      reference_before_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '59.0'
+        Al2O3:
+          state: value
+          value_as_printed: '10.5'
+        Na2O:
+          state: value
+          value_as_printed: '30.5'
+        CaO:
+          state: value
+          value_as_printed: '0.0'
+      reference_after_measurement_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '56.3'
+        Al2O3:
+          state: value
+          value_as_printed: '9.1'
+        Na2O:
+          state: value
+          value_as_printed: '28.6'
+        CaO:
+          state: value
+          value_as_printed: '6.0'
+      phase_as_measured: glass
+      quench_status: not_stated
+      quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+      quench_locator:
+        page: 2
+        section: 2.2. Sample preparation and EDX analyses
+      composition_analysis_method_as_published: EDX
+    quench_status: not_stated
+    quench_statement_as_published: After the EMF measurements, the cell was collected immediately, and quenched by water.
+    quench_locator:
+      page: 2
+      section: 2.2. Sample preparation and EDX analyses
+    blank_cells_typed_absent: true
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_table1_glass_compositions
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_table2_emf_measurements
+  type: table_context
+  locator:
+    page: 4
+    table: '2'
+  units: mV
+  phase: l
+  values:
+    quantity_as_printed: electromotive force (EMF)
+    method_class: measured_direct
+    row_count: 24
+    temperature_columns_K_as_printed:
+    - '1273'
+    - '1373'
+    - '1423'
+    - '1473'
+    - '1523'
+    - '1573'
+    numeric_emf_cells: 82
+    blank_emf_cells: 62
+    rows_as_printed:
+    - observation_id: sugawara_2013_table2_run_21_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '21'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '21'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '70'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '65'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+          Al2O3:
+            state: value
+            value_as_printed: '5'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 24
+        composition_group_as_published: sample/reference composition cells shared with run 24
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '44.5'
+          printed_cell_as_published: 44.5 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '41.5'
+          printed_cell_as_published: 41.5 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '46.7'
+          printed_cell_as_published: 46.7 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '43.3'
+          printed_cell_as_published: 43.3 ± 1.7
+          uncertainty_as_printed: ± 1.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '21'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_24_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '24'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '24'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '70'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '65'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+          Al2O3:
+            state: value
+            value_as_printed: '5'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with run 21
+        composition_group_as_published: sample/reference composition cells shared with run 21
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '44.2'
+          printed_cell_as_published: 44.2 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '42.1'
+          printed_cell_as_published: 42.1 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '39.7'
+          printed_cell_as_published: 39.7 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '39.5'
+          printed_cell_as_published: 39.5 ± 1.4
+          uncertainty_as_printed: ± 1.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '24'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_34_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '34'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '34'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '70'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 51 and 54
+        composition_group_as_published: sample/reference composition cells shared with runs 51 and 54
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '89.3'
+          printed_cell_as_published: 89.3 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '79.7'
+          printed_cell_as_published: 79.7 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '75.0'
+          printed_cell_as_published: 75.0 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '69.2'
+          printed_cell_as_published: 69.2 ± 1.9
+          uncertainty_as_printed: ± 1.9
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '34'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_51_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '51'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '51'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '70'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 54
+        composition_group_as_published: sample/reference composition cells shared with runs 34 and 54
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '96.1'
+          printed_cell_as_published: 96.1 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '90.4'
+          printed_cell_as_published: 90.4 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '87.1'
+          printed_cell_as_published: 87.1 ± 0.7
+          uncertainty_as_printed: ± 0.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '81.2'
+          printed_cell_as_published: 81.2 ± 1.4
+          uncertainty_as_printed: ± 1.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '51'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_54_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '54'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '54'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '70'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample/reference composition cells shared with runs 34 and 51
+        composition_group_as_published: sample/reference composition cells shared with runs 34 and 51
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '69.9'
+          printed_cell_as_published: 69.9 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '78.7'
+          printed_cell_as_published: 78.7 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '83.3'
+          printed_cell_as_published: 83.3 ± 0.8
+          uncertainty_as_printed: ± 0.8
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '82.3'
+          printed_cell_as_published: 82.3 ± 1.9
+          uncertainty_as_printed: ± 1.9
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '54'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_35_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '35'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '35'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '80'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+          Na2O:
+            state: value
+            value_as_printed: '20'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: reference composition cell shared with run 40
+        composition_group_as_published: reference composition cell shared with run 40
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '182.1'
+          printed_cell_as_published: 182.1 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '184.5'
+          printed_cell_as_published: 184.5 ± 1.7
+          uncertainty_as_printed: ± 1.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '35'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_40_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '40'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '40'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '84'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+          Na2O:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+          CaO:
+            state: value
+            value_as_printed: '0'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: reference composition cell shared with run 35
+        composition_group_as_published: reference composition cell shared with run 35
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '236.5'
+          printed_cell_as_published: 236.5 ± 3.3
+          uncertainty_as_printed: ± 3.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '40'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_60_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '60'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '60'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '78'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '12'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+          CaO:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: reference composition cell shared with runs 44, 58, and 59
+        composition_group_as_published: reference composition cell shared with runs 44, 58, and 59
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '278.6'
+          printed_cell_as_published: 278.6 ± 1.9
+          uncertainty_as_printed: ± 1.9
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '281.0'
+          printed_cell_as_published: 281.0 ± 3.7
+          uncertainty_as_printed: ± 3.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '281.0'
+          printed_cell_as_published: 281.0 ± 5.5
+          uncertainty_as_printed: ± 5.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '60'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+    - observation_id: sugawara_2013_table2_run_44_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '44'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '44'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '72'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+          Na2O:
+            state: value
+            value_as_printed: '12'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+          CaO:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with
+              this series
+        composition_group_as_published: sample Na2O cell shared with runs 60, 44, 58, and 59; reference cell shared with this
+          series
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '256.8'
+          printed_cell_as_published: 256.8 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '260.5'
+          printed_cell_as_published: 260.5 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '263.3'
+          printed_cell_as_published: 263.3 ± 1.1
+          uncertainty_as_printed: ± 1.1
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '44'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_58_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '58'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '58'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '72'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '12'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          CaO:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+        composition_group_as_published: sample Na2O cell shared with runs 60, 44, 58, and 59
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '274.0'
+          printed_cell_as_published: 274.0 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '276.6'
+          printed_cell_as_published: 276.6 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '283.2'
+          printed_cell_as_published: 283.2 ± 0.8
+          uncertainty_as_printed: ± 0.8
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '286.6'
+          printed_cell_as_published: 286.6 ± 1.6
+          uncertainty_as_printed: ± 1.6
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '285.7'
+          printed_cell_as_published: 285.7 ± 2.2
+          uncertainty_as_printed: ± 2.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '58'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+    - observation_id: sugawara_2013_table2_run_59_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '59'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '59'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '66'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '12'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          CaO:
+            state: value
+            value_as_printed: '22'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 60, 44, 58, and 59
+        composition_group_as_published: sample Na2O cell shared with runs 60, 44, 58, and 59
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '240.7'
+          printed_cell_as_published: 240.7 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '248.2'
+          printed_cell_as_published: 248.2 ± 0.7
+          uncertainty_as_printed: ± 0.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '259.6'
+          printed_cell_as_published: 259.6 ± 1.3
+          uncertainty_as_printed: ± 1.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '264.4'
+          printed_cell_as_published: 264.4 ± 2.5
+          uncertainty_as_printed: ± 2.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '59'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+    - observation_id: sugawara_2013_table2_run_53_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '53'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '53'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '69'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+          Na2O:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+          CaO:
+            state: value
+            value_as_printed: '5'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+        composition_group_as_published: sample Na2O cell shared with runs 53, 36, 38, and 39; Table 2 prints SiO2=69
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '241.2'
+          printed_cell_as_published: 241.2 ± 1.2
+          uncertainty_as_printed: ± 1.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '247.6'
+          printed_cell_as_published: 247.6 ± 2.3
+          uncertainty_as_printed: ± 2.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '53'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_36_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '36'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '36'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '74'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          CaO:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        composition_group_as_published: sample Na2O cell shared with runs 53, 36, 38, and 39
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '213.2'
+          printed_cell_as_published: 213.2 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '215.5'
+          printed_cell_as_published: 215.5 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '223.6'
+          printed_cell_as_published: 223.6 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '232.5'
+          printed_cell_as_published: 232.5 ± 1.3
+          uncertainty_as_printed: ± 1.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '36'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_38_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '38'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '38'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '68'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          CaO:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        composition_group_as_published: sample Na2O cell shared with runs 53, 36, 38, and 39
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '180.6'
+          printed_cell_as_published: 180.6 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '181.2'
+          printed_cell_as_published: 181.2 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '190.8'
+          printed_cell_as_published: 190.8 ± 0.7
+          uncertainty_as_printed: ± 0.7
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '38'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_39_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '39'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '39'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '62'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          CaO:
+            state: value
+            value_as_printed: '22'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 53, 36, 38, and 39
+        composition_group_as_published: sample Na2O cell shared with runs 53, 36, 38, and 39
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '152.4'
+          printed_cell_as_published: 152.4 ± 0.2
+          uncertainty_as_printed: ± 0.2
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '154.0'
+          printed_cell_as_published: 154.0 ± 1.4
+          uncertainty_as_printed: ± 1.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '39'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_52_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '52'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '52'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '65'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '5'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value_as_printed: '57.9'
+          printed_cell_as_published: 57.9 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '43.3'
+          printed_cell_as_published: 43.3 ± 0.5
+          uncertainty_as_printed: ± 0.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '32.6'
+          printed_cell_as_published: 32.6 ± 0.8
+          uncertainty_as_printed: ± 0.8
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '32.8'
+          printed_cell_as_published: 32.8 ± 2.3
+          uncertainty_as_printed: ± 2.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '52'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_86_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '86'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '86'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '65'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '5'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '37.8'
+          printed_cell_as_published: '37.8'
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '38.4'
+          printed_cell_as_published: '38.4'
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '39.8'
+          printed_cell_as_published: '39.8'
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '42.8'
+          printed_cell_as_published: '42.8'
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '45.2'
+          printed_cell_as_published: '45.2'
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '86'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+    - observation_id: sugawara_2013_table2_run_46_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '46'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '46'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '-15.2'
+          printed_cell_as_published: −15.2 ± 0.3
+          uncertainty_as_printed: ± 0.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-18.0'
+          printed_cell_as_published: −18.0 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '-6.7'
+          printed_cell_as_published: −6.7 ± 1.5
+          uncertainty_as_printed: ± 1.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '46'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_55_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '55'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '55'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '-11.4'
+          printed_cell_as_published: −11.4 ± 0.6
+          uncertainty_as_printed: ± 0.6
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '-18.1'
+          printed_cell_as_published: −18.1 ± 1.4
+          uncertainty_as_printed: ± 1.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-14.4'
+          printed_cell_as_published: −14.4 ± 2.8
+          uncertainty_as_printed: ± 2.8
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '-10.4'
+          printed_cell_as_published: −10.4 ± 3.8
+          uncertainty_as_printed: ± 3.8
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '55'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1573'
+    - observation_id: sugawara_2013_table2_run_78_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '78'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '78'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '58'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '12'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '-47.3'
+          printed_cell_as_published: −47.3
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '-40.6'
+          printed_cell_as_published: −40.6
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-37.7'
+          printed_cell_as_published: −37.7
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '-30.6'
+          printed_cell_as_published: −30.6
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '-29.5'
+          printed_cell_as_published: −29.5
+          uncertainty_as_printed:
+            state: absent
+            reason: no uncertainty printed in this EMF cell
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '78'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+    - observation_id: sugawara_2013_table2_run_47_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '47'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '47'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '54'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-71.1'
+          printed_cell_as_published: −71.1 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '-57.1'
+          printed_cell_as_published: −57.1 ± 2.0
+          uncertainty_as_printed: ± 2.0
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '47'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_56_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '56'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '56'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '54'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '16'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '-83.9'
+          printed_cell_as_published: −83.9 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '-80.2'
+          printed_cell_as_published: −80.2 ± 1.5
+          uncertainty_as_printed: ± 1.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-78.9'
+          printed_cell_as_published: −78.9 ± 2.9
+          uncertainty_as_printed: ± 2.9
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '-74.8'
+          printed_cell_as_published: −74.8 ± 4.6
+          uncertainty_as_printed: ± 4.6
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '56'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1573'
+    - observation_id: sugawara_2013_table2_run_49_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '49'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '49'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '48'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '22'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-147.6'
+          printed_cell_as_published: −147.6 ± 0.4
+          uncertainty_as_printed: ± 0.4
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value_as_printed: '-135.7'
+          printed_cell_as_published: −135.7 ± 2.3
+          uncertainty_as_printed: ± 2.3
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '49'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1523'
+    - observation_id: sugawara_2013_table2_run_57_emf_series
+      type: table_context
+      locator:
+        page: 4
+        table: '2'
+        row: '57'
+      units: mV
+      phase: l
+      values:
+        quantity_as_printed: electromotive force (EMF)
+        method_class: measured_direct
+        schema_gap: The repository observation types have no electrochemical measurement input, and the quantity enum has
+          no EMF quantity; all printed EMF cells are retained as typed table context.
+        schema_gap_symbols:
+        - tools/validate_literature_extracts.py::OBSERVATION_TYPES
+        - simulator/battery/enums.py::Quantity
+        - simulator/battery/migrate.py::QUANTITY_ALIASES
+        - simulator/battery/migrate.py::TYPE_QUANTITY
+        run_as_printed: '57'
+        sample_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '48'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          CaO:
+            state: value
+            value_as_printed: '22'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        reference_composition_mol_percent:
+          SiO2:
+            state: value
+            value_as_printed: '60'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Al2O3:
+            state: value
+            value_as_printed: '10'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+          Na2O:
+            state: value
+            value_as_printed: '30'
+            shared_cell_origin_as_printed: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        composition_group_as_published: sample Na2O cell shared with runs 52, 86, 46, 55, 78, 47, 56, 49, and 57
+        atmosphere_as_published: dry air
+        total_pressure_as_published:
+          state: absent
+          reason: no total pressure is printed for the EMF experiments
+        fO2_as_published:
+          state: absent
+          reason: no oxygen fugacity or oxygen partial pressure is printed
+        temperature_columns_K_as_published:
+        - '1273'
+        - '1373'
+        - '1423'
+        - '1473'
+        - '1523'
+        - '1573'
+        emf_series:
+        - T_K: '1273'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1273 K; table column 8
+          table_column_number: 8
+        - T_K: '1373'
+          value_as_printed: '-180.1'
+          printed_cell_as_published: −180.1 ± 0.5
+          uncertainty_as_printed: ± 0.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1373 K; table column 9
+          table_column_number: 9
+        - T_K: '1423'
+          value_as_printed: '-175.0'
+          printed_cell_as_published: −175.0 ± 1.0
+          uncertainty_as_printed: ± 1.0
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1423 K; table column 10
+          table_column_number: 10
+        - T_K: '1473'
+          value_as_printed: '-168.1'
+          printed_cell_as_published: −168.1 ± 2.5
+          uncertainty_as_printed: ± 2.5
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1473 K; table column 11
+          table_column_number: 11
+        - T_K: '1523'
+          value_as_printed: '-155.9'
+          printed_cell_as_published: −155.9 ± 4.6
+          uncertainty_as_printed: ± 4.6
+          units: mV
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1523 K; table column 12
+          table_column_number: 12
+        - T_K: '1573'
+          value:
+            state: absent
+            reason: blank EMF cell in Table 2
+          locator:
+            page: 4
+            table: '2'
+            row: '57'
+            note: EMF at T=1573 K; table column 13
+          table_column_number: 13
+        blank_cells_typed_absent:
+        - '1273'
+        - '1573'
+    table2_run_53_composition_conflict: Table 2 prints Run 53 sample SiO2=69, Na2O=16, CaO=5; Table 1 and Table 4 print SiO2=79,
+      Na2O=16, CaO=5. All three are retained as printed.
+    total_pressure_as_published:
+      state: absent
+      reason: no total pressure is printed
+    fO2_as_published:
+      state: absent
+      reason: no oxygen fugacity or oxygen partial pressure is printed
+    atmosphere_as_published: dry air
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_table2_emf_measurements
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O
+- observation_id: sugawara_2013_table3_activity_rows
+  type: table_context
+  locator:
+    page: 4
+    table: '3'
+  units: log10 activity
+  values:
+    quantity_as_printed: Na2O activity
+    method_class: quoted_attributed for the authors’ Eq. (3) activity outputs because EMF has no observation type/token for
+      migration; quoted_attributed for rows attributed to Sugawara et al. [27]
+    row_count: 5
+    numeric_activity_cells: 8
+    blank_activity_cells: 2
+    rows_as_printed:
+    - row_as_printed: This study
+      draft_row: 3
+      sample_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '80'
+        Na2O:
+          state: value
+          value_as_printed: '20'
+      reference_melt_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+        Na2O:
+          state: value
+          value_as_printed: '30'
+        Al2O3:
+          state: value
+          value_as_printed: '5'
+      log10_activity_at_1473_K:
+        state: value
+        value_as_printed: −9.01
+      log10_activity_at_1573_K:
+        state: value
+        value_as_printed: −8.46
+      uncertainties_as_printed:
+        '1473':
+          state: absent
+          reason: no uncertainty printed
+        '1573':
+          state: absent
+          reason: no uncertainty printed
+      locator:
+        page: 4
+        table: '3'
+        row: This study
+    - row_as_printed: This study
+      draft_row: 4
+      sample_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '80'
+        Na2O:
+          state: value
+          value_as_printed: '20'
+      reference_melt_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+        Na2O:
+          state: value
+          value_as_printed: '30'
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+      log10_activity_at_1473_K:
+        state: value
+        value_as_printed: −8.94
+      log10_activity_at_1573_K:
+        state: value
+        value_as_printed: −8.39
+      uncertainties_as_printed:
+        '1473':
+          state: absent
+          reason: no uncertainty printed
+        '1573':
+          state: absent
+          reason: no uncertainty printed
+      locator:
+        page: 4
+        table: '3'
+        row: This study
+    - row_as_printed: Sugawara et al. [27]
+      draft_row: 5
+      sample_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '80'
+        Na2O:
+          state: value
+          value_as_printed: '20'
+      reference_melt_composition_mol_percent:
+        SiO2:
+          state: absent
+          reason: blank cell in the printed table
+        Na2O:
+          state: absent
+          reason: blank cell in the printed table
+        Al2O3:
+          state: absent
+          reason: blank cell in the printed table
+      log10_activity_at_1473_K:
+        state: value
+        value_as_printed: −9.14
+      log10_activity_at_1573_K:
+        state: value
+        value_as_printed: −8.60
+      uncertainties_as_printed:
+        '1473': ± 0.22
+        '1573': ± 0.22
+      locator:
+        page: 4
+        table: '3'
+        row: Sugawara et al. [27]
+    - row_as_printed: This study
+      draft_row: 6
+      sample_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '84'
+        Na2O:
+          state: value
+          value_as_printed: '16'
+      reference_melt_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '60'
+        Na2O:
+          state: value
+          value_as_printed: '30'
+        Al2O3:
+          state: value
+          value_as_printed: '10'
+      log10_activity_at_1473_K:
+        state: absent
+        reason: blank activity cell in Table 3
+      log10_activity_at_1573_K:
+        state: value
+        value_as_printed: −8.73
+      uncertainties_as_printed:
+        '1473':
+          state: absent
+          reason: no uncertainty printed
+        '1573':
+          state: absent
+          reason: no uncertainty printed
+      locator:
+        page: 4
+        table: '3'
+        row: This study
+    - row_as_printed: Sugawara et al. [27]
+      draft_row: 7
+      sample_composition_mol_percent:
+        SiO2:
+          state: value
+          value_as_printed: '84'
+        Na2O:
+          state: value
+          value_as_printed: '16'
+      reference_melt_composition_mol_percent:
+        SiO2:
+          state: absent
+          reason: blank cell in the printed table
+        Na2O:
+          state: absent
+          reason: blank cell in the printed table
+        Al2O3:
+          state: absent
+          reason: blank cell in the printed table
+      log10_activity_at_1473_K:
+        state: absent
+        reason: blank activity cell in Table 3
+      log10_activity_at_1573_K:
+        state: value
+        value_as_printed: −8.83
+      uncertainties_as_printed:
+        '1473':
+          state: absent
+          reason: no uncertainty printed
+        '1573': ± 0.22
+      locator:
+        page: 4
+        table: '3'
+        row: Sugawara et al. [27]
+    reference_values_as_printed: Table 3 references are the printed SiO2–Al2O3–Na2O melt compositions; the values are log
+      a(Na2O) of the sample melt.
+    activity_calibration_reference_as_printed: activity of 70SiO2–30Na2O melt from compilation [27] (Eq. 3)
+    activity_calibration_reference_locator:
+      page: 2
+      equation: '3'
+    standard_state_as_published:
+      state: absent
+      reason: No thermodynamic standard state is stated for log a(Na2O).
+    blank_cells_typed_absent: true
+  context_id: sugawara-2013-soda-lime-melt-na2o-activity::context::sugawara_2013_table3_activity_rows
+  work_id: 10.1016/j.jnoncrysol.2013.03.031
+  source_id: sugawara-2013-soda-lime-melt-na2o-activity
+  species: Na2O

@@ -1,0 +1,366 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  citation: Giovanni De Maria and Vincenzo Piacente, “Mass spectrometric study of rock like lunar surface material”, Atti
+    della Accademia Nazionale dei Lincei, Rendiconti, Serie 8, 47(6), 525–536 (1969).
+  source_ids:
+  - de-maria-1969-rend-lincei
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 9be13c6816d4d54f6819300d2ff8d273028bebc4
+    files:
+    - asset_id: pdf:de-maria-1969-rend-lincei
+      role: pdf
+      path: raw/de-maria-1969-rend-lincei/de-maria-1969-rend-lincei.pdf
+      sha256:
+        tag: value
+        value: 866c1fb512c7e856d4bf9fb392d126b8fc6f1e8960f3325930f1255966e675d7
+    - asset_id: pdftotext:de-maria-1969-rend-lincei
+      role: pdftotext
+      path: text/de-maria-1969-rend-lincei
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:de-maria-1969-rend-lincei
+      role: table_csv
+      path: tables/de-maria-1969-rend-lincei
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:de-maria-1969-rend-lincei
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032::experiment::de_maria_1969_andesinic_basalt_kems
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample:
+    form:
+      state:
+        tag: value
+        value: Crushed andesinic basalt of Nuraghe Silvanis.
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+    characterization:
+      state:
+        tag: value
+        value: Vesicular aspect and porphyritic structure of vitrophyric type.
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+  conditions:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+        note: The paper reports background pressure limits in the cell compartment and analyzer, not total sample-vapor pressure.
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 14
+        published_page: 536
+        pdf_page_index: 13
+        section: Conclusions
+        note: No experimental oxygen fugacity is stated. The molybdenum reaction and hypothetical neutral conditions are not
+          an fO2 value.
+    composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+        note: The paper points to reference 10, Table IV, sample 2, but does not print the basalt composition here.
+    apparatus:
+      state:
+        tag: unknown
+        reason: condition apparatus is not a scalar numeric value
+      locator:
+        page: 4
+        published_page: 526
+        pdf_page_index: 3
+        section: Experimental Procedure
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  locator:
+    page: 4
+    published_page: 526
+    pdf_page_index: 3
+    section: Experimental Procedure
+context:
+- observation_id: de_maria_1969_abstract_temperature_range_context
+  type: abstract_summary_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 3
+    published_page: 525
+    pdf_page_index: 2
+    section: Abstract
+  units: K as printed
+  values:
+    temperature_range_as_printed: 300°–2330° K.
+    study_summary_as_printed: Vaporization of the andesinic basalt sample was studied by coupling Knudsen effusion with mass
+      spectrometry.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_abstract_temperature_range_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_activity_estimates_context
+  type: author_calculation_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 13
+    published_page: 535
+    pdf_page_index: 12
+    section: Results
+  units: as printed
+  values:
+    printed_calculation_as_printed: From the partial-pressure estimates, the authors calculate an order of 10^-5, 10^-6, and
+      4·10^-2 for the activities of Na, K, and Fe, respectively, using vapor-pressure data revised by Nesmeyanov [17].
+    activity_values_as_printed:
+      Na: order 10^-5
+      K: order 10^-6
+      Fe: 4·10^-2
+    not_scored_reason: The external Nesmeyanov vapor-pressure inputs are not stored; the printed results are retained as context,
+      not an activity observation with incomplete lineage.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_activity_estimates_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_appearance_potential_method_context
+  type: appearance_potential_calibration_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 9
+    published_page: 531
+    pdf_page_index: 8
+    section: Results
+  units: as printed
+  values:
+    method_as_printed: The ionization potentials were determined by using the method of linear extrapolation and by assuming
+      Hg+ as a standard to calibrate the energy scale.
+    curve_scope_as_printed: Figures 2, 3, and 4 show ionization-efficiency curves for Na+, K+, SiO+, Fe+, m/e 25 and 26, and
+      m/e 50, 51, and 52. They are not digitized in this extract.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_appearance_potential_method_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_figure_only_inventory
+  type: figure_only_inventory
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 5
+    published_page: 527
+    pdf_page_index: 4
+    figure: '1'
+  units: not digitized
+  values:
+    figure_read_candidates:
+    - figure: '1'
+      subject: Comparison of atomic composition of the sample and Surveyor V lunar material.
+      locator:
+        page: 5
+        published_page: 527
+        pdf_page_index: 4
+        figure: '1'
+    - figure: '2'
+      subject: Ionization-efficiency curves for Na+, K+, and SiO+ over the basalt sample.
+      locator:
+        page: 9
+        published_page: 531
+        pdf_page_index: 8
+        figure: '2'
+    - figure: '3'
+      subject: Ionization-efficiency curves for Fe+, m/e 25, and m/e 26 over the basalt sample.
+      locator:
+        page: 10
+        published_page: 532
+        pdf_page_index: 9
+        figure: '3'
+    - figure: '4'
+      subject: Ionization-efficiency curves for m/e 50, 51, and 52 over the basalt sample.
+      locator:
+        page: 11
+        published_page: 533
+        pdf_page_index: 10
+        figure: '4'
+    admission_status: figure_only
+    note: No figure-only data were digitized.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_figure_only_inventory
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_mass40_and_species_interpretation_context
+  type: ion_assignment_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 12
+    published_page: 534
+    pdf_page_index: 11
+    section: Results
+  units: as printed
+  values:
+    mass40_as_printed: Between 1400° and 1800° K, the m/e 40 peak was attributed to re-evaporation of calcium from the shields.
+    sio_isotopic_peaks_as_printed: The m/e 44, 45, and 46 currents agree reasonably with SiO isotopic distribution; SiO appearance
+      was noticed at about 1800° K.
+    surface_ionization_mass50_52_as_printed: The surface-ionization contribution for m/e 50, 51, and 52 was of the order of
+      5–10% of the whole peak.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_mass40_and_species_interpretation_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_method_apparatus_and_calibration
+  type: method_and_calibration_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 4
+    published_page: 526
+    pdf_page_index: 3
+    section: Experimental Procedure
+  units: as printed
+  values:
+    instrument_and_temperature_as_printed: High-temperature Bendix Co. time-of-flight mass spectrometer, model 3015; resolving
+      power 750; ion flight path 200 cm. Radiation heating and electron bombardment were used; temperatures as high as 2400°
+      K were reached with electron-bombardment heating.
+    temperature_measurement_and_calibration_as_printed: Temperature was measured with a Leeds and Northrup optical pyrometer
+      and a W, W—Re thermocouple. The discrepancies never exceeded 12°C. The optical pyrometer was calibrated at the melting
+      point of gold [8]; bottom-window transmission correction was based on Benford [9].
+    background_pressure_as_printed: Below 10^-6 Torr in the Knudsen-cell region and 10^-7 Torr in the analyzer.
+    beam_and_readout_as_printed: A molecular beam shutter distinguished ions formed from neutral particles in the beam from
+      ions created by surface ionization or background gases. Two standard readout channels were used for ion-intensity ratios
+      and isotopic distributions.
+    container_as_printed: Molybdenum effusion cell, 1.2 cm high, 1 cm external diameter, with a 1 mm knife-edge orifice; previously
+      outgassed at 1800° K.
+    sample_as_printed: Crushed andesinic basalt of Nuraghe Silvanis; its composition corresponds to Table IV, sample no. 2,
+      of reference 10. The rock is described as vesicular and porphyritic of vitrophyric type.
+    silver_and_pressure_calibration_as_printed: “Two silver calibrations were made, before and after the vaporization of the
+      sample. The reproducibility of the instrument sensitivity factor was within 15%. On the basis of an extensive observation
+      made during several years in this laboratory, we are led to believe that this procedure would affect the pressure calibration
+      within an uncertainty of 10–15% at the most.”
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_method_apparatus_and_calibration
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_neutral_conditions_statements
+  type: oxygen_potential_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 14
+    published_page: 536
+    pdf_page_index: 13
+    section: Conclusions
+  units: as printed
+  values:
+    neutral_condition_hypothesis_quote: Nevertheless it is legitimate to argue that a respectable amount of the oxygen in
+      the sample could, in neutral conditions, vaporize in free form at a temperature as low as 1700° K.
+    container_conclusion_quote: The present study illustrates the necessity of finding a suitable container to study the material
+      in the most perfect neutral conditions possible.
+    fO2_assignment: No experimental fO2 value is printed or assigned.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_neutral_conditions_statements
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_oxygen_reaction_statement
+  type: oxygen_potential_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 13
+    published_page: 535
+    pdf_page_index: 12
+    section: Conclusions
+  units: as printed
+  values:
+    observed_oxygen_reaction_quote: The failure to detect oxygen—made more difficult because of the relatively high background
+      peak at mass 16—shows that most of the oxygen in the sample reacted with the molybdenum to form non-stoichiometric oxides
+      that began to volatilize at approximately 2000° K.
+    fO2_assignment: No experimental fO2 value is printed or assigned.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_oxygen_reaction_statement
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_sample_vaporization_temperature_context
+  type: experiment_temperature_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 6
+    published_page: 528
+    pdf_page_index: 5
+    section: Results
+  units: as printed
+  values:
+    quantitative_evaporation_as_printed: 178 mgr of sample; starting from room temperature; stages at intervals of about 100°C;
+      about four hours at each stage; the series lasted five days.
+    initial_stage_as_printed: Temperature interval 300°–500° K; weight loss 7.3 mgr (4.1% of sample), compared with 4.71%
+      calculated water in the original sample.
+    intermediate_stage_as_printed: In the temperature range 500°–1800° K the weight loss was negligible while the alkaline
+      metals and presumably part of the alkaline-earth elements volatilized.
+    container_reaction_as_printed: At 1200° K the crucible inner free surfaces began to be covered by brown granules, later
+      identified by X-ray as nonstoichiometric molybdenum oxides.
+    melting_as_printed: Melting of the sample occurred between 1200° and 1300° K.
+    table_conditions_as_printed: Table I intensities were measured at 70 eV electron energy and corrected for surface ionization
+      and photo-effect following the usual procedure [5].
+    surface_ionization_as_printed: At 1600° K and 70 eV, the surface-ionization contribution to Na+ intensity was about 15%
+      of the total peak.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_sample_vaporization_temperature_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na
+- observation_id: de_maria_1969_vaporization_stage_context
+  type: vaporization_interpretation_context
+  experiment: de_maria_1969_andesinic_basalt_kems
+  locator:
+    page: 10
+    published_page: 532
+    pdf_page_index: 9
+    section: Results
+  units: as printed
+  values:
+    first_stage_as_printed: Between 1300° and 1900° K, alkaline and alkaline-earth metals vaporized largely as atomic or oxygen-containing
+      heteronuclear polyatomic species, and to a lesser degree species containing Al and presumably Si.
+    second_stage_as_printed: Approximately 2000°–2300° K; Si and Fe and part of Al volatilized. Si volatilized mainly as SiO;
+      iron and aluminum as monatomic species.
+    third_stage_as_printed: Above 2300° K; residue largely composed of Al2O3 and molybdenum oxide volatilized. Evaporation
+      was not completed because the residue appeared to have reacted strongly with the container and weight loss exceeded
+      initial sample weight.
+    molybdenum_oxide_ions_as_printed: At 70 eV, volatilized molybdenum oxide produced MoO3+, MoO2+, and MoO+ ion peaks, mainly
+      from the outer crucible surfaces.
+  context_id: de-maria-1969-rend-lincei::context::de_maria_1969_vaporization_stage_context
+  work_id: c690c12b3396866fe7834e1fa4cd542f370dfb510e0f9f7767135243662c5032
+  source_id: de-maria-1969-rend-lincei
+  species: Na

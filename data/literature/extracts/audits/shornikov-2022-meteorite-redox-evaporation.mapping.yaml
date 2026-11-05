@@ -1,0 +1,133 @@
+source_id: shornikov-2022-meteorite-redox-evaporation
+source:
+  citation: Shornikov (2022), “Thermodynamic Study of Fractional Evaporation of Refractory Meteorite Matter Melts Under Various Redox Conditions”
+  doi: 10.1007/978-3-031-09883-3_19
+scope: full extraction of printed vapor, activity, composition, condition, reaction-constant, and equation statements
+machine_table_audit:
+  tools:
+    convert: tools/mineru_table_draft.py convert
+    qa: tools/mineru_table_qa.py
+    compare: tools/mineru_table_draft.py compare
+  mineru_inventory:
+    content_lists: 2
+    table_blocks: 0
+    flagged_tables: 0
+    scan_tables: 0
+  convert_result:
+    draft_index: tables/shornikov-2022-meteorite-redox-evaporation/index.yaml
+    tables: 0
+  compare_result:
+    matched: 0
+    no_match: 2
+    mismatch: 0
+    presence_only: 0
+    needs_mapping: 0
+    locator_error: 0
+    unverifiable: 18
+    total: 20
+    disposition: >-
+      Expected because MinerU supplied no table blocks. The two no-match records are prose transition points; the 18
+      unverifiable records are the printed Table 1 and Table 2 locators without MinerU caption evidence. Render review
+      resolved all table content and locators.
+  cell_audit:
+    read_order: MinerU content lists and markdown; exact born-digital pdftotext-layout; rendered PDF pages for cell assignment and locators
+    method: >-
+      Method (b): the source is born-digital and pdftotext preserves its characters, while MinerU supplied no tables.
+      The renders verify each table's row/column assignment and all distinct extract locator pages.
+    page_4_table_1:
+      pdf_page: 4
+      published_page: 353
+      printed_table: '1'
+      printed_rows: 19
+      numeric_cells: 98
+      numeric_endpoints: 115
+      composition_numeric_cells: 79
+      composition_numeric_endpoints: 85
+      temperature_cells: 19
+      temperature_endpoints: 30
+      printed_composition_dashes: 35
+      interval_cells: 17
+      render_check: >-
+        Render verified every row and the CaO, MgO, FeO, Al2O3, TiO2, SiO2, T, approach, cell/heater, results, and
+        reference column assignments. Superscript suffixes Iᵃ and IIᵇ and all interval endpoints were checked.
+    page_6_table_2:
+      pdf_page: 6
+      published_page: 355
+      printed_table: '2'
+      printed_reaction_rows: 16
+      numeric_K_cells: 21
+      printed_absence_marks: 11
+      temperature_columns: ['2173', '2278']
+      render_check: >-
+        Render verified all reaction numbers 10–25, the reaction/species assignments, both temperature columns, all
+        21 numeric constants, and all 11 dash cells.
+    flagged_prose_cells:
+      - {pdf_page: 5, section: Fractional Evaporation of Perovskite, check: 'rendered 2241 ± 10 K; ± width retained separately'}
+      - {pdf_page: 6, section: Fractional Evaporation of Forsterite, check: 'rendered 2171 ± 11 K; ± width retained separately'}
+      - {pdf_page: 4, equation: '5', check: 'rendered Greek φ and p°'}
+      - {pdf_page: 5, equation: '8', check: 'rendered x_d° symbol'}
+  locator_pages_render_verified:
+    - {pdf_page: 3, published_page: 352}
+    - {pdf_page: 4, published_page: 353}
+    - {pdf_page: 5, published_page: 354}
+    - {pdf_page: 6, published_page: 355}
+    - {pdf_page: 7, published_page: 356}
+    - {pdf_page: 8, published_page: 357}
+    - {pdf_page: 9, published_page: 358}
+    - {pdf_page: 10, published_page: 359}
+    - {pdf_page: 11, published_page: 360}
+  invented_chart_tables:
+    disposition: ignored
+    reason: No MinerU details chart blocks occurred; figure curves remain undigitized.
+table_mappings:
+  - printed_table: '1'
+    pdf_page: 4
+    row_count: 19
+    columns:
+      - CaO composition in mol. %
+      - MgO composition in mol. %
+      - FeO composition in mol. %
+      - Al2O3 composition in mol. %
+      - TiO2 composition in mol. %
+      - SiO2 composition in mol. %
+      - T in K
+      - Experimental approach
+      - Material of cell or heater
+      - Research results
+      - References
+    destination: existing context record shornikov_2022_table1_conditions
+    value_change: none
+    dashes: typed absence markers; never treated as zero
+    footnotes:
+      Iᵃ: vacuum furnaces according to Langmuir
+      IIᵇ: effusion mass spectrometric method according to Knudsen
+  - printed_table: '2'
+    pdf_page: 6
+    row_count: 16
+    destination: typed refusal context shornikov_2022_table2_linear_reaction_constants_refusal
+    value_change: none; printed linear K values are not converted to log10 K
+table_tool_emit:
+  disposition: not_run
+  reason: The seat tool has convert and compare modes but no emit mode; rows were transcribed from pdftotext and checked against renders.
+schema_gap:
+  quantity: linear reaction equilibrium constant
+  exact_candidate_checked: simulator/battery/enums.py::Quantity.LOG10_K_REACTION
+  related_alias_checked: simulator/battery/migrate.py::QUANTITY_ALIASES
+  observation_types_checked: tools/validate_literature_extracts.py::OBSERVATION_TYPES
+  type_inference_checked: simulator/battery/migrate.py::TYPE_QUANTITY
+  phase_candidates_checked:
+    - simulator/battery/enums.py::PHASE_BASIS_TOKENS
+    - simulator/battery/enums.py::PhaseRole
+  reason: >-
+    The available reaction-equilibrium token stores log10 K, and its alias has the same log form. No exact type or
+    quantity stores the printed linear constants. All 21 values remain in typed refusal context without conversion.
+extraction_counts:
+  migrated_observations: 3
+  migrated_numeric_values: 3
+  migrated_unavailable_values: 0
+  table_1_numeric_cells: 98
+  table_1_numeric_endpoints: 115
+  table_2_numeric_constants: 21
+  table_2_absent_cells: 11
+  exact_oxide_component_vapor_pressures: 4
+  numeric_Na_or_K_vapor_values: 0

@@ -21,6 +21,7 @@ from simulator.condensation_routing import (
     accepted_species_for_stage_number,
     product_stage_number,
     stage_index_for_visit_identity,
+    stage_list_index_for_destination,
     target_species_for_stage_number,
 )
 from simulator.evaporation import EvaporationMixin
@@ -39,6 +40,16 @@ def test_default_train_targets_use_canonical_registry(stage_number):
     assert train.stages[stage_number].target_species == (
         target_species_for_stage_number(stage_number)
     )
+
+
+def test_stage_list_index_resolves_stage_keys_for_all_collector_bands():
+    train = CondensationTrain.create_default()
+
+    assert stage_list_index_for_destination(train, "stage_0_hot_duct") == 0
+    assert stage_list_index_for_destination(
+        train, "stage_5_vortex_dust_filter") == 5
+    assert stage_list_index_for_destination(
+        train, K_TRAP_STAGE_KEY) == 8
 
 
 @pytest.mark.parametrize(
@@ -227,8 +238,7 @@ def test_route_result_records_scaled_stage_impurity_without_changing_capture():
     condensed = route.condensed_for_species("K")
     impurity = sum(
         species_kg.get("K", 0.0)
-        for stage_number, species_kg in route.impurity_by_stage_species.items()
-        if stage_number != 4
+        for species_kg in route.impurity_by_stage_species.values()
     )
 
     assert condensed > 0.0
@@ -243,7 +253,7 @@ def test_default_k_route_allocation_numeric_pin():
     K at 1 mbar is supersaturated on the 250 C Na collector. That surface
     uses the same capture law as the 40 C trap, so most of the kilogram
     condenses there and is impurity of the Na/Mg stage. The trap keeps
-    the remainder. Stage number 4 is the sum of those two identities.
+    the remainder. The public map splits those two surfaces by stage key.
     The previous pin (stage 4 = 0.9999661577804508, all of it the trap)
     was the designated-species skip: the collector refused K, so the
     trap was the first surface that could capture it and more of the
@@ -264,10 +274,12 @@ def test_default_k_route_allocation_numeric_pin():
         EvaporationFlux(species_kg_hr={'K': 1.0}, total_kg_hr=1.0),
         MeltState(temperature_C=1650.0),
     )
+    # constack merge: repin on gate box
     assert route.condensed_by_stage_species == {
-        4: {'K': 0.9999999705550642},
-        5: {'K': 2.9101495551411142e-08},
-        6: {'K': 3.434399382784235e-10},
+        NA_COLLECTOR_STAGE_KEY: {'K': 0.9169775631320057},
+        K_TRAP_STAGE_KEY: {'K': 0.0830224074230584},
+        'stage_5_vortex_dust_filter': {'K': 2.9101495551411142e-08},
+        'stage_6_turbine_compressor': {'K': 3.434399382784235e-10},
     }
     assert route.capture_kg_by_stage_identity[(4, 0)] == {
         'K': 0.9169775631320057,
@@ -278,9 +290,9 @@ def test_default_k_route_allocation_numeric_pin():
     assert route.remaining_by_species == {'K': 3.7485254416350975e-16}
     assert route.wall_deposit_by_species == {}
     assert route.impurity_by_stage_species == {
-        4: {'K': 0.9169775631320057},
-        5: {'K': 2.9101495551411142e-08},
-        6: {'K': 3.434399382784235e-10},
+        NA_COLLECTOR_STAGE_KEY: {'K': 0.9169775631320057},
+        'stage_5_vortex_dust_filter': {'K': 2.9101495551411142e-08},
+        'stage_6_turbine_compressor': {'K': 3.434399382784235e-10},
     }
 
 
@@ -355,17 +367,19 @@ def test_cold_alkali_walls_predict_and_flag_antoine_extrapolation():
         MeltState(temperature_C=1650.0),
     )
 
-    assert route.condensed_by_stage_species[4]['Na'] > 0.0
-    assert route.condensed_by_stage_species[4]['K'] > 0.0
-    # Stage number 4 is two surfaces. Impurity is the off-design surface
+    assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] > 0.0
+    assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['K'] > 0.0
+    # Stage 4 is two surfaces. Impurity is the off-design surface
     # only: Na on the K trap, K on the Na collector when that wall captures.
     na_trap = route.capture_kg_by_stage_identity[(4, 1)]['Na']
     assert na_trap > 0.0
-    assert route.impurity_by_stage_species[4]['Na'] == pytest.approx(na_trap)
-    k_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('K', 0.0)
-    assert route.impurity_by_stage_species.get(4, {}).get('K', 0.0) == pytest.approx(
-        k_collector
+    assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Na'] == pytest.approx(
+        na_trap
     )
+    k_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('K', 0.0)
+    assert route.impurity_by_stage_species.get(
+        NA_COLLECTOR_STAGE_KEY, {},
+    ).get('K', 0.0) == pytest.approx(k_collector)
     _, na_record = _extrapolated_record_at(route, 'Na', 523.15)
     _, k_record = _extrapolated_record_at(route, 'K', 313.15)
     assert 'Na#wall:523.15' not in route.antoine_extrapolations
@@ -429,15 +443,20 @@ def test_na_at_the_k_trap_is_a_contaminant_and_mass_closes():
     na_trap = route.capture_kg_by_stage_identity[(4, 1)]['Na']
     na_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('Na', 0.0)
     assert na_trap > 0.0
-    assert route.condensed_by_stage_species[4]['Na'] == pytest.approx(
-        na_collector + na_trap
+    assert route.condensed_by_stage_species[NA_COLLECTOR_STAGE_KEY]['Na'] == pytest.approx(
+        na_collector
     )
-    assert route.impurity_by_stage_species[4]['Na'] == pytest.approx(na_trap)
+    assert route.condensed_by_stage_species[K_TRAP_STAGE_KEY]['Na'] == pytest.approx(
+        na_trap
+    )
+    assert route.impurity_by_stage_species[K_TRAP_STAGE_KEY]['Na'] == pytest.approx(
+        na_trap
+    )
     k_trap = route.capture_kg_by_stage_identity.get((4, 1), {}).get('K', 0.0)
     k_collector = route.capture_kg_by_stage_identity.get((4, 0), {}).get('K', 0.0)
-    assert route.impurity_by_stage_species.get(4, {}).get('K', 0.0) == pytest.approx(
-        k_collector
-    )
+    assert route.impurity_by_stage_species.get(
+        NA_COLLECTOR_STAGE_KEY, {},
+    ).get('K', 0.0) == pytest.approx(k_collector)
 
     for species, mass in inlet.items():
         closed = (

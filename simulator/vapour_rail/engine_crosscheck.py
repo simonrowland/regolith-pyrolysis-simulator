@@ -21,6 +21,7 @@ from pathlib import Path
 from statistics import median
 from typing import Any, Final
 
+from engines.engine_commissioning import vaporock_temperature_in_domain
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.feedstock_composition import (
     iron_oxide_values,
@@ -187,7 +188,7 @@ def validate_temperature_grid(temperatures_K: Sequence[float]) -> tuple[float, .
         raise EngineCrosscheckError("temperature grid must not be empty")
     if any(not math.isfinite(value) for value in values):
         raise EngineCrosscheckError("temperature grid values must be finite")
-    if any(value < VAPOROCK_T_MIN_K or value > VAPOROCK_T_MAX_K for value in values):
+    if any(not vaporock_temperature_in_domain(value) for value in values):
         raise EngineCrosscheckError(
             "VapoRock cross-check temperatures must remain inside the validated "
             f"[{VAPOROCK_T_MIN_K:g}, {VAPOROCK_T_MAX_K:g}] K envelope"
@@ -334,7 +335,7 @@ def _run_vaporock_cell(
     pressure_bar: float,
 ) -> dict[str, Any]:
     require_warm_pool_backend(backend)
-    if temperature_K < VAPOROCK_T_MIN_K or temperature_K > VAPOROCK_T_MAX_K:
+    if not vaporock_temperature_in_domain(temperature_K):
         raise EngineCrosscheckError(
             f"refusing out-of-domain VapoRock call at {temperature_K:g} K"
         )

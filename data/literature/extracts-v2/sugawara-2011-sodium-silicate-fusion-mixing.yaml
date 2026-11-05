@@ -1,0 +1,3506 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sugawara-2011-sodium-silicate-fusion-mixing.yaml
+observations:
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '29'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.4'
+      verbatim: ± 1.4
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_dsc_fusion_enthalpy
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for this full-formula fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this prose fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_calculated_fusion_enthalpy_44
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '37.8'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '4.4'
+      verbatim: ± 4.4
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: P. Richet and Y. Bottinga [44].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_calculated_fusion_enthalpy_44
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for the cited calculated fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_dsc_fusion_enthalpy_43
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '34'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '4.0'
+      verbatim: ± 4.0
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: P. Boivin, J.C. Berthelay, Y. Blanc, A. Coulet, and R. Castanet [43].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2si2o5_prior_dsc_fusion_enthalpy_43
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for the cited fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2Si2O5 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2SiO3 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '52.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.6'
+      verbatim: ± 0.6
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: B.F. Naylor [37].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_37
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for the cited fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2SiO3 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_38
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2SiO3 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '52'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.0'
+      verbatim: ± 1.0
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: P. Richet, Y. Bottinga, and C. Tequi [38].
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_drop_calorimetry_fusion_enthalpy_38
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for the cited fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2SiO3 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this cited fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: unknown
+      reason: The prose names Na2SiO3 but gives no molar composition for this value.
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '53.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '2.0'
+      verbatim: ± 2.0
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p2_na2sio3_dsc_fusion_enthalpy
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    paragraph: Results of DSC measurements
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The results prose gives no temperature for this full-formula fusion enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    composition:
+      state:
+        tag: unknown
+        reason: The prose names Na2SiO3 but gives no molar composition for this value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this prose fusion value.
+      locator:
+        page: 2
+        published_page: 1391
+        paragraph: Results of DSC measurements
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_p4_ns_weighted_mean_enthalpy_of_mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'integral_enthalpy_of_mixing_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'integral_enthalpy_of_mixing_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.3'
+      verbatim: ± 0.3
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 4
+        published_page: 1393
+        paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 4
+    published_page: 1393
+    paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: No single temperature is assigned; the paper states that H_Mix^L is temperature-independent under its no-heat-capacity-of-mixing
+          assumption.
+      locator:
+        page: 4
+        published_page: 1393
+        paragraph: Weighted average of liquid mixing enthalpy at NS composition
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 4
+        published_page: 1393
+        paragraph: Weighted average of liquid mixing enthalpy at NS composition
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for this weighted mean.
+      locator:
+        page: 4
+        published_page: 1393
+        paragraph: Weighted average of liquid mixing enthalpy at NS composition
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+  derivation:
+    relation: Authors report the weighted average from the present-study NS row and the Fan [10], Naylor [37], and Richet
+      et al. [38] references; Table 2 data are also cited in the text.
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_fan_reference
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_naylor_reference
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_p4_weighted_mean_richet_reference
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2si2o5_enthalpy_of_mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'integral_enthalpy_of_mixing_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.664'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'integral_enthalpy_of_mixing_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.2'
+      verbatim: ± 1.2
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/3 Na2Si2O5 (N2S); column=H_Mix^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=1/3 Na2Si2O5 (N2S); column=H_Mix^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent
+          under its no-heat-capacity-of-mixing assumption.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.664'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2si2o5_heat_of_fusion
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2si2o5_heat_of_fusion
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2si2o5_heat_of_fusion
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1142'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.664'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.7'
+      verbatim: ± 0.7
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/3 Na2Si2O5 (N2S); column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=1/3 Na2Si2O5 (N2S); column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1142'
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/3 Na2Si2O5 (N2S); column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.664'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_enthalpy_of_mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'integral_enthalpy_of_mixing_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'integral_enthalpy_of_mixing_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.5'
+      verbatim: ± 1.5
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/2 Na2SiO3 (NS); column=H_Mix^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=1/2 Na2SiO3 (NS); column=H_Mix^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent
+          under its no-heat-capacity-of-mixing assumption.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_heat_of_fusion
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_heat_of_fusion
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na2sio3_heat_of_fusion
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1360'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.0'
+      verbatim: ± 1.0
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/2 Na2SiO3 (NS); column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=1/2 Na2SiO3 (NS); column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1360'
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=1/2 Na2SiO3 (NS); column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na6si8o19_eutectic_enthalpy_of_mixing
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'integral_enthalpy_of_mixing_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'integral_enthalpy_of_mixing_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '1.3'
+      verbatim: ± 1.3
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=H_Mix^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=H_Mix^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 1 gives no single temperature for H_Mix^L; the article states that mixing enthalpy is temperature-independent
+          under its no-heat-capacity-of-mixing assumption.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the mixing enthalpy.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: H_Mix^L calculated from the DSC fusion enthalpy and Table 2 thermodynamic data using equations (2) and (16).
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t1_na6si8o19_eutectic_heat_of_fusion
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_present_study_dsc
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1064'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      kind: printed
+      value: '0.9'
+      verbatim: ± 0.9
+      confidence_level: not_stated
+      basis: Printed uncertainty width; confidence level not stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_tabulated
+    original_method_class: measured_tabulated
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 2
+    published_page: 1391
+    table: '1'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1064'
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: The source does not report oxygen fugacity or oxygen partial pressure for the DSC fusion measurement.
+      locator:
+        page: 2
+        published_page: 1391
+        table: '1'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1678'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '47.7'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[47]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_fusion_enthalpy
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na2O; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1678'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na2O; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0'
+          - - Na2O
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '104.6'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[47]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_liquid_heat_capacity
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na2O; column=Cp^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 2 gives no single temperature for Cp^L.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0'
+          - - Na2O
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_enthalpy_at_Tm_as_printed'
+    species:
+      formula: Na2O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1678'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0'
+        - - Na2O
+          - '1'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_enthalpy_at_Tm_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[47]'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na2O; column=H^S_Tm
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na2O; column=H^S_Tm
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1678'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na2O; column=H^S_Tm
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0'
+          - - Na2O
+            - '1'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1142'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.666'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/3 Na2Si2O5; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1142'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.666'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy
+      and endmember data.
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_liquid_heat_capacity
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_per_gram_formula_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.666'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=Cp^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/3 Na2Si2O5; column=Cp^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values
+          are independent of temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.666'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_enthalpy_at_tm
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_enthalpy_at_Tm_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1142'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.666'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_enthalpy_at_Tm_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=H^S_Tm
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/3 Na2Si2O5; column=H^S_Tm
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1142'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=H^S_Tm
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.666'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2si2o5_solid_heat_capacity_equation
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed'
+    species:
+      formula: Na2Si2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.666'
+        - - Na2O
+          - '0.333'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[49]'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/3 Na2Si2O5; column=Cp^G
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/3 Na2Si2O5; column=Cp^G
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.666'
+          - - Na2O
+            - '0.333'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1360'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/2 Na2SiO3; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1360'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy
+      and endmember data.
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_liquid_heat_capacity
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_per_gram_formula_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=Cp^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/2 Na2SiO3; column=Cp^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values
+          are independent of temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_enthalpy_at_tm
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_enthalpy_at_Tm_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1360'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_enthalpy_at_Tm_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=H^S_Tm
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/2 Na2SiO3; column=H^S_Tm
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1360'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=H^S_Tm
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2sio3_solid_heat_capacity_equation
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed'
+    species:
+      formula: Na2SiO3
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.5'
+        - - Na2O
+          - '0.5'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[49]'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=1/2 Na2SiO3; column=Cp^G
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=1/2 Na2SiO3; column=Cp^G
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.5'
+          - - Na2O
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1164'
+    reference_state:
+      tag: unknown
+      reason: qualifier per_gram_formula_as_printed does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1164'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+  derivation:
+    relation: Table 2 footnote f and equations (8) and (16) calculate the fusion enthalpy using the fitted liquid mixing enthalpy
+      and endmember data.
+    inputs:
+    - sugawara-2011-sodium-silicate-fusion-mixing::context::sugawara_2011_t3_gibbs_mixing_coefficients
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+    - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+    parameters: []
+    output_unit: as_published
+    references: []
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_liquid_heat_capacity
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_per_gram_formula_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_per_gram_formula_as_printed'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=Cp^L
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=Cp^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values
+          are independent of temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_enthalpy_at_tm
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_enthalpy_at_Tm_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1164'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_enthalpy_at_Tm_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: author reduction requires an author derivation and admitted measured lineage
+    original_method_class: author_derived
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=H^S_Tm
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=H^S_Tm
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1164'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=H^S_Tm
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+  derived_from:
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  - sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na2o_solid_enthalpy_at_tm
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_na6si8o19_solid_heat_capacity_equation
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed'
+    species:
+      formula: Na6Si8O19
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '0.744'
+        - - Na2O
+          - '0.256'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_capacity_equation_per_gram_formula_as_printed';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[49]'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=Na6Si8O19–SiO2 eutectic composition; column=Cp^G
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=Na6Si8O19–SiO2 eutectic composition; column=Cp^G
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '0.744'
+          - - Na2O
+            - '0.256'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: heat_of_fusion
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: solid_to_liquid
+    per:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use per
+    temperature_K:
+      tag: value
+      value: '1996'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile heat_of_fusion does not use wall
+  value:
+    kind: point
+    point: '8.92'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[50]'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_fusion_enthalpy
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=SiO2; column=ΔH_Tm^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1996'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=SiO2; column=ΔH_Tm^L
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '1'
+          - - Na2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this thermodynamic datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: point
+    point: '81.37'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[38]; Fig. 1 identifies Richet et al. [38] as drop calorimetry and describes these values as temperature-independent.'
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - cp
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_liquid_heat_capacity
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=SiO2; column=Cp^L
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: Table 2 gives no single temperature for Cp^L; the text says the cited Richet et al. [38] heat-capacity values
+          are independent of temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '1'
+          - - Na2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this heat-capacity datum.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_enthalpy_at_tm
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'solid_enthalpy_at_Tm_as_printed'
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1996'
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_percent_as_mole_fraction
+        components:
+        - - SiO2
+          - '1'
+        - - Na2O
+          - '0'
+        amount_basis: mole_fraction
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'solid_enthalpy_at_Tm_as_printed'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[47]'
+  admission:
+    status: rejected
+    reason: source status=typed_refusal
+    decided_by:
+      worker: w1103su11-su11
+      date: '2026-11-02'
+      evidence:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=SiO2; column=H^S_Tm
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=SiO2; column=H^S_Tm
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1996'
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+        note: row=SiO2; column=H^S_Tm
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '1'
+          - - Na2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid enthalpy.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+- observation_id: sugawara-2011-sodium-silicate-fusion-mixing::sugawara_2011_t2_sio2_solid_heat_capacity_equation
+  experiment_id: 10.1016/j.jnoncrysol.2010.09.064::sugawara-2011-sodium-silicate-fusion-mixing
+  identity:
+    quantity:
+      tag: value
+      value: cp
+    species:
+      formula: SiO2
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile cp does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: no single temperature_K mapped from source
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: not_applicable
+      reason: profile cp does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile cp does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile cp does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile cp does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile cp does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile cp does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile cp does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile cp does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile cp does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile cp does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile cp does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped cp field selected; source fields: quantity, method_class, equation_as_printed, formula_variable_as_printed,
+      attribution, method_as_printed, temperature_as_printed'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: '[49]'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: sugawara-2011-sodium-silicate-fusion-mixing
+  locator:
+    page: 3
+    published_page: 1392
+    table: '2'
+    note: row=SiO2; column=Cp^G
+  read_from: pdf:sugawara-2011-sodium-silicate-fusion-mixing
+  point_conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: The equation is a function of T and Table 2 gives no validity interval or single temperature.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_percent_as_mole_fraction
+          components:
+          - - SiO2
+            - '1'
+          - - Na2O
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'
+    fO2_Pa:
+      state:
+        tag: unknown
+        reason: Table 2 does not report oxygen fugacity or oxygen partial pressure for this solid heat capacity equation.
+      locator:
+        page: 3
+        published_page: 1392
+        table: '2'

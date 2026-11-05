@@ -474,7 +474,21 @@ def test_advisory_product_story_renders_available_estimated_transport() -> None:
 # Report: docs-private/research/2026-07-19-webqa/report.md
 # Nightly campaign-length path: car 1 used 352 s CPU vs green at about 298 s;
 # C2A rose from 103 to 158 s after c3's Stage-3 admission and rerouting.
+# Web-phase CPU budget, raised under owner d-319 (budget may rise as the battery
+# store grows; a raise records the measured cost and margin). Studio-3, process
+# CPU (user + sys), -n 0, alternating with green, 2026-11-04:
+#   this test at f6ebcbfb4: 241.8, 250.4, 260.9 s (median 250.4 s, load 45-65);
+#   green's combined headless test at ca283efba: 283.5, 289.3, 301.1 s;
+#   the full-tier gate (xdist 6, load ~55): 300.3 s, the contended maximum seen.
+# 400 s is 1.33x that contended maximum and 1.6x the serial median. It is a perf
+# bar, not a hang backstop: it fails a regression of about 60 % over the serial
+# median, or about 33 % over the contended gate figure.
+HEADLESS_WEB_CPU_BUDGET_SECONDS = 400.0
+
+
+# Nightly (2026-08-02 CI tiering): serial web full path (~187 s junit).
 @pytest.mark.nightly
+@pytest.mark.cpu_budget(HEADLESS_WEB_CPU_BUDGET_SECONDS)
 def test_headless_full_run_ledgers_and_product_story_web(
     headless_full_run_product_story,
 ):
@@ -871,7 +885,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     web_wall = headless_full_run_product_story["web_phase_wall_seconds"]
     test_cpu = time.process_time() - test_started_cpu
     test_wall = time.monotonic() - test_started_wall
-    assert web_cpu + test_cpu <= DEFAULT_CPU_BUDGET_SECONDS
+    assert web_cpu + test_cpu <= HEADLESS_WEB_CPU_BUDGET_SECONDS
     print(
         "HEADLESS_WEB_PHASE "
         f"cpu={web_cpu:.3f}s wall={web_wall:.3f}s "

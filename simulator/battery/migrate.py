@@ -453,6 +453,52 @@ def phase_for_sample_form(form: str | None) -> Phase | None:
     return PHASE_MAP.get(token)
 
 
+_SAMPLE_DESCRIPTION_PHASE_MAP: dict[str, Phase] = {
+    # Reviewed KEMS sample descriptions and states. These are exact labels;
+    # words embedded in mixed or temperature-dependent descriptions stay unknown.
+    "solid": Phase.CR,
+    "crystalline": Phase.CR,
+    "solid stoichiometric mgal2o4 spinel": Phase.CR,
+    "solid lump": Phase.CR,
+    "solid ceramic sample": Phase.CR,
+    "liquid": Phase.L,
+    "liquid_melt": Phase.L,
+    "melt": Phase.L,
+    "solution": Phase.L,
+    "liquid solution": Phase.L,
+    "liquid_solution": Phase.L,
+}
+
+
+def _phase_for_sample_description(description: str | None) -> Phase | None:
+    """Classify a reviewed sample description without loosening PHASE_MAP."""
+
+    phase = phase_for_sample_form(description)
+    if phase is not None or description is None:
+        return phase
+    return _SAMPLE_DESCRIPTION_PHASE_MAP.get(description.strip().casefold())
+
+
+def _phase_for_recorded_vapour_sample(
+    condensed_form: object,
+    sample_phase: object,
+) -> tuple[bool, Phase | None]:
+    """Read a row's explicit condensed state before its experiment's sample."""
+
+    state = (
+        condensed_form.get("state")
+        if isinstance(condensed_form, Mapping)
+        else condensed_form
+    )
+    if isinstance(state, str) and state.strip():
+        phase = _phase_for_sample_description(state)
+        return True, phase
+    if _printed_phase_names_sample_source(sample_phase):
+        phase = _phase_for_sample_description(sample_phase)
+        return True, phase
+    return False, None
+
+
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
     "fugacity_series": Quantity.FUGACITY,
@@ -798,6 +844,15 @@ def _provenance_from_extract(
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
+    if quantity in {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}:
+        condensed_form = obs.get("condensed_form", values.get("condensed_form"))
+        if condensed_form is not None:
+            selected = dict(selected or {})
+            selected["measured_condensed_form"] = condensed_form
+        sample_phase = obs.get("phase", values.get("phase"))
+        if _printed_phase_names_sample_source(sample_phase):
+            selected = dict(selected or {})
+            selected["measured_sample_phase"] = sample_phase
     if quantity is Quantity.LOG10_K_REACTION:
         for name in (
             "reaction_as_printed",
@@ -3856,7 +3911,12 @@ _FEOT_COMPOSITION_DERIVATION_NOTE = (
 
 
 def oxide_molar_mass(oxide: str) -> Decimal:
-    """Composition-component molar mass (g/mol) from CIAAW/NIST weights."""
+    """Composition-component molar mass (g/mol) from CIAAW/NIST weights.
+
+    The alias table still chooses the mass formula (CrO1.5 uses M(Cr2O3)).
+    A tabulated MOLAR_MASS entry wins. Otherwise the mass is
+    oxide_molar_mass_g_mol of that formula.
+    """
 
     mass_formula = _COMPOSITION_COMPONENTS.get(oxide, (oxide, oxide, False))[0]
 
@@ -3864,11 +3924,9 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 
     if mass_formula in MOLAR_MASS:
         return as_decimal(str(MOLAR_MASS[mass_formula]))
-    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
-    return as_decimal(
-        str(parse_formula(mass_formula, species=mass_formula).molar_mass_g_mol)
-    )
+    return as_decimal(str(oxide_molar_mass_g_mol(mass_formula)))
 
 
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
@@ -6788,33 +6846,21 @@ def _named_fraction_bound_selection(
     raw = payload.get(key)
     field_units = _printed_unit_for_field(payload, key) or units
     if isinstance(raw, Mapping) and raw.get("kind") == ValueKind.BOUND.value:
-        try:
-            value = _value_from_plain(raw)
-        except (AssertionError, KeyError, TypeError, ValueError, ArithmeticError):
-            value = None
-        if (
-            value is None
-            or value.kind is not ValueKind.BOUND
-            or value.bound_operator not in {"<", "<=", ">", ">="}
-            or value.bound_value is None
-        ):
-            return _unavailable_selection(
-                f"{key} is not a clean structured one-sided bound: {raw!r}",
-                condition_ranges=condition_ranges,
-                unused_ancillary=_unused_ancillary(payload, key),
-                field_name=key,
-            )
+        selection = _structured_bound_selection(payload, key, condition_ranges)
+        assert selection is not None
+        if not selection.available:
+            return selection
+        value = selection.value
+        assert value.bound_value is not None
         bound = value.bound_value
         trail = "identity"
         if _percent_named_fraction_field(key, field_units):
             bound /= Decimal("100")
             trail = "percent_to_fraction"
-        return SourceSelection(
+        return replace(
+            selection,
             value=replace(value, bound_value=bound),
-            field_name=key,
             unit_trail=trail,
-            unused_ancillary=_unused_ancillary(payload, key),
-            condition_ranges=condition_ranges,
         )
     if isinstance(raw, Mapping):
         raw = raw.get("value")
@@ -6874,6 +6920,40 @@ def _named_fraction_bound_selection(
         ),
         field_name=key,
         unit_trail=trail,
+        unused_ancillary=_unused_ancillary(payload, key),
+        condition_ranges=condition_ranges,
+    )
+
+
+def _structured_bound_selection(
+    payload: Mapping[str, Any],
+    key: str,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    """Read a structured one-sided bound without converting it to a point."""
+
+    raw = payload.get(key)
+    if not isinstance(raw, Mapping) or raw.get("kind") != ValueKind.BOUND.value:
+        return None
+    try:
+        value = _value_from_plain(raw)
+    except (AssertionError, KeyError, TypeError, ValueError, ArithmeticError):
+        value = None
+    if (
+        value is None
+        or value.kind is not ValueKind.BOUND
+        or value.bound_operator not in {"<", "<=", ">", ">="}
+        or value.bound_value is None
+    ):
+        return _unavailable_selection(
+            f"{key} is not a clean structured one-sided bound: {raw!r}",
+            condition_ranges=condition_ranges,
+            unused_ancillary=_unused_ancillary(payload, key),
+            field_name=key,
+        )
+    return SourceSelection(
+        value=value,
+        field_name=key,
         unused_ancillary=_unused_ancillary(payload, key),
         condition_ranges=condition_ranges,
     )
@@ -9874,6 +9954,7 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity | str, tuple[str, ...]] = {
         "estimate_from_glass_Cp_only",
         "value",
     ),
+    Quantity.PARTIAL_MOLAR_ENTHALPY: ("value",),
     Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW: ("present_work_kcal_mol",),
     Quantity.ENTROPY_OF_FUSION: (
         "delta_S_fus_J_mol-1_K-1",
@@ -10394,6 +10475,7 @@ def _convert_compilation_amount(
             Quantity.H_MINUS_H298,
             Quantity.ENTHALPY_OF_FUSION,
             Quantity.ENTROPY_OF_FUSION,
+            Quantity.PARTIAL_MOLAR_ENTHALPY,
             Quantity.DELTA_FH,
             Quantity.DELTA_FG,
         }:
@@ -10405,13 +10487,19 @@ def _convert_compilation_amount(
     token = token.replace(".", "").replace("deg-", "deg").replace("_", "")
     if quantity in FUSION_QUANTITIES:
         token = token.split(";", 1)[0]
+    if (
+        quantity in FUSION_QUANTITIES
+        or quantity is Quantity.PARTIAL_MOLAR_ENTHALPY
+    ):
         token = token.replace("mol−1", "/mol").replace("mol-1", "/mol")
+    if quantity in FUSION_QUANTITIES:
         token = token.replace("k−1", "/k").replace("k-1", "/k")
     energy = quantity in {
         Quantity.H_MINUS_H298,
         Quantity.DELTA_FH,
         Quantity.DELTA_FG,
         Quantity.ENTHALPY_OF_FUSION,
+        Quantity.PARTIAL_MOLAR_ENTHALPY,
     } or quantity in VAPORIZATION_ENTHALPIES
     heat = quantity in {Quantity.CP, Quantity.S, Quantity.ENTROPY_OF_FUSION}
     if not energy and not heat:
@@ -11271,13 +11359,15 @@ def mass_fraction_pair_to_valence_ratio(
         # Hand check from Johnston row 1: 0.021/1.50 = 0.014.
         return numerator_wt_pct / denominator_wt_pct
 
-    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
     def cation_moles(wt_pct: Decimal, basis: str) -> Decimal:
         formula = element if basis == "element" else basis
         try:
-            parsed = parse_formula(formula, species=formula)
-            cations = as_decimal(str(parsed.elements.get(element, 0)))
+            atoms = atoms_parse_formula_else_janaf(formula)
+            if not atoms:
+                raise ValueError(f"unparseable composition component {formula!r}")
+            cations = as_decimal(str(dict(atoms).get(element, 0)))
             molar_mass = oxide_molar_mass(formula)
         except (TypeError, ValueError, KeyError) as exc:
             raise IdentityRefusal(
@@ -11320,6 +11410,10 @@ def _selection_from_named_field(
             condition_ranges=condition_ranges,
             field_name=field_name,
         )
+    if q_token is Quantity.ACTIVITY:
+        bound = _structured_bound_selection(payload, "activity", condition_ranges)
+        if bound is not None:
+            return bound
     if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key not in payload:
@@ -14789,8 +14883,20 @@ def _walk_printed_oxygen(
                 # Printed units choose the atm or bar frame. An explicit
                 # non-printed convention block wins when it parses, and a
                 # block that does not parse is a refusal rather than a guess.
-                # A unitless log is the 1 bar entry in the frame table.
+                # A missing unit stays the 1 bar frame-table entry. An explicit
+                # empty unit is a printed bare log: `_bare_log_convention`
+                # owns it, the same rule as a unitless log_fO2 key.
                 units_reference_pa = _OXYGEN_LOG_REFERENCE_PA.get(units)
+                explicit_empty_unit = False
+                if isinstance(condition, Mapping):
+                    for unit_key in ("units", "unit"):
+                        if unit_key not in condition:
+                            continue
+                        raw_unit = condition.get(unit_key)
+                        explicit_empty_unit = (
+                            raw_unit is not None and str(raw_unit).strip() == ""
+                        )
+                        break
                 conventional_reference_pa = _fO2_conventional_reference_pressure_pa(
                     condition
                 )
@@ -14825,7 +14931,7 @@ def _walk_printed_oxygen(
                             inference=located_condition.inference,
                         ),
                         reference_pressure_pa,
-                        False,
+                        explicit_empty_unit,
                     ))
         if name in _PRINTED_LOG_FO2_KEYS or name in _PRINTED_PO2_KEYS:
             if name in _PRINTED_LOG_FO2_KEYS and buffer_relative:
@@ -20571,7 +20677,13 @@ class Migrator:
                 else (quantity if isinstance(quantity, Quantity) else None)
             )
             sample = raw_item.get("sample") or raw_item.get("id")
-            sample_label = sample.strip() if isinstance(sample, str) else None
+            # Florin's Cu12.1-style sample IDs are labels, not formulas.
+            sample_label = (
+                sample.strip()
+                if isinstance(sample, str)
+                and source_id != "florin-2025-cu-silicate-evaporation"
+                else None
+            )
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
             )
@@ -20653,7 +20765,10 @@ class Migrator:
                     polymorph=species.polymorph,
                     charge=species.charge,
                 )
-            elif sample_label and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            elif (
+                sample_label
+                and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            ):
                 from simulator.accounting.formulas import parse_formula
 
                 try:
