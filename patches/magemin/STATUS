@@ -1,0 +1,7 @@
+# <artifact> <state>   state: applied | unapplied | upstreamed
+# "applied" means present in the checkout that enginepatch.sh maps (../MAGEMin by default).
+# The live engine binary is built from a separate, clean v1.9.6 tree: no patch here is in it.
+0001-thermocalc-amgo-periclase-reference.patch      unapplied
+0002-lp-iteration-cap-terminates-without-pc-recheck.patch applied
+0003-sb-feo-activity-keeps-four-cation-scaling.patch unapplied
+UPSTREAM-PR.md                                       unapplied
