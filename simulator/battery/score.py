@@ -5492,6 +5492,23 @@ def cell_notices(
                     origin=f"engine:{engine.value}",
                 )
             )
+        elif kind == "openimcc_liquid_standard_missing":
+            failures = row.get("standard_failures") or ()
+            reason = str(row.get("reason") or "missing liquid standard")
+            if failures:
+                reason += "; standard_failures=" + json.dumps(
+                    failures,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                )
+            notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(quantity,),
+                    reason=reason,
+                    origin=f"engine:{engine.value}",
+                )
+            )
         elif kind == "openimcc_liquid_standard_conversion":
             details = "; ".join(
                 f"{key}={row.get(key)}"
@@ -5499,9 +5516,17 @@ def cell_notices(
                     "oxide",
                     "standard_id",
                     "active_standard_id",
+                    "temperature_K",
                     "log10_offset",
+                    "temperature_domain_K",
                     "extrapolated",
                 )
+            )
+            domain = row.get("temperature_domain_K")
+            band = (
+                f"[{float(domain[0]):g}, {float(domain[1]):g}] K"
+                if isinstance(domain, (list, tuple)) and len(domain) == 2
+                else None
             )
             notices.append(
                 Notice(
@@ -5509,6 +5534,7 @@ def cell_notices(
                     affected_quantities=(quantity,),
                     reason=f"openimcc_liquid_standard_conversion; {details}",
                     origin=f"engine:{engine.value}",
+                    band=band,
                 )
             )
         elif kind == NoticeKind.IMCC_COMPLEX_SATURATION.value:
@@ -10685,6 +10711,57 @@ def _predict_with_engine(
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
+        standard_refusal = next(
+            (
+                row
+                for row in (getattr(cell, "notices", None) or ())
+                if isinstance(row, Mapping)
+                and row.get("kind") == "openimcc_liquid_standard_missing"
+            ),
+            None,
+        )
+        if (
+            engine is Engine.OPENIMCC
+            and typed == "openimcc_liquid_standard_missing"
+            and standard_refusal is not None
+            and standard_refusal.get("category") == 1
+            and standard_refusal.get("invalid_input") is True
+        ):
+            standard_failures = [
+                dict(failure)
+                for failure in standard_refusal.get("standard_failures", ())
+                if isinstance(failure, Mapping)
+            ]
+            first_failure = standard_failures[0] if standard_failures else {}
+            standard_id = first_failure.get("standard_id")
+            oxide = first_failure.get("oxide")
+            missing_input = (
+                f"liquid standard {standard_id} for {oxide}"
+                if standard_id and oxide
+                else "OpenIMCC liquid standard"
+            )
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                authority=Authority.REFUSED,
+                notices=notices,
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "missing_input",
+                    "input": "liquid_standard",
+                    "missing_input": missing_input,
+                    "category": 1,
+                    "invalid_input": True,
+                    "standard_failures": standard_failures,
+                    "engine_reason": engine_side_reason,
+                },
+                identity=identity,
+                requested_composition=requested,
+                version=engine_version,
+            )
         if engine is Engine.MAGEMIN and quantity is Quantity.ACTIVITY:
             cell_status = str(getattr(cell, "engine_status", "") or "")
             worker_failure = _engine_worker_lifecycle_failure(cell)

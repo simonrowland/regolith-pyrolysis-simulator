@@ -283,11 +283,13 @@ def _d066_translation_to_packaged_standard(
     oxide: str,
     source_standard_id: str,
     temperature_K: float,
-) -> tuple[str, float, bool] | None:
-    """Return source-to-D066 log10 activity offset from its recorded K fit."""
+) -> tuple[str, float, bool, tuple[float, float] | None] | None:
+    """Return source-to-D066 offset and fit-band status from its recorded K fit."""
     packaged = _packaged_gas_datapack()
     source_marker = source_standard_id.split("-", 1)[0]
-    candidates: list[tuple[str, float, bool]] = []
+    candidates: list[
+        tuple[str, float, bool, tuple[float, float] | None]
+    ] = []
     for row in _d066_k_translations():
         translation = row["k_translation"]
         basis = str(translation.get("basis", ""))
@@ -319,10 +321,15 @@ def _d066_translation_to_packaged_standard(
         }
         if len(target_standards) != 1:
             continue
-        temperature_domain = translation.get("T_domain_K")
+        raw_temperature_domain = row.get("T_domain_K")
+        temperature_domain = (
+            (float(raw_temperature_domain[0]), float(raw_temperature_domain[1]))
+            if isinstance(raw_temperature_domain, list)
+            and len(raw_temperature_domain) == 2
+            else None
+        )
         extrapolated = bool(
-            isinstance(temperature_domain, list)
-            and len(temperature_domain) == 2
+            temperature_domain is not None
             and not (
                 float(temperature_domain[0])
                 <= temperature_K
@@ -340,6 +347,7 @@ def _d066_translation_to_packaged_standard(
                 next(iter(target_standards)),
                 log10_offset,
                 extrapolated or target_gibbs[1],
+                temperature_domain,
             )
         )
     if not candidates:
@@ -348,15 +356,18 @@ def _d066_translation_to_packaged_standard(
     if any(
         target != first[0]
         or not math.isclose(offset, first[1], abs_tol=1e-10)
-        for target, offset, _ in candidates[1:]
+        for target, offset, _, _ in candidates[1:]
     ):
         raise LiquidStandardMissingError(
             oxide,
             source_standard_id,
             "the D066 standard translation rows disagree at this temperature",
         )
-    return first[0], first[1], any(
-        extrapolated for _, _, extrapolated in candidates
+    return (
+        first[0],
+        first[1],
+        any(extrapolated for _, _, extrapolated, _ in candidates),
+        first[3],
     )
 
 
@@ -396,6 +407,7 @@ def convert_parent_activities_for_gas(
     }
 
     for oxide, activity in tuple(activities.items()):
+        translation_temperature_domain: tuple[float, float] | None = None
         if oxide not in coupled_oxides:
             continue
         pack_standard = declared.get(oxide)
@@ -441,9 +453,12 @@ def convert_parent_activities_for_gas(
                     str(pack_standard),
                     "no G0(T) row or recorded D066 translation is available",
                 )
-            target_standard, source_to_d066_offset, translation_extrapolated = (
-                translation
-            )
+            (
+                target_standard,
+                source_to_d066_offset,
+                translation_extrapolated,
+                translation_temperature_domain,
+            ) = translation
             assert packaged is not None
             target_gibbs_result = _gibbs_for_standard(
                 gas, packaged, oxide, target_standard, temperature
@@ -464,18 +479,19 @@ def convert_parent_activities_for_gas(
             gibbs_difference / (gas.R_J_MOL_K * temperature)
         )
         activities[oxide] = activity * activity_factor
-        notices.append(
-            {
-                "kind": "openimcc_liquid_standard_conversion",
-                "code": "openimcc_liquid_standard_conversion",
-                "oxide": oxide,
-                "standard_id": str(pack_standard),
-                "active_standard_id": active_standard,
-                "temperature_K": temperature,
-                "log10_offset": log10_offset,
-                "extrapolated": extrapolated or pack_extrapolated,
-            }
-        )
+        notice: dict[str, Any] = {
+            "kind": "openimcc_liquid_standard_conversion",
+            "code": "openimcc_liquid_standard_conversion",
+            "oxide": oxide,
+            "standard_id": str(pack_standard),
+            "active_standard_id": active_standard,
+            "temperature_K": temperature,
+            "log10_offset": log10_offset,
+            "extrapolated": extrapolated or pack_extrapolated,
+        }
+        if translation_temperature_domain is not None:
+            notice["temperature_domain_K"] = list(translation_temperature_domain)
+        notices.append(notice)
     return activities, tuple(notices)
 
 

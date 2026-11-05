@@ -1473,6 +1473,11 @@ def crash_floor_engine_annotation(
     return None
 
 
+def _equilibrate_error_diagnostics(error: BaseException) -> dict[str, Any]:
+    raw_diagnostics = getattr(error, "diagnostics", None)
+    return dict(raw_diagnostics) if isinstance(raw_diagnostics, Mapping) else {}
+
+
 def classify_equilibrate_outcome(
     result: Any | None = None,
     *,
@@ -1493,6 +1498,7 @@ def classify_equilibrate_outcome(
         )
         status_reason = str(getattr(error, "backend_status_reason", "") or "")
         category = str(getattr(error, "backend_failure_category", "") or "")
+        diagnostics = _equilibrate_error_diagnostics(error)
         message = str(error)
         if reason_code == "thermoengine_nonfinite_field":
             engine_reason = f"{reason_code}: {message}"
@@ -1518,6 +1524,12 @@ def classify_equilibrate_outcome(
             "openimcc_oxygen_balance_unavailable",
         } or reason_code.startswith("imcc_gas_"):
             return "refusal", reason_code, engine_reason
+        if (
+            reason_code == "openimcc_liquid_standard_missing"
+            and diagnostics.get("category") == 1
+            and diagnostics.get("invalid_input") is True
+        ):
+            return "refusal", reason_code, message
         bucket = _bucket_from_text(haystack) or REFUSAL_UNAVAILABLE
         return "refusal", bucket, engine_reason
 
@@ -4526,6 +4538,20 @@ def equilibrate_cell(
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
+        diagnostics = _equilibrate_error_diagnostics(exc)
+        refusal_notices = []
+        if (
+            refusal == "openimcc_liquid_standard_missing"
+            and diagnostics.get("category") == 1
+            and diagnostics.get("invalid_input") is True
+        ):
+            refusal_notices.append(
+                {
+                    "kind": refusal,
+                    **diagnostics,
+                    "reason": str(exc),
+                }
+            )
         # A domain refusal is a row. Closing the handle would stamp every
         # later cell unavailable (ThermoEngine fo2_requires_iron on one
         # Fe-free commanded-pO2 cell killed the rest of that column).
@@ -4542,6 +4568,7 @@ def equilibrate_cell(
             refusal_reason=refusal,
             engine_status=type(exc).__name__,
             engine_reason=engine_reason,
+            notices=refusal_notices,
             melt_activities={},
             gas_partial_pressures_Pa={},
             liquid_fraction=None,
