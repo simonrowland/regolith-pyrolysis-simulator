@@ -1112,6 +1112,30 @@ def test_declared_unknown_trace_projects_with_notice() -> None:
     assert "unknown-component=0.3 wt%" in notice.reason
 
 
+def test_formula_unknown_trace_projects_with_notice() -> None:
+    source = {
+        "composition_wt_pct": {
+            "SiO2": "49.85",
+            "MgO": "49.85",
+            "XxO": "0.3",
+        }
+    }
+    wt = _initial_oxide_map_from_values(source, declared_map=True)
+    assert wt == {"SiO2": Decimal("49.85"), "MgO": Decimal("49.85")}
+
+    notice = migrate_module._composition_projection_notice(
+        wt,
+        closure_context=source,
+        quantity=migrate_module.Quantity.ACTIVITY,
+        origin="fixture",
+        declared_component_map=source["composition_wt_pct"],
+    )
+
+    assert notice is not None
+    assert notice.dropped == ("XxO",)
+    assert "XxO=0.3 wt%" in notice.reason
+
+
 @pytest.mark.parametrize("has_quantity", (False, True))
 @pytest.mark.parametrize("has_closure_context", (False, True))
 @pytest.mark.parametrize("has_unknown_oxide", (False, True))
@@ -3632,8 +3656,8 @@ def test_b704_volatile_cells_are_classified_before_closure(
         assert refusal is None
     else:
         assert refusal is not None
-        assert refusal.closure_refusal
-        # green never read this contributor; m1 reports its bad cell.
+        # Malformed volatile cells are class (a), before closure checks.
+        assert not refusal.closure_refusal
         assert (
             "malformed printed volatile component amount for 'H2O'"
             in refusal.reason
@@ -5835,7 +5859,15 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             True,
             id="m1-missing-major",
         ),
-        # green never read this sibling volatile contributor.
+        pytest.param(
+            "formula-unknown-trace",
+            {"SiO2": "49.85", "MgO": "49.85", "XxO": "0.3"},
+            None,
+            None,
+            None,
+            id="green-unknown-token-trace-dropped",
+        ),
+        # Invalid closure contributors get class (a) priority before missing majors.
         pytest.param(
             "sibling-volatile-negative",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5848,10 +5880,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "H2O_wt_pct": "-1",
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            True,
+            False,
             id="negative-sibling-volatile-precedes-missing-major",
         ),
-        # green never read this sibling volatile contributor.
+        # Malformed sibling values use the same class (a) priority.
         pytest.param(
             "sibling-volatile-malformed",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5864,10 +5896,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "H2O_wt_pct": "unreadable",
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            True,
+            False,
             id="malformed-sibling-volatile-precedes-missing-major",
         ),
-        # green never read this nested printed volatile contributor.
+        # Nested printed volatile values are also closure contributors.
         pytest.param(
             "nested-printed-volatile-malformed",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5887,10 +5919,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 }
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            True,
+            False,
             id="malformed-nested-printed-volatile-precedes-missing-major",
         ),
-        # green never read this closure-only contributor.
+        # Closure-only values are checked before the class (b) closure checks.
         pytest.param(
             "closure-only-negative",
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
@@ -5903,10 +5935,10 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 "_migrate_closure_only_components": {"S": "-1"},
             },
             {"SiO2": "50", "MgO": "50", "Al2O3": None},
-            True,
+            False,
             id="negative-closure-component-precedes-missing-major",
         ),
-        # green never read either volatile alias, even when one is numeric.
+        # Every volatile alias is checked, including shadowed nested aliases.
         pytest.param(
             "duplicate-volatile-alias-malformed",
             {"SiO2": "100"},
@@ -5918,7 +5950,7 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
                 },
             },
             {"SiO2": "100"},
-            True,
+            False,
             id="malformed-duplicate-volatile-alias",
         ),
         pytest.param(
@@ -5957,6 +5989,22 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             id="m1-recognized-non-oxide-over-limit",
         ),
         pytest.param(
+            "formula-unknown-and-chloride-traces",
+            {"SiO2": "50", "MgO": "49.3", "XxO": "0.3", "Cl": "0.4"},
+            None,
+            None,
+            False,
+            id="green-unknown-token-makes-combined-traces-unflagged",
+        ),
+        pytest.param(
+            "green-supported-engine-unsupported-oxides",
+            {"B2O3": "50", "Li2O": "50"},
+            None,
+            None,
+            True,
+            id="green-supported-oxides-fail-m1-kept-total",
+        ),
+        pytest.param(
             "taniguchi-metal-iron",
             {"CaO": "39.9", "Al2O3": "59.6"},
             {
@@ -5985,13 +6033,18 @@ def test_mass_closure_refusal_check_order(
     wt: dict[str, object],
     closure_context: object,
     declared: dict[str, object] | None,
-    closure_refusal: bool,
+    closure_refusal: bool | None,
 ) -> None:
     converted, refusal = migrate_module._wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared,
     )
+
+    if closure_refusal is None:
+        assert converted is not None, case
+        assert refusal is None, case
+        return
 
     assert converted is None, case
     assert refusal is not None, case
@@ -6008,6 +6061,12 @@ def test_mass_closure_refusal_check_order(
         assert "malformed printed volatile component amount" in refusal.reason
     if case == "oxide-negative-and-volatile-negative":
         assert "printed component has negative or non-finite amount" in refusal.reason
+    if case in {"unknown-token", "formula-unknown-and-chloride-traces"}:
+        assert "partial analysis contains unsupported component(s) above" in (
+            refusal.reason
+        )
+    if case == "green-supported-engine-unsupported-oxides":
+        assert "no engine-supported oxide mass" in refusal.reason
 
 
 @pytest.mark.parametrize(

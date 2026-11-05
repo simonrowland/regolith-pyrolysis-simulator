@@ -4642,7 +4642,7 @@ def _printed_volatile_mass_percent(
 
     def reject(reason: str) -> None:
         if diagnostics is not None and reason not in reported:
-            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, reason))
+            diagnostics.append((_GREEN_READ_OXIDE_MAP, reason))
             reported.add(reason)
 
     for scope in scopes:
@@ -4694,7 +4694,7 @@ def _printed_composition_closure_components(
         if kind == "malformed" and diagnostics is not None:
             diagnostics.append(
                 (
-                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                    _GREEN_READ_OXIDE_MAP,
                     "malformed printed closure component amount for "
                     f"{name!r}: {value!r}",
                 )
@@ -4751,34 +4751,6 @@ def _oxide_mass_percent_components(
                     f"{raw_name!r}: {raw_amount!r}",
                 )
             )
-        if (
-            _PRINTED_FORMULA_COMPONENT_RE.fullmatch(name)
-            and name not in _COMPOSITION_COMPONENTS
-            and name not in ATOMIC_WEIGHTS_G_PER_MOL
-            and _kume_formula_unit_oxide(name) is None
-            and _volatile_closure_component(name) is None
-        ):
-            diagnostics.append(
-                (
-                    _GREEN_READ_OXIDE_MAP,
-                    "unsupported numeric component has an unknown token: "
-                    f"{raw_name}={amount} wt%",
-                )
-            )
-        if _PRINTED_FORMULA_EXPRESSION_RE.fullmatch(name) and any(
-            component not in _COMPOSITION_COMPONENTS
-            and component not in ATOMIC_WEIGHTS_G_PER_MOL
-            and _kume_formula_unit_oxide(component) is None
-            for component in name.split("_plus_")
-        ):
-            diagnostics.append(
-                (
-                    _GREEN_READ_OXIDE_MAP,
-                    "unsupported numeric component has an unknown token: "
-                    f"{raw_name}={amount} wt%",
-                )
-            )
-
     if diagnostics is not None:
         for component_map in validation_maps:
             if component_map is wt:
@@ -5022,6 +4994,9 @@ def _wt_percent_conversion_or_refusal(
         ):
             declared_maps.append(source_map)
 
+        # Collect invalid-cell diagnostics from every closure contributor before
+        # evaluating the new closure checks; the final decision gives these
+        # Green-era refusals priority over class (b) closure refusals.
         diagnostics: list[tuple[str, str]] = []
         component_maps: list[Mapping[str, Any]] = []
         for component_map in (wt, *declared_maps):
@@ -5053,6 +5028,16 @@ def _wt_percent_conversion_or_refusal(
             (
                 amount
                 for name, amount in oxide_wt.items()
+                if name in _COMPOSITION_COMPONENTS
+                and amount.is_finite()
+                and amount > 0
+            ),
+            Decimal("0"),
+        )
+        engine_supported_oxide_mass = sum(
+            (
+                amount
+                for name, amount in oxide_wt.items()
                 if _is_engine_oxide_component(name)
                 and amount.is_finite()
                 and amount > 0
@@ -5064,6 +5049,13 @@ def _wt_percent_conversion_or_refusal(
                 (
                     _GREEN_READ_OXIDE_MAP,
                     "printed oxide wt% map has no positive mass",
+                )
+            )
+        elif engine_supported_oxide_mass <= 0:
+            diagnostics.append(
+                (
+                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                    "mass-percent composition has no engine-supported oxide mass",
                 )
             )
 
@@ -5078,7 +5070,7 @@ def _wt_percent_conversion_or_refusal(
             if not amount.is_finite() or amount < 0:
                 diagnostics.append(
                     (
-                        _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                        _GREEN_READ_OXIDE_MAP,
                         "printed closure component has negative or non-finite "
                         f"amount for {name!r}: {amount!r}",
                     )
@@ -5156,9 +5148,21 @@ def _wt_percent_conversion_or_refusal(
             details = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
+            green_rejected_unsupported = any(
+                amount > 0
+                and name not in _COMPOSITION_COMPONENTS
+                and name not in ATOMIC_WEIGHTS_G_PER_MOL
+                and _volatile_closure_component(name) is None
+                and _kume_formula_unit_oxide(name) is None
+                for name, amount in dropped.items()
+            )
             diagnostics.append(
                 (
-                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                    (
+                        _GREEN_READ_OXIDE_MAP
+                        if green_rejected_unsupported
+                        else _M1_ONLY_CLOSURE_CONTRIBUTOR
+                    ),
                     "partial analysis contains unsupported component(s) above "
                     f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}",
                 )
