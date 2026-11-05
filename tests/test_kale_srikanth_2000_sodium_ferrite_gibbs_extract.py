@@ -16,6 +16,7 @@ from tools.validate_literature_extracts import (
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/kale-srikanth-2000-sodium-ferrite-gibbs.yaml"
 SOURCE_ID = "kale-srikanth-2000-sodium-ferrite-gibbs"
+AUDIT = ROOT / "data/literature/extracts/audits/kale-srikanth-2000-sodium-ferrite-gibbs.audit.md"
 
 TABLE_I_RENDER_ROWS = [
     ("Shaiu et al. [11]", "−171 970 − 9.456T", (795, 1048)),
@@ -116,7 +117,26 @@ def test_table_iii_inventory_and_transition_values_match_render() -> None:
     )
     assert boundary["values"]["current_phase_equilibration_boundary_as_printed"] == "1048 ± 10 K"
     assert boundary["values"]["current_emf_segment_intersection_as_printed"] == "1028 ± 5 K"
-    assert boundary["values"]["thery_1980_boundary_as_cited"] == "1030 ± 5 K"
+    assert boundary["values"]["thery_boundary_as_cited"] == "1030 ± 5 K"
+
+
+def test_zhang_cell_two_comparison_is_pinned_to_page_five_render() -> None:
+    audit = AUDIT.read_text(encoding="utf-8")
+    assert (
+        "Zhang et al.'s liquid-sodium-reference cell “2” is ~5–10 kJ/mol more "
+        "positive than both the present result and Zhang's result using "
+        "α-Al2O3 + Na-β-Al2O3 as the reference electrode (absolute PDF page "
+        "5, printed page 179, left column)."
+    ) in audit
+    assert (
+        "The source's within ±5 kJ/mol agreement statement applies only to "
+        "the present result versus Yamaguchi et al. [8] in the measurement "
+        "range."
+    ) in audit
+    assert (
+        "That relative band has no temperature range in the sentence, and no "
+        "absolute cell-2 value or residual was calculated."
+    ) in audit
 
 
 def test_isolated_migration_preserves_ranges_and_refuses_only_equation_values() -> None:
