@@ -1,0 +1,70 @@
+# table_index selects the MinerU draft block; the printed locator retained in the extract is Table I.
+# Column 2 is the coefficient equation cell. Column 3 is a temperature range, so it is transcribed manually into T_range_K rather than emitted as a point temperature.
+# The row-specific citation is transcribed into each observation because Table I cites Shaiu, Yamaguchi, Zhang, and Dai separately.
+# Table III is mapped as phase-equilibration context in the extract, not as standard-state thermochemistry. Equation (10) is transcribed from text.
+# The source gives no total pressure or absolute fO2 for each Table I value; neither is assigned.
+source_id: kale-srikanth-2000-sodium-ferrite-gibbs
+source:
+  citation: >-
+    Kale, G. M. and Srikanth, S. (1999). Electrochemical Determination of the Gibbs Energy of Formation of Na2Fe2O4 and Na3Fe5O9 Employing Na-beta-Al2O3 Solid Electrolyte. Journal of the American Ceramic Society, 83(1), 175-180.
+extraction:
+  method: >-
+    Transcribed from MinerU tables and markdown and the born-digital pdftotext layout; render-checked the table layout and flagged cells.
+  date: '2026-11-04'
+  worker: w1104nf-ks00
+review_status: draft
+tables:
+  - page: 2
+    table_index: 1
+    type: gibbs_table
+    quantity: delta_fG
+    evidence_class: quoted_attributed
+    unit: J/mol
+    phase: cr
+    published_page: 176
+    values:
+      - column: 2
+        species: NaFeO2
+    render_verified:
+      - row: 2
+        column: 2
+        text: '−171 970 − 9.456T'
+      - row: 2
+        column: 3
+        text: 795–1048
+      - row: 3
+        column: 2
+        text: '−160 200 − 3.909T'
+      - row: 3
+        column: 3
+        text: 930–1047
+      - row: 4
+        column: 2
+        text: '−152 700 − 1.332T'
+      - row: 4
+        column: 3
+        text: 1047–1278
+      - row: 5
+        column: 2
+        text: '−147 300 − 13.37T'
+      - row: 5
+        column: 3
+        text: 1278–1405
+      - row: 6
+        column: 2
+        text: '−237 425 + 83.1T'
+      - row: 6
+        column: 3
+        text: 635–785
+      - row: 7
+        column: 2
+        text: '−247 086 + 89.435T‡'
+      - row: 7
+        column: 3
+        text: 834–1004
+      - row: 8
+        column: 2
+        text: '−86 000 − 61.89T'
+      - row: 8
+        column: 3
+        text: 773–1030
