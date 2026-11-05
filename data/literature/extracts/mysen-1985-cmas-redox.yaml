@@ -15,7 +15,9 @@ extraction:
   - MinerU table HTML and Markdown
   - pdftotext-layout.txt
   table_layout_check: 'The 600-dpi PDF renders of pages 4 and 6 were checked. Table 2 contains 88 sample rows: 53 CAS and
-    35 MAS rows. The MinerU draft body count of 89 includes the single MgO system heading on draft row 57.'
+    35 MAS rows. The MinerU draft body count of 89 includes the single MgO system heading on draft row 57. At data row 23,
+    the draft label CASVIIIF5+ was render-corrected to CASVIIF5†; at row 77, MASIXIF5 was render-corrected to MASIXF5. The
+    six underlined 77 K spectra are data rows 23, 37, 48, 77, 80, and 84, located by the Table 2 footnote.'
   table_qa: 'MinerU/pdftotext numeric agreement: Table 1 0.821; Table 2 0.742. All stored table cells were checked against
     the page renders because QA flagged numeric disagreement.'
   condition_notes: Table 2 values are Fe3+/ΣFe fractions as printed. Table 2 prints -log fO2; each exact positive printed
@@ -1525,7 +1527,7 @@ species:
         - row: 23
           table_row_number: 26
           table_column_number: 10
-          sample_code_as_published: CASVIIIF5†
+          sample_code_as_published: CASVIIF5†
           value: 0.65
           value_as_published: '0.650'
           T_C: 1550
@@ -2474,6 +2476,13 @@ species:
                 published_page: 318
                 section: Experimental
                 note: Samples were quenched in water at a rate exceeding 500 C/s; Fe-redox preservation on quench is not stated.
+          spectrum_measurement_temperature_K: 77
+          spectrum_temperature_locator:
+            page: 6
+            pdf_page_index: 5
+            published_page: 322
+            table: '2'
+            note: The Table 2 footnote states that underlined sample labels denote spectra taken at 77 K.
         - row: 38
           table_row_number: 41
           table_column_number: 10
@@ -4941,7 +4950,7 @@ species:
         - row: 77
           table_row_number: 81
           table_column_number: 10
-          sample_code_as_published: MASIXIF5
+          sample_code_as_published: MASIXF5
           value: 0.078
           value_as_published: '0.078'
           T_C: 1550

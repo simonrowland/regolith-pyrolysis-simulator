@@ -59,6 +59,10 @@ def _render_pins(document: dict) -> None:
     assert table2[34]["value_as_published"] == "0.072"
     assert table2[75]["sample_code_as_published"] == "MASIXF5"
     assert table2[75]["value_as_published"] == "0.056"
+    assert table2[22]["sample_code_as_published"] == "CASVIIF5†"
+    assert table2[22]["value_as_published"] == "0.650"
+    assert table2[76]["sample_code_as_published"] == "MASIXF5"
+    assert table2[76]["value_as_published"] == "0.078"
     assert wet[0]["sample_code_as_published"] == "001*"
     assert wet[0]["value_as_published"] == "0.80"
     assert wet[0]["sigma_as_published"] == "0.05"
@@ -73,9 +77,21 @@ def _render_pins(document: dict) -> None:
             for condition in ("T_C", "fO2_log", "total_pressure_Pa", "composition"):
                 assert point["point_conditions"][condition]["state"]["tag"] == "unknown"
                 assert point["point_conditions"][condition]["locator"]["page"] == 4
-    assert len(
-        [point for point in table2 if point.get("spectrum_measurement_temperature_K") == 77]
-    ) == 5
+    spectra_77k = [
+        point
+        for point in table2
+        if point.get("spectrum_measurement_temperature_K") == 77
+    ]
+    assert {point["row"] for point in spectra_77k} == {23, 37, 48, 77, 80, 84}
+    row_37 = next(point for point in spectra_77k if point["row"] == 37)
+    assert row_37["sample_code_as_published"] == "CASIVF5"
+    assert row_37["T_C"] == 1550
+    assert row_37["minus_log10_fO2_as_printed"] == "9.00"
+    assert all(
+        point["spectrum_temperature_locator"]["page"] == 6
+        and point["spectrum_temperature_locator"]["table"] == "2"
+        for point in spectra_77k
+    )
 
 
 def test_mysen_render_pins_and_mutation_are_independent() -> None:

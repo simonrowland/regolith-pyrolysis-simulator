@@ -6,14 +6,19 @@ Table 1 contains six comparison samples. Table 2 contains 88 experimental sample
 draft reports 89 body rows because draft row 57 is the MgO system heading, not a sample. The printed row and column layout
 for each table was checked against the complete PDF page render: page 4 for Table 1 and page 6 for Table 2.
 
-The cell audit has 302 entries: 264 Table 2 temperature, `-log fO2`, and Fe3+/ΣFe cells; five 77 K underline annotations;
+The cell audit has 303 entries: 264 Table 2 temperature, `-log fO2`, and Fe3+/ΣFe cells; six 77 K underline annotations;
 24 Table 1 value and uncertainty cells; eight copies of the four MV78 composition components as they are stored on the two
 method rows; and the abstract's 1 atm pressure statement mapped to all 88 Table 2 samples. Table 2 numeric cells were checked
-against the 600 dpi render. The underlined 77 K sample labels were checked at 1200 dpi. Table 1 numeric cells and its row
-layout were checked against the 600 dpi render.
+against the 600 dpi render. The underlined 77 K sample labels on data rows 23, 37, 48, 77, 80, and 84 were checked at 1200 dpi;
+the Table 2 footnote locates all six spectra at 77 K. Table 1 numeric cells and its row layout were checked against the 600 dpi
+render.
 
 The Table 1 footnote's composition text is an OCR disagreement: pdftotext reads Fo15.2, while the page render reads Fo16.2.
 The extract and cell audit use the rendered value. The footnote states that the bulk composition is by weight.
+
+Two Table 2 labels were corrected from the machine draft using the page 6 render: data row 23 reads `CASVIIF5†` (MinerU:
+`CASVIIIF5+`), and data row 77 reads `MASIXF5` (MinerU: `MASIXIF5`). The repeated sample-code fields in the cell audit use the
+rendered labels. The focused test pins both corrections.
 
 `mysen-1985-cmas-redox-mineru-compare.csv` reports 100 mismatches. The values are confirmed against the page renders and
 the complete row and column layout. The mismatch is caused by
