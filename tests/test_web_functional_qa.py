@@ -14,6 +14,7 @@ import web.events as web_events
 from simulator.account_ids import (
     ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT,
     C7_AL_CREDIT_ACCOUNT,
+    CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
     CONDENSATION_RETAINED_HOLDUP_ACCOUNT,
     METAL_FLOAT_LAYER_ACCOUNT,
     METAL_PHASE_ACCOUNT,
@@ -626,7 +627,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
 
     # Offgas species masses and their Cr equivalents come from the same live
     # terminal.offgas projection used by the headless full-run path.
-    _PINNED_CRO_OFFGAS_KG = 0.0
+    _PINNED_CRO_OFFGAS_KG = 2.4563577999771256
     # c679673f5 integrates Stage 2 capture over its temperature band (33 equal
     # center samples). This captures Cr-bearing vapour the midpoint calculation
     # sent to terminal.offgas: Cr-equivalent offgas falls from 0.182436796288
@@ -639,7 +640,7 @@ def test_headless_full_run_ledgers_and_product_story_web(
     # 85fedcb8e's per-strip solver moves a further 1.4458e-7 kg from offgas
     # into Stage 2 capture; the later segment-update refactor leaves the pin
     # unchanged.
-    _PINNED_CR_OFFGAS_EQ_KG = 0.18005189890349527
+    _PINNED_CR_OFFGAS_EQ_KG = 1.896070159628202
     cr_in_rump_kg = rump.get("Cr2O3", 0.0) * _cr_mass_fraction("Cr2O3")
     cr_ingot_kg = completion["products"].get("Cr", 0.0)
     offgas_kg = sim.atom_ledger.project_account_kg("terminal.offgas")
@@ -650,46 +651,73 @@ def test_headless_full_run_ledgers_and_product_story_web(
         float(offgas_kg.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
         for species in ("Cr", "CrO", "CrO2", "CrO3")
     )
-    # d-137's Stage-4 split and per-strip Stage-2 capture interact with
-    # car1's flagged CrO proxy; the product pins below are regenerated from
-    # the merged production inventory.
-    assert rump.get("Cr2O3", 0.0) == pytest.approx(3.328323685668657, rel=1e-9)
-    assert cr_ingot_kg == 0.0
+    # The source-reaction wall refusal leaves proxy CrO on terminal.offgas
+    # instead of booking it on the train. The rump loses the same chromium:
+    # Cr2O3 3.328323685668657 → 0.7042714559225458. Offgas CrO
+    # 0 → 2.4563577999771256, and the Cr-equivalent offgas total
+    # 0.18005189890349527 → 1.896070159628202. Elemental Cr on the train
+    # rounds to the 0.02 kg product. Cartridge residue and the terminal
+    # chromia account hold the rest. Rump + train + offgas + residue +
+    # stored chromia still total 2.459768802 kg Cr against the 2.46 kg feed.
+    assert rump.get("Cr2O3", 0.0) == pytest.approx(0.7042714559225458, rel=1e-9)
+    assert cr_ingot_kg == 0.02
     # Keep the offgas pins at 1e-6 relative tolerance.
     assert cro_offgas_kg == pytest.approx(_PINNED_CRO_OFFGAS_KG, rel=1e-6)
     assert cr_offgas_eq_kg == pytest.approx(_PINNED_CR_OFFGAS_EQ_KG, rel=1e-6)
-    # story payload values are display-rounded (2 dp), so compare loosely.
-    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == pytest.approx(
-        cr_ingot_kg, abs=0.005
-    )
+    # The 0.02 kg product is elemental Cr on the train
+    # (0.023451016296130407 kg, display-rounded). The story does not
+    # report train metal as an ingot.
+    assert story["metal_ingots"]["species_kg"].get("Cr", 0.0) == 0.0
     assert story["escaped_to_vacuum"]["species_kg"].get("CrO", 0.0) == pytest.approx(
         round(cro_offgas_kg, 2), abs=0.005
     )
-    # Inventory closure follows AtomLedger streams: rump Cr + train Cr + Cr
-    # in captured CrO3 + terminal offgas. One Cr per CrO3 gives kg CrO3 *
-    # M(Cr)/M(CrO3) = kg Cr; the molar-mass ratio is dimensionless and tends
-    # to 1 as the oxygen mass tends to zero.
+    # Inventory closure follows AtomLedger streams: rump Cr + train Cr +
+    # terminal offgas + cartridge residue + stored chromia. Formula
+    # resolution supplies the Cr mass fraction. A pure Cr formula is 1.
     train_kg = sim.atom_ledger.project_account_kg(CONDENSATION_TRAIN_ACCOUNT)
+    residue_kg = sim.atom_ledger.project_account_kg(
+        ALKALI_CARTRIDGE_SOLID_RESIDUE_ACCOUNT
+    )
+    chromia_kg = sim.atom_ledger.project_account_kg(
+        CHROMIUM_CONDENSED_OXIDE_ACCOUNT
+    )
     train_cro_kg = float(train_kg.get("CrO", 0.0) or 0.0)
-    assert train_cro_kg == pytest.approx(2.44855547, rel=1e-8)
+    assert train_cro_kg == 0.0
+    assert float(train_kg.get("Cr", 0.0) or 0.0) == pytest.approx(
+        0.023451016296130407, rel=1e-9
+    )
+    assert float(residue_kg.get("Cr", 0.0) or 0.0) == pytest.approx(
+        0.0568976438016042, rel=1e-9
+    )
+    assert float(chromia_kg.get("Cr2O3", 0.0) or 0.0) == pytest.approx(
+        0.002165922033496538, rel=1e-9
+    )
     assert story["off_spec_condensate"]["species_kg"].get("CrO", 0.0) == (
         pytest.approx(round(train_cro_kg, 2), abs=0.005)
     )
-    capture_flag = story["off_spec_condensate"]["flag"]
+    # The uncertified-capture flag follows the offgas CrO. The train no
+    # longer holds that mass, so off-spec condensate has no flag.
+    capture_flag = story["escaped_to_vacuum"]["flag"]
     assert capture_flag["status"] == "flagged prediction"
     assert capture_flag["authority"] == "proxy/bridge"
     assert "tier-2 evaporation alpha 0.9" in capture_flag["reason"]
     assert "cannot certify capture" in capture_flag["reason"]
-    # CrO contains one Cr per molecule: kg Cr = kg CrO × M(Cr)/M(CrO).
-    # The molar-mass ratio is dimensionless, and approaches 1 as oxygen mass
-    # tends to zero.
-    train_cr_eq_kg = float(train_kg.get("Cr", 0.0) or 0.0) + float(
-        train_kg.get("CrO3", 0.0) or 0.0
-    ) * (_CR_MW / _CRO3_MW)
-    train_cr_eq_kg += train_cro_kg * (_CR_MW / _CRO_MW)
-    assert cr_in_rump_kg + train_cr_eq_kg + cr_offgas_eq_kg == pytest.approx(
-        2.46, abs=0.02
-    )
+    assert "terminal.offgas" in capture_flag["reason"]
+    cr_species = ("Cr", "CrO", "CrO2", "CrO3", "Cr2O3")
+
+    def _cr_eq(payload):
+        return sum(
+            float(payload.get(species, 0.0) or 0.0) * _cr_mass_fraction(species)
+            for species in cr_species
+        )
+
+    assert (
+        cr_in_rump_kg
+        + _cr_eq(train_kg)
+        + cr_offgas_eq_kg
+        + _cr_eq(residue_kg)
+        + _cr_eq(chromia_kg)
+    ) == pytest.approx(2.46, abs=0.02)
     assert story["refractory_ceramic"]["species_kg"].get("Cr2O3", 0.0) == (
         pytest.approx(rump.get("Cr2O3", 0.0), abs=0.005)
     )
