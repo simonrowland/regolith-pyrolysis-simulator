@@ -97,6 +97,52 @@ def test_internal_analytical_cell_reports_activity_not_gamma() -> None:
     assert cell.activities_standard_state == benchmark_standard_state
 
 
+def test_internal_analytical_cell_carries_gamma_source_and_fusion_notices() -> None:
+    pot = BinaryPot(
+        pot_id="ia_mgo_gamma_source_and_fusion_notice",
+        kato_1993_table4_system=None,
+        why="cell notice path check",
+        composition_wt_pct={"MgO": 50.0, "SiO2": 50.0},
+    )
+    temperature_K = 1873.0
+    _, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
+    activity = melt_oxide_activity(
+        "MgO", composition_mol, temperature_K=temperature_K
+    )
+    assert activity is not None
+    assert activity.source_composition_range_notice is not None
+
+    cell = equilibrate_cell(
+        open_battery_engine("internal-analytical"),
+        pot,
+        temperature_K=temperature_K,
+        po2=Po2Request(mode=PO2_COMMANDED, po2_bar=1e-10),
+        timeout_s=30.0,
+        isolated=False,
+    )
+
+    assert cell.status == "ok"
+    source_notices = [
+        notice
+        for notice in cell.notices
+        if notice.get("kind") == NoticeKind.ENGINE_MODEL_CAVEAT.value
+        and notice.get("reason") == activity.source_composition_range_notice
+    ]
+    fusion_notices = [
+        notice
+        for notice in cell.notices
+        if str(notice.get("reason") or "").startswith(
+            "d144_fusion_conversion|oxide=MgO|temperature_K=1873|"
+        )
+    ]
+    assert len(source_notices) == 1
+    assert source_notices[0].get("authority") == "bridge"
+    assert len(fusion_notices) == 1
+    assert fusion_notices[0].get("kind") == NoticeKind.FALLBACK.value
+    assert fusion_notices[0].get("authority") == "bridge"
+    assert source_notices[0]["reason"] != fusion_notices[0]["reason"]
+
+
 def test_internal_analytical_scores_multi_cation_parent_activity(monkeypatch) -> None:
     monkeypatch.setattr(
         "simulator.diagnostic_helpers.binary_pot_battery._call_with_hard_timeout",
@@ -218,10 +264,15 @@ def _assert_internal_activity_residual_matches_production(
         "solid-liquid Gibbs crossing; this is JANAF's metastable (supercooled) "
         "liquid branch|certified_band_K=[298.15, 4000]"
     )
-    assert any(
-        notice.kind is NoticeKind.FALLBACK
-        and notice.reason == "melt_oxide_activity has no certified evidence tier"
+    evidence_tier_fallback = next(
+        notice
         for notice in residual.notices
+        if notice.kind is NoticeKind.FALLBACK
+        and notice.reason == "melt_oxide_activity has no certified evidence tier"
+    )
+    assert evidence_tier_fallback.authority is None
+    assert evidence_tier_fallback.reason == (
+        "melt_oxide_activity has no certified evidence tier"
     )
     return residual
 
