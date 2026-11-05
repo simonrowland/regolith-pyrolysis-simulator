@@ -1199,7 +1199,6 @@ class _MELTSBackendSupport(MeltBackend):
         self._engine_version: Optional[str] = None
         self._vaporock_available = False
         self._vaporock_helper: Optional[VapoRockBackend] = None
-        self._vaporock_unavailable_logged = False
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
@@ -1335,8 +1334,11 @@ class _MELTSBackendSupport(MeltBackend):
             warnings.simplefilter('ignore', UserWarning)
             self._vaporock_helper.initialize({})
         self._vaporock_available = self._vaporock_helper.is_available()
-        if not self._vaporock_available and not self._vaporock_unavailable_logged:
-            warnings.warn(
+        if not self._vaporock_available:
+            from simulator.engine_local_config import warn_once_with_summary
+
+            warn_once_with_summary(
+                'simulator.melt_backend.alphamelts.vaporock_unavailable',
                 'VapoRock vapor-melt library unavailable; alphaMELTS vapor '
                 'pressures fall back to activity x Antoine rows; '
                 'vapor_pressures_source records per-species Antoine-row '
@@ -1345,7 +1347,6 @@ class _MELTSBackendSupport(MeltBackend):
                 'first-principles evidence class.',
                 stacklevel=2,
             )
-            self._vaporock_unavailable_logged = True
 
         # Try binary
         if self._mode is None and requested_mode in (None, 'subprocess'):
@@ -5972,9 +5973,49 @@ class _MELTSBackendSupport(MeltBackend):
         if result.status != 'ok' or not pressures:
             detail = '; '.join(result.warnings) if result.warnings else (
                 f'status={result.status}, empty vapor_pressures_Pa')
-            warnings.warn(
+            result_status = str(result.status)
+            result_diagnostics = getattr(result, 'diagnostics', None)
+            diagnostics = (
+                result_diagnostics
+                if isinstance(result_diagnostics, Mapping)
+                else {}
+            )
+            backend_reason = diagnostics.get('backend_status_reason')
+            engine_exception = diagnostics.get('engine_exception')
+            if (
+                result_status in {'out_of_domain', 'not_converged'}
+                and isinstance(backend_reason, str)
+                and backend_reason
+            ):
+                reason_prefix = (
+                    'nonconvergence'
+                    if result_status == 'not_converged'
+                    else result_status
+                )
+                reason_class = f'{reason_prefix}:{backend_reason}'
+            elif (
+                result_status == 'not_converged'
+                and isinstance(engine_exception, str)
+                and engine_exception
+            ):
+                reason_class = f'nonconvergence:{engine_exception}'
+            else:
+                reason_class = {
+                    'not_converged': 'nonconvergence',
+                    'non_authoritative': 'non_authoritative',
+                    'unavailable': 'unavailable',
+                    'out_of_domain': 'out_of_domain',
+                    'ok': 'empty_pressures',
+                }.get(result_status, 'unusable_status')
+            from simulator.engine_local_config import warn_once_with_summary
+
+            warn_once_with_summary(
+                'simulator.melt_backend.alphamelts.vaporock_fallback:'
+                f'{reason_class}',
                 'VapoRock returned no usable vapor pressures '
-                f'({detail}); using activity x Antoine fallback rows '
+                f'(reason={reason_class}; status={result_status}; '
+                f'T={T_C:.6g} C; pressure={pressure_bar:.6g} bar; '
+                f'detail={detail}); using activity x Antoine fallback rows '
                 '(fit_target=pure_component_psat is a fit target, not a '
                 'first-principles evidence class; pseudo rows are backsolved '
                 'VapoRock curve-fits).',

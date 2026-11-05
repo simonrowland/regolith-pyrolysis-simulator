@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ctypes
 import json
+import logging
 import os
 import sqlite3
 import subprocess
@@ -109,7 +110,9 @@ def test_config_absent_legacy_fallback_emits_warning(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr("simulator.engine_local_config._LEGACY_WARNED", set())
+    monkeypatch.setattr(
+        "simulator.engine_local_config._WARNING_REPEAT_COUNTS", {}
+    )
     missing = tmp_path / "missing.toml"
     monkeypatch.setattr(
         "simulator.engine_local_config.config_path",
@@ -128,12 +131,45 @@ def test_config_absent_legacy_fallback_emits_warning(
     assert any("legacy alphaMELTS path-based identity" in str(item.message) for item in caught)
 
 
-def test_warn_legacy_once_is_single_shot() -> None:
+def test_warn_legacy_once_respects_always_filter() -> None:
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
         warn_legacy_once("test-warn-legacy-once", "legacy once")
-    assert len(caught) == 1
+    assert [str(item.message) for item in caught] == [
+        "legacy once",
+        "legacy once",
+    ]
+
+
+def test_warn_once_with_summary_always_filter_emits_every_call(
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "_WARNING_REPEAT_COUNTS",
+        {},
+        raising=False,
+    )
+    key = "test.engine.warning"
+    message = "native fallback warning with detail"
+    caplog.set_level(logging.WARNING, logger="simulator.engine_local_config")
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        for _ in range(50):
+            engine_local_config.warn_once_with_summary(key, message)
+
+    assert len(caught) == 50
+    assert {str(item.message) for item in caught} == {message}
+    assert engine_local_config._WARNING_REPEAT_COUNTS == {key: 1}
+
+    engine_local_config._flush_warning_repeat_summaries()
+
+    assert caplog.records == []
 
 
 def test_thermoengine_dylib_dir_fail_loud_when_missing(

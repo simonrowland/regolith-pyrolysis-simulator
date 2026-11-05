@@ -10,6 +10,7 @@ or equilibrium paths.
 
 from __future__ import annotations
 
+import logging
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -36,6 +37,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 GAS_CONSTANT_J_PER_MOL_K = 8.31446
 CELSIUS_TO_KELVIN_OFFSET = 273.15
 ELLINGHAM_STANDARD_PRESSURE_PA = 100000.0
+logger = logging.getLogger(__name__)
 
 # Same evaporation floor used by BuiltinVaporPressureProvider.
 EVOLUTION_PRESSURE_FLOOR_PA = 1e-15
@@ -321,11 +323,15 @@ def effective_equilibrium_pressure_Pa(
             T_K, source_activity=a_ox, pO2_bar=pO2,
         )
         if evaluation.out_of_range:
-            import warnings
+            from simulator.engine_local_config import warn_once_with_summary
 
-            warnings.warn(
-                f"{species} melt-source reaction: {evaluation.status} "
-                f"at {T_K:g} K", UserWarning, stacklevel=2,
+            warn_once_with_summary(
+                'simulator.chemistry.ellingham_graph:'
+                f'{species}:{evaluation.status}',
+                f"{species} melt-source reaction: {evaluation.status}; "
+                f"continued at {T_K:.6g} K using conservative continuation "
+                "outside the certified range",
+                stacklevel=2,
             )
         return evaluation.pressure_pa
     if row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"):
