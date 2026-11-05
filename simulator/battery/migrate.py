@@ -1557,6 +1557,7 @@ def _percent_composition_closure_error(
     basis: str,
     *,
     closure_context: object = None,
+    mass_kept_total: Decimal | None = None,
 ) -> str | None:
     amounts = tuple(
         amount
@@ -1566,7 +1567,13 @@ def _percent_composition_closure_error(
     if any(not amount.is_finite() or amount < 0 for amount in amounts):
         return f"{basis}-percent composition contains a negative or non-finite amount"
     total = (
-        _mass_percent_kept_total(components, closure_context=closure_context)
+        (
+            mass_kept_total
+            if mass_kept_total is not None
+            else _mass_percent_kept_total(
+                components, closure_context=closure_context
+            )
+        )
         if basis == "mass"
         else sum(amounts, Decimal("0"))
     )
@@ -1610,6 +1617,21 @@ def _percent_composition_closure_error(
 class _CompositionRefusal:
     reason: str
     closure_refusal: bool = False
+
+
+@dataclass(frozen=True)
+class _MassPercentClosureResult:
+    composition: Composition | None
+    refusal: _CompositionRefusal | None
+    kept_total: Decimal | None = None
+    dropped_components: tuple[tuple[str, Decimal], ...] = ()
+    dropped_mass: Decimal = Decimal("0")
+    printed_analysis_total: Decimal | None = None
+
+    def __iter__(self) -> Iterator[Composition | _CompositionRefusal | None]:
+        # Preserve the established two-value unpacking at validation callers.
+        yield self.composition
+        yield self.refusal
 
 
 _COMPOSITION_MAP_RESERVED_KEYS = frozenset(
@@ -1894,10 +1916,16 @@ def _composition_located_from_plain(
             composition_context = (
                 payload if closure_context is None else closure_context
             )
+            closure_result = _wt_percent_conversion_or_refusal(
+                wt,
+                closure_context=composition_context,
+                declared_component_map=declared_component_map,
+            )
             composition = _composition_from_plain(
                 body,
                 closure_context=composition_context,
                 declared_component_map=declared_component_map,
+                closure_result=closure_result,
             )
         except (ArithmeticError, ValueError) as exc:
             return Located(
@@ -1908,10 +1936,9 @@ def _composition_located_from_plain(
         derivation = _mass_percent_composition_derivation(
             accepted_wt,
             locator,
-            closure_context=composition_context,
-            declared_component_map=declared_component_map,
+            closure_result=closure_result,
             source_note=_wt_percent_derivation_source_note(
-                wt, payload, declared_component_map=declared_component_map
+                wt, closure_result=closure_result
             ),
             admitted=serialized_inference is None,
         )
@@ -1923,7 +1950,7 @@ def _composition_located_from_plain(
             ),
             None,
         )
-        if renorm_input:
+        if renorm_input and renorm_input not in derivation.inputs:
             derivation = replace(derivation, inputs=(*derivation.inputs, renorm_input))
         projection_inputs = tuple(
             item
@@ -2264,6 +2291,7 @@ def _composition_from_plain(
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult | None = None,
 ) -> Composition:
     assert isinstance(payload, Mapping)
     components = payload.get("components") or ()
@@ -2291,12 +2319,23 @@ def _composition_from_plain(
             raise ValueError(
                 "mass-percent composition contains invalid, duplicate, unsupported or ambiguous components"
             )
+        result = closure_result or _wt_percent_conversion_or_refusal(
+            wt,
+            closure_context=payload if closure_context is None else closure_context,
+            declared_component_map=declared_component_map,
+        )
+        if result.composition is None:
+            reason = (
+                result.refusal.reason
+                if result.refusal is not None
+                else "mass-percent composition is not usable"
+            )
+            detail = reason.removeprefix(
+                "mass-percent composition is not usable: "
+            )
+            raise ValueError(detail)
         return replace(
-            _wt_percent_conversion_or_raise(
-                wt,
-                closure_context=payload if closure_context is None else closure_context,
-                declared_component_map=declared_component_map,
-            ),
+            result.composition,
             **metadata,
         )
     elif amount_basis is AmountBasis.MOLE_PERCENT:
@@ -4730,14 +4769,9 @@ def _unrecognized_printed_chemical_components(
 
 
 def _omitted_trace_component_source_note(
-    wt: Mapping[str, Decimal],
-    closure_context: object,
-    *,
-    declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult,
 ) -> str | None:
-    dropped = _unrecognized_printed_chemical_components(
-        wt, closure_context, declared_component_map=declared_component_map
-    )
+    dropped = dict(closure_result.dropped_components)
     if not dropped:
         return None
     return "omitted trace components: " + ", ".join(sorted(dropped))
@@ -4745,14 +4779,11 @@ def _omitted_trace_component_source_note(
 
 def _wt_percent_derivation_source_note(
     wt: Mapping[str, Decimal],
-    closure_context: object,
     *,
-    declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult,
 ) -> str | None:
     notes = []
-    trace_note = _omitted_trace_component_source_note(
-        wt, closure_context, declared_component_map=declared_component_map
-    )
+    trace_note = _omitted_trace_component_source_note(closure_result)
     if trace_note is not None:
         notes.append(trace_note)
     if any(_mass_percent_component_key(name)[0] == "FeOT" for name in wt):
@@ -4930,8 +4961,7 @@ def _mass_percent_composition_derivation(
     wt: Mapping[str, Decimal],
     locator: Locator | None,
     *,
-    closure_context: object = None,
-    declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult,
     source_note: object = None,
     admitted: bool = True,
 ) -> Derivation:
@@ -4940,10 +4970,10 @@ def _mass_percent_composition_derivation(
     )
     if not admitted:
         return derivation
-    kept_total = _mass_percent_kept_total(wt, closure_context=closure_context)
+    kept_total = closure_result.kept_total
     if (
-        _MASS_PERCENT_RENORMALIZE_ABOVE
-        < kept_total
+        kept_total is not None
+        and _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total
         <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
     ):
         derivation = replace(
@@ -4954,34 +4984,20 @@ def _mass_percent_composition_derivation(
                 "(d-336 item 2)",
             ),
         )
-    dropped = _unrecognized_printed_chemical_components(
-        wt,
-        closure_context,
-        declared_component_map=declared_component_map,
-    )
-    dropped_mass = sum(dropped.values(), Decimal("0"))
+    dropped = dict(closure_result.dropped_components)
+    dropped_mass = closure_result.dropped_mass
     if (
         dropped
         and Decimal("0") < dropped_mass <= _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
     ):
-        source = _source_printed_composition_values(
-            wt,
-            closure_context,
-            declared_component_map=declared_component_map,
-        )
-        printed_total = sum(
-            (
-                amount
-                for name, raw_amount in source.items()
-                if name.casefold() not in _PRINTED_COMPOSITION_TOTAL_KEYS
-                and (amount := _printed_mass_percent_number(raw_amount)) is not None
-            ),
-            Decimal("0"),
-        )
-        if printed_total > 0:
+        printed_total = closure_result.printed_analysis_total
+        if printed_total is not None and printed_total > 0:
             detail = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
+            # Projection is dropped mass divided by the full printed analysis
+            # total: 0.435 / 99.935 = 0.004353 for the Taniguchi-like map.
+            dropped_mass_fraction = dropped_mass / printed_total
             derivation = replace(
                 derivation,
                 inputs=(
@@ -4989,7 +5005,7 @@ def _mass_percent_composition_derivation(
                     "projected trace components omitted from engine composition: "
                     + detail,
                     "projected trace mass fraction: "
-                    + str(dropped_mass / printed_total),
+                    + str(dropped_mass_fraction),
                 ),
             )
     return derivation
@@ -5519,7 +5535,7 @@ def _wt_percent_conversion_or_refusal(
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
-) -> tuple[Composition | None, _CompositionRefusal | None]:
+) -> _MassPercentClosureResult:
     try:
         declared_maps = [declared_component_map]
         declared_from_context = _declared_printed_composition_map(closure_context)
@@ -5552,7 +5568,9 @@ def _wt_percent_conversion_or_refusal(
         for component_map in component_maps:
             reserved_reason = _composition_map_reserved_scalar_reason(component_map)
             if reserved_reason is not None:
-                return None, _CompositionRefusal(reserved_reason)
+                return _MassPercentClosureResult(
+                    None, _CompositionRefusal(reserved_reason)
+                )
 
         try:
             oxide_wt = _oxide_mass_percent_components(
@@ -5682,8 +5700,14 @@ def _wt_percent_conversion_or_refusal(
             if name not in closure_wt:
                 closure_wt[name] = amount
 
+        kept_total = _mass_percent_kept_total(
+            closure_wt, closure_context=closure_context
+        )
         closure_error = _percent_composition_closure_error(
-            closure_wt, "mass", closure_context=closure_context
+            closure_wt,
+            "mass",
+            closure_context=closure_context,
+            mass_kept_total=kept_total,
         )
         missing_major = tuple(
             dict.fromkeys(
@@ -5756,20 +5780,48 @@ def _wt_percent_conversion_or_refusal(
             None,
         )
         if green_reason is not None:
-            return None, _CompositionRefusal(
-                f"mass-percent composition is not usable: {green_reason}"
+            return _MassPercentClosureResult(
+                None,
+                _CompositionRefusal(
+                    f"mass-percent composition is not usable: {green_reason}"
+                ),
             )
         if m1_reason is not None:
-            return None, _CompositionRefusal(
-                "mass-percent composition is not usable: "
-                + m1_reason,
-                closure_refusal=True,
+            return _MassPercentClosureResult(
+                None,
+                _CompositionRefusal(
+                    "mass-percent composition is not usable: " + m1_reason,
+                    closure_refusal=True,
+                ),
             )
         converted = _mole_fraction_from_wt_percent_components(oxide_wt)
-        return converted, None
+        printed = _source_printed_composition_values(
+            wt,
+            closure_context,
+            declared_component_map=declared_component_map,
+        )
+        printed_analysis_total = sum(
+            (
+                amount
+                for raw_amount in printed.values()
+                if (amount := _printed_mass_percent_number(raw_amount)) is not None
+            ),
+            Decimal("0"),
+        )
+        return _MassPercentClosureResult(
+            converted,
+            None,
+            kept_total=kept_total,
+            dropped_components=tuple(dropped.items()),
+            dropped_mass=dropped_mass,
+            printed_analysis_total=printed_analysis_total,
+        )
     except (ArithmeticError, ValueError) as exc:
-        return None, _CompositionRefusal(
-            f"mass-percent composition is not usable: {exc}"
+        return _MassPercentClosureResult(
+            None,
+            _CompositionRefusal(
+                f"mass-percent composition is not usable: {exc}"
+            ),
         )
 
 
@@ -5914,19 +5966,20 @@ def _wt_percent_conversion_state(
     *,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult | None = None,
 ) -> State[Composition]:
-    converted, refusal = _wt_percent_conversion_or_refusal(
+    result = closure_result or _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
     )
-    if converted is None:
+    if result.composition is None:
         return State.unknown(
-            refusal.reason
-            if refusal is not None
+            result.refusal.reason
+            if result.refusal is not None
             else "mass-percent composition is not usable"
         )
-    return State.of(converted)
+    return State.of(result.composition)
 
 
 def _mass_percent_composition_state(
@@ -5935,24 +5988,26 @@ def _mass_percent_composition_state(
     basis: str,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    closure_result: _MassPercentClosureResult | None = None,
 ) -> State[Composition]:
     """Convert a printed wt% map after its kept mass meets the b-704 limits."""
 
-    converted, refusal = _wt_percent_conversion_or_refusal(
+    result = closure_result or _wt_percent_conversion_or_refusal(
         wt,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
     )
-    if converted is None:
-        assert refusal is not None
-        return State.unknown(refusal.reason)
+    if result.composition is None:
+        assert result.refusal is not None
+        return State.unknown(result.refusal.reason)
     if any(
         amount != 0
         for amount in _printed_volatile_mass_percent(wt, closure_context).values()
     ):
-        return State.of(replace(converted, basis=basis))
+        return State.of(replace(result.composition, basis=basis))
     oxide_wt = _oxide_mass_percent_components(wt)
-    kept_total = _mass_percent_kept_total(wt, closure_context=closure_context)
+    kept_total = result.kept_total
+    assert kept_total is not None
     if _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
         oxide_wt = {
             name: amount * Decimal("100") / kept_total
@@ -5978,18 +6033,23 @@ def _mass_percent_composition_located(
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
 ) -> Located[Composition]:
+    closure_result = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=closure_context,
+        declared_component_map=declared_component_map,
+    )
     state = _mass_percent_composition_state(
         wt,
         basis=basis,
         closure_context=closure_context,
         declared_component_map=declared_component_map,
+        closure_result=closure_result,
     )
     inference = (
         _mass_percent_composition_derivation(
             _oxide_mass_percent_components(wt),
             locator,
-            closure_context=closure_context,
-            declared_component_map=declared_component_map,
+            closure_result=closure_result,
         )
         if state.is_value
         else None
@@ -6554,10 +6614,16 @@ def _catalogue_composition_located_from_values(
         rule = rule.strip(" .")
     if not rule:
         rule = "source-declared catalogue analysis; no separate selection rule stated"
+    closure_result = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=values,
+        declared_component_map=declared_component_map,
+    )
     converted_state = _wt_percent_conversion_state(
         wt,
         closure_context=values,
         declared_component_map=declared_component_map,
+        closure_result=closure_result,
     )
     if not converted_state.is_value:
         return None
@@ -6574,8 +6640,7 @@ def _catalogue_composition_located_from_values(
         inference=_mass_percent_composition_derivation(
             wt,
             locator,
-            closure_context=values,
-            declared_component_map=declared_component_map,
+            closure_result=closure_result,
             source_note=values.get("composition_derivation"),
         ),
     )
@@ -6825,9 +6890,12 @@ def _composition_located_from_values(
     derivation_notes = []
     declared_component_map = _named_printed_composition_map(values)
     composition_context = values if closure_context is None else closure_context
-    trace_note = _omitted_trace_component_source_note(
-        wt, composition_context, declared_component_map=declared_component_map
+    closure_result = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=composition_context,
+        declared_component_map=declared_component_map,
     )
+    trace_note = _omitted_trace_component_source_note(closure_result)
     if trace_note is not None:
         derivation_notes.append(trace_note)
     if pass_note and isinstance(source_note, str) and source_note.strip():
@@ -6836,12 +6904,12 @@ def _composition_located_from_values(
         wt,
         closure_context=composition_context,
         declared_component_map=declared_component_map,
+        closure_result=closure_result,
     )
     derivation = _mass_percent_composition_derivation(
         wt,
         locator,
-        closure_context=composition_context,
-        declared_component_map=declared_component_map,
+        closure_result=closure_result,
         source_note="; ".join(derivation_notes) or None,
         admitted=composition_state.is_value,
     )
@@ -6919,10 +6987,17 @@ def _located_printed_and_initial(
         and not (isinstance(declared_component_map, Mapping) and declared_component_map)
     ):
         return None, None
+    composition_context = closure_context or wt
+    closure_result = _wt_percent_conversion_or_refusal(
+        wt,
+        closure_context=composition_context,
+        declared_component_map=declared_component_map,
+    )
     state = _wt_percent_conversion_state(
         wt,
-        closure_context=closure_context or wt,
+        closure_context=composition_context,
         declared_component_map=declared_component_map,
+        closure_result=closure_result,
     )
     source_values = _source_printed_composition_values(wt, closure_context)
     printed_map = {}
@@ -6974,12 +7049,9 @@ def _located_printed_and_initial(
         inference=_mass_percent_composition_derivation(
             conversion_map,
             locator,
-            closure_context=closure_context,
-            declared_component_map=declared_component_map,
+            closure_result=closure_result,
             source_note=_wt_percent_derivation_source_note(
-                wt,
-                closure_context,
-                declared_component_map=declared_component_map,
+                wt, closure_result=closure_result
             ),
         )
     )
@@ -21712,12 +21784,19 @@ class Migrator:
             }
         elif projected_oxide_map and not composition_role_refusal:
             # A refused composition_role is queued and left unstamped (b716).
+            declared_component_map = _named_printed_composition_map(
+                projected_closure_context
+            )
+            closure_result = _wt_percent_conversion_or_refusal(
+                projected_oxide_map,
+                closure_context=projected_closure_context,
+                declared_component_map=declared_component_map,
+            )
             projected_state = _wt_percent_conversion_state(
                 projected_oxide_map,
                 closure_context=projected_closure_context,
-                declared_component_map=_named_printed_composition_map(
-                    projected_closure_context
-                ),
+                declared_component_map=declared_component_map,
+                closure_result=closure_result,
             )
             point_conditions = {
                 **(point_conditions or {}),
@@ -21727,17 +21806,10 @@ class Migrator:
                     inference=_mass_percent_composition_derivation(
                         projected_oxide_map,
                         projected_oxide_locator or locator,
-                        closure_context=projected_closure_context,
-                        declared_component_map=_named_printed_composition_map(
-                            projected_closure_context
-                        ),
+                        closure_result=closure_result,
                         admitted=projected_state.is_value,
                         source_note=_omitted_trace_component_source_note(
-                            projected_oxide_map,
-                            projected_closure_context,
-                            declared_component_map=_named_printed_composition_map(
-                                projected_closure_context
-                            ),
+                            closure_result,
                         ),
                     ),
                 ),

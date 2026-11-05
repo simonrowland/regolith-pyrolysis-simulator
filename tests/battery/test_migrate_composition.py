@@ -3253,6 +3253,140 @@ def test_residue_ppm_experiment_inherited_renormalization_notice(
     assert notices[0].original == Decimal("104")
 
 
+def test_residue_ppm_inherited_projection_uses_full_printed_total(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"CaO": "39.9", "Al2O3": "59.6", "Fe": "0.435"},
+        "residue-inherited-projection",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = [
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+    ]
+
+    assert len(notices) == 1
+    assert notices[0].dropped == ("Fe",)
+    assert notices[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+        "99.935"
+    )
+    composition = observation.point_conditions["composition"]
+    assert composition.inference is not None
+    projection_inputs = [
+        item
+        for item in composition.inference.inputs
+        if item.startswith("projected trace mass fraction: ")
+    ]
+    assert projection_inputs == [
+        "projected trace mass fraction: "
+        + str(Decimal("0.435") / Decimal("99.935"))
+    ]
+
+
+def test_residue_ppm_inherited_renormalization_uses_closure_kept_total(
+    tmp_path: Path,
+) -> None:
+    extract = _residue_ppm_extract(
+        {"SiO2": "50", "MgO": "47", "H2O": "7"},
+        "residue-inherited-renormalization",
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = _residue_ppm_observation(result)
+    notices = _renormalization_notices(observation)
+
+    assert len(notices) == 1
+    assert notices[0].original == Decimal("104")
+    composition = observation.point_conditions["composition"]
+    assert composition.inference is not None
+    renormalization_inputs = [
+        item
+        for item in composition.inference.inputs
+        if item.startswith("renormalized to 100 wt% from kept oxide total S=")
+    ]
+    assert renormalization_inputs == [
+        "renormalized to 100 wt% from kept oxide total S=104 wt% "
+        "(d-336 item 2)"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("components", "notice_kind"),
+    (
+        (
+            {"CaO": "39.9", "Al2O3": "59.6", "Fe": "0.435"},
+            NoticeKind.COMPOSITION_PROJECTED,
+        ),
+        (
+            {"SiO2": "50", "MgO": "47", "H2O": "7"},
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
+        ),
+    ),
+    ids=("projection", "renormalization"),
+)
+def test_row_local_composition_notices_use_closure_result(
+    tmp_path: Path,
+    components: dict[str, str],
+    notice_kind: NoticeKind,
+) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "type": "activity_coefficient",
+            "phase": "l",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1473,
+                        "gamma": "0.5",
+                        "composition_wt_pct": components,
+                    }
+                ],
+            },
+        }
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith("fixture-source::na_psat::T=1473")
+    )
+    condition = observation.point_conditions["composition"]
+    assert condition.inference is not None
+
+    if notice_kind is NoticeKind.COMPOSITION_PROJECTED:
+        notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.COMPOSITION_PROJECTED
+        ]
+        assert len(notices) == 1
+        assert notices[0].dropped == ("Fe",)
+        assert notices[0].dropped_mass_fraction == Decimal("0.435") / Decimal(
+            "99.935"
+        )
+        assert sum(
+            item.startswith("projected trace mass fraction: ")
+            for item in condition.inference.inputs
+        ) == 1
+    else:
+        notices = _renormalization_notices(observation)
+        assert len(notices) == 1
+        assert notices[0].original == Decimal("104")
+        assert sum(
+            item.startswith(
+                "renormalized to 100 wt% from kept oxide total S="
+            )
+            for item in condition.inference.inputs
+        ) == 1
+
+
 def _renormalization_notices(observation):
     return tuple(
         notice
