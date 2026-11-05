@@ -2272,6 +2272,41 @@ def test_k2o_pack_evaluation_table_matches_zhang_gamma_from_bridge() -> None:
         )
 
 
+def test_published_core_conversion_free_k_pressure_is_pinned(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Pin the old pack-native activity coupled directly to packaged gas data."""
+    import openimcc
+
+    from openimcc import gas
+
+    monkeypatch.delenv("OPENIMCC_VAPOROCK_ROOT", raising=False)
+    composition = {"K2O": 0.2, "Al2O3": 0.8}
+    temperature_K = 2200.0
+    melt = openimcc.evaluate(
+        composition,
+        temperature_K,
+        openimcc_bridge_module._load_pack("published-core"),
+        basis_type="mol",
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    parent_activities = dict(
+        zip(melt.parent_oxides, melt.parent_activity, strict=True)
+    )
+    gas_pack = gas.load_gas_datapack()
+    pressure_bar = float(
+        openimcc.evaluate_gas(
+            parent_activities,
+            temperature_K,
+            1.0e-9,
+            gas_pack,
+        )["K"]
+    )
+
+    assert pressure_bar.hex() == "0x1.d878cc8bf666fp-2"
+
+
 def test_k2o_sensitivity_pack_collision_gets_no_evaluation() -> None:
     from importlib import resources
 
