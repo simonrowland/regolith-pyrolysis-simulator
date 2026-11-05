@@ -5038,6 +5038,31 @@ def _wt_percent_conversion_or_refusal(
         if positive_oxide_mass <= 0:
             raise ValueError("printed oxide wt% map has no positive mass")
 
+        volatile_wt = _printed_volatile_mass_percent(wt, closure_context)
+        volatile_sources = []
+        if isinstance(closure_context, Mapping):
+            volatile_sources.append(closure_context)
+            point_conditions = closure_context.get("point_conditions")
+            if isinstance(point_conditions, Mapping):
+                volatile_sources.append(point_conditions)
+        for volatile_source in volatile_sources:
+            for raw_name, raw_amount in volatile_source.items():
+                alias = _volatile_closure_component(str(raw_name))
+                if alias is None or alias[0] in volatile_wt:
+                    continue
+                kind, _amount = _classify_composition_cell(raw_amount)
+                if kind == "malformed":
+                    raise ValueError(
+                        "malformed printed volatile component amount for "
+                        f"{raw_name!r}: {raw_amount!r}"
+                    )
+        for name, amount in volatile_wt.items():
+            if not amount.is_finite() or amount < 0:
+                raise ValueError(
+                    "printed volatile component has negative or non-finite "
+                    f"amount for {name!r}: {amount!r}"
+                )
+
         dropped = _unrecognized_printed_chemical_components(
             wt,
             closure_context,
@@ -5062,7 +5087,6 @@ def _wt_percent_conversion_or_refusal(
                 "unsupported printed component has a negative or non-finite amount"
             )
 
-        volatile_wt = _printed_volatile_mass_percent(wt, closure_context)
         closure_wt = {**oxide_wt, **volatile_wt}
         for name, amount in _printed_composition_closure_components(
             closure_context

@@ -5826,6 +5826,36 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             id="m1-missing-major",
         ),
         pytest.param(
+            "sibling-volatile-negative",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "50",
+                    "MgO": "50",
+                    "Al2O3": None,
+                },
+                "H2O_wt_pct": "-1",
+            },
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            False,
+            id="green-negative-sibling-volatile-precedes-missing-major",
+        ),
+        pytest.param(
+            "sibling-volatile-malformed",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "50",
+                    "MgO": "50",
+                    "Al2O3": None,
+                },
+                "H2O_wt_pct": "unreadable",
+            },
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            False,
+            id="green-malformed-sibling-volatile-precedes-missing-major",
+        ),
+        pytest.param(
             "partial-94.9",
             {"SiO2": "50", "MgO": "44.9"},
             None,
@@ -5892,6 +5922,10 @@ def test_mass_closure_refusal_check_order(
     assert converted is None, case
     assert refusal is not None, case
     assert refusal.closure_refusal is closure_refusal, (case, refusal)
+    if case == "sibling-volatile-negative":
+        assert "negative or non-finite amount" in refusal.reason
+    if case == "sibling-volatile-malformed":
+        assert "malformed printed volatile component amount" in refusal.reason
 
 
 @pytest.mark.parametrize(
