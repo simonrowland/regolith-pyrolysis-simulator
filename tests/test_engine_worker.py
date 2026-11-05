@@ -117,6 +117,7 @@ def _run_partial_frame_test_worker(
     _bootstrap_args,
     _diagnostic_log_path,
     _diagnostic_signal,
+    _native_output_connection=None,
 ):
     connection.send(('ready', 'partial-frame-test-ready'))
     connection.recv()

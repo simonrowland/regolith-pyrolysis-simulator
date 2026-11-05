@@ -11,6 +11,7 @@ import atexit
 import faulthandler
 import math
 import multiprocessing
+import multiprocessing.context
 import os
 import signal
 import queue
@@ -239,8 +240,14 @@ def _run_engine_worker(
     bootstrap_args: tuple[Any, ...],
     diagnostic_log_path: Optional[str],
     diagnostic_signal: int,
+    native_output_connection: Any = None,
 ) -> None:
     """Run one initialized engine resource until clean shutdown or failure."""
+    if native_output_connection is not None:
+        native_output_fd = native_output_connection.fileno()
+        os.dup2(native_output_fd, 1)
+        os.dup2(native_output_fd, 2)
+        native_output_connection.close()
     if os.environ.get(INHERIT_PROCESS_GROUP_ENV) != '1':
         try:
             os.setsid()
@@ -317,6 +324,61 @@ def _run_engine_worker(
         connection.close()
 
 
+def _read_native_output(connection: Any) -> None:
+    """Forward distinct worker output once and summarize its repeat counts."""
+    counts: dict[bytes, int] = {}
+    pending = bytearray()
+
+    def write_stderr(payload: bytes) -> None:
+        while payload:
+            try:
+                written = os.write(2, payload)
+            except OSError:
+                return
+            if written <= 0:
+                return
+            payload = payload[written:]
+
+    def forward_line(line: bytes) -> None:
+        previous_count = counts.get(line, 0)
+        counts[line] = previous_count + 1
+        lowered = line.lower()
+        is_error = any(
+            token in lowered
+            for token in (b'error', b'abort', b'fatal', b'segmentation')
+        )
+        if previous_count == 0 or is_error:
+            write_stderr(line)
+
+    try:
+        while True:
+            chunk = os.read(connection.fileno(), 65536)
+            if not chunk:
+                break
+            pending.extend(chunk)
+            while True:
+                newline = pending.find(b'\n')
+                if newline < 0:
+                    break
+                line = bytes(pending[:newline + 1])
+                del pending[:newline + 1]
+                forward_line(line)
+        if pending:
+            forward_line(bytes(pending))
+    except OSError:
+        pass
+    finally:
+        try:
+            connection.close()
+        except OSError:
+            pass
+
+    for line, count in counts.items():
+        write_stderr(
+            f'[engine-pool native output] count={count}: {line!r}\n'.encode()
+        )
+
+
 class WarmEngineWorker:
     """Persistent spawned worker with deadlines and crash/hang replacement."""
 
@@ -391,6 +453,9 @@ class WarmEngineWorker:
         self.disabled = False
         self._state_lock = threading.Lock()
         self._pending_reap: list[Any] = []
+        self._native_output_capture: tuple[
+            Any, Any, Any | None, threading.Thread
+        ] | None = None
         self._pool_call_abort_event: threading.Event | None = None
         self._active_frame_readers: dict[int, int] = {}
         self._close_after_frame_read: set[int] = set()
@@ -457,6 +522,60 @@ class WarmEngineWorker:
                     shutdown_socket.detach()
                 except (OSError, ValueError):
                     pass
+
+    def _close_native_output_writer(self, process: Any) -> None:
+        with self._state_lock:
+            capture = self._native_output_capture
+            if capture is None:
+                return
+            captured_process, reader, writer, thread = capture
+            if (
+                captured_process is not process
+                or writer is None
+            ):
+                return
+            self._native_output_capture = (
+                captured_process, reader, None, thread,
+            )
+        try:
+            writer.close()
+        except OSError:
+            pass
+
+    def _finish_native_output_capture(
+        self,
+        process: Any,
+        *,
+        process_start_failed: bool = False,
+    ) -> None:
+        with self._state_lock:
+            capture = self._native_output_capture
+            if capture is None:
+                return
+            captured_process, reader, _writer, thread = capture
+            if captured_process is not process:
+                return
+        if thread.ident is not None:
+            pid = _process_pid(process)
+            if (
+                pid is None and not process_start_failed
+            ) or (
+                pid is not None and process.is_alive()
+            ):
+                return
+        self._close_native_output_writer(process)
+        with self._state_lock:
+            capture = self._native_output_capture
+            if capture is None or capture[0] is not process:
+                return
+            self._native_output_capture = None
+        if thread.ident is None:
+            try:
+                reader.close()
+            except OSError:
+                pass
+            return
+        thread.join()
 
     def _receive_frame_with_deadline(
         self,
@@ -633,18 +752,52 @@ class WarmEngineWorker:
                 )
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
-        process = context.Process(
-            target=_run_engine_worker,
-            args=(
+        native_output_capture = None
+        native_output_reader = None
+        native_output_writer = None
+        native_output_thread = None
+        try:
+            # Injected test contexts do not spawn this worker target.
+            if isinstance(context, multiprocessing.context.BaseContext):
+                native_output_reader, native_output_writer = context.Pipe(
+                    duplex=False,
+                )
+                native_output_thread = threading.Thread(
+                    target=_read_native_output,
+                    args=(native_output_reader,),
+                    name=f'{self.name} native output reader',
+                    daemon=True,
+                )
+            process_args = (
                 child,
                 self._bootstrap,
                 self._handler,
                 self._bootstrap_args,
                 str(self.diagnostic_log_path) if self.diagnostic_log_path else None,
                 self.diagnostic_signal,
-            ),
-            daemon=self.daemon,
-        )
+            )
+            if native_output_writer is not None:
+                process_args += (native_output_writer,)
+            process = context.Process(
+                target=_run_engine_worker,
+                args=process_args,
+                daemon=self.daemon,
+            )
+        except BaseException:
+            if native_output_reader is not None:
+                native_output_reader.close()
+            if native_output_writer is not None:
+                native_output_writer.close()
+            child.close()
+            parent.close()
+            raise
+        if native_output_thread is not None:
+            native_output_capture = (
+                process,
+                native_output_reader,
+                native_output_writer,
+                native_output_thread,
+            )
         # Publish before Process.start() so request_disable / ctor-failure
         # close can reap a child whose start() has not returned. pid is
         # None until the OS create assigns _popen; request_disable then
@@ -655,10 +808,18 @@ class WarmEngineWorker:
         # and _pending_reap is what ctor-failure close already joins.
         with self._state_lock:
             if self.disabled:
+                if native_output_reader is not None:
+                    native_output_reader.close()
+                if native_output_writer is not None:
+                    native_output_writer.close()
                 child.close()
                 parent.close()
                 raise RuntimeError(f'{self.name} worker is disabled')
             if abort_event is not None and abort_event.is_set():
+                if native_output_reader is not None:
+                    native_output_reader.close()
+                if native_output_writer is not None:
+                    native_output_writer.close()
                 child.close()
                 parent.close()
                 raise EngineWorkerTimeout(
@@ -669,6 +830,7 @@ class WarmEngineWorker:
             self.process = process
             self.connection = parent
             self.ready_payload = None
+            self._native_output_capture = native_output_capture
             if process not in self._pending_reap:
                 self._pending_reap.append(process)
         with self._state_lock:
@@ -680,6 +842,7 @@ class WarmEngineWorker:
                 )
             )
         if not still_ours:
+            self._finish_native_output_capture(process)
             child.close()
             parent.close()
             if abort_event is not None and abort_event.is_set():
@@ -690,8 +853,14 @@ class WarmEngineWorker:
                 )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
+            if native_output_thread is not None:
+                native_output_thread.start()
             process.start()
         except BaseException:
+            self._finish_native_output_capture(
+                process,
+                process_start_failed=True,
+            )
             child.close()
             parent.close()
             with self._state_lock:
@@ -700,6 +869,7 @@ class WarmEngineWorker:
                     self.connection = None
             raise
         child.close()
+        self._close_native_output_writer(process)
         with self._state_lock:
             if (
                 self.disabled
@@ -1140,6 +1310,7 @@ class WarmEngineWorker:
         finally:
             if connection is not None:
                 self._close_connection_or_defer(connection)
+            self._finish_native_output_capture(process)
 
     def close(self) -> None:
         """Idempotently stop the worker and release its pipe."""
@@ -1194,6 +1365,7 @@ class WarmEngineWorker:
                     os.killpg(process_pid, signal.SIGKILL)
                 except (AttributeError, OSError):
                     pass
+            self._finish_native_output_capture(process)
         self._reap_pending(timeout_s=1.0)
 
     def request_disable(self) -> None:
@@ -1233,6 +1405,7 @@ class WarmEngineWorker:
                         process.kill()
                     except (AttributeError, OSError, ProcessLookupError):
                         pass
+                self._close_native_output_writer(process)
 
     def _reap_pending(self, *, timeout_s: float) -> bool:
         deadline = time.monotonic() + max(0.0, float(timeout_s))
@@ -1254,6 +1427,8 @@ class WarmEngineWorker:
                 process.join(timeout=max(0.0, deadline - time.monotonic()))
             if process.is_alive():
                 remaining_processes.append(process)
+            else:
+                self._finish_native_output_capture(process)
         if remaining_processes:
             with self._state_lock:
                 self._pending_reap.extend(remaining_processes)
