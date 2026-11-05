@@ -4642,7 +4642,7 @@ def _printed_volatile_mass_percent(
 
     def reject(reason: str) -> None:
         if diagnostics is not None and reason not in reported:
-            diagnostics.append((_GREEN_READ_OXIDE_MAP, reason))
+            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, reason))
             reported.add(reason)
 
     for scope in scopes:
@@ -4694,7 +4694,7 @@ def _printed_composition_closure_components(
         if kind == "malformed" and diagnostics is not None:
             diagnostics.append(
                 (
-                    _GREEN_READ_OXIDE_MAP,
+                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
                     "malformed printed closure component amount for "
                     f"{name!r}: {value!r}",
                 )
@@ -5070,7 +5070,7 @@ def _wt_percent_conversion_or_refusal(
             if not amount.is_finite() or amount < 0:
                 diagnostics.append(
                     (
-                        _GREEN_READ_OXIDE_MAP,
+                        _M1_ONLY_CLOSURE_CONTRIBUTOR,
                         "printed closure component has negative or non-finite "
                         f"amount for {name!r}: {amount!r}",
                     )
