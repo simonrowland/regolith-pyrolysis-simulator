@@ -5465,6 +5465,14 @@ class EvaporationMixin:
         )
         self.last_alkali_cartridge_swing_notices = notices
         for move in moves:
+            # The train holds this stage's condensate together with every
+            # other stage's deposit of the same element. The swing takes
+            # only this hour's cartridge mass, a partial withdrawal.
+            # ledger.move marks the credit after apply; the debit has to
+            # be a declared pool first or mixed origins refuse.
+            self.atom_ledger.mark_amalgamated_pool(
+                move.debit_account, (move.species,),
+            )
             self._move_ledger_species(
                 move.name,
                 move.debit_account,
