@@ -6299,7 +6299,7 @@ def _printed_map_payload(
         wt = components
     printed: dict[str, Any] = {}
     for key, value in wt.items():
-        if str(key) == "locator":
+        if _is_skipped_composition_map_walk_key(key, value):
             continue
         if numeric_values_as == "decimal":
             amount = _as_dec_or_none(value)

@@ -2404,6 +2404,40 @@ def test_point_condition_printed_map_keeps_uncertainty_text_verbatim() -> None:
     }
 
 
+def test_point_condition_printed_map_counts_numeric_locator_and_ignores_real_locator() -> None:
+    printed = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "locator": 1},
+        key="printed_composition",
+    )
+
+    assert printed.state.is_value
+    assert printed.state.value == {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("50"),
+        "locator": Decimal("1"),
+    }
+    refused, reason = migrate_module._printed_mass_percent_map_refusal(
+        printed.state.value,
+        {},
+        reject_dropped_components=True,
+    )
+    assert refused
+    assert reason is not None
+    assert "unsupported component(s) above 0.5 wt%: locator=1 wt%" in reason
+
+    real_locator = {"page": 2, "table": "1", "note": "printed composition"}
+    with_real_locator = migrate_module._point_condition_from_plain(
+        {"SiO2": "50", "MgO": "50", "locator": real_locator},
+        key="printed_composition",
+    )
+    assert with_real_locator.state.is_value
+    assert with_real_locator.state.value == {
+        "SiO2": Decimal("50"),
+        "MgO": Decimal("50"),
+    }
+    assert with_real_locator.locator is not None
+
+
 @pytest.mark.parametrize(
     ("amount_basis", "components_parser"),
     (
