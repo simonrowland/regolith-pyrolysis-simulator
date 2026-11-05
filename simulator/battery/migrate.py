@@ -4172,6 +4172,9 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_PRINTED_COMPOSITION_METADATA_KEYS = frozenset(
+    {"basis", "amount_basis", "components", "state"}
+)
 _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
@@ -4393,14 +4396,6 @@ def _unrecognized_printed_chemical_components(
     green_read_maps: Sequence[Mapping[str, Any]] = (),
     dropped_sources: dict[str, str] | None = None,
 ) -> dict[str, Decimal]:
-    declared_names = (
-        {
-            _mass_percent_component_key(str(name))[0]
-            for name in declared_component_map
-        }
-        if declared_component_map is not None
-        else set()
-    )
     source_map: dict[str, tuple[Any, str]] = {
         str(name): (amount, _GREEN_READ_OXIDE_MAP) for name, amount in wt.items()
     }
@@ -4442,18 +4437,19 @@ def _unrecognized_printed_chemical_components(
     for raw_name, (raw_amount, source) in source_map.items():
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         volatile = _volatile_closure_component(name)
-        # A declared map may retain trace analyses in ppm beside its wt% oxides.
+        # Skip wrapper metadata (basis/amount_basis/components/state), traversal
+        # metadata (_WALK_SKIP_KEYS and locator), totals, ppm, condition keys,
+        # recognized components, formula oxides, and non-numeric cell values.
         if (
-            name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+            name.casefold() in _PRINTED_COMPOSITION_METADATA_KEYS
+            or raw_name in _WALK_SKIP_KEYS
+            or str(raw_name) == "locator"
+            or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or name.casefold().endswith(("_ppm", " ppm"))
             or (volatile is not None and volatile[0] != "Cl")
             or name in _COMPOSITION_COMPONENTS
             or _kume_formula_unit_oxide(name) is not None
             or _is_composition_condition_key(name)
-            or (
-                name not in declared_names
-                and not _is_printed_chemical_component_name(name)
-            )
         ):
             continue
         amount = _printed_mass_percent_number(raw_amount)
@@ -4787,6 +4783,7 @@ def _oxide_mass_percent_components(
         if (
             raw_name in _WALK_SKIP_KEYS
             or raw_name == "locator"
+            or name.casefold() in _PRINTED_COMPOSITION_METADATA_KEYS
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or _is_composition_condition_key(name)
             or (

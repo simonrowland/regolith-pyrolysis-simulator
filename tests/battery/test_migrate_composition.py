@@ -5941,6 +5941,28 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             True,
             id="m1-nested-unknown-token",
         ),
+        # (a) Green read and rejected the numeric unsupported label in its map.
+        pytest.param(
+            "unknown-label",
+            {"SiO2": "50", "MgO": "49", "unknown-component": "1"},
+            None,
+            None,
+            False,
+            id="green-unknown-label-over-trace-limit",
+        ),
+        # (b) Green never read a nested unsupported label; m1 flags its excess.
+        pytest.param(
+            "nested-unknown-label",
+            {"SiO2": "50", "MgO": "50"},
+            {
+                "point_conditions": {
+                    "printed_composition": {"unknown-component": "1"}
+                }
+            },
+            None,
+            True,
+            id="m1-nested-unknown-label-over-trace-limit",
+        ),
         # (a) The over-limit unsupported total includes a token Green rejected.
         pytest.param(
             "formula-unknown-and-chloride-traces",
@@ -6095,21 +6117,24 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
         # Accepted with disclosure: unknown label is within the 0.5 wt% drop limit.
         pytest.param(
             "unknown-component-trace",
-            {"SiO2": "49.85", "MgO": "49.85"},
-            {
-                "composition_wt_pct": {
-                    "SiO2": "49.85",
-                    "MgO": "49.85",
-                    "unknown-component": "0.3",
-                }
-            },
             {
                 "SiO2": "49.85",
                 "MgO": "49.85",
                 "unknown-component": "0.3",
             },
             None,
+            None,
+            None,
             id="m1-unknown-label-trace-disclosed",
+        ),
+        # Wrapper metadata is ignored while the numeric oxide map is accepted.
+        pytest.param(
+            "metadata-basis",
+            {"SiO2": "50", "MgO": "50", "basis": "oxide"},
+            None,
+            None,
+            None,
+            id="metadata-basis-string-is-ignored",
         ),
         # (a) Green's negative oxide refusal wins over the volatile diagnostic.
         pytest.param(
@@ -6138,7 +6163,10 @@ def test_mass_closure_refusal_check_order(
     if closure_refusal is None:
         assert converted is not None, case
         assert refusal is None, case
-        if case in {"formula-unknown-trace", "unknown-component-trace"}:
+        if case in {
+            "formula-unknown-trace",
+            "unknown-component-trace",
+        }:
             notice = migrate_module._composition_projection_notice(
                 wt,
                 closure_context=closure_context,
