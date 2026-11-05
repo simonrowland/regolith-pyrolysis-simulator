@@ -13,7 +13,10 @@ from simulator.diagnostics import _coating_wall_deposit_selection
 import simulator.condensation as condensation_module
 from simulator.condensation import CondensationModel
 from simulator.core import CondensationTrain, EvaporationFlux, MeltState
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.diagnostics import (
+    WALL_STICKING_ALPHA_UNCERTIFIED_CODE,
+    wall_deposit_sticking_authority_status,
+)
 from simulator.optimize.objective import _coating_product_summary
 from simulator.optimize.physics import PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.study import (
@@ -767,8 +770,12 @@ def test_out_of_domain_cited_fe_alpha_computes_but_marks_wall_non_authoritative(
     assert extrapolated
     assert all(record["output_status"] == "status_bearing" for record in extrapolated)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
-    assert authority["uncertified_alpha_species"] == []
+    # b1113 evaluates Fe on every stage. Stage 2 is inside the cited
+    # domain and its record is status_bearing, which
+    # _uncertified_alpha_record ranks as uncertified. That outranks
+    # the out-of-domain code. Fe stays out of domain on the other stages.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -1023,7 +1030,10 @@ def test_later_no_deposit_route_cannot_erase_prior_out_of_domain_authority(
 
     assert second.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert cumulative["authoritative_for_deposit_mass"] is False
-    assert cumulative["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # The later notice still carries the in-domain status-bearing stage-2
+    # record, so the fold stays uncertified. It does not become authoritative.
+    assert cumulative["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert cumulative["uncertified_alpha_species"] == ["Fe"]
     assert cumulative["out_of_domain_alpha_species"] == ["Fe"]
 
 
@@ -1330,7 +1340,10 @@ def test_zero_deposit_out_of_domain_alpha_remains_non_authoritative() -> None:
 
     assert route.wall_deposit_by_species.get("Fe", 0.0) == pytest.approx(0.0)
     assert authority["authoritative_for_deposit_mass"] is False
-    assert authority["code"] == "wall_deposit_sticking_alpha_out_of_domain"
+    # Same fold as the depositing route: the in-domain status-bearing
+    # stage-2 record keeps the code uncertified when nothing deposits.
+    assert authority["code"] == WALL_STICKING_ALPHA_UNCERTIFIED_CODE
+    assert authority["uncertified_alpha_species"] == ["Fe"]
     assert authority["out_of_domain_alpha_species"] == ["Fe"]
     assert authority["deposited_species"] == []
 
