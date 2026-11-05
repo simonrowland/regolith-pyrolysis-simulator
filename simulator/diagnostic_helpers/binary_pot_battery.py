@@ -128,6 +128,7 @@ REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 AUTHORITY_EXTRAPOLATED = "extrapolated"
+_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON = "oxygen_balance_no_admitted_bracket"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
 _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
 
@@ -2116,9 +2117,19 @@ def _solve_vapor_engine_cell_oxygen_balance(
         last_admitted_po2_bar = pO2_bar
         return cells_by_po2[pO2_bar]
 
+    def _is_silicate_window_trial_refusal(
+        refusal: _OxygenBalanceEngineTrialRefusal,
+    ) -> bool:
+        return (
+            refusal.reason_code == REFUSAL_GATE_REFUSED_IN_ADAPTER
+            and "silicate_window" in refusal.backend_status_reason
+        )
+
     start_logp = -6.0
     start_cell = None
     starting_refusal_counts: dict[str, int] = {}
+    starting_grid_had_engine_crash = False
+    starting_grid_all_silicate_window_refusals = True
     # -6 is an arbitrary interior seed, not a domain boundary: refusing that
     # cell says nothing about the solver's log10(pO2/bar) range [-30, 0]. Try
     # it first, then walk outward by 1 dex, preferring the higher side at each
@@ -2132,6 +2143,10 @@ def _solve_vapor_engine_cell_oxygen_balance(
         try:
             start_cell = cell_at_po2(10.0**candidate_logp)
         except _OxygenBalanceEngineTrialRefusal as exc:
+            if exc.reason_code == REFUSAL_ENGINE_CRASH:
+                starting_grid_had_engine_crash = True
+            if not _is_silicate_window_trial_refusal(exc):
+                starting_grid_all_silicate_window_refusals = False
             guard_reason = exc.reason_code
             engine_reason = getattr(exc.cell, "engine_reason", None)
             if engine_reason:
@@ -2148,8 +2163,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
             f"{reason}: {count}"
             for reason, count in sorted(starting_refusal_counts.items())
         )
+        # A recorded crash wins for a mixed refused grid; silicate applies only
+        # when every refusal is that gate, and all other mixes keep the family code.
+        if starting_grid_had_engine_crash:
+            starting_grid_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:engine_domain_crash"
+            )
+        elif starting_grid_all_silicate_window_refusals:
+            starting_grid_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:silicate_window_refusal"
+            )
+        else:
+            starting_grid_reason = _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
         raise _OxygenBalanceRefusal(
-            "oxygen_balance_no_admitted_bracket",
+            starting_grid_reason,
             "no admitted starting cell in log10(pO2/bar) range [-30, 0]; "
             f"last_admitted_pO2_bar=none; starting-cell guard refusals: {refusal_counts}",
         )
@@ -2208,6 +2235,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
             species_metadata,
         )
 
+    def bracket_residual_tokens(detail: str) -> tuple[str, str] | None:
+        match = re.search(
+            r"F\(low\)=([^,]+),\s*F\(high\)=([^\s;)]+)", detail
+        )
+        if match is None:
+            return None
+        low_text, high_text = (token.strip() for token in match.groups())
+        try:
+            float(low_text)
+            float(high_text)
+        except ValueError:
+            return None
+        return low_text, high_text
+
     previous_root_logp: float | None = None
     max_fixed_point_iterations = 8
     # The inner OpenIMCC solve uses Brent xtol=1e-12 dex. Require the
@@ -2220,6 +2261,11 @@ def _solve_vapor_engine_cell_oxygen_balance(
         lower_stop: str | None = None
         upper_stop: str | None = None
         solution = None
+        bracket_edge_evidence: list[
+            tuple[float, float, str | None, str | None, str]
+        ] = []
+        all_bracket_residuals_same_sign = True
+        root_above_one_bar = False
         while lower_stop is None or upper_stop is None:
             for side in ("lower", "upper"):
                 if side == "lower":
@@ -2277,8 +2323,20 @@ def _solve_vapor_engine_cell_oxygen_balance(
                         if last_refused_trial is None
                         else f"{last_refused_trial[0]:g}"
                     )
+                    if _is_silicate_window_trial_refusal(exc):
+                        refusal_reason = (
+                            f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
+                            "silicate_window_refusal"
+                        )
+                    elif exc.reason_code == REFUSAL_ENGINE_CRASH:
+                        refusal_reason = (
+                            f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:"
+                            "engine_domain_crash"
+                        )
+                    else:
+                        refusal_reason = _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
                     raise _OxygenBalanceRefusal(
-                        "oxygen_balance_no_admitted_bracket",
+                        refusal_reason,
                         "engine refused a trial while checking an admitted bracket; "
                         f"last_admitted_pO2_bar={last_admitted_po2_bar!r}; "
                         f"guard at pO2={refused_po2} bar: "
@@ -2292,18 +2350,74 @@ def _solve_vapor_engine_cell_oxygen_balance(
                     )
                     if not (no_sign_change or above_knudsen_limit):
                         raise
+                    root_above_one_bar = root_above_one_bar or above_knudsen_limit
+
+                    residual_tokens = bracket_residual_tokens(detail)
+                    if above_knudsen_limit and high_logp == 0.0:
+                        high_match = re.search(r"F\(1 bar\)=([^\s;)]+)", detail)
+                        if high_match is not None:
+                            high_text = high_match.group(1)
+                            try:
+                                float(high_text)
+                            except ValueError:
+                                high_text = None
+                            low_text = None
+                            if high_text is not None:
+                                # Reuse OpenIMCC at the same low edge and just
+                                # below log10(pO2/bar)=0 to expose F(low) without
+                                # reimplementing its flux calculation.
+                                try:
+                                    _solve_cell_oxygen_balance(
+                                        pressure_model,
+                                        species_metadata,
+                                        temperature_K=temperature_K,
+                                        cell_material=cell_material,
+                                        bracket=(
+                                            low_logp,
+                                            math.nextafter(high_logp, -math.inf),
+                                        ),
+                                    )
+                                except _OxygenBalanceRefusal as edge_exc:
+                                    edge_tokens = bracket_residual_tokens(
+                                        str(edge_exc)
+                                    )
+                                    if edge_tokens is not None:
+                                        low_text = edge_tokens[0]
+                                residual_tokens = (
+                                    None
+                                    if low_text is None
+                                    else (low_text, high_text)
+                                )
+
+                    if residual_tokens is None:
+                        all_bracket_residuals_same_sign = False
+                        low_text = high_text = None
+                    else:
+                        low_text, high_text = residual_tokens
+                        low_value, high_value = float(low_text), float(high_text)
+                        if not (
+                            (low_value > 0.0 and high_value > 0.0)
+                            or (low_value < 0.0 and high_value < 0.0)
+                        ):
+                            all_bracket_residuals_same_sign = False
+                    bracket_edge_evidence.append(
+                        (low_logp, high_logp, low_text, high_text, detail)
+                    )
 
             if solution is not None:
                 break
 
         if solution is None:
-            last_admitted = (
-                "none"
-                if last_admitted_po2_bar is None
-                else f"{last_admitted_po2_bar:g} bar"
+            same_sign_residual = (
+                bool(bracket_edge_evidence)
+                and all_bracket_residuals_same_sign
             )
-            raise _OxygenBalanceRefusal(
-                "oxygen_balance_no_admitted_bracket",
+            refusal_reason = (
+                f"{_OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON}:same_sign_residual"
+                if same_sign_residual
+                else _OXYGEN_BALANCE_NO_ADMITTED_BRACKET_REASON
+            )
+            detail = (
                 "no sign-changing bracket was found in the admitted pO2 window "
                 "reachable from the chosen start; "
                 f"start_pO2_bar={10.0**activity_anchor_logp:g}; "
@@ -2312,8 +2426,32 @@ def _solve_vapor_engine_cell_oxygen_balance(
                 f"lower_stop={lower_stop}; upper_stop={upper_stop}; "
                 "expansion stops at the first refused one-dex trial or solver "
                 "limit on each side and does not establish whether a root exists "
-                "in another admitted window in log10(pO2/bar) range [-30, 0]",
+                "in another admitted window in log10(pO2/bar) range [-30, 0]"
             )
+            if bracket_edge_evidence:
+                recorded_edges = " | ".join(
+                    (
+                        f"log10(pO2/bar)=({low_logp:g}, {high_logp:g}), "
+                        f"F(low)={low_text}, F(high)={high_text}; "
+                        f"inner refusal: {inner_detail}"
+                    )
+                    if low_text is not None and high_text is not None
+                    else (
+                        f"log10(pO2/bar)=({low_logp:g}, {high_logp:g}); "
+                        f"inner refusal: {inner_detail}"
+                    )
+                    for low_logp, high_logp, low_text, high_text, inner_detail
+                    in bracket_edge_evidence
+                )
+                detail += f"; bracket edge evidence: {recorded_edges}"
+            if root_above_one_bar:
+                detail += (
+                    "; A root above 1 bar lies outside molecular-flow effusion "
+                    "validity (Kn << 1 at the orifice), so no admitted root exists. "
+                    "It is not a solver miss, and the admitted window must not be "
+                    "widened to find it."
+                )
+            raise _OxygenBalanceRefusal(refusal_reason, detail)
 
         if not fixed_point_activities:
             return solution
