@@ -71,6 +71,7 @@ from typing import (
 
 import yaml
 
+from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
@@ -4181,6 +4182,9 @@ _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
 _MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("102")
 _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("0.5")
+_GREEN_READ_OXIDE_MAP = "green-read oxide map"
+_EARLY_CLOSURE_CELL_VALIDATION = "early closure-cell validation"
+_M1_ONLY_CLOSURE_CONTRIBUTOR = "m1-only closure contributor"
 _PRINTED_FORMULA_TOKEN = r"(?:[A-Z][a-z]?(?:\d+(?:\.\d+)?|\.\d+)?)+"
 _PRINTED_FORMULA_COMPONENT_RE = re.compile(rf"^{_PRINTED_FORMULA_TOKEN}$")
 _PRINTED_FORMULA_EXPRESSION_RE = re.compile(
@@ -4607,7 +4611,7 @@ def _composition_projection_notice(
 
 def _printed_volatile_mass_percent(
     *payloads: object,
-    malformed: list[str] | None = None,
+    diagnostics: list[tuple[str, str]] | None = None,
 ) -> dict[str, Decimal]:
     """Read numeric volatile amounts attached to this composition row only."""
 
@@ -4635,7 +4639,13 @@ def _printed_volatile_mass_percent(
                     scopes.append(composition_map)
 
     selected: dict[str, tuple[int, Decimal]] = {}
-    malformed_by_component: dict[str, str] = {}
+    reported: set[str] = set()
+
+    def reject(reason: str) -> None:
+        if diagnostics is not None and reason not in reported:
+            diagnostics.append((_EARLY_CLOSURE_CELL_VALIDATION, reason))
+            reported.add(reason)
+
     for scope in scopes:
         for name, raw_amount in scope.items():
             alias = _volatile_closure_component(str(name))
@@ -4649,30 +4659,28 @@ def _printed_volatile_mass_percent(
             component, priority = alias
             kind, amount = _classify_composition_cell(raw_amount)
             if kind == "malformed":
-                malformed_by_component.setdefault(
-                    component,
+                reject(
                     "malformed printed volatile component amount for "
-                    f"{name!r}: {raw_amount!r}",
+                    f"{name!r}: {raw_amount!r}"
                 )
                 continue
             if amount is None:
                 continue
+            if not amount.is_finite() or amount < 0:
+                reject(
+                    "printed volatile component has negative or non-finite "
+                    f"amount for {name!r}: {raw_amount!r}"
+                )
             current = selected.get(component)
             if current is None or priority < current[0]:
                 selected[component] = (priority, amount)
-    if malformed is not None:
-        malformed.extend(
-            reason
-            for component, reason in malformed_by_component.items()
-            if component not in selected
-        )
     return {component: amount for component, (_priority, amount) in selected.items()}
 
 
 def _printed_composition_closure_components(
     payload: object,
     *,
-    malformed: list[str] | None = None,
+    diagnostics: list[tuple[str, str]] | None = None,
 ) -> dict[str, Decimal]:
     """Return same-row printed analytes used for closure, not oxide conversion."""
 
@@ -4684,10 +4692,13 @@ def _printed_composition_closure_components(
     components: dict[str, Decimal] = {}
     for name, value in raw.items():
         kind, amount = _classify_composition_cell(value)
-        if kind == "malformed" and malformed is not None:
-            malformed.append(
-                "malformed printed closure component amount for "
-                f"{name!r}: {value!r}"
+        if kind == "malformed" and diagnostics is not None:
+            diagnostics.append(
+                (
+                    _EARLY_CLOSURE_CELL_VALIDATION,
+                    "malformed printed closure component amount for "
+                    f"{name!r}: {value!r}",
+                )
             )
         elif kind == "number" and amount is not None:
             components[str(name)] = amount
@@ -4698,20 +4709,18 @@ def _oxide_mass_percent_components(
     wt: Mapping[str, Any],
     *,
     validation_maps: Sequence[Mapping[str, Any]] = (),
-    green_rejections: list[str] | None = None,
+    diagnostics: list[tuple[str, str]] | None = None,
 ) -> dict[str, Decimal]:
     names = {_mass_percent_component_key(str(name))[0] for name in wt}
     if "FeOT" in names and names.intersection({"FeO", "Fe2O3"}):
         overlap = ", ".join(sorted(names.intersection({"FeO", "Fe2O3"})))
         reason = f"ambiguous total iron components: FeOT with {overlap}"
-        if green_rejections is None:
+        if diagnostics is None:
             raise ValueError(reason)
-        green_rejections.append(reason)
+        diagnostics.append((_GREEN_READ_OXIDE_MAP, reason))
 
-    def record_raw_cell_rejection(
-        component_map: Mapping[str, Any], raw_name: str, raw_amount: Any
-    ) -> None:
-        if green_rejections is None:
+    def record_raw_cell_rejection(raw_name: str, raw_amount: Any) -> None:
+        if diagnostics is None:
             return
         name, _has_mass_suffix = _mass_percent_component_key(raw_name)
         if (
@@ -4719,74 +4728,68 @@ def _oxide_mass_percent_components(
             or raw_name == "locator"
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
             or _is_composition_condition_key(name)
+            or _volatile_closure_component(raw_name) is not None
+            or _volatile_closure_component(name) is not None
         ):
             return
         kind, amount = _classify_composition_cell(raw_amount)
         if kind == "malformed":
-            volatile_alias = _volatile_closure_component(raw_name)
-            resolved_ditto = False
-            if (
-                volatile_alias is not None
-                and raw_name.casefold().endswith("_as_printed")
-            ):
-                for resolved_name, resolved_amount in component_map.items():
-                    resolved_alias = _volatile_closure_component(
-                        str(resolved_name)
-                    )
-                    if (
-                        resolved_alias is not None
-                        and resolved_alias[0] == volatile_alias[0]
-                        and resolved_alias[1] < volatile_alias[1]
-                        and _classify_composition_cell(resolved_amount)[0]
-                        == "number"
-                    ):
-                        resolved_ditto = True
-                        break
-            if not resolved_ditto:
-                green_rejections.append(
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
                     "malformed printed component amount for "
-                    f"{raw_name!r}: {raw_amount!r}"
+                    f"{raw_name!r}: {raw_amount!r}",
                 )
+            )
             return
         if kind != "number" or amount is None:
             return
         if not amount.is_finite() or amount < 0:
-            green_rejections.append(
-                "printed component has negative or non-finite amount for "
-                f"{raw_name!r}: {raw_amount!r}"
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
+                    "printed component has negative or non-finite amount for "
+                    f"{raw_name!r}: {raw_amount!r}",
+                )
             )
         if (
             _PRINTED_FORMULA_COMPONENT_RE.fullmatch(name)
             and name not in _COMPOSITION_COMPONENTS
+            and name not in ATOMIC_WEIGHTS_G_PER_MOL
             and _kume_formula_unit_oxide(name) is None
             and _volatile_closure_component(name) is None
         ):
-            green_rejections.append(
-                "unsupported numeric component has an unknown token: "
-                f"{raw_name}={amount} wt%"
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
+                    "unsupported numeric component has an unknown token: "
+                    f"{raw_name}={amount} wt%",
+                )
             )
         if _PRINTED_FORMULA_EXPRESSION_RE.fullmatch(name) and any(
             component not in _COMPOSITION_COMPONENTS
+            and component not in ATOMIC_WEIGHTS_G_PER_MOL
             and _kume_formula_unit_oxide(component) is None
             for component in name.split("_plus_")
         ):
-            green_rejections.append(
-                "unsupported numeric component has an unknown token: "
-                f"{raw_name}={amount} wt%"
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
+                    "unsupported numeric component has an unknown token: "
+                    f"{raw_name}={amount} wt%",
+                )
             )
 
-    if green_rejections is not None:
+    if diagnostics is not None:
         for component_map in validation_maps:
             if component_map is wt:
                 continue
             for raw_name, raw_amount in component_map.items():
-                record_raw_cell_rejection(
-                    component_map, str(raw_name), raw_amount
-                )
+                record_raw_cell_rejection(str(raw_name), raw_amount)
 
     components: dict[str, Decimal] = {}
     for raw_name, amount in wt.items():
-        record_raw_cell_rejection(wt, str(raw_name), amount)
+        record_raw_cell_rejection(str(raw_name), amount)
         name, _has_mass_suffix = _mass_percent_component_key(str(raw_name))
         if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
             continue
@@ -4798,7 +4801,7 @@ def _oxide_mass_percent_components(
                 _COMPOSITION_COMPONENTS.get(name) is not None
                 or _kume_formula_unit_oxide(name) is not None
             ):
-                if green_rejections is None:
+                if diagnostics is None:
                     raise ValueError(
                         f"malformed printed oxide amount for {name!r}: "
                         f"{amount!r}"
@@ -5020,8 +5023,7 @@ def _wt_percent_conversion_or_refusal(
         ):
             declared_maps.append(source_map)
 
-        green_rejections: list[str] = []
-        closure_rejections: list[str] = []
+        diagnostics: list[tuple[str, str]] = []
         component_maps: list[Mapping[str, Any]] = []
         for component_map in (wt, *declared_maps):
             if component_map is not None and all(
@@ -5033,17 +5035,20 @@ def _wt_percent_conversion_or_refusal(
             oxide_wt = _oxide_mass_percent_components(
                 wt,
                 validation_maps=component_maps,
-                green_rejections=green_rejections,
+                diagnostics=diagnostics,
             )
         except (ArithmeticError, ValueError) as exc:
             oxide_wt = {}
-            green_rejections.append(str(exc))
+            diagnostics.append((_GREEN_READ_OXIDE_MAP, str(exc)))
         if any(
             not amount.is_finite() or amount < 0
             for amount in oxide_wt.values()
         ):
-            green_rejections.append(
-                "printed oxide component amount is negative or non-finite"
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
+                    "printed oxide component amount is negative or non-finite",
+                )
             )
         positive_oxide_mass = sum(
             (
@@ -5056,30 +5061,28 @@ def _wt_percent_conversion_or_refusal(
             Decimal("0"),
         )
         if positive_oxide_mass <= 0:
-            green_rejections.append("printed oxide wt% map has no positive mass")
-
-        malformed_volatiles: list[str] = []
-        volatile_wt = _printed_volatile_mass_percent(
-            wt, closure_context, malformed=malformed_volatiles
-        )
-        green_rejections.extend(malformed_volatiles)
-        for name, amount in volatile_wt.items():
-            if not amount.is_finite() or amount < 0:
-                green_rejections.append(
-                    "printed volatile component has negative or non-finite "
-                    f"amount for {name!r}: {amount!r}"
+            diagnostics.append(
+                (
+                    _GREEN_READ_OXIDE_MAP,
+                    "printed oxide wt% map has no positive mass",
                 )
+            )
 
-        malformed_closure_only: list[str] = []
-        closure_only_wt = _printed_composition_closure_components(
-            closure_context, malformed=malformed_closure_only
+        volatile_wt = _printed_volatile_mass_percent(
+            wt, closure_context, diagnostics=diagnostics
         )
-        green_rejections.extend(malformed_closure_only)
+
+        closure_only_wt = _printed_composition_closure_components(
+            closure_context, diagnostics=diagnostics
+        )
         for name, amount in closure_only_wt.items():
             if not amount.is_finite() or amount < 0:
-                green_rejections.append(
-                    "printed closure component has negative or non-finite "
-                    f"amount for {name!r}: {amount!r}"
+                diagnostics.append(
+                    (
+                        _EARLY_CLOSURE_CELL_VALIDATION,
+                        "printed closure component has negative or non-finite "
+                        f"amount for {name!r}: {amount!r}",
+                    )
                 )
 
         dropped = _unrecognized_printed_chemical_components(
@@ -5106,8 +5109,12 @@ def _wt_percent_conversion_or_refusal(
             not amount.is_finite() or amount < 0 for amount in dropped_amounts
         )
         if invalid_dropped:
-            green_rejections.append(
-                "unsupported printed component has a negative or non-finite amount"
+            diagnostics.append(
+                (
+                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                    "unsupported printed component has a negative or "
+                    "non-finite amount",
+                )
             )
             dropped_mass = Decimal("0")
         else:
@@ -5138,17 +5145,11 @@ def _wt_percent_conversion_or_refusal(
                 )
             ):
                 reason += "; " + closure_error
-            closure_rejections.append(reason)
-        elif closure_error is not None:
-            if closure_error.startswith(
-                (
-                    "mass-percent composition is a partial analysis:",
-                    "mass-percent composition exceeds the accepted kept-sum limit:",
-                )
-            ):
-                closure_rejections.append(closure_error)
-            else:
-                green_rejections.append(closure_error)
+            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, reason))
+        elif closure_error is not None and not closure_error.startswith(
+            "mass-percent composition contains a negative or non-finite amount"
+        ):
+            diagnostics.append((_M1_ONLY_CLOSURE_CONTRIBUTOR, closure_error))
         if (
             not invalid_dropped
             and dropped_mass > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN
@@ -5156,22 +5157,41 @@ def _wt_percent_conversion_or_refusal(
             details = ", ".join(
                 f"{name}={amount} wt%" for name, amount in dropped.items()
             )
-            closure_rejections.append(
-                "partial analysis contains unsupported component(s) above "
-                f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}"
+            diagnostics.append(
+                (
+                    _M1_ONLY_CLOSURE_CONTRIBUTOR,
+                    "partial analysis contains unsupported component(s) above "
+                    f"{_MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN} wt%: {details}",
+                )
             )
 
-        # Green-era rejections win across every collected contributor. Only
-        # after those are known can m1 mark a mass-closure refusal.
-        if green_rejections:
+        # Green oxide-map failures and invalid cells in any closure contributor
+        # take precedence; only the remaining m1 closure checks are flagged.
+        early_reason = next(
+            (
+                reason
+                for source, reason in diagnostics
+                if source
+                in {_GREEN_READ_OXIDE_MAP, _EARLY_CLOSURE_CELL_VALIDATION}
+            ),
+            None,
+        )
+        m1_reason = next(
+            (
+                reason
+                for source, reason in diagnostics
+                if source == _M1_ONLY_CLOSURE_CONTRIBUTOR
+            ),
+            None,
+        )
+        if early_reason is not None:
             return None, _CompositionRefusal(
-                "mass-percent composition is not usable: "
-                + green_rejections[0]
+                f"mass-percent composition is not usable: {early_reason}"
             )
-        if closure_rejections:
+        if m1_reason is not None:
             return None, _CompositionRefusal(
                 "mass-percent composition is not usable: "
-                + closure_rejections[0],
+                + m1_reason,
                 closure_refusal=True,
             )
 

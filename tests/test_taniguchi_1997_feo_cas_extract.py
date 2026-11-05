@@ -204,10 +204,13 @@ def test_isolated_migration_retains_typed_rows_and_located_conditions() -> None:
     # the allowed kept-sum window; only 31 complete maps remain usable.
     assert len(accepted_compositions) == 31
     assert len(refused_compositions) == 110
+    # Fe-only assays are recognized elements, then rejected for no oxide mass.
     assert all(
         "mass-percent composition is not usable:" in item.identity.composition.reason
         and (
-            "kept sum=0 wt% is below 95 wt%" in item.identity.composition.reason
+            "kept sum=" in item.identity.composition.reason
+            or "printed oxide wt% map has no positive mass"
+            in item.identity.composition.reason
             or "unsupported component(s) above 0.5 wt%" in item.identity.composition.reason
             or "mass-percent composition exceeds the accepted kept-sum limit" in item.identity.composition.reason
         )
