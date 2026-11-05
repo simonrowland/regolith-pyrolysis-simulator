@@ -2,17 +2,32 @@
 
 from __future__ import annotations
 
+import math
+
 import pytest
 
-from simulator.condensation import CondensationModel, _stage_midpoint_temperature_K, _stage_vapour_fog_notice
+from simulator.condensation import (
+    CondensationModel,
+    DepositionInputRefusal,
+    _stage_cold_end_temperature_K,
+    _stage_midpoint_temperature_K,
+    _stage_vapour_fog_notice,
+)
 from simulator.nucleation import (
     ETA_ROLE_UPPER_BOUND,
     FOG_RATE_THRESHOLD_M3_S,
     NOTICE_FOG,
     NOTICE_UNEVALUABLE,
+    fog_capture_code,
+    nucleation_rate,
 )
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
-from simulator.state import CondensationStage, CondensationTrain, EvaporationFlux, MeltState
+from simulator.state import (
+    CondensationStage,
+    CondensationTrain,
+    EvaporationFlux,
+    MeltState,
+)
 
 _P_PA = 5.89
 _INLET_KG_HR = 0.01
@@ -199,6 +214,94 @@ def test_potassium_fog_check_is_unevaluable_on_the_cold_trap() -> None:
     assert trap[0]["saturation_authority"] is None
     assert trap[0]["saturation_notice"] is None
 
+
+def _band_stage(temp_range_C: tuple[float, float]) -> CondensationStage:
+    return CondensationStage(
+        5, "Vortex Dust Filter", temp_range_C, [],
+        stage_key="stage_5_vortex_dust_filter",
+    )
+
+
+def _band_notice(temp_range_C: tuple[float, float], bulk_K: float) -> dict:
+    melt = MeltState(temperature_C=1450.0, hour=4, campaign_hour=4)
+    return _stage_vapour_fog_notice(
+        _band_stage(temp_range_C), "Na", melt, _P_PA, 0.1, _INLET_KG_HR,
+        bulk_temperature_K=bulk_K,
+    )
+
+
+def test_wide_band_fogs_at_the_cold_end() -> None:
+    """Stage 5 is [200, 350] C. 5.89 Pa of Na fogs at 200 C and is clear at 275 C.
+
+    The fog wall is min(temp_range_C). Capture's wall stays the midpoint.
+    An isothermal band still samples its only temperature.
+    """
+
+    wide = _band_stage((200.0, 350.0))
+    cold_K = min(wide.temp_range_C) + CELSIUS_TO_KELVIN_OFFSET
+    midpoint_K = sum(wide.temp_range_C) / 2.0 + CELSIUS_TO_KELVIN_OFFSET
+    hot_bulk_K = 1450.0 + CELSIUS_TO_KELVIN_OFFSET
+    cold = nucleation_rate("Na", cold_K, _P_PA)
+    midpoint = nucleation_rate("Na", midpoint_K, _P_PA)
+    bulk = nucleation_rate("Na", hot_bulk_K, _P_PA)
+    assert fog_capture_code(cold) == NOTICE_FOG
+    assert fog_capture_code(midpoint) is None
+    assert fog_capture_code(bulk) is None
+
+    # Capture wall, unchanged: the [200, 350] C midpoint is 548.15 K.
+    assert _stage_midpoint_temperature_K(wide).hex() == "0x1.1213333333333p+9"
+    assert _stage_cold_end_temperature_K(wide) == pytest.approx(cold_K)
+
+    notice = _band_notice((200.0, 350.0), hot_bulk_K)
+    assert notice["code"] == NOTICE_FOG
+    assert notice["clearance_temperature_basis"] == "stage_wall"
+    assert notice["wall_temperature_basis"] == "stage_wall"
+    assert notice["wall_temperature_K"] == pytest.approx(cold_K)
+    assert notice["wall_clearance_code"] == NOTICE_FOG
+    assert notice["wall_J_m3_s"] == pytest.approx(cold.rate_m3_s)
+    assert notice["bulk_temperature_basis"] == "stage_bulk"
+    assert notice["bulk_temperature_K"] == pytest.approx(hot_bulk_K)
+    assert notice["bulk_clearance_code"] is None
+    assert notice["bulk_J_m3_s"] == pytest.approx(bulk.rate_m3_s)
+    assert notice["p_Pa"] == pytest.approx(_P_PA)
+    assert notice["eta_role"] == ETA_ROLE_UPPER_BOUND
+    assert notice["J_m3_s"] > FOG_RATE_THRESHOLD_M3_S
+
+    clear_iso = _band_notice((275.0, 275.0), hot_bulk_K)
+    assert clear_iso["code"] is None
+    assert clear_iso["wall_temperature_K"] == pytest.approx(midpoint_K)
+    assert clear_iso["wall_temperature_K"] == pytest.approx(
+        _stage_midpoint_temperature_K(_band_stage((275.0, 275.0))),
+    )
+    assert clear_iso["wall_clearance_code"] is None
+    assert clear_iso["clearance_temperature_basis"] == "stage_bulk"
+
+    fog_iso = _band_notice((200.0, 200.0), hot_bulk_K)
+    assert fog_iso["code"] == NOTICE_FOG
+    assert fog_iso["wall_temperature_K"] == pytest.approx(cold_K)
+    assert fog_iso["wall_clearance_code"] == NOTICE_FOG
+    assert fog_iso["clearance_temperature_basis"] == "stage_wall"
+
+
+@pytest.mark.parametrize(
+    "band",
+    [(math.nan, 600.0), (500.0, math.inf), (600.0, 500.0)],
+)
+def test_cold_end_refuses_a_bad_band_without_moving_the_midpoint(band) -> None:
+    stage = _band_stage(band)
+    with pytest.raises(DepositionInputRefusal, match="stage_temperature"):
+        _stage_cold_end_temperature_K(stage)
+    with pytest.raises(DepositionInputRefusal, match="stage_temperature"):
+        _stage_midpoint_temperature_K(stage)
+
+
+def test_cold_end_below_absolute_zero_refuses_while_the_midpoint_can_remain() -> None:
+    """[-300, 100] C is ordered. Its mean is above 0 K. Its cold end is not."""
+
+    stage = _band_stage((-300.0, 100.0))
+    assert _stage_midpoint_temperature_K(stage) > 0.0
+    with pytest.raises(DepositionInputRefusal, match="T_surface_K"):
+        _stage_cold_end_temperature_K(stage)
 
 
 def test_capture_wall_midpoint_kelvin_pin() -> None:
