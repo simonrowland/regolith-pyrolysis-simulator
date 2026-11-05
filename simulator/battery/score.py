@@ -10037,6 +10037,7 @@ def _predict_with_engine(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
+                        authority=Authority.BRIDGE,
                     )
                 )
             activity_sources = tuple(

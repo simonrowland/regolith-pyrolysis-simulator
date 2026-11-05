@@ -3387,6 +3387,14 @@ def _internal_analytical_vapor_pressure_adapter(
                             }
                         if fusion_authority == AUTHORITY_EXTRAPOLATED:
                             fusion_extrapolated = True
+                    if oxide_activity.source_composition_range_notice is not None:
+                        core_flags.append(
+                            {
+                                "kind": NoticeKind.ENGINE_MODEL_CAVEAT.value,
+                                "authority": "bridge",
+                                "reason": oxide_activity.source_composition_range_notice,
+                            }
+                        )
                     resolved = (
                         parent_formula,
                         oxide_activity.thermodynamic_parent_activity(),
