@@ -2541,10 +2541,22 @@ def test_recipe_runtime_override_numeric_error_pin(value, field):
         _recipe_inputs_from_controls({"runtime_campaign_overrides": {
             "C4": {field: value},
         }})
-    assert caught.value.description == (
-        f"controls.runtime_campaign_overrides.C4.{field} "
-        "must be a finite non-negative number"
-    )
+    if field in {"pO2_mbar", "p_total_mbar"}:
+        from simulator.campaigns import CampaignManager
+
+        # Pressure fields keep the raw value for the typed refusal. The
+        # recipe boundary reports that owner text, not the generic
+        # non-negative prose used for hold temperature and ramp rate.
+        with pytest.raises(ValueError) as owner:
+            CampaignManager.validate_runtime_campaign_overrides(
+                {"C4": {field: value}}
+            )
+        assert caught.value.description == str(owner.value)
+    else:
+        assert caught.value.description == (
+            f"controls.runtime_campaign_overrides.C4.{field} "
+            "must be a finite non-negative number"
+        )
 
 
 @pytest.mark.parametrize("field", ["stage3_product_purity", "stage3_instantaneous_purity"])
