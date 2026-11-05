@@ -1323,21 +1323,23 @@ def test_po2_wall_sweep_mode_suppresses_first_tick_sio_release():
         # (pO2_exponent 0.0), so the old SiO2-drawdown proxy no longer
         # isolates the SiO channel the 1/sqrt(pO2) lever acts on (executed:
         # SiO2_gas leg 6.3814e-05 mol in both modes; SiO leg ratio exactly
-        # 1.0e-3). Measure the SiO channel directly as the ledger-wide SiO
-        # delta across every sink account.
-        def _sio_mol_total() -> float:
+        # 1.0e-3). b1113 condenses that SiO inside the tick, so the
+        # ledger-wide SiO species total is zero in both modes. The captured
+        # product is elemental Si on the train. Its mole ratio between
+        # 1 mbar and 1e-6 mbar is the same 1e-3 lever.
+        def _si_product_mol_total() -> float:
             return sum(
-                float(payload.get("SiO", 0.0))
+                float(payload.get("Si", 0.0))
                 for payload in sim.atom_ledger.mol_by_account().values()
                 if isinstance(payload, dict)
             )
 
-        initial_sio_mol = _sio_mol_total()
+        initial_si_mol = _si_product_mol_total()
         sim.step()
-        sio_mol = max(0.0, _sio_mol_total() - initial_sio_mol)
+        si_mol = max(0.0, _si_product_mol_total() - initial_si_mol)
         from simulator.state import MOLAR_MASS
-        sio_molar_mass_kg_mol = MOLAR_MASS["SiO"] / 1000.0
-        return sio_mol * sio_molar_mass_kg_mol
+        si_molar_mass_kg_mol = MOLAR_MASS["Si"] / 1000.0
+        return si_mol * si_molar_mass_kg_mol
 
     # pO2 ~vacuum: tiny floor, near hard-vacuum suppression.
     no_suppress = _evolved_sio_kg_one_tick(pO2_mbar=1.0e-6)
