@@ -818,11 +818,13 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
     # 40 C K trap. c679673f5/85fedcb8e band integration changes the row total
-    # from 0.0004975311735864234 to 0.0004974950336209987 kg; the next row
+    # from 0.0004975311735864234 to 0.0004974950336209987 kg. The d-344
+    # cartridge (14.7388 m2) and the e-NTU bulk temperature then raise that
+    # hour's live Na+K product to 0.0007693717261912645 kg. The next row
     # transfers it to reagent, so live product returns to zero while cumulative
     # condensate and recycled mass retain the capture.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004974950336209987, rel=1e-12, abs=1e-15
+        0.0007693717261912645, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2053,8 +2055,10 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
             allow_nan=False,
         ).encode("utf-8")
         assert canonical_hours == expected_hours
+        # The committed mars golden's per-hour summary. The condenser stack
+        # regenerated that fixture; this is its sha256, not a second run.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "48f744baf44800a9bc8bd223d67b4378fbce24ba4bbcb91492f883157ad2fba7"
+            "95ff7a31410ea31906535bca81c4747bcf3d2aa6ce180c8c70e99320dacc3d00"
         )
 
 
