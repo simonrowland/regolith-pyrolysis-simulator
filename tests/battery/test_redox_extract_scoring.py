@@ -1379,7 +1379,11 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
             )
 
 
-def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
+def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
+    # SCHEMA.md: an ambient_pressure_evidence quote supplies 101325 Pa when
+    # total pressure is otherwise missing. Kress Table 1's gas_mixing quote is
+    # that evidence. The row text says the uncertainty was not printed, so the
+    # score has no band and is not an unpublished-pressure refusal.
     root = Path(__file__).resolve().parents[2]
     extract = (
         root
@@ -1391,6 +1395,27 @@ def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
     hard_issue_details = [issue.detail for issue in result.validation.hard_issues]
     assert hard_issue_details.count("derived observation requires derived_from") == 0
     assert result.validation.hard_issues == ()
+    redox_rows = [
+        row
+        for row in result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.FE3_FE2_RATIO
+    ]
+    assert len(redox_rows) == 63
+    for row in redox_rows:
+        assert row.identity.total_pressure_Pa.is_value
+        assert row.identity.total_pressure_Pa.value == Decimal("101325")
+        ambient = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.TOTAL_PRESSURE_AMBIENT_OPEN_FURNACE
+        ]
+        assert ambient
+        assert all(
+            notice.authority is Authority.DERIVED_FROM_APPARATUS
+            and notice.band is None
+            for notice in ambient
+        )
     context = ScoreContext(
         result.works,
         result.experiments,
@@ -1407,12 +1432,12 @@ def test_kress_table1_redox_rows_refuse_only_unpublished_pressure():
         if "kress-carmichael-1988-iron-oxidation-stoichiometry" in residual.key
     ]
     assert len(residuals) == 63
-    assert all(residual.numeric is None for residual in residuals)
     assert all(
-        residual.refusal is not None
-        and residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
-        and residual.refusal.detail
-        == {"fields": ["total_pressure_Pa"], "detail": ""}
+        residual.refusal is None
+        and residual.numeric is not None
+        and residual.numeric.value.is_finite()
+        and residual.numeric.decision_band is None
+        and residual.status is ResidualStatus.NO_BAND
         for residual in residuals
     )
 

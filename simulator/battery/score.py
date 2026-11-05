@@ -5018,6 +5018,12 @@ def decision_band_for(
 
 
 _UNCERTAINTY_NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+# "Row-specific uncertainties are not printed" is a denial, not a width.
+# Up to six words may sit between the noun and "not printed".
+_UNCERTAINTY_NOT_PRINTED_RE = re.compile(
+    r"\buncertaint(?:y|ies)\b(?:\s+\w+){0,6}\s+not\s+printed\b",
+    re.IGNORECASE,
+)
 _UNCERTAINTY_RANGE_RE = re.compile(
     rf"[\[(]\s*({_UNCERTAINTY_NUMBER})\s*[,;–—]\s*({_UNCERTAINTY_NUMBER})\s*[\])]"
 )
@@ -5482,6 +5488,18 @@ def _confidence_level_notice(
     )
 
 
+def _verbatim_denies_printed_uncertainty(uncertainty: Uncertainty) -> bool:
+    """True when the verbatim text says no uncertainty was printed.
+
+    A denial is not a width. Parsing the first number in that sentence
+    (``0.8`` in ``between 0.8 and 8.0%``) invents a unit the paper did not
+    print for the cell.
+    """
+
+    raw = uncertainty.verbatim
+    return isinstance(raw, str) and _UNCERTAINTY_NOT_PRINTED_RE.search(raw) is not None
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -5492,6 +5510,8 @@ def _printed_uncertainty_band(
     band_basis: str = "row_printed",
 ) -> _PrintedBandResolution:
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
+        return _PrintedBandResolution()
+    if _verbatim_denies_printed_uncertainty(uncertainty):
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
