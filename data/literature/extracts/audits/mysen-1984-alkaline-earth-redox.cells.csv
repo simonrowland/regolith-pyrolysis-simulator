@@ -135,10 +135,11 @@ pdf_page,printed_table,row,sample,cell,printed_value,stored_field,stored_value,a
 2,1,34,BSF5,"Temp., °C",1550,values.T_C,1550,b: 600 dpi render,The same temperature is mapped to point_conditions.T_C.
 2,1,34,BSF5,−log fO2,0.68,minus_log_fO2_as_published,0.68,b: 600 dpi render,Stored verbatim; canonical fO2_log uses the signed negative value and a separate unprinted bar reference convention.
 2,1,34,BSF5,Fe3+/ΣFe,0.833,values.value,0.833,b: 600 dpi render,Printed ferric fraction retained; valence_basis.value_form=fraction.
-9,3,Table 3,CS2F5,Fe3+/ΣFe,0.58,no new row,Table 1 r04: 0.584,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.584.
-9,3,Table 3,CS1.4F5,Fe3+/ΣFe,0.61,no new row,Table 1 r06: 0.614,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.614.
-9,3,Table 3,CS1.4F5,Fe3+/ΣFe,0.29,no new row,Table 1 r07: 0.288,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.288.
-9,3,Table 3,CS1.4F5,Fe3+/ΣFe,0.12,no new row,Table 1 r08: 0.117,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.117.
-9,3,Table 3,CS1.4F5,Fe3+/ΣFe,0.00,no new row,Table 1 r09: 0.000,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.000.
-9,3,Table 3,CS1.4F10,Fe3+/ΣFe,0.68,no new row,Table 1 r18: 0.677,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.677.
-9,3,Table 3,CS.8F5,Fe3+/ΣFe,0.71,no new row,Table 1 r15: 0.710,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.710.
+9,3,2,CS2F5,Fe3+/ΣFe,0.58,no new row,Table 1 r04: 0.584,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.584.
+9,3,4,CS1.4F5,Fe3+/ΣFe,0.61,no new row,Table 1 r06: 0.614,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.614.
+9,3,5,CS1.4F5,Fe3+/ΣFe,0.29,no new row,Table 1 r07: 0.288,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.288.
+9,3,6,CS1.4F5,Fe3+/ΣFe,0.12,no new row,Table 1 r08: 0.117,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.117.
+9,3,7,CS1.4F5,Fe3+/ΣFe,0.00,no new row,Table 1 r09: 0.000,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.000.
+9,3,8,CS1.4F10,Fe3+/ΣFe,0.68,no new row,Table 1 r18: 0.677,b: 600 dpi render,Repeated to two decimals; Table 1 stores the primary value 0.677.
+9,3,10,CS.8F5,1150 cm⁻¹ relative-area column,0.71,excluded from redox extraction,not a redox value,b: 600 dpi render; MinerU HTML agrees,The printed 0.71 is under the 1150 cm⁻¹ relative-area column; the Fe3+/ΣFe cell for row CS.8F5 is an ellipsis.
+9,3,10,CS.8F5,Fe3+/ΣFe,...,excluded from redox extraction,unreported,b: 600 dpi render; MinerU HTML agrees,The Fe3+/ΣFe cell is an ellipsis; do not count the adjacent 0.71 relative-area value as redox evidence.

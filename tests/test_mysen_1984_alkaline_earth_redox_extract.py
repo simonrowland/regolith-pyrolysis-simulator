@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from decimal import Decimal
 from pathlib import Path
 
@@ -22,6 +23,7 @@ from tools.validate_literature_extracts import check_all_fidelity_samples_match
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/mysen-1984-alkaline-earth-redox.yaml"
 MAPPING = ROOT / "data/literature/extracts/audits/mysen-1984-alkaline-earth-redox.mapping.yaml"
+CELLS = ROOT / "data/literature/extracts/audits/mysen-1984-alkaline-earth-redox.cells.csv"
 SOURCE_ID = "mysen-1984-alkaline-earth-redox"
 
 
@@ -80,6 +82,49 @@ def test_table1_render_pins_and_migrated_conditions():
     assert table3_pin["value"] == "0.000"
     assert table3_pin["locator"]["table"] == "3"
     assert table3_pin["locator"]["row"] == "CS1.4F5"
+
+    table3_mapping = yaml.safe_load(MAPPING.read_text(encoding="utf-8"))["tables"][1]
+    assert table3_mapping["row_count_printed"] == 10
+    assert table3_mapping["redox_cells_checked"] == 6
+    assert table3_mapping["ambiguous_cells"] == [
+        {
+            "row": "CS.8F5",
+            "table_row_number": 10,
+            "relative_area_column": "1150 cm−1",
+            "relative_area_value": "0.71",
+            "Fe3+/ΣFe_cell": "...",
+            "interpretation": "The printed 0.71 is a relative-area value, not an Fe redox fraction; the Fe3+/ΣFe cell is unreported.",
+        }
+    ]
+    with CELLS.open(encoding="utf-8", newline="") as cells_file:
+        table3_cells = [
+            cell
+            for cell in csv.DictReader(cells_file)
+            if cell["pdf_page"] == "9" and cell["printed_table"] == "3"
+        ]
+    table3_redox_cells = [
+        cell for cell in table3_cells if cell["cell"] == "Fe3+/ΣFe"
+    ]
+    assert len(table3_redox_cells) == 7
+    assert [
+        cell["row"]
+        for cell in table3_redox_cells
+        if cell["stored_field"] == "no new row"
+    ] == ["2", "4", "5", "6", "7", "8"]
+    ambiguous_relative_area = next(
+        cell
+        for cell in table3_cells
+        if cell["sample"] == "CS.8F5" and cell["printed_value"] == "0.71"
+    )
+    assert ambiguous_relative_area["cell"] == "1150 cm⁻¹ relative-area column"
+    assert ambiguous_relative_area["stored_field"] == "excluded from redox extraction"
+    unreported_redox = next(
+        cell
+        for cell in table3_redox_cells
+        if cell["sample"] == "CS.8F5"
+    )
+    assert unreported_redox["printed_value"] == "..."
+    assert unreported_redox["stored_field"] == "excluded from redox extraction"
 
     for source in source_rows:
         observation_id = source["observation_id"]

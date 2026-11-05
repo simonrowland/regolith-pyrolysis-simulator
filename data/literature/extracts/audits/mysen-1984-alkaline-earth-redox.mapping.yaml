@@ -42,12 +42,21 @@ tables:
 - page: 9
   table: '3'
   caption: Summary of relative areas (intensities) of Raman bands and their assignments
-  row_count_printed: 11
-  redox_cells_checked: 7
+  row_count_printed: 10
+  redox_cells_checked: 6
   new_redox_rows: 0
-  transcription_audit: The Fe3+/ΣFe column was checked against a 600 dpi render of physical PDF page 9. All
-    seven printed redox cells repeat Table 1 values to two decimals and are recorded in the companion CSV as
-    duplicate-only.
+  transcription_audit: Table 3 has ten body rows. Its six unambiguous Fe3+/ΣFe cells were checked against a
+    600 dpi render of physical PDF page 9; all repeat Table 1 values to two decimals and are recorded in the
+    companion CSV as duplicate-only. Row 10 (CS.8F5) prints 0.71 under the 1150 cm−1 relative-area column;
+    its Fe3+/ΣFe cell is an ellipsis. The audit records both cells separately and excludes 0.71 from redox
+    evidence. The printed column placement gives no basis to infer a typesetting error.
+  ambiguous_cells:
+  - row: CS.8F5
+    table_row_number: 10
+    relative_area_column: '1150 cm−1'
+    relative_area_value: '0.71'
+    Fe3+/ΣFe_cell: '...'
+    interpretation: The printed 0.71 is a relative-area value, not an Fe redox fraction; the Fe3+/ΣFe cell is unreported.
 - page: 5
   table: '2'
   caption: Average values of hyperfine parameters
