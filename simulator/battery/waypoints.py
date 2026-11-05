@@ -10,8 +10,11 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
+    _MASS_PERCENT_MAXIMUM_KEPT_SUM,
+    _MASS_PERCENT_RENORMALIZE_ABOVE,
     _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
+    _mass_percent_kept_total,
     _printed_mass_percent_map_refusal,
 )
 from simulator.battery.records import (
@@ -528,6 +531,19 @@ def charge_moles_by_species(
                     # (e.g. {kind: categorical, categorical: 'Fe-Mn or Fe-Sn'});
                     # non-numeric leaves carry no wt% and route nothing.
                     continue
+            charge_scale: Decimal | None = None
+            if is_mass_percent:
+                # Shared d-336 item 1 kept S aligns charge and migration admission.
+                kept_total = _mass_percent_kept_total(
+                    numeric,
+                    closure_context={"printed_composition": source_map},
+                )
+                if (
+                    _MASS_PERCENT_RENORMALIZE_ABOVE
+                    < kept_total
+                    <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+                ):
+                    charge_scale = Decimal("100") / kept_total
             for species, wt_pct in numeric.items():
                 molar_mass = _molar_mass_kg_mol(species)
                 if molar_mass is None:
@@ -535,8 +551,11 @@ def charge_moles_by_species(
                     # reduced set must not be scored as the whole charge.
                     dropped.append(species)
                     continue
+                charged_wt_pct = (
+                    wt_pct if charge_scale is None else wt_pct * charge_scale
+                )
                 species_mass = _multiply(
-                    mass, Value.point_of(wt_pct / Decimal(100))
+                    mass, Value.point_of(charged_wt_pct / Decimal(100))
                 )
                 value = (
                     None
@@ -544,8 +563,9 @@ def charge_moles_by_species(
                     else _divide(species_mass, Value.point_of(molar_mass))
                 )
                 if value is not None:
-                    # Premise: w_i is printed wt% and m_i=m*w_i/100.
-                    # Algebra: n_i=m*w_i/(100*M_i). Units: kg/(kg/mol)=mol.
+                    # n_i=m*w_i/(100*M_i); renormalize with w_i'=100*w_i/S.
+                    # At S=104, w_i' applies the factor 100/104=0.9615.
+                    # Units: kg/(kg/mol)=mol.
                     # Sanity: 100 mg pure Mg2SiO4 gives 7.108e-4 mol.
                     ranked(
                         species,

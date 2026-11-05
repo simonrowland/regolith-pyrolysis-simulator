@@ -1164,6 +1164,51 @@ def test_b704_waypoint_guard_normalizes_wt_suffix_before_closure() -> None:
     assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
 
 
+def test_b1128_waypoint_guard_admits_104_and_refuses_above_105() -> None:
+    base = factories.kems_experiment()
+    printed_104 = {"SiO2": Decimal("40"), "MgO": Decimal("64")}
+    accepted_experiment = replace(
+        base,
+        sample=replace(
+            base.sample,
+            initial_composition=None,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [[name, str(amount)] for name, amount in printed_104.items()],
+                }
+            ),
+        ),
+    )
+
+    accepted = normalized_composition(accepted_experiment, _bench())
+    converted, refusal = _wt_percent_conversion_or_refusal(printed_104)
+    assert accepted.selected is not None
+    assert accepted.selected.route == "normalized_printed_composition"
+    assert refusal is None and converted is not None
+    for species, expected_fraction in converted.as_map().items():
+        assert abs(accepted.selected.value[species] - expected_fraction) < Decimal(
+            "1e-27"
+        )
+
+    refused_experiment = replace(
+        accepted_experiment,
+        sample=replace(
+            accepted_experiment.sample,
+            printed_composition=factories.located(
+                {
+                    "amount_basis": AmountBasis.MASS_PERCENT.value,
+                    "components": [["SiO2", "50"], ["MgO", "55.01"]],
+                }
+            ),
+        ),
+    )
+    refused = normalized_composition(refused_experiment, _bench())
+    assert refused.selected is None
+    assert refused.absence is not None
+    assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+
+
 def test_nonfinite_print_refuses_unparameterized_derived_initial() -> None:
     base = factories.kems_experiment()
     locator = factories.loc()

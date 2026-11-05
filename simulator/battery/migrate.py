@@ -1063,6 +1063,7 @@ def _hold_reason_notice(
     quantity: Quantity | None,
     origin: str,
     band: object = None,
+    original: Decimal | None = None,
     include_misprint: bool = True,
 ) -> Notice | None:
     if not isinstance(quantity, Quantity) or not reason:
@@ -1084,6 +1085,7 @@ def _hold_reason_notice(
         reason=reason,
         origin=origin,
         band=str(band) if kind is NoticeKind.OUT_OF_CERTIFIED_BAND and band else None,
+        original=original,
     )
 
 
@@ -1531,6 +1533,21 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     return dict(pairs)
 
 
+def _total_iron_printed_as_element_only(
+    components: Mapping[str, Decimal],
+) -> bool:
+    names = {_mass_percent_component_key(str(name))[0] for name in components}
+    has_total_iron_element = any(
+        (component := _COMPOSITION_COMPONENTS.get(name)) is not None
+        and component[0] == "Fe"
+        and component[1] == "T.Fe"
+        for name in names
+    )
+    return has_total_iron_element and not names.intersection(
+        {"FeO", "Fe2O3", "FeOT"}
+    )
+
+
 def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
     return _percent_components(payload, AmountBasis.MOLE_PERCENT)
 
@@ -1538,6 +1555,8 @@ def _mole_percent_components(payload: object) -> dict[str, Decimal] | None:
 def _percent_composition_closure_error(
     components: Mapping[str, Decimal],
     basis: str,
+    *,
+    closure_context: object = None,
 ) -> str | None:
     amounts = tuple(
         amount
@@ -1546,7 +1565,11 @@ def _percent_composition_closure_error(
     )
     if any(not amount.is_finite() or amount < 0 for amount in amounts):
         return f"{basis}-percent composition contains a negative or non-finite amount"
-    total = sum(amounts, Decimal("0"))
+    total = (
+        _mass_percent_kept_total(components, closure_context=closure_context)
+        if basis == "mass"
+        else sum(amounts, Decimal("0"))
+    )
     rounding_bound = sum(
         (
             Decimal("0.5").scaleb(amount.as_tuple().exponent)
@@ -1564,6 +1587,19 @@ def _percent_composition_closure_error(
             return (
                 "mass-percent composition exceeds the accepted kept-sum limit: "
                 f"sum={total} wt% is above {_MASS_PERCENT_MAXIMUM_KEPT_SUM} wt%"
+            )
+        if (
+            total > _MASS_PERCENT_RENORMALIZE_ABOVE
+            and _total_iron_printed_as_element_only(components)
+        ):
+            # Kunisada flux-e has S=102.15 with 2.3 wt% T.Fe as Fe; treating
+            # it as FeO shifts S by 2.3 * (71.844 / 55.845 - 1) ~= 0.66 to
+            # 102.81, so renormalisation would depend on the unruled valence.
+            return (
+                "mass-percent composition exceeds the accepted kept-sum limit: "
+                f"sum={total} wt% is above {_MASS_PERCENT_RENORMALIZE_ABOVE} wt%; "
+                "total iron printed as element: renormalisation depends on the "
+                "iron valence convention, pending an owner ruling"
             )
     elif abs(total - Decimal("100")) > rounding_bound:
         return f"{basis}-percent composition does not close to 100 (sum={total})"
@@ -1634,6 +1670,38 @@ def _composition_map_reserved_scalar_reason(payload: object) -> str | None:
                 f"'{name}'"
             )
     return None
+
+
+def _mass_percent_kept_total(
+    components: Mapping[str, Decimal], *, closure_context: object = None
+) -> Decimal:
+    """Return S from the oxide, volatile, and same-row closure analytes."""
+
+    source_map = _printed_composition_source_map(closure_context)
+    analysis = source_map if source_map is not None else components
+    try:
+        kept = _oxide_mass_percent_components(analysis)
+    except ValueError as exc:
+        if "ambiguous total iron components" not in str(exc):
+            raise
+        return sum(components.values(), Decimal("0"))
+    kept.update(_printed_volatile_mass_percent(analysis, closure_context))
+    for name, amount in _printed_composition_closure_components(
+        closure_context
+    ).items():
+        if name not in kept:
+            kept[name] = amount
+    dropped = _unrecognized_printed_chemical_components(
+        components,
+        closure_context,
+        declared_component_map=_declared_printed_composition_map(
+            closure_context
+        ),
+    )
+    if sum(dropped.values(), Decimal("0")) > _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN:
+        for name, amount in dropped.items():
+            kept.setdefault(name, amount)
+    return sum(kept.values(), Decimal("0"))
 
 
 def _mass_percent_printed_from_plain(
@@ -1798,16 +1866,22 @@ def _composition_located_from_plain(
         )
     wt = _mass_percent_components(body)
     if wt is not None and any(_is_mass_percent_oxide_component(name) for name in wt):
+        serialized_inference = None
         if isinstance(payload, Mapping) and "state" not in payload:
             locator = _locator_from_plain(payload.get("locator"))
         else:
             source = _located_from_plain(payload, lambda value: value)
             locator = source.locator
+            if isinstance(payload, Mapping) and "inference" in payload:
+                serialized_inference = source.inference
         try:
             declared_component_map = _declared_printed_composition_map(payload)
+            composition_context = (
+                payload if closure_context is None else closure_context
+            )
             composition = _composition_from_plain(
                 body,
-                closure_context=payload if closure_context is None else closure_context,
+                closure_context=composition_context,
                 declared_component_map=declared_component_map,
             )
         except (ArithmeticError, ValueError) as exc:
@@ -1816,16 +1890,29 @@ def _composition_located_from_plain(
                 locator=locator,
             )
         accepted_wt = _oxide_mass_percent_components(wt)
+        derivation = _mass_percent_composition_derivation(
+            accepted_wt,
+            locator,
+            closure_context=composition_context,
+            source_note=_wt_percent_derivation_source_note(
+                wt, payload, declared_component_map=declared_component_map
+            ),
+            admitted=serialized_inference is None,
+        )
+        renorm_input = next(
+            (
+                item
+                for item in (serialized_inference.inputs if serialized_inference else ())
+                if item.startswith("renormalized to 100 wt% from kept oxide total S=")
+            ),
+            None,
+        )
+        if renorm_input:
+            derivation = replace(derivation, inputs=(*derivation.inputs, renorm_input))
         return Located(
             State.of(composition),
             locator=locator,
-            inference=wt_pct_to_mole_fraction_derivation(
-                accepted_wt,
-                locator,
-                source_note=_wt_percent_derivation_source_note(
-                    wt, payload, declared_component_map=declared_component_map
-                ),
-            ),
+            inference=derivation,
         )
     if (
         isinstance(body, Mapping)
@@ -3828,6 +3915,16 @@ def located_value(value: object, locator: Locator | None) -> Located[Any]:
     return Located(State.of(value), locator=locator)
 
 
+def _relocated(
+    state: State[Any], source: object, locator: Locator | None
+) -> Located[Any]:
+    return Located(
+        state,
+        locator=locator,
+        inference=source.inference if isinstance(source, Located) else None,
+    )
+
+
 def torr_to_pa(pressure_torr: object) -> Decimal:
     """P_Pa = P_Torr × 101325 / 760 (CGPM 1954 atmosphere)."""
 
@@ -4323,11 +4420,11 @@ _PRINTED_COMPOSITION_METADATA_KEYS = frozenset(
 _PRINTED_COMPOSITION_MISSING_MARKERS = frozenset(
     {"-", "–", "—", "n.d.", "nd", "bdl", "--", "n/a", "not reported"}
 )
-# b-704's 2026-10-04 sweep found a natural gap between 92.35 and 96.86 wt%;
-# near-complete assays from 98 through 102 were ordinary, so accept kept mass
-# from 95 through 102 wt% and tolerate no more than 0.5 wt% of dropped traces.
+# Accept kept mass from 95 through 105 wt%; totals above 102 are renormalized
+# to 100 wt%, and no more than 0.5 wt% of dropped traces are tolerated.
 _MASS_PERCENT_MINIMUM_KEPT_SUM = Decimal("95")
-_MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("102")
+_MASS_PERCENT_RENORMALIZE_ABOVE = Decimal("102")
+_MASS_PERCENT_MAXIMUM_KEPT_SUM = Decimal("105")
 _MASS_PERCENT_MAXIMUM_DROPPED_UNKNOWN = Decimal("0.5")
 _GREEN_READ_OXIDE_MAP = "green-read oxide map"
 _M1_ONLY_CLOSURE_CONTRIBUTOR = "m1-only closure contributor"
@@ -4780,6 +4877,75 @@ def _composition_projection_notice(
         origin=origin,
         dropped=tuple(dropped),
         dropped_mass_fraction=dropped_mass / printed_total,
+    )
+
+
+def _mass_percent_composition_derivation(
+    wt: Mapping[str, Decimal],
+    locator: Locator | None,
+    *,
+    closure_context: object = None,
+    source_note: object = None,
+    admitted: bool = True,
+) -> Derivation:
+    derivation = wt_pct_to_mole_fraction_derivation(
+        wt, locator, source_note=source_note
+    )
+    if not admitted:
+        return derivation
+    kept_total = _mass_percent_kept_total(wt, closure_context=closure_context)
+    if (
+        _MASS_PERCENT_RENORMALIZE_ABOVE
+        < kept_total
+        <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+    ):
+        return replace(
+            derivation,
+            inputs=(
+                *derivation.inputs,
+                f"renormalized to 100 wt% from kept oxide total S={kept_total} wt% "
+                "(d-336 item 2)",
+            ),
+        )
+    return derivation
+
+
+def _mass_percent_renormalization_notice(
+    identity: Identity,
+    point_conditions: Mapping[str, object] | None,
+    *,
+    quantity: Quantity | None,
+    origin: str,
+) -> Notice | None:
+    composition_state = identity.composition
+    located = (point_conditions or {}).get("composition")
+    if (
+        not isinstance(quantity, Quantity)
+        or composition_state is None
+        or not composition_state.is_value
+        or not isinstance(located, Located)
+        or not located.state.is_value
+        or located.inference is None
+    ):
+        return None
+    prefix = "renormalized to 100 wt% from kept oxide total S="
+    kept_total = next(
+        (
+            _as_dec_or_none(item.split("S=", 1)[1].split(" wt%", 1)[0])
+            for item in located.inference.inputs
+            if item.startswith(prefix)
+        ),
+        None,
+    )
+    if kept_total is None:
+        return None
+    return _hold_reason_notice(
+        "out_of_certified_band: mass-percent analysis with kept oxide total="
+        f"{kept_total} wt% was renormalized to 100 wt% per d-336 item 2",
+        quantity=quantity,
+        origin=origin,
+        band="95-102 wt% kept oxide total",
+        original=kept_total,
     )
 
 
@@ -5431,7 +5597,9 @@ def _wt_percent_conversion_or_refusal(
             if name not in closure_wt:
                 closure_wt[name] = amount
 
-        closure_error = _percent_composition_closure_error(closure_wt, "mass")
+        closure_error = _percent_composition_closure_error(
+            closure_wt, "mass", closure_context=closure_context
+        )
         missing_major = tuple(
             dict.fromkeys(
                 (
@@ -5512,7 +5680,6 @@ def _wt_percent_conversion_or_refusal(
                 + m1_reason,
                 closure_refusal=True,
             )
-
         converted = _mole_fraction_from_wt_percent_components(oxide_wt)
         return converted, None
     except (ArithmeticError, ValueError) as exc:
@@ -5630,17 +5797,9 @@ def _printed_mass_percent_map_refusal(
             return True, refusal.reason
         return True, None
 
-    closure_amounts = {
-        name: amount
-        for name, amount in wt.items()
-        if _volatile_closure_component(
-            _mass_percent_component_key(name)[0]
-        ) is None
-    }
-    closure_amounts.update(
-        _printed_volatile_mass_percent(raw, closure_context)
+    return True, _percent_composition_closure_error(
+        wt, "mass", closure_context=closure_context
     )
-    return True, _percent_composition_closure_error(closure_amounts, "mass")
 
 
 def _wt_percent_conversion_or_raise(
@@ -5707,16 +5866,49 @@ def _mass_percent_composition_state(
         for amount in _printed_volatile_mass_percent(wt, closure_context).values()
     ):
         return State.of(replace(converted, basis=basis))
+    oxide_wt = _oxide_mass_percent_components(wt)
+    kept_total = _mass_percent_kept_total(wt, closure_context=closure_context)
+    if _MASS_PERCENT_RENORMALIZE_ABOVE < kept_total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM:
+        oxide_wt = {
+            name: amount * Decimal("100") / kept_total
+            for name, amount in oxide_wt.items()
+        }
     return State.of(
         Composition(
             basis=basis,
             components=tuple(
                 (str(name), as_decimal(amount))
-                for name, amount in _oxide_mass_percent_components(wt).items()
+                for name, amount in oxide_wt.items()
             ),
             amount_basis=AmountBasis.MASS_PERCENT,
         )
     )
+
+
+def _mass_percent_composition_located(
+    wt: Mapping[str, Decimal],
+    *,
+    basis: str,
+    locator: Locator | None,
+    closure_context: object = None,
+    declared_component_map: Mapping[str, Any] | None = None,
+) -> Located[Composition]:
+    state = _mass_percent_composition_state(
+        wt,
+        basis=basis,
+        closure_context=closure_context,
+        declared_component_map=declared_component_map,
+    )
+    inference = (
+        _mass_percent_composition_derivation(
+            _oxide_mass_percent_components(wt),
+            locator,
+            closure_context=closure_context,
+        )
+        if state.is_value
+        else None
+    )
+    return Located(state, locator=locator, inference=inference)
 
 
 def _total_iron_reported_as_feo_notice(
@@ -6293,9 +6485,10 @@ def _catalogue_composition_located_from_values(
     return Located(
         State.of(composition),
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(
+        inference=_mass_percent_composition_derivation(
             wt,
             locator,
+            closure_context=values,
             source_note=values.get("composition_derivation"),
         ),
     )
@@ -6552,10 +6745,17 @@ def _composition_located_from_values(
         derivation_notes.append(trace_note)
     if pass_note and isinstance(source_note, str) and source_note.strip():
         derivation_notes.append(source_note)
-    derivation = wt_pct_to_mole_fraction_derivation(
+    composition_state = _wt_percent_conversion_state(
+        wt,
+        closure_context=composition_context,
+        declared_component_map=declared_component_map,
+    )
+    derivation = _mass_percent_composition_derivation(
         wt,
         locator,
+        closure_context=composition_context,
         source_note="; ".join(derivation_notes) or None,
+        admitted=composition_state.is_value,
     )
     if set(wt) == {"K2O", "SiO2"} and wt["SiO2"] == Decimal("100") - wt["K2O"]:
         # The relation follows from the printed Decimal values. pass_note
@@ -6564,11 +6764,6 @@ def _composition_located_from_values(
             derivation,
             relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
         )
-    composition_state = _wt_percent_conversion_state(
-        wt,
-        closure_context=composition_context,
-        declared_component_map=declared_component_map,
-    )
     if composition_state.is_unknown:
         return Located(composition_state, locator=locator, inference=derivation)
     composition = composition_state.value
@@ -6688,9 +6883,10 @@ def _located_printed_and_initial(
     initial = Located(
         state,
         locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(
+        inference=_mass_percent_composition_derivation(
             conversion_map,
             locator,
+            closure_context=closure_context,
             source_note=_wt_percent_derivation_source_note(
                 wt,
                 closure_context,
@@ -21465,9 +21661,11 @@ class Migrator:
                 "composition": Located(
                     projected_state,
                     locator=projected_oxide_locator or locator,
-                    inference=wt_pct_to_mole_fraction_derivation(
+                    inference=_mass_percent_composition_derivation(
                         projected_oxide_map,
                         projected_oxide_locator or locator,
+                        closure_context=projected_closure_context,
+                        admitted=projected_state.is_value,
                         source_note=_omitted_trace_component_source_note(
                             projected_oxide_map,
                             projected_closure_context,
@@ -21921,15 +22119,14 @@ class Migrator:
                     # A valid printed start was closure-checked when converted.
                     # Only a phase vector left as the identity input needs its
                     # own mass-percent check here.
-                    composition_state = _mass_percent_composition_state(
+                    located_composition = _mass_percent_composition_located(
                         dict(components),
                         basis="printed_phase_composition",
+                        locator=printed.locator,
                         closure_context=phase_closure_context,
                         declared_component_map=printed.state.value,
                     )
-                    located_composition = Located(
-                        composition_state, locator=printed.locator
-                    )
+                    composition_state = located_composition.state
                 ident_kwargs["composition"] = composition_state
                 point_conditions = {
                     **(point_conditions or {}),
@@ -22714,8 +22911,15 @@ class Migrator:
         )
         if total_iron_notice is not None:
             observation_notices.append(total_iron_notice)
-        if projection_notice is not None:
-            observation_notices.append(projection_notice)
+        renormalization_notice = _mass_percent_renormalization_notice(
+            identity,
+            point_conditions,
+            quantity=q_token,
+            origin=obs_id,
+        )
+        if renormalization_notice is not None:
+            observation_notices.append(renormalization_notice)
+        observation_notices.extend(projection_notices)
         observation_notices.extend(starting_bulk_notices)
         observation_notices.extend(validity_notices)
         from simulator.battery.validity import comparison_method_cell_constant_cancels
@@ -23240,6 +23444,7 @@ class Migrator:
         value_sel: SourceSelection | None = None
         point_oxide_map: dict[str, Decimal] | None = None
         point_map_declared = False
+        point_map_explicit = False
         point_composition_refusal: list[str] = []
         point_composition_refusal_classifications: list[_CompositionRefusal] = []
         point_composition_located: Located[Composition] | None = None
@@ -24246,12 +24451,18 @@ class Migrator:
                                 kind, amount = _classify_composition_cell(raw_amount)
                                 if kind == "number" and amount is not None:
                                     components[normalized_formula] = amount
-                            composition = _mass_percent_composition_state(
+                            located_composition = _mass_percent_composition_located(
                                 components,
                                 basis="printed_oxides",
+                                locator=printed.locator,
                                 closure_context=parent_values,
                                 declared_component_map=printed.state.value,
                             )
+                            composition = located_composition.state
+                            point_conditions = {
+                                **(point_conditions or {}),
+                                "composition": located_composition,
+                            }
                     mass = run_experiment.sample.mass_kg
                     mass_value = (
                         mass.state.value
@@ -24619,9 +24830,10 @@ class Migrator:
             # map, expose that composition to condition consumers as well.
             point_conditions = {
                 **(point_conditions or {}),
-                "composition": Located(
+                "composition": _relocated(
                     identity.composition,
-                    locator=point_locator,
+                    (point_conditions or {}).get("composition"),
+                    point_locator,
                 ),
             }
         if identity.composition is None or not identity.composition.is_value:
@@ -24688,6 +24900,14 @@ class Migrator:
                         identity = replace(
                             identity, composition=converted_composition.state
                         )
+                        point_conditions = {
+                            **(point_conditions or {}),
+                            "composition": _relocated(
+                                converted_composition.state,
+                                converted_composition,
+                                point_locator,
+                            ),
+                        }
         if q_token_point is Quantity.VALENCE_RATIO and (
             identity.total_pressure_Pa is None
             or not identity.total_pressure_Pa.is_value
@@ -24747,6 +24967,14 @@ class Migrator:
                 identity,
                 composition=State.unknown(malformed_composition_amount),
             )
+        renormalization_notice = _mass_percent_renormalization_notice(
+            identity,
+            point_conditions,
+            quantity=q_token_point,
+            origin=point_id,
+        )
+        if renormalization_notice is not None:
+            child_notices.append(renormalization_notice)
         parent_hold_notice = _hold_reason_notice(
             parent_reason,
             quantity=q_token_point,
