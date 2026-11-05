@@ -5856,6 +5856,43 @@ def test_thomas_wood_chlorine_sibling_counts_toward_dropped_limit(
             id="green-malformed-sibling-volatile-precedes-missing-major",
         ),
         pytest.param(
+            "nested-printed-volatile-malformed",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "50",
+                    "MgO": "50",
+                    "Al2O3": None,
+                },
+                "point_conditions": {
+                    "printed_composition": {
+                        "SiO2": "50",
+                        "MgO": "50",
+                        "Al2O3": None,
+                        "H2O_wt_pct": "unreadable",
+                    }
+                }
+            },
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            False,
+            id="green-malformed-nested-printed-volatile-precedes-missing-major",
+        ),
+        pytest.param(
+            "closure-only-negative",
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            {
+                "composition_wt_pct": {
+                    "SiO2": "50",
+                    "MgO": "50",
+                    "Al2O3": None,
+                },
+                "_migrate_closure_only_components": {"S": "-1"},
+            },
+            {"SiO2": "50", "MgO": "50", "Al2O3": None},
+            False,
+            id="green-negative-closure-only-precedes-missing-major",
+        ),
+        pytest.param(
             "partial-94.9",
             {"SiO2": "50", "MgO": "44.9"},
             None,
@@ -5926,6 +5963,10 @@ def test_mass_closure_refusal_check_order(
         assert "negative or non-finite amount" in refusal.reason
     if case == "sibling-volatile-malformed":
         assert "malformed printed volatile component amount" in refusal.reason
+    if case == "nested-printed-volatile-malformed":
+        assert "malformed printed volatile component amount" in refusal.reason
+    if case == "closure-only-negative":
+        assert "negative or non-finite amount" in refusal.reason
 
 
 @pytest.mark.parametrize(
