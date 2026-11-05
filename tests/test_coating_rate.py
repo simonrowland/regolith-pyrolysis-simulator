@@ -632,8 +632,9 @@ def test_coating_diagnostic_default_output_is_byte_identical_to_golden() -> None
     # Prior cumulative typed diff: 1 d-195, 27,533 d-045, 195,428 d-252, 0 unexplained.
     # C0 exits at h5 instead of h19; the 24 h regenerated trajectory reaches C3_NA and C4.
     # Final wall deposits remain 0 kg for Fe/K/Mg/Na/SiO. Fouling-rate verdict and campaigns_to_resinter are not carried in this payload.
+    # Rebaselined for fafbee7c4 + d-346 notices; numeric leaves are unchanged.
     assert hashlib.sha256(actual_bytes).hexdigest() == (
-        "84fd56f0bea9ee322da880febe06d0262b0324795b60030c2c6369e3dd2cad2d"
+        "0df5e654cbb08589ddd89981fa03c6f398c7847e58f06e12c7211aa4f2656b5f"
     )
 
 
