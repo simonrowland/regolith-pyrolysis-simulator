@@ -1088,6 +1088,23 @@ def test_computed_carrier_authority_paths_close_actual_ledger(
     # route that can now capture this entire tiny parcel on its first wall.
     monkeypatch.setattr(sim.condensation_model, "_wall_deposit_candidates_by_segment_kg", lambda **kwargs: {})
     monkeypatch.setattr(sim.condensation_model, "_condensation_efficiency", lambda **kwargs: 0.5)
+    # The freeze-out cartridge does not use _condensation_efficiency. Hold it
+    # at zero capture so this 1e-6 kg/h parcel still has an escaping remainder
+    # for the terminal-offgas authority check. eta_aerosol None keeps the
+    # booked fraction equal to eta_vapour.
+    monkeypatch.setattr(
+        sim.condensation_model,
+        "_alkali_cartridge_vapour_capture",
+        lambda **kwargs: (
+            0.0,
+            {
+                "eta_vapour": 0.0,
+                "f_eq": 0.0,
+                "eta_aerosol": None,
+                "notices": (),
+            },
+        ),
+    )
     carrier_authority = {}
     if status != "missing":
         authoritative = status == "authoritative"
