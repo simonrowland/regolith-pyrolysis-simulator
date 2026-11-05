@@ -442,6 +442,9 @@ def test_scored_missing_openimcc_liquid_standard_preserves_category_one_refusal(
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.execution.state is ExecutionState.NOT_PROBED
     assert prediction.refusal_detail["reason"] == "missing_input"
+    assert "no G0(T) row or recorded translation" in prediction.refusal_detail[
+        "engine_reason"
+    ]
     assert prediction.refusal_detail["category"] == 1
     assert prediction.refusal_detail["invalid_input"] is True
     failure = prediction.refusal_detail["standard_failures"][0]
