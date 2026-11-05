@@ -16,7 +16,6 @@ import multiprocessing
 import multiprocessing.context
 import os
 import re
-import select
 import signal
 import queue
 import socket
@@ -40,10 +39,13 @@ MAX_NATIVE_OUTPUT_PENDING_BYTES = 64 * 1024
 # Cap each summary payload and its identifying sample to bound shutdown output.
 MAX_NATIVE_OUTPUT_SUMMARY_BYTES = 1024
 MAX_NATIVE_OUTPUT_SUMMARY_EXAMPLE_BYTES = 192
+# Cap per-key shutdown summaries even when error keys are exempt from the key cap.
+MAX_NATIVE_OUTPUT_SUMMARY_LINES = 256
+# Bound each worker's native log contribution to 4 MiB while retaining room
+# for many distinct diagnostics before repeat output is suppressed.
+MAX_NATIVE_OUTPUT_FORWARD_BYTES = 4 * 1024 * 1024
 # Never make worker cleanup wait indefinitely for the parent stderr sink.
 ENGINE_NATIVE_OUTPUT_READER_JOIN_S = 0.25
-# POSIX guarantees a writable pipe accepts at least PIPE_BUF bytes atomically.
-NATIVE_OUTPUT_WRITE_CHUNK_BYTES = 512
 # _stop_pair on the start() handshake-timeout path (diagnostic=False):
 # killpg + join(0.1) + kill + join(1.0). These joins sit AFTER the
 # handshake wall and BEFORE _start_and_consume's ready.put.
@@ -70,11 +72,17 @@ def _pool_debug(msg: str) -> None:
 
 def _normalise_native_output_line(line: bytes) -> bytes:
     line = _NATIVE_OUTPUT_HEX_RE.sub(b'<address>', line)
+    line = _NATIVE_OUTPUT_SPECIAL_NUMBER_RE.sub(b'<number>', line)
     return _NATIVE_OUTPUT_NUMBER_RE.sub(b'<number>', line)
 
 
 def _preserve_python_output_streams() -> None:
-    """Keep Python stream output on the inherited scorer descriptors."""
+    """Keep Python stream output on the inherited scorer descriptors.
+
+    Python handlers added later that explicitly write to fd 2 or
+    ``sys.__stderr__`` enter native capture; its byte budget and dedupe still
+    bound those writes.
+    """
     global _WORKER_PYTHON_STREAMS
 
     original_stdout, original_stderr = sys.stdout, sys.stderr
@@ -122,6 +130,10 @@ _WORKER_PYTHON_STREAMS: tuple[Any, Any] | None = None
 # "a pool is coming into existence" moment, and the increment is O(1).
 _ENGINE_POOL_SEQ = 0
 _NATIVE_OUTPUT_HEX_RE = re.compile(rb'0[xX][0-9a-fA-F]+')
+_NATIVE_OUTPUT_SPECIAL_NUMBER_RE = re.compile(
+    rb'(?<![A-Za-z0-9_])[-+]?(?:nan|inf)\b',
+    re.IGNORECASE,
+)
 _NATIVE_OUTPUT_NUMBER_RE = re.compile(
     rb'(?<![A-Za-z0-9_])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?'
 )
@@ -387,77 +399,158 @@ def _run_engine_worker(
         connection.close()
 
 
-def _read_native_output(connection: Any, *, stderr_fd: int = 2) -> int:
-    """Deduplicate bounded native output; return bytes dropped at the sink."""
-    # 256 digest keys bound counts/examples to a small fixed amount per worker.
-    # One aggregate bucket represents additional ordinary lines; errors bypass it.
+def _read_native_output(connection: Any, *, stderr_fd: int = 2) -> None:
+    """Forward bounded native output and close the reader fd on thread exit."""
+    # Ordinary keys are capped; error keys stay countable outside that cap.
     counts: dict[bytes, int] = {}
     examples: dict[bytes, bytes] = {}
     pending = bytearray()
+    fragment_error: bool | None = None
+    forward_error_continuations = False
+    ordinary_key_count = 0
     overflow_count = 0
-    dropped_bytes = 0
+    ordinary_truncated_lines = 0
+    forwarded_bytes = 0
+    budget_reached = False
+    sink_failed = False
 
-    def write_stderr(payload: bytes) -> None:
-        nonlocal dropped_bytes
+    def write_forwarded(payload: bytes) -> None:
+        nonlocal forwarded_bytes, budget_reached, sink_failed
         while payload:
-            chunk = payload[:NATIVE_OUTPUT_WRITE_CHUNK_BYTES]
+            if sink_failed or budget_reached:
+                return
+            remaining = MAX_NATIVE_OUTPUT_FORWARD_BYTES - forwarded_bytes
+            if remaining <= 0:
+                budget_reached = True
+                return
+            chunk = payload[:remaining]
             try:
-                _, writable, _ = select.select([], [stderr_fd], [], 0)
-                if not writable:
-                    dropped_bytes += len(payload)
-                    return
                 written = os.write(stderr_fd, chunk)
-            except (BlockingIOError, OSError, ValueError):
-                dropped_bytes += len(payload)
+            except OSError:
+                sink_failed = True
                 return
             if written <= 0:
-                dropped_bytes += len(payload)
+                sink_failed = True
+                return
+            forwarded_bytes += written
+            payload = payload[written:]
+        if forwarded_bytes >= MAX_NATIVE_OUTPUT_FORWARD_BYTES:
+            budget_reached = True
+
+    def write_summary(payload: bytes) -> None:
+        if sink_failed:
+            return
+        if len(payload) > MAX_NATIVE_OUTPUT_SUMMARY_BYTES:
+            payload = payload[:MAX_NATIVE_OUTPUT_SUMMARY_BYTES - 1] + b'\n'
+        while payload:
+            try:
+                written = os.write(stderr_fd, payload)
+            except OSError:
+                return
+            if written <= 0:
                 return
             payload = payload[written:]
 
-    def forward_line(line: bytes) -> None:
-        nonlocal overflow_count
+    def is_error_line(line: bytes) -> bool:
         lowered = line.lower()
-        is_error = any(
+        return any(
             token in lowered
             for token in (b'error', b'abort', b'fatal', b'segmentation')
         )
+
+    def record_line(
+        line: bytes,
+        *,
+        is_error: bool | None = None,
+        output: bytes | None = None,
+    ) -> bool:
+        nonlocal ordinary_key_count, overflow_count
+        if is_error is None:
+            is_error = is_error_line(line)
         key = hashlib.sha256(_normalise_native_output_line(line)).digest()
         previous_count = counts.get(key)
         if previous_count is None:
-            if len(counts) >= MAX_NATIVE_OUTPUT_DISTINCT_LINES:
+            if (
+                not is_error
+                and ordinary_key_count >= MAX_NATIVE_OUTPUT_DISTINCT_LINES
+            ):
                 overflow_count += 1
-                if is_error:
-                    write_stderr(line)
-                return
+                return False
             counts[key] = 0
             examples[key] = line[:MAX_NATIVE_OUTPUT_SUMMARY_EXAMPLE_BYTES]
+            if not is_error:
+                ordinary_key_count += 1
             previous_count = 0
         counts[key] = previous_count + 1
-        if previous_count == 0 or is_error:
-            write_stderr(line)
+        first_occurrence = previous_count == 0
+        if first_occurrence:
+            write_forwarded(line if output is None else output)
+        return first_occurrence
+
+    def flush_first_fragment(line: bytes) -> tuple[bool, bool]:
+        nonlocal ordinary_truncated_lines
+        is_error = is_error_line(line)
+        output = line if is_error else line + b'...[truncated]\n'
+        first_occurrence = record_line(
+            line,
+            is_error=is_error,
+            output=output,
+        )
+        if not is_error:
+            ordinary_truncated_lines += 1
+        return is_error, is_error and first_occurrence
+
+    def forward_continuation(line: bytes) -> None:
+        if fragment_error and forward_error_continuations:
+            write_forwarded(line)
 
     try:
         while True:
-            if len(pending) >= MAX_NATIVE_OUTPUT_PENDING_BYTES:
-                forward_line(bytes(pending) + b'...[truncated]\n')
-                pending.clear()
-            chunk = os.read(
-                connection.fileno(),
-                min(65536, MAX_NATIVE_OUTPUT_PENDING_BYTES - len(pending)),
-            )
+            chunk = os.read(connection.fileno(), 65536)
             if not chunk:
                 break
-            pending.extend(chunk)
-            while True:
-                newline = pending.find(b'\n')
-                if newline < 0:
+            while chunk:
+                if fragment_error is not None:
+                    newline = chunk.find(b'\n')
+                    if newline < 0:
+                        forward_continuation(chunk)
+                        chunk = b''
+                        continue
+                    forward_continuation(chunk[:newline + 1])
+                    chunk = chunk[newline + 1:]
+                    fragment_error = None
+                    forward_error_continuations = False
+                    continue
+
+                newline = chunk.find(b'\n')
+                if newline >= 0:
+                    line = bytes(pending) + chunk[:newline + 1]
+                    pending.clear()
+                    if len(line) <= MAX_NATIVE_OUTPUT_PENDING_BYTES:
+                        record_line(line)
+                    else:
+                        first_fragment = line[:MAX_NATIVE_OUTPUT_PENDING_BYTES]
+                        continuation = line[MAX_NATIVE_OUTPUT_PENDING_BYTES:]
+                        line_is_error, forward_error_continuations = (
+                            flush_first_fragment(first_fragment)
+                        )
+                        if line_is_error and forward_error_continuations:
+                            write_forwarded(continuation)
+                    chunk = chunk[newline + 1:]
+                    continue
+
+                available = MAX_NATIVE_OUTPUT_PENDING_BYTES - len(pending)
+                if len(chunk) <= available:
+                    pending.extend(chunk)
                     break
-                line = bytes(pending[:newline + 1])
-                del pending[:newline + 1]
-                forward_line(line)
+                first_fragment = bytes(pending) + chunk[:available]
+                pending.clear()
+                fragment_error, forward_error_continuations = (
+                    flush_first_fragment(first_fragment)
+                )
+                chunk = chunk[available:]
         if pending:
-            forward_line(bytes(pending))
+            record_line(bytes(pending))
     except OSError:
         pass
     finally:
@@ -466,23 +559,40 @@ def _read_native_output(connection: Any, *, stderr_fd: int = 2) -> int:
         except OSError:
             pass
 
-    # At most 256 per-key summaries plus one aggregate overflow/drop summary.
-    for key, count in counts.items():
+    # Error keys bypass the key cap, so cap per-key summaries at 256 lines.
+    summary_omitted = max(
+        0,
+        len(counts) - MAX_NATIVE_OUTPUT_SUMMARY_LINES,
+    )
+    for index, (key, count) in enumerate(counts.items()):
+        if index >= MAX_NATIVE_OUTPUT_SUMMARY_LINES:
+            break
         example = examples[key]
         summary = (
             f'[engine-pool native output] count={count}: {example!r}\n'
         ).encode()
-        if len(summary) > MAX_NATIVE_OUTPUT_SUMMARY_BYTES:
-            summary = summary[:MAX_NATIVE_OUTPUT_SUMMARY_BYTES - 1] + b'\n'
-        write_stderr(summary)
-    if overflow_count or dropped_bytes:
-        write_stderr(
-            (
-                '[engine-pool native output] '
-                f'other_count={overflow_count} dropped_bytes={dropped_bytes}\n'
-            ).encode()
+        write_summary(summary)
+    if (
+        overflow_count
+        or ordinary_truncated_lines
+        or summary_omitted
+        or budget_reached
+    ):
+        details = [f'other_count={overflow_count}']
+        if ordinary_truncated_lines:
+            details.append(
+                f'ordinary_truncated_lines={ordinary_truncated_lines}'
+            )
+        if summary_omitted:
+            details.append(f'summary_omitted={summary_omitted}')
+        if budget_reached:
+            details.append(
+                f'forwarding budget reached at '
+                f'{MAX_NATIVE_OUTPUT_FORWARD_BYTES} bytes'
+            )
+        write_summary(
+            f'[engine-pool native output] {" ".join(details)}\n'.encode()
         )
-    return dropped_bytes
 
 
 class WarmEngineWorker:
@@ -658,7 +768,7 @@ class WarmEngineWorker:
             capture = self._native_output_capture
             if capture is None:
                 return
-            captured_process, reader, _writer, thread = capture
+            captured_process, _reader, _writer, thread = capture
             if captured_process is not process:
                 return
         if thread.ident is not None:
@@ -675,12 +785,8 @@ class WarmEngineWorker:
             if capture is None or capture[0] is not process:
                 return
             self._native_output_capture = None
-        if thread.ident is None:
-            try:
-                reader.close()
-            except OSError:
-                pass
-            return
+        # The daemon reader may outlive this join while stderr is blocked; it
+        # resumes when the sink unblocks and closes its own read fd in finally.
         thread.join(timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S)
 
     def _receive_frame_with_deadline(
@@ -874,6 +980,7 @@ class WarmEngineWorker:
                     name=f'{self.name} native output reader',
                     daemon=True,
                 )
+                native_output_thread.start()
             process_args = (
                 child,
                 self._bootstrap,
@@ -890,10 +997,17 @@ class WarmEngineWorker:
                 daemon=self.daemon,
             )
         except BaseException:
-            if native_output_reader is not None:
-                native_output_reader.close()
             if native_output_writer is not None:
                 native_output_writer.close()
+            if native_output_thread is not None:
+                if native_output_thread.ident is None:
+                    # No reader thread owns this fd when Thread.start fails.
+                    if native_output_reader is not None:
+                        native_output_reader.close()
+                else:
+                    native_output_thread.join(
+                        timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S,
+                    )
             child.close()
             parent.close()
             raise
@@ -914,18 +1028,22 @@ class WarmEngineWorker:
         # and _pending_reap is what ctor-failure close already joins.
         with self._state_lock:
             if self.disabled:
-                if native_output_reader is not None:
-                    native_output_reader.close()
                 if native_output_writer is not None:
                     native_output_writer.close()
+                if native_output_thread is not None:
+                    native_output_thread.join(
+                        timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S,
+                    )
                 child.close()
                 parent.close()
                 raise RuntimeError(f'{self.name} worker is disabled')
             if abort_event is not None and abort_event.is_set():
-                if native_output_reader is not None:
-                    native_output_reader.close()
                 if native_output_writer is not None:
                     native_output_writer.close()
+                if native_output_thread is not None:
+                    native_output_thread.join(
+                        timeout=ENGINE_NATIVE_OUTPUT_READER_JOIN_S,
+                    )
                 child.close()
                 parent.close()
                 raise EngineWorkerTimeout(
@@ -948,7 +1066,10 @@ class WarmEngineWorker:
                 )
             )
         if not still_ours:
-            self._finish_native_output_capture(process)
+            self._finish_native_output_capture(
+                process,
+                process_start_failed=True,
+            )
             child.close()
             parent.close()
             if abort_event is not None and abort_event.is_set():
@@ -959,8 +1080,6 @@ class WarmEngineWorker:
                 )
             raise RuntimeError(f'{self.name} worker is disabled')
         try:
-            if native_output_thread is not None:
-                native_output_thread.start()
             process.start()
         except BaseException:
             self._finish_native_output_capture(
