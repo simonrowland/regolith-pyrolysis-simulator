@@ -1,0 +1,38 @@
+source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+source_locator_basis: absolute PDF page plus printed table number and row/column
+transcription: MinerU table blocks and born-digital pdftotext-layout, reconciled against rendered page 1481
+render_checks:
+  pages:
+    - 2
+    - 3
+  reason: >-
+    Page 1481 render checked the row/column assignments of Tables I and II, all comma-grouped calcium heat-content
+    cells, the (a)/(b) printed marks, the Table II c/l boundary cells, and the prose melting values. Page 1482 render
+    checked every fitted equation, including the printed CaFe2O5(l) label.
+tables:
+  - page: 2
+    table: 'I'
+    type: heat_capacity_and_heat_content_series
+    quantity: negative_enthalpy_change_on_cooling
+    evidence_class: measured_direct
+    unit: cal/mol
+    compounds: [CaFe2O4, Ca2Fe2O5]
+    printed_rows: 31
+    extracted_calcium_points: 49
+    data_columns: [2, 4, 6]
+    notes: >-
+      Three printed T/H column pairs. Table I values marked b are retained but excluded from fitted liquid lineage.
+      The two CaFe2O4 values marked a in its incongruent-melting interval remain typed-refused for phase unknown.
+  - page: 2
+    table: 'II'
+    type: heat_capacity_and_heat_content_series
+    quantity: negative_enthalpy_change_on_cooling
+    evidence_class: measured_reduced
+    unit: cal/mol
+    compounds: [CaFe2O4, Ca2Fe2O5]
+    printed_rows: 24
+    extracted_calcium_points: 35
+    data_columns: [2, 4]
+    derived_from: Table I calcium heat-content measurements used for the smooth fits; b-marked CaFe2O4 rows excluded
+    notes: >-
+      Table II has compound headings and paired H/S columns. The (c) and (l) transition labels are preserved as printed.

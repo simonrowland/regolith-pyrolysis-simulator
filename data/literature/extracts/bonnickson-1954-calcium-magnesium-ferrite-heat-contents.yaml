@@ -1,0 +1,1091 @@
+schema_version: literature_extract.v1
+source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+source:
+  citation: Bonnickson, K. R. (1954). High temperature heat contents of calcium and magnesium ferrites. Journal
+    of the American Chemical Society, 76, 1480–1482.
+  doi: 10.1021/ja01635a006
+  year: 1954
+extraction:
+  method: Transcribed from MinerU table blocks and born-digital pdftotext; table rows were parsed from machine text.
+  date: '2026-11-05'
+  worker: w1105fe-bonn54
+  note: Calcium ferrites only. No unit conversion; heat contents remain cal/mol above H(298.16 K).
+review_status: draft
+fidelity_samples:
+- path: species.CaFe2O4.observations[bonnickson_1954_tablei_cafe2o4_cr_heat_content].values.points[0].value
+  value: '4220.0'
+  locator:
+    page: 2
+    table: I
+- path: species.CaFe2O4.observations[bonnickson_1954_tablei_cafe2o4_cr_heat_content].values.points[1].value
+  value: '43870.0'
+  locator:
+    page: 2
+    table: I
+- path: species.Ca2Fe2O5.observations[bonnickson_1954_tableii_ca2fe2o5_cr_heat_content].values.points[0].value
+  value: '4870.0'
+  locator:
+    page: 2
+    table: II
+species:
+  CaFe2O4:
+    observations:
+    - observation_id: bonnickson_1954_tablei_cafe2o4_cr_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: cr
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 411.3
+          value: 4220.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 3
+            column: 2
+        - T_K: 1333.7
+          value: 43870.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 3
+            column: 4
+        - T_K: 549.3
+          value: 9880.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 4
+            column: 2
+        - T_K: 1385.5
+          value: 46560.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 4
+            column: 4
+        - T_K: 650.9
+          value: 14050.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 5
+            column: 2
+        - T_K: 1406.0
+          value: 47750.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 5
+            column: 4
+        - T_K: 726.1
+          value: 17220.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 6
+            column: 2
+        - T_K: 1429.7
+          value: 48300.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 6
+            column: 4
+        - T_K: 846.8
+          value: 22310.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 7
+            column: 2
+        - T_K: 1462.6
+          value: 50590.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 7
+            column: 4
+        - T_K: 909.1
+          value: 25070.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 8
+            column: 2
+        - T_K: 1038.2
+          value: 30600.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 9
+            column: 2
+        - T_K: 1131.7
+          value: 34700.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 10
+            column: 2
+        - T_K: 1229.0
+          value: 39130.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 11
+            column: 2
+    - observation_id: bonnickson_1954_tablei_cafe2o4_l_b_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: l
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 1566.2
+          value: 79130.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 3
+            column: 6
+          mark_as_printed: b
+          phase_as_printed: b
+          note_as_printed: Five determinations (labeled b in Table I) are discordant by about 1.3% on the average;
+            these five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+            treatment of the data.
+        - T_K: 1573.3
+          value: 80460.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 4
+            column: 6
+          mark_as_printed: b
+          phase_as_printed: b
+          note_as_printed: Five determinations (labeled b in Table I) are discordant by about 1.3% on the average;
+            these five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+            treatment of the data.
+        - T_K: 1574.4
+          value: 79800.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 5
+            column: 6
+          mark_as_printed: b
+          phase_as_printed: b
+          note_as_printed: Five determinations (labeled b in Table I) are discordant by about 1.3% on the average;
+            these five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+            treatment of the data.
+        - T_K: 1593.9
+          value: 80980.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 6
+            column: 6
+          mark_as_printed: b
+          phase_as_printed: b
+          note_as_printed: Five determinations (labeled b in Table I) are discordant by about 1.3% on the average;
+            these five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+            treatment of the data.
+        - T_K: 1549.3
+          value: 78650.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 10
+            column: 4
+          mark_as_printed: b
+          phase_as_printed: b
+          note_as_printed: Five determinations (labeled b in Table I) are discordant by about 1.3% on the average;
+            these five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+            treatment of the data.
+        marker_as_printed: b
+    - observation_id: bonnickson_1954_tablei_cafe2o4_l_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: l
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 1616.3
+          value: 83700.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 7
+            column: 6
+        - T_K: 1652.0
+          value: 85590.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 8
+            column: 6
+        - T_K: 1702.1
+          value: 88490.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 9
+            column: 6
+        - T_K: 1805.3
+          value: 94080.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 10
+            column: 6
+    - observation_id: bonnickson_1954_tablei_cafe2o4_unknown_a_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: unknown
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 1504.6
+          value: 64320.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 8
+            column: 4
+          phase: unknown
+          phase_reason: Incongruent melting interval; no per-row phase printed.
+          mark_as_printed: a
+          phase_as_printed: a
+          note_as_printed: (Note results labeled a in Table I.)
+        - T_K: 1529.7
+          value: 74970.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 9
+            column: 4
+          phase: unknown
+          phase_reason: Incongruent melting interval; no per-row phase printed.
+          mark_as_printed: a
+          phase_as_printed: a
+          note_as_printed: (Note results labeled a in Table I.)
+        marker_as_printed: a
+        admission_status: typed_refusal
+        phase_refusal_reason: The printed measurement lies in the source-stated incongruent-melting interval and
+          the row has no phase label; preserve the numeric value without assigning a phase.
+    - observation_id: bonnickson_1954_tableii_cafe2o4_cr_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: II
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: cr
+      phase_as_printed: c
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table II smooth heat-content values; the source attributes the fitting method to its
+        Table I experimental data.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_reduced
+        points:
+        - T_K: 400.0
+          value: 3940.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 3
+            column: 2
+        - T_K: 500.0
+          value: 7900.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 4
+            column: 2
+        - T_K: 600.0
+          value: 11950.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 5
+            column: 2
+        - T_K: 700.0
+          value: 16090.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 8
+            column: 2
+        - T_K: 800.0
+          value: 20310.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 9
+            column: 2
+        - T_K: 900.0
+          value: 24600.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 10
+            column: 2
+        - T_K: 1000.0
+          value: 28950.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 11
+            column: 2
+        - T_K: 1100.0
+          value: 33360.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 12
+            column: 2
+        - T_K: 1200.0
+          value: 37820.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 13
+            column: 2
+        - T_K: 1300.0
+          value: 42340.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 16
+            column: 2
+        - T_K: 1400.0
+          value: 46920.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 17
+            column: 2
+        - T_K: 1500.0
+          value: 51540.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 18
+            column: 2
+        - T_K: 1510.0
+          value: 52000.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 19
+            column: 2
+          mark_as_printed: c
+          phase_as_printed: c
+        derived_from:
+        - bonnickson_1954_tablei_cafe2o4_cr_heat_content
+    - observation_id: bonnickson_1954_tableii_cafe2o4_l_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: II
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: l
+      phase_as_printed: l
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table II smooth heat-content values; the source attributes the fitting method to its
+        Table I experimental data.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_reduced
+        points:
+        - T_K: 1510.0
+          value: 77870.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 20
+            column: 2
+          mark_as_printed: l
+          phase_as_printed: l
+        - T_K: 1600.0
+          value: 82810.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 21
+            column: 2
+        - T_K: 1700.0
+          value: 88300.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 22
+            column: 2
+        - T_K: 1800.0
+          value: 93790.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 25
+            column: 2
+        derived_from:
+        - bonnickson_1954_tablei_cafe2o4_l_heat_content
+        - bonnickson_1954_tablei_cafe2o4_unknown_a_heat_content
+    - observation_id: bonnickson_1954_cafe2o4_heat_of_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id001
+        page: 2
+        published_page: 1481
+        paragraph: incongruent-melting discussion
+        row: 1510 K melting treatment
+        column: heat of fusion
+      phase: cr
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat of fusion at the source-adopted melting temperature.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1510'
+          locator: *id001
+      derived_from: &id002
+      - bonnickson_1954_tableii_cafe2o4_cr_heat_content
+      - bonnickson_1954_tableii_cafe2o4_l_heat_content
+      derivation:
+        relation: Heat of fusion at adopted Tm from H_l(Tm) − H_c(Tm), as stated by the authors.
+        inputs: *id002
+        output_unit: cal/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_reduced
+        value: 25870
+        T_K: 1510
+        derived_from: *id002
+        statement_as_printed: The heat of fusion at this temperature is 25,870 cal./mole.
+    context:
+    - observation_id: bonnickson_1954_cafe2o4_melting_interval
+      type: source_context
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: According to the existing phase diagram for the CaO–Fe2O3 system, the compound CaFe2O4
+          melts incongruently over a range of temperature. There is some evidence in the present results of beginning
+          of melting as low as 1,463°K., and melting is not complete at 1,530°K. (Note results labeled a in Table
+          I.) Five determinations (labeled b in Table I) in the temperature range 1,573 to 1,594°K. are discordant
+          by about 1.3% on the average; either there was some lack of equilibrium, or the substance was not completely
+          melted. These five points were given no weight in drawing the curve for the liquid in Fig. 1 or in subsequent
+          treatment of the data. Because of the incongruent melting range, the melting temperature has been taken
+          rather arbitrarily at an intermediate value of 1,510°K. The heat of fusion at this temperature is 25,870
+          cal./mole, and the entropy of fusion is 17.13 cal./deg. mole.
+    - observation_id: bonnickson_1954_cafe2o4_equation_cr
+      type: source_context
+      locator:
+        page: 3
+        published_page: 1482
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: 'CaFe2O4(c): H_T − H_298.16 = 39.42T + 2.38×10^-3 T^2 + 3.66×10^-5 T^-1 − 13,194;
+          (0.3%; 298–1510 K).'
+    - observation_id: bonnickson_1954_cafe2o4_equation_l
+      type: source_context
+      locator:
+        page: 3
+        published_page: 1482
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: 'CaFe2O4(l): H_T − H_298.16 = 54.90T − 5030; (0.1%; 1510–1800 K).'
+  Ca2Fe2O5:
+    observations:
+    - observation_id: bonnickson_1954_tablei_ca2fe2o5_cr_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: cr
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 376.5
+          value: 3695.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 13
+            column: 2
+        - T_K: 1107.0
+          value: 45250.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 13
+            column: 4
+        - T_K: 1652.3
+          value: 77850.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 13
+            column: 6
+        - T_K: 478.3
+          value: 9100.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 14
+            column: 2
+        - T_K: 1202.7
+          value: 50850.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 14
+            column: 4
+        - T_K: 1703.9
+          value: 80950.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 14
+            column: 6
+        - T_K: 597.7
+          value: 15620.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 15
+            column: 2
+        - T_K: 1260.1
+          value: 54060.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 15
+            column: 4
+        - T_K: 731.5
+          value: 23500.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 16
+            column: 2
+        - T_K: 1338.9
+          value: 58650.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 16
+            column: 4
+        - T_K: 788.3
+          value: 26560.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 17
+            column: 2
+        - T_K: 1409.0
+          value: 62780.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 17
+            column: 4
+        - T_K: 912.9
+          value: 33960.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 18
+            column: 2
+        - T_K: 1441.0
+          value: 64650.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 18
+            column: 4
+        - T_K: 1014.1
+          value: 39920.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 19
+            column: 2
+        - T_K: 1483.6
+          value: 67280.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 19
+            column: 4
+        - T_K: 1033.7
+          value: 40660.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 20
+            column: 2
+        - T_K: 1606.7
+          value: 74180.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 20
+            column: 4
+    - observation_id: bonnickson_1954_tablei_ca2fe2o5_l_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: l
+      phase_as_printed: not specified for individual measurements in Table I
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table I experimental measurements.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_direct
+        points:
+        - T_K: 1751.8
+          value: 118940.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 15
+            column: 6
+        - T_K: 1752.1
+          value: 118380.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 16
+            column: 6
+        - T_K: 1766.8
+          value: 120070.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 17
+            column: 6
+        - T_K: 1793.0
+          value: 122090.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 18
+            column: 6
+        - T_K: 1810.3
+          value: 123400.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 19
+            column: 6
+        - T_K: 1837.6
+          value: 125320.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: I
+            row: 20
+            column: 6
+    - observation_id: bonnickson_1954_tableii_ca2fe2o5_cr_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: II
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: cr
+      phase_as_printed: c
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table II smooth heat-content values; the source attributes the fitting method to its
+        Table I experimental data.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_reduced
+        points:
+        - T_K: 400.0
+          value: 4870.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 3
+            column: 4
+        - T_K: 500.0
+          value: 10210.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 4
+            column: 4
+        - T_K: 600.0
+          value: 15800.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 5
+            column: 4
+        - T_K: 700.0
+          value: 21490.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 8
+            column: 4
+        - T_K: 800.0
+          value: 27250.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 9
+            column: 4
+        - T_K: 900.0
+          value: 33060.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 10
+            column: 4
+        - T_K: 1000.0
+          value: 38890.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 11
+            column: 4
+        - T_K: 1100.0
+          value: 44730.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 12
+            column: 4
+        - T_K: 1200.0
+          value: 50580.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 13
+            column: 4
+        - T_K: 1300.0
+          value: 56430.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 16
+            column: 4
+        - T_K: 1400.0
+          value: 62280.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 17
+            column: 4
+        - T_K: 1500.0
+          value: 68130.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 18
+            column: 4
+        - T_K: 1600.0
+          value: 73980.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 21
+            column: 4
+        - T_K: 1700.0
+          value: 79830.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 22
+            column: 4
+        derived_from:
+        - bonnickson_1954_tablei_ca2fe2o5_cr_heat_content
+    - observation_id: bonnickson_1954_tableii_ca2fe2o5_l_heat_content
+      type: heat_capacity_and_heat_content_series
+      locator:
+        page: 2
+        published_page: 1481
+        table: II
+        row: all listed rows
+        column: T, H(T)-H(298.16)
+      phase: l
+      phase_as_printed: l
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat-content increment above H(298.16 K), as printed.
+      method_as_published: Table II smooth heat-content values; the source attributes the fitting method to its
+        Table I experimental data.
+      values:
+        quantity: negative_enthalpy_change_on_cooling
+        reference_temperature_K: 298.16
+        method_class: measured_reduced
+        points:
+        - T_K: 1750.0
+          value: 82760.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 23
+            column: 4
+        - T_K: 1750.0
+          value: 118870.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 24
+            column: 4
+        - T_K: 1800.0
+          value: 122580.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 25
+            column: 4
+        - T_K: 1850.0
+          value: 126290.0
+          locator:
+            page: 2
+            published_page: 1481
+            table: II
+            row: 26
+            column: 4
+        derived_from:
+        - bonnickson_1954_tablei_ca2fe2o5_l_heat_content
+    - observation_id: bonnickson_1954_ca2fe2o5_heat_of_fusion
+      type: heat_capacity_and_heat_content_series
+      locator: &id003
+        page: 2
+        published_page: 1481
+        paragraph: incongruent-melting discussion
+        row: 1750 K melting treatment
+        column: heat of fusion
+      phase: cr
+      units: cal/mol
+      per: mol_species
+      standard_state_as_printed: Heat of fusion at the source-adopted melting temperature.
+      point_conditions:
+        temperature_K:
+          state:
+            tag: value
+            value:
+              kind: point
+              point: '1750'
+          locator: *id003
+      derived_from: &id004
+      - bonnickson_1954_tableii_ca2fe2o5_cr_heat_content
+      - bonnickson_1954_tableii_ca2fe2o5_l_heat_content
+      derivation:
+        relation: Heat of fusion at adopted Tm from H_l(Tm) − H_c(Tm), as stated by the authors.
+        inputs: *id004
+        output_unit: cal/mol
+      values:
+        quantity: heat_of_fusion
+        method_class: measured_reduced
+        value: 36110
+        T_K: 1750
+        derived_from: *id004
+        statement_as_printed: The heat of fusion is 36,110 cal./mole.
+    context:
+    - observation_id: bonnickson_1954_ca2fe2o5_melting_interval
+      type: source_context
+      locator:
+        page: 2
+        published_page: 1481
+        table: I
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: The compound Ca2Fe2O5 also melts incongruently according to the phase diagram. In
+          the present work there was no evidence of melting below 1704°K., and melting was complete at 1752°K. In
+          treating the data, the melting point is taken as 1750°K. The heat of fusion is 36,110 cal./mole, and the
+          entropy of fusion is 20.63 cal./deg.-mole.
+    - observation_id: bonnickson_1954_ca2fe2o5_equation_cr
+      type: source_context
+      locator:
+        page: 3
+        published_page: 1482
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: 'Ca2Fe2O5(c): H_T − H_298.16 = 59.24T + 11.68×10^5 T^-1 − 21,580; (0.5%; 298–1750
+          K).'
+    - observation_id: bonnickson_1954_ca2fe2o5_equation_l
+      type: source_context
+      locator:
+        page: 3
+        published_page: 1482
+      units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+      values:
+        statement_as_printed: 'CaFe2O5(l) [printed label; contextual formula misprint resolved as Ca2Fe2O5]: H_T
+          − H_298.16 = 74.20T − 10,980; (0.1%; 1750–1850 K).'
+        phase_as_printed: CaFe2O5(l)
+        notes: 'Printed formula misprint resolved by context: the preceding Ca2Fe2O5 paragraph gives complete melting
+          at 1752 K, matching this fit interval of 1750–1850 K. CaFe2O5 is not charge-balanced for Ca2+ and Fe3+
+          with O5.'
