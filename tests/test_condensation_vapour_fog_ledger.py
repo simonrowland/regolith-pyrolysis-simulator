@@ -22,15 +22,18 @@ from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.runner import PyrolysisRun, RunnerError
 from tests.test_optimizer_evalspec import _c2a_window_profile
 
-# sha256 of float.hex kg_by_account plus product_ledger, captured before the
-# stage notice existed.
+# sha256 of float.hex kg_by_account plus product_ledger. Re-read from the
+# production runs after the approved condenser stack (film temperature,
+# every-species cold capture, e-NTU, the freeze-out cartridge, and the
+# 14.7388 m2 area). Those moves change ledger bytes. This pin is not a
+# with/without check of the fog flag; the history assertion below is.
 _LEDGER_DIGEST = {
-    "lunar_c2a_18h": "13c9a5d3a3bcde1e7e5d71ea10e3aa94fc2f847a854db10dcd612921bd85f7c3",
+    "lunar_c2a_18h": "2c6c392904e1fbec287d9d3a2c2a86e6233dc877ca424a52ead0599f41b9d580",
     "mars_c2a_18h_declared_carbon": (
-        "01abdfaa8900d529c0c22fb1d29615aad123dad0b59cda8304b427204dab33b2"
+        "03777f56497ec7ff81a01ceef1c55bd4aaf84c4b1613a293e432b6a559656a83"
     ),
-    "ci_c2a_18h": "434d8803a77151d876b2a5291e6a96a61fec4f0fd81157ac3a945c7c105fc89c",
-    "lunar_c0_24h": "a99c2ceb611ae5e885dcb7acd2468b65eea068a5fbe7c202a393a2ae9fe1e76a",
+    "ci_c2a_18h": "d958b2a5a3716255fbb9c1a352425388e70c42955583c1ae266d89306e0e670a",
+    "lunar_c0_24h": "ff94b195c9eab7017033c1c6b6cf9419fea1875741f4c2400b29334b3f49fede",
 }
 
 
