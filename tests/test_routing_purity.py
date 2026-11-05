@@ -496,6 +496,12 @@ def test_na_at_the_k_trap_is_a_contaminant_and_mass_closes():
         EvaporationMixin._swing_alkali_freeze_out_cartridge.__get__(host)
     )
     host._move_ledger_species = lambda *args, **kwargs: 0.0
+    # The swing marks the debit account before the partial withdrawal.
+    # This host records stage sources only; the stubbed move has no
+    # origin state, so the mark is a no-op here.
+    host.atom_ledger = SimpleNamespace(
+        mark_amalgamated_pool=lambda *_args, **_kwargs: None,
+    )
     host._LEDGER_KG_TOL = 1e-12
     host.vapor_pressures = {}
     for species in inlet:
