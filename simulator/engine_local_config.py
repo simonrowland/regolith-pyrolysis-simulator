@@ -50,6 +50,31 @@ _REQUIRED_ENGINE_KEYS = frozenset(
     }
 )
 
+
+def _cache_version_label(engine: str, version: str) -> str:
+    text = str(version or "").strip()
+    if str(engine).strip().lower() not in {"alphamelts", "alphamelts2"}:
+        return text
+
+    first_line = text.splitlines()[0] if text else ""
+    release = re.search(
+        r"\b(?:alphamelts2|alphamelts)\s+v?(\d+(?:\.\d+){1,3}(?:[-+][A-Za-z0-9.-]+)?)",
+        first_line,
+        flags=re.IGNORECASE,
+    )
+    if release:
+        return f"alphaMELTS {release.group(1)}"
+
+    bare_release = re.match(
+        r"\s*v?(\d+(?:\.\d+){1,3}(?:[-+][A-Za-z0-9.-]+)?)",
+        first_line,
+        flags=re.IGNORECASE,
+    )
+    if bare_release:
+        return f"alphaMELTS {bare_release.group(1)}"
+    return "alphaMELTS"
+
+
 @dataclass(frozen=True)
 class EngineIdentity:
     name: str
@@ -58,10 +83,11 @@ class EngineIdentity:
     extra: Mapping[str, str] = field(default_factory=dict)
 
     def cache_version(self) -> str:
+        version = _cache_version_label(self.name, self.version)
         digest = normalize_digest(self.digest)
         if not digest:
-            return str(self.version).strip()
-        return f"{self.version} (digest={digest})"
+            return version
+        return f"{version} (digest={digest})"
 
 
 @dataclass(frozen=True)
@@ -825,6 +851,28 @@ def sha256_file(path: Path) -> str:
     return f"sha256:{hashlib.sha256(path.read_bytes()).hexdigest()}"
 
 
+def _cache_version_for_binary(
+    engine: str,
+    binary_path: str | Path,
+    reported_version: str,
+) -> str | None:
+    path = Path(binary_path).expanduser()
+    if not path.is_file():
+        resolved = shutil.which(str(binary_path))
+        if resolved is None:
+            return None
+        path = Path(resolved)
+    try:
+        digest = sha256_file(path)
+    except OSError:
+        return None
+    return EngineIdentity(
+        name=engine,
+        version=reported_version,
+        digest=digest,
+    ).cache_version()
+
+
 def sha256_combined(*parts: bytes) -> str:
     hasher = hashlib.sha256()
     for part in parts:
@@ -930,6 +978,8 @@ def is_legacy_cache_version(version: str) -> bool:
     text = str(version or "").strip()
     if not text:
         return False
+    if "path=" in text or "server=" in text:
+        return True
     if "digest=sha256:" in text:
         return False
     if "alphaMELTS subprocess (" in text and "/" in text:
