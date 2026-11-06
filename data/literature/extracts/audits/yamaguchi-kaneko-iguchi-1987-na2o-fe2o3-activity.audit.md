@@ -13,11 +13,12 @@ and absolute PDF page numbers.
 | Table 1, p. 988 / PDF p. 3 | 5 cell identities: 0, 6, 9, 10, 11 | All five bulk formulas and phase assemblages retained in context. Cells 6/9 are repeat cells; 10/11 are thermal-EMF controls, not independent activity rows. |
 | Table 2, p. 989 / PDF p. 4 | 8 fit rows: 3 for cell 0 and 5 for cells 6/9 | All 8 piecewise EMF fits, including A, dA, B and dB, retained as measured-reduced context. The raw points are plotted and not tabulated. |
 | Table 3, p. 991 / PDF p. 6 | 4 log-activity fit rows | All four coefficient fits are stored as measured-reduced `activity` observations in printed log10 form, typed-refused because no numeric points are printed. |
-| Table 4, p. 991 / PDF p. 6 | 4 Gibbs fit rows: one Na3Fe5O9 and three Na2Fe2O4 | All four fits retained as measured-reduced `delta_fG` observations, typed-refused. Formula, equation label, reaction and reaction basis remain explicit. |
+| Table 4, p. 991 / PDF p. 6 | 4 Gibbs fit rows: one Na3Fe5O9 and three Na2Fe2O4 | Three fits are measured-reduced `delta_fG` observations; the Na3Fe5O9 row is a reaction-(B) energy for two formula units and remains quantity-unknown under a descriptive label. All are typed-refused as coefficient functions. |
 | Abstract, p. 986 / PDF p. 1 | 4 coefficient fits | Retained separately from Table 4 so the printed disagreements remain visible. |
 
-The extraction therefore contains 12 migrated fit observations (4 activity and
-8 Gibbs fits), plus 8 located Table 2 EMF fit rows in source context. It does
+The extraction therefore contains 12 migrated fit observations (4 activity,
+7 `delta_fG`, and one quantity-unknown reaction-(B) Gibbs fit), plus 8 located
+Table 2 EMF fit rows in source context. It does
 not create points by evaluating an equation or reading values from a figure.
 The cell audit CSV records all 100 numeric cells across the printed fit tables
 and abstract (80 coefficients and uncertainty cells plus 20 temperature-range
@@ -57,12 +58,18 @@ It reports 0 matched, 0 mismatched and 0 total candidates.
 - The abstract gives Na3Fe5O9 as −(248.6 ± 1.1) − (2.447 ± 1.188)×10⁻³T.
   Table 4 gives the reaction-basis intercept −497.2 ± 2.2 but repeats the
   same slope rather than an obvious factor of two. Both printed bases are
-  preserved.
+  preserved. The abstract intercept is one formula unit (half the reaction
+  intercept), while its slope is unhalved; neither coefficient is adjusted.
 - Table 4 labels its first row “Eq. (A)” even though the caption and body
   identify the formation reaction as (B); Eq. (A) is the carbonate reaction
   on p. 987. The row label is retained verbatim.
-- Equation (6) uses the NF/N3F5 activity ratio, while equation (5) and the
-  preceding activity definition use N3F5/NF. The ratio is not inverted.
+- Equation (6) prints both `ΔG°(Na2Fe2O4) = 1/5[ΔG°(B) + ΔG°(C)]` and its
+  expanded activity expression. The expanded form uses NF/N3F5, while equation
+  (5) and the preceding activity definition use N3F5/NF; the printed ratio is
+  retained without inversion.
+- The Table 4 Eq. (D) phase heading `−NF <1405 K` is stored literally. Its
+  `<1405 K` window overlaps the `<1047 K` and `1047<T<1278 K` rows and is not
+  the abstract's `1278<T<1405 K` interval.
 - One body occurrence reads Na3Fe5O5; it is recorded as a literal typo, not
   treated as another phase.
 
@@ -111,6 +118,14 @@ quantity has no token in `simulator/battery/enums.py::Quantity` or
 remain located context and are not mislabeled as activity. These code checks
 are also recorded in the extract's schema-audit context.
 
+The Table 4 Na3Fe5O9 row is the standard Gibbs energy of reaction (B), whose
+extent is two Na3Fe5O9 formula units. `simulator/battery/enums.py::Quantity`
+and `simulator/battery/migrate.py::QUANTITY_ALIASES` / `::TYPE_QUANTITY` have
+no exact reaction-extent Gibbs-energy token; `Quantity.DELTA_FG` would assign
+the full reaction energy to one species formula unit. The descriptive
+`reaction_standard_gibbs_energy_for_reaction_B` label therefore migrates with
+quantity unknown, pinned to exactly this row in the focused test.
+
 The authors' fit outputs are `measured_reduced`, with Table 3 activity fits
 carrying `raw_inputs.state=not_printed` at Figure 2 (cell 0) or Figure 3 (cells
 6/9). Table 4 and abstract Gibbs fits link to the stored Table 3 fits named by
@@ -125,13 +140,14 @@ are deferred.
 
 The focused test runs the real migrator on this extract. Result: 12
 observations, 12 unavailable coefficient-only expressions, 0 hard issues,
-0 unknown quantities and 0 unknown phases. All 12 carry a page-located
+one quantity-unknown reaction-basis row (`yki1987_gibbs_table4_na3fe5o9`),
+and 0 unknown phases. All 12 carry a page-located
 temperature bound or interval. No total pressure or fO2 condition is added.
 
 | Observation | composition | total pressure | fO2 | identity temperature | located temperature condition |
 |---|---|---|---|---|---|
 | `yki1987_activity_f_n3f5` | unknown; no numeric composition printed | unknown | unknown | unknown; fit has no single T | `<1405 K`, Table 3, p. 991 |
-| `yki1987_gibbs_table4_na3fe5o9` | not applicable to delta_fG | not applicable | not applicable | unknown; fit has no single T | `<1405 K`, Table 4, p. 991 |
+| `yki1987_gibbs_table4_na3fe5o9` | unknown; reaction quantity has no profile | unknown | unknown | unknown; fit has no single T | `<1405 K`, Table 4, p. 991 |
 | `yki1987_gibbs_table4_na2fe2o4_mid` | not applicable to delta_fG | not applicable | not applicable | unknown; fit has no single T | `1047<T<1278 K`, Table 4, p. 991 |
 
 The isolated migration preserves every printed range as a bound or interval
