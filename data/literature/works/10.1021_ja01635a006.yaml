@@ -1,0 +1,156 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ja01635a006
+  citation: Bonnickson, K. R. (1954). High temperature heat contents of calcium and magnesium ferrites. Journal of the American
+    Chemical Society, 76, 1480–1482.
+  source_ids:
+  - bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      role: pdf
+      path: raw/bonnickson-1954-calcium-magnesium-ferrite-heat-contents/bonnickson-1954-calcium-magnesium-ferrite-heat-contents.pdf
+      sha256:
+        tag: value
+        value: a6bcd77666effddd8a12370fa5be844d784f9ac3424950ad8144454ef35d2c3e
+    - asset_id: pdftotext:bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      role: pdftotext
+      path: text/bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/ja01635a006
+experiments:
+- experiment_id: 10.1021/ja01635a006::bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1021/ja01635a006
+  locator:
+    page: 2
+    published_page: 1481
+    table: I
+    note: row=all listed rows; column=T, H(T)-H(298.16)
+context:
+- observation_id: bonnickson_1954_ca2fe2o5_equation_cr
+  type: source_context
+  locator:
+    page: 3
+    published_page: 1482
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: 'Ca2Fe2O5(c): H_T − H_298.16 = 59.24T + 11.68×10^5 T^-1 − 21,580; (0.5%; 298–1750 K).'
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_ca2fe2o5_equation_cr
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: Ca2Fe2O5
+- observation_id: bonnickson_1954_ca2fe2o5_equation_l
+  type: source_context
+  locator:
+    page: 3
+    published_page: 1482
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: 'CaFe2O5(l) [printed label; contextual formula misprint resolved as Ca2Fe2O5]: H_T − H_293.16 =
+      74.20T − 10,980; (0.1%; 1750–1850 K).'
+    phase_as_printed: CaFe2O5(l)
+    notes: 'Printed formula misprint resolved by context: the preceding Ca2Fe2O5 paragraph gives complete melting at 1752
+      K, matching this fit interval of 1750–1850 K. CaFe2O5 is not charge-balanced for Ca2+ and Fe3+ with O5. The printed
+      H_293.16 reference is a probable misprint for H_298.16; it is preserved verbatim.'
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_ca2fe2o5_equation_l
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: Ca2Fe2O5
+- observation_id: bonnickson_1954_ca2fe2o5_melting_interval
+  type: source_context
+  locator:
+    page: 2
+    published_page: 1481
+    table: I
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: The compound Ca2Fe2O5 also melts incongruently according to the phase diagram. In the present work
+      there was no evidence of melting below 1704°K., and melting was complete at 1752°K. In treating the data, the melting
+      point is taken as 1750°K. The heat of fusion is 36,110 cal./mole, and the entropy of fusion is 20.63 cal./deg.-mole.
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_ca2fe2o5_melting_interval
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: Ca2Fe2O5
+- observation_id: bonnickson_1954_cafe2o4_equation_cr
+  type: source_context
+  locator:
+    page: 3
+    published_page: 1482
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: 'CaFe2O4(c): H_T − H_298.16 = 39.42T + 2.38×10^-3 T^2 + 3.66×10^-5 T^-1 − 13,194; (0.3%; 298–1510
+      K).'
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_cafe2o4_equation_cr
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: CaFe2O4
+- observation_id: bonnickson_1954_cafe2o4_equation_l
+  type: source_context
+  locator:
+    page: 3
+    published_page: 1482
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: 'CaFe2O4(l): H_T − H_298.16 = 54.90T − 5030; (0.1%; 1510–1800 K).'
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_cafe2o4_equation_l
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: CaFe2O4
+- observation_id: bonnickson_1954_cafe2o4_melting_interval
+  type: source_context
+  locator:
+    page: 2
+    published_page: 1481
+    table: I
+  units: cal/mol; cal/(deg mol); K, as applicable to printed statement
+  values:
+    statement_as_printed: According to the existing phase diagram for the CaO–Fe2O3 system, the compound CaFe2O4 melts incongruently
+      over a range of temperature. There is some evidence in the present results of beginning of melting as low as 1,463°K.,
+      and melting is not complete at 1,530°K. (Note results labeled a in Table I.) Five determinations (labeled b in Table
+      I) in the temperature range 1,573 to 1,594°K. are discordant by about 1.3% on the average; either there was some lack
+      of equilibrium, or the substance was not completely melted. These five points were given no weight in drawing the curve
+      for the liquid in Fig. 1 or in subsequent treatment of the data. Because of the incongruent melting range, the melting
+      temperature has been taken rather arbitrarily at an intermediate value of 1,510°K. The heat of fusion at this temperature
+      is 25,870 cal./mole, and the entropy of fusion is 17.13 cal./deg. mole.
+  context_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents::context::bonnickson_1954_cafe2o4_melting_interval
+  work_id: 10.1021/ja01635a006
+  source_id: bonnickson-1954-calcium-magnesium-ferrite-heat-contents
+  species: CaFe2O4

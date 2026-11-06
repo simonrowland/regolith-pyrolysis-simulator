@@ -1,0 +1,203 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2172/7145613
+  citation: Shaiu, B. (1976). Thermodynamic properties of compounds of Na2O with the oxides of chromium, nickel and iron.
+    M.S. thesis, Iowa State University. doi:10.2172/7145613.
+  source_ids:
+  - shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      role: pdf
+      path: raw/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: eb912bbd8eb0be509362aa320cfa034e7119ddb703fdaaee6622135808028b50
+    - asset_id: pdftotext:shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      role: pdftotext
+      path: text/shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2172/7145613
+experiments:
+- experiment_id: 10.2172/7145613::shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2172/7145613
+  locator:
+    page: 47
+    table: '8'
+    note: row=Na2FeO2
+context:
+- observation_id: shaiu_1976_na4feo3_calorimetry_method
+  type: method_context
+  locator:
+    page: 48
+    equation: 61-63
+  units: kcal/mol and cal/mol-K as printed
+  values:
+    method_class: quoted_attributed
+    method: solution calorimetry
+    calorimetry_attribution: Gross and Wilson [10]
+    reaction: 2 Na2O + FeO -> Na4FeO3
+    delta_H_298_as_printed: -25.07 ± 0.55 kcal
+    delta_S_as_printed: 0.0 ± 1.0 cal/mol-K
+    confidence_level: not stated
+    gibbs_relation_as_printed: ΔGf°[Na4FeO3] = 2ΔGf°[Na2O] + ΔGf°[FeO] - 25070 = -289180 + 82.69T
+  context_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics::context::shaiu_1976_na4feo3_calorimetry_method
+  work_id: 10.2172/7145613
+  source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  species: Na4FeO3
+- observation_id: shaiu_1976_table10_na4feo3_comparison
+  type: comparison_context
+  locator:
+    page: 55
+    table: '10'
+    row: (Na2O)2·FeO, 973 K
+  units: Values in columns headed -kcal/mol and cal/mol-K as printed
+  values:
+    method_class: author_estimate
+    this_work:
+      delta_Hf_column_value: '289.2'
+      delta_Sf: '82.69'
+      delta_Gf_column_value: '208.7'
+      method: estimated
+      method_class: author_estimate
+    wu_6:
+      delta_Hf_column_value: '276.4'
+      delta_Sf: '80.6'
+      delta_Gf_column_value: '198.0'
+      method: estimated
+      method_class: quoted_attributed
+      attribution: '[6]'
+    source_note: The printed ΔHf and ΔGf column headings carry a leading minus sign; values are preserved as printed without
+      re-signing.
+  context_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics::context::shaiu_1976_table10_na4feo3_comparison
+  work_id: 10.2172/7145613
+  source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  species: Na4FeO3
+- observation_id: shaiu_1976_table11_fe_oxide_reactions
+  type: comparison_context
+  locator:
+    page: 57
+    table: '11'
+  units: ΔG° in kcal/mol as printed
+  values:
+    rows:
+    - reaction: Na2O + FeO -> Na2FeO2
+      T_K: 298
+      delta_G_as_printed: '-18.86'
+      method: galvanic cell
+      attribution: This work
+      method_class: measured_reduced
+    - reaction: Na2O + FeO -> Na2FeO2
+      T_K: 298
+      delta_G_as_printed: '-18.0'
+      method: estimated
+      attribution: '[35]'
+      method_class: quoted_attributed
+    - reaction: 2Na2O + Fe -> Na2FeO2 + 2Na(l)
+      T_K: 298
+      delta_G_as_printed: '+13.4'
+      method: galvanic cell
+      attribution: This work
+      method_class: measured_reduced
+    - reaction: 2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO
+      T_K: 298
+      delta_G_as_printed: '-83.4'
+      method: estimated
+      attribution: This work
+      method_class: author_estimate
+    - reaction: 2Na2O + Fe + 0.5O2 -> (Na2O)2·FeO
+      T_K: 298
+      delta_G_as_printed: '-88.8'
+      method: estimated
+      attribution: '[10]'
+      method_class: quoted_attributed
+    - reaction: 2Na2O + FeO -> (Na2O)2·FeO
+      T_K: 298
+      delta_G_as_printed: '-25.1'
+      method: estimated
+      attribution: This work
+      method_class: author_estimate
+    - reaction: 2Na2O + FeO -> (Na2O)2·FeO
+      T_K: 298
+      delta_G_as_printed: '-25.07'
+      method: calorimetry
+      attribution: '[10]'
+      method_class: quoted_attributed
+    - reaction: 2Na2O + FeO -> (Na2O)2·FeO
+      T_K: 298
+      delta_G_as_printed: '-24.8'
+      method: Knudsen effusion
+      attribution: '[65]'
+      method_class: quoted_attributed
+    - reaction: 3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)
+      T_K: 298
+      delta_G_as_printed: '+7.2'
+      method: estimated
+      attribution: This work
+      method_class: author_estimate
+    - reaction: 3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)
+      T_K: 873
+      delta_G_as_printed: '-3.2'
+      method: estimated
+      attribution: This work
+      method_class: author_estimate
+    - reaction: 3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)
+      T_K: 873
+      delta_G_as_printed: '-2.2'
+      method: calorimetry
+      attribution: '[10]'
+      method_class: quoted_attributed
+    - reaction: 3Na2O + Fe -> (Na2O)2·FeO + 2Na(l)
+      T_K: 873
+      delta_G_as_printed: '-2.5'
+      method: calorimetry
+      attribution: '[18]'
+      method_class: quoted_attributed
+    - reaction: Na2O + Fe -> FeO + 2Na(l)
+      T_K: 298
+      delta_G_as_printed: '+32.2'
+      method: estimated
+      attribution: This work
+      method_class: measured_reduced
+  context_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics::context::shaiu_1976_table11_fe_oxide_reactions
+  work_id: 10.2172/7145613
+  source_id: shaiu-1976-na-cr-ni-fe-oxide-thermodynamics
+  species: Na4FeO3

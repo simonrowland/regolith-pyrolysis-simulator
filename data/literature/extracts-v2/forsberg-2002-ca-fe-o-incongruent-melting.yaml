@@ -1,0 +1,445 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/forsberg-2002-ca-fe-o-incongruent-melting.yaml
+observations:
+- observation_id: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq13_reaction_gibbs_caFe2o4
+  experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'delta_rG_from_component_oxides'
+    species:
+      formula: CaFe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1030, 1280]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_rG_from_component_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  locator:
+    page: 4
+    published_page: 388
+    equation: '13'
+  read_from: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+  point_conditions:
+    fO2_control:
+      state:
+        tag: value
+        value:
+          channel: gas_mix
+          atmosphere: 20 mole pct O2 in Ar
+          oxygen_partial_pressure_Pa: '20000'
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars.
+  derivation:
+    relation: Equation (12), ΔG = −2FE, applied to the measured cell [2] EMF series.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        figure: '3'
+        note: Raw EMF readings are plotted, not tabulated.
+    references: []
+- observation_id: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq14_reaction_gibbs_ca2fe2o5
+  experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'delta_rG_from_component_oxides'
+    species:
+      formula: Ca2Fe2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1140, 1340]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'delta_rG_from_component_oxides'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  locator:
+    page: 4
+    published_page: 388
+    equation: '14'
+  read_from: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+  point_conditions:
+    fO2_control:
+      state:
+        tag: value
+        value:
+          channel: gas_mix
+          atmosphere: 20 mole pct O2 in Ar
+          oxygen_partial_pressure_Pa: '20000'
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars.
+  derivation:
+    relation: Equation (13) plus Equation (12), ΔG_cell3 = −2FE, gives the Equation (14) fit for reaction [11].
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        figure: '3'
+        note: The cell [3] EMF readings used with Equation (13) are plotted, not tabulated.
+    references: []
+- observation_id: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq19_dfG_caFe2o4
+  experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: CaFe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1030, 1280]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, reaction_as_printed, reference_oxide_reaction_as_printed,
+      delta_fG_function_as_printed, uncertainty_as_printed, confidence_level, standard_state_as_printed, auxiliary_data_as_printed,
+      status, schema_gap, method_class_reason, printed_uncertainty_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  locator:
+    page: 4
+    published_page: 388
+    equation: '19'
+  read_from: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+  point_conditions:
+    fO2_control:
+      state:
+        tag: value
+        value:
+          channel: gas_mix
+          atmosphere: 20 mole pct O2 in Ar
+          oxygen_partial_pressure_Pa: '20000'
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars.
+  derivation:
+    relation: Equation (15) combines the measured reaction Gibbs fit in Equation (13) with the JANAF CaO and Fe2O3 formation
+      functions in Equations (17) and (18). The source does not print numeric EMF rows.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        figure: '3'
+        note: Raw EMF readings for Equation (13) are plotted, not tabulated.
+    references: []
+- observation_id: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq20_dfG_ca2fe2o5
+  experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell3
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Ca2Fe2O5
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1140, 1340]; no midpoint invented
+    standard_pressure_Pa:
+      tag: unknown
+      reason: no standard_pressure_Pa mapped from source
+    reaction:
+      tag: unknown
+      reason: no reaction mapped from source
+    formation_elements:
+      tag: unknown
+      reason: no formation_elements mapped from source
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: 'no mapped delta_fG field selected; source fields: quantity, method_class, reaction_as_printed, reference_oxide_reaction_as_printed,
+      delta_fG_function_as_printed, uncertainty_as_printed, confidence_level, standard_state_as_printed, auxiliary_data_as_printed,
+      status, schema_gap, method_class_reason, printed_uncertainty_note'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  locator:
+    page: 4
+    published_page: 388
+    equation: '20'
+  read_from: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+  point_conditions:
+    fO2_control:
+      state:
+        tag: value
+        value:
+          channel: gas_mix
+          atmosphere: 20 mole pct O2 in Ar
+          oxygen_partial_pressure_Pa: '20000'
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars.
+  derivation:
+    relation: Equation (16) combines the measured reaction Gibbs fit in Equation (14), twice the JANAF CaO function, and the
+      JANAF Fe2O3 function. The source does not print numeric EMF rows.
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 4
+        figure: '3'
+        note: Raw EMF readings for Equation (14) are plotted, not tabulated.
+    references: []
+- observation_id: forsberg-2002-ca-fe-o-incongruent-melting::forsberg2002_eq24_dfH298_caFe2o4
+  experiment_id: 10.1007/s11663-002-0050-1::experiment::forsberg2002_cell2
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'reaction_enthalpy_from_component_oxides'
+    species:
+      formula: CaFe2O4
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+        rejection_kind: omitted
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'reaction_enthalpy_from_component_oxides'; refusing
+      to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: forsberg-2002-ca-fe-o-incongruent-melting
+  locator:
+    page: 6
+    published_page: 390
+    equation: '24'
+  read_from: pdf:forsberg-2002-ca-fe-o-incongruent-melting
+  point_conditions:
+    fO2_control:
+      state:
+        tag: value
+        value:
+          channel: gas_mix
+          atmosphere: 20 mole pct O2 in Ar
+          oxygen_partial_pressure_Pa: '20000'
+      locator:
+        page: 2
+        section: Emf Cells and Experimental Procedure
+        note: Oxygen activity is reported as about 0.2 bars.
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 6
+        published_page: 390
+        equation: '24'
+  derivation:
+    relation: ΔH°298(CaFe2O4) = ΔG°(CaFe2O4) − T Δ(Gef), Equation (21).
+    inputs: []
+    parameters: []
+    output_unit: as_published
+    raw_inputs:
+      state:
+        tag: value
+        value: not_printed
+      locator:
+        page: 5
+        figure: '4'
+        note: Individual calculated ΔH values use plotted EMF data.
+    references: []

@@ -2282,12 +2282,12 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_entropy_table4::points:h=0a328c6ff060
+- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_entropy_table4
   experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-kems
   identity:
     quantity:
-      tag: value
-      value: S
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaO
       phase:
@@ -2299,60 +2299,28 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1665, 1870]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        components:
+        - - CaO
+          - '1'
+        - - MgO
+          - '1'
+        - - SiO2
+          - '2'
+        amount_basis: mol_inventory
   value:
-    kind: point
-    point: '17'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1665, 1870] is a temperature
+      domain, not the observable
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      sigma: '1.5'
-      parent: shornikov-1997-diopside-vaporization::shornikov_1997_cao_partial_entropy_table4
+    kind: none
   evidence:
     class:
       tag: value
@@ -4767,12 +4735,12 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_entropy_table4::points:h=3f5dcc8a864d
+- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_entropy_table4
   experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-kems
   identity:
     quantity:
-      tag: value
-      value: S
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: MgO
       phase:
@@ -4784,60 +4752,28 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1665, 1870]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        components:
+        - - CaO
+          - '1'
+        - - MgO
+          - '1'
+        - - SiO2
+          - '2'
+        amount_basis: mol_inventory
   value:
-    kind: point
-    point: '19.1'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1665, 1870] is a temperature
+      domain, not the observable
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      sigma: '1.5'
-      parent: shornikov-1997-diopside-vaporization::shornikov_1997_mgo_partial_entropy_table4
+    kind: none
   evidence:
     class:
       tag: value
@@ -11907,12 +11843,12 @@ observations:
     parameters: []
     output_unit: as_published
     references: []
-- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_entropy_table4::points:h=2f3cc9bb1208
+- observation_id: shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_entropy_table4
   experiment_id: b17f2e0c7b1e2b42009320bd5a8f2a9ae3e9f9d016ec4d230f433a9335cc06dd::experiment::shornikov-1997-diopside-kems
   identity:
     quantity:
-      tag: value
-      value: S
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: SiO2
       phase:
@@ -11924,60 +11860,28 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile S does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
     temperature_K:
       tag: unknown
       reason: source T_range_K [1665, 1870]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: not_applicable
-      reason: profile S does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile S does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile S does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile S does not use reservoir
     composition:
-      tag: not_applicable
-      reason: profile S does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile S does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile S does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile S does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile S does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile S does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile S does not use wall
+      tag: value
+      value:
+        basis: printed_formula_stoichiometry
+        components:
+        - - CaO
+          - '1'
+        - - MgO
+          - '1'
+        - - SiO2
+          - '2'
+        amount_basis: mol_inventory
   value:
-    kind: point
-    point: '23.2'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; temperature_range_K [1665, 1870] is a temperature
+      domain, not the observable
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      sigma: '2.4'
-      parent: shornikov-1997-diopside-vaporization::shornikov_1997_sio2_partial_entropy_table4
+    kind: none
   evidence:
     class:
       tag: value

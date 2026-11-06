@@ -6045,8 +6045,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6059,54 +6059,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '298'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-40.48'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6123,14 +6085,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [5, 18]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r03_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6158,8 +6115,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6172,54 +6129,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '298'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-41.84'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6236,14 +6155,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [17]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r04_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6271,8 +6185,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6285,54 +6199,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '298'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-40.48'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6349,14 +6225,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [11]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r05_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6384,8 +6255,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6398,54 +6269,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '298'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-47.11'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6462,14 +6295,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [13]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r06_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6497,8 +6325,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6511,54 +6339,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '298'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-42.98'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6575,14 +6365,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [27]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r07_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6610,8 +6395,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6624,54 +6409,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [888.0, 972.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-37.05'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6688,14 +6435,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [34]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r08_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6720,8 +6462,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6734,54 +6476,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [900.0, 1250.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-40.07'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6798,14 +6502,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [36]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r09_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6830,8 +6529,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6844,54 +6543,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '973'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-38.73'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -6908,14 +6569,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r10_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -6943,8 +6599,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -6957,54 +6613,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '975'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-42.25'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7021,14 +6639,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [24, 25]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r11_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7056,8 +6669,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7070,54 +6683,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '975'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-41.88'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7134,14 +6709,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [26]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r12_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7169,8 +6739,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7183,54 +6753,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '976'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-42.86'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7247,14 +6779,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [23]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r13_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7282,8 +6809,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7296,54 +6823,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1046'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-42.38'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7360,14 +6849,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [22]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r14_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7395,8 +6879,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7409,54 +6893,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1068'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-40.45'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7473,14 +6919,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [19]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r15_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7508,8 +6949,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7522,54 +6963,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1073'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-40.43'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7586,14 +6989,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [20]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r16_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7621,8 +7019,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7635,54 +7033,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1074'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-43.78'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7699,14 +7059,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [21]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r17_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7734,8 +7089,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7748,54 +7103,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1078'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-42.83'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7812,14 +7129,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [30]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r18_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7847,8 +7159,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7861,54 +7173,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1180.0, 1290.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-26.88'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -7925,14 +7199,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [33]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r19_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -7957,8 +7226,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -7971,54 +7240,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1600.0, 1800.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-37.19'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8035,14 +7266,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [7]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r21_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -8067,8 +7293,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -8081,54 +7307,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1600.0, 2100.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-38.23'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8145,14 +7333,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [8]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r22_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -8177,8 +7360,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -8191,54 +7374,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1600.0, 2100.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-37.47'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8255,14 +7400,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [9]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r23_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -8287,8 +7427,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -8301,54 +7441,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: value
       value: '1740'
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-37.55'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8365,14 +7467,9 @@ observations:
     original_method_class: quoted_attributed
     attribution: Table 1 Ref. [37]. The cited paper is not stored in this extract.
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r24_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -8400,8 +7497,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -8414,54 +7511,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [1791.0, 2241.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '-39.98'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8478,14 +7537,9 @@ observations:
     original_method_class: derived_least_squares
     model: derived_least_squares
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r25_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2
@@ -8510,8 +7564,8 @@ observations:
   experiment_id: 10.1134/s0036024419080284::shornikova-2019-perovskite-thermodynamics
   identity:
     quantity:
-      tag: value
-      value: delta_fH
+      tag: unknown
+      reason: row type is a curation label, not a statement of the observable
     species:
       formula: CaTiO3
       phase:
@@ -8523,54 +7577,16 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fH does not use subtype
     per:
       tag: value
       value: mol_species
     temperature_K:
       tag: unknown
       reason: source T_range_K [2241.0, 2398.0]; no midpoint invented
-    standard_pressure_Pa:
-      tag: unknown
-      reason: no standard_pressure_Pa mapped from source
-    reaction:
-      tag: unknown
-      reason: no reaction mapped from source
-    formation_elements:
-      tag: unknown
-      reason: no formation_elements mapped from source
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fH does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fH does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fH does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fH does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fH does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fH does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fH does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fH does not use wall
   value:
-    kind: point
-    point: '7.73'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; row type is a curation label, not a statement of the observable; refusing
+      to pick a number
     approximate: false
   uncertainty:
     kind: printed
@@ -8587,14 +7603,9 @@ observations:
     original_method_class: derived_least_squares
     model: derived_least_squares
   admission:
-    status: admitted
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-  notices:
-  - kind: admission_defaulted
-    affected_quantities:
-    - delta_fH
-    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
-    origin: shornikova-2019-perovskite-thermodynamics::shornikova_2019_perovskite_thermodynamics_p002_t01_r26_c03
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
   source_id: shornikova-2019-perovskite-thermodynamics
   locator:
     page: 2

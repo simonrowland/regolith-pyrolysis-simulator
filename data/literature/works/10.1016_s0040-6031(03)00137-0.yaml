@@ -1,0 +1,489 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/s0040-6031(03)00137-0
+  citation: Huang, J., Furukawa, T. and Aoto, K. (2003), "Thermodynamic study of sodium–iron oxides. Part II. Ternary phase
+    diagram of the Na–Fe–O system", Thermochimica Acta 405, 67–72.
+  source_ids:
+  - huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 8874a0416966327981e980469e6df38dfd9855c1
+    files:
+    - asset_id: pdf:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      role: pdf
+      path: raw/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram.pdf
+      sha256:
+        tag: value
+        value: 9f685ff2f67b8454eb33e14fc8c697921b2c607deb823133781b2462d464b847
+    - asset_id: pdftotext:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      role: pdftotext
+      path: text/huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1016/s0040-6031(03)00137-0
+experiments:
+- experiment_id: 10.1016/s0040-6031(03)00137-0::huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.1016/s0040-6031(03)00137-0
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1, standard formation Gibbs energy at 298.; row=1; column=2
+context:
+- observation_id: huang2003p2_Na4FeO3_oxygen_potential_limit
+  type: oxygen_potential_context
+  units: kJ/mol
+  locator:
+    page: 5
+    published_page: 71
+    pdf_page_index: 4
+    section: 3
+    figure: '7'
+  values:
+    method_class: model_derived
+    quantity_as_printed: oxygen potential
+    value_as_printed: about −536
+    temperature_as_printed: 800 K
+    statement_as_printed: The calculated highest oxygen potential at 800 K at which Na4FeO3(s) can stably exist is as low
+      as about −536 kJ mol−1.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_Na4FeO3_oxygen_potential_limit
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_Na8Fe2O7_temperature_stability_prose
+  type: phase_stability_context
+  units: as_printed
+  locator:
+    page: 5
+    published_page: 71
+    pdf_page_index: 4
+    section: 3
+  values:
+    method_class: model_derived
+    composition: Na8Fe2O7
+    appears_over_temperature_as_printed: about 637 K
+    tends_to_replace_Na5FeO4_above_temperature_as_printed: about 944 K
+    statement_as_printed: Na8Fe2O7 appears over about 637 K and tends to replace Na5FeO4 when the temperature is higher than
+      about 944 K.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_Na8Fe2O7_temperature_stability_prose
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_coexistence_prose
+  type: phase_equilibrium_context
+  units: as_printed
+  locator:
+    page: 5
+    published_page: 71
+    pdf_page_index: 4
+    section: 3
+  values:
+    method_class: model_derived
+    coexistence_as_printed: Na(l), Fe(s), and Na4FeO3(s) coexist over 694 K.
+    temperature_as_printed: 694 K
+    oxygen_potential: The Na4FeO3 stability-limit potential is reported separately below; no oxygen potential is stated for
+      this coexistence condition.
+    figure_only_geometry: Figures 1–7 give phase-diagram geometry and are deferred as out of scope.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_coexistence_prose
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_data_summary_overlap
+  type: source_overlap_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.3
+  values:
+    overlap_source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-kems
+    overlap: Part I contains the original Na3FeO3 vapor-pressure measurements and derived Gibbs function, reported here as
+      equation (4) and again among Table 1 thermodynamic values. Reaction (10), Na4FeO3(s) → Na3FeO3(s) + Na(g) over 590–717
+      K, is the Part I experiment; Part II extends the fit from Part I's 720 K limit to about 1000 K. Part I remains the owner
+      of its measured rows; the Part II copies above are attributed to Part I.
+    consumer: openimcc/physics NaFeO2 band
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_data_summary_overlap
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_external_phase_data
+  type: adopted_phase_data_context
+  units: as_printed
+  locator:
+    page: 1
+    published_page: 67
+    pdf_page_index: 0
+    section: 1
+  values:
+    method_class: quoted_attributed
+    attributed_sources_as_printed:
+    - Dai et al. [1,2]: binary phase-diagram studies.
+    - Lindemer et al. [3]: estimated oxide phases, including Na8Fe2O7 and higher oxides.
+    - Seetharaman and Du [4]: low-oxygen and oxygen–sodium potential diagrams; Na2FeO2 stability ruled out by thermodynamic
+        analysis.
+    - Sridharan et al. [5,6]: thermal analysis and solid-state reactions; ternary phase equilibria.
+    - Bhat and Borgstedt [9]: Na4FeO3 thermodynamic assessment.
+    - Stuve et al. [14]: Na8Fe2O7 standard formation enthalpy.
+    excluded_or_unadopted: Na2FeO2 and higher oxides were excluded from the calculation; source reports failed synthesis or
+      absent observations for the former and absent observations for the latter.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_external_phase_data
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_invariant_figures_deferred
+  type: phase_diagram_geometry_deferred_context
+  units: as_printed
+  locator:
+    page: 4
+    published_page: 70
+    pdf_page_index: 3
+    section: 3
+    figures: 1–7
+  values:
+    method_class: figure_only
+    reason: Invariant and three-phase topology is only shown graphically; the brief excludes geometry read from figures. The
+      source reports no tabulated invariant equilibrium.
+    figure_read_candidate: Any phase-diagram boundaries and invariant points in Figures 1–7.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_invariant_figures_deferred
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_na3feo3_equation4
+  type: thermodynamic_equation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.3
+    equation: '4'
+  values:
+    method_class: quoted_attributed
+    attribution: Huang, Furukawa and Aoto Part I, cited as [13]
+    equation_as_printed: ΔfG°(Na3FeO3) = −1168629 + 338.34 × T
+    temperature_range_as_printed: Valid until about 1000 K according to this Part II source.
+    units_as_printed: J mol−1; T in K
+    overlap_with_part_i_extract: Part I source owns the underlying vapor-pressure measurements; no Part I observations are
+      duplicated here.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_na3feo3_equation4
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
+- observation_id: huang2003p2_na4feo3_equation2
+  type: thermodynamic_equation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.2
+    equation: '2'
+  values:
+    method_class: quoted_attributed
+    attribution: Bhat and Borgstedt [9]
+    equation_as_printed: ΔfG°(Na4FeO3) = −1212202 + 351.10 × T
+    units_as_printed: J mol−1; T in K
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_na4feo3_equation2
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
+- observation_id: huang2003p2_na4feo3_equation3
+  type: thermodynamic_relation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.2
+    equation: '3'
+  values:
+    method_class: relation_as_printed
+    equation_as_printed: ΔfH°(298) = ΔfG°(298) + T ΔfS°(298)
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_na4feo3_equation3
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
+- observation_id: huang2003p2_na5feo4_equation5
+  type: thermodynamic_equation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.4
+    equation: '5'
+  values:
+    method_class: model_derived
+    equation_as_printed: ΔfG°(Na5FeO4) = −1602430 + 467.3 × T
+    units_as_printed: J mol−1; T in K
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_na5feo4_equation5
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
+- observation_id: huang2003p2_na8fe2o7_equation6
+  type: thermodynamic_equation_context
+  units: as_printed
+  locator:
+    page: 3
+    published_page: 69
+    pdf_page_index: 2
+    section: 2.2.5
+    equation: '6'
+  values:
+    method_class: model_derived
+    equation_as_printed: ΔfG°(Na8Fe2O7) = −2754068 + 771.86 × T
+    units_as_printed: J mol−1; T in K
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_na8fe2o7_equation6
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
+- observation_id: huang2003p2_reactions_7_10_measured
+  type: thermodynamic_reaction_context
+  units: as_printed
+  locator:
+    page: 5
+    published_page: 71
+    pdf_page_index: 4
+    section: 3
+    equations: 7–10
+  values:
+    method_class: measured_direct
+    measurement_statement: The paper says these equilibrium reactions were confirmed by the authors' vapor-pressure measurements
+      and XRD analysis in the present laboratory.
+    oxygen_potential: The paper says the partial oxygen pressures for reactions (7)–(10) were too low to measure.
+    reactions_as_printed:
+    - NaFeO2(s) → 1/3 Fe3O4(s) + Na(g) + 1/3 O2(g), 1288–1380 K
+    - Na3FeO3(s) → NaFeO2(s) + 2Na(g) + 1/2 O2(g), 823–1023 K
+    - Na5FeO4(s) → 1/2 Na8Fe2O7(s) + Na(g) + 1/4 O2(g), 603–673 K
+    - Na4FeO3(s) → Na3FeO3(s) + Na(g), 590–717 K
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_reactions_7_10_measured
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(l)
+- observation_id: huang2003p2_table1_Na3FeO3_function_coefficients
+  type: thermodynamic_function_coefficients_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Coefficient cells for the printed Cp(T) and G(T) functions.
+  values:
+    method_class: quoted_attributed
+    attribution: Huang, Furukawa and Aoto Part I [13] for Gibbs formation input; authors estimated function parameters.
+    composition: Na3FeO3(s)
+    heat_capacity_function_as_printed: Cp(T) = a + b × T − c/T², J mol−1 K−1
+    heat_capacity_coefficients_as_printed:
+      a: '181.7'
+      b: '0.03339'
+      c: '2967000'
+    gibbs_function_as_printed: G(T) = −g1 + g2 × T − g3 × T × ln(T) − g4 × T² + g5/T, J mol−1
+    gibbs_function_coefficients_as_printed:
+      g1: '1228246'
+      g2: '1071.530'
+      g3: '181.69'
+      g4: '0.016695'
+      g5: '1483500'
+    schema_gap: Cp and Gibbs-function coefficients are not Cp or formation Gibbs values themselves; no exact observation quantity
+      token applies.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.CP
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_table1_Na3FeO3_function_coefficients
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na3FeO3
+- observation_id: huang2003p2_table1_Na4FeO3_function_coefficients
+  type: thermodynamic_function_coefficients_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Coefficient cells for the printed Cp(T) and G(T) functions.
+  values:
+    method_class: quoted_attributed
+    attribution: MALT2 database [12] for heat-capacity estimate; function assessment as described in section 2.2.2
+    composition: Na4FeO3(s)
+    heat_capacity_function_as_printed: Cp(T) = a + b × T − c/T², J mol−1 K−1
+    heat_capacity_coefficients_as_printed:
+      a: '212.49'
+      b: '0.0383'
+      c: '3280000'
+    gibbs_function_as_printed: G(T) = −g1 + g2 × T − g3 × T × ln(T) − g4 × T² + g5/T, J mol−1
+    gibbs_function_coefficients_as_printed:
+      g1: '1282201'
+      g2: '1244.166'
+      g3: '212.49'
+      g4: '0.019155'
+      g5: '1642000'
+    schema_gap: Cp and Gibbs-function coefficients are not Cp or formation Gibbs values themselves; no exact observation quantity
+      token applies.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.CP
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_table1_Na4FeO3_function_coefficients
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na4FeO3
+- observation_id: huang2003p2_table1_Na5FeO4_function_coefficients
+  type: thermodynamic_function_coefficients_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Coefficient cells for the printed Cp(T) and G(T) functions.
+  values:
+    method_class: quoted_attributed
+    attribution: Heat capacity estimated by the authors as described in section 2.2.4.
+    composition: Na5FeO4(s)
+    heat_capacity_function_as_printed: Cp(T) = a + b × T − c/T², J mol−1 K−1
+    heat_capacity_coefficients_as_printed:
+      a: '262.61'
+      b: '0.04818'
+      c: '4455000'
+    gibbs_function_as_printed: G(T) = −g1 + g2 × T − g3 × T × ln(T) − g4 × T² + g5/T, J mol−1
+    gibbs_function_coefficients_as_printed:
+      g1: '1691381'
+      g2: '1551.917'
+      g3: '262.60'
+      g4: '0.024000'
+      g5: '2228000'
+    schema_gap: Cp and Gibbs-function coefficients are not Cp or formation Gibbs values themselves; no exact observation quantity
+      token applies.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.CP
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_table1_Na5FeO4_function_coefficients
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na5FeO4
+- observation_id: huang2003p2_table1_Na8Fe2O7_function_coefficients
+  type: thermodynamic_function_coefficients_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Coefficient cells for the printed Cp(T) and G(T) functions.
+  values:
+    method_class: model_derived
+    attribution: Authors estimate heat capacity from Na3FeO3 and Na5FeO4; Gibbs function equation (6).
+    composition: Na8Fe2O7(s)
+    heat_capacity_function_as_printed: Cp(T) = a + b × T − c/T², J mol−1 K−1
+    heat_capacity_coefficients_as_printed:
+      a: '444.3'
+      b: '0.08156'
+      c: '7422000'
+    gibbs_function_as_printed: G(T) = −g1 + g2 × T − g3 × T × ln(T) − g4 × T² + g5/T, J mol−1
+    gibbs_function_coefficients_as_printed:
+      g1: '2906986'
+      g2: '2603.706'
+      g3: '444.3'
+      g4: '0.04078'
+      g5: '3711000'
+    schema_gap: Cp and Gibbs-function coefficients are not Cp or formation Gibbs values themselves; no exact observation quantity
+      token applies.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.CP
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_table1_Na8Fe2O7_function_coefficients
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na8Fe2O7
+- observation_id: huang2003p2_table1_NaFeO2_function_coefficients
+  type: thermodynamic_function_coefficients_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    table: '1'
+    note: Coefficient cells for the printed Cp(T) and G(T) functions.
+  values:
+    method_class: quoted_attributed
+    attribution: SGTE assessment, as stated in section 2.2.1
+    composition: NaFeO2(s)
+    heat_capacity_function_as_printed: Cp(T) = a + b × T − c/T², J mol−1 K−1
+    heat_capacity_coefficients_as_printed:
+      a: '100.77'
+      b: '0.0186'
+      c: '1479000'
+    gibbs_function_as_printed: G(T) = −g1 + g2 × T − g3 × T × ln(T) − g4 × T² + g5/T, J mol−1
+    gibbs_function_coefficients_as_printed:
+      g1: '723394'
+      g2: '455.159'
+      g3: '80.55'
+      g4: '0.006653'
+      g5: '0.0'
+    schema_gap: Cp and Gibbs-function coefficients are not Cp or formation Gibbs values themselves; no exact observation quantity
+      token applies.
+    schema_gap_symbols:
+    - simulator/battery/enums.py::Quantity.CP
+    - simulator/battery/enums.py::Quantity.DELTA_FG
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_table1_NaFeO2_function_coefficients
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: NaFeO2
+- observation_id: huang2003p2_thermodynamic_equations
+  type: thermodynamic_equation_context
+  units: as_printed
+  locator:
+    page: 2
+    published_page: 68
+    pdf_page_index: 1
+    section: 2.2.1
+    equation: '1'
+  values:
+    method_class: quoted_attributed
+    attribution: SGTE assessment [19]; equation (1) is repeated in this Part II source.
+    subject_as_printed: Gibbs formation function for NaFeO2(s) in subsection 2.2.1.
+    equation_as_printed: ΔfG°(Na4FeO3) = −701849.4 + 204.19 × T
+    units_as_printed: J mol−1; T in K
+    source_text_discrepancy: The subsection names NaFeO2 but equation (1) prints Na4FeO3; retained verbatim.
+  context_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram::context::huang2003p2_thermodynamic_equations
+  work_id: 10.1016/s0040-6031(03)00137-0
+  source_id: huang-furukawa-aoto-2003-sodium-iron-oxides-phase-diagram
+  species: Na(g)
